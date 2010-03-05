@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" y="39" x="11" width="100%" height="100%" 
+	verticalScrollPolicy="{bVerticalScrool}"
+	xmlns:local="flexlib.containers.*" creationComplete="init()"
+	frameRate="1"
+	backgroundAlpha="{BackgroundAlpha}" backgroundColor="#88610E">
+	<mx:Script>
+		<![CDATA[
+			import jardin.DocHerbe;
+			import mx.controls.Image;
+		
+		import mx.controls.Alert;
+		import mx.collections.Sort;
+		import mx.controls.LinkButton;
+		import mx.collections.SortField;
+		import mx.rpc.events.FaultEvent;
+		import mx.rpc.events.ResultEvent;
+		import mx.collections.ArrayCollection;
+	
+		import flash.events.Event;
+		
+	    import flash.display.Sprite;
+	    import ws.tink.display.HitTest;
+	    import flash.geom.Rectangle;
+		
+		[Bindable]
+		public var MinFontSize:Number = 10;
+		
+		[Bindable]
+		public var MaxFontSize:Number = 25;
+		
+		[Bindable]
+		public var HoverColor:uint = 0xFF66666;
+		
+		[Bindable]
+		public var FontColor:uint = 0xFFFFFF;
+		
+		[Bindable]
+		public var XmlFileSource:String = "";
+		
+		[Bindable]
+		public var TagFieldName:String = "";
+		
+		[Bindable]
+		public var BackgroundColor:uint = 0xFFFFFF;
+		
+		[Bindable]
+		public var BackgroundAlpha:Number = 1;
+
+		[Bindable]
+		public var limiteTerre:int=500;
+
+		[Bindable]
+		public var minOccurTag:int=10;
+
+		[Bindable]
+		public var pluie:Boolean=false;
+		
+		[Bindable]
+		public var bVerticalScrool:String="off";
+
+		[Bindable]
+		public var tgTerre:TagCloud;
+
+		[Bindable]
+		public var tgCiel:TagCloud;
+		
+		private function init():void
+		{
+			if(pluie){
+				btnMakeEco.label = "Make Rain"
+			}else{
+				btnMakeEco.label = "Make Compost"			
+			}
+		}
+
+		private function load():void
+		{
+			if(XmlFileSource != '' && TagFieldName != '')
+			{
+				XMLService.url = XmlFileSource+this.login.text; 
+				XMLService.send();
+			}
+			else
+			{
+				Alert.show("XML source not specified.");	
+			}		
+		}
+		
+		private function resultHandler(evt:ResultEvent):void
+		{
+			//nettoie les tags
+			ClearScreen(this);
+			if(!pluie){
+				ClearScreen(tgCiel);
+				tgCiel.load();			
+			}			
+			buildTagCloud(new XML(evt.result));
+		}
+
+		private function ClearScreen(tg:TagCloud):void{
+			
+			//nettoie les tags
+			var arr:Array=tg.getChildren();
+			var id:String;
+			for each(var dObj:Object in arr){
+				id = dObj.id;
+				if(id.substr(0,4)=="http"){
+					tg.removeChild(DisplayObject(dObj));						
+				}
+			}
+			tg.graphics.clear();
+			
+		}		
+		private function errorHandler(evt:FaultEvent):void
+		{
+			Alert.show("Error: " + evt.fault.message);
+		}
+		
+		private function buildTagCloud(xml:XML):void
+		{
+						
+			//récupération des item du flux rss
+			var x:XMLList = xml.channel.item;
+			
+			//redimensionne le canvas
+			/*
+			if(pluie){
+				this.height = x.length()*6;
+			}else{
+				this.height = x.length()*6;
+				this.tgCiel.limiteTerre = this.height+tgCiel.height;				
+			}
+			*/
+			
+			//var a:ArrayCollection = new ArrayCollection();
+			//var s:String = ""; 
+			//var last:String = "";
+			//var n:int = 1;
+			var max:int;
+			max = getMaxOccur(x);
+			//var i:Number = 0; 
+			//boucle sur chaque item
+			for each (var item:XML in x){
+				var title:String = item.title;
+				var nb:int = item.description;
+				var url:String = item.guid;
+				if(nb>minOccurTag){
+					if(pluie){
+						this.addChild(createTagLink(title, getFontHeight(nb, max),url));
+					}else{
+						tagContainer.addChild(createTagLink(title, getFontHeight(nb, max),url));
+					}
+				}
+			}
+			
+		}
+		
+		private function createTagLink(label:String, size:Number, url:String):LinkButton
+		{
+			var tag:LinkButton = new LinkButton();
+			tag.label = label;
+			tag.id = url;
+			tag.setStyle("fontWeight","normal");
+			tag.setStyle("fontFamily","Verdana");
+			tag.setStyle("paddingRight",0);
+			tag.setStyle("paddingLeft",0);
+			tag.setStyle("fontSize", size);
+			tag.setStyle("focusAlpha", 0.5);
+			
+			if(pluie)
+				tag.setStyle("color", "white");
+			else
+				tag.setStyle("color", "black");
+			tag.setStyle("textRollOverColor", HoverColor)
+			tag.alpha = 0;
+			tag.addEventListener(MouseEvent.CLICK, tagClickHandler);
+			
+			if(pluie){
+				tag.addEventListener(Event.ENTER_FRAME, enterFrameHandler);
+			}
+			return tag;	
+		}
+        
+        // get the maximum times a tag occurs for scaling.
+		private function getMaxOccur(x:XMLList):Number
+		{
+			var max:int = 1;
+			
+			for each (var item:XML in x){
+				var n:int = item.description;
+				if(n > max) max = n;
+			} 
+			
+			return max;
+		}
+		
+		public function tagClickHandler(evt:MouseEvent):void
+		{
+			navigateToURL(new URLRequest(evt.target.id), 'quote')
+			//Alert.show("You clicked: " + evt.target.label);
+			//tagContainer.addChild(LinkButton(evt.target));
+		}
+
+		private function enterFrameHandler(e:Event):void {
+			
+			var limiteNuageBas:int=200;
+			var limiteNuageHaut:int=20;
+			var limiteNuageDroite:int=this.width;
+			var limiteNuageGauche:int=0;
+			var limiteSortie:int=5;
+			var limiteReste:int=2000;
+			var vitessePluie:int=30;
+			
+			if(e.target.y > limiteTerre){
+				//le tag arrive sur la terre
+				e.target.y = limiteNuageHaut;
+			}else if(e.target.y > limiteNuageBas){
+				//le tag est sorti du nuage
+				e.target.y = e.target.y + vitessePluie;
+				//vérifie le hit test
+				var arrTag:Array = tgTerre.tagContainer.getChildren();
+				for each (var tag:Object in arrTag){
+		            var intersection:Rectangle = HitTest.complexIntersectionRectangle(DisplayObject(e.target), DisplayObject(tag), 5 );
+		            var hit:Boolean = ( intersection.width > 0 && intersection.height > 0 );
+					if(hit){
+						//vérifie que le tag est équivalent
+						if(tag.label == e.target.label){
+							//affiche le document
+							tgTerre.DrawDoc(LinkButton(tag));
+							//change le style du tag
+							tag.setStyle("color", "0xFF0000");
+							//supprime la pluie
+							//e.target.setStyle("color", "0xFF0000");
+							this.removeChild(DisplayObject(e.target));
+						}
+					}
+				} 
+			}else{
+				//le tag bouge dans le nuage
+				var bMove:int = randomNumber(0, limiteReste);
+				if(bMove>limiteSortie){
+					e.target.y = randomNumber(limiteNuageHaut, limiteNuageBas); 
+					e.target.x = randomNumber(limiteNuageGauche, limiteNuageDroite);
+					//e.target.alpha = randomNumber(0, 100);
+				}else{
+					//le tag sort du nuage
+					e.target.y = limiteNuageBas + 1;					
+				}
+			}
+		}
+		
+		public function DrawDoc(tag:LinkButton):void{
+
+			var dh:DocHerbe=new DocHerbe("http://feeds.delicious.com/v2/rss/"+tgCiel.login.text+"/"+tag.label,this,this.tgCiel,tag);
+			dh.send();
+		} 
+		
+        public function drawBourgeon(x:Number,y:Number,id:String,brgSize:int,img:Class):void {
+
+			var brg:Image= new Image();	
+			brg.source = img;
+			brg.x = x-brgSize;
+			brg.y = y;
+			brg.width = brgSize;
+			brg.height = brgSize;
+			brg.id = id;
+			brg.addEventListener(MouseEvent.CLICK, tagClickHandler);
+			this.addChild(brg);
+			            
+        }
+
+		
+		// scaling between occurences and font size
+		// @occurences - the # of times a tag has occured in the xml
+		// @maxoccur - the largest occurence value 
+		public function getFontHeight(occurences:int, maxoccur:int):int
+		{
+			var interval:int = Math.round((MaxFontSize - MinFontSize) / 3);
+			var ht:int = MinFontSize;
+			
+			if(occurences == maxoccur)
+			{
+				// largest size
+				ht = MaxFontSize;
+			}
+			else if(occurences >= (maxoccur / 2))
+			{
+				ht = MaxFontSize - interval;
+			}
+			else if(occurences > 1)
+			{
+				ht = MinFontSize + interval;
+			}
+			else
+			{
+				// smallest/default size
+				ht = MinFontSize;
+			}
+			
+			return ht;
+		}
+
+		/** 
+		* Generate a random number
+		* @return Random Number
+		* @error throws Error if low or high is not provided
+		* http://scriptplayground.com/tutorials/as/Generate-random-number-in-ActionScript-3/
+		*/  
+		public function randomNumber(low:Number=NaN, high:Number=NaN):Number
+		{
+		  var low:Number = low;
+		  var high:Number = high;
+		
+		  if(isNaN(low))
+		  {
+		    throw new Error("low must be defined");
+		  }
+		  if(isNaN(high))
+		  {
+		    throw new Error("high must be defined");
+		  }
+		
+		  return Math.round(Math.random() * (high - low)) + low;
+		}
+
+
+		]]>
+	</mx:Script>
+	<mx:HBox id="bLogin"  horizontalAlign="left" height="100%" width="100%" 
+		backgroundColor="{BackgroundColor}" backgroundAlpha="{BackgroundAlpha}"
+		>
+		<mx:Label text="delicious login" color="white" />
+		<mx:TextInput id="login" />
+		<mx:Button id="btnMakeEco" label="make rain" click="load()" 
+			themeColor="#FF00F6" alpha="0.69" borderColor="#C8234D" 
+			cornerRadius="0" fillAlphas="[1.0, 0.36, 0.36, 0.36]" fillColors="[#CA7C9F, #CA7CBE, #DE0868, #DE0868]"/>		
+	</mx:HBox>
+	<mx:HTTPService fault="errorHandler(event)" showBusyCursor="true" id="XMLService" resultFormat="e4x" url="{XmlFileSource}" result="resultHandler(event)" />
+	<local:FlowBox y="26" width="100%" height="100%" horizontalScrollPolicy="off" id="tagContainer" verticalAlign="bottom" 
+		backgroundColor="{BackgroundColor}" backgroundAlpha="{BackgroundAlpha}" horizontalAlign="center" horizontalGap="0" verticalGap="0" >
+	</local:FlowBox>
+	
+</mx:Canvas>
