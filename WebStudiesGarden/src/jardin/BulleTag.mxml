@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+	creationComplete="init()"
+	 
+
+	>
+	<mx:Script>
+		<![CDATA[
+	    import flash.display.Sprite;
+	    import ws.tink.display.HitTest;
+	    import flash.geom.Rectangle;
+		import mx.events.FlexEvent;
+
+		[Bindable]
+		public var pluie:Boolean=true;
+		[Bindable]
+		public var _label:String;
+		[Bindable]
+		public var _size:Number;
+		[Bindable]
+		public var _url:String;
+		[Bindable]
+		public var limiteTerre:int=500;
+		[Bindable]
+		public var limiteNuageDroite:int=200;
+		[Bindable]
+		public var tgTerre:TagCloud;
+		
+		private var FaitBulle:Boolean=true;
+					
+		private function init():void
+		{
+			createTag();
+		}			
+
+		public function createBulle():void
+		{
+			FaitBulle=false;
+			var env:int=20;
+			this.graphics.clear();
+			this.graphics.beginFill( 0xFFFFFF,0.3)
+			this.graphics.drawEllipse(-env, -env, _tag.width+(env*2), _tag.height+(env*2));
+			this.graphics.endFill();
+			if(!pluie){
+				this.addEventListener( MouseEvent.MOUSE_DOWN, onCircleMouseDown );
+				this.addEventListener( MouseEvent.MOUSE_MOVE, onStageMouseMove );
+				this.addEventListener( MouseEvent.MOUSE_UP, onStageMouseUp );
+			}			
+		}
+
+		private function createTag():void
+		{
+			_tag.label = _label;
+			_tag.id = _url;
+			_tag.setStyle("fontWeight","normal");
+			_tag.setStyle("fontFamily","Verdana");
+			_tag.setStyle("paddingRight",0);
+			_tag.setStyle("paddingLeft",0);
+			_tag.setStyle("fontSize", _size);
+			_tag.setStyle("focusAlpha", 0.5);
+						
+			if(pluie)
+				_tag.setStyle("color", "white");
+			else
+				_tag.setStyle("color", "black");
+			_tag.setStyle("textRollOverColor", "red")
+			_tag.alpha = 0;
+			_tag.addEventListener(MouseEvent.CLICK, tagClickHandler);
+			
+			if(pluie){
+				_tag.addEventListener(Event.ENTER_FRAME, enterFrameHandler);
+			}
+
+		}
+
+		private function onCircleMouseDown( event:MouseEvent ):void
+		{
+			this.startDrag( false );
+		}
+		
+		private function onStageMouseMove( event:MouseEvent ):void
+		{
+			/*
+			var intersection:Rectangle = HitTest.complexIntersectionRectangle( _circle0, _circle1, 5 );
+			var hit:Boolean = ( intersection.width > 0 && intersection.height > 0 );
+			
+			_intersection.graphics.clear();
+			if( hit )
+			{
+				_intersection.graphics.beginFill( 0xFF0000, 0.5 );
+				_intersection.graphics.drawRect( intersection.x, intersection.y, intersection.width, intersection.height );
+				_intersection.graphics.endFill();
+			}
+			
+			if( hit != _hit )
+			{
+				_hit = hit;
+				var color:Number = ( _hit ) ? 0x00FF00 : 0xFFFFFF;
+				draw( _circle0, color );
+				draw( _circle1, color );
+			}
+			*/
+		}
+		
+		private function onStageMouseUp( event:MouseEvent ):void
+		{
+			this.stopDrag();
+		}
+		
+
+
+		public function tagClickHandler(evt:MouseEvent):void
+		{
+			navigateToURL(new URLRequest(evt.target.id), 'quote')
+		}
+		
+
+		private function enterFrameHandler(e:Event):void {
+			
+			var limiteNuageBas:int=200;
+			var limiteNuageHaut:int=20;
+			var limiteNuageGauche:int=0;
+			var limiteSortie:int=5;
+			var limiteReste:int=2000;
+			var vitessePluie:int=30;
+			
+			if(this.y > limiteTerre){
+				//le tag arrive sous la terre
+				this.y = limiteNuageHaut;
+			}else if(this.y > limiteNuageBas){
+				//le tag est sorti du nuage
+				this.y = this.y + vitessePluie;
+	            //vérifie le tag touche la terre
+	            var intersection:Rectangle = HitTest.complexIntersectionRectangle(DisplayObject(this), tgTerre.bLogin);
+	            var hit:Boolean = ( intersection.width > 0 && intersection.height > 0 );
+				if(hit)VerifCoherence();
+			}else{
+				//le tag bouge dans le nuage
+				var bMove:int = tgTerre.randomNumber(0, limiteReste);
+				if(bMove>limiteSortie){
+					this.y = tgTerre.randomNumber(limiteNuageHaut, limiteNuageBas); 
+					this.x = tgTerre.randomNumber(limiteNuageGauche, limiteNuageDroite);
+					//e.target.alpha = randomNumber(0, 100);
+				}else{
+					//le tag sort du nuage
+					if(FaitBulle)createBulle();
+					this.y = limiteNuageBas + 1;
+					//le tag arrive sur terre
+				}
+			}
+		}
+
+		public function VerifCoherence():void
+		{
+
+				var arrTag:Array = tgTerre.tagContainer.getChildren();
+				for each (var tag:Object in arrTag){
+					//vérifie que le tag est équivalent
+					if(tag._label == this._label){
+						tag.createBulle()
+						//affiche le document
+						tgTerre.DrawDoc(BulleTag(tag));
+						//change le style du tag
+						tag.setStyle("color", "0xFF0000");
+						//supprime la pluie
+						//this.parentApplication.removeChild(this);
+						this.visible=false;
+						this.removeEventListener(Event.ENTER_FRAME, enterFrameHandler);
+					}
+				} 
+
+		}
+		
+		
+		]]>
+	</mx:Script>
+	<mx:LinkButton id="_tag" x="0" y="0" label="LinkButton" />
+	
+</mx:Canvas>
