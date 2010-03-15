@@ -6,6 +6,8 @@
 	backgroundAlpha="{BackgroundAlpha}" backgroundColor="#88610E">
 	<mx:Script>
 		<![CDATA[
+			import jardin.BulleTag;
+			import jardin.BulleTerre;
 			import jardin.DocHerbe;
 			import mx.controls.Image;
 		
@@ -104,10 +106,10 @@
 			var arr:Array=tg.getChildren();
 			var id:String;
 			for each(var dObj:Object in arr){
-				id = dObj.id;
-				if(id.substr(0,4)=="http"){
+				if(dObj is BulleTag || dObj is Image){			
 					tg.removeChild(DisplayObject(dObj));						
 				}
+				if(dObj.id=="tagContainer")tagContainer.removeAllChildren();
 			}
 			tg.graphics.clear();
 			
@@ -145,12 +147,24 @@
 				var title:String = item.title;
 				var nb:int = item.description;
 				var url:String = item.guid;
+				var bulle:BulleTag;
 				if(nb>minOccurTag){
+					bulle = new BulleTag();
+					bulle.tgTerre = this.tgTerre;
+					bulle._label = title;
+					bulle._size = getFontHeight(nb, max);
+					bulle._url = url;
+
 					if(pluie){
-						this.addChild(createTagLink(title, getFontHeight(nb, max),url));
+						//this.addChild(createTagLink(title, getFontHeight(nb, max),url));
+						bulle.limiteNuageDroite = this.width;
+						bulle.limiteTerre = this.limiteTerre;
+						this.addChild(bulle);
 					}else{
-						tagContainer.addChild(createTagLink(title, getFontHeight(nb, max),url));
-					}
+						//tagContainer.addChild(createTagLink(title, getFontHeight(nb, max),url));
+						bulle.pluie=false;
+						tagContainer.addChild(bulle);
+					}					
 				}
 			}
 			
@@ -167,7 +181,7 @@
 			tag.setStyle("paddingLeft",0);
 			tag.setStyle("fontSize", size);
 			tag.setStyle("focusAlpha", 0.5);
-			
+						
 			if(pluie)
 				tag.setStyle("color", "white");
 			else
@@ -227,7 +241,7 @@
 						//vérifie que le tag est équivalent
 						if(tag.label == e.target.label){
 							//affiche le document
-							tgTerre.DrawDoc(LinkButton(tag));
+							tgTerre.DrawDoc(BulleTag(tag));
 							//change le style du tag
 							tag.setStyle("color", "0xFF0000");
 							//supprime la pluie
@@ -250,9 +264,9 @@
 			}
 		}
 		
-		public function DrawDoc(tag:LinkButton):void{
+		public function DrawDoc(bt:BulleTag):void{
 
-			var dh:DocHerbe=new DocHerbe("http://feeds.delicious.com/v2/rss/"+tgCiel.login.text+"/"+tag.label,this,this.tgCiel,tag);
+			var dh:DocHerbe=new DocHerbe("http://feeds.delicious.com/v2/rss/"+tgCiel.login.text+"/"+bt._label,this,this.tgCiel,bt);
 			dh.send();
 		} 
 		

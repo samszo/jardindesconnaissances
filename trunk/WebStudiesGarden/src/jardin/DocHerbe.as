@@ -4,15 +4,13 @@ package jardin
     import flash.events.*;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
-    
-    import mx.controls.LinkButton;
 	
 	public class DocHerbe extends Sprite
 	{
 		public var _url:String;
 		public var _tgTerre:TagCloud;
 		public var _tgCiel:TagCloud;
-		public var _tag:LinkButton;
+		public var _tag:BulleTag;
 
 		[Embed(source="bourgeon.png")]
         [Bindable]
@@ -21,7 +19,7 @@ package jardin
         [Bindable]
         public var bourgeonL:Class; 
 
-		public function DocHerbe(url:String, tgT:TagCloud, tgC:TagCloud, tag:LinkButton)
+		public function DocHerbe(url:String, tgT:TagCloud, tgC:TagCloud, tag:BulleTag)
 		{
 			_url = url
 			_tgTerre=tgT;
