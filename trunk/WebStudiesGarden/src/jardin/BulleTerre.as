@@ -5,6 +5,7 @@ package jardin
 	import flash.events.MouseEvent;
 	
 	import mx.controls.LinkButton;
+    import flash.geom.Rectangle;
 
 	public class BulleTerre extends Sprite
 	{
