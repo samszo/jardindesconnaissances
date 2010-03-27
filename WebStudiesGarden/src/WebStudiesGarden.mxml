@@ -8,9 +8,10 @@
 			
 		]]>
 	</mx:Script>
+
 	<local:TagCloud id="CielTagCloud" 
 		pluie="true" limiteTerre="3400" tgTerre="{TerreTagCloud}"
-		minOccurTag="1"
+		minOccurTag="1" cloudnetwork="false"
 		MaxFontSize="32" MinFontSize="10" 
 		width="100%" height="4600" x="10" y="10" 
 		XmlFileSource="http://feeds.delicious.com/v2/rss/tags/" TagFieldName="item" 
