@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="400" height="300"
+		creationComplete="load()"
+	>
+	<mx:Script>
+		<![CDATA[
+
+		import mx.controls.Alert;
+		import mx.collections.Sort;
+		import mx.controls.LinkButton;
+		import mx.collections.SortField;
+		import mx.rpc.events.FaultEvent;
+		import mx.rpc.events.ResultEvent;
+		import mx.collections.ArrayCollection;
+	
+		import flash.events.Event;
+		
+	    import flash.display.Sprite;
+	    import ws.tink.display.HitTest;
+	    import flash.geom.Rectangle;
+		
+		[Bindable]
+		public var MinFontSize:Number = 10;
+		
+		[Bindable]
+		public var MaxFontSize:Number = 25;
+		
+		[Bindable]
+		public var HoverColor:uint = 0xFF66666;
+		
+		[Bindable]
+		public var FontColor:uint = 0xFFFFFF;
+		
+		[Bindable]
+		public var XmlFileSource:String = "";
+		
+		[Bindable]
+		public var TagFieldName:String = "";
+		
+		[Bindable]
+		public var BackgroundColor:uint = 0xFFFFFF;
+		
+		[Bindable]
+		public var BackgroundAlpha:Number = 1;
+
+		[Bindable]
+		public var limiteTerre:int=500;
+
+		[Bindable]
+		public var minOccurTag:int=10;
+
+		[Bindable]
+		public var pluie:Boolean=false;
+		
+		[Bindable]
+		public var tgTerre:TagCloud;
+
+		[Bindable]
+		public var tgCiel:TagCloud;
+		
+		private function load():void
+		{
+			if(XmlFileSource != '' && TagFieldName != '')
+			{
+				XMLService.send();
+			}
+			else
+			{
+				Alert.show("XML source not specified.");	
+			}		
+		}
+
+		private function resultHandler(evt:ResultEvent):void
+		{
+			buildTagCloud(new XML(evt.result));
+		}
+
+		private function errorHandler(evt:FaultEvent):void
+		{
+			//Alert.show("Error: " + evt.fault.message);
+		}
+
+		private function buildTagCloud(xml:XML):void
+		{
+						
+			//récupération des item du flux rss
+			var x:XMLList = xml.channel.item;
+			
+			var max:int;
+			max = getMaxOccur(x);
+
+			//boucle sur chaque item
+			for each (var item:XML in x){
+				var title:String = item.title;
+				var nb:int = item.description;
+				var url:String = item.guid;
+				var bulle:BulleTag;
+				if(nb>minOccurTag){
+					bulle = new BulleTag();
+					bulle.tgTerre = this.tgTerre;
+					bulle._label = title;
+					bulle._size = getFontHeight(nb, max);
+					bulle._url = url;
+					bulle.limiteNuageDroite = this.width;
+					bulle.limiteTerre = this.limiteTerre;
+					this.addChild(bulle);
+				}
+			}
+			
+		}
+
+        // get the maximum times a tag occurs for scaling.
+		private function getMaxOccur(x:XMLList):Number
+		{
+			var max:int = 1;
+			
+			for each (var item:XML in x){
+				var n:int = item.description;
+				if(n > max) max = n;
+			} 
+			
+			return max;
+		}
+
+		private function enterFrameHandler(e:Event):void {
+			
+			var limiteNuageBas:int=200;
+			var limiteNuageHaut:int=20;
+			var limiteNuageDroite:int=this.width;
+			var limiteNuageGauche:int=0;
+			var limiteSortie:int=5;
+			var limiteReste:int=2000;
+			var vitessePluie:int=30;
+			
+			if(e.target.y > limiteTerre){
+				//le tag arrive sur la terre
+				e.target.y = limiteNuageHaut;
+			}else if(e.target.y > limiteNuageBas){
+				//le tag est sorti du nuage
+				e.target.y = e.target.y + vitessePluie;
+				//vérifie le hit test
+				var arrTag:Array = tgTerre.tagContainer.getChildren();
+				for each (var tag:Object in arrTag){
+		            var intersection:Rectangle = HitTest.complexIntersectionRectangle(DisplayObject(e.target), DisplayObject(tag), 5 );
+		            var hit:Boolean = ( intersection.width > 0 && intersection.height > 0 );
+					if(hit){
+						//vérifie que le tag est équivalent
+						if(tag.label == e.target.label){
+							//affiche le document
+							tgTerre.DrawDoc(BulleTag(tag));
+							//change le style du tag
+							tag.setStyle("color", "0xFF0000");
+							//supprime la pluie
+							//e.target.setStyle("color", "0xFF0000");
+							this.removeChild(DisplayObject(e.target));
+						}
+					}
+				} 
+			}else{
+				//le tag bouge dans le nuage
+				var bMove:int = this.tgCiel.randomNumber(0, limiteReste);
+				if(bMove>limiteSortie){
+					e.target.y = this.tgCiel.randomNumber(limiteNuageHaut, limiteNuageBas); 
+					e.target.x = this.tgCiel.randomNumber(limiteNuageGauche, limiteNuageDroite);
+					//e.target.alpha = randomNumber(0, 100);
+				}else{
+					//le tag sort du nuage
+					e.target.y = limiteNuageBas + 1;					
+				}
+			}
+		}
+
+		// scaling between occurences and font size
+		// @occurences - the # of times a tag has occured in the xml
+		// @maxoccur - the largest occurence value 
+		public function getFontHeight(occurences:int, maxoccur:int):int
+		{
+			var interval:int = Math.round((MaxFontSize - MinFontSize) / 3);
+			var ht:int = MinFontSize;
+			
+			if(occurences == maxoccur)
+			{
+				// largest size
+				ht = MaxFontSize;
+			}
+			else if(occurences >= (maxoccur / 2))
+			{
+				ht = MaxFontSize - interval;
+			}
+			else if(occurences > 1)
+			{
+				ht = MinFontSize + interval;
+			}
+			else
+			{
+				// smallest/default size
+				ht = MinFontSize;
+			}
+			
+			return ht;
+		}
+
+
+		]]>
+	</mx:Script>
+	
+	<mx:HTTPService fault="errorHandler(event)" showBusyCursor="true" id="XMLService" resultFormat="e4x" url="{XmlFileSource}" result="resultHandler(event)" />
+
+</mx:Canvas>
