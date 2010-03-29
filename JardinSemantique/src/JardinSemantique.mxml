@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute"
+	creationComplete="onCreationComplete()" 
+	xmlns:piemenu="com.finflex.piemenu.*" xmlns:paint="com.degrafa.paint.*" >
+	
+	<mx:Script>
+		<![CDATA[
+			import jardin.CloudUser;
+			import jardin.SpriteUIComponent;
+			import mx.controls.Alert;
+			import mx.collections.ArrayCollection;
+			import mx.utils.ObjectUtil;
+			
+			import com.finflex.piemenu.MenuItem;
+			import com.finflex.piemenu.PieMenu;
+			
+			public var tcUser:CloudUser; 
+			
+			public function onCreationComplete():void{
+				this.addEventListener(MouseEvent.CLICK, backgroundClick);
+
+				tcUser = new CloudUser("http://localhost/evalactisem/tmp/tags/luckysemiosis.xml");
+				addChild(new SpriteUIComponent (tcUser));
+
+			}
+			
+			public function backgroundClick(event:MouseEvent):void{
+				if(event.target == this){
+					
+					mxmlPie.x = event.stageX;
+					mxmlPie.y = event.stageY;
+					mxmlPie.show();
+				}
+				
+			}
+			
+		]]>
+	</mx:Script>
+	<piemenu:PieMenu id="mxmlPie" width="200" height="200" x="383" y="96" size="180">
+		<piemenu:fills>
+			<paint:SolidFill color="#ffffff" id="filli"/>
+		</piemenu:fills>
+		<piemenu:strokes>
+			<paint:SolidStroke color="#000000" id="stroke"/>
+		</piemenu:strokes>
+				
+		<piemenu:items>
+			
+			<piemenu:MenuItem fill="{filli}" stroke="{stroke}">
+				
+				<piemenu:MenuItem/>
+			
+			</piemenu:MenuItem>
+			
+			<piemenu:MenuItem>
+				
+				<piemenu:MenuItem/>
+				<piemenu:MenuItem/>
+				<piemenu:MenuItem/>
+			
+			</piemenu:MenuItem>
+			
+		</piemenu:items>
+		
+	</piemenu:PieMenu>
+	
+</mx:Application>
