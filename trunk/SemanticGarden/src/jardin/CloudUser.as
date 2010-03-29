@@ -10,14 +10,15 @@ package jardin
 		public var minOccurTag:int=1;
 		public var MinFontSize:Number = 6;
 		public var MaxFontSize:Number = 36;
+		public var MaxX:Number = 800;
+		public var MaxY:Number = 0;
 		 
 		public function CloudUser(url:String)
 		{
 			loadUserTag(url);
-			//makeFond();
 			//addEventListener( MouseEvent.MOUSE_DOWN, onMouseDown );
 			//addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
-			addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove);
+			//addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove);
 
 		}
 
@@ -25,10 +26,11 @@ package jardin
 		{
 			var fond:Sprite = new Sprite();
 			fond.graphics.clear();
-			fond.graphics.beginFill(0xF5D03A)
-			fond.graphics.drawRect(0,0,1000,1000);
+			fond.graphics.beginFill(0xFF0000,0.01)
+			fond.graphics.drawRect(0,0,this.MaxX,this.MaxY);
 			fond.graphics.endFill();
-			addChild(fond);
+			this.addChildAt(fond,0);
+			//this.addChild(fond);
 			
 		}
 
@@ -64,6 +66,7 @@ package jardin
 		{
 			try{
 				buildTagCloud(new XML(event.target.data));
+				makeFond();
 			}catch (err:Error){
 			 	// code to react to the error
 				trace ("CloudUser:resultHandler:erreur="+err.message);
@@ -101,7 +104,7 @@ package jardin
 						tagContainer.addChild(bulle);
 					}
 					*/
-					if(xBulle>1000){
+					if(xBulle>MaxX){
 						xBulle=0; 
 						yBulle += bulle.height 
 					} else {
@@ -113,6 +116,7 @@ package jardin
 					i++;				
 				}
 			}
+			MaxY = yBulle;
 			
 		}
 		

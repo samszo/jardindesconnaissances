@@ -3,6 +3,7 @@
 	<name>SemanticGarden</name>
 	<comment></comment>
 	<projects>
+		<project>DegrafaPieMenu</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

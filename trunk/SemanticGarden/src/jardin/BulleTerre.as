@@ -19,6 +19,8 @@ package jardin
 		public var _over:Boolean=false;
 		public var _jardin:SemanticGarden;
 
+		public	var bousso:Boussole;
+
 		public function BulleTerre(jardin:SemanticGarden, texte:String, size:int, url:String)
 		{
 			super();
@@ -29,23 +31,35 @@ package jardin
 			makeTag();
 			makeBulle();
 			//makeBrique();
+
+			bousso = new Boussole(_jardin.tcUser);
+			bousso.x = _bulle.width/2;
+			bousso.y = _bulle.height/2;
+			bousso.visible=false;
+			addChild(bousso);
+
+
 			addEventListener( MouseEvent.MOUSE_DOWN, onMouseDown );
 			addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
 			addEventListener( MouseEvent.MOUSE_OVER, onMouseOver);
 			addEventListener( MouseEvent.MOUSE_OUT, onMouseOut);
+			addEventListener( MouseEvent.CLICK, mouseClickHandler);
+
 			
 		}
-		
+
+
 		private function makeTag():void
 		{
-            _tag = new TextField();
+            _tag = new  TextField();
             _tag.text = _texte;
             _tag.x = _margeX;
             _tag.y = _margeY;
             _tag.autoSize = TextFieldAutoSize.LEFT;
             _tag.background = true;
             _tag.border = true;
-
+  			_tag.selectable = false;
+  
             var format:TextFormat = new TextFormat();
             format.font = "Verdana";
             format.color = 0xFF0000;
@@ -92,10 +106,14 @@ package jardin
 		{
 			this.stopDrag();
 		}
+        private function mouseClickHandler(event:MouseEvent):void {
+            bousso.drawPoly(10,6,0,0);
 
+            //event.updateAfterEvent();
+        }
 		private function onMouseOver( event:MouseEvent ):void
 		{
-			
+			/*
 			if(!_over){
 				_over = true;
 				this.tabIndex = 0;
@@ -105,10 +123,14 @@ package jardin
 				this.y = this.mouseY;				
 				trace ("BulleTerre:onMouseOver:scaleX="+scaleX+" - scaleY="+scaleY);
 			}
+			*/
+            bousso.visible=true;
+            _jardin.bousso.visible=false;
 		}
 
 		private function onMouseOut( event:MouseEvent ):void
 		{
+			/*
 			if(_over){
 				_over = false;
 				this.scaleX=1;
@@ -116,6 +138,8 @@ package jardin
 				_jardin.AddTag(this);
 				trace ("BulleTerre:onMouseOut:scaleX="+scaleX+" - scaleY="+scaleY);
 			}
+			*/
+            bousso.visible = false;			
 		}
 
 	}
