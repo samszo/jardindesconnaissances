@@ -106,11 +106,13 @@
 			if(cloudnetwork)	
 				buildNetworkCloud(new XML(evt.result));
 			else{
+				/*
 				if(!pluie){
 					ClearScreen(tgCiel);
 					tgCiel.load();			
-				}else		
-					buildTagCloud(new XML(evt.result));
+				}
+				*/		
+				buildTagCloud(new XML(evt.result));
 			}
 
 		}
