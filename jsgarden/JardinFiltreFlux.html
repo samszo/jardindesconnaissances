@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="fr"> 
+    <head> 
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+    <meta name="viewport" content="width=device-width" />
+    <title>Jardin Filtre Flux</title> 
+    <link rel="stylesheet" href="demo.css" type="text/css" media="screen"> 
+    <link rel="stylesheet" href="demo-print.css" type="text/css" media="print"> 
+	<script src="jquery-1.4.4.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="raphael-min.js" type="text/javascript" charset="utf-8"></script> 
+    <script src="jardin.js" type="text/javascript" charset="utf-8"></script> 
+    <script src="graine.js" type="text/javascript" charset="utf-8"></script> 
+    <script src="nuage.js" type="text/javascript" charset="utf-8"></script> 
+    <script src="bulle.js" type="text/javascript" charset="utf-8"></script>
+    <script src="popup.js"></script> 
+    <script src="rhizome.js"></script> 
+    <script type="text/javascript" charset="utf-8"> 
+	window.onload = function () {
+		demandeCompte();
+	};
+	function demandeCompte(){
+		var saisie = prompt("Saisissez le nom du compte delicious ou annulez", "");
+		if (saisie!=null) {
+        	cultive(saisie);	
+		}else{
+        	cultive("luckysemiosis");	
+		}			
+	}
+	function cultive(compte){
+		//création de la scène
+		var R = Raphael("jardin", 960, 1280);
+		//création du jardin
+		var J = new jardin(R, 0, 0, 960, 1280, compte);
+		J.draw();
+		//évènement pour planter des graines
+		J.compost.node.onclick = function (event) {
+			J.planteGraine(event.pageX,event.pageY,"");
+		};
+		//création des nuages a partir d'un js en local
+		//J.data = data;
+		//J.setNuage();		
+		//création des nuages a partir des datas de delicious
+		var url = "http://feeds.delicious.com/v2/json/"+J.exis;
+		$.ajax({
+			type: "GET", 
+			dataType: "jsonp", 
+			url: url,
+			/*
+			complete: function (xhr, ajaxOptions, thrownError) { 
+				if(xhr.status == 404) { 
+					alert("le compte n'a pas été trouvé");
+			      	demandeCompte();
+				}else{ 
+					alert("le compte n'a pas été trouvé");
+			      	demandeCompte();
+				} 
+			},
+			*/  
+			success: function(data){
+				J.data = data;
+				J.setNuage("deliciousBookUser");
+			}
+		});
+				
+	}
+    </script> 
+    </head> 
+    <body> 
+		<div id="jardin"></div>
+    </body> 
+</html>
