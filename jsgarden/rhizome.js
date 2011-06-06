@@ -5,8 +5,10 @@ function rhizome(graine){
 	this.env = 10;
 	this.txts = new Array();
 	this.cirs = new Array();
+	this.tags = new Array();
 	this.paths = new Array();
 	this.tronc = 30;
+	this.maxX = 0;
 	
 	this.draw = function(){	
 		this.getHistoDeliciousTag();
@@ -26,7 +28,7 @@ function rhizome(graine){
 
 	this.pousse = function(){
 		var i, item, x, y, dt, hDate, nbItem = this.data.length
-			, txt, cir, path, courbe;
+			, txt, cir;
 		this.st = this.graine.jardin.R.set();
 		//calcul la nouvelle grille
 		for(i= 0; i < nbItem; i++){
@@ -44,16 +46,38 @@ function rhizome(graine){
 			item = this.data[i];
 			//calcul la position verticale par rapport à la date
 			dt = new Date(item["dt"]);
+			y = this.graine.jardin.getTempoY(dt);	
 			hDate = (this.graine.jardin.now-dt.getTime())/1000;
-			y = this.graine.jardin.terre.attr("y")+(this.graine.jardin.hSec*hDate);
+			
 			//création des graphiques
 			txt = this.graine.jardin.R.text(x+this.env, y, item["dt"]);
 			txt.attr({fill:"white", font: this.env+'px Helvetica, Arial'});
 			txt.hide();
 			cir = this.graine.jardin.R.circle(x, y, this.env);
 			cir.attr({fill:"white", opacity: 0.1});
-			//lien du noeud à la graine
-			path = "M"+x+" "+y+" L"+x+" "+this.graine.y;
+			this.txts.push(txt);
+			this.cirs.push(cir);
+			
+			var tags = item["t"], j, xTag, path="", courbe;
+			for(j= 0; j < tags.length; j++){
+				if(tags[j]!=this.graine.tag){
+					xTag = x+(this.env*3*(j+1));
+					//enregistre le max pour le placement de la prochaine graine
+					if(this.maxX < xTag)this.maxX = xTag;
+					//création du graphique pour le tag lié
+					cir = this.graine.jardin.R.circle(xTag, y, this.env);
+					cir.attr({fill:"orange", opacity: 0.3});
+					this.tags.push(cir);
+					this.st.push(cir);
+					//calcul le lien
+					if(path=="")path = "M"+xTag+" "+y; else	path += " L"+xTag+" "+y;
+				}
+			}
+
+			//lien du noeud 
+			if(path=="") path = "M"+x+" "+y; else path += " L"+x+" "+y;
+			//à la graine
+			path += " L"+x+" "+this.graine.y;
 			//lien de la graine à la branche
 			y = this.graine.jardin.compost.attr("y")-(this.graine.jardin.hSec*hDate/2)-this.tronc;
 			//M 231.42857,298.07647 C 365.10362,113.8281 441.48286,128.04512 454.28571,212.36218
@@ -62,12 +86,10 @@ function rhizome(graine){
 			else
 				courbe=" C"+(x+13.4)+","+(y-18.5)+" "+(x+21)+","+(y-17)+" "+(x+22)+","+(y-8);
 			path += " L"+x+" "+y+courbe;
-			
-			
+				
 			path = this.graine.jardin.R.path(path).attr({stroke: "green"});				
-			this.txts.push(txt);
-			this.cirs.push(cir);
 			this.paths.push(path);
+			
 			this.st.push(
 			    txt,
 			    cir,
@@ -81,22 +103,36 @@ function rhizome(graine){
 	}
 	this.redraw = function(){
 		//recalcul la position des noeuds
-		var i, courbe, path, hdate, dt, x = this.graine.x, nbItem = this.txts.length, duree = 2000;
+		var i, z=0, courbe, hdate, dt, x = this.graine.x, nbItem = this.txts.length, duree = 2000;
 		for(i= 0; i < nbItem; i++){
 			
 			//calcul la position verticale par rapport à la date
 			dt = new Date(this.data[i]["dt"]);
 			hDate = (this.graine.jardin.now-dt.getTime())/1000;
-			y = this.graine.jardin.terre.attr("y")+(this.graine.jardin.hSec*hDate);
+			y = this.graine.jardin.getTempoY(dt);	
 
 			//mise à jour du texte
 			this.txts[i].stop().animate({y:y, easing: "elastic"}, duree);
 
 			//mise à jour du noeud
 			this.cirs[i].stop().animate({cy: y, easing: "elastic"}, duree);
-
-			//lien lien
-			path = "M"+x+" "+y+" L"+x+" "+this.graine.y;
+			
+			//mise à jour du lien
+			var tags = this.data[i]["t"], j, path="", xTag;
+			for(j= 0; j < tags.length; j++){
+				if(tags[j]!=this.graine.tag){
+					xTag = x+(this.env*3*(j+1));
+					//calcul le lien
+					if(path=="")path = "M"+xTag+" "+y; else	path += " L"+xTag+" "+y;
+					//mise à jour des tags liés
+					this.tags[z].stop().animate({cy: y, easing: "elastic"}, duree);
+					z++;										
+				}
+			}
+			//lien du noeud 
+			if(path=="") path = "M"+x+" "+y; else path += " L"+x+" "+y;
+			//à la graine
+			path += " L"+x+" "+this.graine.y;
 			//lien de la graine à la branche
 			y = this.graine.jardin.compost.attr("y")-(this.graine.jardin.hSec*hDate/2)-this.tronc;
 			//M 231.42857,298.07647 C 365.10362,113.8281 441.48286,128.04512 454.28571,212.36218

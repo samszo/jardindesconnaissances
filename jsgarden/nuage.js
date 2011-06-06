@@ -16,6 +16,9 @@ function nuage(jardin, x, y, wCiel, data, type){
 	this.frame;
 	this.is_label_visible=false;
 	this.leave_timer;
+	this.TagNbMax=0;
+	this.TagNbMin=0;
+	this.TagIntervals = new Array();
 }
 nuage.prototype = { 
 
@@ -39,17 +42,7 @@ nuage.prototype = {
 				for(i= 0; i < this.data.length; i++){
 					if(i==0){
 						//création des éléments graphiques
-						this.txt = this.jardin.R.text(this.x, this.y, this.data[i]["a"]);
-						this.txt.attr({fill:"black", font: this.env+'px Helvetica, Arial'});
-						this.cx = this.txt.attr("text").length*this.env/3;
-						this.cy = this.env;
-						this.eli = this.jardin.R.ellipse(this.x, this.y, this.cx, this.cy);
-						this.eli.attr({fill:"black", opacity: 0.2});
-						this.st = this.jardin.R.set();
-						this.st.push(
-						    this.eli,
-						    this.txt
-						);
+						this.setForme(this.data[i]["a"]);
 					}				
 					//gestion des dates
 					var dt = new Date(this.data[i]["dt"]).getTime(); 
@@ -66,6 +59,22 @@ nuage.prototype = {
 				}
 				this.flotte(this.wCiel, 30000, true);
 				this.jardin.drawCouchesTempo();				
+		 		break;
+			case "deliciousTagsUser":
+				var item;
+				i=0;
+				this.calculTags();
+				for(item in this.data){				
+					if(i==0){
+						//création des éléments graphiques
+						this.setForme(this.jardin.exis);
+						i++;
+					}				
+					var e = new bulle(this, 0-this.cx, this.y, item, this.getTailleTag(this.data[item]));
+					e.draw();
+					this.bulles.push(e);
+				}
+				this.flotte(this.wCiel, 30000, true);
 		 		break;
 			case "jsonTags":
 				this.t = this.jardin.R.text(this.x, this.y, "luckysemiosis");
@@ -84,14 +93,67 @@ nuage.prototype = {
 		}
 
 	}
-	,
-	flotte: function(fin, duree, deb){
+	,calculTags: function(){
+		
+		//calcul les intervales
+		var nb;
+		for(item in this.data){		
+			//enregistre les intervalles d'occurence
+			nb = this.data[item];
+	    	if(this.TagNbMax < nb)
+				this.TagNbMax = nb;
+			if(this.TagNbMin > nb)
+				this.TagNbMin=nb;				
+		}
+		this.TagIntervals.push((this.TagNbMax-this.TagNbMin)/3);
+		this.TagIntervals.push((this.TagNbMax-this.TagNbMin)/1.5);		
+	}
+	,getTailleTag: function(nb) {
+		//calcul un interval par rapport à une taille cf. protovis pour le faire plus proprement
+		var taille;
+		if (nb <= this.TagNbMin) {
+			taille = 0.5;
+		} else if (nb > this.TagNbMin && nb <= this.TagIntervals[0]) {
+			taille = 1;
+		} else if (nb > this.TagIntervals[0] && nb <= this.TagIntervals[1]) {
+			taille = 3/2;
+		} else if (nb > this.TagIntervals[1] && nb < this.TagNbMax) {
+			taille = 4/2;
+		} else if (nb >= this.TagNbMax) {
+			taille = 5/2;
+		}
+		return taille*2;
+	}
+	,setForme: function(cpt){
+		//création des éléments graphiques
+		this.txt = this.jardin.R.text(this.x, this.y, cpt);
+		this.txt.attr({fill:"black", font: this.env+'px Helvetica, Arial'});
+		this.cx = this.txt.attr("text").length*this.env/3;
+		this.cy = this.env;
+		this.eli = this.jardin.R.ellipse(this.x, this.y, this.cx, this.cy);
+		this.eli.attr({fill:"black", opacity: 0.2});
+		this.st = this.jardin.R.set();
+		this.st.push(
+		    this.eli,
+		    this.txt
+		);
+	}
+	,flotte: function(fin, duree, deb){
 		var n = this, i, j=0, nb = this.bulles.length;
 		fin = fin + this.cx;
 		//vérifie s'il reste des bulles
 		for(i= 0; i < nb; i++){
 			if(this.bulles[i].txt.attr("fill")=="black")j++;
-			if(deb)this.bulles[i].bougeChaos(0);
+			//s'il y a trop de bulle on ne les fait pas bouger
+			if(nb<100){			
+				if(deb)this.bulles[i].bougeChaos(0);
+			}else{
+				//choisi si la bulle tombe 	
+				if((Math.random()*nb)>i){
+					this.bulles[i].st.attr("x")=this.txt.attr("x");
+					this.bulles[i].tombe(); 
+				}
+			}
 		}
 		if(j==0)return;		
 		this.st.attr({x: 0-this.cx, cx: 0-this.cx});

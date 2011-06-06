@@ -10,9 +10,10 @@ function graine(J, x, y, r){
 	this.fond;
 	this.st = new Array();
 	this.rhizomes = new Array();
+	this.txtL;
+	this.maxX;
 
-	this.draw = function(){
-		this.getCirclePoint();
+	this.draw = function(){	
 		var i;
 		this.st = this.jardin.R.set();
 		for (i=0; i < 6; i++){
@@ -48,7 +49,8 @@ function graine(J, x, y, r){
 
 		if(saisie=="")saisie = prompt("Saisissez votre tag :", "");
 		if (saisie!=null) {
-        	this.tag = saisie;
+        	this.tag = saisie; 
+			this.getPoints();
         	if(this.txt){
 				this.txt.attr({text:this.tag});
 			}else{
@@ -79,16 +81,25 @@ function graine(J, x, y, r){
 		}
 	}
 
-	this.getCirclePoint = function(){
+	this.getPoints = function(){
+		//recalcule le x en fonction de l'étendu du rhizome de la dernière graine
+		this.txtL = this.r*this.tag.length/5;
+		this.x = 100;
+		if(this.jardin.graines.length>0){
+			this.x = this.jardin.graines[this.jardin.graines.length-1].points[0][0]+(this.jardin.graines[this.jardin.graines.length-1].r*2);
+			var rhi = this.jardin.graines[this.jardin.graines.length-1].rhizomes[0]; 
+			if(rhi && this.x < rhi.maxX+(rhi.env*2))this.x = rhi.maxX+(rhi.env*2);
+		}
+
 		this.points = new Array();
-		var _x,_y, nbPoint = 6, pi = Math.PI, i, ope = this.r*this.tag.length/5;
+		var _x,_y, nbPoint = 6, pi = Math.PI, i;
 		for(i=0; i < nbPoint; i++){
 			_x = (Math.cos(2 * i * pi / nbPoint)*this.r)+this.x;
 			_y = (Math.sin(2 * i * pi / nbPoint)*this.r)+this.y;
 
 			//gestion de la largeur de l'exagone suivant le texte
-			if(i == 0 || i == 1) _x += ope;
-			if(i == 2 || i == 3 || i == 4) _x -= ope;
+			if(i == 0 || i == 1) _x += this.txtL;
+			if(i == 2 || i == 3 || i == 4) _x -= this.txtL;
 			if(i == 5) _x = this.points[1][0];
 
 			this.points.push(new Array(_x, _y));
@@ -111,6 +122,8 @@ function graine(J, x, y, r){
 						rhi.draw();
 						this.rhizomes.push(rhi);
 						bulle.remove(j);
+						j--;
+						nbBulle--;
 					}
 				}
 			}		
