@@ -74,7 +74,7 @@ jardin.prototype = {
 	    var nbJour = nbHeure/24;
 	    var nbMois = nbJour/30;
 	    var nbAn = nbJour/365;
-		var nbLigne, font = 12; maxInt = this.terre.attr("height")/font;
+		var nbLigne, font = 12; maxInt = 40;//this.terre.attr("height")/font;
 		
 		if(nbHeure < maxInt){
 			//on affiche les heures
@@ -95,13 +95,13 @@ jardin.prototype = {
 		this.hSec = (this.terre.attr("height")-100)/this.diffDate;
 
 		//trace les repères
-		var i, y, d, nbSec, path, txt; 
+		var i, x = this.x+10, y, d, path, txt; 
 		for (i=0; i <= nbLigne; i++){
 			//on affiche les heures
 			if(nbHeure < maxInt){
 				d = new Date(dN.getFullYear(), dN.getMonth(), dN.getDate(), dN.getHours(), 0, 0, 0);
 				d = new Date(d.getTime()-(i*60*60*1000));
-				strDate = d.toLocaleTimeString();
+				strDate = this.jours[d.getDay()] + ' ' +d.getHours() + ' H';
 			}else if(nbJour < maxInt){
 				//on affiche les jours
 				d = new Date(dN.getFullYear(), dN.getMonth(), dN.getDate(), 0, 0, 0, 0);
@@ -110,7 +110,7 @@ jardin.prototype = {
 			}else if(nbMois < maxInt){
 				//on affiche les mois
 				var nbY = parseInt((dN.getMonth()+i)/12);
-				var numM = dN.getMonth()-i-(12*nbY);
+				var numM = dN.getMonth()-i+(12*nbY);
 				d = new Date(dN.getFullYear()-nbY, numM, 1, 0, 0, 0, 0);
 				strDate = this.mois[d.getMonth()] + ' ' + d.getFullYear();
 			}else if(nbMois > maxInt){
@@ -118,13 +118,10 @@ jardin.prototype = {
 				d = new Date(dN.getFullYear()-i, 0, 1, 0, 0, 0, 0);
 				strDate = d.getFullYear();
 			}
-			//y = this.terre.attr("y")+(this.hInt*i);
-			nbSec = (this.now-d.getTime())/1000;
-			y = this.terre.attr("y")+(this.hSec*nbSec);
-			
+			y = this.getTempoY(d);		
 			path = "M"+this.x+" "+y+" L"+this.w+", "+y;
 			path = this.R.path(path).attr({stroke: "white"});
-			txt = this.R.text(this.x+100,y-10,strDate).attr({fill: "white", font: font+'px Helvetica, Arial'});
+			txt = this.R.text(x,y-10,strDate).attr({fill: "white", font: font+'px Helvetica, Arial', 'text-anchor':'start'});
 			this.setCouchesTempo.push(
 			    txt,
 			    path
@@ -140,4 +137,11 @@ jardin.prototype = {
 			}	
 		}
 	}
+	,
+	getTempoY: function (d) {
+		//y = this.terre.attr("y")+(this.hInt*i);
+		var nbSec = (this.now-d.getTime())/1000;
+		return this.terre.attr("y")+(this.hSec*nbSec)+20;
+	}
+
 }

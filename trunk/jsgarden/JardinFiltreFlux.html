@@ -16,8 +16,21 @@
     <script src="rhizome.js"></script> 
     <script type="text/javascript" charset="utf-8"> 
 	window.onload = function () {
-		demandeCompte();
+		if(svgWarning())demandeCompte();
 	};
+// Display a warning for browsers without SVG
+	var svgWarningHtml = '<div id="svgWarning" style="z-index: 1; width: 300px; padding: 8px 8px 8px 8px; position: fixed; top: 200px; left: 50%; margin-left: -150px; background: #ffd; border: solid 4px #b00; font-size: 14pt;"><div id="warnclose" style="position: absolute; right: 12px; color: white; font-weight: bold; cursor: default;" >X</div> <div id="warntitle" style="font-weight: bold; background: #b00; color: white; text-align: center;">WARNING</div> Votre navigateur ne supporte pas le SVG qui est utilisé par ce site. Veuillez utiliser <A href="http://www.w3.org/Graphics/SVG/WG/wiki/Implementations">un navigateur compatible</a>.</div></div>';
+	
+	function svgWarning() {
+	    // SVG test taken from Modernizr 2.0
+	    if (!!document.createElementNS &&
+	        !!document.createElementNS('http://www.w3.org/2000/svg', 'svg').createSVGRect)
+	        return true;
+	    // No SVG, do something about it.
+	    $("jardin").html(svgWarningHtml);
+        return false;
+	}
+
 	function demandeCompte(){
 		var saisie = prompt("Saisissez le nom du compte delicious ou annulez", "");
 		if (saisie!=null) {
@@ -28,9 +41,9 @@
 	}
 	function cultive(compte){
 		//création de la scène
-		var R = Raphael("jardin", 960, 1280);
+		var R = Raphael("jardin", 2560, 1280);
 		//création du jardin
-		var J = new jardin(R, 0, 0, 960, 1280, compte);
+		var J = new jardin(R, 0, 0, 2560, 1280, compte);
 		J.draw();
 		//évènement pour planter des graines
 		J.compost.node.onclick = function (event) {
@@ -39,7 +52,11 @@
 		//création des nuages a partir d'un js en local
 		//J.data = data;
 		//J.setNuage();		
-		//création des nuages a partir des datas de delicious
+		//création des nuages a partir des tags d'un compte delicious
+		//var type = "deliciousTagsUser";
+		//var url = "http://feeds.delicious.com/v2/json/tags/"+J.exis;
+		//création des nuages a partir du bookmark d'un compte delicious
+		var type = "deliciousBookUser";
 		var url = "http://feeds.delicious.com/v2/json/"+J.exis;
 		$.ajax({
 			type: "GET", 
@@ -58,7 +75,7 @@
 			*/  
 			success: function(data){
 				J.data = data;
-				J.setNuage("deliciousBookUser");
+				J.setNuage(type);
 			}
 		});
 				

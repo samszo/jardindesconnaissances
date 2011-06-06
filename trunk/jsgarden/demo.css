@@ -7,44 +7,44 @@ body {
 	position: relative; 
 	margin-left: auto; 
 	margin-right: auto; 
-	width: 960px; 
+	width: 2560px; 
 	text-align: left;
 }
-/* merci à http://www.alsacreations.com/astuce/lire/1177-une-feuille-de-styles-de-base-pour-le-web-mobile.html*/
+/* merci à http://www.alsacreations.com/astuce/lire/1177-une-feuille-de-styles-de-base-pour-le-web-mobile.html
 @media (max-width: 640px) { 
  
- /* passer tous les éléments de largeur fixe en largeur automatique */ 
+ // passer tous les éléments de largeur fixe en largeur automatique  
  body, element1, element2 { 
    width: auto !important; 
    margin: auto !important; 
    padding: auto !important; 
  } 
  
- /* fixer une largeur maximale  de 100 % aux éléments potentiellement problématiques */ 
+ // fixer une largeur maximale  de 100 % aux éléments potentiellement problématiques 
  img, table, td, blockquote, code, pre, textarea, input, iframe, object, embed, video { 
    max-width: 100% !important; 
  } 
  
- /* gestion des mots longs */ 
+ // gestion des mots longs  
  textarea, table, td, th, code, pre, samp { 
-   word-wrap: break-word; /* césure forcée */ 
+   word-wrap: break-word; // césure forcée  
  } 
  code, pre, samp { 
-   white-space: pre-line; /* passage à la ligne spécifique pour les éléments à châsse fixe */ 
+   white-space: pre-line; // passage à la ligne spécifique pour les éléments à châsse fixe  
  } 
  
- /* Passer à une seule colonne (à appliquer aux éléments multi-colonnes) */ 
+ // Passer à une seule colonne (à appliquer aux éléments multi-colonnes)  
  element1, element2 { 
    float: none !important; 
    width: auto !important 
  } 
  
- /* masquer les éléments superflus */ 
+ // masquer les éléments superflus  
  .hide_mobile { 
    display: none !important; 
  } 
  
- /* Un message personnalisé */ 
+ // Un message personnalisé 
  body:before { 
    content: "Version mobile du site"; 
    display: block; 
@@ -58,3 +58,4 @@ body {
    -webkit-text-size-adjust: 70%; 
   } 
 } 
+*/ 

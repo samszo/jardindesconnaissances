@@ -123,7 +123,7 @@ function bulle(nuage, x, y, tag, poids){
 			if(b && this.tag == b.tag){
 				b.st.stop()
 				b.st.remove();
-				//this.nuage.bulles.splice(i, 1);
+				this.nuage.bulles.splice(i, 1);
 			}
 		}
 	}
