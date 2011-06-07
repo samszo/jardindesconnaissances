@@ -24,18 +24,8 @@ nuage.prototype = {
 
 	draw: function(type, w){
 
-		var i
-			,txt = {font: '12px Helvetica, Arial', fill: "#fff"}
-        	,txt1 = {font: '10px Helvetica, Arial', fill: "#fff"}
-        	,colorhue = .6 || Math.random()
-        	,color = "hsb(" + [colorhue, .5, 1] + ")"
-        	;
-		this.label = this.jardin.R.set();
-	    this.label.push(this.jardin.R.text(60, 12, "---").attr(txt));
-	    this.label.push(this.jardin.R.text(60, 27, "---").attr(txt1).attr({fill: color}));
-	    this.label.hide();
-	    this.frame = this.jardin.R.popup(100, 100, this.label, "top").attr({fill: "#000", stroke: "#666", "stroke-width": 2, "fill-opacity": .7}).hide();
-	    
+		var i;
+
 		//dessine le nuage suivant le type de data
 		switch (this.type) {
 			case "deliciousBookUser":				

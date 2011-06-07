@@ -9,7 +9,7 @@ function rhizome(graine){
 	this.paths = new Array();
 	this.tronc = 30;
 	this.maxX = 0;
-	
+		
 	this.draw = function(){	
 		this.getHistoDeliciousTag();
 	}
@@ -28,7 +28,7 @@ function rhizome(graine){
 
 	this.pousse = function(){
 		var i, item, x, y, dt, hDate, nbItem = this.data.length
-			, txt, cir;
+			, txt, cir, rhi = this;
 		this.st = this.graine.jardin.R.set();
 		//calcul la nouvelle grille
 		for(i= 0; i < nbItem; i++){
@@ -54,20 +54,49 @@ function rhizome(graine){
 			txt.attr({fill:"white", font: this.env+'px Helvetica, Arial'});
 			txt.hide();
 			cir = this.graine.jardin.R.circle(x, y, this.env);
-			cir.attr({fill:"white", opacity: 0.1});
+			cir.attr({fill:"white", opacity: 0.3});
+			cir.id = rhi.graine.jardin.graines.length+"-"+i;
+			
 			this.txts.push(txt);
 			this.cirs.push(cir);
+			//affichage d'un popup 
+			cir.hover(function(event){
+					var id = this.id.split("-")[1];
+					var idDate = new Date(rhi.data[id]["dt"]);
+					rhi.graine.jardin.showPopup(this.attr("cx"), this.attr("cy"), [rhi.data[id]["d"],"date : "+idDate.getDate()+'-'+idDate.getMonth()+'-'+idDate.getFullYear()]);
+					rhi.paths[id].attr({stroke:"red"}).toFront();
+				}
+				,function (event) {
+					rhi.graine.jardin.hidePopup();
+					var id = this.id.split("-")[1];
+					rhi.paths[id].attr({stroke:"green"});
+	            }
+			);
 			
-			var tags = item["t"], j, xTag, path="", courbe;
+			var tags = item["t"], j, xTag, path="", courbe, cirT;
 			for(j= 0; j < tags.length; j++){
 				if(tags[j]!=this.graine.tag){
 					xTag = x+(this.env*3*(j+1));
 					//enregistre le max pour le placement de la prochaine graine
 					if(this.maxX < xTag)this.maxX = xTag;
 					//création du graphique pour le tag lié
-					cir = this.graine.jardin.R.circle(xTag, y, this.env);
-					cir.attr({fill:"orange", opacity: 0.3});
-					this.tags.push(cir);
+					cirT = this.graine.jardin.R.circle(xTag, y, this.env);
+					cirT.attr({fill:"orange", opacity: 0.3});
+					cirT.id = cir.id+"-"+j;				
+					this.tags.push(cirT);
+					
+					//affichage d'un popup 
+					cirT.hover(function(event){						
+							var ids = this.id.split("-");
+							rhi.graine.jardin.showPopup(this.attr("cx"), this.attr("cy"), [rhi.data[ids[1]]["d"],"tag : "+rhi.data[ids[1]]["t"][ids[2]]]);
+							rhi.paths[ids[1]].attr({stroke:"red"}).toFront();
+						}
+						,function (event) {
+							rhi.graine.jardin.hidePopup();
+							var id = this.id.split("-")[1];
+							rhi.paths[id].attr({stroke:"green"});
+			            }
+					);
 					this.st.push(cir);
 					//calcul le lien
 					if(path=="")path = "M"+xTag+" "+y; else	path += " L"+xTag+" "+y;
@@ -95,6 +124,7 @@ function rhizome(graine){
 			    cir,
 			    path
 			);
+			
 		}
 		this.graine.st.toFront();
 		this.graine.fond.toFront();
