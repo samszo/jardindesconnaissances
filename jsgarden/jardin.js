@@ -21,10 +21,27 @@ function jardin(R, x, y, w, h, exis){
 	this.setCouchesTempo;
 	this.jours = ['Dimanche', 'Lundi','Mardi','Mercredi','Jeudi','Vendredi', 'Samedi'];
 	this.mois = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+	this.label;
+	this.frame;
+	this.is_label_visible=false;
+	this.leave_timer;
+	
 }
 jardin.prototype = { 
 
 	draw: function(){
+	
+		//popup
+		var i
+			,txt = {font: '18px Helvetica, Arial', fill: "black"}
+        	,txt1 = {font: '14px Helvetica, Arial', fill: "black"}
+  			;
+		this.label = this.R.set();
+	    this.label.push(this.R.text(60, 10, "---").attr(txt));
+	    this.label.push(this.R.text(60, 30, "---").attr(txt1));
+	    this.label.hide();
+	    this.frame = this.R.popup(100, 100, this.label, "top").attr({fill: "white", stroke: "green", "stroke-width": 2, "fill-opacity": .7}).hide();
+			
 		//création du cadre pour le ciel
 		this.ciel = this.R.rect(this.x, this.y, this.w, this.h/2);		
 		this.ciel.attr({fill:"white"});
@@ -35,28 +52,43 @@ jardin.prototype = {
 		this.terre = this.R.rect(this.x, (this.h/2)+this.hCompost, this.w, this.h/2);		
 		this.terre.attr({fill:"black"});
 	}
-	,
-	planteGraine: function(x,y,tag){
+	,showPopup: function(x, y, infos){
+		clearTimeout(this.leave_timer);
+		this.label[0].attr({text: infos[0]}).stop().hide();
+        this.label[1].attr({text: infos[1]}).stop().hide();
+		var ppp = this.R.popup(x, y, this.label, "top", 1);
+		this.frame.show().stop().toFront().animate({path: ppp.path}, 200);
+		this.label[0].show().toFront().animateWith(this.frame, {translation: [ppp.dx, ppp.dy]}, 200 * this.is_label_visible);
+        this.label[1].show().toFront().animateWith(this.frame, {translation: [ppp.dx, ppp.dy]}, 200 * this.is_label_visible);
+        this.is_label_visible = true;
+	}
+	,hidePopup: function(x, y, infos){
+        var j = this;
+        this.leave_timer = setTimeout(function () {
+            j.frame.hide();
+            j.label[0].hide();
+            j.label[1].hide();
+            j.is_label_visible = false;
+        }, 1);
+	}
+	,planteGraine: function(x,y,tag){
 		var e = new graine(this, x,this.compost.attr("y")+(this.compost.attr("height")/2),this.compost.attr("height")/2);
 		e.setFiltre(tag);
 		this.graines.push(e);
 	}
-	,
-	setNuage: function(type){	
+	,setNuage: function(type){	
 		var n = new nuage(this, 0, 100, this.w, this.data, type);
 		n.draw();
 		this.nuages.push(n);
 	}
-	,
-	vent: function(x){
+	,vent: function(x){
 		var b = Math.floor(Math.random()*this.forceVent);
 		if((b-1)%2)
 			return x+b;
 		else
 			return x-b;
 	}
-	,
-	drawCouchesTempo: function () {
+	,drawCouchesTempo: function () {
 		if(this.setCouchesTempo){
 			this.setCouchesTempo.remove();
 		}else{
@@ -137,8 +169,7 @@ jardin.prototype = {
 			}	
 		}
 	}
-	,
-	getTempoY: function (d) {
+	,getTempoY: function (d) {
 		//y = this.terre.attr("y")+(this.hInt*i);
 		var nbSec = (this.now-d.getTime())/1000;
 		return this.terre.attr("y")+(this.hSec*nbSec)+20;

@@ -28,8 +28,8 @@ var tokenRegex = /\{([^\}]+)\}/g,
             w = Math.round(bb.width),
             h = Math.round(bb.height),
             x = Math.round(bb.x) - r,
-            y = Math.round(bb.y) - r,
-            gap = Math.min(h / 2, w / 2, 10),
+            y = Math.round(bb.y) - r;
+        var gap = Math.min(h / 2, w / 2, 10),
             shapes = {
                 top: "M{x},{y}h{w4},{w4},{w4},{w4}a{r},{r},0,0,1,{r},{r}v{h4},{h4},{h4},{h4}a{r},{r},0,0,1,-{r},{r}l-{right},0-{gap},{gap}-{gap}-{gap}-{left},0a{r},{r},0,0,1-{r}-{r}v-{h4}-{h4}-{h4}-{h4}a{r},{r},0,0,1,{r}-{r}z",
                 bottom: "M{x},{y}l{left},0,{gap}-{gap},{gap},{gap},{right},0a{r},{r},0,0,1,{r},{r}v{h4},{h4},{h4},{h4}a{r},{r},0,0,1,-{r},{r}h-{w4}-{w4}-{w4}-{w4}a{r},{r},0,0,1-{r}-{r}v-{h4}-{h4}-{h4}-{h4}a{r},{r},0,0,1,{r}-{r}z",

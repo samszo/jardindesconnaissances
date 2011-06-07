@@ -115,7 +115,7 @@ function graine(J, x, y, r){
 			var nbBulle = nuage.bulles.length;
 			for(j=0; j < nbBulle; j++){
 				var bulle = nuage.bulles[j];
-				if(this.tag == bulle.tag){
+				if(bulle && this.tag == bulle.tag){
 					//création du rhizome
 					if(this.rhizomes.length==0){
 						var rhi = new rhizome(this);

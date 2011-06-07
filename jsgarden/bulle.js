@@ -28,23 +28,12 @@ function bulle(nuage, x, y, tag, poids){
 		);
 
 		var b = this;
-		//affichage d'un popup mais ne marche pas très bien
+		//affichage d'un popup 
 		this.st.hover(function(event){
-				this.attr({fill:"red"});
-				clearTimeout(b.nuage.leave_timer);
-				var ppp = b.nuage.jardin.R.popup(this.attr("cx"), this.attr("cy")-10, b.nuage.label, "top", 1);
-				b.nuage.frame.show().stop().animate({path: ppp.path}, 200);
-				b.nuage.label[0].attr({text: b.tag}).show().stop().animateWith(b.nuage.frame, {translation: [ppp.dx, ppp.dy]}, 200 * b.nuage.is_label_visible);
-	            b.nuage.label[1].attr({text: b.poids}).show().animateWith(b.nuage.frame, {translation: [ppp.dx, ppp.dy]}, 200 * b.nuage.is_label_visible);
-	            b.nuage.is_label_visible = true;
+				b.nuage.jardin.showPopup(this.attr("cx"), this.attr("cy")-10, ["tag : "+b.tag, "nombre d'occurence : "+b.poids]);
 			}
 			,function () {
-                b.nuage.leave_timer = setTimeout(function () {
-                    b.nuage.frame.hide();
-                    b.nuage.label[0].hide();
-                    b.nuage.label[1].hide();
-                    b.nuage.is_label_visible = false;
-                }, 1);
+				b.nuage.jardin.hidePopup();
             }
 		);
 		
