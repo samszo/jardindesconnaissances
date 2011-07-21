@@ -24,10 +24,10 @@ function graine(J, x, y, r){
 		this.fond.toFront();
 		this.txt.toFront();
 		this.matchTag();
-	}
+	};
 	
 	this.getFond = function(){
-		//calcul le fond de l'exagone pour pouvoir gérer des événements globaux
+		// calcul le fond de l'exagone pour pouvoir gérer des événements globaux
 		var path = "M"+this.points[0][0]+" "+this.points[0][1];
 		var i;
 		for (i=1; i < 6; i++){
@@ -43,7 +43,7 @@ function graine(J, x, y, r){
 				g.setFiltre();
 			};
 		}
-	}
+	};
 
 	this.setFiltre = function(saisie){
 
@@ -60,7 +60,7 @@ function graine(J, x, y, r){
 		}
 		//recalcule l'exagone
 		this.draw();
-	}
+	};
 
 	this.getPath = function(j){
 		var path = "M"+this.points[j][0]+" "+this.points[j][1]+"L"+this.points[j+1][0]+" "+this.points[j+1][1];
@@ -79,7 +79,7 @@ function graine(J, x, y, r){
 			this.st.push(c);
 			this.paths.push(c);			
 		}
-	}
+	};
 
 	this.getPoints = function(){
 		//recalcule le x en fonction de l'étendu du rhizome de la dernière graine
@@ -105,7 +105,7 @@ function graine(J, x, y, r){
 			this.points.push(new Array(_x, _y));
 		}
 		this.points.push(new Array(this.points[0][0], this.points[0][1]));
-	}
+	};
 
 	this.matchTag = function(){
 		var i, j, nbNuage = this.jardin.nuages.length;
@@ -128,7 +128,7 @@ function graine(J, x, y, r){
 				}
 			}		
 		}
-	}
+	};
 
 
 }
