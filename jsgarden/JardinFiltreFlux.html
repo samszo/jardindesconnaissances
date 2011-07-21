@@ -51,34 +51,28 @@
 		};
 		//création des nuages a partir d'un js en local
 		//J.data = data;
-		//J.setNuage();		
+		//J.setNuage();	
+		
 		//création des nuages a partir des tags d'un compte delicious
-		//var type = "deliciousTagsUser";
-		//var url = "http://feeds.delicious.com/v2/json/tags/"+J.exis;
+		var type = "deliciousTagsUser";
+		var url = "http://feeds.delicious.com/v2/json/tags/"+J.exis;
 		//création des nuages a partir du bookmark d'un compte delicious
 		var type = "deliciousBookUser";
 		var url = "http://feeds.delicious.com/v2/json/"+J.exis;
+		//création des nuages a partir de la base de données de tag
+		var type = "fluxTagsExis";
+		var url = "http://localhost/jardindesconnaissances/public/flux/tags/exis/"+J.exis;
+		
 		$.ajax({
 			type: "GET", 
-			dataType: "jsonp", 
+			dataType: "json", 
 			url: url,
-			/*
-			complete: function (xhr, ajaxOptions, thrownError) { 
-				if(xhr.status == 404) { 
-					alert("le compte n'a pas été trouvé");
-			      	demandeCompte();
-				}else{ 
-					alert("le compte n'a pas été trouvé");
-			      	demandeCompte();
-				} 
-			},
-			*/  
 			success: function(data){
 				J.data = data;
 				J.setNuage(type);
 			}
 		});
-				
+			
 	}
     </script> 
     </head> 

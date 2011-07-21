@@ -174,5 +174,4 @@ jardin.prototype = {
 		var nbSec = (this.now-d.getTime())/1000;
 		return this.terre.attr("y")+(this.hSec*nbSec)+20;
 	}
-
-}
+};
