@@ -12,19 +12,20 @@ function rhizome(graine){
 		
 	this.draw = function(){	
 		this.getHistoDeliciousTag();
-	}
+	};
 
 	this.getHistoDeliciousTag = function(){
 		//récupération de l'historique des tags delicious
+		//var url = "http://feeds.delicious.com/v2/json/"+this.graine.jardin.exis+"/"+this.graine.tag+"?count=100";
 		var url = "http://feeds.delicious.com/v2/json/"+this.graine.jardin.exis+"/"+this.graine.tag+"?count=100";
 		var rh = this;
-		$.ajax({ type: "GET", dataType: "jsonp", url: url,
+		$.ajax({ type: "GET", dataType: "json", url: url,
 			success: function(data){
 				rh.data = data;
 				rh.pousse();
 			}
 		});
-	}
+	};
 
 	this.pousse = function(){
 		var i, item, x, y, dt, hDate, nbItem = this.data.length
@@ -130,7 +131,8 @@ function rhizome(graine){
 		this.graine.fond.toFront();
 		this.graine.txt.toFront();
 
-	}
+	};
+	
 	this.redraw = function(){
 		//recalcul la position des noeuds
 		var i, z=0, courbe, hdate, dt, x = this.graine.x, nbItem = this.txts.length, duree = 2000;
@@ -175,6 +177,6 @@ function rhizome(graine){
 			this.paths[i].stop().animate({path: path, easing: "elastic"}, duree);
 		}
 		
-	}
+	};
 
 }

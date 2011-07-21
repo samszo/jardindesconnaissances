@@ -50,6 +50,22 @@ nuage.prototype = {
 				this.flotte(this.wCiel, 30000, true);
 				this.jardin.drawCouchesTempo();				
 		 		break;
+			case "fluxTagsExis":				
+				for(i= 0; i < this.data.length; i++){
+					if(i==0){
+						//création des éléments graphiques
+						this.setForme(this.data[i]["login"]);
+					}
+					if(i<50){
+						var e = new bulle(this, 0-this.cx, this.y, this.data[i]["code"], 1);
+						e.draw();
+						this.bulles.push(e);						
+					}
+
+				}
+				this.flotte(this.wCiel, 30000, true);
+				this.jardin.drawCouchesTempo();				
+		 		break;
 			case "deliciousTagsUser":
 				var item;
 				i=0;
@@ -140,8 +156,9 @@ nuage.prototype = {
 			}else{
 				//choisi si la bulle tombe 	
 				if((Math.random()*nb)>i){
-					this.bulles[i].st.attr("x")=this.txt.attr("x");
-					this.bulles[i].tombe(); 
+					var b = this.bulles[i];
+					b.st.attr("x") = this.txt.attr("x");
+					b.tombe(); 
 				}
 			}
 		}
@@ -155,4 +172,4 @@ nuage.prototype = {
 		},duree);
 	}
 
-}
+};
