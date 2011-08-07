@@ -10,7 +10,9 @@ class Flux_Delicious{
 	var $cache;
 	var $forceCalcul = false;
 	var $user;
+	var $idUser;
 	var $del;
+	var $dbUU;
 	
     /**
      * Récupère l'identifiant d'utilisateur
@@ -34,7 +36,7 @@ class Flux_Delicious{
      * @param string $pwd
      * 
      */
-	function SaveUserPost($user, $pwd) {
+	function SaveUserPost($user, $pwd, $detail=false, $dt=false) {
 
         $c = "Flux_Delicious_SaveUserPost_".$user;
         if($this->forceCalcul)$this->cache->remove($c);
@@ -43,7 +45,7 @@ class Flux_Delicious{
 			$posts = $delicious->getAllPosts();
 			$this->cache->save($posts,$c);
 		}
-		$this->SavePosts($posts, $user);
+		$this->SavePosts($posts, $user, $detail, $dt);
 	}
 	
 	function SaveUserNetwork($user, $pwd) {
@@ -56,15 +58,15 @@ class Flux_Delicious{
 			$this->cache->save($nw,$c);
 		}
 
-		$idUsrc = $this->GetUser($user);		
+		$this->idUser = $this->GetUser($user);		
 		
 		//récupère ou enregistre le users du network
 		$uu = new Model_DbTable_Flux_UtiUti();		
 		$date = new Zend_Date();
 		foreach ($nw as $us) {
 			$idUdst = $this->GetUser($us);		
-			$uu->ajouter(array("uti_id_src"=>$idUsrc,"uti_id_dst"=>$idUdst));		
-			$uu->edit($idUsrc, $idUdst, array("network"=>1));		
+			$uu->ajouter(array("uti_id_src"=>$this->idUser,"uti_id_dst"=>$idUdst));		
+			$uu->edit($this->idUser, $idUdst, array("network"=>1));		
 		};		
 	}
 
@@ -96,50 +98,60 @@ class Flux_Delicious{
 		$this->user = $user;
 		$this->del = new Zend_Service_Delicious($user, $pwd);
 		$ud = new Model_DbTable_Flux_UtiDoc();
-		$uu = new Model_DbTable_Flux_UtiUti();		
+		$this->dbUU = new Model_DbTable_Flux_UtiUti();		
 		
-		$idUsrc = $this->GetUser($user);		
+		$this->idUser = $this->GetUser($user);		
 		
 		//récupère les posts d'un utilisateur
-		$arrUd = $ud->findDocByUti($idUsrc);
+		$arrUd = $ud->findDocByUti($this->idUser);
 		$date = new Zend_Date();
 		foreach ($arrUd as $d) {
-			//récupère le détail de l'url
-			$urlDetails = $this->GetHtmlDetailUrl($d);
-	        //enregistre le detail de l'url
-			foreach ($urlDetails as $post) {
-				//ne prend pas en compte l'utilisateur source
-				if($post["a"]!=$user){
-					//enregistre la relation entre utilisateur au niveau post
-					$idUdst = $this->GetUser($post["a"]);		
-					$uu->ajouter(array("uti_id_src"=>$idUsrc,"uti_id_dst"=>$idUdst));		
-					$uu->edit($idUsrc, $idUdst, array("post"=>1));		
-					//enregistre le post
-					$this->SavePosts(array($post), $post["a"]);
-				}
-			}
-	        
+	        $this->SaveHtmlDetailUrl($d['url']);	        
 		}						
 	}
+		
+	function SaveHtmlDetailUrl($url){
+
+		//récupère le détail de l'url
+		$urlDetails = $this->GetHtmlDetailUrl($url);
+        //enregistre le detail de l'url
+		foreach ($urlDetails as $post) {
+			//ne prend pas en compte l'utilisateur source
+			if($post["a"]!=$this->user){
+				//enregistre la relation entre utilisateur au niveau post
+				$this->SaveUserRela($post["a"], array("post"=>1));
+				//enregistre le post
+				$this->SavePosts(array($post), $post["a"]);
+			}
+		}
+		
+	}
+
+	function SaveUserRela($userDst, $types){
+		//enregistre la relation entre utilisateur au niveau post
+		$idUdst = $this->GetUser($userDst);		
+		$this->dbUU->ajouter(array("uti_id_src"=>$this->idUser,"uti_id_dst"=>$idUdst));		
+		$this->dbUU->edit($this->idUser, $idUdst, $types);		
+	}
 	
-	function GetHtmlDetailUrl($d){
+	function GetHtmlDetailUrl($url){
 		//vérifie si le detail est en cache
-		$cD = "Flux_Delicious_SaveUserPostUser_".$this->user."_".$d["doc_id"]."details";
+		$cD = "Flux_Delicious_GetHtmlDetailUrl_".md5($url)."details";
 	    if($this->forceCalcul)$this->cache->remove($cD);
 		if(!$urlDetails = $this->cache->load($cD)) {	
 			//vérifie si les infos de l'url sont en cache
-			$c = "Flux_Delicious_SaveUserPostUser_".$this->user."_".$d["doc_id"];
+			$c = "Flux_Delicious_GetHtmlDetailUrl_".md5($url);
 			if($this->forceCalcul)$this->cache->remove($c);
 			if(!$urlInfo = $this->cache->load($c)) {	
-				$urlInfo = $this->del->getUrlInfos($d["url"]);
+				$urlInfo = $this->del->getUrlInfos($url);
 				$this->cache->save($urlInfo,$c);
 	        }
         	if($urlInfo[0]["total_posts"] > 100){
 				//récupère les infos en parsant les pages html
-				$urlDetails = $this->ParseHtmlDetailUrl($d["url"]);
+				$urlDetails = $this->ParseHtmlDetailUrl($url);
 			}else{					
 				//récupère les infos à partir du flux
-				$urlDetails = $this->del->getUrlDetails2($d["url"]);
+				$urlDetails = $this->del->getUrlDetails2($url);
 			}
 	        $this->cache->save($urlDetails,$cD);
         }
@@ -165,16 +177,22 @@ class Flux_Delicious{
 		$posts = array();
 		foreach ($results as $post) {
 			$s = simplexml_import_dom($post);
-			if($s->div->div[0]['title'])
+			if($s->div->div[0]['title']){
 				$dt = $s->div->div[0]['title']."";
-			$a = $s->div->div[2]->a['title']."";
-			$n = $s->div->div[1]."";
+				$numDiv = 2;
+			}else{
+				$numDiv = 1;
+			}
+			$a = $s->div->div[$numDiv]->a['title']."";
+			$n = $s->div->div[$numDiv-1]."";
 			$u = $url;
 			$arrT = array();
-			if($s->div->div[2]->div->ul){
-				foreach($s->div->div[2]->div->ul->li as $t){
+			if($s->div->div[$numDiv]->div->ul){
+				foreach($s->div->div[$numDiv]->div->ul->li as $t){
 					$arrT[] = $t->a."";
 				}
+			}else{
+				$arrT[] = "";
 			}
 			$d = ""; 
 			//ajoute l'item au tableau
@@ -194,46 +212,57 @@ class Flux_Delicious{
 	function UpdateUserBase($user, $pwd){
 		//récupération de la dernière date de mise à jour
 		$d = new Model_DbTable_Flux_Doc();
-		$r = $d->findLastDoc($user);
-
+		$this->idUser = $this->GetUser($user);
+		$r = $d->findLastDoc($this->idUser);
+		$this->forceCalcul = true;
 		if($r){
-			$delicious = new Zend_Service_Delicious($user, $pwd);
-			$date = new Zend_Date($r[0]["maj"]);
-			$posts = $delicious->getPosts(null, $date);
-			$this->SavePosts($posts, $user);		
-		}else{
-			$this->SaveUserBase($user, $pwd);
+			$dt = new Zend_Date($r[0]["maj"]);
+			$this->SaveUserPost($user, $pwd, true, $dt);
 		}		
 	}
 	
-	function SavePosts($posts, $user){
-		$idU = $this->GetUser($user);		
-				
-		//récupère ou enregistre le post
+	function SavePosts($posts, $user, $detail=false, $dt=false){
+								
+		//initialise les variables
+		$this->idUser = $this->GetUser($user);
+     	// TODO :: définir des propriété de class pour les objet de base de données //		
 		$t = new Model_DbTable_Flux_Tag();
 		$ut = new Model_DbTable_Flux_UtiTag();
 		$d = new Model_DbTable_Flux_Doc();
 		$ud = new Model_DbTable_Flux_UtiDoc();
 		$td = new Model_DbTable_Flux_TagDoc();
+		$this->dbUU = new Model_DbTable_Flux_UtiUti();		
 		$date = new Zend_Date();
+
+		//récupère ou enregistre le post
 		foreach ($posts as $post) {
 			//gestion du type d'objet post
 			if(is_array($post)){
 				//venant directement du json
-				$pudDate = $post["dt"];					
-				$idD = $d->ajouter(array("url"=>$post["u"],"titre"=>$post["d"],"note"=>$post["n"],"pubDate"=>$pudDate,"maj"=>$date->get("c")));
+				$pudDate = $post["dt"];
+				//gestion de la date de mise à jour
+				if($pudDate<$dt)continue;
+				$url = $post["u"];					
+				$idD = $d->ajouter(array("url"=>$url,"titre"=>$post["d"],"note"=>$post["n"],"pubDate"=>$pudDate,"maj"=>$date->get("c")));
 				$tags = $post["t"];
 			}else{
 				//venant d'un objet zend delicious
 				$pudDate = $post->getDate()->toString("c");
-				$idD = $d->ajouter(array("url"=>$post->getUrl(),"titre"=>$post->getTitle(),"note"=>$post->getNotes(),"pubDate"=>$pudDate,"maj"=>$date->get("c")));
+				//gestion de la date de mise à jour
+				if($pudDate<$dt)continue;
+				$url = $post->getUrl();					
+				$idD = $d->ajouter(array("url"=>$url,"titre"=>$post->getTitle(),"note"=>$post->getNotes(),"pubDate"=>$pudDate,"maj"=>$date->get("c")));
 				$tags = $post->getTags();				
 			}
-			$ud->ajouter(array("uti_id"=>$idU, "doc_id"=>$idD, "maj"=>$pudDate));
+			$ud->ajouter(array("uti_id"=>$this->idUser, "doc_id"=>$idD, "maj"=>$pudDate));
 			foreach ($tags as $tag) {
 				$idT = $t->ajouter(array("code"=>$tag));
-				$ut->ajouter(array("uti_id"=>$idU, "tag_id"=>$idT));
-				$td->ajouter(array("tag_id"=>$idU, "doc_id"=>$idT));
+				$ut->ajouter(array("uti_id"=>$this->idUser, "tag_id"=>$idT));
+				$td->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD));
+			}
+			//enregistre le detail de l'url
+			if($detail){
+				$this->SaveHtmlDetailUrl($url);
 			}
 		};
 		
