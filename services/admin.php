@@ -2,9 +2,6 @@
 require_once( "../application/configs/config.php" );
 
 try {
-	// *ZAMFBROWSER IMPLEMENTATION*
-	set_include_path(get_include_path().PATH_SEPARATOR."/Users/paragraphe/Documents/www/ZamfBrowser/browser");
-	require_once( "ZendAmfServiceBrowser.php" );
 	
 	//paramètrage du cache
 	$frontendOptions = array(
@@ -21,11 +18,19 @@ try {
 	
 	$application->bootstrap();
 
+	$user = "luckysemiosis";
+	$pwd = "xxxxx";
+	
+	$f = new Flux_Dbpedia();
+	$f->cache = $cache;
+	$f->GetTagsLinks($user);
+	
 	//
 	$f = new Flux_Delicious($cache);
 	$f->cache = $cache;
-	//$f->SaveUserPostUser("luckysemiosis", "Samszo0");
-	$f->user = "luckysemiosis";
+	$f->SaveUserPost($user, $pwd);
+	$f->SaveUserPostUser($user, $pwd);
+	$f->user = $user;
 	//$f->GetHtmlDetailUrl(array("doc_id"=>6668,"url"=>"http://www.worldcat.org/"));
 	//
 	$s = new Flux_Stats;
