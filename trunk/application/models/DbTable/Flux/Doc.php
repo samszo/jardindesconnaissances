@@ -26,6 +26,11 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     protected $_primary = 'doc_id';
 
+	protected $_dependentTables = array(
+		'Model_DbTable_Flux_UtiDoc'
+		,'Model_DbTable_Flux_TagDoc'
+		);
+    
     
     /**
      * Vérifie si une entrée Flux_Doc existe.
@@ -79,7 +84,8 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     
     /**
      * Recherche une entrée Flux_Doc avec la clef primaire spécifiée
-     * et supprime cette entrée.
+     * et supprime cette entrée
+     * rt toutre les entrées liées
      *
      * @param integer $id
      *
@@ -87,7 +93,11 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_Doc.doc_id = ' . $id);
+    	foreach($this->_dependentTables as $t){
+			$tEnfs = new $t();
+			$tEnfs->removeDoc($id);
+		}
+    	$this->delete('flux_Doc.doc_id = ' . $id);
     }
     
     /**

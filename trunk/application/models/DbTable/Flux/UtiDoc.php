@@ -38,9 +38,8 @@ class Model_DbTable_Flux_UtiDoc extends Zend_Db_Table_Abstract
     {
 		$select = $this->select();
 		$select->from($this, array('uti_id'));
-		foreach($data as $k=>$v){
-			$select->where($k.' = ?', $v);
-		}
+		$select->where('uti_id = ?', $data['uti_id']);
+		$select->where('doc_id = ?', $data['doc_id']);
 	    $rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->uti_id; else $id=false;
         return $id;
@@ -82,13 +81,27 @@ class Model_DbTable_Flux_UtiDoc extends Zend_Db_Table_Abstract
      * Recherche une entrée Flux_UtiDoc avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
-     * @param integer $id
+     * @param integer $idUti
+     * @param integer $idDoc
      *
      * @return void
      */
-    public function remove($id)
+    public function remove($idUti, $idDoc)
     {
-        $this->delete('flux_UtiDoc.uti_id = ' . $id);
+        $this->delete('flux_UtiDoc.uti_id = ' . $idUti. ' AND flux_UtiDoc.doc_id = ' . $idDoc);
+    }
+
+    /**
+     * Recherche une entrée Flux_UtiDoc avec la clef étrangère spécifiée
+     * et supprime ces entrées.
+     *
+     * @param integer $idDoc
+     *
+     * @return void
+     */
+    public function removeDoc($idDoc)
+    {
+        $this->delete(' flux_UtiDoc.doc_id = ' . $idDoc);
     }
     
     /**

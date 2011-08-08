@@ -82,13 +82,27 @@ class Model_DbTable_Flux_TagDoc extends Zend_Db_Table_Abstract
      * Recherche une entrée Flux_TagDoc avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
-     * @param integer $id
+     * @param integer $idTag
+     * @param integer $idDoc
      *
      * @return void
      */
-    public function remove($id)
+    public function remove($idTag, $idDoc)
     {
-        $this->delete('flux_TagDoc.tag_id = ' . $id);
+        $this->delete('flux_TagDoc.tag_id = ' . $idTag.' AND flux_TagDoc.doc_id = ' . $idDoc);
+    }
+
+    /**
+     * Recherche une entrée Flux_UtiDoc avec la clef étrangère spécifiée
+     * et supprime ces entrées.
+     *
+     * @param integer $idDoc
+     *
+     * @return void
+     */
+    public function removeDoc($idDoc)
+    {
+        $this->delete(' doc_id = ' . $idDoc);
     }
     
     /**
