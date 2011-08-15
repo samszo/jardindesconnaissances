@@ -16,10 +16,12 @@ function rhizome(graine){
 
 	this.getHistoDeliciousTag = function(){
 		//récupération de l'historique des tags delicious
-		//var url = "http://feeds.delicious.com/v2/json/"+this.graine.jardin.exis+"/"+this.graine.tag+"?count=100";
 		var url = "http://feeds.delicious.com/v2/json/"+this.graine.jardin.exis+"/"+this.graine.tag+"?count=100";
+		var dT = "jsonp"; //jsonp = valide en cross domain
+		var url = "http://localhost/jardindesconnaissances/public/flux/docs?uti="+this.graine.jardin.exis+"&tag="+this.graine.tag;
+		var dT = "json";
 		var rh = this;
-		$.ajax({ type: "GET", dataType: "json", url: url,
+		$.ajax({ type: "GET", dataType: dT, url: url,
 			success: function(data){
 				rh.data = data;
 				rh.pousse();
