@@ -38,10 +38,9 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     {
 		$select = $this->select();
 		$select->from($this, array('tag_id'));
-		foreach($data as $k=>$v){
-			$select->where($k.' = ?', $v);
-		}
-	    $rows = $this->fetchAll($select);        
+		$select->where(' code = ?', $data['code']);
+		if(isset($data['parent']))$select->where(' parent = ?', $data['parent']);
+		$rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->tag_id; else $id=false;
         return $id;
     } 
