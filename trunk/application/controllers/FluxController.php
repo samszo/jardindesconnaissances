@@ -32,11 +32,31 @@ class FluxController extends Zend_Controller_Action {
     public function tagsAction()
     {
 	    $dbTags = new Model_DbTable_Flux_UtiTag();
-	    if($this->_getParam('exis', 0)){
-		    $this->view->tags = $dbTags->findTagByUti($this->_getParam('exis', 0));	    	
+	    if($this->_getParam('uti', 0)){
+		    $this->view->tags = $dbTags->findTagByUti($this->_getParam('uti', 0));	    	
 	    }else{
 		    $this->view->tags = $dbTags->findTagUti();	    	
 	    }
+    }	
+
+    public function docsAction()
+    {
+	    $dbUD = new Model_DbTable_Flux_UtiDoc();
+		$rs = array();
+	    if($this->_getParam('tag', 0) && $this->_getParam('uti', 0)){
+		    $arr = $dbUD->findDocByUtiTag($this->_getParam('uti', 0),$this->_getParam('tag', 0));
+		    foreach ($arr as $d){
+		    	$arrT = $dbUD->findTagByDocUti($d["doc_id"],$d["uti_id"]);
+		    	//formatage du tableau des tags
+		    	$tags = array();
+		    	foreach ($arrT as $t){
+		    		$tags[] = $t['code'];
+		    	}
+		    	$r = array("d"=>$d["titre"],"dt"=>$d["pubDate"],"u"=>$d["url"],"t"=>$tags,"oD"=>$d,"oT"=>$arrT);
+		    	$rs[] = $r;
+		    }
+	    }
+	    $this->view->docs = $rs;		    
     }	
     
 }

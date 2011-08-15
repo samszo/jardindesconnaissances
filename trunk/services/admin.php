@@ -17,23 +17,32 @@ try {
 	
 	
 	$application->bootstrap();
-
+	
 	$user = "luckysemiosis";
-	$pwd = "xxxxx";
+	$pwd = "Samszo0";
 	
-	$f = new Flux_Dbpedia();
-	$f->cache = $cache;
-	$f->GetTagsLinks($user);
+	//$f = new Flux_Dbpedia();
+	//$f->cache = $cache;
+	//$f->SaveUserTagsLinks($user);
+	
+	//$d = new Model_DbTable_Flux_Doc();
+	//$d->remove(7641);
 	
 	//
-	$f = new Flux_Delicious($cache);
-	$f->cache = $cache;
-	$f->SaveUserPost($user, $pwd);
-	$f->SaveUserPostUser($user, $pwd);
+	$f = new Flux_Delicious($user, $pwd);
+	$f->cache = $cache;	
+	//$f->SaveUserFan($user, $pwd);
+	//$f->SaveUserNetwork($user, $pwd);
+	//$f->SaveUserPost($user, $pwd);
+	//$f->SaveUserPostUser($user, $pwd);
+	//$f->UpdateUserBase($user, $pwd);
+	/*
 	$f->user = $user;
-	//$f->GetHtmlDetailUrl(array("doc_id"=>6668,"url"=>"http://www.worldcat.org/"));
-	//
-	$s = new Flux_Stats;
+	$f->idUser = 1;
+	$f->SaveHtmlDetailUrl("http://www.freebase.com/");
+	*/
+	
+	//$s = new Flux_Stats;
 	//$arr = $s->GetTypeRelaUser(1);
 	
 	

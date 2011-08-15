@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="demo-print.css" type="text/css" media="print"> 
 	<script src="jquery-1.4.4.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="raphael-min.js" type="text/javascript" charset="utf-8"></script> 
+    <script src="d3.min.js" type="text/javascript" charset="utf-8"></script> 
     <script src="jardin.js" type="text/javascript" charset="utf-8"></script> 
     <script src="graine.js" type="text/javascript" charset="utf-8"></script> 
     <script src="nuage.js" type="text/javascript" charset="utf-8"></script> 
@@ -61,7 +62,7 @@
 		var url = "http://feeds.delicious.com/v2/json/"+J.exis;
 		//création des nuages a partir de la base de données de tag
 		var type = "fluxTagsExis";
-		var url = "http://localhost/jardindesconnaissances/public/flux/tags/exis/"+J.exis;
+		var url = "http://localhost/jardindesconnaissances/public/flux/tags?uti="+J.exis;
 		
 		$.ajax({
 			type: "GET", 

@@ -19,6 +19,7 @@ function nuage(jardin, x, y, wCiel, data, type){
 	this.TagNbMax=0;
 	this.TagNbMin=0;
 	this.TagIntervals = new Array();
+	this.nbLimit = 100;
 }
 nuage.prototype = { 
 
@@ -50,14 +51,19 @@ nuage.prototype = {
 				this.flotte(this.wCiel, 30000, true);
 				this.jardin.drawCouchesTempo();				
 		 		break;
-			case "fluxTagsExis":				
+			case "fluxTagsExis":
+				//transforme les poids en tableau lineaire
+			    var arr = this.data.map(function(d){return d.poids;});
+				var poids = d3.scale.log().domain([d3.min(arr),d3.max(arr)]).range([10, 64]); 
 				for(i= 0; i < this.data.length; i++){
 					if(i==0){
 						//création des éléments graphiques
 						this.setForme(this.data[i]["login"]);
 					}
-					if(i<50){
-						var e = new bulle(this, 0-this.cx, this.y, this.data[i]["code"], 1);
+					if(i<this.nbLimit){
+						var p = poids(this.data[i]["poids"]);
+						console.log(this.data[i]["poids"]+"="+p);
+						var e = new bulle(this, 0-this.cx, this.y, this.data[i]["code"], p, this.data[i]);
 						e.draw();
 						this.bulles.push(e);						
 					}
@@ -151,16 +157,19 @@ nuage.prototype = {
 		for(i= 0; i < nb; i++){
 			if(this.bulles[i].txt.attr("fill")=="black")j++;
 			//s'il y a trop de bulle on ne les fait pas bouger
-			if(nb<100){			
+			if(nb<=this.nbLimit){			
 				if(deb)this.bulles[i].bougeChaos(0);
-			}else{
+			}
+			/*
+			else{
 				//choisi si la bulle tombe 	
 				if((Math.random()*nb)>i){
 					var b = this.bulles[i];
-					b.st.attr("x") = this.txt.attr("x");
+					//b.eli.attr("cx") = this.txt.attr("x");
 					b.tombe(); 
 				}
 			}
+			*/
 		}
 		if(j==0)return;		
 		this.st.attr({x: 0-this.cx, cx: 0-this.cx});

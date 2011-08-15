@@ -1,25 +1,26 @@
-function bulle(nuage, x, y, tag, poids){
+function bulle(nuage, x, y, tag, taille, data){
 	this.nuage = nuage;
 	this.x = x;
 	this.cx;
 	this.y = y;
 	this.cy;
 	this.tag = tag;
-	this.poids = poids;
+	this.taille = taille;
 	this.eli;
 	this.txt;
 	this.st;
 	this.env = 4;
-
+	this.data = data;
+	
 	this.draw = function(){
-		this.cx = this.tag.length*this.env;
-		this.cy = (this.poids*10);
+		this.cx = this.tag.length*this.taille;
+		this.cy = (this.taille);
 		
 		this.eli = this.nuage.jardin.R.ellipse(this.x, this.y, this.cx, this.cy);
 		this.eli.attr({fill:"black", opacity: 0.2});		
 		
 		this.txt = this.nuage.jardin.R.text(this.x, this.y, this.tag);
-		this.txt.attr({fill:"black", font: (this.poids*10)+'px Helvetica, Arial'});
+		this.txt.attr({fill:"black", font: (this.taille)+'px Helvetica, Arial'});
 
 		this.st = this.nuage.jardin.R.set();
 		this.st.push(
@@ -30,7 +31,7 @@ function bulle(nuage, x, y, tag, poids){
 		var b = this;
 		//affichage d'un popup 
 		this.st.hover(function(event){
-				b.nuage.jardin.showPopup(this.attr("cx"), this.attr("cy")-10, ["tag : "+b.tag, "nombre d'occurence : "+b.poids]);
+				b.nuage.jardin.showPopup(this.attr("cx"), this.attr("cy")-10, ["tag : "+b.tag, "nombre d'occurence : "+b.data['poids']]);
 			}
 			,function () {
 				b.nuage.jardin.hidePopup();

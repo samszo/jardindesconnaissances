@@ -5,15 +5,111 @@
  * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Flux_Delicious{
+class Flux_Delicious  extends Zend_Service_Delicious{
 
 	var $cache;
 	var $forceCalcul = false;
 	var $user;
 	var $idUser;
-	var $del;
+	var $dbU;
 	var $dbUU;
-	
+	var $dbUT;
+	var $dbUD;
+	var $dbUTD;
+	var $dbT;
+	var $dbTD;		
+	var $dbD;
+
+	const JSON2_URI     	= 'http://feeds.delicious.com';
+    const JSON2_URL     	= '/v2/json/url/%s';
+    const JSON2_URLINFO     = '/v2/json/urlinfo/%s';
+
+ 	public function __construct($user, $pwd)
+    {
+    	parent::__construct($user, $pwd);
+    }
+
+    /**
+     * Get details on a particular bookmarked URL
+     *
+     * Returned array contains four elements:
+     *  - hash - md5 hash of URL
+     *  - top_tags - array of tags and their respective usage counts
+     *  - url - URL for which details were returned
+     *  - total_posts - number of users that have bookmarked URL
+     *
+     * If URL hasen't been bookmarked null is returned.
+     *
+     * @param  string $url URL for which to get details
+     * @return array
+     */
+    public function getUrlDetails2($url)
+    {
+        $path = sprintf(self::JSON2_URL, md5($url));
+        return $this->makeRequestJ2($path, array(), 'json2');               
+    }
+
+    
+    /**
+     * Get infos like tagometer on a particular bookmarked URL
+     *
+     * Returned array contains four elements:
+     *  - hash - md5 hash of URL
+     *  - title - title of the post
+     *  - top_tags - array of tags and their respective usage counts
+     *  - url - URL for which details were returned
+     *  - total_posts - number of users that have bookmarked URL
+     *
+     * If URL hasen't been bookmarked null is returned.
+     *
+     * @param  string $url URL for which to get details
+     * @return array
+     */
+    public function getUrlInfos($url)
+    {
+        $path = sprintf(self::JSON2_URLINFO, md5($url));
+        return $this->makeRequestJ2($path, array("count"=>100), 'json2');
+    }
+
+    /**
+     * Handles all GET requests to a web service
+     *
+     * @param   string $path  Path
+     * @param   array  $parms Array of GET parameters
+     * @param   string $type  Type of a request ("xml"|"json")
+     * @return  mixed  decoded response from web service
+     * @throws  Zend_Service_Delicious_Exception
+     */
+    public function makeRequestJ2($path, array $parms = array(), $type = 'xml')
+    {
+        // if previous request was made less then 1 sec ago
+        // wait until we can make a new request
+        $timeDiff = microtime(true) - self::$_lastRequestTime;
+        if ($timeDiff < 1) {
+            usleep((1 - $timeDiff) * 1000000);
+        }
+
+        $this->_rest->getHttpClient()->setAuth($this->_authUname, $this->_authPass);
+
+        $this->_rest->setUri(self::JSON2_URI);
+
+        self::$_lastRequestTime = microtime(true);
+        $response = $this->_rest->restGet($path, $parms);
+
+        if (!$response->isSuccessful()) {
+            /**
+             * @see Zend_Service_Delicious_Exception
+             */
+            throw new Zend_Service_Delicious_Exception("Http client reported an error: '{$response->getMessage()}'");
+        }
+
+        $responseBody = $response->getBody();
+
+        return Zend_Json_Decoder::decode($responseBody);
+
+    }
+    
+    
     /**
      * Récupère l'identifiant d'utilisateur
      *
@@ -24,8 +120,8 @@ class Flux_Delicious{
 	function GetUser($user) {
 
 		//récupère ou enregistre l'utilisateur
-		$u = new Model_DbTable_Flux_Uti();
-		return $u->ajouter(array("login"=>$user,"flux"=>"delicious"));		
+		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti();
+		return $this->dbU->ajouter(array("login"=>$user,"flux"=>"delicious"));		
 
 	}
 	
@@ -36,16 +132,15 @@ class Flux_Delicious{
      * @param string $pwd
      * 
      */
-	function SaveUserPost($user, $pwd, $detail=false, $dt=false) {
+	function SaveUserPost($user, $pwd, $detail=false) {
 
         $c = "Flux_Delicious_SaveUserPost_".$user;
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$posts = $this->cache->load($c)) {
-			$delicious = new Zend_Service_Delicious($user, $pwd);
-			$posts = $delicious->getAllPosts();
+			$posts = $this->getAllPosts();
 			$this->cache->save($posts,$c);
 		}
-		$this->SavePosts($posts, $user, $detail, $dt);
+		$this->SavePosts($posts, $user, $detail);
 	}
 	
 	function SaveUserNetwork($user, $pwd) {
@@ -53,20 +148,18 @@ class Flux_Delicious{
         $c = "Flux_Delicious_SaveUserNetwork_".$user;
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$nw = $this->cache->load($c)) {
-			$delicious = new Zend_Service_Delicious($user, $pwd);
-			$nw = $delicious->getUserNetwork($user);
+			$nw = $this->getUserNetwork($user);
 			$this->cache->save($nw,$c);
 		}
 
 		$this->idUser = $this->GetUser($user);		
 		
 		//récupère ou enregistre le users du network
-		$uu = new Model_DbTable_Flux_UtiUti();		
-		$date = new Zend_Date();
+		if(!$this->dbUU)$this->dbUU = new Model_DbTable_Flux_UtiUti();
 		foreach ($nw as $us) {
 			$idUdst = $this->GetUser($us);		
-			$uu->ajouter(array("uti_id_src"=>$this->idUser,"uti_id_dst"=>$idUdst));		
-			$uu->edit($this->idUser, $idUdst, array("network"=>1));		
+			$this->dbUU->ajouter(array("uti_id_src"=>$this->idUser,"uti_id_dst"=>$idUdst));		
+			$this->dbUU->edit($this->idUser, $idUdst, array("network"=>1));		
 		};		
 	}
 
@@ -75,20 +168,19 @@ class Flux_Delicious{
         $c = "Flux_Delicious_SaveUserFan_".$user;
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$nw = $this->cache->load($c)) {
-			$delicious = new Zend_Service_Delicious($user, $pwd);
-			$nw = $delicious->getUserFans($user);
+			$nw = $this->getUserFans($user);
 			$this->cache->save($nw,$c);
 		}
 
 		$idUsrc = $this->GetUser($user);		
 		
 		//récupère ou enregistre le users du network
-		$uu = new Model_DbTable_Flux_UtiUti();		
+		if(!$this->dbUU)$this->dbUU = new Model_DbTable_Flux_UtiUti();
 		$date = new Zend_Date();
 		foreach ($nw as $us) {
 			$idUdst = $this->GetUser($us);		
-			$uu->ajouter(array("uti_id_src"=>$idUsrc,"uti_id_dst"=>$idUdst));		
-			$uu->edit($idUsrc, $idUdst, array("fan"=>1));		
+			$this->dbUU->ajouter(array("uti_id_src"=>$idUsrc,"uti_id_dst"=>$idUdst));		
+			$this->dbUU->edit($idUsrc, $idUdst, array("fan"=>1));		
 		};		
 	}
 
@@ -96,17 +188,18 @@ class Flux_Delicious{
 
 		//création des objets
 		$this->user = $user;
-		$this->del = new Zend_Service_Delicious($user, $pwd);
-		$ud = new Model_DbTable_Flux_UtiDoc();
-		$this->dbUU = new Model_DbTable_Flux_UtiUti();		
+		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc();
 		
 		$this->idUser = $this->GetUser($user);		
 		
 		//récupère les posts d'un utilisateur
-		$arrUd = $ud->findDocByUti($this->idUser);
+		$arrUd = $this->dbUD->findDocByUti($this->idUser);
 		$date = new Zend_Date();
 		foreach ($arrUd as $d) {
-	        $this->SaveHtmlDetailUrl($d['url']);	        
+			//prise en compte d'une clef lors d'un plantage
+			if($d["doc_id"]>=6621){
+		        $this->SaveHtmlDetailUrl($d['url']);
+			}	        
 		}						
 	}
 		
@@ -129,6 +222,7 @@ class Flux_Delicious{
 
 	function SaveUserRela($userDst, $types){
 		//enregistre la relation entre utilisateur au niveau post
+		if(!$this->dbUU)$this->dbUU = new Model_DbTable_Flux_UtiUti();
 		$idUdst = $this->GetUser($userDst);		
 		$this->dbUU->ajouter(array("uti_id_src"=>$this->idUser,"uti_id_dst"=>$idUdst));		
 		$this->dbUU->edit($this->idUser, $idUdst, $types);		
@@ -143,7 +237,7 @@ class Flux_Delicious{
 			$c = "Flux_Delicious_GetHtmlDetailUrl_".md5($url);
 			if($this->forceCalcul)$this->cache->remove($c);
 			if(!$urlInfo = $this->cache->load($c)) {	
-				$urlInfo = $this->del->getUrlInfos($url);
+				$urlInfo = $this->getUrlInfos($url);
 				$this->cache->save($urlInfo,$c);
 	        }
         	if($urlInfo[0]["total_posts"] > 100){
@@ -151,7 +245,7 @@ class Flux_Delicious{
 				$urlDetails = $this->ParseHtmlDetailUrl($url);
 			}else{					
 				//récupère les infos à partir du flux
-				$urlDetails = $this->del->getUrlDetails2($url);
+				$urlDetails = $this->getUrlDetails2($url);
 			}
 	        $this->cache->save($urlDetails,$cD);
         }
@@ -164,6 +258,8 @@ class Flux_Delicious{
         if($this->forceCalcul)$this->cache->remove($c);
 		if(!$html = $this->cache->load($c)) {	
 			$delUri = "http://www.delicious.com/url/".md5($url)."?show=all&page=".$p;
+			//pour éviter d'âtre considérer comme un spammeur il faut attendre au moins 1 seconde entre deux requêtes
+			sleep(1);
 			$client = new Zend_Http_Client($delUri);
 			$response = $client->request();
 			$html = $response->getBody();
@@ -178,7 +274,9 @@ class Flux_Delicious{
 		foreach ($results as $post) {
 			$s = simplexml_import_dom($post);
 			if($s->div->div[0]['title']){
-				$dt = $s->div->div[0]['title']."";
+				$dt = strtotime($s->div->div[0]['title']."");
+				$odt = new Zend_Date($dt);
+				$dt = $odt->get("c");
 				$numDiv = 2;
 			}else{
 				$numDiv = 1;
@@ -211,27 +309,39 @@ class Flux_Delicious{
 	
 	function UpdateUserBase($user, $pwd){
 		//récupération de la dernière date de mise à jour
-		$d = new Model_DbTable_Flux_Doc();
 		$this->idUser = $this->GetUser($user);
-		$r = $d->findLastDoc($this->idUser);
-		$this->forceCalcul = true;
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc();
+		$r = $this->dbD->findLastDoc($this->idUser);
+		$date = new Zend_Date();
 		if($r){
 			$dt = new Zend_Date($r[0]["maj"]);
-			$this->SaveUserPost($user, $pwd, true, $dt);
+			//récupère les posts pour chaque jour entre le dernier et aujourd'hui
+			while ($dt->compare($date)<0) {
+				// TODO :: employer la même méthode pour le reste de la class
+				$c = str_replace("::", "_", __METHOD__)."_".$dt->getTimestamp();
+		        if($this->forceCalcul)$this->cache->remove($c);
+				if(!$posts = $this->cache->load($c)) {	
+					$posts = $this->getPosts(null,$dt);
+			        $this->cache->save($posts, $c);
+				}
+				$this->SavePosts($posts, $user, true);
+				$dt->addDay(1);
+			}
 		}		
 	}
 	
-	function SavePosts($posts, $user, $detail=false, $dt=false){
+	function SavePosts($posts, $user, $detail=false){
 								
 		//initialise les variables
-		$this->idUser = $this->GetUser($user);
+		$idUser = $this->GetUser($user);
      	// TODO :: définir des propriété de class pour les objet de base de données //		
-		$t = new Model_DbTable_Flux_Tag();
-		$ut = new Model_DbTable_Flux_UtiTag();
-		$d = new Model_DbTable_Flux_Doc();
-		$ud = new Model_DbTable_Flux_UtiDoc();
-		$td = new Model_DbTable_Flux_TagDoc();
-		$this->dbUU = new Model_DbTable_Flux_UtiUti();		
+		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag();
+		if(!$this->dbUT)$this->dbUT = new Model_DbTable_Flux_UtiTag();
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc();
+		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc();
+		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc();
+		if(!$this->dbUU)$this->dbUU = new Model_DbTable_Flux_UtiUti();		
+		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc();		
 		$date = new Zend_Date();
 
 		//récupère ou enregistre le post
@@ -240,25 +350,21 @@ class Flux_Delicious{
 			if(is_array($post)){
 				//venant directement du json
 				$pudDate = $post["dt"];
-				//gestion de la date de mise à jour
-				if($pudDate<$dt)continue;
 				$url = $post["u"];					
-				$idD = $d->ajouter(array("url"=>$url,"titre"=>$post["d"],"note"=>$post["n"],"pubDate"=>$pudDate,"maj"=>$date->get("c")));
+				$idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>$post["d"],"note"=>$post["n"],"pubDate"=>$pudDate,"maj"=>$date->get("c")));
 				$tags = $post["t"];
 			}else{
 				//venant d'un objet zend delicious
 				$pudDate = $post->getDate()->toString("c");
-				//gestion de la date de mise à jour
-				if($pudDate<$dt)continue;
 				$url = $post->getUrl();					
-				$idD = $d->ajouter(array("url"=>$url,"titre"=>$post->getTitle(),"note"=>$post->getNotes(),"pubDate"=>$pudDate,"maj"=>$date->get("c")));
+				$idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>$post->getTitle(),"note"=>$post->getNotes(),"pubDate"=>$pudDate,"maj"=>$date->get("c")));
 				$tags = $post->getTags();				
 			}
-			$ud->ajouter(array("uti_id"=>$this->idUser, "doc_id"=>$idD, "maj"=>$pudDate));
+			// ajouter lors du calcul statistique $this->dbUD->ajouter(array("uti_id"=>$idUser, "doc_id"=>$idD, "maj"=>$pudDate));
 			foreach ($tags as $tag) {
-				$idT = $t->ajouter(array("code"=>$tag));
-				$ut->ajouter(array("uti_id"=>$this->idUser, "tag_id"=>$idT));
-				$td->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD));
+				$idT = $this->dbT->ajouter(array("code"=>$tag));
+				// ajouter lors du calcul statistique $this->dbUT->ajouter(array("uti_id"=>$idUser, "tag_id"=>$idT));
+				$this->dbUTD->ajouter(array("uti_id"=>$idUser, "tag_id"=>$idT, "doc_id"=>$idD,"maj"=>$pudDate));
 			}
 			//enregistre le detail de l'url
 			if($detail){

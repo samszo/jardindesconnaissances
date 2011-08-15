@@ -15,22 +15,85 @@ class Flux_Dbpedia{
 	var $cache;
 	var $forceCalcul = false;
 	var $user;
+	var $idUser;
 	var $del;
+	var $dbUT;
+	var $dbD;
+	var $dbT;
+	var $dbUD;
+	var $dbTD;
+	var $dbED;
+	var $dbET;
+	var $dbTT;
+	
+    const IDEXI = 1;
+	
+	function SaveUserTagsLinks($user) {
+		
+		//récupère les tags d'un utilisateur
+		if(!$this->dbUT) $this->dbUT = new Model_DbTable_Flux_UtiTag();
+		$arrTags = $this->dbUT->findTagByUti($user);
+		
+		foreach ($arrTags as $tag){
+			$this->SaveTagLinks($tag);
+		}
+	}
 	
 	function GetTagLinks($tag) {
 		
-        $c = __CLASS__."_".__METHOD__."_".$tag;
-        if($this->forceCalcul)$this->cache->remove($c);
+        $c = str_replace("::", "_", __METHOD__)."_".md5($tag);
+		if($this->forceCalcul)$this->cache->remove($c);
         if(!$flux = $this->cache->load($c)) {
 			$searchUrl = $this->getUrlKeyword($tag);
 		    $flux = $this->request($searchUrl);
 	    	$this->cache->save($flux,$c);
 		}
 		
+		return simplexml_load_string($flux);      
+	}
+
+	function SaveTagLinks($tag) {
 		
+		if(!$this->dbD) $this->dbD = new Model_DbTable_Flux_Doc();
+		if(!$this->dbT) $this->dbT = new Model_DbTable_Flux_Tag();
+		if(!$this->dbTD) $this->dbTD = new Model_DbTable_Flux_TagDoc();
+		if(!$this->dbED) $this->dbED = new Model_DbTable_Flux_ExiDoc();
+		if(!$this->dbET) $this->dbET = new Model_DbTable_Flux_ExiTag();
+		if(!$this->dbTT) $this->dbTT = new Model_DbTable_Flux_TagTag();
 		
-		echo $flux;  
-	    
+		$links = $this->GetTagLinks($tag['code']);
+
+		$date = new Zend_Date();
+		foreach ($links->Result as $r){
+			//enregistre le document dppedia
+			$idD = $this->dbD->ajouter(array("url"=>$r->URI,"titre"=>$r->Label,"maj"=>$date->get("c")));
+			//lie le document avec l'api
+			$this->dbED->ajouter(array("exi_id"=>self::IDEXI, "doc_id"=>$idD));
+			//enregistre les tags de class
+			foreach ($r->Classes->Class as $t) {
+				//ajoute le tag
+				$idT = $this->dbT->ajouter(array("code"=>$t->Label,"desc"=>$t->URI,"parent"=>"Class"));
+				//lie le tag au document
+				$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD));
+				//lie le tag à l'api
+				$this->dbET->ajouter(array("tag_id"=>$idT, "exi_id"=>self::IDEXI));
+				//lie le tag dbpedia au tag de l'utilisateur
+				$this->dbTT->ajouter(array("tag_id_src"=>$tag['tag_id'], "tag_id_dst"=>$idT));
+			}
+			//enregistre les tags de category
+			foreach ($r->Categories->Category as $t) {
+				//ajoute le tag
+				$idT = $this->dbT->ajouter(array("code"=>$t->Label,"desc"=>$t->URI,"parent"=>"Category"));
+				//lie le tag au document
+				$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD));
+				//lie le tag à l'api
+				$this->dbET->ajouter(array("tag_id"=>$idT, "exi_id"=>self::IDEXI));
+				//lie le tag dbpedia au tag de l'utilisateur
+				$this->dbTT->ajouter(array("tag_id_src"=>$tag['tag_id'], "tag_id_dst"=>$idT));
+			}
+			
+		}
+		
 	}
 	
 	function getUrlKeyword($QueryString, $QueryClass="", $MaxHits=""){
