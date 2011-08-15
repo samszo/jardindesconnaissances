@@ -15,7 +15,7 @@
  * @copyright  2010 Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_Flux_tagtag extends Zend_Db_Table_Abstract
+class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
 {
     
     /*
