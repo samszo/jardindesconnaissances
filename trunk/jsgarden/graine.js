@@ -83,8 +83,10 @@ function graine(J, x, y, r){
 
 	this.getPoints = function(){
 		//recalcule le x en fonction de l'étendu du rhizome de la dernière graine
-		this.txtL = this.r*this.tag.length/5;
-		this.x = 100;
+		var txt = this.jardin.R.text(10, 10, this.tag);
+		this.txtL = txt[0].clientWidth;
+		txt.remove();
+		this.x = this.jardin.compost.attr("x")+this.txtL+this.r;
 		if(this.jardin.graines.length>0){
 			this.x = this.jardin.graines[this.jardin.graines.length-1].points[0][0]+(this.jardin.graines[this.jardin.graines.length-1].r*2);
 			var rhi = this.jardin.graines[this.jardin.graines.length-1].rhizomes[0]; 
