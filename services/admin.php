@@ -21,6 +21,9 @@ try {
 	$user = "luckysemiosis";
 	$pwd = "Samszo0";
 	
+	$zot = new Flux_Zotero();
+	$zot->SaveRdf($_REQUEST);
+	
 	//$f = new Flux_Dbpedia();
 	//$f->cache = $cache;
 	//$f->SaveUserTagsLinks($user);

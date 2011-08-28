@@ -7,7 +7,7 @@ $www = "C:/wamp/www";
 define ("WEB_ROOT","http://localhost/jardindesconnaissances");
 define ("ROOT_PATH",$www."/jardindesconnaissances");
 define ("WEB_ROOT_AJAX",WEB_ROOT."/public");
-
+define ("SEP_PATH","/");
 
 // Define path to application directory
 defined('APPLICATION_PATH')

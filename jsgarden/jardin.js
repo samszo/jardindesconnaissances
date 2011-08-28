@@ -1,13 +1,14 @@
-function jardin(R, x, y, w, h, exis){
+function jardin(R, x, y, w, h){
 	this.R = R;
 	this.x = x;
 	this.y = y;
 	this.w = w;
 	this.h = h;
-	this.exis = exis;
+	this.exis;
 	this.ciel;
 	this.terre;
 	this.compost;
+	this.nappe;
 	this.data;
 	this.nuages = new Array();
 	this.graines = new Array();
@@ -25,11 +26,8 @@ function jardin(R, x, y, w, h, exis){
 	this.frame;
 	this.is_label_visible=false;
 	this.leave_timer;
-	
-}
-jardin.prototype = { 
 
-	draw: function(){
+	this.draw = function(){
 	
 		//popup
 		var i
@@ -45,14 +43,38 @@ jardin.prototype = {
 		//création du cadre pour le ciel
 		this.ciel = this.R.rect(this.x, this.y, this.w, this.h/2);		
 		this.ciel.attr({fill:"white"});
+
+		//création du cadre pour la mer des sources
+		this.mer = this.R.rect(this.x, this.h/2, this.w/10, this.h/2);		
+		this.mer.attr({fill:"blue",stroke:"blue"});
+		//libellé du cadre mer
+		d3svg.append("svg:text")
+			.attr("x",this.x+6)
+			.attr("y",this.h/2+32)
+			.attr("fill","white")
+	 		.style("font", "32px sans-serif")
+	 		.text("Mer des sources");
+		//ajout des boutons source
+		var btnDel = d3svg.append("svg:image")
+			.attr("xlink:href","../public/img/delicious.20.gif")
+			.attr("x",this.x+6).attr("y",this.h/2+64)
+			.attr("height",32).attr("width",32)
+			.on("click", demandeCompte);
+		btnDel.append("svg:title")
+	 		.text("Cliquer ici pour ajouter un compte delicious");
+
+		
 		//création du cadre pour le compost
-		this.compost = this.R.rect(this.x, this.h/2, this.w, this.hCompost);		
+		this.compost = this.R.rect(this.w/10, this.h/2, this.w, this.hCompost);		
 		this.compost.attr({fill:"green", opacity: 0.5});
+		//création du cadre pour la nappe phréatique
+		this.nappe = this.R.rect(this.w/10, (this.h/2)+this.hCompost, this.w, this.hCompost);		
+		this.nappe.attr({fill:"blue",stroke:"blue"});
 		//création du cadre pour la terre
-		this.terre = this.R.rect(this.x, (this.h/2)+this.hCompost, this.w, this.h/2);		
+		this.terre = this.R.rect(this.w/10, (this.h/2)+(this.hCompost*2), this.w, this.h/2);		
 		this.terre.attr({fill:"black"});
-	}
-	,showPopup: function(x, y, infos){
+	};
+	this.showPopup=function(x, y, infos){
 		clearTimeout(this.leave_timer);
 		this.label[0].attr({text: infos[0]}).stop().hide();
         this.label[1].attr({text: infos[1]}).stop().hide();
@@ -61,8 +83,8 @@ jardin.prototype = {
 		this.label[0].show().toFront().animateWith(this.frame, {translation: [ppp.dx, ppp.dy]}, 200 * this.is_label_visible);
         this.label[1].show().toFront().animateWith(this.frame, {translation: [ppp.dx, ppp.dy]}, 200 * this.is_label_visible);
         this.is_label_visible = true;
-	}
-	,hidePopup: function(x, y, infos){
+	};
+	this.hidePopup=function(x, y, infos){
         var j = this;
         this.leave_timer = setTimeout(function () {
             j.frame.hide();
@@ -70,25 +92,25 @@ jardin.prototype = {
             j.label[1].hide();
             j.is_label_visible = false;
         }, 1);
-	}
-	,planteGraine: function(x,y,tag){
+	};
+	this.planteGraine=function(x,y,tag){
 		var e = new graine(this, x,this.compost.attr("y")+(this.compost.attr("height")/2),this.compost.attr("height")/2);
 		e.setFiltre(tag);
 		this.graines.push(e);
-	}
-	,setNuage: function(type){	
+	};
+	this.setNuage=function(type){	
 		var n = new nuage(this, 0, 100, this.w, this.data, type);
 		n.draw();
 		this.nuages.push(n);
-	}
-	,vent: function(x){
+	};
+	this.vent=function(x){
 		var b = Math.floor(Math.random()*this.forceVent);
 		if((b-1)%2)
 			return x+b;
 		else
 			return x-b;
-	}
-	,drawCouchesTempo: function () {
+	};
+	this.drawCouchesTempo=function () {
 		if(this.setCouchesTempo){
 			this.setCouchesTempo.remove();
 		}else{
@@ -168,10 +190,43 @@ jardin.prototype = {
 				graine.rhizomes[j].redraw();
 			}	
 		}
-	}
-	,getTempoY: function (d) {
+	};
+	this.getTempoY=function (d) {
 		//y = this.terre.attr("y")+(this.hInt*i);
 		var nbSec = (this.now-d.getTime())/1000;
 		return this.terre.attr("y")+(this.hSec*nbSec)+20;
+	};
+	function demandeCompte (){
+		var saisie = prompt("Saisissez le nom du compte delicious ou annulez", "");
+		if (saisie!=null) {
+        	cultive(saisie);	
+		}else{
+        	cultive("luckysemiosis");	
+		}			
+	}
+	function cultive (compte){
+		//initialisation du compte
+		J.exis = compte;
+		
+		//création des nuages a partir des tags d'un compte delicious
+		var type = "deliciousTagsUser";
+		var url = "http://feeds.delicious.com/v2/json/tags/"+J.exis;
+		//création des nuages a partir du bookmark d'un compte delicious
+		var type = "deliciousBookUser";
+		var url = "http://feeds.delicious.com/v2/json/"+J.exis;
+		//création des nuages a partir de la base de données de tag
+		var type = "fluxTagsExis";
+		var url = "http://localhost/jardindesconnaissances/public/flux/tags?uti="+J.exis;
+		
+		$.ajax({
+			type: "GET", 
+			dataType: "json", 
+			url: url,
+			success: function(data){
+				J.data = data;
+				J.setNuage(type);
+			}
+		});
+			
 	}
 };

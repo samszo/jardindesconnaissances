@@ -13,14 +13,19 @@ function bulle(nuage, x, y, tag, taille, data){
 	this.data = data;
 	
 	this.draw = function(){
-		this.cx = this.tag.length*this.taille;
-		this.cy = (this.taille);
 		
+		//contruction du texte pour récupérer la taille de la bulle
+		this.txt = this.nuage.jardin.R.text(this.x, this.y, this.tag);
+		this.txt.attr({fill:"black", font: (this.taille)+'px Helvetica, Arial'});
+
+		//construction de la bulle
+		this.cx = this.txt[0].clientWidth;
+		this.cy = this.txt[0].clientHeight;	
 		this.eli = this.nuage.jardin.R.ellipse(this.x, this.y, this.cx, this.cy);
 		this.eli.attr({fill:"black", opacity: 0.2});		
 		
-		this.txt = this.nuage.jardin.R.text(this.x, this.y, this.tag);
-		this.txt.attr({fill:"black", font: (this.taille)+'px Helvetica, Arial'});
+		//place le texte au premier plan pour qu'il soit visible
+		this.txt.toFront();		
 
 		this.st = this.nuage.jardin.R.set();
 		this.st.push(

@@ -6,9 +6,14 @@
     <title>Jardin Filtre Flux</title> 
     <link rel="stylesheet" href="demo.css" type="text/css" media="screen"> 
     <link rel="stylesheet" href="demo-print.css" type="text/css" media="print"> 
+	<style type="text/css">
+		.link { stroke: #ccc; }
+	</style>
 	<script src="jquery-1.4.4.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="raphael-min.js" type="text/javascript" charset="utf-8"></script> 
-    <script src="d3.min.js" type="text/javascript" charset="utf-8"></script> 
+    <script src="d3.js" type="text/javascript" charset="utf-8"></script>
+	<script src="d3.layout.js" type="text/javascript" ></script>
+	<script src="d3.geom.js" type="text/javascript" ></script>     
     <script src="jardin.js" type="text/javascript" charset="utf-8"></script> 
     <script src="graine.js" type="text/javascript" charset="utf-8"></script> 
     <script src="nuage.js" type="text/javascript" charset="utf-8"></script> 
@@ -16,8 +21,19 @@
     <script src="popup.js"></script> 
     <script src="rhizome.js"></script> 
     <script type="text/javascript" charset="utf-8"> 
-	window.onload = function () {
-		if(svgWarning())demandeCompte();
+    var d3svg, R, J, d3svg;
+    window.onload = function () {
+		if(svgWarning())creaJardin();
+		/*
+	    .attr("version", 1.1)
+	    .attr("xmlns", "http://www.w3.org/2000/svg")
+	    .node().parentNode.innerHTML;
+		d3.select("body").append("a")
+	    .attr("title", "file.svg")
+	    .attr("href-lang", "image/svg+xml")
+	    .attr("href", "data:image/svg+xml;base64,\n"+btoa(html))
+	    .text("Download this plot");
+		*/
 	};
 // Display a warning for browsers without SVG
 	var svgWarningHtml = '<div id="svgWarning" style="z-index: 1; width: 300px; padding: 8px 8px 8px 8px; position: fixed; top: 200px; left: 50%; margin-left: -150px; background: #ffd; border: solid 4px #b00; font-size: 14pt;"><div id="warnclose" style="position: absolute; right: 12px; color: white; font-weight: bold; cursor: default;" >X</div> <div id="warntitle" style="font-weight: bold; background: #b00; color: white; text-align: center;">WARNING</div> Votre navigateur ne supporte pas le SVG qui est utilisé par ce site. Veuillez utiliser <A href="http://www.w3.org/Graphics/SVG/WG/wiki/Implementations">un navigateur compatible</a>.</div></div>';
@@ -32,52 +48,28 @@
         return false;
 	}
 
-	function demandeCompte(){
-		var saisie = prompt("Saisissez le nom du compte delicious ou annulez", "");
-		if (saisie!=null) {
-        	cultive(saisie);	
-		}else{
-        	cultive("luckysemiosis");	
-		}			
-	}
-	function cultive(compte){
-		//création de la scène
-		var R = Raphael("jardin", 2560, 1280);
+	function creaJardin(){
+		//création de la scène Raphael
+		R = Raphael("jardin", 2560, 1280);
+		//initialise le svg D3
+		d3svg = d3.select("svg");
+		
 		//création du jardin
-		var J = new jardin(R, 0, 0, 2560, 1280, compte);
+		J = new jardin(R, 0, 0, 2560, 1280);
 		J.draw();
 		//évènement pour planter des graines
 		J.compost.node.onclick = function (event) {
 			J.planteGraine(event.pageX,event.pageY,"");
 		};
-		//création des nuages a partir d'un js en local
-		//J.data = data;
-		//J.setNuage();	
-		
-		//création des nuages a partir des tags d'un compte delicious
-		var type = "deliciousTagsUser";
-		var url = "http://feeds.delicious.com/v2/json/tags/"+J.exis;
-		//création des nuages a partir du bookmark d'un compte delicious
-		var type = "deliciousBookUser";
-		var url = "http://feeds.delicious.com/v2/json/"+J.exis;
-		//création des nuages a partir de la base de données de tag
-		var type = "fluxTagsExis";
-		var url = "http://localhost/jardindesconnaissances/public/flux/tags?uti="+J.exis;
-		
-		$.ajax({
-			type: "GET", 
-			dataType: "json", 
-			url: url,
-			success: function(data){
-				J.data = data;
-				J.setNuage(type);
-			}
-		});
-			
 	}
-    </script> 
+	</script> 
     </head> 
-    <body> 
+    <body>
+	<form id="source" enctype="multipart/form-data" action="" method="post">
+		<input type="hidden" name="MAX_FILE_SIZE" value="2097152" id="MAX_FILE_SIZE" />
+		<input type="file" name="url" id="url" />
+		<input type="submit" name="envoyer" id="boutonenvoyer" value="Ajouter" />
+	</form>         
 		<div id="jardin"></div>
     </body> 
 </html>
