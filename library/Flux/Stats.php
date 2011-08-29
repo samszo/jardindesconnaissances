@@ -9,8 +9,50 @@ class Flux_Stats{
 
 	var $cache;
 	var $forceCalcul = false;
+	var $dbU;
+	var $dbUU;
+	var $dbUT;
+	var $dbUD;
+	var $dbUTD;
+	var $dbT;
+	var $dbTD;		
+	var $dbD;
 	
     /**
+     * Récupère les statistiques d'un network étendu pour un tag 
+     *
+     * @param string $tag
+     * @param string $user
+     * 
+     * @return array
+     */
+	function GetTagUserNetwork($tag, $user) {
+		
+		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc();
+		
+		//vérifie s'il faut mettre à jour les données
+		if($this->forceCalcul){
+			//récupère les infos de l'utilisateur
+			if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti();
+			$u = $this->dbU->findByLogin($user);		
+			//recherche les post de l'utilisateur pour le tag
+			$f = new Flux_Delicious($user, $u['pwd']);
+			$f->forceCalcul = $this->forceCalcul;
+			$f->cache = $this->cache;	
+			$f->idUser = $u['uti_id'];
+			$f->SaveUserPost($user,true,$tag);
+		}
+		
+		//exécution de la requête
+		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag();
+		$t = $this->dbT->findByCode($tag);
+		$arrStat = $this->dbUTD->findStatByTags($t['tag_id']);
+
+		return $arrStat;
+		
+	}
+	
+	/**
      * Récupère la typologie des relations entre utilisateur pour un utilisateur  
      *
      * @param string $idUser

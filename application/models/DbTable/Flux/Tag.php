@@ -138,7 +138,8 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
                     ->from( array("f" => "flux_Tag") )                           
                     ->where( "f.code = ?", $code );
 
-        return $this->fetchAll($query)->toArray(); 
+		$arr = $this->fetchAll($query)->toArray();
+        return $arr[0]; 
     }
     /*
      * Recherche une entrée Flux_Tag avec la valeur spécifiée

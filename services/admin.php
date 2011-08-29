@@ -19,10 +19,9 @@ try {
 	$application->bootstrap();
 	
 	$user = "luckysemiosis";
-	$pwd = "Samszo0";
 	
 	$zot = new Flux_Zotero();
-	$zot->SaveRdf($_REQUEST);
+	//$zot->SaveRdf($_REQUEST);
 	
 	//$f = new Flux_Dbpedia();
 	//$f->cache = $cache;
@@ -32,21 +31,24 @@ try {
 	//$d->remove(7641);
 	
 	//
-	$f = new Flux_Delicious($user, $pwd);
+	$f = new Flux_Delicious();
+	$f->forceCalcul = true;
 	$f->cache = $cache;	
 	//$f->SaveUserFan($user, $pwd);
 	//$f->SaveUserNetwork($user, $pwd);
-	//$f->SaveUserPost($user, $pwd);
+	//$f->SaveUserPost($user);
 	//$f->SaveUserPostUser($user, $pwd);
 	//$f->UpdateUserBase($user, $pwd);
 	/*
 	$f->user = $user;
 	$f->idUser = 1;
-	$f->SaveHtmlDetailUrl("http://www.freebase.com/");
+	$f->SaveHtmlDetailUrl("http://bibliontology.com/");
 	*/
 	
-	//$s = new Flux_Stats;
-	//$arr = $s->GetTypeRelaUser(1);
+	$s = new Flux_Stats;
+	$s->cache = $cache;	
+	//$s->forceCalcul = true;
+	$arr = $s->GetTagUserNetwork('bibliothèque', $user);
 	
 	
 	$server = new Zend_Amf_Server();

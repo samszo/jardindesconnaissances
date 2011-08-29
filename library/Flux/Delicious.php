@@ -24,7 +24,7 @@ class Flux_Delicious  extends Zend_Service_Delicious{
     const JSON2_URL     	= '/v2/json/url/%s';
     const JSON2_URLINFO     = '/v2/json/urlinfo/%s';
 
- 	public function __construct($user, $pwd)
+ 	public function __construct($user=null, $pwd=null)
     {
     	parent::__construct($user, $pwd);
     }
@@ -46,7 +46,7 @@ class Flux_Delicious  extends Zend_Service_Delicious{
     public function getUrlDetails2($url)
     {
         $path = sprintf(self::JSON2_URL, md5($url));
-        return $this->makeRequestJ2($path, array(), 'json2');               
+        return $this->makeRequestJ2($path, array("count"=>100), 'json2');               
     }
 
     
@@ -132,12 +132,12 @@ class Flux_Delicious  extends Zend_Service_Delicious{
      * @param string $pwd
      * 
      */
-	function SaveUserPost($user, $pwd, $detail=false) {
+	function SaveUserPost($user, $detail=false, $tag=null) {
 
-        $c = "Flux_Delicious_SaveUserPost_".$user;
+        $c = "Flux_Delicious_SaveUserPost_".$user."_".md5($tag);
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$posts = $this->cache->load($c)) {
-			$posts = $this->getAllPosts();
+			$posts = $this->getAllPosts($tag);
 			$this->cache->save($posts,$c);
 		}
 		$this->SavePosts($posts, $user, $detail);
@@ -239,6 +239,9 @@ class Flux_Delicious  extends Zend_Service_Delicious{
 			if(!$urlInfo = $this->cache->load($c)) {	
 				$urlInfo = $this->getUrlInfos($url);
 				$this->cache->save($urlInfo,$c);
+				//sauvegarde le détail
+				if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc();
+				$this->dbD->edit(-1,array("total_posts"=>$urlInfo[0]["total_posts"],"top_tags"=>json_encode($urlInfo[0]["top_tags"])),$url);
 	        }
         	if($urlInfo[0]["total_posts"] > 100){
 				//récupère les infos en parsant les pages html

@@ -77,9 +77,12 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      *
      * @return void
      */
-    public function edit($id, $data)
-    {        
-        $this->update($data, 'flux_Doc.doc_id = ' . $id);
+    public function edit($id, $data, $url=null)
+    {
+    	if($url)
+	        $this->update($data, 'flux_Doc.url = "'. $url.'"');
+    	else        
+	        $this->update($data, 'flux_Doc.doc_id = ' . $id);
     }
     
     /**
