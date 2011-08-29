@@ -188,5 +188,45 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
     }
     
+    /*
+     * Recherche les documents pour des utilisateurs et des tags
+     * et retourne ces entrées.
+     *
+     * @param string $users
+     * @param string $tags
+     */
+    public function findDocsByUsersTags($users, $tags)
+    {
+	    //défiition de la requête
+		$sql = "select d.doc_id, d.url, d.titre, d.branche, d.tronc, d.poids, d.maj, d.pubDate, d.note 
+		from flux_utitagdoc utd
+			inner join flux_doc d on d.doc_id = utd.doc_id
+		where utd.tag_id IN (".tags.") AND utd.uti_id IN (".$users.")  
+		group by d.doc_id";
+        $db = Zend_Db_Table::getDefaultAdapter();
+    	$stmt = $db->query($sql);
+    	return $stmt->fetchAll();
+    }
+
+    /*
+     * Recherche les statistiques pour des tags
+     * et retourne ces entrées.
+     *
+     * @param string $tags
+     */
+    public function findStatByTags($tags, $order ="d.doc_id, u.uti_id")
+    {
+	    //défiition de la requête
+		$sql = "SELECT `d`.*, `u`.*, `t`.*, utd.* 
+			FROM `flux_utitagdoc` AS `utd` 
+		 		INNER JOIN `flux_doc` AS `d` ON d.doc_id=utd.doc_id
+		 		INNER JOIN `flux_uti` AS `u` ON u.uti_id = utd.uti_id
+		 		INNER JOIN `flux_tag` AS `t` ON t.tag_id = utd.tag_id 
+		 	WHERE t.tag_id IN (".$tags.")
+		 	ORDER BY ".$order;
+        $db = Zend_Db_Table::getDefaultAdapter();
+    	$stmt = $db->query($sql);
+    	return $stmt->fetchAll();
+    }
     
 }

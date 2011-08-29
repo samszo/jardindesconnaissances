@@ -154,8 +154,8 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
         $query = $this->select()
                     ->from( array("f" => "flux_Uti") )                           
                     ->where( "f.login = ?", $login );
-
-        return $this->fetchAll($query)->toArray(); 
+		$arr = $this->fetchAll($query)->toArray();
+        return $arr[0]; 
     }
     /*
      * Recherche une entrée Flux_Uti avec la valeur spécifiée
