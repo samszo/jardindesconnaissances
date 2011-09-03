@@ -117,7 +117,20 @@ class Flux_Dbpedia{
 			WHERE {
 			dbp:".$term." dbp2:abstract ?abstract .
 			}";
-	 
+
+	   	/* pour récupérer les classification dewey lié à un mot clef
+	   	 * http://dewey.info/sparql.php
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX dct: <http://purl.org/dc/terms/>
+
+SELECT *
+WHERE {
+  ?x skos:prefLabel ?prefLabel ;
+     skos:notation ?notation .
+  FILTER regex(?prefLabel, "jazz", "i") 
+}
+	   	 */
+	   	
 	   	$searchUrl = 'http://dbpedia.org/sparql?'
 	    	.'query='.urlencode($query)
 	      	.'&format='.$format;

@@ -24,9 +24,26 @@ class Flux_Delicious  extends Zend_Service_Delicious{
     const JSON2_URL     	= '/v2/json/url/%s';
     const JSON2_URLINFO     = '/v2/json/urlinfo/%s';
 
- 	public function __construct($user=null, $pwd=null)
+ 	public function __construct($user=null, $pwd=null, $cache=null)
     {
     	parent::__construct($user, $pwd);
+    	
+    	if($cache){
+		    $this->cache = $cache;	
+    	}else{
+    		//paramètrage du cache
+			$frontendOptions = array(
+		    	'lifetime' => 31536000, //  temps de vie du cache de 1 an
+		        'automatic_serialization' => true
+			);
+		   	$backendOptions = array(
+				// Répertoire où stocker les fichiers de cache
+		   		'cache_dir' => ROOT_PATH.'/tmp/flux/'
+			);
+			// créer un objet Zend_Cache_Core
+			$this->cache = Zend_Cache::factory('Core','File',$frontendOptions,$backendOptions);
+    	} 
+    	
     }
 
     /**
@@ -87,8 +104,8 @@ class Flux_Delicious  extends Zend_Service_Delicious{
         $timeDiff = microtime(true) - self::$_lastRequestTime;
         if ($timeDiff < 1) {
             usleep((1 - $timeDiff) * 1000000);
-        }
-
+        }      
+        
         $this->_rest->getHttpClient()->setAuth($this->_authUname, $this->_authPass);
 
         $this->_rest->setUri(self::JSON2_URI);
@@ -198,15 +215,15 @@ class Flux_Delicious  extends Zend_Service_Delicious{
 		foreach ($arrUd as $d) {
 			//prise en compte d'une clef lors d'un plantage
 			if($d["doc_id"]>=6621){
-		        $this->SaveHtmlDetailUrl($d['url']);
+		        $this->SaveDetailUrl($d['url']);
 			}	        
 		}						
 	}
 		
-	function SaveHtmlDetailUrl($url){
+	function SaveDetailUrl($url){
 
 		//récupère le détail de l'url
-		$urlDetails = $this->GetHtmlDetailUrl($url);
+		$urlDetails = $this->GetDetailUrl($url);
         //enregistre le detail de l'url
 		foreach ($urlDetails as $post) {
 			//ne prend pas en compte l'utilisateur source
@@ -228,13 +245,13 @@ class Flux_Delicious  extends Zend_Service_Delicious{
 		$this->dbUU->edit($this->idUser, $idUdst, $types);		
 	}
 	
-	function GetHtmlDetailUrl($url){
+	function GetDetailUrl($url){
 		//vérifie si le detail est en cache
-		$cD = "Flux_Delicious_GetHtmlDetailUrl_".md5($url)."details";
+		$cD = str_replace("::", "_", __METHOD__)."_".md5($url);
 	    if($this->forceCalcul)$this->cache->remove($cD);
 		if(!$urlDetails = $this->cache->load($cD)) {	
 			//vérifie si les infos de l'url sont en cache
-			$c = "Flux_Delicious_GetHtmlDetailUrl_".md5($url);
+			$c = $cD."details";
 			if($this->forceCalcul)$this->cache->remove($c);
 			if(!$urlInfo = $this->cache->load($c)) {	
 				$urlInfo = $this->getUrlInfos($url);
@@ -246,23 +263,44 @@ class Flux_Delicious  extends Zend_Service_Delicious{
         	if($urlInfo[0]["total_posts"] > 100){
 				//récupère les infos en parsant les pages html
 				$urlDetails = $this->ParseHtmlDetailUrl($url);
-			}else{					
+			}else{									
 				//récupère les infos à partir du flux
 				$urlDetails = $this->getUrlDetails2($url);
+			}
+			//vérifie si l'url vient d'un agrégateur de flux
+			$urlP = $this->VerifUrl($url);
+			if($urlP){
+				//on ajoute les détails de cette url à ceux de l'url d'origine
+				$urlDetailsP = $this->GetDetailUrl($urlP);
+				$urlDetails = array_merge($urlDetailsP,$urlDetails);
 			}
 	        $this->cache->save($urlDetails,$cD);
         }
 		return $urlDetails;
 	}
 	
+	function VerifUrl($url){
+		$sale = false;
+		//vérification de la propreté de l'url
+		$arrUrl = parse_url($url);
+		if(isset($arrUrl["query"])){
+			$q = parse_str($arrUrl["query"], $ps);
+			//vérifie un lien générer par feedburner
+			if (array_key_exists('utm_source', $ps)) {
+			    //on retourne l'url nettoyer des paramètres feedburner
+				return $arrUrl["scheme"]."://".$arrUrl["host"].$arrUrl["path"];
+			}
+			
+		}
+		return $sale;
+	}
+	
 	function ParseHtmlDetailUrl($url, $p=1){
 		//vérifie si le detail est en cache
-		$c = "Flux_Delicious_ParseHtmlDetailUrl_".md5($url)."_".$p;
+		$c = str_replace("::", "_", __METHOD__)."_".md5($url)."_".$p;
         if($this->forceCalcul)$this->cache->remove($c);
-		if(!$html = $this->cache->load($c)) {	
-			$delUri = "http://www.delicious.com/url/".md5($url)."?show=all&page=".$p;
-			//pour éviter d'âtre considérer comme un spammeur il faut attendre au moins 1 seconde entre deux requêtes
-			sleep(1);
+		if(!$html = $this->cache->load($c)) {
+			$delUri = "http://www.delicious.com/url/".md5($url)."?show=all&page=".$p."&count=100";
 			$client = new Zend_Http_Client($delUri);
 			$response = $client->request();
 			$html = $response->getBody();
@@ -300,7 +338,8 @@ class Flux_Delicious  extends Zend_Service_Delicious{
 			$posts[] = array("a"=>$a,"u"=>$u,"d"=>$d,"n"=>$n,"dt"=>$dt, "t"=>$arrT);
 		}
 		//vérifie s'il y a plusieurs page
-		if($posts){
+		//il y a une limite de 40 pages de 50 posts soit 2000 posts maximum	
+		if($posts && $p < 40){
 			$pp = $this->ParseHtmlDetailUrl($url,$p+1);
 			foreach ($pp as $post) {
 				$posts[] = $post;
@@ -371,7 +410,7 @@ class Flux_Delicious  extends Zend_Service_Delicious{
 			}
 			//enregistre le detail de l'url
 			if($detail){
-				$this->SaveHtmlDetailUrl($url);
+				$this->SaveDetailUrl($url);
 			}
 		};
 		

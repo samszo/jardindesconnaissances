@@ -3,19 +3,6 @@ require_once( "../application/configs/config.php" );
 
 try {
 	
-	//paramètrage du cache
-	$frontendOptions = array(
-    	'lifetime' => 31536000, //  temps de vie du cache de 1 an
-        'automatic_serialization' => true
-	);
-   	$backendOptions = array(
-		// Répertoire où stocker les fichiers de cache
-   		'cache_dir' => ROOT_PATH.'/tmp/'
-	);
-	// créer un objet Zend_Cache_Core
-	$cache = Zend_Cache::factory('Core','File',$frontendOptions,$backendOptions);				
-	
-	
 	$application->bootstrap();
 	
 	$user = "luckysemiosis";
@@ -24,7 +11,6 @@ try {
 	//$zot->SaveRdf($_REQUEST);
 	
 	//$f = new Flux_Dbpedia();
-	//$f->cache = $cache;
 	//$f->SaveUserTagsLinks($user);
 	
 	//$d = new Model_DbTable_Flux_Doc();
@@ -32,23 +18,22 @@ try {
 	
 	//
 	$f = new Flux_Delicious();
-	$f->forceCalcul = true;
-	$f->cache = $cache;	
+	//$f->forceCalcul = true;
 	//$f->SaveUserFan($user, $pwd);
 	//$f->SaveUserNetwork($user, $pwd);
 	//$f->SaveUserPost($user);
 	//$f->SaveUserPostUser($user, $pwd);
 	//$f->UpdateUserBase($user, $pwd);
-	/*
+	//
 	$f->user = $user;
 	$f->idUser = 1;
-	$f->SaveHtmlDetailUrl("http://bibliontology.com/");
-	*/
+	$f->SaveDetailUrl("www.worldcat.org/");
+	//
 	
 	$s = new Flux_Stats;
-	$s->cache = $cache;	
-	//$s->forceCalcul = true;
-	$arr = $s->GetTagUserNetwork('bibliothèque', $user);
+	$s->forceCalcul = true;
+	//$s->update("simple");
+	$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
 	
 	$server = new Zend_Amf_Server();
