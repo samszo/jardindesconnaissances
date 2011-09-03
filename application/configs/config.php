@@ -9,6 +9,10 @@ define ("ROOT_PATH",$www."/jardindesconnaissances");
 define ("WEB_ROOT_AJAX",WEB_ROOT."/public");
 define ("SEP_PATH","/");
 
+//code de sécurité pour l'administation
+define ("CODE_ADMIN","simple");
+
+
 // Define path to application directory
 defined('APPLICATION_PATH')
     || define('APPLICATION_PATH', ROOT_PATH . '/application');

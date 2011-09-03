@@ -18,7 +18,82 @@ class Flux_Stats{
 	var $dbTD;		
 	var $dbD;
 	
-    /**
+ 	public function __construct($cache=null)
+    {
+    	if($cache){
+		    $this->cache = $cache;	
+    	}else{
+    		//paramètrage du cache
+			$frontendOptions = array(
+		    	'lifetime' => 31536000, //  temps de vie du cache de 1 an
+		        'automatic_serialization' => true
+			);
+		   	$backendOptions = array(
+				// Répertoire où stocker les fichiers de cache
+		   		'cache_dir' => ROOT_PATH.'/tmp/stats/'
+			);
+			// créer un objet Zend_Cache_Core
+			$this->cache = Zend_Cache::factory('Core','File',$frontendOptions,$backendOptions);
+    	} 
+    }
+	
+	/**
+     * Mise à jour des calculs statistiques 
+     *
+     * 
+     */
+    function update($code) {
+        //vérifie le code de sécurité d'administration
+    	if($code != CODE_ADMIN) return "vous n'êtes pas autorisé a éxécuter cette action !";
+    	
+    	$message = "";
+    	
+    	$db = Zend_Db_Table::getDefaultAdapter();
+    	//excution des requêtes pour la relation entre utilisateur et tag
+		$sql = "TRUNCATE TABLE  flux_utitag";
+    	$stmt = $db->query($sql);
+		$message .= $sql."<br/>";
+		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+    	
+		$sql = "INSERT INTO flux_utitag (tag_id, uti_id, poids)
+			SELECT utd.tag_id, uti_id, count(distinct utd.doc_id) nb
+			FROM flux_utitagdoc utd
+			GROUP BY utd.tag_id, uti_id";
+    	$stmt = $db->query($sql);
+		$message .= $sql."<br/>"; 
+		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+		
+    	//excution des requêtes pour la relation entre utilisateur et document
+		$sql = "TRUNCATE TABLE  flux_utidoc";
+    	$stmt = $db->query($sql);
+		$message .= $sql."<br/>"; 
+		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+		
+		$sql = "INSERT INTO flux_utidoc (doc_id, uti_id, maj, poids)
+			SELECT doc_id, uti_id, maj, count(distinct tag_id) nb
+			FROM flux_utitagdoc utd
+			GROUP BY doc_id, uti_id";
+    	$stmt = $db->query($sql);
+		$message .= $sql."<br/>"; 
+		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+
+    	//excution des requêtes pour la relation entre tag et document
+		$sql = "TRUNCATE TABLE flux_tagdoc";
+    	$stmt = $db->query($sql);
+		$message .= $sql."<br/>"; 
+		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+		$sql = "INSERT INTO flux_tagdoc (tag_id, doc_id, poids)
+			SELECT utd.tag_id, utd.doc_id, count(distinct uti_id) nb
+			FROM flux_utitagdoc utd
+			GROUP BY utd.tag_id, utd.doc_id";
+    	$stmt = $db->query($sql);
+		$message .= $sql."<br/>"; 
+		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+
+		return $message;		
+    }
+    
+	/**
      * Récupère les statistiques d'un network étendu pour un tag 
      *
      * @param string $tag
@@ -34,13 +109,14 @@ class Flux_Stats{
 		if($this->forceCalcul){
 			//récupère les infos de l'utilisateur
 			if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti();
-			$u = $this->dbU->findByLogin($user);		
+			$u = $this->dbU->findByLogin($user["login"]);		
 			//recherche les post de l'utilisateur pour le tag
-			$f = new Flux_Delicious($user, $u['pwd']);
+			$f = new Flux_Delicious($user["login"], $user['pwd']);
 			$f->forceCalcul = $this->forceCalcul;
-			$f->cache = $this->cache;	
 			$f->idUser = $u['uti_id'];
-			$f->SaveUserPost($user,true,$tag);
+			$f->SaveUserPost($user["login"],true,$tag);
+			//mise à jour des stats
+			$this->update(CODE_ADMIN);
 		}
 		
 		//exécution de la requête

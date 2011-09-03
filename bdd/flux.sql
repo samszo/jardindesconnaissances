@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Serveur: localhost
--- Généré le : Lun 15 Août 2011 à 09:12
+-- Généré le : Sam 03 Septembre 2011 à 05:39
 -- Version du serveur: 5.5.8
 -- Version de PHP: 5.3.5
 
@@ -64,9 +64,11 @@ CREATE TABLE IF NOT EXISTS `flux_doc` (
   `maj` datetime NOT NULL,
   `pubDate` datetime NOT NULL,
   `note` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `total_posts` int(11) NOT NULL,
+  `top_tags` varchar(2000) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`doc_id`),
   FULLTEXT KEY `url` (`url`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC AUTO_INCREMENT=8195 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC AUTO_INCREMENT=8215 ;
 
 -- --------------------------------------------------------
 
@@ -148,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `flux_tag` (
   `parent` char(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`tag_id`),
   KEY `code` (`code`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=24335 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=25797 ;
 
 -- --------------------------------------------------------
 
@@ -160,6 +162,7 @@ DROP TABLE IF EXISTS `flux_tagdoc`;
 CREATE TABLE IF NOT EXISTS `flux_tagdoc` (
   `tag_id` int(11) NOT NULL,
   `doc_id` int(11) NOT NULL,
+  `poids` int(11) NOT NULL,
   PRIMARY KEY (`tag_id`,`doc_id`),
   KEY `tag_id` (`tag_id`),
   KEY `doc_id` (`doc_id`)
@@ -223,7 +226,7 @@ CREATE TABLE IF NOT EXISTS `flux_uti` (
   `flux` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`uti_id`),
   KEY `login` (`login`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=55847 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=59273 ;
 
 -- --------------------------------------------------------
 
