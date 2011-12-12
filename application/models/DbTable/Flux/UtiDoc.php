@@ -81,27 +81,13 @@ class Model_DbTable_Flux_UtiDoc extends Zend_Db_Table_Abstract
      * Recherche une entrée Flux_UtiDoc avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
-     * @param integer $idUti
-     * @param integer $idDoc
+     * @param integer $id
      *
      * @return void
      */
-    public function remove($idUti, $idDoc)
+    public function remove($id)
     {
-        $this->delete('flux_UtiDoc.uti_id = ' . $idUti. ' AND flux_UtiDoc.doc_id = ' . $idDoc);
-    }
-
-    /**
-     * Recherche une entrée Flux_UtiDoc avec la clef étrangère spécifiée
-     * et supprime ces entrées.
-     *
-     * @param integer $idDoc
-     *
-     * @return void
-     */
-    public function removeDoc($idDoc)
-    {
-        $this->delete(' flux_UtiDoc.doc_id = ' . $idDoc);
+        $this->delete('flux_UtiDoc.uti_id = ' . $id);
     }
     
     /**
@@ -142,97 +128,34 @@ class Model_DbTable_Flux_UtiDoc extends Zend_Db_Table_Abstract
     	$sql = "SELECT d.url, d.doc_id
     		FROM flux_Doc d 
     		INNER JOIN flux_UtiDoc ud ON ud.doc_id = d.doc_id 
-    		INNER JOIN flux_Uti u ON u.uti_id = ud.uti_id AND u.uti_id  = ".$UtiId."
-    		ORDER BY d.doc_id ";
+    		INNER JOIN flux_Uti u ON u.uti_id = ud.uti_id AND u.uti_id  = ".$UtiId
+    		." ORDER BY ud.maj DESC";
         $db = Zend_Db_Table::getDefaultAdapter();
     	$stmt = $db->query($sql);
     	return $stmt->fetchAll();
     	
     }
-
-    /**
-     * Recherche les docs pour un user et un tag
-     * et retourne cette entrée.
-     *
-     * @param string $uti
-     * @param string $tag
-
-     * @return array
-     */
-    public function findDocByUtiTag($uti, $tag)
-    {
-        $query = $this->select()
-        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-    		->from(array('d' => 'flux_doc'))
-            ->joinInner(array('ud' => 'flux_utidoc'),
-            	'ud.doc_id=d.doc_id')
-            ->joinInner(array('u' => 'flux_uti'),
-            	'u.uti_id = ud.uti_id')
-            ->joinInner(array('td' => 'flux_tagdoc'),
-            	'td.doc_id = d.doc_id')
-            ->joinInner(array('t' => 'flux_tag'),
-            	't.tag_id = td.tag_id')
-            ->where( "u.login = ?", $uti)
-            ->where( "t.code = ?", $tag)
-            ->order("d.pubDate");
-        /*
-         SELECT `d`.*, `ud`.*, `u`.*, `td`.*, `t`.* FROM `flux_doc` AS `d`
- INNER JOIN `flux_utidoc` AS `ud` ON ud.doc_id=d.doc_id
- INNER JOIN `flux_uti` AS `u` ON u.uti_id = ud.uti_id
- INNER JOIN `flux_tagdoc` AS `td` ON td.doc_id = d.doc_id
- INNER JOIN `flux_tag` AS `t` ON t.tag_id = td.tag_id WHERE (u.login = 'luckysemiosis') AND (t.code = 'agent') ORDER BY `d`.`pubDate` ASC
-         */
-		return $this->fetchAll($query)->toArray(); 
-            
-    }
-
-    /**
-     * Recherche les tags pour un user et un doc
-     * et retourne cette entrée.
-     *
-     * @param string $docId
-     * @param string $utiId
-
-     * @return array
-     */
-    public function findTagByDocUti($docId, $utiId)
-    {
-        $query = $this->select()
-        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-    		->from(array('t' => 'flux_tag'))
-            ->joinInner(array('td' => 'flux_tagdoc'),
-            	'td.tag_id = t.tag_id')
-            ->joinInner(array('ut' => 'flux_utitag'),
-            	'ut.tag_id = t.tag_id')
-            ->where( "ut.uti_id = ?", $utiId)
-            ->where( "td.doc_id = ?", $docId)
-            ->order("t.code");
-        /*
-         SELECT `t`.*, `td`.*, `ut`.* 
-FROM `flux_tag` AS `t`
- INNER JOIN `flux_tagdoc` AS `td` ON td.tag_id = t.tag_id
- INNER JOIN `flux_utitag` AS `ut` ON ut.tag_id = t.tag_id 
- WHERE (ut.uti_id = '1') AND (td.doc_id = '11309') ORDER BY `t`.`code` ASC
-         */
-		return $this->fetchAll($query)->toArray(); 
-            
-    }
-
     
-    /*
-     * Recherche une entrée Flux_UtiDoc avec la valeur spécifiée
+    /**
+     * Recherche le doc le plus récent pour un user
      * et retourne cette entrée.
      *
-     * @param int $uti_id
-     */
-    public function findByUti_id($uti_id)
-    {
-        $query = $this->select()
-                    ->from( array("f" => "flux_UtiDoc") )                           
-                    ->where( "f.uti_id = ?", $uti_id );
+     * @param int $UtiId
 
-        return $this->fetchAll($query)->toArray(); 
+     * @return array
+     */
+    public function findDernierDocByUti($UtiId)
+    {
+    	$sql = "SELECT d.url, d.doc_id, ud.maj
+    		FROM flux_Doc d 
+    		INNER JOIN flux_UtiDoc ud ON ud.doc_id = d.doc_id 
+    		INNER JOIN flux_Uti u ON u.uti_id = ud.uti_id AND u.uti_id  = ".$UtiId;
+        $db = Zend_Db_Table::getDefaultAdapter();
+    	$stmt = $db->query($sql);
+    	return $stmt->fetchAll();
+    	
     }
+    
     /*
      * Recherche une entrée Flux_UtiDoc avec la valeur spécifiée
      * et retourne cette entrée.
