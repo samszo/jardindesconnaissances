@@ -6,10 +6,26 @@ try {
 	$application->bootstrap();
 	
 	$user = "luckysemiosis";
+	$pwd = "";
 	
-	$zot = new Flux_Zotero();
+	$lu = new Flux_Lucene();
+	//$lu->addBddDocs();
+	$hits = $lu->find("spinoza");
+	$arr="";
+	foreach ($hits as $hit) {
+	    $arr[] = array("score"=>$hit->score,"title"=>$hit->title,"titre"=>$hit->titre,"url"=>$hit->url,"mp3"=>$hit->mp3);
+	}
+	print_r($arr);
+	
+	/* pour importer les classeurs google doc
+	//$gd = new Flux_Gdata($user, $pwd);
+	//$arr = $gd->saveSpreadsheetsTags();
+		
+	/* pour importer les rdf de Zotero
+	//$zot = new Flux_Zotero();
 	//$zot->SaveRdf($_REQUEST);
 	
+	// pour importer les flux Wikipedia
 	//$f = new Flux_Dbpedia();
 	//$f->SaveUserTagsLinks($user);
 	
@@ -18,22 +34,22 @@ try {
 	
 	//
 	$f = new Flux_Delicious();
-	//$f->forceCalcul = true;
-	//$f->SaveUserFan($user, $pwd);
-	//$f->SaveUserNetwork($user, $pwd);
-	//$f->SaveUserPost($user);
-	//$f->SaveUserPostUser($user, $pwd);
-	//$f->UpdateUserBase($user, $pwd);
-	//
+	/*
+	$f->forceCalcul = true;
+	$f->SaveUserFan($user, $pwd);
+	$f->SaveUserNetwork($user, $pwd);
+	$f->SaveUserPost($user);
+	$f->SaveUserPostUser($user, $pwd);
+	$f->UpdateUserBase($user, $pwd);
 	$f->user = $user;
 	$f->idUser = 1;
 	$f->SaveDetailUrl("www.worldcat.org/");
-	//
 	
 	$s = new Flux_Stats;
 	$s->forceCalcul = true;
 	//$s->update("simple");
 	$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
+	*/
 	
 	
 	$server = new Zend_Amf_Server();
