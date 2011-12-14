@@ -2,8 +2,8 @@
 date_default_timezone_set('Europe/Paris');
 setlocale (LC_TIME, 'fr_FR.utf8','fra'); 
 ini_set("memory_limit",'1600M');
-//$www = "/Users/paragraphe/Documents/www";
-$www = "C:/wamp/www";
+$www = "/Users/paragraphe/Documents/www";
+//$www = "C:/wamp/www";
 define ("WEB_ROOT","http://localhost/jardindesconnaissances");
 define ("ROOT_PATH",$www."/jardindesconnaissances");
 define ("WEB_ROOT_AJAX",WEB_ROOT."/public");

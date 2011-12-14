@@ -129,6 +129,23 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     }
 
     /**
+     * Récupère toutes les entrées distinct de Flux_Doc pour un champs
+     * de tri, intervalles
+	 *
+     * @param string $column
+     *
+     * @return array
+     */
+    public function getDistinct($column)
+    {
+        $query = $this->select()
+			->from( array("flux_Doc" => "flux_Doc"),array("nb" => "COUNT(*)",$column))
+			->group($column);
+
+        return $this->fetchAll($query)->toArray();
+    }
+    
+    /**
      * Recherche le doc le plus récent pour un utilisateur
      * et retourne cette entrée.
      *
