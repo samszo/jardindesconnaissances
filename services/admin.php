@@ -8,14 +8,17 @@ try {
 	$user = "luckysemiosis";
 	$pwd = "";
 	
-	$lu = new Flux_Lucene();
+	//pour gérer les indes Lucene
+	//$lu = new Flux_Lucene();
 	//$lu->addBddDocs();
+	/*
 	$hits = $lu->find("spinoza");
 	$arr="";
 	foreach ($hits as $hit) {
 	    $arr[] = array("score"=>$hit->score,"title"=>$hit->title,"titre"=>$hit->titre,"url"=>$hit->url,"mp3"=>$hit->mp3);
 	}
 	print_r($arr);
+	*/
 	
 	/* pour importer les classeurs google doc
 	//$gd = new Flux_Gdata($user, $pwd);
