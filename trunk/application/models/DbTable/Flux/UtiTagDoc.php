@@ -114,22 +114,25 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray();
     }
-
-    /**
-     * Récupère les spécifications des colonnes Flux_utitagdoc 
+    
+    /*
+     * Retourne les entrées de Flux_utitagdoc
+     * 
+     *
+     * 
      */
-    public function getCols(){
-
-    	$arr = array("cols"=>array(
-    	   	array("titre"=>"uti_id","champ"=>"uti_id","visible"=>true),
-    	array("titre"=>"tag_id","champ"=>"tag_id","visible"=>true),
-    	array("titre"=>"doc_id","champ"=>"doc_id","visible"=>true),
-    	array("titre"=>"maj","champ"=>"maj","visible"=>true),
-        	
-    		));    	
-    	return $arr;
-		
-    }     
+    public function getAllInfo()
+    {
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("utd" => "flux_utitagdoc") )                           
+            ->joinInner(array('t' => 'flux_tag'),
+            	't.tag_id = utd.tag_id',array('code'))
+        	->joinInner(array('d' => 'flux_doc'),
+            	'd.doc_id = utd.doc_id',array('url','titre'));
+			
+        return $this->fetchAll($query)->toArray(); 
+    }
     
     /*
      * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
@@ -151,14 +154,60 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
      *
      * @param int $tag_id
      */
-    public function findByTag_id($tag_id)
+    public function findByTagId($tag_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_utitagdoc") )                           
-                    ->where( "f.tag_id = ?", $tag_id );
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("utd" => "flux_utitagdoc") )                           
+            ->joinInner(array('t' => 'flux_tag'),
+            	't.tag_id = utd.tag_id',array('code'))
+        	->joinInner(array('d' => 'flux_doc'),
+            	'd.doc_id = utd.doc_id',array('url','titre'))
+        	->where( "utd.tag_id = ?", $tag_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
+
+    /*
+     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param int $tag
+     */
+    public function findByTag($tag)
+    {
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("utd" => "flux_utitagdoc") )                           
+            ->joinInner(array('t' => 'flux_tag'),
+            	't.tag_id = utd.tag_id',array('code'))
+        	->joinInner(array('d' => 'flux_doc'),
+            	'd.doc_id = utd.doc_id',array('url','titre'))
+        	->where( "t.code LIKE '%".$tag."%'");
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+
+    /*
+     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param int $url
+     */
+    public function findByUrl($url)
+    {
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("utd" => "flux_utitagdoc") )                           
+            ->joinInner(array('t' => 'flux_tag'),
+            	't.tag_id = utd.tag_id',array('code'))
+        	->joinInner(array('d' => 'flux_doc'),
+            	'd.doc_id = utd.doc_id',array('url','titre'))
+        	->where( "d.url = ?", $url);
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+    
     /*
      * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
      * et retourne cette entrée.
