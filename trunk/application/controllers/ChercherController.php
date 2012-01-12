@@ -39,7 +39,25 @@ class ChercherController extends Zend_Controller_Action {
 	    $this->view->resultats = "";
     	if($this->_getParam('recherche', 0)){
 			$lu = new Flux_Lucene();
-			$this->view->resultats = $lu->find($this->_getParam('recherche', 0));
+			$hits = $lu->find($this->_getParam('recherche', 0));
+			$arr="";
+			foreach ($hits as $hit) {
+			    $arr[] = array("score"=>$hit->score,"title"=>$hit->title,"titre"=>$hit->titre,"url"=>$hit->url,"mp3"=>$hit->mp3);
+			}			
+			$this->view->resultats = $arr;
+	    }
+	}
+
+	/**
+	 * affichage des positions d'un term
+	 */
+	public function positionAction() {
+	    $this->view->resultats = "";
+    	if($this->_getParam('term', 0)){
+			$lu = new Flux_Lucene();
+			$lu->getDb("fluxDeleuzeSpinoza");
+			$this->view->resultats = $lu->getTermPositions(array('field'=>'body', 'text'=>$this->_getParam('term', 0)));
+			$this->view->term = $this->_getParam('term', 0);
 	    }
 	}
 	
