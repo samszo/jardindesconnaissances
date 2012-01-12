@@ -9,24 +9,26 @@
 class Flux_Deleuze extends Flux_Site{
 	
 	var $root = "http://www2.univ-paris8.fr/deleuze/";
+
+	public function __construct($idBase=false)
+    {
+    	parent::__construct($idBase);
+    }
 	
     function addInfoDocLucene($url, $doc) {
-		$c = str_replace("::", "_", __METHOD__)."_".md5($url); 
-	   	$dom = $this->cache->load($c);
-        if(!$dom){
-	    	$client = new Zend_Http_Client($url);
-			$response = $client->request();
-			$html = $response->getBody();
-			$dom = new Zend_Dom_Query($html);	    
-        	$this->cache->save($dom, $c);
-        }    	
-		//récupère le titre du document
+	   	
+    	//récupère le body de l'url
+    	$html = $this->getUrlBodyContent($url);
+		$dom = new Zend_Dom_Query($html);	    
+    	
+	   	//récupère le titre du document
 		$results = $dom->query('/html/body/table[2]/tr[2]/td[2]/p[1]/strong');
 		$titre = "";
 		foreach ($results as $result) {
 		    $titre = $result->nodeValue;
 		}	    
 		$doc->addField(Zend_Search_Lucene_Field::Keyword('titre',$titre));
+		
 		//récupère le mp3 du document 
 		$results = $dom->query('/html/body/table[2]/tr[2]/td[2]/table/tr/td[1]/a');
 		$mp3 = "";
@@ -39,6 +41,10 @@ class Flux_Deleuze extends Flux_Site{
 		
 		//ajoute l'url du document
 		$doc->addField(Zend_Search_Lucene_Field::Keyword('url',$url));
+		
+		//ajoute dans la base le sous-document mp3
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		
 		
 		return $doc;		 
 	}	

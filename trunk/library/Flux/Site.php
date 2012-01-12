@@ -8,7 +8,7 @@ class Flux_Site{
 	var $login;
 	var $pwd;
     var $user;
-	var $idUser;
+	var $graine;
 	var $dbU;
 	var $dbUU;
 	var $dbUT;
@@ -17,8 +17,11 @@ class Flux_Site{
 	var $dbT;
 	var $dbTD;		
 	var $dbD;
+	var $db;
 	    
-    function __construct(){    	
+    function __construct($idBase=false){    	
+    	
+    	$this->getDb($idBase);
     	
         $frontendOptions = array(
             'lifetime' => 8640000000000000000000000000, // temps de vie du cache en seconde
@@ -57,6 +60,7 @@ class Flux_Site{
 			$arr['dbname']=$idBase;
 			$db = Zend_Db::factory('PDO_MYSQL', $arr);	
     	}
+    	$this->db = $db;
     	return $db;
     }
     
@@ -73,5 +77,39 @@ class Flux_Site{
 		$this->user = $this->dbU->ajouter($user);		
 
 	}
-    
+
+    /**
+     * Récupère l'identifiant de la graine ou la crée
+     *
+     * @param array $graine
+     * 
+     */
+	function getGraine($graine) {
+
+		//TODO récupère ou enregistre la graine
+		//if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti();
+		//$this->graine = $this->dbU->ajouter($user);		
+
+	}
+
+    /**
+     * Récupère le contenu d'une url
+     *
+     * @param string $url
+     *   
+     * @return string
+     */
+	function getUrlBodyContent($url) {
+
+		$c = str_replace("::", "_", __METHOD__)."_".md5($url); 
+	   	$html = $this->cache->load($c);
+        if(!$html){
+	    	$client = new Zend_Http_Client($url);
+			$response = $client->request();
+			$html = $response->getBody();
+        	$this->cache->save($html, $c);
+        }    	
+		return $html;
+	}
+	
 }

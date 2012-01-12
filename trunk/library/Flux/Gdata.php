@@ -12,19 +12,24 @@ class Flux_Gdata extends Flux_Site{
 	var $docs;		
 	var $feed;
  	
-	public function __construct($login=null, $pwd=null)
+	public function __construct($login=null, $pwd=null, $idBase=false)
     {
-    	parent::__construct();
+    	parent::__construct($idBase);
     	
     	$this->login = $login;
     	$this->pwd = $pwd;
     }
 	
 	function getSpreadsheets(){
-	    $service = Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
-	    $this->client = Zend_Gdata_ClientLogin::getHttpClient($this->login, $this->pwd, $service);
-	    $spreadsheetService = new Zend_Gdata_Spreadsheets($this->client);
-		$this->feed = $spreadsheetService->getSpreadsheetFeed();	
+		$c = str_replace("::", "_", __METHOD__)."_".md5($this->login); 
+	   	$this->feed = $this->cache->load($c);
+        if(!$this->feed){
+			$service = Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
+		    $this->client = Zend_Gdata_ClientLogin::getHttpClient($this->login, $this->pwd, $service);
+		    $spreadsheetService = new Zend_Gdata_Spreadsheets($this->client);
+			$this->feed = $spreadsheetService->getSpreadsheetFeed();
+			$this->cache->save($this->feed, $c);
+        }	
 	}
 
 	function getSpreadsheetsContents(){
@@ -37,12 +42,16 @@ class Flux_Gdata extends Flux_Site{
 				if($i<10000){					
 					$wss = $ss->getWorksheets();
 					$ssName = $ss->getTitleValue();
+					//TODO récupérer l'url du classeur
+					$ssUrl = "";
 					$arrWs = array();
 					foreach ($wss as $ws){
 						$wsName = $ws->getTitleValue();
-						$arrWs[] = array('titre'=>$wsName,'values'=>$ws->getContentsAsRows());		
+						//TODO récupérer l'url de la feuille
+						$wsUrl = "";
+						$arrWs[] = array('titre'=>$wsName,'url'=>$wsUrl,'values'=>$ws->getContentsAsRows());		
 					}
-					$arr[] = array('titre'=>$ssName,'feuilles'=>$arrWs); 
+					$arr[] = array('titre'=>$ssName,'url'=>$ssUrl,'feuilles'=>$arrWs); 
 				}
 				$i++;
 			}
@@ -51,27 +60,33 @@ class Flux_Gdata extends Flux_Site{
 		return $arr;
 	}
 	
-	function saveSpreadsheetsTags(){
+	function saveSpreadsheetsTags($docTronc=-1){
 		
 		$arr = $this->getSpreadsheetsContents();
 		if($arr){
+			if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+			if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+			if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc($this->db);
+			if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
+			if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+			//TODO ajouter les db pour graine utigraine et grainedoc 
+			
 			$this->getUser(array("login"=>$this->login,"flux"=>"gdata"));
-	
-			if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag();
-			//if(!$this->dbUT)$this->dbUT = new Model_DbTable_Flux_UtiTag();
-			if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc();
-			if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc();
-			if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc();
-			if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc();
+			$this->getGraine(array("titre"=>"Google data","class"=>"Flux_Gdata","url"=>"????"));
+			//TODO ajouter la utigraine 
+			
 			$date = new Zend_Date();
 			
 			foreach ($arr as $nSS=>$vSS){
-				$arrSS = split(" ", $vSS['titre']);
-				$idD = $this->dbD->ajouter(array("url"=>$arrSS[1],"titre"=>$arrSS[0],"pubDate"=>$date->get("c")));
+				//ajouter un document correspondant au classeur
+				$idD = $this->dbD->ajouter(array("url"=>$vSS['url'],"titre"=>$vSS['titre'],"tronc"=>$docTronc,"pubDate"=>$date->get("c")));
+				//TODO ajouter la grainedoc 
+				
 				$i = 0;
 				foreach ($vSS['feuilles'] as $nWS=>$vWS) {
 					//ajouter un document correspondant à la feuille
-					$idDF = $this->dbD->ajouter(array("url"=>$arrSS[1],"titre"=>$vWS['titre'],"tronc"=>$idD,"pubDate"=>$date->get("c")));
+					$idDF = $this->dbD->ajouter(array("url"=>$vWS['url'],"titre"=>$vWS['titre'],"tronc"=>$idD,"pubDate"=>$date->get("c")));
+					//TODO ajouter la grainedoc 
 					$j = 0;
 					if($idDF>44){
 						foreach ($vWS['values'] as $v) {
