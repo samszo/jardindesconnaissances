@@ -210,20 +210,6 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      * Recherche une entrée Flux_Doc avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param int $branche
-     */
-    public function findByBranche($branche)
-    {
-        $query = $this->select()
-                    ->from( array("f" => "flux_Doc") )                           
-                    ->where( "f.branche = ?", $branche );
-
-        return $this->fetchAll($query)->toArray(); 
-    }
-    /*
-     * Recherche une entrée Flux_Doc avec la valeur spécifiée
-     * et retourne cette entrée.
-     *
      * @param varchar $tronc
      */
     public function findByTronc($tronc)
