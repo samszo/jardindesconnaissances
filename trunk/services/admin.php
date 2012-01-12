@@ -7,11 +7,28 @@ try {
 	
 	$user = "luckysemiosis";
 	$pwd = "";
+
+    //pour gérer les compte mail
+    $gm = new Flux_Gmail("samszon","Janvier2010");
+    
+    /*
+	$site = new Flux_Site();
+    $db = $site->getDb("fluxDeleuzeSpinoza");
+	$dbUTD = new Model_DbTable_Flux_UtiTagDoc($db);
+	$arr = $dbUTD->getAllInfo();
+	*/
+		
+	/*pour gérer les index Lucene
+	$lu = new Flux_Lucene();
+	$lu->getDb("fluxDeleuzeSpinoza");
+	$lu->getTermPositions(array('field'=>'body', 'text'=>'Justine'));
+    $lu->getUser(array("login"=>"Flux_Lucene"));
+	$lu->saveDocsTerms();
+	//$lu->index->optimize();
+	 */
 	
-	//pour gérer les indes Lucene
-	//$lu = new Flux_Lucene();
-	//$lu->addBddDocs();
 	/*
+	$lu->addBddDocs();
 	$hits = $lu->find("spinoza");
 	$arr="";
 	foreach ($hits as $hit) {
@@ -63,7 +80,7 @@ try {
 	
 	$server->setClass('Flux_delicious');
 	
-	$response = $server->handle();
+	//$response = $server->handle();
 
 }catch (Zend_Exception $e) {
 	echo "Récupère exception: " . get_class($e) . "\n";
