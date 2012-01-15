@@ -111,5 +111,36 @@ class Flux_Site{
         }    	
 		return $html;
 	}
+
+	function getParamString($params, $md5=false){
+		$s="";
+		foreach ($params as $k=>$v){
+			if($md5) $s .= "_".md5($v);
+			else $s .= "_".$v;
+		}
+		return $s;	
+	}
+	
+	function request($url){
+	 
+		if (!function_exists('curl_init')){
+			die('CURL is not installed!');
+		}
+	 
+		// get curl handle
+		$ch= curl_init();
+		curl_setopt($ch,
+			CURLOPT_URL,
+			$url);
+		curl_setopt($ch,
+	    	CURLOPT_RETURNTRANSFER,
+			true);
+	 
+		$response = curl_exec($ch);
+	 
+		curl_close($ch);
+	 
+		return $response;
+	}	
 	
 }
