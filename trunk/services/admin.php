@@ -8,6 +8,14 @@ try {
 	$user = "luckysemiosis";
 	$pwd = "";
 
+    $diigo = new Flux_Diigo($user,$pwd,"fluxDiigo");
+    $diigo->saveAll();
+    //$diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
+    //$diigo->getGroupeRss("bulles");
+	//$diigo->getRequest(array("user"=>$user,"count"=>100));
+    //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));
+	
+	
     //pour gérer les compte mail
     $gm = new Flux_Gmail("samszon","Janvier2010");
     
