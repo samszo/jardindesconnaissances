@@ -18,13 +18,14 @@ class Flux_Site{
 	var $dbTD;		
 	var $dbD;
 	var $db;
-	    
+	var $index;
+	
     function __construct($idBase=false){    	
     	
     	$this->getDb($idBase);
     	
         $frontendOptions = array(
-            'lifetime' => 8640000000000000000000000000, // temps de vie du cache en seconde
+            'lifetime' => 3000000000000000000, // temps de vie du cache en seconde
             'automatic_serialization' => true,
         	'caching' => true //active ou desactive le cache
         );  
@@ -112,6 +113,26 @@ class Flux_Site{
 		return $html;
 	}
 
+    /**
+     * Ajoute des informations supplémentaire d'indexation
+     *
+     * @param string $url
+     * @param Zend_Search_Lucene_Document_Html $doc
+     *   
+     * @return Zend_Search_Lucene_Document_Html
+     */
+	function addInfoDocLucene($url, $doc) {
+	   	
+    	//récupère le body de l'url
+    	//$html = $this->getUrlBodyContent($url);
+		//$dom = new Zend_Dom_Query($html);	    
+    					
+		//ajoute l'url du document
+		$doc->addField(Zend_Search_Lucene_Field::Keyword('url',$url));
+				
+		return $doc;		 
+	}	
+		
 	function getParamString($params, $md5=false){
 		$s="";
 		foreach ($params as $k=>$v){
