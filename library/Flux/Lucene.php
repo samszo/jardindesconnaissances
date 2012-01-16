@@ -41,8 +41,7 @@ class Flux_Lucene extends Flux_Site{
     	
     	foreach ($arr as $u){
     		//TODO gérer dynamiquement la création de class avec une info dans la table doc
-    		$this->classUrl = new Flux_Deleuze();
-    		
+    		$this->classUrl = new Flux_Deleuze();    		
     		$this->addDoc($u["url"]);
     	}
 	}
