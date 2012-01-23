@@ -6,10 +6,10 @@ try {
 	$application->bootstrap();
 	
 	$user = "luckysemiosis";
-	$pwd = "";
+	$pwd = "samszo";
 
-    $diigo = new Flux_Diigo($user,$pwd,"fluxDiigo");
-    $diigo->saveAll();
+    //$diigo = new Flux_Diigo($user,$pwd,"fluxDiigo");
+    //$diigo->saveAll();
     //$diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
     //$diigo->getGroupeRss("bulles");
 	//$diigo->getRequest(array("user"=>$user,"count"=>100));
@@ -17,7 +17,10 @@ try {
 	
 	
     //pour gérer les compte mail
-    $gm = new Flux_Gmail("samszon","Janvier2010");
+    //$gm = new Flux_Gmail("samszon","Janvier2010");
+    //$gm->saveFolderMessages("veille/intelligence collective", "google_alerte");
+    //$gm->getMessagesByFolderName("veille/intelligence collective");
+    //$gm->getDossiers();
     
     /*
 	$site = new Flux_Site();
@@ -26,13 +29,17 @@ try {
 	$arr = $dbUTD->getAllInfo();
 	*/
 		
-	/*pour gérer les index Lucene
+	//pour gérer les index Lucene
 	$lu = new Flux_Lucene();
-	$lu->getDb("fluxDeleuzeSpinoza");
+	//$lu->index->optimize();
+	$terms = $lu->index->terms();
+	$hits = $lu->find("body:intelligence collective");
+	$lu->getDb("fluxDiigo");
+	$lu->addDocsInfos();
+	/*
 	$lu->getTermPositions(array('field'=>'body', 'text'=>'Justine'));
     $lu->getUser(array("login"=>"Flux_Lucene"));
 	$lu->saveDocsTerms();
-	//$lu->index->optimize();
 	 */
 	
 	/*

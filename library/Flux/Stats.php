@@ -5,36 +5,13 @@
  * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Flux_Stats{
+class Flux_Stats  extends Flux_Site{
 
-	var $cache;
-	var $forceCalcul = false;
-	var $dbU;
-	var $dbUU;
-	var $dbUT;
-	var $dbUD;
-	var $dbUTD;
-	var $dbT;
-	var $dbTD;		
-	var $dbD;
 	
- 	public function __construct($cache=null)
+ 	public function __construct($idBase=false)
     {
-    	if($cache){
-		    $this->cache = $cache;	
-    	}else{
-    		//paramètrage du cache
-			$frontendOptions = array(
-		    	'lifetime' => 31536000, //  temps de vie du cache de 1 an
-		        'automatic_serialization' => true
-			);
-		   	$backendOptions = array(
-				// Répertoire où stocker les fichiers de cache
-		   		'cache_dir' => ROOT_PATH.'/tmp/stats/'
-			);
-			// créer un objet Zend_Cache_Core
-			$this->cache = Zend_Cache::factory('Core','File',$frontendOptions,$backendOptions);
-    	} 
+    	parent::__construct($idBase);
+    	
     }
 	
 	/**
@@ -48,10 +25,9 @@ class Flux_Stats{
     	
     	$message = "";
     	
-    	$db = Zend_Db_Table::getDefaultAdapter();
     	//excution des requêtes pour la relation entre utilisateur et tag
 		$sql = "TRUNCATE TABLE  flux_utitag";
-    	$stmt = $db->query($sql);
+    	$stmt = $this->db->query($sql);
 		$message .= $sql."<br/>";
 		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
     	
@@ -59,13 +35,13 @@ class Flux_Stats{
 			SELECT utd.tag_id, uti_id, count(distinct utd.doc_id) nb
 			FROM flux_utitagdoc utd
 			GROUP BY utd.tag_id, uti_id";
-    	$stmt = $db->query($sql);
+    	$stmt = $this->db->query($sql);
 		$message .= $sql."<br/>"; 
 		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
 		
     	//excution des requêtes pour la relation entre utilisateur et document
 		$sql = "TRUNCATE TABLE  flux_utidoc";
-    	$stmt = $db->query($sql);
+    	$stmt = $this->db->query($sql);
 		$message .= $sql."<br/>"; 
 		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
 		
@@ -73,20 +49,20 @@ class Flux_Stats{
 			SELECT doc_id, uti_id, maj, count(distinct tag_id) nb
 			FROM flux_utitagdoc utd
 			GROUP BY doc_id, uti_id";
-    	$stmt = $db->query($sql);
+    	$stmt = $this->db->query($sql);
 		$message .= $sql."<br/>"; 
 		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
 
     	//excution des requêtes pour la relation entre tag et document
 		$sql = "TRUNCATE TABLE flux_tagdoc";
-    	$stmt = $db->query($sql);
+    	$stmt = $this->db->query($sql);
 		$message .= $sql."<br/>"; 
 		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
 		$sql = "INSERT INTO flux_tagdoc (tag_id, doc_id, poids)
 			SELECT utd.tag_id, utd.doc_id, count(distinct uti_id) nb
 			FROM flux_utitagdoc utd
 			GROUP BY utd.tag_id, utd.doc_id";
-    	$stmt = $db->query($sql);
+    	$stmt = $this->db->query($sql);
 		$message .= $sql."<br/>"; 
 		$message .= $stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
 
@@ -142,11 +118,53 @@ class Flux_Stats{
 			FROM flux_UtiUti
 			WHERE uti_id_src = ".$idUser."
 			GROUP BY fan, post, network";
-        $db = Zend_Db_Table::getDefaultAdapter();
-    	$stmt = $db->query($sql);
+    	$stmt = $this->db->query($sql);
     	return $stmt->fetchAll();
 		
 	}
+	
+
+	/**
+     * Récupère les tags associés à une liste de tag 
+     *
+     * @param array $arrTags
+     * @param boolean $docRacine
+     * 
+     * @return array
+     */
+	function GetTagAssos($arrTags, $docRacine=true) {
+
+		//définition de la requête
+		//attention la colonne value est nécessaire pour le graphique  
+		$sql = "SELECT t1.tag_id, t1.code, SUM(td1.poids) value, COUNT(DISTINCT(td.doc_id)) nbDoc
+			FROM flux_tag t
+				INNER JOIN flux_tagdoc td ON td.tag_id = t.tag_id
+				INNER JOIN flux_tagdoc td1 ON td1.doc_id = td.doc_id
+				INNER JOIN flux_tag t1 ON t1.tag_id = td1.tag_id";
+		//vérifie si on prend les tags du document racine ou de ces éélments
+		if($docRacine){
+			$sql .= " INNER JOIN flux_doc d ON d.doc_id = td.doc_id  AND d.url != ''";
+		}else{
+			$sql .= " INNER JOIN flux_doc d ON d.doc_id = td.doc_id  AND d.url = ''";			
+		}
+		//construction de la condition des tag
+		$where = " WHERE ";
+		foreach ($arrTags as $tag) {
+			$where .= " t.code LIKE '%".$tag."%' OR ";
+		}
+		$where = substr($where, 0, -3);
+
+		//construction de la fin de requête
+		$sql = $sql.$where." GROUP BY t1.tag_id	ORDER BY value DESC";
+    	
+		$stmt = $this->db->query($sql);
+		//$arr = $stmt->fetchAll();
+    	//return array("code"=>racine,"tags"=>$arr);
+    	return $stmt->fetchAll();
+    	
+	}
+	
+	
 	/*
 	//vérifier pourquoi certaine url ne sont utilisée qu'une seule fois
 SELECT count(*) nb, ud.doc_id, d.url

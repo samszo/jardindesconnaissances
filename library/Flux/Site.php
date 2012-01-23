@@ -18,7 +18,7 @@ class Flux_Site{
 	var $dbTD;		
 	var $dbD;
 	var $db;
-	var $index;
+	var $lucene;
 	
     function __construct($idBase=false){    	
     	
@@ -27,7 +27,7 @@ class Flux_Site{
         $frontendOptions = array(
             'lifetime' => 3000000000000000000, // temps de vie du cache en seconde
             'automatic_serialization' => true,
-        	'caching' => true //active ou desactive le cache
+        	'caching' => false //active ou desactive le cache
         );  
         $backendOptions = array(
             // Répertoire où stocker les fichiers de cache
@@ -62,6 +62,7 @@ class Flux_Site{
 			$db = Zend_Db::factory('PDO_MYSQL', $arr);	
     	}
     	$this->db = $db;
+    	$this->idBase = $idBase;
     	return $db;
     }
     
@@ -128,7 +129,7 @@ class Flux_Site{
 		//$dom = new Zend_Dom_Query($html);	    
     					
 		//ajoute l'url du document
-		$doc->addField(Zend_Search_Lucene_Field::Keyword('url',$url));
+		$doc->addField(Zend_Search_Lucene_Field::Keyword('url',urlencode($url)));
 				
 		return $doc;		 
 	}	
@@ -142,26 +143,34 @@ class Flux_Site{
 		return $s;	
 	}
 	
-	function request($url){
-	 
-		if (!function_exists('curl_init')){
-			die('CURL is not installed!');
-		}
-	 
-		// get curl handle
-		$ch= curl_init();
-		curl_setopt($ch,
-			CURLOPT_URL,
-			$url);
-		curl_setopt($ch,
-	    	CURLOPT_RETURNTRANSFER,
-			true);
-	 
-		$response = curl_exec($ch);
-	 
-		curl_close($ch);
-	 
-		return $response;
-	}	
+	function getKW($chaine){
+		
+		$params['content'] = $chaine; //page content
+		//set the length of keywords you like
+		$params['min_word_length'] = 3;  //minimum length of single words
+		$params['min_word_occur'] = 1;  //minimum occur of single words
+		
+		$params['min_2words_length'] = 3;  //minimum length of words for 2 word phrases
+		$params['min_2words_phrase_length'] = 10; //minimum length of 2 word phrases
+		$params['min_2words_phrase_occur'] = 2; //minimum occur of 2 words phrase
+		
+		$params['min_3words_length'] = 3;  //minimum length of words for 3 word phrases
+		$params['min_3words_phrase_length'] = 10; //minimum length of 3 word phrases
+		$params['min_3words_phrase_occur'] = 2; //minimum occur of 3 words phrase
+		
+		$keyword = new autokeyword($params, "UTF-8");
+		
+		//return $keyword->get_keywords();
+		return $keyword->parse_words();
+		
+	}
 	
+	function saveTag($tag, $idD, $poids, $date ){
+		//on ajoute le tag
+		$idT = $this->dbT->ajouter(array("code"=>$tag));
+		//on ajoute le lien entre le tag et le doc avec le poids
+		$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD, "poids"=>$poids));
+		//on ajoute le lien entre le tag l'utilisateur et le doc
+		$this->dbUTD->ajouter(array("uti_id"=>$this->user, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date));		
+	}
 }
