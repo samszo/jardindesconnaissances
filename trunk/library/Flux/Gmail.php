@@ -14,6 +14,15 @@ class Flux_Gmail extends Flux_Site{
 	var $pwd;
 	var $imap;
 
+    /**
+     * Construction du gestionnaire de flux.
+     *
+     * @param string $login
+     * @param string $pwd
+     * @param string $idBase
+     *
+     * 
+     */
 	public function __construct($login=null, $pwd=null, $idBase=false)
     {
     	parent::__construct($idBase);
@@ -26,7 +35,13 @@ class Flux_Gmail extends Flux_Site{
     	
     }
 	
-	function getFolders(){
+    /**
+     * Affiche la lsite des dossiers pour un compte mail.
+     *
+     *
+     * 
+     */
+    function showFolders(){
 		$folders = new RecursiveIteratorIterator(
                         $this->imap->getFolders(),
                         RecursiveIteratorIterator::SELF_FIRST
@@ -44,23 +59,64 @@ class Flux_Gmail extends Flux_Site{
 	    echo '';		
 	}
 
-	function getMessagesByFolderName($name){
-		$folder = $this->imap->getFolders($name);
+    /**
+     * Enregistre les messages d'un dossier de mail.
+     *
+     * @param string $name
+     * @param string $type
+     *
+     * 
+     */
+	 function saveFolderMessages($name, $type=""){
+
+		//sélection du dossier  
 		$this->imap->selectFolder($name);
 		$nbMessage = $this->imap->countMessages();
-
-		$message = $this->imap->getMessage(10);
-		
-		if($message->isMultipart()){
-			$part = $message->getPart(1);
-			echo $part->getContent();			
+		//parcourt tout les messages du dossier
+		for ($i = 1; $i <= $nbMessage; $i++) {
+			//récupération du message
+			$message = $this->imap->getMessage($i);
+			//récupération des en tête
+			$headers = $message->getHeaders();
+			$t = $this->getSubjectType($headers["subject"]);
+			//vérifie si on traite ce type
+			if($type=="" || $type==$t){
+				//récupération des flags
+				$flags = $message->getFlags();
+				//récupération du contenu
+				$c = $message->getContent();
+				//traitement du mail suivant le type
+				switch ($type) {
+					case "google_alerte":
+						$this->saveMessageGoogleAlertContent($c);
+						break;
+					default:
+						$this->saveMessageContent($c);
+						break;
+				}							
+			}
 		}
-
-		echo '<pre>';
-		echo $message->getContent();
-		echo '</pre>';
 		
 	}
-
 	
+	function getSubjectType($subject){
+		
+		if(substr($subject, 0,15)=="Alerte Google -")return "google_alerte";
+		
+		return "";
+	}
+	
+	function saveMessageGoogleAlertContent($content){
+		//charge le contenu dans un dom
+		$dom = new Zend_Dom_Query($content);	       	
+	   	//récupère les éléments de l'alerte
+		$results = $dom->query('//td');
+		
+	}
+	
+	function saveMessageContent($content){
+		//récupération des mots clefs
+		$kw = $this->getMotClef($content);		
+	}
+		
 }

@@ -43,10 +43,10 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     {
 		$select = $this->select();
 		$select->from($this, array('doc_id'));
-		$select->where('url = ?', $data["url"]);
-		if(isset($data["tronc"]))$select->where('tronc = ?', $data["tronc"]);
-		
-	    $rows = $this->fetchAll($select);        
+		foreach($data as $k=>$v){
+			$select->where($k.' = ?', $v);
+		}
+		$rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->doc_id; else $id=false;
         return $id;
     } 

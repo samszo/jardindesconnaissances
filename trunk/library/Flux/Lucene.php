@@ -12,16 +12,31 @@ class Flux_Lucene extends Flux_Site{
 	var $classUrl;
 	var $nbCaract = 100;
 	
-	public function __construct($login=null, $pwd=null, $idBase=false)
+	public function __construct($login=null, $pwd=null, $idBase=false, $classUrl=false)
     {
     	parent::__construct($idBase);
     	
-		$this->index = Zend_Search_Lucene::open('../data/flux-index');
-		// Création de l'index
-		//$this->index = Zend_Search_Lucene::create('../data/flux-index');
+    	if(!$classUrl)$this->classUrl = $this;
+    	else $this->classUrl = new $classUrl();
+    	     	
+		try {
+    		//ouverture de l'index
+			$this->index = Zend_Search_Lucene::open('../data/flux-index');
+		}catch (Zend_Exception $e) {
+			// Création de l'index
+			$this->index = Zend_Search_Lucene::create('../data/flux-index');
+		}
+    		
     }
 
-    function addDoc($url) {
+    function addDoc($url, $replace=false) {
+    	//vérifie si le document existe
+    	$hits = $this->index->find('url:'.urlencode($url));
+    	if($hits){
+    		if(!$replace)return "";
+    		else $this->deleteDoc($hits);
+    	} 
+    	
 		$c = str_replace("::", "_", __METHOD__)."_".md5($url); 
 	   	$doc = $this->cache->load($c);
         if(!$doc){
@@ -33,29 +48,32 @@ class Flux_Lucene extends Flux_Site{
 		$this->index->addDocument($doc);		 
 	}
 	
-    function addDocsInfos() {
-    	$this->removeAllIndex();
-    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc();
+	function deleteDoc($hits){
+		foreach ($hits as $hit) {
+		    $this->index->delete($hit->id);
+		}		
+	}
+	
+    function addDocsInfos($replace=false) {   	
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
     	//$arr = $this->dbD->getDistinct("url");
     	$arr = $this->dbD->getAll();
-    	
+    	$i = 0;
     	foreach ($arr as $u){
-    		//TODO gérer dynamiquement la création de class avec une info dans la table doc
-    		$this->classUrl = new Flux_Deleuze();    		
-    		$this->addDoc($u["url"]);
+    		if($u["url"]!=""){// && $u["doc_id"]>=4318
+    			$this->addDoc($u["url"],$replace);
+    		}  		
+    		$i++;
     	}
 	}
 	
 	function find($query) {
-		/*TODO le cache ne marche pas bien
 		$c = str_replace("::", "_", __METHOD__)."_".md5($query); 
 	   	$hits = $this->cache->load($c);
         if(!$hits){
 			$hits = $this->index->find($query);
 			$this->cache->save($hits, $c);
         }
-        */
-		$hits = $this->index->find($query);
         return $hits;
 	}
 	

@@ -8,7 +8,7 @@
  */
 class Flux_Diigo extends Flux_Site{
 
-	const API_KEY = "";
+	const API_KEY = "2e941a84576cefed";
 	const API_URI = "https://secure.diigo.com";
     const API_URL = '/api/v2/bookmarks';
     const RSS_GROUP_URL = 'http://groups.diigo.com/group/';
@@ -54,7 +54,7 @@ class Flux_Diigo extends Flux_Site{
     }
     
     function saveAll(){
-    	$i = 1;
+
     	$this->getUser(array("login"=>$this->login,"flux"=>"diigo"));
 		//initialise les gestionnaires de base de données
     	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
@@ -63,19 +63,21 @@ class Flux_Diigo extends Flux_Site{
 		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
 		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
     	//initialise le moteur d'indexation
-		if(!$this->index){
-			$this->index = new Flux_Lucene($this->login, $this->pwd, $this->idBase);
-			$this->index->classUrl = $this;	
+		if(!$this->lucene){
+			$this->lucene = new Flux_Lucene($this->login, $this->pwd, $this->idBase);
+			$this->lucene->classUrl = $this;
+			$this->lucene->index->optimize();	
 		}
 		
-    	while ($i>0) {
+    	$i = 3700;
+		while ($i>0) {
     		$arr = $this->getRequest(array("user"=>$this->login,"count"=>100, "start"=>$i-1));
     		foreach ($arr as $item){
     			$this->saveItem($item);
     		}
-    		$i = count($arr);
+    		$i = $i+count($arr);
     	}
-    	
+    	$this->lucene->index->optimize();
     }
 
     function saveItem($item){
@@ -86,28 +88,23 @@ class Flux_Diigo extends Flux_Site{
 		//TODO ajouter la utigraine 
 				    			
 		//ajouter un document correspondant au lien
-		$idD = $this->dbD->ajouter(array("url"=>$item['url'],"titre"=>$item['title'],"pubDate"=>$item['created_at']));
+		$idD = $this->dbD->ajouter(array("url"=>$item['url'],"titre"=>$item['title'],"tronc"=>0,"pubDate"=>$item['created_at']));
 		//index le document
-		$this->index->addDoc($item['url']);
+		//$this->lucene->addDoc($item['url']);
 		
 		//TODO ajouter la grainedoc 
 		$i = 0;
 		//traitement des annotations
 		if(count($item['annotations'])>0){
 			foreach ($item['annotations'] as $note){
-				$this->saveContent($note['content']);
+				$this->saveContent($note, $idD);
 			}
 		}		
 		//traitement des mots clefs
 		if($item['tags']!=""){
 			$arrTags = explode(",", $item['tags']);
-			foreach ($arrTags as $tag){	    			
-				//on ajoute le tag
-				$idT = $this->dbT->ajouter(array("code"=>$tag));
-				//on ajoute le lien entre le tag et le doc avec le poids
-				$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD,"poids"=>1));
-				//on ajoute le lien entre le tag l'utilisateur et le doc
-				$this->dbUTD->ajouter(array("uti_id"=>$this->user, "tag_id"=>$idT, "doc_id"=>$idD,"maj"=>$item['created_at']));
+			foreach ($arrTags as $tag){
+				$this->saveTag($tag, $idD, 1, $item['created_at']);	    			
 				$i++;
 			}						
 		}				
@@ -117,13 +114,21 @@ class Flux_Diigo extends Flux_Site{
 		
     } 
 
-	function saveContent($content){
-		//$dom = new Zend_Dom_Query($content);	    			
-	   	//récupère les mot clefs
-	   	$txt = strip_tags($content);
-	   	//$arrKW =
-	   	//enregistre les mots clefs 
-		//$results = $dom->query('/html/body/table[2]/tr[2]/td[2]/p[1]/strong');		
+	function saveContent($item, $idD){
+	   	
+		//enregistre le document
+		$id = $this->dbD->ajouter(array("tronc"=>$idD,"data"=>$item['content'],"pubDate"=>$item['created_at']));
+		
+		//récupère les mot clefs
+	   	$arrKW = $this->getKW($item['content']);
+	   	//enregistre les mots clefs
+	   	$i=0; 
+	   	foreach ($arrKW as $kw=>$nb){
+			$this->saveTag($kw, $id, $nb, $item['created_at']);
+			$i++;	    			
+	   	}
+		$this->dbUD->ajouter(array("uti_id"=>$this->user, "doc_id"=>$id, "poids"=>$i));										    
+	   	//$results = $dom->query('/html/body/table[2]/tr[2]/td[2]/p[1]/strong');		
 	}
     
     
