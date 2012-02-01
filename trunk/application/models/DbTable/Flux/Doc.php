@@ -42,12 +42,13 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     public function existe($data)
     {
 		$select = $this->select();
-		$select->from($this, array('doc_id'));
+		$select->from($this);
 		foreach($data as $k=>$v){
-			$select->where($k.' = ?', $v);
+			if($k!="maj" && $k!="poids" )
+				$select->where($k.' = ?', $v);
 		}
 		$rows = $this->fetchAll($select);        
-	    if($rows->count()>0)$id=$rows[0]->doc_id; else $id=false;
+	    if($rows->count()>0)$id=$rows->toArray(); else $id=false;
         return $id;
     } 
         
@@ -64,11 +65,20 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     	$id=false;
     	if($existe)$id = $this->existe($data);
     	if(!$id){
+    		if(!$data["pubDate"]) $data["pubDate"] = new Zend_Db_Expr('NOW()');
     	 	$id = $this->insert($data);
+    	}else{
+    		//met à jour le poids
+    		if($data["poids"]){
+    			$dt["poids"] = $id[0]["poids"]+$data["poids"];
+    			$dt["maj"] = $data["maj"];
+    			$this->edit($id[0]["doc_id"], $dt);
+    		} 
+    		$id = $id[0]["doc_id"];
     	}
     	return $id;
-    } 
-           
+    }     
+    
     /**
      * Recherche une entrée Flux_Doc avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
@@ -80,6 +90,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data, $url=null)
     {
+    	if(!$data["maj"]) $data["maj"] = new Zend_Db_Expr('NOW()');
     	if($url)
 	        $this->update($data, 'flux_Doc.url = "'. $url.'"');
     	else        
