@@ -8,7 +8,7 @@
  */
 class Flux_Diigo extends Flux_Site{
 
-	const API_KEY = "2e941a84576cefed";
+	const API_KEY = "";
 	const API_URI = "https://secure.diigo.com";
     const API_URL = '/api/v2/bookmarks';
     const RSS_GROUP_URL = 'http://groups.diigo.com/group/';
