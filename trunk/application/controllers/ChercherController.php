@@ -55,7 +55,7 @@ class ChercherController extends Zend_Controller_Action {
 	    $this->view->resultats = "";
     	if($this->_getParam('term', 0)){
 			$lu = new Flux_Lucene();
-			$lu->getDb("fluxDeleuzeSpinoza");
+			$lu->getDb("flux_DeleuzeSpinoza");
 			$this->view->resultats = $lu->getTermPositions(array('field'=>'body', 'text'=>$this->_getParam('term', 0)));
 			$this->view->term = $this->_getParam('term', 0);
 	    }
