@@ -32,7 +32,7 @@ class Model_DbTable_Flux_TagDoc extends Zend_Db_Table_Abstract
      *
      * @param array $data
      *
-     * @return integer
+     * @return array
      */
     public function existe($data)
     {
@@ -41,8 +41,10 @@ class Model_DbTable_Flux_TagDoc extends Zend_Db_Table_Abstract
 		$select->where('tag_id = ?', $data['tag_id']);
 		$select->where('doc_id = ?', $data['doc_id']);
 		$rows = $this->fetchAll($select);        
-	    if($rows->count()>0)$id=$rows[0]->tag_id; else $id=false;
-        return $id;
+	    if($rows->count()>0)
+	    	return $rows[0];
+	    else 
+	    	return false;
     } 
         
     /**
@@ -51,18 +53,36 @@ class Model_DbTable_Flux_TagDoc extends Zend_Db_Table_Abstract
      * @param array $data
      * @param boolean $existe
      *  
-     * @return integer
+     * @return array
      */
     public function ajouter($data, $existe=true)
     {
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
+    	$ids=false;
+    	if($existe)$ids = $this->existe($data);
+    	if(!$ids){
     	 	$id = $this->insert($data);
+    	}else{
+    		//met à jour le poids
+    		$this->ajoutPoids($data);
     	}
-    	return $id;
+    	return $ids;
     } 
-           
+
+    /**
+     * Recherche une entrée Flux_TagDoc avec la clef primaire spécifiée
+     * et ajoute le poids.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function ajoutPoids($data)
+    {        
+		$sql = 'UPDATE flux_TagDoc SET poids = poids + '.$data["poids"].' WHERE tag_id = '.$data["tag_id"].' AND doc_id ='.$data["doc_id"];
+    	$this->_db->query($sql);    
+    }
+    
+    
     /**
      * Recherche une entrée Flux_TagDoc avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.

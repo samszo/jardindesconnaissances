@@ -277,5 +277,34 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     	$stmt = $db->query($sql);
     	return $stmt->fetchAll();
     }
+
+	/**
+     * Récupère les tags associés à un document et leur poids
+     *
+     * @param integer $idUti
+     * @param integer $idDoc
+     * 
+     * @return array
+     */
+	function GetUtiTagDoc($idUti, $idDoc) {
+
+		//définition de la requête
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("utd" => "flux_utitagdoc"), array("tag_id"))                           
+            ->joinInner(array('t' => 'flux_tag'),
+            	't.tag_id = utd.tag_id',array('code'))
+        	->joinInner(array('td' => 'flux_tagdoc'),
+            	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
+        	->where( "utd.uti_id = ?", $idUti)
+        	->where( "utd.doc_id = ?", $idDoc)
+        	->group("utd.tag_id")
+        	->order("value DESC");
+
+        return $this->fetchAll($query)->toArray(); 
+		
+    	
+	}
+    
     
 }
