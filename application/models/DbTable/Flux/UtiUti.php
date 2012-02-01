@@ -19,7 +19,7 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_UtiUti';
+    protected $_name = 'flux_utiuti';
     
     /*
      * Clef primaire de la table.
@@ -28,7 +28,7 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
 
     
     /**
-     * Vérifie si une entrée Flux_UtiUti existe.
+     * Vérifie si une entrée flux_utiuti existe.
      *
      * @param array $data
      *
@@ -47,7 +47,7 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
     } 
         
     /**
-     * Ajoute une entrée Flux_UtiUti.
+     * Ajoute une entrée flux_utiuti.
      *
      * @param array $data
      * @param boolean $existe
@@ -65,7 +65,7 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
     } 
            
     /**
-     * Recherche une entrée Flux_UtiUti avec la clef primaire spécifiée
+     * Recherche une entrée flux_utiuti avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
      * @param integer $idSrc
@@ -76,11 +76,11 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
      */
     public function edit($idSrc, $idDst, $data)
     {        
-        $this->update($data, 'flux_UtiUti.uti_id_src = ' . $idSrc.' AND flux_UtiUti.uti_id_dst = ' . $idDst);
+        $this->update($data, 'flux_utiuti.uti_id_src = ' . $idSrc.' AND flux_utiuti.uti_id_dst = ' . $idDst);
     }
     
     /**
-     * Recherche une entrée Flux_UtiUti avec la clef primaire spécifiée
+     * Recherche une entrée flux_utiuti avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $idSrc
@@ -90,17 +90,17 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
      */
     public function remove($idSrc, $idDst)
     {
-        $this->delete('flux_UtiUti.uti_id_src = ' . $idSrc.' AND flux_UtiUti.uti_id_dst = ' . $idDst);
+        $this->delete('flux_utiuti.uti_id_src = ' . $idSrc.' AND flux_utiuti.uti_id_dst = ' . $idDst);
     }
     
     /**
-     * Récupère toutes les entrées Flux_UtiUti avec certains critères
+     * Récupère toutes les entrées flux_utiuti avec certains critères
      * de tri, intervalles
      */
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_UtiUti" => "flux_UtiUti") );
+                    ->from( array("flux_utiuti" => "flux_utiuti") );
                     
         if($order != null)
         {
@@ -116,7 +116,7 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
     }
     
     /*
-     * Recherche une entrée Flux_UtiUti avec la valeur spécifiée
+     * Recherche une entrée flux_utiuti avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $uti_id_src
@@ -124,13 +124,13 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
     public function findByUti_id_src($uti_id_src)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiUti") )                           
+                    ->from( array("f" => "flux_utiuti") )                           
                     ->where( "f.uti_id_src = ?", $uti_id_src );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_UtiUti avec la valeur spécifiée
+     * Recherche une entrée flux_utiuti avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $uti_id_dst
@@ -138,13 +138,13 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
     public function findByUti_id_dst($uti_id_dst)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiUti") )                           
+                    ->from( array("f" => "flux_utiuti") )                           
                     ->where( "f.uti_id_dst = ?", $uti_id_dst );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_UtiUti avec la valeur spécifiée
+     * Recherche une entrée flux_utiuti avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $network
@@ -152,13 +152,13 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
     public function findByNetwork($network)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiUti") )                           
+                    ->from( array("f" => "flux_utiuti") )                           
                     ->where( "f.network = ?", $network );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_UtiUti avec la valeur spécifiée
+     * Recherche une entrée flux_utiuti avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $fan
@@ -166,7 +166,7 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
     public function findByFan($fan)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiUti") )                           
+                    ->from( array("f" => "flux_utiuti") )                           
                     ->where( "f.fan = ?", $fan );
 
         return $this->fetchAll($query)->toArray(); 

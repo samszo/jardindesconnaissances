@@ -1,6 +1,6 @@
 <?php
 /**
- * Ce fichier contient la classe Flux_UtiTagRelated.
+ * Ce fichier contient la classe flux_utitagrelated.
  *
  * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
@@ -8,18 +8,18 @@
 
 
 /**
- * Classe ORM qui représente la table 'flux_UtiTagRelated'.
+ * Classe ORM qui représente la table 'flux_utitagrelated'.
  *
  * @copyright  201=& Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
+class Model_DbTable_flux_utitagrelated extends Zend_Db_Table_Abstract
 {
     
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_UtiTagRelated';
+    protected $_name = 'flux_utitagrelated';
     
     /*
      * Clef primaire de la table.
@@ -28,7 +28,7 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
 
     
     /**
-     * Vérifie si une entrée Flux_UtiTagRelated existe.
+     * Vérifie si une entrée flux_utitagrelated existe.
      *
      * @param array $data
      *
@@ -47,7 +47,7 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
     } 
         
     /**
-     * Ajoute une entrée Flux_UtiTagRelated.
+     * Ajoute une entrée flux_utitagrelated.
      *
      * @param array $data
      * @param boolean $existe
@@ -65,7 +65,7 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
     } 
            
     /**
-     * Recherche une entrée Flux_UtiTagRelated avec la clef primaire spécifiée
+     * Recherche une entrée flux_utitagrelated avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
      * @param integer $id
@@ -75,11 +75,11 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
-        $this->update($data, 'flux_UtiTagRelated.uti_id = ' . $id);
+        $this->update($data, 'flux_utitagrelated.uti_id = ' . $id);
     }
     
     /**
-     * Recherche une entrée Flux_UtiTagRelated avec la clef primaire spécifiée
+     * Recherche une entrée flux_utitagrelated avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $id
@@ -88,17 +88,17 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_UtiTagRelated.uti_id = ' . $id);
+        $this->delete('flux_utitagrelated.uti_id = ' . $id);
     }
     
     /**
-     * Récupère toutes les entrées Flux_UtiTagRelated avec certains critères
+     * Récupère toutes les entrées flux_utitagrelated avec certains critères
      * de tri, intervalles
      */
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_UtiTagRelated" => "flux_UtiTagRelated") );
+                    ->from( array("flux_utitagrelated" => "flux_utitagrelated") );
                     
         if($order != null)
         {
@@ -114,7 +114,7 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
     }
 
     /**
-     * Récupère les spécifications des colonnes Flux_UtiTagRelated 
+     * Récupère les spécifications des colonnes flux_utitagrelated 
      */
     public function getCols(){
 
@@ -129,7 +129,7 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
     }     
     
     /*
-     * Recherche une entrée Flux_UtiTagRelated avec la valeur spécifiée
+     * Recherche une entrée flux_utitagrelated avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $uti_id
@@ -137,13 +137,13 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
     public function findByUti_id($uti_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiTagRelated") )                           
+                    ->from( array("f" => "flux_utitagrelated") )                           
                     ->where( "f.uti_id = ?", $uti_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_UtiTagRelated avec la valeur spécifiée
+     * Recherche une entrée flux_utitagrelated avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $tag_id
@@ -151,13 +151,13 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
     public function findByTag_id($tag_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiTagRelated") )                           
+                    ->from( array("f" => "flux_utitagrelated") )                           
                     ->where( "f.tag_id = ?", $tag_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_UtiTagRelated avec la valeur spécifiée
+     * Recherche une entrée flux_utitagrelated avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $poids
@@ -165,7 +165,7 @@ class Model_DbTable_Flux_UtiTagRelated extends Zend_Db_Table_Abstract
     public function findByPoids($poids)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiTagRelated") )                           
+                    ->from( array("f" => "flux_utitagrelated") )                           
                     ->where( "f.poids = ?", $poids );
 
         return $this->fetchAll($query)->toArray(); 

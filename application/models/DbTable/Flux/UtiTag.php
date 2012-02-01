@@ -1,6 +1,6 @@
 <?php
 /**
- * Ce fichier contient la classe Flux_UtiTag.
+ * Ce fichier contient la classe flux_utitag.
  *
  * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
@@ -8,18 +8,18 @@
 
 
 /**
- * Classe ORM qui représente la table 'flux_UtiTag'.
+ * Classe ORM qui représente la table 'flux_utitag'.
  *
  * @copyright  201=& Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
+class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
 {
     
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_UtiTag';
+    protected $_name = 'flux_utitag';
     
     /*
      * Clef primaire de la table.
@@ -28,7 +28,7 @@ class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
 
     
     /**
-     * Vérifie si une entrée Flux_UtiTag existe.
+     * Vérifie si une entrée flux_utitag existe.
      *
      * @param array $data
      *
@@ -47,7 +47,7 @@ class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
     } 
         
     /**
-     * Ajoute une entrée Flux_UtiTag.
+     * Ajoute une entrée flux_utitag.
      *
      * @param array $data
      * @param boolean $existe
@@ -65,7 +65,7 @@ class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
     } 
            
     /**
-     * Recherche une entrée Flux_UtiTag avec la clef primaire spécifiée
+     * Recherche une entrée flux_utitag avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
      * @param integer $id
@@ -75,11 +75,11 @@ class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
-        $this->update($data, 'flux_UtiTag.uti_id = ' . $id);
+        $this->update($data, 'flux_utitag.uti_id = ' . $id);
     }
     
     /**
-     * Recherche une entrée Flux_UtiTag avec la clef primaire spécifiée
+     * Recherche une entrée flux_utitag avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $id
@@ -88,17 +88,17 @@ class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_UtiTag.uti_id = ' . $id);
+        $this->delete('flux_utitag.uti_id = ' . $id);
     }
     
     /**
-     * Récupère toutes les entrées Flux_UtiTag avec certains critères
+     * Récupère toutes les entrées flux_utitag avec certains critères
      * de tri, intervalles
      */
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_UtiTag" => "flux_UtiTag") );
+                    ->from( array("flux_utitag" => "flux_utitag") );
                     
         if($order != null)
         {
@@ -143,7 +143,7 @@ class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
     {
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-            ->from(array('ut' => 'flux_UtiTag'))
+            ->from(array('ut' => 'flux_utitag'))
             ->joinInner(array('t' => 'Flux_Tag'),
             	'ut.tag_id = t.tag_id', array('code'))
             ->joinInner(array('u' => 'Flux_Uti'),
@@ -154,7 +154,7 @@ class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
     }
     
     /**
-     * Recherche une entrée Flux_UtiTag avec la valeur spécifiée
+     * Recherche une entrée flux_utitag avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $tag_id
@@ -162,13 +162,13 @@ class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
     public function findByTag_id($tag_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiTag") )                           
+                    ->from( array("f" => "flux_utitag") )                           
                     ->where( "f.tag_id = ?", $tag_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_UtiTag avec la valeur spécifiée
+     * Recherche une entrée flux_utitag avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $poids
@@ -176,7 +176,7 @@ class Model_DbTable_Flux_UtiTag extends Zend_Db_Table_Abstract
     public function findByPoids($poids)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiTag") )                           
+                    ->from( array("f" => "flux_utitag") )                           
                     ->where( "f.poids = ?", $poids );
 
         return $this->fetchAll($query)->toArray(); 

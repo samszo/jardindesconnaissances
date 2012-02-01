@@ -1,6 +1,6 @@
 <?php
 /**
- * Ce fichier contient la classe Flux_Acti.
+ * Ce fichier contient la classe flux_acti.
  *
  * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
@@ -8,18 +8,18 @@
 
 
 /**
- * Classe ORM qui représente la table 'flux_Acti'.
+ * Classe ORM qui représente la table 'flux_acti'.
  *
  * @copyright  201=& Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
+class Model_DbTable_flux_acti extends Zend_Db_Table_Abstract
 {
     
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_Acti';
+    protected $_name = 'flux_acti';
     
     /*
      * Clef primaire de la table.
@@ -28,7 +28,7 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
 
     
     /**
-     * Vérifie si une entrée Flux_Acti existe.
+     * Vérifie si une entrée flux_acti existe.
      *
      * @param array $data
      *
@@ -47,7 +47,7 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
     } 
         
     /**
-     * Ajoute une entrée Flux_Acti.
+     * Ajoute une entrée flux_acti.
      *
      * @param array $data
      * @param boolean $existe
@@ -65,7 +65,7 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
     } 
            
     /**
-     * Recherche une entrée Flux_Acti avec la clef primaire spécifiée
+     * Recherche une entrée flux_acti avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
      * @param integer $id
@@ -75,11 +75,11 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
-        $this->update($data, 'flux_Acti.acti_id = ' . $id);
+        $this->update($data, 'flux_acti.acti_id = ' . $id);
     }
     
     /**
-     * Recherche une entrée Flux_Acti avec la clef primaire spécifiée
+     * Recherche une entrée flux_acti avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $id
@@ -88,17 +88,17 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_Acti.acti_id = ' . $id);
+        $this->delete('flux_acti.acti_id = ' . $id);
     }
     
     /**
-     * Récupère toutes les entrées Flux_Acti avec certains critères
+     * Récupère toutes les entrées flux_acti avec certains critères
      * de tri, intervalles
      */
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_Acti" => "flux_Acti") );
+                    ->from( array("flux_acti" => "flux_acti") );
                     
         if($order != null)
         {
@@ -114,7 +114,7 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
     }
 
     /**
-     * Récupère les spécifications des colonnes Flux_Acti 
+     * Récupère les spécifications des colonnes flux_acti 
      */
     public function getCols(){
 
@@ -129,7 +129,7 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
     }     
     
     /*
-     * Recherche une entrée Flux_Acti avec la valeur spécifiée
+     * Recherche une entrée flux_acti avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $acti_id
@@ -137,13 +137,13 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
     public function findByActi_id($acti_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Acti") )                           
+                    ->from( array("f" => "flux_acti") )                           
                     ->where( "f.acti_id = ?", $acti_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_Acti avec la valeur spécifiée
+     * Recherche une entrée flux_acti avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param text $code
@@ -151,13 +151,13 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
     public function findByCode($code)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Acti") )                           
+                    ->from( array("f" => "flux_acti") )                           
                     ->where( "f.code = ?", $code );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_Acti avec la valeur spécifiée
+     * Recherche une entrée flux_acti avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param varchar $desc
@@ -165,7 +165,7 @@ class Model_DbTable_Flux_Acti extends Zend_Db_Table_Abstract
     public function findByDesc($desc)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Acti") )                           
+                    ->from( array("f" => "flux_acti") )                           
                     ->where( "f.desc = ?", $desc );
 
         return $this->fetchAll($query)->toArray(); 
