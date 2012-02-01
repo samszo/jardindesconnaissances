@@ -30,8 +30,7 @@
   <body>
     <div class="body">
       <div class="content">
-
-		<h1 id='bubble_chart'>Bubble Chart</h1><a href='http://flare.prefuse.org/'>DATA</a>
+		<h1 id='bubble_chart'>Bubble Chart</h1><a href='<?php echo $this->urlStats; ?>'>DATA</a>
 		<div class='gallery' id='chart'> </div>
 
 
@@ -54,7 +53,7 @@
 		    .attr("height", r)
 		    .attr("class", "bubble");
 		
-		d3.json("../stat/tagassos?idBase=fluxdiigo&tags[]=outils&racine=true", function(json) {
+		d3.json("<?php echo $this->urlStats; ?>", function(json) {
 			  var node = vis.selectAll("g.node")
 			    .data(bubble.nodes({children: json})
 			    		.filter(function(d) { return !d.children; }))
