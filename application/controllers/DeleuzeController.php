@@ -18,7 +18,7 @@ class DeleuzeController extends Zend_Controller_Action {
 			$this->view->title = "Affichage des flux Deleuze";
 		    $this->view->headTitle($this->view->title, 'PREPEND');
 		    $site = new Flux_Site();
-		    $db = $site->getDb("fluxDeleuzeSpinoza");
+		    $db = $site->getDb("flux_DeleuzeSpinoza");
 			$dbUTD = new Model_DbTable_Flux_UtiTagDoc($db);
 		    if($this->_getParam('tag', 0)){
 		    	$arr = $dbUTD->findByTag($this->_getParam('tag', 0));

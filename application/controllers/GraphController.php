@@ -22,10 +22,12 @@ class GraphController extends Zend_Controller_Action {
     public function bullesAction()
     {
 	    $this->view->stats = "";
-    	if($this->_getParam('tags')){
-			$s = new Flux_Stats($this->_getParam('idBase', 0));
-			$this->view->stats = $s->GetTagAssos($this->_getParam('tags'),$this->_getParam('racine', 0));	    
-	    }
+	    
+	    $request = $this->getRequest();
+		$url = $request->getRequestUri();
+		$arrUrl = explode("?",$url);
+		
+		$this->view->urlStats = "../stat/tagassos?".$arrUrl[1];	    
     }	
     
 }
