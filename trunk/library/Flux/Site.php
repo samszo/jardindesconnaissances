@@ -17,6 +17,9 @@ class Flux_Site{
 	var $dbT;
 	var $dbTD;		
 	var $dbD;
+	var $dbIEML;
+	var $dbUIEML;
+	var $dbTrad;
 	var $db;
 	var $lucene;
 	
@@ -143,6 +146,13 @@ class Flux_Site{
 		return $s;	
 	}
 	
+    /**
+     * Récupère les mots clefs d'une chaine
+     *
+     * @param string $chaine
+     *   
+     * @return array
+     */
 	function getKW($chaine){
 		
 		$params['content'] = $chaine; //page content
@@ -165,12 +175,45 @@ class Flux_Site{
 		
 	}
 	
-	function saveTag($tag, $idD, $poids, $date ){
+    /**
+     * Sauvegarde d'un tag
+     *
+     * @param string $tag
+     * @param integer $idD
+     * @param integer $poids
+     * @param date $date
+     *   
+     * @return integer
+     */
+	function saveTag($tag, $idD, $poids, $date){
 		//on ajoute le tag
 		$idT = $this->dbT->ajouter(array("code"=>$tag));
 		//on ajoute le lien entre le tag et le doc avec le poids
 		$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD, "poids"=>$poids));
 		//on ajoute le lien entre le tag l'utilisateur et le doc
-		$this->dbUTD->ajouter(array("uti_id"=>$this->user, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date));		
+		$this->dbUTD->ajouter(array("uti_id"=>$this->user, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date));
+
+		return $idT;
 	}
+
+    /**
+     * Sauvegarde d'un tag sémantique IEML
+     *
+     * @param string $ieml
+     * @param integer $idUti
+     * @param integer $idTag
+     *   
+     * @return integer
+     */
+	function saveIEML($ieml, $idUti, $idTag){
+		//on ajoute le tag ieml
+		$idIeml = $this->dbIEML->ajouter(array("code"=>$ieml));
+		//on ajoute le tag ieml à l'utilisateur
+		$this->dbUIEML->ajouter(array("uti_id"=>$idUti, "ieml_id"=>$idIeml));
+		//on ajoute la traduction ieml
+		$this->dbTrad->ajouter(array("tag_id"=>$idTag, "ieml_id"=>$idIeml));			
+		
+		return $idIeml;
+	}
+	
 }

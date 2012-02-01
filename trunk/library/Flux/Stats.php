@@ -164,6 +164,28 @@ class Flux_Stats  extends Flux_Site{
     	
 	}
 	
+	/**
+     * Récupère les tags associés à un document et leur poids
+     *
+     * @param string $uti
+     * @param string $url
+     * 
+     * @return array
+     */
+	function GetUtiTagDoc($uti, $url) {
+
+		//récupération des identifiants
+		//création des tables
+		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+		
+		$rUti = $this->dbU->findByLogin($uti);
+		$rDoc = $this->dbD->findByUrl($url);
+
+		return $this->dbUTD->GetUtiTagDoc($rUti["uti_id"], $rDoc[0]["doc_id"]);
+    	
+	}
 	
 	/*
 	//vérifier pourquoi certaine url ne sont utilisée qu'une seule fois
