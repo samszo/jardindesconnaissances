@@ -44,7 +44,7 @@ class Flux_Tweetpalette extends Flux_Site{
 		if(!$this->dbUIEML)$this->dbUIEML = new Model_DbTable_Flux_UtiIeml($this->db);
 		if(!$this->dbTrad)$this->dbTrad = new Model_DbTable_Flux_Trad($this->db);
 		
-		$this->user = $this->dbU->ajouter(array("login"=>$uti,"flux"=>"Flux_Tweetpalette"));
+		$this->user = $this->dbU->ajouter(array("login"=>$uti,"flux"=>__CLASS__));
 		$idDoc = $this->dbD->ajouter(array("url"=>$url,"titre"=>$event));
 		$date = new Zend_Date();
 		
@@ -82,23 +82,29 @@ class Flux_Tweetpalette extends Flux_Site{
 		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
 		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
 
-		$Doc = $this->dbD->findByUrl($url);
 		$DocFond = $this->dbD->findByUrl($urlFond);
 
-		//le format du json correspond à heatmap.js
 		$dc = "";
 		$max = 0;
 		if($showAll){
     		//récupère tous les clics sur le fond pour un événement
-    		$DocsClic = $this->dbD->findByTronc($DocFond[0]["doc_id"]."_".$Doc[0]["doc_id"]);
-    		foreach ($DocsClic as $d) {
-    			$coor = substr($d["data"],0,-1);
-    			$dc .= $coor.",count:".$d["poids"]."},";
-    			if($max<$d["poids"])$max=$d["poids"];
-    		}    		
+    		$DocsClic = $this->dbD->findLikeTronc($DocFond[0]["doc_id"]."_");
 		}else{
-    		$dc = "";			
+			//récupère les données suivant les paramètres
+			$Uti = $this->dbU->findByParams(array("login"=>$uti,"flux"=>__CLASS__));
+			if($url!="no"){
+				$Doc = $this->dbD->findByUrl($url);
+				$DocsClic = $this->dbD->findByUtiTronc($Uti[0]["uti_id"], $DocFond[0]["doc_id"]."_".$Doc[0]["doc_id"]);						
+			}else{
+				$DocsClic = $this->dbD->findByUtiTronc($Uti[0]["uti_id"], $DocFond[0]["doc_id"]."_", true);							
+			}
     	}
+		//construction du format json correspondant à heatmap.js
+		foreach ($DocsClic as $d) {
+    		$coor = substr($d["data"],0,-1);
+    		$dc .= $coor.",count:".$d["poids"]."},";
+    		if($max<$d["poids"])$max=$d["poids"];
+    	}    		
     	$dc = "{max: ".$max.", data: [".substr($dc,0,-1)."]}";
     	return $dc;
     }
