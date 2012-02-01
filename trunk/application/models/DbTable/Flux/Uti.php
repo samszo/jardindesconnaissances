@@ -10,7 +10,7 @@
 /**
  * Classe ORM qui représente la table 'flux_Uti'.
  *
- * @copyright  201=& Samuel Szoniecky
+ * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
  */
 class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
@@ -19,7 +19,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_Uti';
+    protected $_name = 'flux_uti';
     
     /*
      * Clef primaire de la table.
@@ -75,7 +75,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
-        $this->update($data, 'flux_Uti.uti_id = ' . $id);
+        $this->update($data, 'flux_uti.uti_id = ' . $id);
     }
     
     /**
@@ -88,7 +88,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_Uti.uti_id = ' . $id);
+        $this->delete('flux_uti.uti_id = ' . $id);
     }
     
     /**
@@ -98,7 +98,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_Uti" => "flux_Uti") );
+                    ->from( array("flux_uti" => "flux_uti") );
                     
         if($order != null)
         {
@@ -112,22 +112,6 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray();
     }
-
-    /**
-     * Récupère les spécifications des colonnes Flux_Uti 
-     */
-    public function getCols(){
-
-    	$arr = array("cols"=>array(
-    	   	array("titre"=>"uti_id","champ"=>"uti_id","visible"=>true),
-    	array("titre"=>"login","champ"=>"login","visible"=>true),
-    	array("titre"=>"maj","champ"=>"maj","visible"=>true),
-    	array("titre"=>"flux","champ"=>"flux","visible"=>true),
-        	
-    		));    	
-    	return $arr;
-		
-    }     
     
     /*
      * Recherche une entrée Flux_Uti avec la valeur spécifiée
@@ -138,7 +122,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     public function findByuti_id($uti_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Uti") )                           
+                    ->from( array("f" => "flux_uti") )                           
                     ->where( "f.uti_id = ?", $uti_id );
 
         return $this->fetchAll($query)->toArray(); 
@@ -152,7 +136,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     public function findByLogin($login)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Uti") )                           
+                    ->from( array("f" => "flux_uti") )                           
                     ->where( "f.login = ?", $login );
 		$arr = $this->fetchAll($query)->toArray();
         return $arr[0]; 
@@ -166,7 +150,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     public function findByMaj($maj)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Uti") )                           
+                    ->from( array("f" => "flux_uti") )                           
                     ->where( "f.maj = ?", $maj );
 
         return $this->fetchAll($query)->toArray(); 
@@ -180,11 +164,27 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     public function findByFlux($flux)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Uti") )                           
+                    ->from( array("f" => "flux_uti") )                           
                     ->where( "f.flux = ?", $flux );
 
         return $this->fetchAll($query)->toArray(); 
     }
     
-    
+    /**
+     * Recherche des entrée avec une liste de paramètres
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    public function findByParams($params)
+    {
+		$select = $this->select();
+		$select->from($this);
+		foreach($params as $k=>$v){
+			$select->where($k.' = ?', $v);
+		}
+		return $this->fetchAll($select)->toArray();        
+    } 
+            
 }

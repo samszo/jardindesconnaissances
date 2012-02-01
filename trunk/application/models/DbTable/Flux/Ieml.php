@@ -1,6 +1,6 @@
 <?php
 /**
- * Ce fichier contient la classe Flux_Ieml.
+ * Ce fichier contient la classe flux_ieml.
  *
  * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
@@ -8,18 +8,18 @@
 
 
 /**
- * Classe ORM qui représente la table 'flux_Ieml'.
+ * Classe ORM qui représente la table 'flux_ieml'.
  *
  * @copyright  201=& Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
+class Model_DbTable_flux_ieml extends Zend_Db_Table_Abstract
 {
     
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_Ieml';
+    protected $_name = 'flux_ieml';
     
     /*
      * Clef primaire de la table.
@@ -28,7 +28,7 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
 
     
     /**
-     * Vérifie si une entrée Flux_Ieml existe.
+     * Vérifie si une entrée flux_ieml existe.
      *
      * @param array $data
      *
@@ -47,7 +47,7 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     } 
         
     /**
-     * Ajoute une entrée Flux_Ieml.
+     * Ajoute une entrée flux_ieml.
      *
      * @param array $data
      * @param boolean $existe
@@ -65,7 +65,7 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     } 
            
     /**
-     * Recherche une entrée Flux_Ieml avec la clef primaire spécifiée
+     * Recherche une entrée flux_ieml avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
      * @param integer $id
@@ -75,11 +75,11 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
-        $this->update($data, 'flux_Ieml.ieml_id = ' . $id);
+        $this->update($data, 'flux_ieml.ieml_id = ' . $id);
     }
     
     /**
-     * Recherche une entrée Flux_Ieml avec la clef primaire spécifiée
+     * Recherche une entrée flux_ieml avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $id
@@ -88,17 +88,17 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_Ieml.ieml_id = ' . $id);
+        $this->delete('flux_ieml.ieml_id = ' . $id);
     }
     
     /**
-     * Récupère toutes les entrées Flux_Ieml avec certains critères
+     * Récupère toutes les entrées flux_ieml avec certains critères
      * de tri, intervalles
      */
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_Ieml" => "flux_Ieml") );
+                    ->from( array("flux_ieml" => "flux_ieml") );
                     
         if($order != null)
         {
@@ -114,7 +114,7 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     }
 
     /**
-     * Récupère les spécifications des colonnes Flux_Ieml 
+     * Récupère les spécifications des colonnes flux_ieml 
      */
     public function getCols(){
 
@@ -132,7 +132,7 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     }     
     
     /*
-     * Recherche une entrée Flux_Ieml avec la valeur spécifiée
+     * Recherche une entrée flux_ieml avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $ieml_id
@@ -140,13 +140,13 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     public function findByIeml_id($ieml_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Ieml") )                           
+                    ->from( array("f" => "flux_ieml") )                           
                     ->where( "f.ieml_id = ?", $ieml_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_Ieml avec la valeur spécifiée
+     * Recherche une entrée flux_ieml avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param varchar $code
@@ -154,13 +154,13 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     public function findByCode($code)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Ieml") )                           
+                    ->from( array("f" => "flux_ieml") )                           
                     ->where( "f.code = ?", $code );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_Ieml avec la valeur spécifiée
+     * Recherche une entrée flux_ieml avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param varchar $desc
@@ -168,13 +168,13 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     public function findByDesc($desc)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Ieml") )                           
+                    ->from( array("f" => "flux_ieml") )                           
                     ->where( "f.desc = ?", $desc );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_Ieml avec la valeur spécifiée
+     * Recherche une entrée flux_ieml avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $niveau
@@ -182,13 +182,13 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     public function findByNiveau($niveau)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Ieml") )                           
+                    ->from( array("f" => "flux_ieml") )                           
                     ->where( "f.niveau = ?", $niveau );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_Ieml avec la valeur spécifiée
+     * Recherche une entrée flux_ieml avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param varchar $parent
@@ -196,13 +196,13 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     public function findByParent($parent)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Ieml") )                           
+                    ->from( array("f" => "flux_ieml") )                           
                     ->where( "f.parent = ?", $parent );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_Ieml avec la valeur spécifiée
+     * Recherche une entrée flux_ieml avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param date $maj
@@ -210,7 +210,7 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
     public function findByMaj($maj)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_Ieml") )                           
+                    ->from( array("f" => "flux_ieml") )                           
                     ->where( "f.maj = ?", $maj );
 
         return $this->fetchAll($query)->toArray(); 

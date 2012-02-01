@@ -1,6 +1,6 @@
 <?php
 /**
- * Ce fichier contient la classe Flux_UtiIeml.
+ * Ce fichier contient la classe flux_utiieml.
  *
  * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
@@ -8,18 +8,18 @@
 
 
 /**
- * Classe ORM qui représente la table 'flux_UtiIeml'.
+ * Classe ORM qui représente la table 'flux_utiieml'.
  *
  * @copyright  201=& Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
+class Model_DbTable_flux_utiieml extends Zend_Db_Table_Abstract
 {
     
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_UtiIeml';
+    protected $_name = 'flux_utiieml';
     
     /*
      * Clef primaire de la table.
@@ -28,7 +28,7 @@ class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
 
     
     /**
-     * Vérifie si une entrée Flux_UtiIeml existe.
+     * Vérifie si une entrée flux_utiieml existe.
      *
      * @param array $data
      *
@@ -47,7 +47,7 @@ class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
     } 
         
     /**
-     * Ajoute une entrée Flux_UtiIeml.
+     * Ajoute une entrée flux_utiieml.
      *
      * @param array $data
      * @param boolean $existe
@@ -65,7 +65,7 @@ class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
     } 
            
     /**
-     * Recherche une entrée Flux_UtiIeml avec la clef primaire spécifiée
+     * Recherche une entrée flux_utiieml avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
      * @param integer $id
@@ -75,11 +75,11 @@ class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
-        $this->update($data, 'flux_UtiIeml.uti_id = ' . $id);
+        $this->update($data, 'flux_utiieml.uti_id = ' . $id);
     }
     
     /**
-     * Recherche une entrée Flux_UtiIeml avec la clef primaire spécifiée
+     * Recherche une entrée flux_utiieml avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $id
@@ -88,17 +88,17 @@ class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_UtiIeml.uti_id = ' . $id);
+        $this->delete('flux_utiieml.uti_id = ' . $id);
     }
     
     /**
-     * Récupère toutes les entrées Flux_UtiIeml avec certains critères
+     * Récupère toutes les entrées flux_utiieml avec certains critères
      * de tri, intervalles
      */
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_UtiIeml" => "flux_UtiIeml") );
+                    ->from( array("flux_utiieml" => "flux_utiieml") );
                     
         if($order != null)
         {
@@ -114,7 +114,7 @@ class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
     }
 
     /**
-     * Récupère les spécifications des colonnes Flux_UtiIeml 
+     * Récupère les spécifications des colonnes flux_utiieml 
      */
     public function getCols(){
 
@@ -128,7 +128,7 @@ class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
     }     
     
     /*
-     * Recherche une entrée Flux_UtiIeml avec la valeur spécifiée
+     * Recherche une entrée flux_utiieml avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $uti_id
@@ -136,13 +136,13 @@ class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
     public function findByUti_id($uti_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiIeml") )                           
+                    ->from( array("f" => "flux_utiieml") )                           
                     ->where( "f.uti_id = ?", $uti_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_UtiIeml avec la valeur spécifiée
+     * Recherche une entrée flux_utiieml avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $ieml_id
@@ -150,7 +150,7 @@ class Model_DbTable_Flux_UtiIeml extends Zend_Db_Table_Abstract
     public function findByIeml_id($ieml_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_UtiIeml") )                           
+                    ->from( array("f" => "flux_utiieml") )                           
                     ->where( "f.ieml_id = ?", $ieml_id );
 
         return $this->fetchAll($query)->toArray(); 

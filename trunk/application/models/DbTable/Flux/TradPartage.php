@@ -1,6 +1,6 @@
 <?php
 /**
- * Ce fichier contient la classe Flux_TradPartage.
+ * Ce fichier contient la classe flux_tradpartage.
  *
  * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
@@ -8,18 +8,18 @@
 
 
 /**
- * Classe ORM qui représente la table 'flux_TradPartage'.
+ * Classe ORM qui représente la table 'flux_tradpartage'.
  *
  * @copyright  201=& Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
+class Model_DbTable_flux_tradpartage extends Zend_Db_Table_Abstract
 {
     
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_TradPartage';
+    protected $_name = 'flux_tradpartage';
     
     /*
      * Clef primaire de la table.
@@ -28,7 +28,7 @@ class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
 
     
     /**
-     * Vérifie si une entrée Flux_TradPartage existe.
+     * Vérifie si une entrée flux_tradpartage existe.
      *
      * @param array $data
      *
@@ -47,7 +47,7 @@ class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
     } 
         
     /**
-     * Ajoute une entrée Flux_TradPartage.
+     * Ajoute une entrée flux_tradpartage.
      *
      * @param array $data
      * @param boolean $existe
@@ -65,7 +65,7 @@ class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
     } 
            
     /**
-     * Recherche une entrée Flux_TradPartage avec la clef primaire spécifiée
+     * Recherche une entrée flux_tradpartage avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
      * @param integer $id
@@ -75,11 +75,11 @@ class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
-        $this->update($data, 'flux_TradPartage.trad_id = ' . $id);
+        $this->update($data, 'flux_tradpartage.trad_id = ' . $id);
     }
     
     /**
-     * Recherche une entrée Flux_TradPartage avec la clef primaire spécifiée
+     * Recherche une entrée flux_tradpartage avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $id
@@ -88,17 +88,17 @@ class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_TradPartage.trad_id = ' . $id);
+        $this->delete('flux_tradpartage.trad_id = ' . $id);
     }
     
     /**
-     * Récupère toutes les entrées Flux_TradPartage avec certains critères
+     * Récupère toutes les entrées flux_tradpartage avec certains critères
      * de tri, intervalles
      */
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_TradPartage" => "flux_TradPartage") );
+                    ->from( array("flux_tradpartage" => "flux_tradpartage") );
                     
         if($order != null)
         {
@@ -114,7 +114,7 @@ class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
     }
 
     /**
-     * Récupère les spécifications des colonnes Flux_TradPartage 
+     * Récupère les spécifications des colonnes flux_tradpartage 
      */
     public function getCols(){
 
@@ -128,7 +128,7 @@ class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
     }     
     
     /*
-     * Recherche une entrée Flux_TradPartage avec la valeur spécifiée
+     * Recherche une entrée flux_tradpartage avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $trad_id
@@ -136,13 +136,13 @@ class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
     public function findByTrad_id($trad_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_TradPartage") )                           
+                    ->from( array("f" => "flux_tradpartage") )                           
                     ->where( "f.trad_id = ?", $trad_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_TradPartage avec la valeur spécifiée
+     * Recherche une entrée flux_tradpartage avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $uti_id
@@ -150,7 +150,7 @@ class Model_DbTable_Flux_TradPartage extends Zend_Db_Table_Abstract
     public function findByUti_id($uti_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_TradPartage") )                           
+                    ->from( array("f" => "flux_tradpartage") )                           
                     ->where( "f.uti_id = ?", $uti_id );
 
         return $this->fetchAll($query)->toArray(); 
