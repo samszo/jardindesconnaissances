@@ -132,7 +132,7 @@
 		}
 
 		function getTweet() {
-			$.post("tweetpalette"
+			$.post("tweetpalette/lit"
 					, getParams(),
 					 function(data){
 						if(data)showTweetClic(data);
