@@ -5,10 +5,12 @@
 		var _X, _Y;
 		var sem=[];
 		var xx;
+		var dtInput;
 		
 		window.onload = function(){
 			
 			getTweet();
+			getInput();
 			
 			xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});
 			
@@ -23,7 +25,23 @@
 				setTweet();				
 				envoiTweet();
 			};
+			
 		};
+
+		function multiSelect(item){
+			//gère les informations liées
+			for (i=0;i<dtInput.events.length;i++){
+				var val = item.innerHTML;
+				if(val==dtInput.events[i].titre){
+					$("#url_event").val(dtInput.events[i].url);
+					return;
+				}
+				if(val==dtInput.events[i].url){
+					$("#tag_event").val(dtInput.events[i].titre);
+					return;
+				}
+			}			
+		}
 		
 		function getSemClic(x, y){
 			sem=[];
@@ -101,6 +119,7 @@
 		}
 		
 		function ecriTweet() {
+						
 			if(document.getElementById('tag_event').value)
 				tweet = "#"+document.getElementById('tag_event').value;
 			else
@@ -151,8 +170,17 @@
 					 function(data){
 						getTweet();
 					 }, "json");
+			getInput();
 		}
-		
+
+		function getInput() {
+			$.post("tweetpalette/input"
+					, {"idBase":idBase},
+					 function(data){
+						setInput(data);
+					 }, "json");			
+		}
+
 		function getParams(){
 
 			if(document.getElementById('url_court').value) url = document.getElementById('url_court').value;
@@ -169,3 +197,29 @@
 			
 			return {"idBase":idBase, "event":event, "url":url, "uti":uti, "sem":sem, "urlFond":urlFond, "showAllUti":showAllUti};
 		}
+
+		function setInput(data){
+			dtInput = data;
+			//création des tableaux
+			var dtE=[], e="";
+			var dtUrl=[], url="";
+			var dtU=[];
+			for (i=0;i<dtInput.events.length;i++){
+				//vérifie les doublons
+				if(e!=dtInput.events[i].titre)
+					dtE.push(dtInput.events[i].titre);
+				if(url!=dtInput.events[i].url)
+					dtUrl.push(dtInput.events[i].url);
+				e = dtInput.events[i].titre;
+				url = dtInput.events[i].url;
+			}
+			for (i=0;i<dtInput.utis.length;i++){
+				dtU.push(dtInput.utis[i].login);
+			}
+			
+	        $("#user_event").smartAutoComplete({source: dtU});
+	        $("#url_event").smartAutoComplete({source: dtUrl});
+	        $("#tag_event").smartAutoComplete({source: dtE});
+
+		}
+		
