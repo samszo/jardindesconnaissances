@@ -331,5 +331,22 @@ class Model_DbTable_flux_doc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
     } 
     
+    /**
+     * Recherche des entrées avec une filtre
+     *
+     * @param string $filtre
+     * @param array $cols
+     *
+     * @return array
+     */
+    public function findFiltre($filtre, $cols)
+    {
+        $query = $this->select()
+        	->from( array("f" => "flux_doc"), $cols )                           
+			->where($filtre)
+			->order($cols);
+		
+        return $this->fetchAll($query)->toArray(); 
+    } 
     
 }

@@ -95,10 +95,12 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
      * Récupère toutes les entrées Flux_Uti avec certains critères
      * de tri, intervalles
      */
-    public function getAll($order=null, $limit=0, $from=0)
+    public function getAll($cols=false, $order=null, $limit=0, $from=0)
     {
-        $query = $this->select()
-                    ->from( array("flux_uti" => "flux_uti") );
+    	if($cols)
+        	$query = $this->select()->from( array("flux_uti" => "flux_uti"), $cols);
+    	else 
+    		$query = $this->select()->from( array("flux_uti" => "flux_uti") );
                     
         if($order != null)
         {
