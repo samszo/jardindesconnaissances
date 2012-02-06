@@ -108,5 +108,21 @@ class Flux_Tweetpalette extends Flux_Site{
     	$dc = "{max: ".$max.", data: [".substr($dc,0,-1)."]}";
     	return $dc;
     }
+    
+    /**
+     * récupère les inputs user, event et tag
+     * 
+     * return array
+     */
+    function getInput(){
+		//création des tables
+		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		
+		$events = $this->dbD->findFiltre("titre != 'clic fond' AND titre != 'Palette de tweet'", array("titre","url"));
+		$utis = $this->dbU->getAll(array("login"));
+		
+    	return array("events"=>$events,"utis"=>$utis);
+    }    
 	
 }
