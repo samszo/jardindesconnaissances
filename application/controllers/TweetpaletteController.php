@@ -58,5 +58,17 @@ class TweetpaletteController extends Zend_Controller_Action {
 	          print_r($e);
 		}
 	}
+
+	public function inputAction() {
+		try {
+			//récupère les informations pour les input
+			$tp = new Flux_Tweetpalette($this->_getParam('idBase', 0));
+			$this->view->data = $tp->getInput();			
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+	          print_r($e);
+		}
+	}
 	
 }
