@@ -86,11 +86,11 @@ class Flux_Tweetpalette extends Flux_Site{
 
 		$dc = "";
 		$max = 0;
-		if($showAll){
+		if($showAll=="true"){
     		//récupère tous les clics sur le fond pour un événement
     		$DocsClic = $this->dbD->findLikeTronc($DocFond[0]["doc_id"]."_");
 		}else{
-			//récupère les données suivant les paramètres
+			//récupère les données suivant les paramètres";
 			$Uti = $this->dbU->findByParams(array("login"=>$uti,"flux"=>__CLASS__));
 			if($url!="no"){
 				$Doc = $this->dbD->findByUrl($url);
