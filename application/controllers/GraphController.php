@@ -29,5 +29,14 @@ class GraphController extends Zend_Controller_Action {
 		
 		$this->view->urlStats = "../stat/tagassos?".$arrUrl[1];	    
     }	
+
+    public function audiowaveAction()
+    {
+	    $request = $this->getRequest();
+		$url = $request->getRequestUri();
+		$arrUrl = explode("?",$url);
+		$this->view->urlWav = "../../data/audios/01_10-02-81_9A.wav";
+		$this->view->urlStats = "../stat/audiowave?".$arrUrl[1];	    
+    }	
     
 }
