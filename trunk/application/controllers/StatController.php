@@ -45,5 +45,12 @@ class StatController extends Zend_Controller_Action {
 			$this->view->stats = $s->GetTagAssos($this->_getParam('tags'),$this->_getParam('racine', 0));	    
 	    }
     }	
-    
+
+    public function audiowaveAction()
+    {
+	    $this->view->stats = "";
+    	$audio = new Flux_Audio();
+		$this->view->stats = $audio->getWave("../data/audios/01_10-02-81_9A.wav");	    
+    }	
+        
 }
