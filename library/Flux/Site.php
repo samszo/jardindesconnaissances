@@ -28,9 +28,9 @@ class Flux_Site{
     	$this->getDb($idBase);
     	
         $frontendOptions = array(
-            'lifetime' => 3000000000000000000, // temps de vie du cache en seconde
+            'lifetime' => 3000000000000000000000000000, // temps de vie du cache en seconde
             'automatic_serialization' => true,
-        	'caching' => false //active ou desactive le cache
+        	'caching' => true //active ou desactive le cache
         );  
         $backendOptions = array(
             // Répertoire où stocker les fichiers de cache
