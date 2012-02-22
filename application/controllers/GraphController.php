@@ -32,11 +32,20 @@ class GraphController extends Zend_Controller_Action {
 
     public function audiowaveAction()
     {
-	    $request = $this->getRequest();
-		$url = $request->getRequestUri();
-		$arrUrl = explode("?",$url);
-		$this->view->urlWav = "../../data/audios/01_10-02-81_9A.wav";
-		$this->view->urlStats = "../stat/audiowave?".$arrUrl[1];	    
+    	if($this->_getParam('idDoc', 0) && $this->_getParam('idBase', 0)){
+    		//connexion à la base
+			$s = new Flux_Site($this->_getParam('idBase', 0));
+    		//récupère le document et son contenu
+    		$db = new Model_DbTable_flux_doc($s->db);
+			$arr = $db->findBydoc_id($this->_getParam('idDoc', 0));
+			//print_r($arr[0]);
+			$this->view->urlSon = $arr[0]["url"];
+			$this->view->urlStats = "../stat/audiowave?idDoc=".$this->_getParam('idDoc', 0);
+			$text = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $arr[0]["note"]));
+			//$text = substr($text, 0, 1000); 
+			$this->view->texte = $text;
+	    }
+    	
     }	
     
 }
