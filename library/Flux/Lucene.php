@@ -12,19 +12,21 @@ class Flux_Lucene extends Flux_Site{
 	var $classUrl;
 	var $nbCaract = 100;
 	
-	public function __construct($login=null, $pwd=null, $idBase=false, $classUrl=false)
+	public function __construct($login=null, $pwd=null, $idBase=false, $classUrl=false, $path='../data/flux-index')
     {
     	parent::__construct($idBase);
     	
     	if(!$classUrl)$this->classUrl = $this;
     	else $this->classUrl = new $classUrl();
-    	     	
+
+    	$this->getDb($idBase);
+    	
 		try {
     		//ouverture de l'index
-			$this->index = Zend_Search_Lucene::open('../data/flux-index');
+			$this->index = Zend_Search_Lucene::open($path);
 		}catch (Zend_Exception $e) {
 			// Création de l'index
-			$this->index = Zend_Search_Lucene::create('../data/flux-index');
+			$this->index = Zend_Search_Lucene::create($path);
 		}
     		
     }
@@ -45,7 +47,7 @@ class Flux_Lucene extends Flux_Site{
         }
 		//récupère les informations du type de document
 		$doc = $this->classUrl->addInfoDocLucene($url, $doc);
-		$this->index->addDocument($doc);		 
+        $this->index->addDocument($doc);		 
 	}
 	
 	function deleteDoc($hits){
@@ -77,9 +79,17 @@ class Flux_Lucene extends Flux_Site{
         return $hits;
 	}
 	
-	function getTermPositions($term) {
+	function getTermPositions($term, $fields=array("title", "url")) {
+		//création du term
 		$objTerm = new Zend_Search_Lucene_Index_Term(strtolower($term['text']), $term['field']);
-		$posis = $this->index->termPositions($objTerm);
+		//récupère les positions du term
+		$c = str_replace("::", "_", __METHOD__)."_getPosis_".$term['field']."_".$term['text']; 
+	   	$posis = $this->cache->load($c);
+        if(!$posis){
+			$posis = $this->index->termPositions($objTerm);
+        	$this->cache->save($posis, $c);			
+        }
+		
 		$result = array();
 		foreach ($posis as $kD => $ps) {
 			//on récupère le document lucene
@@ -118,7 +128,14 @@ class Flux_Lucene extends Flux_Site{
 				
 		    }
 		    //on stocke les informations
-		    $result[] = array("titre"=>$doc->getFieldValue('titre'),"url"=>$doc->getFieldValue('url'),"mp3"=>$doc->getFieldValue('mp3'),"taille"=>strlen($html),"phrases"=>$phrases);
+		    //$result[] = array("titre"=>$doc->getFieldValue('titre'),"url"=>$doc->getFieldValue('url'),"mp3"=>$doc->getFieldValue('mp3'),"taille"=>strlen($html),"phrases"=>$phrases);
+		    $r = "";
+		    foreach ($fields as $f) {
+		    	$r[$f]=$doc->getFieldValue($f);
+		    }
+		    $r["taille"]=strlen($html);
+		    $r["phrases"]=$phrases;
+		    $result[] = $r;
 		}
 		
 		return $result;
@@ -199,7 +216,13 @@ class Flux_Lucene extends Flux_Site{
 		}
 	}
 	
-	function saveDocsTerms(){
+    /**
+     * Enregistre dans la base de donnée les termes associés aux document
+     *
+     * @param array $terms
+     * 
+     */
+	function saveDocsTerms($terms=""){
 
 		//création des tables
 		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
@@ -208,13 +231,15 @@ class Flux_Lucene extends Flux_Site{
 		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
 		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
 		
-		$c = "LuceneGetAllTerms"; 
-	   	$terms = $this->cache->load($c);
-        if(!$terms){
-			$terms = $this->index->terms();
-			$this->cache->save($terms, $c);
-        }
-
+		if(!$terms){
+			$c = "LuceneGetAllTerms"; 
+		   	$terms = $this->cache->load($c);
+	        if(!$terms){
+				$terms = $this->index->terms();
+				$this->cache->save($terms, $c);
+	        }
+		}
+		
         foreach ($terms as $kT => $term) {
         	//on ne gère que les terms du body
         	if($term->field == "body"){
@@ -226,7 +251,7 @@ class Flux_Lucene extends Flux_Site{
 			    	//on récupère le document lucene
 			    	$doc = $this->index->getDocument($kD);			    	
 				    //retrouve le document avec l'url
-				    $idDoc = $this->dbD->ajouter(array("url"=>$doc->getFieldValue('url')));
+				    $idDoc = $this->dbD->ajouter(array("url"=>urldecode($doc->getFieldValue('url'))));
 				    //retrouve le tag correspondant au terme
 					$idT = $this->dbT->ajouter(array("code"=>$term->text));
 					//on ajoute le lien entre le tag et le doc avec le poids

@@ -157,10 +157,16 @@ class Flux_Stats  extends Flux_Site{
 		//construction de la fin de requête
 		$sql = $sql.$where." GROUP BY t1.tag_id	ORDER BY value DESC";
     	
-		$stmt = $this->db->query($sql);
-		//$arr = $stmt->fetchAll();
-    	//return array("code"=>racine,"tags"=>$arr);
-    	return $stmt->fetchAll();
+
+		//récupère les tags
+		$c = str_replace("::", "_", __METHOD__).md5($where); 
+	   	$arr = $this->cache->load($c);
+        if(!$arr){
+			$arr = $this->db->query($sql)->fetchAll();
+			$this->cache->save($arr, $c);			
+        }
+
+		return $arr;
     	
 	}
 	
