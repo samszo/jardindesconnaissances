@@ -78,7 +78,7 @@ class Flux_Site{
 	function getUser($user) {
 
 		//récupère ou enregistre l'utilisateur
-		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti();
+		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
 		$this->user = $this->dbU->ajouter($user);		
 
 	}
@@ -105,7 +105,7 @@ class Flux_Site{
      * @return string
      */
 	function getUrlBodyContent($url) {
-
+		if(substr($url, 0, 7)!="http://")$url = urldecode($url);
 		$c = str_replace("::", "_", __METHOD__)."_".md5($url); 
 	   	$html = $this->cache->load($c);
         if(!$html){
