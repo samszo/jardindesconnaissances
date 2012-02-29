@@ -47,5 +47,18 @@ class GraphController extends Zend_Controller_Action {
 	    }
     	
     }	
+
+    public function tagcloudAction()
+    {
+	    $request = $this->getRequest();
+		$url = $request->getRequestUri();
+		$arrUrl = explode("?",$url);
+		$idBase = "flux_diigo";
+		$s = new Flux_Site($idBase);		
+		$dbU = new Model_DbTable_Flux_Uti($s->db);
+		$this->view->utis = json_encode($dbU->getAll(array("login")));
+		
+		$this->view->urlStats = "../stat/tagassos?idBase=".$idBase."&tags[]=intelligence&tags[]=collective";	    
+    }	
     
 }

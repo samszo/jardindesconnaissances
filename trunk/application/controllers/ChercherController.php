@@ -22,7 +22,8 @@ class ChercherController extends Zend_Controller_Action {
 			if ($this->getRequest()->isPost()) {
 		        $formData = $this->getRequest()->getPost();
 		        if ($form->isValid($formData)) {
-		        	$lu = new Flux_Lucene();
+					$lu = new Flux_Lucene(null, null, "flux_DeleuzeSpinoza", false, '../data/deleuze-index');
+					$this->view->fields = $lu->index->getFieldNames();
 					$this->view->resultats = $lu->find($form->getValue('recherche'));
 		        }
 		    }	
@@ -38,7 +39,7 @@ class ChercherController extends Zend_Controller_Action {
 	public function resultatAction() {
 	    $this->view->resultats = "";
     	if($this->_getParam('recherche', 0)){
-			$lu = new Flux_Lucene();
+			$lu = new Flux_Lucene(null, null, "flux_DeleuzeSpinoza", false, '../data/deleuze-index');
 			$hits = $lu->find($this->_getParam('recherche', 0));
 			$arr="";
 			foreach ($hits as $hit) {
@@ -54,9 +55,10 @@ class ChercherController extends Zend_Controller_Action {
 	public function positionAction() {
 	    $this->view->resultats = "";
     	if($this->_getParam('term', 0)){
-			$lu = new Flux_Lucene();
-			$lu->getDb("flux_DeleuzeSpinoza");
-			$this->view->resultats = $lu->getTermPositions(array('field'=>'body', 'text'=>$this->_getParam('term', 0)));
+			$lu = new Flux_Lucene(null, null, "flux_DeleuzeSpinoza", false, '../data/deleuze-index');
+			$fiels = array("titre","url","mp3");
+			
+			$this->view->resultats = $lu->getTermPositions(array('field'=>'body', 'text'=>$this->_getParam('term', 0)),$fiels);
 			$this->view->term = $this->_getParam('term', 0);
 	    }
 	}
