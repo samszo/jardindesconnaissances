@@ -31,22 +31,23 @@ class Flux_Lucene extends Flux_Site{
     		
     }
 
-    function addDoc($url, $replace=false) {
+    function addDoc($DocInfos, $replace=false) {
+    	$url = $DocInfos["url"];
     	//vérifie si le document existe
-    	$hits = $this->index->find('url:'.urlencode($url));
+    	$hits = false;//$this->index->find('url:'.urlencode($url));
     	if($hits){
     		if(!$replace)return "";
     		else $this->deleteDoc($hits);
     	} 
     	
 		$c = str_replace("::", "_", __METHOD__)."_".md5($url); 
-	   	$doc = $this->cache->load($c);
+	   	$doc = false;//$this->cache->load($c);
         if(!$doc){
     		$doc = Zend_Search_Lucene_Document_Html::loadHTMLFile($url);
 			$this->cache->save($doc, $c);
         }
 		//récupère les informations du type de document
-		$doc = $this->classUrl->addInfoDocLucene($url, $doc);
+		$doc = $this->classUrl->addInfoDocLucene($DocInfos, $doc);
         $this->index->addDocument($doc);		 
 	}
 	
@@ -62,8 +63,8 @@ class Flux_Lucene extends Flux_Site{
     	$arr = $this->dbD->getAll();
     	$i = 0;
     	foreach ($arr as $u){
-    		if($u["url"]!=""){// && $u["doc_id"]>=4318
-    			$this->addDoc($u["url"],$replace);
+    		if($u["tronc"]==""){// && $u["doc_id"]>=4318
+    			$this->addDoc($u,$replace);
     		}  		
     		$i++;
     	}
@@ -81,6 +82,59 @@ class Flux_Lucene extends Flux_Site{
 	
 	function getTermPositions($term, $fields=array("title", "url")) {
 		//création du term
+		$c = str_replace("::", "_", __METHOD__)."_".$term['text']."_".$term['field']; 
+	   	$result = $this->cache->load($c);
+        if(!$result){
+			$objTerm = new Zend_Search_Lucene_Index_Term(strtolower($term['text']), $term['field']);
+			$posis = $this->index->termPositions($objTerm);
+			$result = array();
+			foreach ($posis as $kD => $ps) {
+				//on récupère le document lucene
+		    	$doc = $this->index->getDocument($kD);
+			    $url = urldecode($doc->getFieldValue('url'));
+		    	//récupère le contenu du document
+		    	if($term['field']=="cours"){
+			    	$html = $doc->getFieldValue('cours');		    		
+		    	}else{
+			    	$html = $this->getUrlBodyContent($url);		    		
+		    	}
+		    	//on recherche les occurrences du mots dans le doc
+				$pattern = '/\b'.$term['text'].'\b/i';
+				$segs = preg_split($pattern, $html);
+			    //on calcule les phrases
+			    $pHTML=0;$phrases=array();
+			    for ($i = 0; $i < count($segs); $i++) {
+			    	//vérifie si on traite le premier élément
+					if($i==0){
+						//on récupère le début de la phrase
+						//$deb = substr($segs[$i], -$this->nbCaract, strlen($segs[$i]));
+						$deb = $this->cutStr($segs[$i],$this->nbCaract,"...","dg");
+						$p = $ps[$i];	
+						$pHTML += strlen($segs[$i]);
+						//on récupère la fin de la phrase
+						//$arrFin = $this->getFinPhrase($segs, $i+1);
+						$fin = $this->cutStr($segs[$i+1],$this->nbCaract);
+					}else{
+						//on récupère le début de la phrase
+						//$deb = substr($segs[$i-1], -$this->nbCaract, strlen($segs[$i-1]));
+						$deb = $this->cutStr($segs[$i-1],$this->nbCaract,"...","dg");
+						$p = $ps[$i-1];
+						$pHTML += strlen($term['text'])+strlen($segs[$i-1]);
+						//on récupère la fin de la phrase
+						//$arrFin = $this->getFinPhrase($segs, $i);
+						$fin = $this->cutStr($segs[$i],$this->nbCaract);
+					}
+					
+		    		$phrases[] = array("p"=>$p, "pHTML"=> $pHTML, "deb"=> $deb,"fin"=> $fin);
+		    		$i++;
+					
+			    }
+			    //on stocke les informations
+			    $result[] = array("titre"=>$doc->getFieldValue('titre'),"url"=>$url,"mp3"=>$doc->getFieldValue('mp3'),"taille"=>strlen($html),"phrases"=>$phrases);
+			}
+			$this->cache->save($result, $c);
+        }
+
 		$objTerm = new Zend_Search_Lucene_Index_Term(strtolower($term['text']), $term['field']);
 		//récupère les positions du term
 		$c = str_replace("::", "_", __METHOD__)."_getPosis_".$term['field']."_".$term['text']; 
