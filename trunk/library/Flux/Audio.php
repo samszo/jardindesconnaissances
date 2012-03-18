@@ -57,7 +57,7 @@ class Flux_Audio extends Flux_Site{
 	*/
 	function getMp3Infos($filename) {
 		$m = new mp3file($filename);
-		$a = $m->get_metadata();		
+		return $m->get_metadata();		
 	}
 	
 	/**

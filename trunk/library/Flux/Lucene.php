@@ -81,60 +81,17 @@ class Flux_Lucene extends Flux_Site{
 	}
 	
 	function getTermPositions($term, $fields=array("title", "url")) {
-		//création du term
-		$c = str_replace("::", "_", __METHOD__)."_".$term['text']."_".$term['field']; 
-	   	$result = $this->cache->load($c);
-        if(!$result){
-			$objTerm = new Zend_Search_Lucene_Index_Term(strtolower($term['text']), $term['field']);
-			$posis = $this->index->termPositions($objTerm);
-			$result = array();
-			foreach ($posis as $kD => $ps) {
-				//on récupère le document lucene
-		    	$doc = $this->index->getDocument($kD);
-			    $url = urldecode($doc->getFieldValue('url'));
-		    	//récupère le contenu du document
-		    	if($term['field']=="cours"){
-			    	$html = $doc->getFieldValue('cours');		    		
-		    	}else{
-			    	$html = $this->getUrlBodyContent($url);		    		
-		    	}
-		    	//on recherche les occurrences du mots dans le doc
-				$pattern = '/\b'.$term['text'].'\b/i';
-				$segs = preg_split($pattern, $html);
-			    //on calcule les phrases
-			    $pHTML=0;$phrases=array();
-			    for ($i = 0; $i < count($segs); $i++) {
-			    	//vérifie si on traite le premier élément
-					if($i==0){
-						//on récupère le début de la phrase
-						//$deb = substr($segs[$i], -$this->nbCaract, strlen($segs[$i]));
-						$deb = $this->cutStr($segs[$i],$this->nbCaract,"...","dg");
-						$p = $ps[$i];	
-						$pHTML += strlen($segs[$i]);
-						//on récupère la fin de la phrase
-						//$arrFin = $this->getFinPhrase($segs, $i+1);
-						$fin = $this->cutStr($segs[$i+1],$this->nbCaract);
-					}else{
-						//on récupère le début de la phrase
-						//$deb = substr($segs[$i-1], -$this->nbCaract, strlen($segs[$i-1]));
-						$deb = $this->cutStr($segs[$i-1],$this->nbCaract,"...","dg");
-						$p = $ps[$i-1];
-						$pHTML += strlen($term['text'])+strlen($segs[$i-1]);
-						//on récupère la fin de la phrase
-						//$arrFin = $this->getFinPhrase($segs, $i);
-						$fin = $this->cutStr($segs[$i],$this->nbCaract);
-					}
-					
-		    		$phrases[] = array("p"=>$p, "pHTML"=> $pHTML, "deb"=> $deb,"fin"=> $fin);
-		    		$i++;
-					
-			    }
-			    //on stocke les informations
-			    $result[] = array("titre"=>$doc->getFieldValue('titre'),"url"=>$url,"mp3"=>$doc->getFieldValue('mp3'),"taille"=>strlen($html),"phrases"=>$phrases);
-			}
-			$this->cache->save($result, $c);
-        }
 
+	    $c1 = str_replace("::", "_", __METHOD__).$term['field']."_".$term['text']; 
+		foreach ($fields as $f) {
+	    	$c1 .= "_".$f;
+	    }
+	   	$result = $this->cache->load($c1);
+        if($result){
+        	return $result;
+        }
+	    
+		
 		$objTerm = new Zend_Search_Lucene_Index_Term(strtolower($term['text']), $term['field']);
 		//récupère les positions du term
 		$c = str_replace("::", "_", __METHOD__)."_getPosis_".$term['field']."_".$term['text']; 
@@ -143,13 +100,18 @@ class Flux_Lucene extends Flux_Site{
 			$posis = $this->index->termPositions($objTerm);
         	$this->cache->save($posis, $c);			
         }
-		
+		        
 		$result = array();
 		foreach ($posis as $kD => $ps) {
 			//on récupère le document lucene
 	    	$doc = $this->index->getDocument($kD);
-	    	//récupère le body de l'url
-	    	$html = $this->getUrlBodyContent($doc->getFieldValue('url'));
+		    $url = urldecode($doc->getFieldValue('url'));
+	    	//récupère le contenu du document
+	    	if($term['field']=="cours"){
+		    	$html = $doc->getFieldValue('cours');		    		
+	    	}else{
+		    	$html = $this->getUrlBodyContent($url);		    		
+	    	}
 	    	//on recherche les occurrences du mots dans le doc
 			$pattern = '/\b'.$term['text'].'\b/i';
 			$segs = preg_split($pattern, $html);
@@ -159,38 +121,37 @@ class Flux_Lucene extends Flux_Site{
 		    	//vérifie si on traite le premier élément
 				if($i==0){
 					//on récupère le début de la phrase
-					//$deb = substr($segs[$i], -$this->nbCaract, strlen($segs[$i]));
-					$deb = $this->cutStr($segs[$i],$this->nbCaract,"...","dg");
+					$deb = $this->cutStr($segs[$i],$this->nbCaract,"","dg");
 					$p = $ps[$i];	
 					$pHTML += strlen($segs[$i]);
 					//on récupère la fin de la phrase
-					//$arrFin = $this->getFinPhrase($segs, $i+1);
-					$fin = $this->cutStr($segs[$i+1],$this->nbCaract);
+					$fin = $this->cutStr($segs[$i+1],$this->nbCaract,"");
 				}else{
 					//on récupère le début de la phrase
-					//$deb = substr($segs[$i-1], -$this->nbCaract, strlen($segs[$i-1]));
-					$deb = $this->cutStr($segs[$i-1],$this->nbCaract,"...","dg");
+					$deb = $this->cutStr($segs[$i-1],$this->nbCaract,"","dg");
 					$p = $ps[$i-1];
 					$pHTML += strlen($term['text'])+strlen($segs[$i-1]);
 					//on récupère la fin de la phrase
-					//$arrFin = $this->getFinPhrase($segs, $i);
-					$fin = $this->cutStr($segs[$i],$this->nbCaract);
+					$fin = $this->cutStr($segs[$i],$this->nbCaract,"");
 				}
 				
 	    		$phrases[] = array("p"=>$p, "pHTML"=> $pHTML, "deb"=> $deb,"fin"=> $fin);
 	    		$i++;
 				
 		    }
-		    //on stocke les informations
-		    //$result[] = array("titre"=>$doc->getFieldValue('titre'),"url"=>$doc->getFieldValue('url'),"mp3"=>$doc->getFieldValue('mp3'),"taille"=>strlen($html),"phrases"=>$phrases);
 		    $r = "";
 		    foreach ($fields as $f) {
-		    	$r[$f]=$doc->getFieldValue($f);
+		    	if($f=="url")
+			    	$r[$f]=urldecode($doc->getFieldValue($f));
+		    	else
+			    	$r[$f]=$doc->getFieldValue($f);
 		    }
 		    $r["taille"]=strlen($html);
 		    $r["phrases"]=$phrases;
 		    $result[] = $r;
+		    
 		}
+        $this->cache->save($result, $c1);			
 		
 		return $result;
 	}
@@ -223,7 +184,7 @@ class Flux_Lucene extends Flux_Site{
 	public function cutStr($str, $max = 100, $finish = '...', $dir="gd"){
 
 		if (strlen($str) <= $max){
-	        return $str;
+	        return htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", strip_tags($str)));
 	    }
 	        
 	    $max = intval($max) - strlen($finish);
@@ -251,7 +212,7 @@ class Flux_Lucene extends Flux_Site{
 		    $str = $finish.rtrim($str);   	
 	    }
 	    
-	    return str_replace(CHR(13).CHR(10),"",strip_tags($str));
+	    return htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", strip_tags($str)));
 	}
 	
 	function removeAllIndex(){
