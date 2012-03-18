@@ -20,6 +20,9 @@ class Flux_Site{
 	var $dbIEML;
 	var $dbUIEML;
 	var $dbTrad;
+	var $dbE;
+	var $dbED;
+	var $dbET;
 	var $db;
 	var $lucene;
 	
