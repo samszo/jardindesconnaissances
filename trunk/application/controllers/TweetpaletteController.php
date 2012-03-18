@@ -55,7 +55,6 @@ class TweetpaletteController extends Zend_Controller_Action {
 		}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
 	          echo "Message: " . $e->getMessage() . "\n";
-	          print_r($e);
 		}
 	}
 
@@ -67,7 +66,6 @@ class TweetpaletteController extends Zend_Controller_Action {
 		}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
 	          echo "Message: " . $e->getMessage() . "\n";
-	          print_r($e);
 		}
 	}
 	

@@ -39,10 +39,11 @@ class GraphController extends Zend_Controller_Action {
     		$db = new Model_DbTable_flux_doc($s->db);
 			$arr = $db->findBydoc_id($this->_getParam('idDoc', 0));
 			//print_r($arr[0]);
+			$this->view->urlTitre = $arr[0]["titre"];
 			$this->view->urlSon = $arr[0]["url"];
-			$this->view->urlStats = "../stat/audiowave?idDoc=".$this->_getParam('idDoc', 0);
+			$this->view->urlWave = "../stat/audiowave?idDoc=".$this->_getParam('idDoc', 0);
+			$this->view->urlStat = "../deleuze/position?term=abstrait";
 			$text = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $arr[0]["note"]));
-			//$text = substr($text, 0, 1000); 
 			$this->view->texte = $text;
 	    }
     	
@@ -60,5 +61,21 @@ class GraphController extends Zend_Controller_Action {
 		
 		$this->view->urlStats = "../stat/tagassos?idBase=".$idBase."&tags[]=intelligence&tags[]=collective";	    
     }	
+    
+    public function sunburstAction()
+    {
+	    /*
+    	$request = $this->getRequest();
+		$url = $request->getRequestUri();
+		$arrUrl = explode("?",$url);
+		$idBase = "flux_diigo";
+		$s = new Flux_Site($idBase);		
+		$dbU = new Model_DbTable_Flux_Uti($s->db);
+		$this->view->utis = json_encode($dbU->getAll(array("login")));
+		
+		$this->view->urlStats = "../stat/tagassos?idBase=".$idBase."&tags[]=intelligence&tags[]=collective";
+		*/	    
+    }	
+    
     
 }

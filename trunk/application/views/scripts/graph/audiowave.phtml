@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<script type='text/javascript' src="../js/d3.js"></script>
 	<script type='text/javascript' src="../js/d3.time.js"></script>
+	<script type='text/javascript' src="../js/selectbar.js"></script>
 	<script type='text/javascript' src="../js/popcorn-complete.js"></script>
 	<style>	
 		svg {
@@ -19,23 +20,23 @@
 		  stroke: #000;
 		  shape-rendering: crispEdges;
 		}
-		.brush .extent {
-		  stroke: #fff;
-		  fill-opacity: .125;
-		  shape-rendering: crispEdges;
-		}	
 	</style>
 </head>
 <body>
+	<div id="titre" ><?php echo $this->urlTitre; ?></div>
+	<div id="lien" ><?php echo $this->urlSon; ?></div>
     <audio controls='controls' id='audioW' src='<?php echo $this->urlSon; ?>' >
 	</audio>
+	<div id="divSVG" ></div>
 	<div id="txtSelect" width="100%"></div>
 	<div id="txtAuto" width="100%" ></div>
 <script>
 var allTexte = "<?php echo $this->texte; ?>";
 var nbCarDeb = 0, nbCarFin = 0, nbCarTot = allTexte.length, arrMots = allTexte.split(" ");
-var txtSelect = document.getElementById("txtSelect"), txtAuto = document.getElementById("txtAuto"), arrCar=[];
-//construction du tableau des caractères
+var txtSelect = document.getElementById("txtSelect"), txtAuto = document.getElementById("txtAuto")
+	, arrCar=[], arrSbSon = [], arrSbTxt = [], arrPhrases = [{pHTML:50},{pHTML:100}];
+
+//construction du tableau des mots
 for(i=0; i < arrMots.length; i++){
 	nbCarFin += arrMots[i].length+1;
 	arrCar.push({n:i,mot:arrMots[i],carDeb:nbCarDeb,carFin:nbCarFin});
@@ -44,71 +45,36 @@ for(i=0; i < arrMots.length; i++){
 
 
 var margin = {top: 10, right: 10, bottom: 100, left: 40},
-    margin2 = {top: 260, right: 10, bottom: 20, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom,
-    height2 = 300 - margin2.top - margin2.bottom,
-	marginConText = {top: 200, right: 10, bottom: 20, left: 40},
-	heightConText = 30;
+    mrgCntxSon = {top: 10, right: 10, bottom: 20, left: 40},
+    width = 1000 - margin.left - margin.right,
+    height = 10,
+    hCntxSon = 20,
+	mrgCntxText = {top: 60, right: 10, bottom: 10, left: 40},
+	hCntxText = 20;
 
-var x = d3.time.scale().range([0, width]),
-    x2 = d3.time.scale().range([0, width]),
-    y = d3.scale.linear().range([height, 0]),
-    y2 = d3.scale.linear().range([height2, 0]),
-    xTxt = d3.scale.linear().range([0, width]).domain([0, arrCar.length]);
+var xCntxSon = d3.time.scale().range([0, width]),
+    yCntxSon = d3.scale.linear().range([hCntxSon, 0]),
+    xCntxSonInv,
+    xCntxTxt = d3.scale.linear().range([0, width]).domain([0, arrCar.length-1]),
+	xCntxTxtInv = d3.scale.linear().range([0, arrCar.length-1]).domain([0, width]);
 
-var xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format.utc("%X")),
-    xAxis2 = d3.svg.axis().scale(x2).orient("bottom").tickFormat(d3.time.format.utc("%X")),
-    yAxis = d3.svg.axis().scale(y).orient("left"),
-    xAxisTxt = d3.svg.axis().scale(xTxt).orient("bottom");
-    
+var xAxisCntxSon = d3.svg.axis().scale(xCntxSon).orient("top").tickFormat(d3.time.format.utc("%X")),
+    xAxisCntxTxt = d3.svg.axis().scale(xCntxTxt).orient("bottom");
 
-var brush = d3.svg.brush()
-    .x(x2)
-    .on("brush", brush)
-    .on("brushend", brushend);
-
-var brushTxt = d3.svg.brush()
-	.x(xTxt)
-	.on("brushend", brushendTxt);
-
-var area = d3.svg.area()
-    .interpolate("monotone")
-    .x(function(d) { return x(d.date); })
-    .y0(function(d) { return y(d.y1); })
-    .y1(function(d) { return y(d.y2); });
-     
-var area2 = d3.svg.area()
-    .interpolate("monotone")
-    .x(function(d) { return x2(d.date); })
-    .y0(function(d) { return y2(d.y1); })
-    .y1(function(d) { return y2(d.y2); });
-
-var areaText = d3.svg.area()
-	.x(function(d) { 
-		return xTxt(d.n); 
-		})
-	.y0(heightConText)
-	.y1(heightConText+10);
-
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#divSVG").append("svg")
 	.attr("width", width + margin.left + margin.right)
 	.attr("height", height + margin.top + margin.bottom);
 
-var contextTxt = svg.append("g")
-	.attr("transform", "translate(" + marginConText.left + "," + marginConText.top + ")");
-contextTxt.append("path")
-		.data([arrCar])
-		.attr("d", areaText);
-contextTxt.append("g")
+var gCntxText = svg.append("g")
+	.attr("transform", "translate(" + mrgCntxText.left + "," + mrgCntxText.top + ")");
+gCntxText.append("g")
 		.attr("class", "x axis")
-		.attr("transform", "translate(0," + heightConText + ")")
-		.call(xAxisTxt);
-contextTxt.append("g")
-	.attr("class", "x brush")
-	.call(brushTxt)
-	.selectAll("rect")
-	.attr("height", heightConText + 7);
+		.attr("transform", "translate(0," + hCntxText + ")")
+		.call(xAxisCntxTxt);
+gCntxText.append("text")
+	   	.attr("class", "x axis")
+		.attr("transform", "translate(-"+mrgCntxText.left+"," + hCntxText + ")")
+		.text("texte");
 
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
@@ -116,11 +82,8 @@ svg.append("defs").append("clipPath")
     .attr("width", width)
     .attr("height", height);
 
-var focus = svg.append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var context = svg.append("g")
-    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+var gCntxSon = svg.append("g")
+    .attr("transform", "translate(" + mrgCntxSon.left + "," + mrgCntxSon.top + ")");
 	
 //utc important pour le calcul des secondes
 var formatDate = d3.time.format.utc("%m/%d/%Y %X");
@@ -137,106 +100,47 @@ document.addEventListener('DOMContentLoaded', function () {
 }, false);
 
 
-d3.json("<?php echo $this->urlStats; ?>", function(data) {
+d3.json("<?php echo $this->urlWave; ?>", function(data) {
 
 	data.forEach(function(d) {
 	    d.date = formatDate.parse(d.date);
 	  });
 	  	
-  x.domain(d3.extent(data.map(function(d) { return d.date; })));
-  y.domain([0, d3.max(data.map(function(d) { return d.y1; }))]);
-  x2.domain(x.domain());
-  y2.domain(y.domain());
+  xCntxSon.domain(d3.extent(data.map(function(d) { return d.date; })));
+  yCntxSon.domain([0, d3.max(data.map(function(d) { return d.y1; }))]);
 
-  focus.append("path")
-      .data([data])
-      .attr("clip-path", "url(#clip)")
-      .attr("d", area);
+  xCntxSonInv = d3.time.scale().range(d3.extent(data.map(function(d) { return d.date; }))).domain( [0, width]);
 
-  focus.append("g")
+  gCntxSon.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  focus.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);  
-
-  context.append("path")
-      .data([data])
-      .attr("d", area2);
-
-  context.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height2 + ")")
-      .call(xAxis2);
-  
-  context.append("g")
-      .attr("class", "x brush")
-      .call(brush)
-    .selectAll("rect")
-      .attr("y", -6)
-      .attr("height", height2 + 7);
-  
+      .attr("transform", "translate(0," + hCntxSon + ")")
+      .call(xAxisCntxSon);
+  gCntxSon.append("text")
+	.attr("class", "x axis")
+	.attr("transform", "translate(-"+mrgCntxSon.left+",30)")
+	.text("audio");
+    
 });
 
-var texte = svg.append("text")
-	.attr("x", marginConText.left)
-	.attr("y", marginConText.top)
-	.text("");
-
-
-function getTexteTaille() {
-	var rect,
-    s = 64;
-	do {
-	  texte.style("font-size", s-- + "px");
-	  rect = texte.node().getBBox();
-	} while (rect.width >= width);
+for(i=0; i < arrPhrases.length; i++){
+	arrSbSon.push(selectbar({wBar:10, wSel:30, x:arrPhrases[i]['pHTML'], width:width, hSel:hCntxSon, left:mrgCntxSon.left, top:mrgCntxSon.top+hCntxSon
+		  , xCntx:xCntxSonInv, svg:svg, fncDragEnd:playSonSelect}));
+	arrSbTxt.push(selectbar({wBar:10, wSel:30, x:arrPhrases[i]['pHTML'], width:width, hSel:hCntxText, left:mrgCntxText.left, top:mrgCntxText.top
+			, xCntx:xCntxTxtInv, svg:svg, fncDragEnd:showTextSelect}));	
 }
 
-function brush() {
-  x.domain(brush.empty() ? x2.domain() : brush.extent());
-  focus.select("path").attr("d", area);
-  focus.select(".x.axis").call(xAxis);
-}
+function playSonSelect(arrExt) {
+	//calcule l'intervale en seconde
+	nbSecDeb = arrExt[0] / 1000;
+	nbSecFin = arrExt[1] / 1000;
+	var d0 = new Date(arrExt[0]);
+	var d1 = new Date(arrExt[1]);
+	var queryTime = formatDate(d0)+" - "+formatDate(d1)+" = "+nbSecDeb+" - "+nbSecFin;
+	console.log(queryTime);
+	audioW.play(nbSecDeb);
+	showTextAuto();
+};
 
-function brushend() {
-	if (!brush.empty()){
-		//calcule l'intervale en seconde
-		var arr = brush.extent();
-		nbSecDeb = arr[0].getTime() / 1000;
-		nbSecFin = arr[1].getTime() / 1000;
-		var queryTime = formatDate(arr[0])+" - "+formatDate(arr[1])+" = "+nbSecDeb+" - "+nbSecFin;
-		console.log(queryTime);
-		audioW.play(nbSecDeb);
-		//calcule l'interval en texte
-		nbSecTot = audioW.duration();
-		nbCarDeb = Math.round(nbCarTot/nbSecTot*nbSecDeb);
-		nbCarFin = Math.round(nbCarTot/nbSecTot*nbSecFin);
-		var queryTexte = nbCarDeb+" - "+nbCarFin;
-		console.log(queryTexte);
-		var txt = allTexte.substring(nbCarDeb,nbCarFin);
-		console.log("texte="+txt);
-		txtAuto.innerHTML = txt;
-		/*
-		texte.text(txt);
-		getTexteTaille();
-		*/
-	};
-}
-
-function brushTxt() {
-	  x.domain(brush.empty() ? x2.domain() : brush.extent());
-	  focus.select("path").attr("d", area);
-	  focus.select(".x.axis").call(xAxis);
-	}
-
-function brushendTxt() {
-	if (!brushTxt.empty()){
-		showTextSelect(brushTxt.extent());
-	};
-}
 
 function showTextSelect(arrExt){
 	//Récupère le nombre de caractère
@@ -244,11 +148,19 @@ function showTextSelect(arrExt){
 	var arrMotFin = arrCar[Math.round(arrExt[1])];
 	var txt = allTexte.substring(arrMotDeb["carDeb"],arrMotFin["carFin"]);
 	console.log("texte="+txt);
-	/*
-	texte.text(txt);
-	getTexteTaille();
-	*/
 	txtSelect.innerHTML = txt;
+}
+
+function showTextAuto(){
+	//calcule l'interval en texte
+	nbSecTot = audioW.duration();
+	nbCarDeb = Math.round(nbCarTot/nbSecTot*nbSecDeb);
+	nbCarFin = Math.round(nbCarTot/nbSecTot*nbSecFin);
+	var queryTexte = nbCarDeb+" - "+nbCarFin;
+	console.log(queryTexte);
+	var txt = allTexte.substring(nbCarDeb,nbCarFin);
+	console.log("texte="+txt);
+	txtAuto.innerHTML = txt;	
 }
     </script>
   </body>
