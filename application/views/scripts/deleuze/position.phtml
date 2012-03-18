@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script type='text/javascript' src="../js/d3.v2.js"></script>
+	<script type='text/javascript' src="../js/d3.time.js"></script>
+	<script type='text/javascript' src="../js/selectsontexte.js"></script>
+	<script type='text/javascript' src="../js/selectbar.js"></script>
+	<script type='text/javascript' src="../js/popcorn-complete.js"></script>
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+	
+	<style>	
+		svg {
+		  font: 10px sans-serif;
+		}		
+		.Select {  background-color: red; display:inline;} 
+		.txtSelect { background-color: orange; } 
+		.sonSelect { background-color: violet; weight: 100px } 
+		path {
+		  fill: steelblue;
+		}
+		.axis path, .axis line {
+		  fill: steelblue;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
+		.ref{
+		  vertical-align:middle;
+		}
+		.term{
+		  color:blue;
+		}
+	</style>
+	<script>
+		var arrSst = [];
+		var idExi = '<?php echo $this->idExi; ?>';
+		var mailExi = '<?php echo $this->identite;; ?>';
+		function showSst(idElem){			
+			var chk = document.getElementById("chk_"+idElem);
+			var bs = d3.select('#son_'+idElem);
+			bs.attr("visibility", function() { if(chk.checked) return "visible"; else return "hidden"; });	  		
+			var bt = d3.select('#txt_'+idElem);
+			bt.attr("visibility", function() { if(chk.checked) return "visible"; else return "hidden"; });	  		
+		}
+		function updSst(idDoc, num, idDocPosi){
+			var p = getParams(idDoc, num);
+			p.idDocPosi = idDocPosi;
+			$.post("modif", p,
+					 function(data){
+						alert("Modification effectuée.");
+					 }, "json");						
+		}
+		function saveSst(idDoc, num){
+			var p = getParams(idDoc, num);
+			$.post("ajout", p,
+					 function(data){
+						addSb(data);
+					 }, "json");
+		}
+		function delSst(idDoc, idDocPar){
+			$.post("supp"
+					,  {"idDoc":idDoc},
+					 function(data){
+						var toto = data;
+					 }, "json");
+			var dPar = document.getElementById("ref_"+idDocPar);
+			var d = document.getElementById("Select_exi_"+idDoc);
+			dPar.removeChild(d); 
+
+		}
+		function getParams(idDoc, num){
+
+			var sst = arrSst[idDoc];
+			var p = sst.sbparams(num);
+			p.idDoc = idDoc;
+			p.idExi = idExi;
+			p.mailExi = mailExi;
+			return p;
+		}
+		function addSb(p){
+ 			var oP = eval('(' + p['note'] + ')');
+			var sst = arrSst[oP['idDoc']];
+			var nbSb = sst.arrSbSon.length;
+ 			var idElem = oP['idDoc']+"_"+nbSb+"_"+p['idDoc']+"_"+oP['idExi'];
+			var bs = d3.select('#ref_'+oP['idDoc']);
+			var d1 = bs.append("div")
+				.attr("id", "Select_exi_"+p['idDoc']);
+			var d2 = d1.append("div")
+				.attr("class","Select")
+				.attr("id","Select_"+idElem)
+				.html(oP['mailExi']);
+			d2.append("input")
+				.attr("id","chk_"+idElem)
+				.attr("type","checkbox")
+				.attr("checked","checked")
+				.attr("onclick","showSst('"+idElem+"',-1)");
+			d2.append("img")
+				.attr("id", "Select_del_"+p['idDoc'])
+				.attr("onclick","delSst("+p['idDoc']+","+oP['idDoc']+")")
+				.attr("src", "../img/DeleteRecord.png")
+				.attr("title", "Supprimer la sélection");
+			d2.append("img")
+				.attr("id", "Select_upd_"+p['idDoc'])
+				.attr("onclick","updSst("+oP['idDoc']+","+nbSb+","+p['idDoc']+")")
+				.attr("src", "../img/UpdateRecord.png")
+				.attr("title", "Modifier la sélection");
+			d2.append("span")
+				.attr("id", "Select_son_"+idElem)
+				.attr("class","sonSelect");
+			d2.append("br");
+			d2.append("span")
+				.attr("id", "Select_txt_"+idElem)
+				.attr("class","txtSelect");
+			sst.addNewPosiSb(oP, idElem);
+		}
+	</script>	
+	
+</head>
+<body>
+	<div class="ref" id="mail"><?php echo $this->identite; ?></div>
+	<?php foreach($this->resultats as $r) : ?>
+		<div class="ref" id="ref_<?php echo $r['doc_id']; ?>" >
+	    	<audio controls='controls' id='audioW_<?php echo $r['doc_id']; ?>' src='<?php echo $r['urlSonLocal']; ?>' ></audio>
+			<?php echo $r['doc_id']." - ".$r['titre']; ?>
+			<a href="<?php echo $r['url']; ?>"><?php echo $r['url']; ?></a>
+			<div id="divSVG_<?php echo $r['doc_id']; ?>" ></div>
+			<?php
+			 $i = 0;
+			 foreach ($r['phrases'] as $p) : ?>
+			 	<p>
+			 		<!--  - ...<?php echo $p['deb']; ?> <span class='term'><?php echo $this->term; ?></span> <?php echo $p['fin']; ?>...-->
+			 		<?php
+			 			//important pour l'affichage des sélections : libre_libre_[index dans le tableau des barres de sélection] 
+			 			$idElem = $r['doc_id']."_".$i; 
+			 		?> 
+			 		<div class="Select" id="Select_<?php echo $idElem; ?>" >Automatique 
+				 		<input id='chk_<?php echo $idElem; ?>' type='checkbox' checked='checked' onclick='showSst("<?php echo $idElem; ?>")' >
+					 	<img id="Select_save_<?php echo $idElem; ?>" onclick='saveSst(<?php echo $r['doc_id'].",".$i; ?>)'  src="../img/AddRecord.png" title="Ajouter la sélection à votre compte" />
+					 	<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span><br/>
+					 	<span class="txtSelect" id="Select_txt_<?php echo $idElem; ?>" ></span>
+				 	</div>
+			 	</p>		 			 	 
+			<?php $i++; endforeach; ?>
+			<?php
+				 $j = 0;
+				 foreach ($r['posis'] as $p){
+				 		echo '<div id="Select_exi_'.$p['idDoc'].'">';
+			 			$oP = json_decode($p['note']);
+			 			$idElem = $r['doc_id']."_".($i+$j)."_".$p['idDoc']."_".$oP->idExi;
+				 		echo '<div class="Select" id="Select_'.$idElem.'" >'.$oP->mailExi.' 
+				 			<input id="chk_'.$idElem.'" type="checkbox" checked="checked" onclick="showSst(\''.$idElem.'\',-1)" >';
+				 		if($this->identite==$oP->mailExi){
+				 			echo '<img id="Select_del_'.$p['idDoc'].'" onclick="delSst('.$p['idDoc'].','.$r['doc_id'].')"  src="../img/DeleteRecord.png" title="Supprimer la sélection" />
+				 			<img id="Select_upd_'.$p['idDoc'].'" onclick="updSst('.$r['doc_id'].','.($i+$j).','.$p['idDoc'].')"  src="../img/UpdateRecord.png" title="Modifier la sélection" />';
+				 		}
+					 	echo '<span class="sonSelect" id="Select_son_'.$idElem.'" ></span><br/>
+							 	<span class="txtSelect" id="Select_txt_'.$idElem.'" ></span>
+						 	</div>
+					 	</div>';		 			 	 
+				 	$j++;
+				 }
+				 ?>
+		</div>
+	  	<script>
+	  	arrSst[<?php echo $r['doc_id']; ?>] = new selectsontexte({term:"<?php echo $this->term; ?>"
+				, data:<?php echo json_encode($r); ?>
+				, idDoc:"<?php echo $r['doc_id']; ?>"});
+	  	</script>
+		<hr/>
+	<?php endforeach; ?>
+  </body>
+</html>	

@@ -27,8 +27,10 @@ class Model_DbTable_flux_doc extends Zend_Db_Table_Abstract
     protected $_primary = 'doc_id';
 
 	protected $_dependentTables = array(
-		'Model_DbTable_Flux_UtiDoc'
+		'Model_DbTable_Flux_ExiDoc'
+		,'Model_DbTable_Flux_UtiDoc'
 		,'Model_DbTable_Flux_TagDoc'
+		,'Model_DbTable_Flux_UtiTagDoc'
 		);
     
     
@@ -44,7 +46,7 @@ class Model_DbTable_flux_doc extends Zend_Db_Table_Abstract
 		$select = $this->select();
 		$select->from($this);
 		foreach($data as $k=>$v){
-			if($k!="maj" && $k!="poids" )
+			if($k!="maj" && $k!="poids"  && $k!="note" )
 				$select->where($k.' = ?', $v);
 		}
 		$rows = $this->fetchAll($select);        
@@ -65,11 +67,11 @@ class Model_DbTable_flux_doc extends Zend_Db_Table_Abstract
     	$id=false;
     	if($existe)$id = $this->existe($data);
     	if(!$id){
-    		if(!$data["pubDate"]) $data["pubDate"] = new Zend_Db_Expr('NOW()');
+    		if(!isset($data["pubDate"])) $data["pubDate"] = new Zend_Db_Expr('NOW()');
     	 	$id = $this->insert($data);
     	}else{
     		//met à jour le poids
-    		if($data["poids"]){
+    		if(isset($data["poids"])){
     			$dt["poids"] = $id[0]["poids"]+$data["poids"];
     			$dt["maj"] = $data["maj"];
     			$this->edit($id[0]["doc_id"], $dt);
@@ -227,7 +229,7 @@ class Model_DbTable_flux_doc extends Zend_Db_Table_Abstract
     {
         $query = $this->select()
                     ->from( array("f" => "flux_doc") )                           
-                    ->where( "f.tronc LIKE ?", $tronc );
+                    ->where( "f.tronc = ?", $tronc );
 
         return $this->fetchAll($query)->toArray(); 
     }

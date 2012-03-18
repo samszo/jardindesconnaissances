@@ -9,8 +9,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			'basePath' => APPLICATION_PATH));
 
 		$loader = Zend_Loader_Autoloader::getInstance();
-		$loader->registerNamespace(array('Flux_'));
-		$loader->registerNamespace(array('Jardin_'));
+		$loader->registerNamespace(array('Flux_','Jardin_'));
 		return $moduleLoader;
 	}
 

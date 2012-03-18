@@ -77,7 +77,8 @@ class Model_DbTable_flux_tagdoc extends Zend_Db_Table_Abstract
      * @return void
      */
     public function ajoutPoids($data)
-    {        
+    {
+    	if(!isset($data["poids"]))$data["poids"]=1;        
 		$sql = 'UPDATE flux_tagdoc SET poids = poids + '.$data["poids"].' WHERE tag_id = '.$data["tag_id"].' AND doc_id ='.$data["doc_id"];
     	$this->_db->query($sql);    
     }

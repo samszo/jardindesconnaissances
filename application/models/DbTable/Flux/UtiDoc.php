@@ -89,7 +89,20 @@ class Model_DbTable_flux_utidoc extends Zend_Db_Table_Abstract
     {
         $this->delete('flux_utidoc.uti_id = ' . $id);
     }
-    
+
+    /**
+     * Recherche les entrées avec la clef primaire spécifiée
+     * et supprime ces entrées.
+     *
+     * @param integer $id
+     *
+     * @return void
+     */
+    public function removeDoc($id)
+    {
+        $this->delete('doc_id = ' . $id);
+    }
+      
     /**
      * Récupère toutes les entrées flux_utidoc avec certains critères
      * de tri, intervalles

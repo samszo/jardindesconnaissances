@@ -94,6 +94,20 @@ class Model_DbTable_Flux_ExiDoc extends Zend_Db_Table_Abstract
     }
     
     /**
+     * Recherche une entrée Flux_exidoc avec la clef primaire spécifiée
+     * et supprime cette entrée.
+     *
+     * @param integer $id
+     *
+     * @return void
+     */
+    public function removeDoc($id)
+    {
+        $this->delete('flux_exidoc.doc_id = ' . $id);
+    }
+    
+    
+    /**
      * Récupère toutes les entrées Flux_exidoc avec certains critères
      * de tri, intervalles
      */

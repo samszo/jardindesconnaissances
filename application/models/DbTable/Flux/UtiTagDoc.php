@@ -92,6 +92,19 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
         $this->delete('flux_utitagdoc.uti_id = ' . $id);
     }
+
+    /**
+     * Recherche les entrées avec la clef primaire spécifiée
+     * et supprime ces entrées.
+     *
+     * @param integer $id
+     *
+     * @return void
+     */
+    public function removeDoc($id)
+    {
+        $this->delete('doc_id = ' . $id);
+    }
     
     /**
      * Récupère toutes les entrées Flux_utitagdoc avec certains critères
