@@ -9,6 +9,7 @@ function selectsontexte(config) {
 	this.formatDate, this.audioW, this.allTexte, this.svg, this.width;
 	this.mrgCntxSon, this.mrgCntxText, this.hCntxSon, this.hCntxText;
   	this.nbSecDeb, this.nbSecFin;
+  	this.arrTc = [], this.idDoc = config.idDoc;
 
 	this.sst = function() {
 	  
@@ -23,7 +24,10 @@ function selectsontexte(config) {
 	  , txtAuto = document.getElementById("txtAuto_"+idDoc)
 	  , divSVG = "#divSVG_"+idDoc
 	  , self = this;	  
-	  	  
+	  
+	  //création du tagcloud général
+	  //var tcg	= new tagcloud({idDoc:"divSVG_"+idDoc, txt:this.allTexte, data:false});
+
 	  var margin = {top: 10, right: 10, bottom: 80, left: 40};
 	  this.width = 1000 - margin.left - margin.right;
 	  this.mrgCntxSon = {top: 10, right: 10, bottom: 20, left: 40};
@@ -118,6 +122,10 @@ function selectsontexte(config) {
     		, hSel:this.hCntxText, left:this.mrgCntxText.left, top:this.mrgCntxText.top
 	  		, xCntx:this.xCntxTxt ,xCntxInv:this.xCntxTxtInv , svg:this.svg, fncDragEnd:this.showTextSelect, xUnit:1, sst:this});
 	  	this.arrSbTxt.push(sb);
+	  	var txtDeb = this.allTexte.indexOf(phrases[i]['deb']);
+	  	var txt = this.allTexte.substring(txtDeb,txtDeb+100);	  	
+	  	//this.arrTc.push(new tagcloud({idDoc:idDoc+'_'+i, txt:txt, data:false}));
+
 	  	sb.show();
 	  }
     //ajoute les phrases positionnées par des existences
@@ -178,8 +186,10 @@ function selectsontexte(config) {
 
   this.showTextSelect = function(arrExt, id, sst){
   	//Récupère le nombre de caractère
-  	var arrMotDeb = sst.arrCar[Math.round(arrExt[0])];
-  	var arrMotFin = sst.arrCar[Math.floor(arrExt[1])];
+	var motDeb = Math.round(arrExt[0]);
+	var motFin = Math.floor(arrExt[1]);
+  	var arrMotDeb = sst.arrCar[motDeb];
+  	var arrMotFin = sst.arrCar[motFin];
   	var txt = sst.allTexte.substring(arrMotDeb["carDeb"],arrMotFin["carFin"]);
   	//console.log(arrMotDeb["carDeb"]+" - "+arrMotFin["carFin"]+" : "+txt);
 	document.getElementById("Select_"+id).innerHTML = txt;
@@ -187,11 +197,22 @@ function selectsontexte(config) {
 	var sbs=sst.arrSbSon[arrId[2]]; 
 	if(!sst.sbs){
 		sst.sbs=sbs;
-		sst.sbs.show();			
+		sst.sbs.show();
+		sst.arrTc.push(new tagcloud({idDoc:arrId[1]+'_'+arrId[2], txt:txt, data:false}));
 	}else if(sst.sbs.id != sbs.id){
 		sst.sbs=sbs;
 		sst.sbs.show();			
+		sst.arrTc.push(new tagcloud({idDoc:arrId[1]+'_'+arrId[2], txt:txt, data:false}));
 	}
+	
+	/*
+	 * calcul le tableau de mot pour le tagcloud
+	var data = [];
+	for(var i=motDeb; i < motFin; i++){
+		data.push({"tag_id":i,"code":sst.arrCar[motDeb],"value":"1245","nbDoc":"9"});
+	}
+	*/	
+	
 	//document.getElementById("Select_"+arrId[1]+"_"+arrId[2]).style.display='inline';		
 	return {"deb":arrMotDeb["carDeb"], "fin":arrMotFin["carFin"]};
   };
@@ -211,10 +232,10 @@ function selectsontexte(config) {
 		var sbt=sst.arrSbTxt[arrId[2]];
 		if(!sst.sbt){
 			sst.sbt=sbt;
-			sst.sbt.show();			
+			sst.sbt.show();
 		}else if(sst.sbt.id != sbt.id){
 			sst.sbt=sbt;
-			sst.sbt.show();			
+			sst.sbt.show();
 		}
 		return {"deb":sst.nbSecDeb, "fin":sst.nbSecFin};
 		
@@ -255,6 +276,9 @@ function selectsontexte(config) {
 			, hSel:this.hCntxText, left:this.mrgCntxText.left, top:this.mrgCntxText.top
 	  		, xCntx:this.xCntxTxt ,xCntxInv:this.xCntxTxtInv , svg:this.svg, fncDragEnd:this.showTextSelect, xUnit:1, sst:this});	
 	  	this.arrSbTxt.push(sb);
+	  	var txt = this.allTexte.substring(p['sbt']['deb'], p['sbt']['fin']);
+	  	this.arrTc.push(new tagcloud({idDoc:idElem, txt:txt, data:false}));
+
 	  	sb.show();
   
   };
