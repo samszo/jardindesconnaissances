@@ -4,8 +4,11 @@
 	<meta charset="utf-8">
 	<script type='text/javascript' src="../js/d3.v2.js"></script>
 	<script type='text/javascript' src="../js/d3.time.js"></script>
+	<script type='text/javascript' src="../js/d3.layout.cloud.js"></script>
 	<script type='text/javascript' src="../js/selectsontexte.js"></script>
 	<script type='text/javascript' src="../js/selectbar.js"></script>
+	<script type='text/javascript' src="../js/tagcloud.js"></script>
+	
 	<script type='text/javascript' src="../js/popcorn-complete.js"></script>
 	<script type="text/javascript" src="../js/jquery.min.js"></script>
 	
@@ -40,7 +43,13 @@
 			var bs = d3.select('#son_'+idElem);
 			bs.attr("visibility", function() { if(chk.checked) return "visible"; else return "hidden"; });	  		
 			var bt = d3.select('#txt_'+idElem);
-			bt.attr("visibility", function() { if(chk.checked) return "visible"; else return "hidden"; });	  		
+			bt.attr("visibility", function() { if(chk.checked) return "visible"; else return "hidden"; });
+			var show = document.getElementById("showSelect_"+idElem);
+			if(chk.checked){
+				show.style.display="inline"; 
+			}else{
+				show.style.display="none"; 
+			}	  		
 		}
 		function updSst(idDoc, num, idDocPosi){
 			var p = getParams(idDoc, num);
@@ -107,10 +116,15 @@
 			d2.append("span")
 				.attr("id", "Select_son_"+idElem)
 				.attr("class","sonSelect");
-			d2.append("br");
-			d2.append("span")
+			var div3 = d2.append("div").attr("id", "showSelect_"+idElem);
+			div3.append("span")
 				.attr("id", "Select_txt_"+idElem)
 				.attr("class","txtSelect");
+			div3.append("div")
+				.attr("id", "status_"+idElem);
+			div3.append("div")
+				.attr("id", "vis_"+idElem);
+			
 			sst.addNewPosiSb(oP, idElem);
 		}
 	</script>	
@@ -135,9 +149,13 @@
 			 		?> 
 			 		<div class="Select" id="Select_<?php echo $idElem; ?>" >Automatique 
 				 		<input id='chk_<?php echo $idElem; ?>' type='checkbox' checked='checked' onclick='showSst("<?php echo $idElem; ?>")' >
-					 	<img id="Select_save_<?php echo $idElem; ?>" onclick='saveSst(<?php echo $r['doc_id'].",".$i; ?>)'  src="../img/AddRecord.png" title="Ajouter la sélection à votre compte" />
-					 	<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span><br/>
-					 	<span class="txtSelect" id="Select_txt_<?php echo $idElem; ?>" ></span>
+						 	<img id="Select_save_<?php echo $idElem; ?>" onclick='saveSst(<?php echo $r['doc_id'].",".$i; ?>)'  src="../img/AddRecord.png" title="Ajouter la sélection à votre compte" />
+						 	<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span><br/>
+					 		<div id="showSelect_<?php echo $idElem; ?>" > 
+							 	<span class="txtSelect" id="Select_txt_<?php echo $idElem; ?>" ></span>
+							 	<div id="status_<?php echo $idElem; ?>"></div>
+							 	<div id="vis_<?php echo $idElem; ?>"></div>
+						 	</div>
 				 	</div>
 			 	</p>		 			 	 
 			<?php $i++; endforeach; ?>
@@ -154,7 +172,11 @@
 				 			<img id="Select_upd_'.$p['idDoc'].'" onclick="updSst('.$r['doc_id'].','.($i+$j).','.$p['idDoc'].')"  src="../img/UpdateRecord.png" title="Modifier la sélection" />';
 				 		}
 					 	echo '<span class="sonSelect" id="Select_son_'.$idElem.'" ></span><br/>
-							 	<span class="txtSelect" id="Select_txt_'.$idElem.'" ></span>
+							 	<div id="showSelect_'.$idElem.'" >
+							 		<span class="txtSelect" id="Select_txt_'.$idElem.'" ></span>
+							 		<div id="status_'.$idElem.'"></div>
+						 			<div id="vis_'.$idElem.'"></div>
+						 		</div>
 						 	</div>
 					 	</div>';		 			 	 
 				 	$j++;
