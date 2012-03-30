@@ -6,8 +6,8 @@ class Form_Auth_Login extends Zend_Form
         $this->setMethod('post');
  
         $this->addElement(
-            'text', 'mail', array(
-                'label' => 'Mail:',
+            'text', 'login', array(
+                'label' => 'Login:',
                 'required' => true,
                 'filters'    => array('StringTrim'),
             ));

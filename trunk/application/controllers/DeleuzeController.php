@@ -12,6 +12,7 @@ require_once 'Zend/Controller/Action.php';
 class DeleuzeController extends Zend_Controller_Action {
 	
 	var $dbNom = "flux_DeleuzeSpinoza";
+
 	/**
 	 * The default action - show the home page
 	 */
@@ -39,6 +40,21 @@ class DeleuzeController extends Zend_Controller_Action {
 	}
 
 	/**
+	 * affiche un arbre pour gérer les mots clefs
+	 */
+	public function arbreAction() {
+		try {
+			$this->view->title = "Arbre de cours";
+		    $this->view->headTitle($this->view->title, 'PREPEND');
+
+		
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+	}
+
+	/**
 	 * affichage des positions d'un term
 	 */
 	public function positionAction() {
@@ -47,8 +63,8 @@ class DeleuzeController extends Zend_Controller_Action {
 		if ($auth->hasIdentity()) {
 		    // l'identité existe ; on la récupère
 		    $this->view->identite = $auth->getIdentity();
-		    $ssExi = new Zend_Session_Namespace('exi');
-		    $this->view->idExi = $ssExi->idExi;
+		    $ssUti = new Zend_Session_Namespace('uti');
+		    $this->view->idUti = $ssUti->idUti;
 		}else{
 		    $this->_redirect('/auth/login');
 		}
@@ -56,6 +72,7 @@ class DeleuzeController extends Zend_Controller_Action {
 	    $this->view->resultats = "";
     	if($this->_getParam('term', 0)){
 			$oD = new Flux_Deleuze($this->dbNom);
+			$oD->user = $ssUti->idUti;
     		$arrPosis = $oD->getTermPositions($this->_getParam('term', 0));
 			$this->view->resultats = $arrPosis;
 			$this->view->term = $this->_getParam('term', 0);
@@ -68,10 +85,10 @@ class DeleuzeController extends Zend_Controller_Action {
 			if ($auth->hasIdentity()) {
 			    // l'identité existe ; on la récupère
 			    $this->view->identite = $auth->getIdentity();
-				$ssExi = new Zend_Session_Namespace('exi');
+			    $ssUti = new Zend_Session_Namespace('uti');
 				//enregistre les positions
 				$oD = new Flux_Deleuze($this->dbNom);
-				$this->view->data = $oD->saveTermPosition($ssExi->idExi, $this->getRequest()->getParams());
+				$this->view->data = $oD->saveTermPosition($ssUti->idUti, $this->getRequest()->getParams());
 			}else{
 			    $this->_redirect('/auth/login');
 			}
@@ -81,7 +98,7 @@ class DeleuzeController extends Zend_Controller_Action {
 	          echo "Message: " . $e->getMessage() . "\n";
 		}
 	}
-
+		
 	public function suppAction() {
 		try {
 			$auth = Zend_Auth::getInstance();

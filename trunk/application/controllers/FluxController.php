@@ -57,6 +57,31 @@ class FluxController extends Zend_Controller_Action {
 		    }
 	    }
 	    $this->view->docs = $rs;		    
-    }	
-    
+    }
+    	
+	public function ajoutexitagAction() {
+		try {
+			$auth = Zend_Auth::getInstance();
+			if ($auth->hasIdentity()) {
+			    // l'identité existe ; on la récupère
+			    $this->view->identite = $auth->getIdentity();
+				$ssUti = new Zend_Session_Namespace('uti');
+				//enregistre les positions
+				$o = new Flux_Site($this->_getParam('db', 0));
+				$o->user = $ssUti->idUti;
+				$d = new Zend_Date();
+				$this->view->data = $o->saveTag($this->_getParam('tag', 0), $this->_getParam('idDoc', 0), $this->_getParam('poids', 0),$d->get("c"));
+				
+				$dbUTD = new Model_DbTable_Flux_UtiTagDoc($o->db);		
+				$this->view->data = $dbUTD->GetUtiTagDoc($ssUti->idUti, $this->_getParam('idDoc', 0));
+				
+			}else{
+			    $this->_redirect('/auth/login');
+			}
+			
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+	}    
 }

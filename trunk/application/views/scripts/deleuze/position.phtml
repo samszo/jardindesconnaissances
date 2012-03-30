@@ -16,9 +16,12 @@
 		svg {
 		  font: 10px sans-serif;
 		}		
-		.Select {  background-color: red; display:inline;} 
-		.txtSelect { background-color: orange; } 
-		.sonSelect { background-color: violet; weight: 100px } 
+		.Select {background-color: steelblue;} 
+		.txtSelect { 
+			width: 330px;
+			float:left;
+			} 
+		.sonSelect {width: 100px } 
 		path {
 		  fill: steelblue;
 		}
@@ -29,14 +32,31 @@
 		}
 		.ref{
 		  vertical-align:middle;
+		  width: 1000px; 
+		}
+		.posi{
+		  overflow:auto;
 		}
 		.term{
 		  color:blue;
 		}
+		.tgcld{
+		  width: 640px;
+		}
+		.status{
+			float:right;
+		}
+		.tag{
+			cursor: pointer;	
+		}
+		.tag:hover {
+		    color: green;
+		}		
 	</style>
 	<script>
+		var db = "flux_DeleuzeSpinoza";
 		var arrSst = [];
-		var idExi = '<?php echo $this->idExi; ?>';
+		var idExi = '<?php echo $this->idUti; ?>';
 		var mailExi = '<?php echo $this->identite;; ?>';
 		function showSst(idElem){			
 			var chk = document.getElementById("chk_"+idElem);
@@ -66,17 +86,37 @@
 						addSb(data);
 					 }, "json");
 		}
-		function delSst(idDoc, idDocPar){
+		function delSst(idDoc, idDocPar, idElem){
 			$.post("supp"
 					,  {"idDoc":idDoc},
 					 function(data){
 						var toto = data;
 					 }, "json");
-			var dPar = document.getElementById("ref_"+idDocPar);
+			var dPar = document.getElementById("table_"+idDocPar);
 			var d = document.getElementById("Select_exi_"+idDoc);
+			dPar.removeChild(d); 
+			d = document.getElementById("showSelect_"+idElem);
 			dPar.removeChild(d); 
 
 		}
+		function saveTag(tag, poids, idDoc){
+			var arr = idDoc.split("_");
+			var p = {"tag":tag, "idDoc":arr[3], "poids":poids, "db":db};
+			$.post("../flux/ajoutexitag", p,
+					 function(data){
+						updTc(data, arr, idDoc);
+					 }, "json");
+		}
+		function updTc(data, arrId, idElem){
+			//modifie les data de la position
+			var sst = arrSst[arrId[1]];
+			sst.data['posis'][arrId[5]]['tags'] = data;
+			//récupère la barre de sélection
+			var sb = sst.arrSbTxt[arrId[2]];
+			//recalcule la sélection
+			sb.show();			
+			activeTag();
+		}	
 		function getParams(idDoc, num){
 
 			var sst = arrSst[idDoc];
@@ -90,10 +130,15 @@
  			var oP = eval('(' + p['note'] + ')');
 			var sst = arrSst[oP['idDoc']];
 			var nbSb = sst.arrSbSon.length;
- 			var idElem = oP['idDoc']+"_"+nbSb+"_"+p['idDoc']+"_"+oP['idExi'];
-			var bs = d3.select('#ref_'+oP['idDoc']);
-			var d1 = bs.append("div")
+			var nbTc = 0;
+			if(sst.data['posis'])
+				nbTc = sst.data['posis'].length-1;
+ 			var idElem = oP['idDoc']+"_"+nbSb+"_"+p['idDoc']+"_"+oP['idExi']+"_"+nbTc;
+			var bs = d3.select('#table_'+oP['idDoc']);
+			var dL = bs.append("tr")
 				.attr("id", "Select_exi_"+p['idDoc']);
+			var d1 = dL.append("td")
+				.attr("colspan", "2");
 			var d2 = d1.append("div")
 				.attr("class","Select")
 				.attr("id","Select_"+idElem)
@@ -105,7 +150,7 @@
 				.attr("onclick","showSst('"+idElem+"',-1)");
 			d2.append("img")
 				.attr("id", "Select_del_"+p['idDoc'])
-				.attr("onclick","delSst("+p['idDoc']+","+oP['idDoc']+")")
+				.attr("onclick","delSst("+p['idDoc']+","+oP['idDoc']+",'"+idElem+"')")
 				.attr("src", "../img/DeleteRecord.png")
 				.attr("title", "Supprimer la sélection");
 			d2.append("img")
@@ -116,17 +161,30 @@
 			d2.append("span")
 				.attr("id", "Select_son_"+idElem)
 				.attr("class","sonSelect");
-			var div3 = d2.append("div").attr("id", "showSelect_"+idElem);
-			div3.append("span")
+			d2.append("span")
+				.attr("id", "status_"+idElem)
+				.attr("class","status");
+			var dL1 = bs.append("tr").attr("id", "showSelect_"+idElem);
+			var cl1 = dL1.append("td");
+			cl1.append("div")
 				.attr("id", "Select_txt_"+idElem)
 				.attr("class","txtSelect");
-			div3.append("div")
-				.attr("id", "status_"+idElem);
-			div3.append("div")
-				.attr("id", "vis_"+idElem);
-			
+			var cl2 = dL1.append("td");
+			cl2.append("div")
+				.attr("id", "vis_"+idElem)
+				.attr("class","tgcld");
 			sst.addNewPosiSb(oP, idElem);
+			activeTag();
 		}
+
+		function activeTag(){
+			d3.selectAll(".tag")
+			.on("click", function(){
+					var d = event.target;
+					console.log(d.id+" "+d.innerText+" "+d.getAttribute('v'));
+					saveTag(d.innerText, d.getAttribute('v'), d.id);
+				});			
+		}			
 	</script>	
 	
 </head>
@@ -138,50 +196,70 @@
 			<?php echo $r['doc_id']." - ".$r['titre']; ?>
 			<a href="<?php echo $r['url']; ?>"><?php echo $r['url']; ?></a>
 			<div id="divSVG_<?php echo $r['doc_id']; ?>" ></div>
-			<?php
-			 $i = 0;
-			 foreach ($r['phrases'] as $p) : ?>
-			 	<p>
-			 		<!--  - ...<?php echo $p['deb']; ?> <span class='term'><?php echo $this->term; ?></span> <?php echo $p['fin']; ?>...-->
-			 		<?php
-			 			//important pour l'affichage des sélections : libre_libre_[index dans le tableau des barres de sélection] 
-			 			$idElem = $r['doc_id']."_".$i; 
-			 		?> 
-			 		<div class="Select" id="Select_<?php echo $idElem; ?>" >Automatique 
-				 		<input id='chk_<?php echo $idElem; ?>' type='checkbox' checked='checked' onclick='showSst("<?php echo $idElem; ?>")' >
-						 	<img id="Select_save_<?php echo $idElem; ?>" onclick='saveSst(<?php echo $r['doc_id'].",".$i; ?>)'  src="../img/AddRecord.png" title="Ajouter la sélection à votre compte" />
-						 	<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span><br/>
-					 		<div id="showSelect_<?php echo $idElem; ?>" > 
-							 	<span class="txtSelect" id="Select_txt_<?php echo $idElem; ?>" ></span>
-							 	<div id="status_<?php echo $idElem; ?>"></div>
-							 	<div id="vis_<?php echo $idElem; ?>"></div>
-						 	</div>
-				 	</div>
-			 	</p>		 			 	 
-			<?php $i++; endforeach; ?>
-			<?php
-				 $j = 0;
-				 foreach ($r['posis'] as $p){
-				 		echo '<div id="Select_exi_'.$p['idDoc'].'">';
-			 			$oP = json_decode($p['note']);
-			 			$idElem = $r['doc_id']."_".($i+$j)."_".$p['idDoc']."_".$oP->idExi;
-				 		echo '<div class="Select" id="Select_'.$idElem.'" >'.$oP->mailExi.' 
-				 			<input id="chk_'.$idElem.'" type="checkbox" checked="checked" onclick="showSst(\''.$idElem.'\',-1)" >';
-				 		if($this->identite==$oP->mailExi){
-				 			echo '<img id="Select_del_'.$p['idDoc'].'" onclick="delSst('.$p['idDoc'].','.$r['doc_id'].')"  src="../img/DeleteRecord.png" title="Supprimer la sélection" />
-				 			<img id="Select_upd_'.$p['idDoc'].'" onclick="updSst('.$r['doc_id'].','.($i+$j).','.$p['idDoc'].')"  src="../img/UpdateRecord.png" title="Modifier la sélection" />';
-				 		}
-					 	echo '<span class="sonSelect" id="Select_son_'.$idElem.'" ></span><br/>
-							 	<div id="showSelect_'.$idElem.'" >
-							 		<span class="txtSelect" id="Select_txt_'.$idElem.'" ></span>
-							 		<div id="status_'.$idElem.'"></div>
-						 			<div id="vis_'.$idElem.'"></div>
-						 		</div>
-						 	</div>
-					 	</div>';		 			 	 
-				 	$j++;
-				 }
-				 ?>
+			<div class="posi" id="posi_<?php echo $r['doc_id']; ?>" >
+				<table>
+					<tbody id="table_<?php echo $r['doc_id']; ?>">
+					<?php
+					 $i = 0;
+					 foreach ($r['phrases'] as $p) : ?>
+					 		<?php
+					 			//important pour l'affichage des sélections : libre_libre_[index dans le tableau des barres de sélection] 
+					 			$idElem = $r['doc_id']."_".$i; 
+					 		?>
+					 		<tr>
+					 			<td colspan="2" > 
+							 		<div class="Select" id="Select_<?php echo $idElem; ?>" >Automatique 
+								 		<input id='chk_<?php echo $idElem; ?>' type='checkbox' checked='checked' onclick='showSst("<?php echo $idElem; ?>")' >
+										<img id="Select_save_<?php echo $idElem; ?>" onclick='saveSst(<?php echo $r['doc_id'].",".$i; ?>)'  src="../img/AddRecord.png" title="Ajouter la sélection à votre compte" />
+										<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span>
+										<span class="status" id="status_<?php echo $idElem; ?>"></span>
+								 	</div>
+								</td>
+						 	</tr>
+					 		<tr id="showSelect_<?php echo $idElem; ?>" >
+					 			<td>
+									<div class="txtSelect" id="Select_txt_<?php echo $idElem; ?>" ></div>
+								</td>
+					 			<td>
+									<div class="tgcld" id="vis_<?php echo $idElem; ?>"></div>
+								</td>
+						 	</tr>
+					<?php $i++; endforeach; ?>
+					<?php
+						 $j = 0;
+						 foreach ($r['posis'] as $p) : 
+						 			$oP = json_decode($p['note']);
+						 			$idElem = $r['doc_id']."_".($i+$j)."_".$p['idDoc']."_".$oP->idExi."_".$j;
+						 		?>
+						 		<tr id="Select_exi_<?php echo $p['idDoc']; ?>">
+						 			<td colspan="2" > 
+								 		<div class="Select" id="Select_<?php echo $idElem; ?>" ><?php echo $oP->mailExi; ?> 
+									 		<input id='chk_<?php echo $idElem; ?>' type='checkbox' checked='checked' onclick='showSst("<?php echo $idElem; ?>")' >
+											<?php
+										 		if($this->identite==$oP->mailExi){
+										 			echo '<img id="Select_del_'.$p['idDoc'].'" onclick="delSst('.$p['idDoc'].','.$r['doc_id'].',\''.$idElem.'\')"  src="../img/DeleteRecord.png" title="Supprimer la sélection" />
+										 			<img id="Select_upd_'.$p['idDoc'].'" onclick="updSst('.$r['doc_id'].','.($i+$j).','.$p['idDoc'].')"  src="../img/UpdateRecord.png" title="Modifier la sélection" />';
+										 		}else{
+										 			echo '<img id="Select_save_'.$idElem.'" onclick="saveSst('.$r['doc_id'].','.$i.')"  src="../img/AddRecord.png" title="Ajouter la sélection à votre compte" />';
+										 		}
+											?>
+											<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span>
+											<span class="status" id="status_<?php echo $idElem; ?>" ></span>
+									 	</div>
+									</td>
+							 	</tr>
+						 		<tr id="showSelect_<?php echo $idElem; ?>" >
+						 			<td>
+										<div class="txtSelect" id="Select_txt_<?php echo $idElem; ?>" ></div>
+									</td>
+						 			<td>
+										<div class="tgcld" id="vis_<?php echo $idElem; ?>"></div>
+									</td>
+							 	</tr>
+						<?php $j++; endforeach; ?>
+					</tbody>					 
+				</table>
+			</div>		 			 	 
 		</div>
 	  	<script>
 	  	arrSst[<?php echo $r['doc_id']; ?>] = new selectsontexte({term:"<?php echo $this->term; ?>"
@@ -190,5 +268,8 @@
 	  	</script>
 		<hr/>
 	<?php endforeach; ?>
+	<script>
+		activeTag();
+	</script>
   </body>
 </html>	

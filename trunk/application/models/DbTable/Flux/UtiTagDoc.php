@@ -314,10 +314,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
         	->group("utd.tag_id")
         	->order("value DESC");
 
-        return $this->fetchAll($query)->toArray(); 
-		
-    	
+        return $this->fetchAll($query)->toArray(); 		
 	}
-    
-    
+    	
 }
