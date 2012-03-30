@@ -91,6 +91,7 @@ class Flux_Deleuze extends Flux_Site{
 	    	$lu = new Flux_Lucene();
 			$lu->db = $this->db;
 	    	$dbD = new Model_DbTable_flux_doc($this->db);
+			if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
 	    	$audio = new Flux_Audio();
 	    	
 			//récupère les positions du term dans les documents
@@ -112,7 +113,8 @@ class Flux_Deleuze extends Flux_Site{
 					}
 					//vérifie si on traite une position
 					if(substr($doc['note'], 0, 33)=='{"controller":"deleuze","action":'){
-						$posis[$i]['posis'][] = array("idDoc"=>$doc['doc_id'], "note"=>$doc['note']);
+						$tags = $this->dbUTD->GetUtiTagDoc($this->user, $doc['doc_id']);
+						$posis[$i]['posis'][] = array("idDoc"=>$doc['doc_id'], "note"=>$doc['note'], "tags"=>$tags);
 					}
 				}
 			}
@@ -128,33 +130,28 @@ class Flux_Deleuze extends Flux_Site{
      *
      * enregistre les positions défini par l'utilisateur
      * 
-     * @param int $idExi
+     * @param int $idUser
      * @param array $data
      * 
      * @return array
      */
-    function saveTermPosition($idExi, $data) {
+    function saveTermPosition($idUser, $data) {
     	
+    	$this->user = $idUser;
     	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-		if(!$this->dbED)$this->dbED = new Model_DbTable_Flux_ExiDoc($this->db);
-		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
-		if(!$this->dbET)$this->dbET = new Model_DbTable_Flux_ExiTag($this->db);
-		if(!$this->dbTD)$this->dbTD = new Model_DbTable_flux_tagdoc($this->db);
+		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
 		
     	//ajoute le document
     	$note = json_encode($data);
     	$idDoc = $this->dbD->ajouter(array("tronc"=>$data['idDoc'],"note"=>$note),false);
-    	//echo "ajoute le lien à l'existence : ".$idExi." - ".$idDoc;
-    	$this->dbED->ajouter(array("exi_id"=>$idExi,"doc_id"=>$idDoc));
-    	//echo "récupère le tag";
-    	$idTag = $this->dbT->ajouter(array("code"=>$data['term']));
-    	//echo "ajoute le tag à l'existence";
-    	$this->dbET->ajouter(array("exi_id"=>$idExi,"tag_id"=>$idTag));
-    	//echo "ajoute le tag au document";
-    	$this->dbTD->ajouter(array("doc_id"=>$idDoc,"tag_id"=>$idTag));
-
+    	
+		$d = new Zend_Date();
+    	$idTag = $this->saveTag($data['term'], $idDoc, 1, $d->get("c"));
+    	
+		$tags = $this->dbUTD->GetUtiTagDoc($idUser, $idDoc);
+    	    	
     	//echo "retourne les information du nouvel élément";
-    	return array("idDoc"=>$idDoc, "note"=>$note);
+    	return array("idDoc"=>$idDoc, "note"=>$note, "tags"=>$tags);
     	
     }
 
