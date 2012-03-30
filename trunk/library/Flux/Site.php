@@ -189,10 +189,18 @@ class Flux_Site{
      * @return integer
      */
 	function saveTag($tag, $idD, $poids, $date){
+
+		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
+		if(!$this->dbUT)$this->dbUT = new Model_DbTable_Flux_UtiTag($this->db);
+		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+		
 		//on ajoute le tag
 		$idT = $this->dbT->ajouter(array("code"=>$tag));
 		//on ajoute le lien entre le tag et le doc avec le poids
 		$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD, "poids"=>$poids));
+		//on ajoute le lien entre le tag et l'uti avec le poids
+		$this->dbUT->ajouter(array("tag_id"=>$idT, "uti_id"=>$this->user, "poids"=>$poids));
 		//on ajoute le lien entre le tag l'utilisateur et le doc
 		$this->dbUTD->ajouter(array("uti_id"=>$this->user, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date));
 
