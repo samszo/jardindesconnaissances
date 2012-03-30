@@ -27,8 +27,7 @@ class Model_DbTable_flux_doc extends Zend_Db_Table_Abstract
     protected $_primary = 'doc_id';
 
 	protected $_dependentTables = array(
-		'Model_DbTable_Flux_ExiDoc'
-		,'Model_DbTable_Flux_UtiDoc'
+		'Model_DbTable_Flux_UtiDoc'
 		,'Model_DbTable_Flux_TagDoc'
 		,'Model_DbTable_Flux_UtiTagDoc'
 		);

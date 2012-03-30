@@ -20,11 +20,11 @@ class AuthController extends Zend_Controller_Action
 				if ($loginForm->isValid($formData)) {
 		            $adapter = new Zend_Auth_Adapter_DbTable(
 		                $db,
-		                'flux_exi',
-		                'mail',
+		                'flux_uti',
+		                'login',
 		                'mdp'
 		                );		                
-		            $adapter->setIdentity($loginForm->getValue('mail'));
+		            $adapter->setIdentity($loginForm->getValue('login'));
 		            $adapter->setCredential($loginForm->getValue('password'));
 		            
 		            // Tentative d'authentification et stockage du résultat
@@ -33,9 +33,9 @@ class AuthController extends Zend_Controller_Action
 		            //print_r($result);
 		            if ($result->isValid()) {		            	
 		            	//met en sessions les informations de l'existence
-		            	$r = $adapter->getResultRowObject(array('exi_id','role'));
-		            	$ssExi = new Zend_Session_Namespace('exi');
-		            	$ssExi->idExi = $r->exi_id;
+		            	$r = $adapter->getResultRowObject(array('uti_id','role'));
+		            	$ssExi = new Zend_Session_Namespace('uti');
+		            	$ssExi->idUti = $r->uti_id;
 		            	$ssExi->role = $r->role;
 		                
 		                $this->_redirect('/deleuze/position');
