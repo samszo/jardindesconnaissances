@@ -5,31 +5,45 @@
  */
 function tagcloud(config) {
 	this.idDoc = config.idDoc;  
+	this.exi = this.idDoc.split("_").length > 3;  
 	this.txt = config.txt;  
 	this.data = config.data;
+	this.utiWords = config.utiWords;
 	// From 
 	// Jonathan Feinberg's cue.language, see lib/cue.language/license.txt.
 	// 
-	this.stopWords = /^(vousmême|puisqu|estàdire|très|cela|alors|donc|etc|for|tant|au|en|un|une|aux|et|mais|par|c|d|du|des|pour|il|ici|lui|ses|sa|son|je|j|l|m|me|moi|mes|ma|mon|n|ne|pas|de|sur|on|se|soi|notre|nos|qu|s|même|elle|t|que|celà|la|le|les|te|toi|leur|leurs|eux|y|ces|ils|ce|ceci|cet|cette|tu|ta|ton|tes|à|nous|ou|quel|quels|quelle|quelles|qui|avec|dans|sans|vous|votre|vos|été|étée|étées|étés|étant|suis|es|est|sommes|êtes|sont|serai|seras|sera|serons|serez|seront|serais|serait|serions|seriez|seraient|étais|était|étions|étiez|étaient|fus|fut|fûmes|fûtes|furent|sois|soit|soyons|soyez|soient|fusse|fusses|fût|fussions|fussiez|fussent|ayant|eu|eue|eues|eus|ai|as|avons|avez|ont|aurai|auras|aura|aurons|aurez|auront|aurais|aurait|aurions|auriez|auraient|avais|avait|avions|aviez|avaient|eut|eûmes|eûtes|eurent|aie|aies|ait|ayons|ayez|aient|eusse|eusses|eût|eussions|eussiez|eussent|i|me|my|myself|we|us|our|ours|ourselves|you|your|yours|yourself|yourselves|he|him|his|himself|she|her|hers|herself|it|its|itself|they|them|their|theirs|themselves|what|which|who|whom|whose|this|that|these|those|am|is|are|was|were|be|been|being|have|has|had|having|do|does|did|doing|will|would|should|can|could|ought|i'm|you're|he's|she's|it's|we're|they're|i've|you've|we've|they've|i'd|you'd|he'd|she'd|we'd|they'd|i'll|you'll|he'll|she'll|we'll|they'll|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|doesn't|don't|didn't|won't|wouldn't|shan't|shouldn't|can't|cannot|couldn't|mustn't|let's|that's|who's|what's|here's|there's|when's|where's|why's|how's|a|an|the|and|but|if|or|because|as|until|while|of|at|by|for|with|about|against|between|into|through|during|before|after|above|below|to|from|up|upon|down|in|out|on|off|over|under|again|further|then|once|here|there|when|where|why|how|all|any|both|each|few|more|most|other|some|such|no|nor|not|only|own|same|so|than|too|very|say|says|said|shall)$/;
+	this.stopWords = /^(estce|vousmême|puisqu|estàdire|très|cela|alors|donc|etc|for|tant|au|en|un|une|aux|et|mais|par|c|d|du|des|pour|il|ici|lui|ses|sa|son|je|j|l|m|me|moi|mes|ma|mon|n|ne|pas|de|sur|on|se|soi|notre|nos|qu|s|même|elle|t|que|celà|la|le|les|te|toi|leur|leurs|eux|y|ces|ils|ce|ceci|cet|cette|tu|ta|ton|tes|à|nous|ou|quel|quels|quelle|quelles|qui|avec|dans|sans|vous|votre|vos|été|étée|étées|étés|étant|suis|es|est|sommes|êtes|sont|serai|seras|sera|serons|serez|seront|serais|serait|serions|seriez|seraient|étais|était|étions|étiez|étaient|fus|fut|fûmes|fûtes|furent|sois|soit|soyons|soyez|soient|fusse|fusses|fût|fussions|fussiez|fussent|ayant|eu|eue|eues|eus|ai|as|avons|avez|ont|aurai|auras|aura|aurons|aurez|auront|aurais|aurait|aurions|auriez|auraient|avais|avait|avions|aviez|avaient|eut|eûmes|eûtes|eurent|aie|aies|ait|ayons|ayez|aient|eusse|eusses|eût|eussions|eussiez|eussent|i|me|my|myself|we|us|our|ours|ourselves|you|your|yours|yourself|yourselves|he|him|his|himself|she|her|hers|herself|it|its|itself|they|them|their|theirs|themselves|what|which|who|whom|whose|this|that|these|those|am|is|are|was|were|be|been|being|have|has|had|having|do|does|did|doing|will|would|should|can|could|ought|i'm|you're|he's|she's|it's|we're|they're|i've|you've|we've|they've|i'd|you'd|he'd|she'd|we'd|they'd|i'll|you'll|he'll|she'll|we'll|they'll|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|doesn't|don't|didn't|won't|wouldn't|shan't|shouldn't|can't|cannot|couldn't|mustn't|let's|that's|who's|what's|here's|there's|when's|where's|why's|how's|a|an|the|and|but|if|or|because|as|until|while|of|at|by|for|with|about|against|between|into|through|during|before|after|above|below|to|from|up|upon|down|in|out|on|off|over|under|again|further|then|once|here|there|when|where|why|how|all|any|both|each|few|more|most|other|some|such|no|nor|not|only|own|same|so|than|too|very|say|says|said|shall)$/;
 	this.punctuation = /["“!()&*+,-\.\/:;<=>?\[\\\]^`\{|\}~]+/g;
-	this.elision = /[’']+/g;
+	this.elision = /[’'’0123456789]+/g;
 	this.wordSeparators = /[\s\u3031-\u3035\u309b\u309c\u30a0\u30fc\uff70]+/g;
 	
 	this.tc = function() {
 	    var fill = d3.scale.category20b(),
-		w = 512,
-		h= 128,
+		w = 640,
+		h= 128, hpt,
 		scale = 1,
 		complete = 0,
 		statusText = d3.select("#status_"+this.idDoc),
 		fontSize,
 		maxLength = 30,
-		self = this;
-		
-	    if(this.txt) this.data=parseText(this.txt);
+		self = this,
+		posiTxt = document.getElementById("Select_txt_"+this.idDoc);
+	    if(posiTxt){
+		    hpt  = posiTxt.clientHeight;
+	    	if(hpt>h)h=hpt;
+	    }
+	    
+	    if(this.txt){
+	    	this.data=parseText();
+	    	//hypertextualise seulement les sélections des utilisateurs
+	    	if(this.exi){
+		    	posiTxt.innerHTML = hypertextualise();	    		
+	    	}
+	    }
 		var max = this.data.length;
 	    
 		var svg = d3.select("#vis_"+this.idDoc).append("svg")
+			.attr("id", "svg_"+this.idDoc)
 			.attr("width", w)
 			.attr("height", h);
 		var background = svg.append("g"),
@@ -41,21 +55,36 @@ function tagcloud(config) {
 		d3.layout.cloud().size([w, h])
 			.words(this.data)
 		    .rotate(0)
-		    .fontSize(function(d) { 
+		    .fontSize(function(d) {
 		    	var n = d.value*16;
+		    	if(self.exi){
+		    		var uw = inUtiWords(d.key);
+		    		if(uw){
+		    	  		if(uw.code=="rigueur"){
+		    	  			var t = 1;
+		    	  		}
+		    			n = uw.value*8;
+		    		}
+		    	}
+		    	if(n>h)n=h/2;
 		    	return n; 
 		    	})
 			.text(function(d) { return d.key; })
 		    .on("word", progress)
 		    .on("end", draw)
 		    .start();
-		    
-	
+		    	
 		function draw(words) {
 			var text = vis.selectAll("text")
 		        .data(words)
 			    .enter().append("text")
-		    	  	.style("fill", function(d) { return fill(d.text.toLowerCase()); })
+		    	  	//.style("fill", function(d) { return fill(d.text.toLowerCase()); })
+		    	  	.style("fill", function(d) {
+		    	  		if(self.exi && inUtiWords(d.text))
+		    	  			return "violet"; 
+		    	  		else
+		    	  			return "black"; 
+		    	  	})
 		        	.style("font-size", function(d) { 
 		        		return d.size + "px"; 
 		        		})
@@ -63,16 +92,19 @@ function tagcloud(config) {
 		    	    .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
 		        	.text(function(d) { return d.text; })
 		        	.on("click", function(d) {alert(d.text);})
+		        	.on("mouseover", function(d, i) { if(self.exi) d3.select(this).style("fill", "red");})
+		        	.on("mouseout", function(d, i) { if(self.exi) d3.select(this).style("fill", "black");})
+		        	.attr("cursor", function() { if(self.exi) return "pointer";})
 		        	;
 		}
 		function progress(d) {
 			statusText.text(++complete + "/" + max);
 		}
 				
-		function parseText(text) {
+		function parseText() {
 			tags = {};
 			var cases = {};
-			text.split(self.wordSeparators).forEach(function(word) {
+			self.txt.split(self.wordSeparators).forEach(function(word) {
 				var j = word.search("&quot;");
 				if(j==0){
 					word = word.substr(6);
@@ -89,10 +121,32 @@ function tagcloud(config) {
 				tags[word = word.toLowerCase()] = (tags[word] || 0) + 1;
 			});
 			tags = d3.entries(tags).sort(function(a, b) { return b.value - a.value; });
-			tags.forEach(function(d) { d.key = cases[d.key]; });
+			tags.forEach(function(d) {d.key = cases[d.key];});
 			return tags;
-		} 		
-  };
-  	  
+		}
+		function inUtiWords(txt) {
+			 for(var i= 0; i < self.utiWords.length; i++)
+			 {
+				 if(txt==self.utiWords[i]['code']){
+					 return self.utiWords[i];					 
+				 } 
+			 }
+			 return false;
+		}
+		function hypertextualise() {
+			 var nTxt = self.txt, d, reg, str;
+			 for(var i= 0; i < self.data.length; i++)
+			 {
+				 d = self.data[i];
+				 reg=new RegExp("("+d.key+")", "g");
+				 str = "<span id='tag_"+self.idDoc+"' class='tag' v='"+d.value+"'>$1</span>";
+				 nTxt = nTxt.replace(reg, str);
+			 }
+
+			 return nTxt;
+		}
+
+  };  
+  
   return this.tc();
 }

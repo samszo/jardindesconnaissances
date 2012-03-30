@@ -10,14 +10,15 @@ function selectsontexte(config) {
 	this.mrgCntxSon, this.mrgCntxText, this.hCntxSon, this.hCntxText;
   	this.nbSecDeb, this.nbSecFin;
   	this.arrTc = [], this.idDoc = config.idDoc;
+	this.data = config.data;
 
 	this.sst = function() {
 	  
-	  var data = config.data, sbparams;
-	  this.allTexte = data['text'];
+	  var sbparams;
+	  this.allTexte = this.data['text'];
 	  var nbCarDeb = 0, nbCarFin = 0, nbCarTot = this.allTexte.length, arrMots = this.allTexte.split(" ")
-	  , phrases = data['phrases'], posis = data['posis'], arrSon = []
-	  , audioSource = data['urlSonLocal']
+	  , phrases = this.data['phrases'], posis = this.data['posis'], arrSon = []
+	  , audioSource = this.data['urlSonLocal']
 	  , term = config.term, idDoc = config.idDoc
 	  , audioElm = "#audioW_"+idDoc
 	  , txtSelect
@@ -44,7 +45,7 @@ function selectsontexte(config) {
 	  }
 
 	  //construction du tableau des secondes	  
-	 var nbSecTot = data['mp3Infos']['Length'];
+	 var nbSecTot = this.data['mp3Infos']['Length'];
 	 for(var i=1; i < nbSecTot; i++){
 		 var d = new Date();
 		 d = new Date(i*1000);
@@ -68,7 +69,15 @@ function selectsontexte(config) {
 	  gCntxText.append("g")
 	  		.attr("class", "x axis")
 	  		.attr("transform", "translate(0," + this.hCntxText + ")")
-	  		.call(xAxisCntxTxt);
+	  		.call(xAxisCntxTxt)
+	        .on("mouseover", function(){return tooltip.style("visibility", "visible");})
+	        .on("mousemove", function(){
+	        	return tooltip
+	        		.style("top", (event.pageY-20)+"px")
+	        		.style("left",(event.pageX-20)+"px")
+	        		.text(getMotByX(event.offsetX-margin.left));
+	        	})
+	        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 	  gCntxText.append("text")
 	  	   	.attr("class", "x axis")
 	  		.attr("transform", "translate(-"+this.mrgCntxText.left+"," + this.hCntxText + ")")
@@ -122,9 +131,6 @@ function selectsontexte(config) {
     		, hSel:this.hCntxText, left:this.mrgCntxText.left, top:this.mrgCntxText.top
 	  		, xCntx:this.xCntxTxt ,xCntxInv:this.xCntxTxtInv , svg:this.svg, fncDragEnd:this.showTextSelect, xUnit:1, sst:this});
 	  	this.arrSbTxt.push(sb);
-	  	var txtDeb = this.allTexte.indexOf(phrases[i]['deb']);
-	  	var txt = this.allTexte.substring(txtDeb,txtDeb+100);	  	
-	  	//this.arrTc.push(new tagcloud({idDoc:idDoc+'_'+i, txt:txt, data:false}));
 
 	  	sb.show();
 	  }
@@ -132,7 +138,7 @@ function selectsontexte(config) {
     if(posis){
 	    for(var j=0; j < posis.length; j++){
 	    	var p = eval('(' + posis[j]['note'] + ')');
-	    	var idElem = idDoc+"_"+(i+j)+"_"+posis[j]['idDoc']+"_"+p['idExi'];
+	    	var idElem = idDoc+"_"+(i+j)+"_"+posis[j]['idDoc']+"_"+p['idExi']+"_"+j;
 	    	this.addNewPosiSb(p, idElem);
 		  }
     }
@@ -154,6 +160,16 @@ function selectsontexte(config) {
 		  return s;
 	  }
 
+	  function getMotByX(x){
+		  	var xDeb = self.xCntxTxtInv(x);
+			var motDeb = Math.round(xDeb)-3;
+			var motFin = motDeb+3;
+		  	var arrMotDeb = self.arrCar[motDeb];
+		  	var arrMotFin = self.arrCar[motFin];
+		  	var txt = self.allTexte.substring(arrMotDeb["carDeb"],arrMotFin["carFin"]);
+		    return txt;
+	  }
+	  
 	  function showTextAuto(){
 	  	//calcule l'interval en texte
 	  	nbCarDeb = Math.round(nbCarTot/nbSecTot*nbSecDeb);
@@ -192,32 +208,36 @@ function selectsontexte(config) {
   	var arrMotFin = sst.arrCar[motFin];
   	var txt = sst.allTexte.substring(arrMotDeb["carDeb"],arrMotFin["carFin"]);
   	//console.log(arrMotDeb["carDeb"]+" - "+arrMotFin["carFin"]+" : "+txt);
+  	//hypertextualise le texte
 	document.getElementById("Select_"+id).innerHTML = txt;
 	var arrId = id.split("_");
-	var sbs=sst.arrSbSon[arrId[2]]; 
+	var strId = id.substring(4);
+	var sbs=sst.arrSbSon[arrId[2]];
 	if(!sst.sbs){
 		sst.sbs=sbs;
 		sst.sbs.show();
-		sst.arrTc.push(new tagcloud({idDoc:arrId[1]+'_'+arrId[2], txt:txt, data:false}));
 	}else if(sst.sbs.id != sbs.id){
 		sst.sbs=sbs;
 		sst.sbs.show();			
-		sst.arrTc.push(new tagcloud({idDoc:arrId[1]+'_'+arrId[2], txt:txt, data:false}));
 	}
-	
-	/*
-	 * calcul le tableau de mot pour le tagcloud
-	var data = [];
-	for(var i=motDeb; i < motFin; i++){
-		data.push({"tag_id":i,"code":sst.arrCar[motDeb],"value":"1245","nbDoc":"9"});
+	var tc = sst.arrTc[arrId[2]], utiWords=false;
+	//récupère les mots de l'utilisateur uniquement pour les posis
+	if(arrId.length > 3 && sst.data['posis']) utiWords = sst.data['posis'][arrId[5]]['tags'];
+	if(!tc){
+		sst.arrTc.push(new tagcloud({idDoc:strId, txt:txt, data:false, utiWords:utiWords}));	
+	}else{
+		var dPar = document.getElementById("vis_"+strId);
+		var d = document.getElementById("svg_"+strId);
+		if(d){
+			dPar.removeChild(d); 
+			sst.arrTc[arrId[2]]=new tagcloud({idDoc:strId, txt:txt, data:false, utiWords:utiWords}); 
+		}
 	}
-	*/	
-	
+		
 	//document.getElementById("Select_"+arrId[1]+"_"+arrId[2]).style.display='inline';		
 	return {"deb":arrMotDeb["carDeb"], "fin":arrMotFin["carFin"]};
   };
-  
-  
+    
   this.playSonSelect = function(arrExt, id, sst) {
 	  	//calcule l'intervale en seconde
 	  	sst.nbSecDeb = arrExt[0] / 1000;
@@ -276,8 +296,6 @@ function selectsontexte(config) {
 			, hSel:this.hCntxText, left:this.mrgCntxText.left, top:this.mrgCntxText.top
 	  		, xCntx:this.xCntxTxt ,xCntxInv:this.xCntxTxtInv , svg:this.svg, fncDragEnd:this.showTextSelect, xUnit:1, sst:this});	
 	  	this.arrSbTxt.push(sb);
-	  	var txt = this.allTexte.substring(p['sbt']['deb'], p['sbt']['fin']);
-	  	this.arrTc.push(new tagcloud({idDoc:idElem, txt:txt, data:false}));
 
 	  	sb.show();
   
