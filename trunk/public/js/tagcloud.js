@@ -6,8 +6,10 @@
 function tagcloud(config) {
 	this.idDoc = config.idDoc;  
 	this.exi = this.idDoc.split("_").length > 3;  
+	this.global = config.global;  
 	this.txt = config.txt;  
 	this.data = config.data;
+	this.term = config.term;
 	this.utiWords = config.utiWords;
 	// From 
 	// Jonathan Feinberg's cue.language, see lib/cue.language/license.txt.
@@ -20,26 +22,35 @@ function tagcloud(config) {
 	this.tc = function() {
 	    var fill = d3.scale.category20b(),
 		w = 640,
-		h= 128, hpt,
-		scale = 1,
+		h = 128, hpt,
 		complete = 0,
 		statusText = d3.select("#status_"+this.idDoc),
-		fontSize,
 		maxLength = 30,
 		self = this,
 		posiTxt = document.getElementById("Select_txt_"+this.idDoc);
+	    
+	    if(config.w) w = config.w;
+	    if(config.h) h = config.h;
+	    
 	    if(posiTxt){
 		    hpt  = posiTxt.clientHeight;
 	    	if(hpt>h)h=hpt;
 	    }
 	    
+	    if(this.data){
+	    	this.data = parseData();
+	    }
 	    if(this.txt){
 	    	this.data=parseText();
 	    	//hypertextualise seulement les sélections des utilisateurs
 	    	if(this.exi){
-		    	posiTxt.innerHTML = hypertextualise();	    		
+		    	hypertextualise();	    		
 	    	}
+		    //colorise le term de la recherche
+		    showTerm();
+	    	posiTxt.innerHTML = this.txt;
 	    }
+	    
 		var max = this.data.length;
 	    
 		var svg = d3.select("#vis_"+this.idDoc).append("svg")
@@ -49,23 +60,30 @@ function tagcloud(config) {
 		var background = svg.append("g"),
 			vis = svg.append("g")
 				.attr("transform", "translate(" + [w >> 1, h >> 1] + ")"); 
+
+		var tooltip = d3.select("body")
+		    .append("div")
+		    .attr("class", "term")
+		    .style("position", "absolute")
+		    .style("z-index", "10")
+		    .style("visibility", "hidden")
+		    .style("font","64px sans-serif")
+		    .style("background-color","white")		    
+		    .text("a simple tooltip");
 		
 		var ext = d3.extent(this.data.map(function(x) { return parseInt(x.value); }));
-		fontSize = d3.scale.log().domain([ext[0],ext[0]]).range([16, 128]);
+		var fontSize = d3.scale.log().domain([ext[0],ext[1]]).range([16, 128]);
 		d3.layout.cloud().size([w, h])
 			.words(this.data)
 		    .rotate(0)
+		    .spiral("rectangular")
 		    .fontSize(function(d) {
 		    	var n = d.value*16;
 		    	if(self.exi){
 		    		var uw = inUtiWords(d.key);
-		    		if(uw){
-		    	  		if(uw.code=="rigueur"){
-		    	  			var t = 1;
-		    	  		}
-		    			n = uw.value*8;
-		    		}
+		    		if(uw) n = uw.value*8;
 		    	}
+		    	if(self.global)n=fontSize(d.value);
 		    	if(n>h)n=h/2;
 		    	return n; 
 		    	})
@@ -82,8 +100,10 @@ function tagcloud(config) {
 		    	  	.style("fill", function(d) {
 		    	  		if(self.exi && inUtiWords(d.text))
 		    	  			return "violet"; 
+		    	  		else if(self.term==d.text)
+		    	  			return "blue";
 		    	  		else
-		    	  			return "black"; 
+		    	  			return "black";
 		    	  	})
 		        	.style("font-size", function(d) { 
 		        		return d.size + "px"; 
@@ -91,10 +111,30 @@ function tagcloud(config) {
 			        .attr("text-anchor", "middle")
 		    	    .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
 		        	.text(function(d) { return d.text; })
-		        	.on("click", function(d) {alert(d.text);})
-		        	.on("mouseover", function(d, i) { if(self.exi) d3.select(this).style("fill", "red");})
-		        	.on("mouseout", function(d, i) { if(self.exi) d3.select(this).style("fill", "black");})
-		        	.attr("cursor", function() { if(self.exi) return "pointer";})
+		        	.on("click", function(d) {
+		        		if(self.exi){
+							console.log(self.idDoc+" "+d.text+" "+-1);
+							saveTag(d.text, -1, "tag_"+self.idDoc);
+		        		} 
+		        		if(self.global){
+		        			chargeTag(d.text);	
+		        		}
+		        	})
+		        	.on("mouseover", function(d, i) { 
+		        		if(self.exi) d3.select(this).style("fill", "red");
+		        		if(self.global) return tooltip.style("visibility", "visible");		        		
+		        		})
+		        	.on("mouseout", function(d, i) { 
+		        		if(self.exi) d3.select(this).style("fill", "black");
+		        		if(self.global) return tooltip.style("visibility", "hidden");
+		        		})
+	    	        .on("mousemove", function(d, i){
+	    	        	if(self.global) return tooltip
+			        		.style("top", (event.pageY+10)+"px")
+			        		.style("left",(event.pageX+10)+"px")
+	    	        		.text(d.text);
+	    	        	})
+		        	.attr("cursor", function() { if(self.exi || self.global) return "pointer";})
 		        	;
 		}
 		function progress(d) {
@@ -115,7 +155,11 @@ function tagcloud(config) {
 				if(i>0)word = word.substr(i+1);
 				word = word.replace(self.punctuation, "");
 				if (self.stopWords.test(word.toLowerCase())) return;
-				if (word.length <= 3) return;
+				if (word.length <= 2) return;
+		    	if(self.exi){
+		    		var uw = inUtiWords(word);
+		    		if(uw.value<0) return;
+		    	}				
 				word = word.substr(0, maxLength);
 				cases[word.toLowerCase()] = word;
 				tags[word = word.toLowerCase()] = (tags[word] || 0) + 1;
@@ -124,28 +168,53 @@ function tagcloud(config) {
 			tags.forEach(function(d) {d.key = cases[d.key];});
 			return tags;
 		}
+
+		function parseData() {
+			tags = {};
+			var cases = {};
+			self.data.forEach(function(d) {
+				if (d.value <= 0) return;
+				var word = d.code;
+				var i = word.search(self.elision);
+				if(i>0) word = word.substr(i+1);
+				word = word.replace(self.punctuation, "");
+				if (self.stopWords.test(word.toLowerCase())) return;
+				if (word.length <= 2) return;
+				word = word.substr(0, maxLength);
+				cases[word.toLowerCase()] = word;
+				tags[word = word.toLowerCase()] = d.value;
+			});
+			tags = d3.entries(tags).sort(function(a, b) { return b.value - a.value; });
+			tags.forEach(function(d) {d.key = cases[d.key];});
+			return tags;
+		}
+		
 		function inUtiWords(txt) {
 			 for(var i= 0; i < self.utiWords.length; i++)
 			 {
-				 if(txt==self.utiWords[i]['code']){
+				 if(txt.toLowerCase()==self.utiWords[i]['code']){
 					 return self.utiWords[i];					 
 				 } 
 			 }
 			 return false;
 		}
 		function hypertextualise() {
-			 var nTxt = self.txt, d, reg, str;
+			 var d, reg, str;
 			 for(var i= 0; i < self.data.length; i++)
 			 {
 				 d = self.data[i];
 				 reg=new RegExp("("+d.key+")", "g");
 				 str = "<span id='tag_"+self.idDoc+"' class='tag' v='"+d.value+"'>$1</span>";
-				 nTxt = nTxt.replace(reg, str);
+				 self.txt =  self.txt.replace(reg, str);
 			 }
-
-			 return nTxt;
 		}
 
+		function showTerm() {
+			 reg=new RegExp("("+self.term+")", "g");
+			 str = "<span id='tag_"+self.idDoc+"' class='term' >$1</span>";
+			 self.txt =  self.txt.replace(reg, str);
+		}
+		
   };  
   
   return this.tc();
