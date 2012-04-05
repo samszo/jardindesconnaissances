@@ -1,195 +1,31 @@
+<?php if(!$this->ajax) : ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8">
+	<script type='text/javascript' src="../js/popcorn-complete.js"></script>
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
 	<script type='text/javascript' src="../js/d3.v2.js"></script>
 	<script type='text/javascript' src="../js/d3.time.js"></script>
 	<script type='text/javascript' src="../js/d3.layout.cloud.js"></script>
 	<script type='text/javascript' src="../js/selectsontexte.js"></script>
 	<script type='text/javascript' src="../js/selectbar.js"></script>
 	<script type='text/javascript' src="../js/tagcloud.js"></script>
+	<script type='text/javascript' src="../js/deleuze.js"></script>
+
+	<link rel="stylesheet" href="../css/deleuze.css" />
 	
-	<script type='text/javascript' src="../js/popcorn-complete.js"></script>
-	<script type="text/javascript" src="../js/jquery.min.js"></script>
-	
-	<style>	
-		svg {
-		  font: 10px sans-serif;
-		}		
-		.Select {background-color: steelblue;} 
-		.txtSelect { 
-			width: 330px;
-			float:left;
-			} 
-		.sonSelect {width: 100px } 
-		path {
-		  fill: steelblue;
-		}
-		.axis path, .axis line {
-		  fill: steelblue;
-		  stroke: #000;
-		  shape-rendering: crispEdges;
-		}
-		.ref{
-		  vertical-align:middle;
-		  width: 1000px; 
-		}
-		.posi{
-		  overflow:auto;
-		}
-		.term{
-		  color:blue;
-		}
-		.tgcld{
-		  width: 640px;
-		}
-		.status{
-			float:right;
-		}
-		.tag{
-			cursor: pointer;	
-		}
-		.tag:hover {
-		    color: green;
-		}		
-	</style>
 	<script>
+
 		var db = "flux_DeleuzeSpinoza";
-		var arrSst = [];
 		var idExi = '<?php echo $this->idUti; ?>';
 		var mailExi = '<?php echo $this->identite;; ?>';
-		function showSst(idElem){			
-			var chk = document.getElementById("chk_"+idElem);
-			var bs = d3.select('#son_'+idElem);
-			bs.attr("visibility", function() { if(chk.checked) return "visible"; else return "hidden"; });	  		
-			var bt = d3.select('#txt_'+idElem);
-			bt.attr("visibility", function() { if(chk.checked) return "visible"; else return "hidden"; });
-			var show = document.getElementById("showSelect_"+idElem);
-			if(chk.checked){
-				show.style.display="inline"; 
-			}else{
-				show.style.display="none"; 
-			}	  		
-		}
-		function updSst(idDoc, num, idDocPosi){
-			var p = getParams(idDoc, num);
-			p.idDocPosi = idDocPosi;
-			$.post("modif", p,
-					 function(data){
-						alert("Modification effectuée.");
-					 }, "json");						
-		}
-		function saveSst(idDoc, num){
-			var p = getParams(idDoc, num);
-			$.post("ajout", p,
-					 function(data){
-						addSb(data);
-					 }, "json");
-		}
-		function delSst(idDoc, idDocPar, idElem){
-			$.post("supp"
-					,  {"idDoc":idDoc},
-					 function(data){
-						var toto = data;
-					 }, "json");
-			var dPar = document.getElementById("table_"+idDocPar);
-			var d = document.getElementById("Select_exi_"+idDoc);
-			dPar.removeChild(d); 
-			d = document.getElementById("showSelect_"+idElem);
-			dPar.removeChild(d); 
-
-		}
-		function saveTag(tag, poids, idDoc){
-			var arr = idDoc.split("_");
-			var p = {"tag":tag, "idDoc":arr[3], "poids":poids, "db":db};
-			$.post("../flux/ajoutexitag", p,
-					 function(data){
-						updTc(data, arr, idDoc);
-					 }, "json");
-		}
-		function updTc(data, arrId, idElem){
-			//modifie les data de la position
-			var sst = arrSst[arrId[1]];
-			sst.data['posis'][arrId[5]]['tags'] = data;
-			//récupère la barre de sélection
-			var sb = sst.arrSbTxt[arrId[2]];
-			//recalcule la sélection
-			sb.show();			
-			activeTag();
-		}	
-		function getParams(idDoc, num){
-
-			var sst = arrSst[idDoc];
-			var p = sst.sbparams(num);
-			p.idDoc = idDoc;
-			p.idExi = idExi;
-			p.mailExi = mailExi;
-			return p;
-		}
-		function addSb(p){
- 			var oP = eval('(' + p['note'] + ')');
-			var sst = arrSst[oP['idDoc']];
-			var nbSb = sst.arrSbSon.length;
-			var nbTc = 0;
-			if(sst.data['posis'])
-				nbTc = sst.data['posis'].length-1;
- 			var idElem = oP['idDoc']+"_"+nbSb+"_"+p['idDoc']+"_"+oP['idExi']+"_"+nbTc;
-			var bs = d3.select('#table_'+oP['idDoc']);
-			var dL = bs.append("tr")
-				.attr("id", "Select_exi_"+p['idDoc']);
-			var d1 = dL.append("td")
-				.attr("colspan", "2");
-			var d2 = d1.append("div")
-				.attr("class","Select")
-				.attr("id","Select_"+idElem)
-				.html(oP['mailExi']);
-			d2.append("input")
-				.attr("id","chk_"+idElem)
-				.attr("type","checkbox")
-				.attr("checked","checked")
-				.attr("onclick","showSst('"+idElem+"',-1)");
-			d2.append("img")
-				.attr("id", "Select_del_"+p['idDoc'])
-				.attr("onclick","delSst("+p['idDoc']+","+oP['idDoc']+",'"+idElem+"')")
-				.attr("src", "../img/DeleteRecord.png")
-				.attr("title", "Supprimer la sélection");
-			d2.append("img")
-				.attr("id", "Select_upd_"+p['idDoc'])
-				.attr("onclick","updSst("+oP['idDoc']+","+nbSb+","+p['idDoc']+")")
-				.attr("src", "../img/UpdateRecord.png")
-				.attr("title", "Modifier la sélection");
-			d2.append("span")
-				.attr("id", "Select_son_"+idElem)
-				.attr("class","sonSelect");
-			d2.append("span")
-				.attr("id", "status_"+idElem)
-				.attr("class","status");
-			var dL1 = bs.append("tr").attr("id", "showSelect_"+idElem);
-			var cl1 = dL1.append("td");
-			cl1.append("div")
-				.attr("id", "Select_txt_"+idElem)
-				.attr("class","txtSelect");
-			var cl2 = dL1.append("td");
-			cl2.append("div")
-				.attr("id", "vis_"+idElem)
-				.attr("class","tgcld");
-			sst.addNewPosiSb(oP, idElem);
-			activeTag();
-		}
-
-		function activeTag(){
-			d3.selectAll(".tag")
-			.on("click", function(){
-					var d = event.target;
-					console.log(d.id+" "+d.innerText+" "+d.getAttribute('v'));
-					saveTag(d.innerText, d.getAttribute('v'), d.id);
-				});			
-		}			
 	</script>	
 	
 </head>
 <body>
-	<div class="ref" id="mail"><?php echo $this->identite; ?></div>
+<?php endif; ?>
+
 	<?php foreach($this->resultats as $r) : ?>
 		<div class="ref" id="ref_<?php echo $r['doc_id']; ?>" >
 	    	<audio controls='controls' id='audioW_<?php echo $r['doc_id']; ?>' src='<?php echo $r['urlSonLocal']; ?>' ></audio>
@@ -261,15 +97,18 @@
 				</table>
 			</div>		 			 	 
 		</div>
-	  	<script>
+	  	<script class="sst" >
 	  	arrSst[<?php echo $r['doc_id']; ?>] = new selectsontexte({term:"<?php echo $this->term; ?>"
 				, data:<?php echo json_encode($r); ?>
 				, idDoc:"<?php echo $r['doc_id']; ?>"});
 	  	</script>
 		<hr/>
 	<?php endforeach; ?>
+<?php if(!$this->ajax) : ?>
 	<script>
 		activeTag();
 	</script>
   </body>
-</html>	
+</html>
+<?php endif; ?>
+	

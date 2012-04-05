@@ -21,6 +21,11 @@ class Form_Auth_Login extends Zend_Form
             'ignore'   => true,
             'label'    => 'Login',
             ));
- 
+
+        $this->addElement('submit', 'crea', array(
+            'ignore'	=> true,
+            'label'		=> "Inscription",
+            ));
+            
     }
 }
