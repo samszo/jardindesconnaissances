@@ -125,6 +125,37 @@ class Flux_Deleuze extends Flux_Site{
     	return $posis;
     }
 
+
+    /**
+     * saveAutoKeyword
+     *
+     * enregistre les mots-clef calculé automatiquement
+     * 
+     * @param string $class
+     * 
+     * @return array
+     */
+    function saveAutoKeyword($class) {
+    	
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
+
+    	$this->user = $this->dbU->ajouter(array("login"=>$class));
+		
+    	//récupère le texte des documents
+		$arr = $this->dbD->getAll();
+		$d = new Zend_Date();
+		foreach ($arr as $doc){
+			//on ne traite que les mp3
+			if($doc['note']!="" && substr($doc['note'], 0, 33) != '{"controller":"deleuze","action":'){
+				$arrKw = $this->getKW($doc['note'], $class);
+				foreach ($arrKw as $k=>$val){
+					$this->saveTag($k, $doc['doc_id'], $val, $d->get("c"));
+				}
+			}
+		}    	
+    }
+    
     /**
      * saveTermPosition
      *
