@@ -153,25 +153,26 @@ class Flux_Site{
      * Récupère les mots clefs d'une chaine
      *
      * @param string $chaine
+     * @param string $class
      *   
      * @return array
      */
-	function getKW($chaine){
+	function getKW($chaine, $class="autokeyword"){
 		
 		$params['content'] = $chaine; //page content
 		//set the length of keywords you like
-		$params['min_word_length'] = 3;  //minimum length of single words
+		$params['min_word_length'] = 4;  //minimum length of single words
 		$params['min_word_occur'] = 1;  //minimum occur of single words
 		
-		$params['min_2words_length'] = 3;  //minimum length of words for 2 word phrases
+		$params['min_2words_length'] = 4;  //minimum length of words for 2 word phrases
 		$params['min_2words_phrase_length'] = 10; //minimum length of 2 word phrases
 		$params['min_2words_phrase_occur'] = 2; //minimum occur of 2 words phrase
 		
-		$params['min_3words_length'] = 3;  //minimum length of words for 3 word phrases
+		$params['min_3words_length'] = 4;  //minimum length of words for 3 word phrases
 		$params['min_3words_phrase_length'] = 10; //minimum length of 3 word phrases
 		$params['min_3words_phrase_occur'] = 2; //minimum occur of 3 words phrase
 		
-		$keyword = new autokeyword($params, "UTF-8");
+		if($class=="autokeyword")$keyword = new autokeyword($params, "UTF-8");
 		
 		//return $keyword->get_keywords();
 		return $keyword->parse_words();
