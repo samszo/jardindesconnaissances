@@ -1,5 +1,5 @@
 		var arrSst = [];
-/*
+
 		(function(Popcorn) {
 		    
 			  Popcorn.plugin( "funzo" , function( options ) {
@@ -27,7 +27,7 @@
 			  });
 			    
 			})(Popcorn);		
-*/				
+
 		
 		function showSst(idElem){			
 			var chk = document.getElementById("chk_"+idElem);

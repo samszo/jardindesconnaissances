@@ -11,6 +11,7 @@ function selectsontexte(config) {
   	this.nbSecDeb, this.nbSecFin;
   	this.arrTc = [], this.idDoc = config.idDoc;
 	this.data = config.data;
+	this.audioElm = "#audioW_"+this.idDoc;
 
 	this.sst = function() {
 	  
@@ -20,7 +21,6 @@ function selectsontexte(config) {
 	  , phrases = this.data['phrases'], posis = this.data['posis'], arrSon = []
 	  , audioSource = this.data['urlSonLocal']
 	  , term = config.term, idDoc = config.idDoc
-	  , audioElm = "#audioW_"+idDoc
 	  , txtSelect
 	  , txtAuto = document.getElementById("txtAuto_"+idDoc)
 	  , divSVG = "#divSVG_"+idDoc
@@ -29,6 +29,9 @@ function selectsontexte(config) {
 	  //création du tagcloud général
 	  //var tcg	= new tagcloud({idDoc:"divSVG_"+idDoc, txt:this.allTexte, data:false});
 
+	  //chargement de l'audio
+	  this.audioW = Popcorn(this.audioElm);
+	  	  	  
 	  var margin = {top: 10, right: 10, bottom: 80, left: 40};
 	  this.width = 1000 - margin.left - margin.right;
 	  this.mrgCntxSon = {top: 10, right: 10, bottom: 20, left: 40};
@@ -86,14 +89,6 @@ function selectsontexte(config) {
 	  var gCntxSon = this.svg.append("g")
 	      .attr("transform", "translate(" + this.mrgCntxSon.left + "," + this.mrgCntxSon.top + ")");
 	  	
-	  //variable pour la gestion de l'audio
-	  document.addEventListener('DOMContentLoaded', function () {
-	  	self.audioW = Popcorn(audioElm);
-	  	self.audioW.listen("timeupdate", function (evt) {
-	  		var t = evt.currentTarget.currentTime;
-	  		if(t>=self.nbSecFin)	self.audioW.pause();
-	  	});
-	  }, false);
 
 	var tooltip = d3.select("body")
 	    .append("div")
@@ -218,19 +213,19 @@ function selectsontexte(config) {
 		sst.sbs.show();
 	}else if(sst.sbs.id != sbs.id){
 		sst.sbs=sbs;
-		sst.sbs.show();			
+		sst.sbs.show();
 	}
 	var tc = sst.arrTc[arrId[2]], utiWords=false;
 	//récupère les mots de l'utilisateur uniquement pour les posis
 	if(arrId.length > 3 && sst.data['posis']) utiWords = sst.data['posis'][arrId[5]]['tags'];
 	if(!tc){
-		sst.arrTc.push(new tagcloud({idDoc:strId, txt:txt, data:false, utiWords:utiWords}));	
-	}else{
+		sst.arrTc.push(new tagcloud({idDoc:strId, txt:txt, data:false, utiWords:utiWords, term:sst.term}));	
+	}else if(tc.utiWords != utiWords){
 		var dPar = document.getElementById("vis_"+strId);
 		var d = document.getElementById("svg_"+strId);
 		if(d){
 			dPar.removeChild(d); 
-			sst.arrTc[arrId[2]]=new tagcloud({idDoc:strId, txt:txt, data:false, utiWords:utiWords}); 
+			sst.arrTc[arrId[2]]=new tagcloud({idDoc:strId, txt:txt, data:false, utiWords:utiWords, term:sst.term}); 
 		}
 	}
 		
@@ -246,7 +241,15 @@ function selectsontexte(config) {
 	  	var d1 = new Date(arrExt[1]);
 	  	var queryTime = sst.formatDate(d0)+" - "+sst.formatDate(d1);//+" = "+nbSecDeb+" - "+nbSecFin;
 	  	//console.log(queryTime);
-	  	if(sst.audioW) sst.audioW.play(sst.nbSecDeb);
+	  	/*if(sst.audioW) sst.audioW.play(sst.nbSecDeb);
+	  	else sst.setAudio();
+		*/
+		// "funzo" is an instance method!
+	  	sst.audioW.funzo({
+		      start: sst.nbSecDeb,
+		      end: sst.nbSecFin
+		  });	  
+
 		document.getElementById("Select_"+id).innerHTML = queryTime;
 		var arrId = id.split("_");
 		var sbt=sst.arrSbTxt[arrId[2]];
@@ -299,6 +302,17 @@ function selectsontexte(config) {
 
 	  	sb.show();
   
+  };
+  
+  this.setAudio = function() {
+	  document.addEventListener('DOMContentLoaded', function () {
+		  //variable pour la gestion de l'audio
+			this.audioW = Popcorn(this.audioElm);
+			this.audioW.listen("timeupdate", function (evt) {
+		  		var t = evt.currentTarget.currentTime;
+		  		if(t>=this.nbSecFin)	this.audioW.pause();
+		  	});
+	  }, false);
   };
   
   return this.sst();
