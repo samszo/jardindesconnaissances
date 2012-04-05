@@ -69,8 +69,7 @@ class Model_DbTable_flux_tagdoc extends Zend_Db_Table_Abstract
     } 
 
     /**
-     * Recherche une entrée flux_tagdoc avec la clef primaire spécifiée
-     * et ajoute le poids.
+     * mise à jour du poids.
      *
      * @param array $data
      *

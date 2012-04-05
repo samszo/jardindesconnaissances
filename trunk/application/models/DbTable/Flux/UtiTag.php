@@ -38,9 +38,8 @@ class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
     {
 		$select = $this->select();
 		$select->from($this, array('uti_id'));
-		foreach($data as $k=>$v){
-			$select->where($k.' = ?', $v);
-		}
+		$select->where('tag_id = ?', $data['tag_id']);
+		$select->where('uti_id = ?', $data['uti_id']);
 	    $rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->uti_id; else $id=false;
         return $id;
@@ -60,10 +59,29 @@ class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
     	if($existe)$id = $this->existe($data);
     	if(!$id){
     	 	$id = $this->insert($data);
+    	}else{
+    		//met à jour le poids
+    		$this->ajoutPoids($data);
     	}
-    	return $id;
+       	return $id;
     } 
-           
+
+    /**
+     * mise à jour du poids.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function ajoutPoids($data)
+    {
+    	if(!isset($data["poids"]))$data["poids"]=1;        
+		$sql = 'UPDATE flux_utitag SET poids = poids + '.$data["poids"].' WHERE tag_id = '.$data["tag_id"].' AND uti_id ='.$data["uti_id"];
+    	$this->_db->query($sql);    
+    }
+    
+    
+    
     /**
      * Recherche une entrée flux_utitag avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.

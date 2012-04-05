@@ -17,7 +17,10 @@ class AuthController extends Zend_Controller_Action
 
 			if ($this->getRequest()->isPost()) {
 		        $formData = $this->getRequest()->getPost();
-				if ($loginForm->isValid($formData)) {
+		        
+		        if(isset($formData["crea"]))$this->_redirect('auth/inscription');
+				
+		        if ($loginForm->isValid($formData)) {
 		            $adapter = new Zend_Auth_Adapter_DbTable(
 		                $db,
 		                'flux_uti',
@@ -38,7 +41,7 @@ class AuthController extends Zend_Controller_Action
 		            	$ssExi->idUti = $r->uti_id;
 		            	$ssExi->role = $r->role;
 		                
-		                $this->_redirect('/deleuze/position');
+		                $this->_redirect('/deleuze/navigation');
 		                return;
 		            }
 				}
@@ -51,5 +54,31 @@ class AuthController extends Zend_Controller_Action
 		    echo "Message: " . $e->getMessage() . "\n";
 		}	        
     }
- 
+
+    public function inscriptionAction()
+    {
+    	try {
+    		$this->view->form = $form = new Form_Auth_Inscription();
+   	    	if($this->getRequest()->isPost()){
+				$formData = $this->getRequest()->getPost();
+				if($form->isValid($formData)){
+					//supprime les données du bouton
+					unset($formData['envoyer']);
+					$formData['ip_inscription'] = $_SERVER['REMOTE_ADDR'];
+					$formData['date_inscription'] = date('Y-m-d H:i:s');
+					//print_r($formData);
+					$db = new Model_DbTable_Flux_Uti();
+					$db->ajouter($formData);
+					$this->_redirect('auth/login');
+				}else{
+					$form->populate($formData);
+				}
+				
+			}    			        
+	        
+    	}catch (Zend_Exception $e) {
+			echo "Récupère exception: " . get_class($e) . "\n";
+		    echo "Message: " . $e->getMessage() . "\n";
+		}	        
+    }
 }

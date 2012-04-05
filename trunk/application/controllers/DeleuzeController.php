@@ -68,7 +68,7 @@ class DeleuzeController extends Zend_Controller_Action {
 		}else{
 		    $this->_redirect('/auth/login');
 		}
-		
+				
 	    $this->view->resultats = "";
     	if($this->_getParam('term', 0)){
 			$oD = new Flux_Deleuze($this->dbNom);
@@ -76,7 +76,31 @@ class DeleuzeController extends Zend_Controller_Action {
     		$arrPosis = $oD->getTermPositions($this->_getParam('term', 0));
 			$this->view->resultats = $arrPosis;
 			$this->view->term = $this->_getParam('term', 0);
-	    }
+    	}
+	    $this->view->ajax = false;
+    	if($this->_getParam('ajax', 0))$this->view->ajax = true;
+	    
+	}	
+
+	/**
+	 * affichage les outils de navigation dans les cours
+	 */
+	public function navigationAction() {
+		
+		$auth = Zend_Auth::getInstance();
+		if ($auth->hasIdentity()) {
+		    // l'identité existe ; on la récupère
+		    $this->view->identite = $auth->getIdentity();
+		    $ssUti = new Zend_Session_Namespace('uti');
+		    $this->view->idUti = $ssUti->idUti;
+		}else{
+		    $this->_redirect('/auth/login');
+		}
+		
+		//récupère les utilisateurs avec des mots clefs
+		$dbUTD = new Model_DbTable_Flux_UtiTagDoc();
+		$this->view->cribles = $dbUTD->GetUtisNbTagNbDoc();
+		
 	}	
 	
 	public function ajoutAction() {

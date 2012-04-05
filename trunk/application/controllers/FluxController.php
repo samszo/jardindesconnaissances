@@ -59,7 +59,7 @@ class FluxController extends Zend_Controller_Action {
 	    $this->view->docs = $rs;		    
     }
     	
-	public function ajoutexitagAction() {
+	public function ajoututitagAction() {
 		try {
 			$auth = Zend_Auth::getInstance();
 			if ($auth->hasIdentity()) {
@@ -84,4 +84,24 @@ class FluxController extends Zend_Controller_Action {
 	          echo "Message: " . $e->getMessage() . "\n";
 		}
 	}    
+	
+	public function gettutitagsAction() {
+		try {
+			$auth = Zend_Auth::getInstance();
+			if ($auth->hasIdentity()) {
+			    // l'identité existe ; on la récupère
+				$o = new Flux_Site($this->_getParam('db', 0));
+				$dbUTD = new Model_DbTable_Flux_UtiTagDoc($o->db);		
+				$this->view->data = $dbUTD->GetUtiTags($this->_getParam('idUti', 0),"LENGTH(t.code) > 3");
+				
+			}else{
+			    $this->_redirect('/auth/login');
+			}
+			
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+	}    
+	
 }

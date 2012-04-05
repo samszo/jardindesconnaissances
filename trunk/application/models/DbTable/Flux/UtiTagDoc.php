@@ -316,5 +316,53 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 		
 	}
-    	
+
+	/**
+     * Récupère les tags associés à un utilisateur
+     *
+     * @param integer $idUti
+     * @param string $w
+     * 
+     * @return array
+     */
+	function GetUtiTags($idUti, $w="") {
+
+		//définition de la requête
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("utd" => "flux_utitagdoc"), array("tag_id"))                           
+            ->joinInner(array('t' => 'flux_tag'),
+            	't.tag_id = utd.tag_id',array('code'))
+        	->joinInner(array('td' => 'flux_tagdoc'),
+            	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
+        	->where( "utd.uti_id = ?", $idUti)
+        	->group("utd.tag_id")
+        	->order("value DESC");
+		if($w!="")$query->where($w);
+        return $this->fetchAll($query)->toArray(); 		
+	}
+	
+	/**
+     * Récupère la liste des utilisateurs avec le nombre de tags et le nombre de document
+     * 
+     * @param string $w
+     * 
+     * @return array
+     */
+	function GetUtisNbTagNbDoc($w="") {
+
+		//définition de la requête
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("utd" => "flux_utitagdoc")
+        		, array("tag_id", "nbTag"=>"COUNT(DISTINCT tag_id)", "nbDoc"=>"COUNT(DISTINCT doc_id)"))                           
+            ->joinInner(array('u' => 'flux_uti'),
+            	'u.uti_id = utd.uti_id',array('login','uti_id'))
+        	->group("utd.uti_id")
+        	->order("login");
+		if($w!="")$query->where($w);
+        	
+        return $this->fetchAll($query)->toArray(); 		
+	}
+	
 }
