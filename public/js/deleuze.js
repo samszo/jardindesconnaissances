@@ -28,6 +28,14 @@
 			    
 			})(Popcorn);		
 
+		function cursor_wait() {
+			document.body.style.cursor = 'wait';
+		}
+
+		// Returns the cursor to the default pointer
+		function cursor_clear() {
+			document.body.style.cursor = 'default';
+		}		
 		
 		function showSst(idElem){			
 			var chk = document.getElementById("chk_"+idElem);
@@ -63,24 +71,19 @@
 					 function(data){
 						var toto = data;
 					 }, "json");
-			/*
-			var dPar = document.getElementById("table_"+idDocPar);
-			var d = document.getElementById("Select_exi_"+idDoc);
-			dPar.removeChild(d); 
-			d = document.getElementById("showSelect_"+idElem);
-			dPar.removeChild(d);
-			*/
 			d3.select('#Select_exi_'+idDoc).remove();
 			d3.select('#showSelect_'+idDoc).remove();
 
 
 		}
 		function saveTag(tag, poids, idDoc){
+			cursor_wait();
 			var arr = idDoc.split("_");
 			var p = {"tag":tag, "idDoc":arr[3], "poids":poids, "db":db};
 			$.post("../flux/ajoututitag", p,
 					 function(data){
 						updTc(data, arr, idDoc);
+						cursor_clear();
 					 }, "json");
 		}
 		function updTc(data, arrId, idElem){
@@ -154,28 +157,33 @@
 		}
 
 		function activeTag(){
+			cursor_wait();
 			d3.selectAll(".tag")
 			.on("click", function(){
 					var d = event.target;
 					console.log(d.id+" "+d.innerText+" "+d.getAttribute('v'));
 					saveTag(d.innerText, d.getAttribute('v'), d.id);
+					cursor_clear();
 				});			
 		}
 		
 		function chgcrible(c) {
 			if (c.selectedIndex != 0){
+				cursor_wait();
 				d3.select('#gPosi').html("");
 				d3.select('#vis_gTC').html("");
 				var p = {"idUti":c.options[c.selectedIndex].value, "db":db};
 				$.post("../flux/gettutitags", p,
 						 function(data){
 							//console.log(data);
-							tcGlobal = new tagcloud({idDoc:"gTC", data:data, w:1000, h:300, global:true}); 							
+							tcGlobal = new tagcloud({idDoc:"gTC", data:data, w:1000, h:300, global:true});
+							cursor_clear();
 						 }, "json");
 			}	 
 		}
 
 		function chargeTag(tag){
+			cursor_wait();
 			d3.select('#gPosi').html("");
 			var p = {"term":tag, "ajax":true};
 			$.post("../deleuze/position", p,
@@ -188,5 +196,6 @@
 							.html(function() {
 								eval(this.innerText); 
 								});
+						cursor_clear();
 					 });
 		}
