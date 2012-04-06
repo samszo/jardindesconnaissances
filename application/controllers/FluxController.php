@@ -92,7 +92,7 @@ class FluxController extends Zend_Controller_Action {
 			    // l'identité existe ; on la récupère
 				$o = new Flux_Site($this->_getParam('db', 0));
 				$dbUTD = new Model_DbTable_Flux_UtiTagDoc($o->db);		
-				$this->view->data = $dbUTD->GetUtiTags($this->_getParam('idUti', 0),"LENGTH(t.code) > 3");
+				$this->view->data = $dbUTD->GetUtiTags($this->_getParam('idUti', 0),"LENGTH(t.code) > 3", "SUM(td.poids) >= 1");
 				
 			}else{
 			    $this->_redirect('/auth/login');
