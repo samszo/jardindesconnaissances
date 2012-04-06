@@ -198,8 +198,9 @@ function selectsontexte(config) {
   this.showTextSelect = function(arrExt, id, sst){
   	//Récupère le nombre de caractère
 	var motDeb = Math.round(arrExt[0]);
-	var motFin = Math.floor(arrExt[1]);
+	var motFin = Math.round(arrExt[1]);
   	var arrMotDeb = sst.arrCar[motDeb];
+  	if(motFin >= sst.arrCar.length)motFin = sst.arrCar.length-1;
   	var arrMotFin = sst.arrCar[motFin];
   	var txt = sst.allTexte.substring(arrMotDeb["carDeb"],arrMotFin["carFin"]);
   	//console.log(arrMotDeb["carDeb"]+" - "+arrMotFin["carFin"]+" : "+txt);
