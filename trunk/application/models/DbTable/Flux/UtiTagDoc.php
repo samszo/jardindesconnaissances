@@ -322,10 +322,11 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
      *
      * @param integer $idUti
      * @param string $w
+     * @param string $h
      * 
      * @return array
      */
-	function GetUtiTags($idUti, $w="") {
+	function GetUtiTags($idUti, $w="", $h="") {
 
 		//définition de la requête
         $query = $this->select()
@@ -339,29 +340,38 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
         	->group("utd.tag_id")
         	->order("value DESC");
 		if($w!="")$query->where($w);
-        return $this->fetchAll($query)->toArray(); 		
+		if($h!="")$query->having($h);
+		return $this->fetchAll($query)->toArray(); 		
 	}
 	
 	/**
      * Récupère la liste des utilisateurs avec le nombre de tags et le nombre de document
      * 
      * @param string $w
+     * @param string $h
      * 
      * @return array
      */
-	function GetUtisNbTagNbDoc($w="") {
+	function GetUtisNbTagNbDoc($w="", $h="") {
 
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         	->from( array("utd" => "flux_utitagdoc")
-        		, array("tag_id", "nbTag"=>"COUNT(DISTINCT tag_id)", "nbDoc"=>"COUNT(DISTINCT doc_id)"))                           
+        		, array("utd.tag_id", "nbTag"=>"COUNT(DISTINCT utd.tag_id)", "nbDoc"=>"COUNT(DISTINCT utd.doc_id)"))                           
             ->joinInner(array('u' => 'flux_uti'),
-            	'u.uti_id = utd.uti_id',array('login','uti_id'))
+            	'u.uti_id = utd.uti_id',array('login','utd.uti_id'))
+            /*
+        	->joinInner(array('td' => 'flux_tagdoc'),
+            	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
+            ->joinInner(array('t' => 'flux_tag'),
+            	't.tag_id = utd.tag_id',array('code'))
+            */
         	->group("utd.uti_id")
         	->order("login");
 		if($w!="")$query->where($w);
-        	
+		if($h!="")$query->having($h);
+		
         return $this->fetchAll($query)->toArray(); 		
 	}
 	
