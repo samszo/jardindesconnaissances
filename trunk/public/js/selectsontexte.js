@@ -12,6 +12,7 @@ function selectsontexte(config) {
   	this.arrTc = [], this.idDoc = config.idDoc;
 	this.data = config.data;
 	this.audioElm = "#audioW_"+this.idDoc;
+	this.idExi = config.idExi;
 
 	this.sst = function() {
 	  
@@ -220,13 +221,13 @@ function selectsontexte(config) {
 	//récupère les mots de l'utilisateur uniquement pour les posis
 	if(arrId.length > 3 && sst.data['posis']) utiWords = sst.data['posis'][arrId[5]]['tags'];
 	if(!tc){
-		sst.arrTc.push(new tagcloud({idDoc:strId, txt:txt, data:false, utiWords:utiWords, term:sst.term}));	
+		sst.arrTc.push(new tagcloud({idDoc:strId, idExi:sst.idExi, txt:txt, data:false, utiWords:utiWords, term:sst.term}));	
 	}else if(tc.utiWords != utiWords){
 		var dPar = document.getElementById("vis_"+strId);
 		var d = document.getElementById("svg_"+strId);
 		if(d){
 			dPar.removeChild(d); 
-			sst.arrTc[arrId[2]]=new tagcloud({idDoc:strId, txt:txt, data:false, utiWords:utiWords, term:sst.term}); 
+			sst.arrTc[arrId[2]]=new tagcloud({idDoc:strId, idExi:sst.idExi, txt:txt, data:false, utiWords:utiWords, term:sst.term}); 
 		}
 	}
 		
@@ -242,15 +243,14 @@ function selectsontexte(config) {
 	  	var d1 = new Date(arrExt[1]);
 	  	var queryTime = sst.formatDate(d0)+" - "+sst.formatDate(d1);//+" = "+nbSecDeb+" - "+nbSecFin;
 	  	//console.log(queryTime);
-	  	/*if(sst.audioW) sst.audioW.play(sst.nbSecDeb);
-	  	else sst.setAudio();
-		*/
-		// "funzo" is an instance method!
+
+	  	// "funzo" is an instance method!
 	  	sst.audioW.funzo({
 		      start: sst.nbSecDeb,
 		      end: sst.nbSecFin
 		  });	  
-
+	  	if(sst.audioW.readyState() > 0) sst.audioW.play(sst.nbSecDeb);
+	  	
 		document.getElementById("Select_"+id).innerHTML = queryTime;
 		var arrId = id.split("_");
 		var sbt=sst.arrSbTxt[arrId[2]];
