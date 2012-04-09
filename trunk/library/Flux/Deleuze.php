@@ -84,7 +84,7 @@ class Flux_Deleuze extends Flux_Site{
      */
     function getTermPositions($term) {
 
-	    $c = str_replace("::", "_", __METHOD__).$term; 
+	    $c = str_replace("::", "_", __METHOD__).md5($term); 
 	   	$posis = false;//$this->cache->load($c);
         if(!$posis){
         	
@@ -95,7 +95,7 @@ class Flux_Deleuze extends Flux_Site{
 	    	$audio = new Flux_Audio();
 	    	
 			//récupère les positions du term dans les documents
-			$posis = $lu->getTermPositions(array('field'=>'cours', 'text'=>$term),array("titre", "url", "mp3", "doc_id"));
+			$posis = $lu->getTermPositions(array('field'=>'cours', 'text'=>$term),array("titre", "url", "mp3", "doc_id"),true);
 	    	
 			//ajoute les informations du mp3
 			for ($i = 0; $i < count($posis); $i++) {
