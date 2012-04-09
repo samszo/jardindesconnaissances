@@ -38,7 +38,7 @@
 			cursor: pointer;	
 		}
 		.tag:hover {
-		    color: green;
+		    color: red;
 		}
 		.globalTC {
 			width: 1000px;
