@@ -5,12 +5,14 @@
  */
 function tagcloud(config) {
 	this.idDoc = config.idDoc;  
-	this.exi = this.idDoc.split("_").length > 3;  
+	this.idExi = config.idExi; 
+	this.exi;
 	this.global = config.global;  
 	this.txt = config.txt;  
 	this.data = config.data;
 	this.term = config.term;
 	this.utiWords = config.utiWords;
+	this.poidsTag = 1;
 	// From 
 	// Jonathan Feinberg's cue.language, see lib/cue.language/license.txt.
 	// 
@@ -28,6 +30,9 @@ function tagcloud(config) {
 		maxLength = 30,
 		self = this,
 		posiTxt = document.getElementById("Select_txt_"+this.idDoc);
+
+		var arrId = this.idDoc.split("_")
+		this.exi = arrId.length > 3 && arrId[3] == this.idExi;  
 	    
 	    if(config.w) w = config.w;
 	    if(config.h) h = config.h;
@@ -113,15 +118,19 @@ function tagcloud(config) {
 		        	.text(function(d) { return d.text; })
 		        	.on("click", function(d) {
 		        		if(self.exi){
-							console.log(self.idDoc+" "+d.text+" "+-1);
-							saveTag(d.text, -1, "tag_"+self.idDoc);
+							console.log(self.idDoc+" "+d.text+" "+self.poidsTag);
+							saveTag(d.text, self.poidsTag, "tag_"+self.idDoc);
 		        		} 
 		        		if(self.global){
 		        			chargeTag(d.text);	
 		        		}
 		        	})
 		        	.on("mouseover", function(d, i) { 
-		        		if(self.exi) d3.select(this).style("fill", "red");
+		        		if(self.exi){
+		        			var c;
+		        			if(self.poidsTag<1)c="yellow"; else c="red";
+		        			d3.select(this).style("fill", c);
+		        		}
 		        		if(self.global) return tooltip.style("visibility", "visible");		        		
 		        		})
 		        	.on("mouseout", function(d, i) { 

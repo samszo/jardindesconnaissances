@@ -1,33 +1,30 @@
 		var arrSst = [];
 
-		(function(Popcorn) {
-		    
-			  Popcorn.plugin( "funzo" , function( options ) {
-
-			    return {
-
-			      start: function( event, options ) {
-
-			        // Inside of these plugin method definitions, you can
-			        // always trust that the context will be the Popcorn
-			        // instance that will call the plugin method...
-
-			        this.pause();
-
-			        // ...would pause the current video when the plugin
-			        // is executed.
-
-			      },
-			      end: function( event, options ) {
-
-			        // still the same context in here!
-
-			      }
-			    };
-			  });
-			    
-			})(Popcorn);		
-
+		// Provide an object
+		// Popcorn will manage the events
+		(function (Popcorn) {
+		  Popcorn.plugin( "funzo" , {
+		    _setup : function( options ) {
+		       // setup code, fire on initialization
+		       // options refers to the options passed into the plugin on init
+		       // this refers to the popcorn object
+		    },
+		    start: function( event, options ){
+		       // fire on options.start
+		       // event refers to the event object
+		       // options refers to the options passed into the plugin on init
+		       // this refers to the popcorn object
+		    },
+		    end: function( event, options ){
+		       // fire on options.end
+		       // event refers to the event object
+		       // options refers to the options passed into the plugin on init
+		       // this refers to the popcorn object
+		       this.pause();	
+		    }
+		  });
+		})(Popcorn);
+		
 		function cursor_wait() {
 			document.body.style.cursor = 'wait';
 		}
@@ -82,9 +79,15 @@
 			var p = {"tag":tag, "idDoc":arr[3], "poids":poids, "db":db};
 			$.post("../flux/ajoututitag", p,
 					 function(data){
-						updTc(data, arr, idDoc);
 						cursor_clear();
+						updTc(data, arr, idDoc);
 					 }, "json");
+		}
+		function ajoutTag(idDoc){
+			var saisie = prompt("Saisissez votre tag :", "")
+		    if (saisie!="") {
+				saveTag(saisie, 1, idDoc);
+		    }
 		}
 		function updTc(data, arrId, idElem){
 			//modifie les data de la position
@@ -96,6 +99,14 @@
 			sb.show();			
 			activeTag();
 		}	
+		function poidsTag(idElem, poids){
+			//récupère le tagcloud
+			var arrId = idElem.split("_");
+			var sst = arrSst[arrId[0]];
+			var tc = sst.arrTc[arrId[1]];
+			tc.poidsTag = poids;
+		}	
+
 		function getParams(idDoc, num){
 
 			var sst = arrSst[idDoc];
@@ -122,6 +133,9 @@
 				.attr("class","Select")
 				.attr("id","Select_"+idElem)
 				.html(oP['mailExi']);
+			d2.append("span")
+				.attr("id", "Select_son_"+idElem)
+				.attr("class","sonSelect");
 			d2.append("input")
 				.attr("id","chk_"+idElem)
 				.attr("type","checkbox")
@@ -137,9 +151,23 @@
 				.attr("onclick","updSst("+oP['idDoc']+","+nbSb+","+p['idDoc']+")")
 				.attr("src", "../img/UpdateRecord.png")
 				.attr("title", "Modifier la sélection");
-			d2.append("span")
-				.attr("id", "Select_son_"+idElem)
-				.attr("class","sonSelect");
+			/*
+			d2.append("img")
+				.attr("id", "Select_tag_"+p['idDoc'])
+				.attr("onclick","ajoutTag('"+idElem+"')")
+				.attr("src", "../img/tag.png")
+				.attr("title", "Ajouter un tag");
+			*/
+			d2.append("img")
+				.attr("id", "Select_tag+_"+p['idDoc'])
+				.attr("onclick","poidsTag('"+idElem+"',1)")
+				.attr("src", "../img/tag+.png")
+				.attr("title", "Augmente le poids du tag");
+			d2.append("img")
+				.attr("id", "Select_tag-_"+p['idDoc'])
+				.attr("onclick","poidsTag('"+idElem+"',-1)")
+				.attr("src", "../img/tag-.png")
+				.attr("title", "Diminue le poids du tag");
 			d2.append("span")
 				.attr("id", "status_"+idElem)
 				.attr("class","status");
