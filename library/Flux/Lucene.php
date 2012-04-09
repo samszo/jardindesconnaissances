@@ -80,9 +80,9 @@ class Flux_Lucene extends Flux_Site{
         return $hits;
 	}
 	
-	function getTermPositions($term, $fields=array("title", "url")) {
+	function getTermPositions($term, $fields=array("title", "url"), $find=false) {
 
-	    $c1 = str_replace("::", "_", __METHOD__).$term['field']."_".$term['text']; 
+	    $c1 = str_replace("::", "_", __METHOD__).$term['field']."_".md5($term['text'])."_".$find; 
 		foreach ($fields as $f) {
 	    	$c1 .= "_".$f;
 	    }
@@ -91,20 +91,33 @@ class Flux_Lucene extends Flux_Site{
         	return $result;
         }
 	    
-		
-		$objTerm = new Zend_Search_Lucene_Index_Term(strtolower($term['text']), $term['field']);
-		//récupère les positions du term
-		$c = str_replace("::", "_", __METHOD__)."_getPosis_".$term['field']."_".$term['text']; 
-	   	$posis = $this->cache->load($c);
-        if(!$posis){
-			$posis = $this->index->termPositions($objTerm);
-        	$this->cache->save($posis, $c);			
+        if($find){
+			//recherche la requête
+			$c = str_replace("::", "_", __METHOD__)."_find_".$term['field']."_".md5($term['text']); 
+		   	$posis = $this->cache->load($c);
+	        if(!$posis){
+				$posis = $this->find($term['field'].":".$term['text']);
+	        	$this->cache->save($posis, $c);			
+	        }        	
+        }else{
+			$objTerm = new Zend_Search_Lucene_Index_Term(strtolower($term['text']), $term['field']);
+			//récupère les positions du term
+			$c = str_replace("::", "_", __METHOD__)."_getPosis_".$term['field']."_".md5($term['text']); 
+		   	$posis = $this->cache->load($c);
+	        if(!$posis){
+				$posis = $this->index->termPositions($objTerm);
+	        	$this->cache->save($posis, $c);			
+	        }        	
         }
+		
 		        
 		$result = array();
 		foreach ($posis as $kD => $ps) {
 			//on récupère le document lucene
-	    	$doc = $this->index->getDocument($kD);
+	        if($find)			
+		    	$doc = $this->index->getDocument($ps->id);
+		    else
+		    	$doc = $this->index->getDocument($kD);
 		    $url = urldecode($doc->getFieldValue('url'));
 	    	//récupère le contenu du document
 	    	if($term['field']=="cours"){
@@ -122,14 +135,14 @@ class Flux_Lucene extends Flux_Site{
 				if($i==0){
 					//on récupère le début de la phrase
 					$deb = $this->cutStr($segs[$i],$this->nbCaract,"","dg");
-					$p = $ps[$i];	
+					if($find)$p = -1; else $p = $ps[$i];	
 					$pHTML += strlen($segs[$i]);
 					//on récupère la fin de la phrase
 					$fin = $this->cutStr($segs[$i+1],$this->nbCaract,"");
 				}else{
 					//on récupère le début de la phrase
 					$deb = $this->cutStr($segs[$i-1],$this->nbCaract,"","dg");
-					$p = $ps[$i-1];
+					if($find)$p = -1; else $p = $ps[$i-1];
 					$pHTML += strlen($term['text'])+strlen($segs[$i-1]);
 					//on récupère la fin de la phrase
 					$fin = $this->cutStr($segs[$i],$this->nbCaract,"");
