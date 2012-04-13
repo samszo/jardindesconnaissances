@@ -28,6 +28,7 @@ function tagcloud(config) {
 		complete = 0,
 		statusText = d3.select("#status_"+this.idDoc),
 		maxLength = 30,
+		maxTag = 1000,
 		self = this,
 		posiTxt = document.getElementById("Select_txt_"+this.idDoc);
 
@@ -77,7 +78,7 @@ function tagcloud(config) {
 		    .text("a simple tooltip");
 		
 		var ext = d3.extent(this.data.map(function(x) { return parseInt(x.value); }));
-		var fontSize = d3.scale.log().domain([ext[0],ext[1]]).range([16, 128]);
+		var fontSize = d3.scale.log().domain([ext[0],ext[1]]).range([8, 128]);
 		d3.layout.cloud().size([w, h])
 			.words(this.data)
 		    .rotate(0)
@@ -104,7 +105,7 @@ function tagcloud(config) {
 		    	  	//.style("fill", function(d) { return fill(d.text.toLowerCase()); })
 		    	  	.style("fill", function(d) {
 		    	  		if(self.exi && inUtiWords(d.text))
-		    	  			return "violet"; 
+		    	  			return "steelblue"; 
 		    	  		else if(self.term==d.text)
 		    	  			return "blue";
 		    	  		else
@@ -181,8 +182,10 @@ function tagcloud(config) {
 		function parseData() {
 			tags = {};
 			var cases = {};
+			var j=0;
 			self.data.forEach(function(d) {
 				if (d.value <= 0) return;
+				if(j>maxTag) return;
 				var word = d.code;
 				var i = word.search(self.elision);
 				if(i>0) word = word.substr(i+1);
@@ -192,6 +195,7 @@ function tagcloud(config) {
 				word = word.substr(0, maxLength);
 				cases[word.toLowerCase()] = word;
 				tags[word = word.toLowerCase()] = d.value;
+				j++;
 			});
 			tags = d3.entries(tags).sort(function(a, b) { return b.value - a.value; });
 			tags.forEach(function(d) {d.key = cases[d.key];});
