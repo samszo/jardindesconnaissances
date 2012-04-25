@@ -119,17 +119,21 @@ function selectsontexte(config) {
   		.text("audio");
     
     //ajoute les phrases calculées automatiquement
-    for(var i=0; i < phrases.length; i++){
-    	this.arrSbSon.push(new selectbar({id:'son_'+idDoc+'_'+i, wBar:10, wSel:10, d:[{x: getSecByCar(phrases[i]['deb']), y: 0}], width:this.width
-    		, hSel:this.hCntxSon, left:this.mrgCntxSon.left, top:this.mrgCntxSon.top+this.hCntxSon
-	  		, xCntx:this.xCntxSon ,xCntxInv:this.xCntxSonInv, svg:this.svg, fncDragEnd:this.playSonSelect, xUnit:1000, sst:this}));
-    	var sb =new selectbar({id:'txt_'+idDoc+'_'+i, wBar:10, wSel:10, d:[{x: getMotByTerm(phrases[i]['deb']), y: 0}], width:this.width
-    		, hSel:this.hCntxText, left:this.mrgCntxText.left, top:this.mrgCntxText.top
-	  		, xCntx:this.xCntxTxt ,xCntxInv:this.xCntxTxtInv , svg:this.svg, fncDragEnd:this.showTextSelect, xUnit:1, sst:this});
-	  	this.arrSbTxt.push(sb);
+    var i=0;
+    if(phrases){    	
+	    for(i=0; i < phrases.length; i++){
+	    	this.arrSbSon.push(new selectbar({id:'son_'+idDoc+'_'+i, wBar:10, wSel:10, d:[{x: getSecByCar(phrases[i]['deb']), y: 0}], width:this.width
+	    		, hSel:this.hCntxSon, left:this.mrgCntxSon.left, top:this.mrgCntxSon.top+this.hCntxSon
+		  		, xCntx:this.xCntxSon ,xCntxInv:this.xCntxSonInv, svg:this.svg, fncDragEnd:this.playSonSelect, xUnit:1000, sst:this}));
+	    	var sb =new selectbar({id:'txt_'+idDoc+'_'+i, wBar:10, wSel:10, d:[{x: getMotByTerm(phrases[i]['deb']), y: 0}], width:this.width
+	    		, hSel:this.hCntxText, left:this.mrgCntxText.left, top:this.mrgCntxText.top
+		  		, xCntx:this.xCntxTxt ,xCntxInv:this.xCntxTxtInv , svg:this.svg, fncDragEnd:this.showTextSelect, xUnit:1, sst:this});
+		  	this.arrSbTxt.push(sb);
+	
+		  	sb.show();
+	    }
+	}
 
-	  	sb.show();
-	  }
     //ajoute les phrases positionnées par des existences
     if(posis){
 	    for(var j=0; j < posis.length; j++){

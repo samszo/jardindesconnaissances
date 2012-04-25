@@ -106,7 +106,7 @@ function tagcloud(config) {
 		    	  	.style("fill", function(d) {
 		    	  		if(self.exi && inUtiWords(d.text))
 		    	  			return "steelblue"; 
-		    	  		else if(self.term==d.text)
+		    	  		else if(self.term.indexOf(d.text)>0)
 		    	  			return "blue";
 		    	  		else
 		    	  			return "black";
@@ -223,9 +223,14 @@ function tagcloud(config) {
 		}
 
 		function showTerm() {
-			 reg=new RegExp("("+self.term+")", "g");
-			 str = "<span id='tag_"+self.idDoc+"' class='term' >$1</span>";
-			 self.txt =  self.txt.replace(reg, str);
+			var arr = self.term.split(" and ");
+			if(arr.length==1) arr = self.term.split(" or ");
+			 for(var i= 0; i < arr.length; i++)
+			 {
+				 reg=new RegExp("("+arr[i]+")", "g");
+				 str = "<span id='tag_"+self.idDoc+"' class='term' >$1</span>";
+				 self.txt =  self.txt.replace(reg, str);				 
+			 }			
 		}
 		
   };  
