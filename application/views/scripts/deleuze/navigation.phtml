@@ -31,6 +31,9 @@
 			<option value="<?php echo $c['uti_id']; ?>"><?php echo $c['login']." : ".$c['nbTag']." tag(s) - ".$c['nbDoc']." doc(s)" ; ?></option>
 		<?php endforeach; ?>		
 	</select>		
+	<span>Interrogation directe :</span>
+	<input type="text" id="rqt" />
+	<input type="button" onclick="find();" value="soumettre" >
 	<span class="status" >Utilisateur : <?php echo $this->identite; ?>
 		<a href="../auth/login">déconnexion</a>
 	</span>

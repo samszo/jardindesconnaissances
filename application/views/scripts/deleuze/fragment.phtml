@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script type='text/javascript' src="../js/popcorn-complete.js"></script>
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type='text/javascript' src="../js/d3.v2.js"></script>
+	<script type='text/javascript' src="../js/d3.time.js"></script>
+	<script type='text/javascript' src="../js/d3.layout.cloud.js"></script>
+	<script type='text/javascript' src="../js/selectsontexte.js"></script>
+	<script type='text/javascript' src="../js/selectbar.js"></script>
+	<script type='text/javascript' src="../js/tagcloud.js"></script>
+	<script type='text/javascript' src="../js/deleuze.js"></script>
+
+	<link rel="stylesheet" href="../css/deleuze.css" />
+	
+	<script>
+
+		var db = "flux_DeleuzeSpinoza";
+	</script>	
+	
+</head>
+<body>
+
+	<?php foreach($this->resultats as $r) : ?>
+		<div class="ref" id="ref_<?php echo $r['doc_id']; ?>" >
+	    	<audio controls='controls' id='audioW_<?php echo $r['doc_id']; ?>' src='<?php echo $r['urlSonLocal']; ?>' ></audio>
+			<?php echo $r['doc_id']." - ".$r['titre']; ?>
+			<a href="<?php echo $r['url']; ?>"><?php echo $r['url']; ?></a>
+			<div id="divSVG_<?php echo $r['doc_id']; ?>" style="display:none" ></div>
+			<div class="posi" id="posi_<?php echo $r['doc_id']; ?>" >
+				<table>
+					<tbody id="table_<?php echo $r['doc_id']; ?>">
+					<?php
+						 $j = 0;
+						 $i = 0;
+						 foreach ($r['posis'] as $p) : 
+						 			$oP = json_decode($p['note']);
+						 			$idElem = $r['doc_id']."_".($i+$j)."_".$p['idDoc']."_".$oP->idExi."_".$j;
+						 		?>
+						 		<tr id="Select_exi_<?php echo $p['idDoc']; ?>">
+						 			<td colspan="2" > 
+								 		<div class="Select" id="Select_<?php echo $idElem; ?>" > 
+											<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span>
+											<span class="status" id="status_<?php echo $idElem; ?>" ></span>
+									 	</div>
+									</td>
+							 	</tr>
+						 		<tr id="showSelect_<?php echo $idElem; ?>" >
+						 			<td>
+										<div class="txtSelect" id="Select_txt_<?php echo $idElem; ?>" ></div>
+									</td>
+						 			<td>
+										<div class="tgcld" id="vis_<?php echo $idElem; ?>"></div>
+									</td>
+							 	</tr>
+						<?php $j++; endforeach; ?>
+					</tbody>					 
+				</table>
+			</div>		 			 	 
+		</div>
+	  	<script class="sst" >
+	  	var sst = new selectsontexte({term:"<?php echo $this->term; ?>"
+				, data:<?php echo json_encode($r); ?>
+				, idDoc:"<?php echo $r['doc_id']; ?>"
+				, idExi:-1});
+	  	</script>
+		<hr/>
+	<?php endforeach; ?>
+	<script>
+		activeTag();
+	</script>
+  </body>
+</html>
+	

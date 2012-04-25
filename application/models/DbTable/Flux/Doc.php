@@ -251,6 +251,25 @@ class Model_DbTable_flux_doc extends Zend_Db_Table_Abstract
      * Recherche une entrée flux_doc avec la valeur spécifiée
      * et retourne cette entrée.
      *
+     * @param string $url
+     * @param int $idParent
+     * 
+     * @return Array
+     */
+    public function findByUrlByParent($url, $idParent)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_doc") )                           
+                    ->where( "f.tronc =".$idParent)
+                    ->where( "f.url LIKE '%$url%'");
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+    
+    /**
+     * Recherche une entrée flux_doc avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
      * @param int $poids
      */
     public function findByPoids($poids)

@@ -45,9 +45,9 @@
 					 		<tr>
 					 			<td colspan="2" > 
 							 		<div class="Select" id="Select_<?php echo $idElem; ?>" >Automatique 
+										<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span>
 								 		<input id='chk_<?php echo $idElem; ?>' type='checkbox' checked='checked' onclick='showSst("<?php echo $idElem; ?>")' >
 										<img id="Select_save_<?php echo $idElem; ?>" onclick='saveSst(<?php echo $r['doc_id'].",".$i; ?>)'  src="../img/AddRecord.png" title="Ajouter la sélection à votre compte" />
-										<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span>
 										<span class="status" id="status_<?php echo $idElem; ?>"></span>
 								 	</div>
 								</td>
@@ -70,16 +70,19 @@
 						 		<tr id="Select_exi_<?php echo $p['idDoc']; ?>">
 						 			<td colspan="2" > 
 								 		<div class="Select" id="Select_<?php echo $idElem; ?>" ><?php echo $oP->mailExi; ?> 
+											<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span>
 									 		<input id='chk_<?php echo $idElem; ?>' type='checkbox' checked='checked' onclick='showSst("<?php echo $idElem; ?>")' >
 											<?php
 										 		if($this->identite==$oP->mailExi){
 										 			echo '<img id="Select_del_'.$p['idDoc'].'" onclick="delSst('.$p['idDoc'].','.$r['doc_id'].',\''.$idElem.'\')"  src="../img/DeleteRecord.png" title="Supprimer la sélection" />
-										 			<img id="Select_upd_'.$p['idDoc'].'" onclick="updSst('.$r['doc_id'].','.($i+$j).','.$p['idDoc'].')"  src="../img/UpdateRecord.png" title="Modifier la sélection" />';
+										 			<img id="Select_upd_'.$p['idDoc'].'" onclick="updSst('.$r['doc_id'].','.($i+$j).','.$p['idDoc'].')"  src="../img/UpdateRecord.png" title="Modifier la sélection" />
+										 			<!--<img id="Select_tag_'.$p['idDoc'].'" onclick="ajoutTag(\''.$idElem.'\')"  src="../img/tag.png" title="Ajouter un tag" />-->
+										 			<img id="Select_tag+_'.$p['idDoc'].'" onclick="poidsTag(\''.$idElem.'\',1)"  src="../img/tag+.png" title="Augmente le poid d\'un tag" />
+										 			<img id="Select_tag-_'.$p['idDoc'].'" onclick="poidsTag(\''.$idElem.'\',-1)"  src="../img/tag-.png" title="Diminue le poids d\'un tag" />';
 										 		}else{
 										 			echo '<img id="Select_save_'.$idElem.'" onclick="saveSst('.$r['doc_id'].','.$i.')"  src="../img/AddRecord.png" title="Ajouter la sélection à votre compte" />';
 										 		}
 											?>
-											<span class="sonSelect" id="Select_son_<?php echo $idElem; ?>" ></span>
 											<span class="status" id="status_<?php echo $idElem; ?>" ></span>
 									 	</div>
 									</td>
@@ -100,7 +103,8 @@
 	  	<script class="sst" >
 	  	arrSst[<?php echo $r['doc_id']; ?>] = new selectsontexte({term:"<?php echo $this->term; ?>"
 				, data:<?php echo json_encode($r); ?>
-				, idDoc:"<?php echo $r['doc_id']; ?>"});
+				, idDoc:"<?php echo $r['doc_id']; ?>"
+				, idExi:"<?php echo $oP->idExi; ?>"});
 	  	</script>
 		<hr/>
 	<?php endforeach; ?>
