@@ -86,7 +86,7 @@ class Flux_Lucene extends Flux_Site{
 		foreach ($fields as $f) {
 	    	$c1 .= "_".$f;
 	    }
-	   	$result = $this->cache->load($c1);
+	   	$result = false;//$this->cache->load($c1);
         if($result){
         	return $result;
         }
@@ -125,47 +125,86 @@ class Flux_Lucene extends Flux_Site{
 	    	}else{
 		    	$html = $this->getUrlBodyContent($url);		    		
 	    	}
-	    	//on recherche les occurrences du mots dans le doc
-			$pattern = '/\b'.$term['text'].'\b/i';
-			$segs = preg_split($pattern, $html);
-		    //on calcule les phrases
-		    $pHTML=0;$phrases=array();
-		    for ($i = 0; $i < count($segs); $i++) {
-		    	//vérifie si on traite le premier élément
-				if($i==0){
-					//on récupère le début de la phrase
-					$deb = $this->cutStr($segs[$i],$this->nbCaract,"","dg");
-					if($find)$p = -1; else $p = $ps[$i];	
-					$pHTML += strlen($segs[$i]);
-					//on récupère la fin de la phrase
-					$fin = $this->cutStr($segs[$i+1],$this->nbCaract,"");
-				}else{
-					//on récupère le début de la phrase
-					$deb = $this->cutStr($segs[$i-1],$this->nbCaract,"","dg");
-					if($find)$p = -1; else $p = $ps[$i-1];
-					$pHTML += strlen($term['text'])+strlen($segs[$i-1]);
-					//on récupère la fin de la phrase
-					$fin = $this->cutStr($segs[$i],$this->nbCaract,"");
-				}
-				
-	    		$phrases[] = array("p"=>$p, "pHTML"=> $pHTML, "deb"=> $deb,"fin"=> $fin);
-	    		$i++;
-				
-		    }
-		    $r = "";
-		    foreach ($fields as $f) {
-		    	if($f=="url")
-			    	$r[$f]=urldecode($doc->getFieldValue($f));
-		    	else
-			    	$r[$f]=$doc->getFieldValue($f);
-		    }
-		    $r["taille"]=strlen($html);
-		    $r["phrases"]=$phrases;
-		    $result[] = $r;
-		    
+
+	    	//récupère les segments de phrase
+	    	$segs = $this->getSegments($html, $term['text']);
+
+			/**
+			 * TODO:
+			 * régler le problème de case sensitive qui fait que Lucène renvoit des valeurs et pas $this->getSegments
+			 */
+	    	if(count($segs)>1){
+	    	
+		    	//on calcule les phrases
+			    $pHTML=0;$phrases=array();
+			    for ($i = 0; $i < count($segs); $i++) {
+			    	//vérifie si on traite le premier élément
+					if($i==0){
+						//on récupère le début de la phrase
+						$deb = $this->cutStr($segs[$i],$this->nbCaract,"","dg");
+						//dans le cas d'un termPositions c'est lucène qui calcule la position
+						if($find)$p = -1; else $p = $ps[$i];
+						//on récupère la position manuelle 	
+						$pHTML += strlen($segs[$i]);
+						//on récupère le mot trouvé
+						$FinFind = strpos($segs[$i+1], "</find>");
+						$mot = substr($segs[$i+1], 0, $FinFind);
+						//on récupère la fin de la phrase
+						$fin = $this->cutStr(substr($segs[$i+1], $FinFind),$this->nbCaract,"");
+					}else{
+						//on récupère le début de la phrase
+						$deb = $this->cutStr($segs[$i-1],$this->nbCaract,"","dg");
+						if($find)$p = -1; else $p = $ps[$i-1];
+						//on récupère le mot trouvé
+						$FinFind = strpos($segs[$i], "</find>");
+						$mot = substr($segs[$i], 0, $FinFind);
+						//on calcule  la position manuelle
+						$pHTML += strlen($mot)+strlen($segs[$i-1]);
+						//on récupère la fin de la phrase
+						$fin = $this->cutStr(substr($segs[$i], $FinFind),$this->nbCaract,"");
+						//on supprime le find du segment
+						$segs[$i] = substr($segs[$i], $find);
+					}
+					
+		    		$phrases[] = array("p"=>$p, "pHTML"=> $pHTML, "deb"=> $deb,"fin"=> $fin,"mot"=> $mot);
+		    		$i++;
+					
+			    }
+			    $r = "";
+			    foreach ($fields as $f) {
+			    	if($f=="url")
+				    	$r[$f]=urldecode($doc->getFieldValue($f));
+			    	else
+				    	$r[$f]=$doc->getFieldValue($f);
+			    }
+			    $r["taille"]=strlen($html);
+			    $r["phrases"]=$phrases;
+			    $result[] = $r;
+	    	}		    
 		}
         $this->cache->save($result, $c1);			
 		
+		return $result;
+	}
+
+	function getSegments($html, $texte){
+		
+    	//vérification des requêtes complexes and
+    	$arrQ = split(" and ", $texte);
+    	
+    	//vérification des requêtes complexes or
+    	if(count($arrQ)==1) $arrQ = split(" or ", $texte);
+    	
+    	$result = array();
+    	
+		//tag les mots de la requête
+    	for ($i = 0; $i < count($arrQ); $i++) {
+    		$html = preg_replace("[(".$arrQ[$i].")]", '<find>$1</find>', $html);    		
+    	}
+    	//création du tableau des résultats
+    	$pattern = "[<find>]";
+    	$result = preg_split($pattern, $html);
+    	
 		return $result;
 	}
 	

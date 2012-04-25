@@ -218,5 +218,54 @@ class Flux_Deleuze extends Flux_Site{
     	$this->dbD->edit($data['idDocPosi'], array("note"=>$note));
     	    	    	
     }
+
+    /**
+     * getFragment
+     *
+     * Récupère un fragment avec son identifiant
+     * 
+     * @param int $id
+     * 
+     * @return array
+     */
+    function getFragment($id) {
+
+	    $c = str_replace("::", "_", __METHOD__).md5($id); 
+	   	$posis = false;//$this->cache->load($c);
+        if(!$posis){
+        	
+	    	$dbD = new Model_DbTable_flux_doc($this->db);
+	    	$audio = new Flux_Audio();
+	    	
+	    	//récupère le document et son contenu
+			$doc = $dbD->findBydoc_id($id);
+			$doc = $doc[0];
+
+	    	//récupère le document PARENT et son contenu
+			$docP = $dbD->findBydoc_id($doc["tronc"]);
+			$docP = $docP[0];
+			
+			//récupère le mp3 associé
+			$docMp3 = $dbD->findByUrlByParent(".mp3", $doc["tronc"]);
+			$docMp3 = $docMp3[0];
+			
+			$posis[0]['titre'] = "fragment de ".$docP["titre"];
+			$posis[0]['phrases'] = "";
+			$posis[0]['doc_id'] = $doc["tronc"];
+			$posis[0]['url'] = $docP["url"];
+			$posis[0]['exi'] = "lien";
+			$posis[0]['urlSon'] = $docMp3["url"];
+			$pathLocal = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", ROOT_PATH."/data/deleuze/", $docMp3["url"]);
+			$posis[0]['mp3Infos'] = $audio->getMp3Infos($pathLocal);	    
+			$posis[0]['urlSonLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", WEB_ROOT."/data/deleuze/", $docMp3["url"]);
+			$posis[0]['text'] = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $docMp3["note"]));									
+
+			$posis[0]['posis'][] = array("idDoc"=>$doc['doc_id'], "note"=>$doc['note'], "tags"=>-1);
+        	
+        	$this->cache->save($posis, $c);			
+        }
+	    
+    	return $posis;
+    }    
     
 }
