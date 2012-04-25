@@ -135,6 +135,8 @@ class Flux_Lucene extends Flux_Site{
 			 */
 	    	if(count($segs)>1){
 	    	
+	    		$phrases = $this->getPhrases($segs);
+	    		/*
 		    	//on calcule les phrases
 			    $pHTML=0;$phrases=array();
 			    for ($i = 0; $i < count($segs); $i++) {
@@ -170,6 +172,7 @@ class Flux_Lucene extends Flux_Site{
 		    		$i++;
 					
 			    }
+			    */
 			    $r = "";
 			    foreach ($fields as $f) {
 			    	if($f=="url")
@@ -187,6 +190,47 @@ class Flux_Lucene extends Flux_Site{
 		return $result;
 	}
 
+	function getPhrases($segs){
+		
+	    	//on calcule les phrases
+		    $pHTML=0;$phrases=array();
+		    for ($i = 0; $i < count($segs); $i++) {
+		    	//vérifie si on traite le premier élément
+				if($i==0){
+					//on récupère le début de la phrase
+					$deb = $this->cutStr($segs[$i],$this->nbCaract,"","dg");
+					//dans le cas d'un termPositions c'est lucène qui calcule la position
+					if($find)$p = -1; else $p = $ps[$i];
+					//on récupère la position manuelle 	
+					$pHTML += strlen($segs[$i]);
+					//on récupère le mot trouvé
+					$FinFind = strpos($segs[$i+1], "</find>");
+					$mot = substr($segs[$i+1], 0, $FinFind);
+					//on récupère la fin de la phrase
+					$fin = $this->cutStr(substr($segs[$i+1], $FinFind),$this->nbCaract,"");
+				}else{
+					//on récupère le début de la phrase
+					$deb = $this->cutStr($segs[$i-1],$this->nbCaract,"","dg");
+					if($find)$p = -1; else $p = $ps[$i-1];
+					//on récupère le mot trouvé
+					$FinFind = strpos($segs[$i], "</find>");
+					$mot = substr($segs[$i], 0, $FinFind);
+					//on calcule  la position manuelle
+					$pHTML += strlen($mot)+strlen($segs[$i-1]);
+					//on récupère la fin de la phrase
+					$fin = $this->cutStr(substr($segs[$i], $FinFind),$this->nbCaract,"");
+					//on supprime le find du segment
+					$segs[$i] = substr($segs[$i], $find);
+				}
+				
+	    		$phrases[] = array("p"=>$p, "pHTML"=> $pHTML, "deb"=> $deb,"fin"=> $fin,"mot"=> $mot);
+	    		$i++;
+				
+		    }
+		return $phrases;
+	}
+	
+	
 	function getSegments($html, $texte){
 		
     	//vérification des requêtes complexes and
