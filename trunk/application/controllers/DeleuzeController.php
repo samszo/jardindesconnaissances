@@ -83,6 +83,33 @@ class DeleuzeController extends Zend_Controller_Action {
 	}	
 
 	/**
+	 * affichage un fragment
+	 */
+	public function fragmentAction() {
+		
+		$auth = Zend_Auth::getInstance();
+		if ($auth->hasIdentity()) {
+		    // l'identité existe ; on la récupère
+		    $this->view->identite = $auth->getIdentity();
+		    $ssUti = new Zend_Session_Namespace('uti');
+		    $this->view->idUti = $ssUti->idUti;
+		}else{
+		    $this->view->identite = "aucun";
+		    $this->view->idUti = -1;
+		}
+				
+	    $this->view->resultats = "";
+    	if($this->_getParam('id', 0)){
+			$oD = new Flux_Deleuze($this->dbNom);
+    		$arrPosis = $oD->getFragment($this->_getParam('id', 0));
+			$this->view->resultats = $arrPosis;
+			$this->view->term = $this->_getParam('term', 0);
+    	}
+	    
+	}	
+	
+	
+	/**
 	 * affichage les outils de navigation dans les cours
 	 */
 	public function navigationAction() {
@@ -99,7 +126,7 @@ class DeleuzeController extends Zend_Controller_Action {
 		
 		//récupère les utilisateurs avec des mots clefs
 		$dbUTD = new Model_DbTable_Flux_UtiTagDoc();
-		$this->view->cribles = $dbUTD->GetUtisNbTagNbDoc();
+		$this->view->cribles = $dbUTD->GetUtisNbTagNbDoc("u.role = 'crible'");
 		
 	}	
 	

@@ -62,6 +62,13 @@ class GraphController extends Zend_Controller_Action {
 		//$this->view->urlStats = "../stat/tagassos?idBase=".$idBase."&tags[]=intelligence&tags[]=collective";	    
 		$this->view->urlStats = "../stat/tagassos?idBase=".$idBase."&tags[]=rapport";	    
     }	
+
+    public function arbreAction()
+    {
+	    $request = $this->getRequest();
+		$url = $request->getRequestUri();
+		$arrUrl = explode("?",$url);		
+    }	
     
     public function sunburstAction()
     {
