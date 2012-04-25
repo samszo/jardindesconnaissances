@@ -81,6 +81,7 @@
 					 function(data){
 						cursor_clear();
 						updTc(data, arr, idDoc);
+						cursor_clear();
 					 }, "json");
 		}
 		function ajoutTag(idDoc){
@@ -191,8 +192,8 @@
 					var d = event.target;
 					console.log(d.id+" "+d.innerText+" "+d.getAttribute('v'));
 					saveTag(d.innerText, d.getAttribute('v'), d.id);
-					cursor_clear();
-				});			
+				});	
+			cursor_clear();
 		}
 		
 		function chgcrible(c) {
@@ -210,6 +211,16 @@
 			}	 
 		}
 
+		function find() {
+			var q = document.getElementById("rqt").value;
+			if (q != ""){
+				chargeTag(q);
+			}else{
+				alert("Veuillez saisir une expression !");
+				
+			}	 
+		}
+		
 		function chargeTag(tag){
 			cursor_wait();
 			d3.select('#gPosi').html("");
