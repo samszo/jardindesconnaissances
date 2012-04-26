@@ -79,50 +79,59 @@ class Flux_Deleuze extends Flux_Site{
      * Récupère les positions d'un term dans les document texte et mp3
      * 
      * @param string $term
+     * @param boolean $json
      * 
      * @return array
      */
-    function getTermPositions($term) {
+    function getTermPositions($term, $json=false) {
 
-	    $c = str_replace("::", "_", __METHOD__).md5($term); 
-	   	$posis = false;//$this->cache->load($c);
-        if(!$posis){
-        	
-	    	$lu = new Flux_Lucene();
-			$lu->db = $this->db;
-	    	$dbD = new Model_DbTable_flux_doc($this->db);
-			if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
-	    	$audio = new Flux_Audio();
-	    	
-			//récupère les positions du term dans les documents
-			$posis = $lu->getTermPositions(array('field'=>'cours', 'text'=>$term),array("titre", "url", "mp3", "doc_id"),true);
-	    	
-			//ajoute les informations du mp3
-			for ($i = 0; $i < count($posis); $i++) {
-	    		//récupère le document et son contenu
-				$arr = $dbD->findByTronc($posis[$i]['doc_id']);
-				foreach ($arr as $doc){
-					//vérifie si on traite le mp3
-					if(substr($doc['url'],-3)=="mp3"){
-						$posis[$i]['exi'] = "lucene";
-						$posis[$i]['urlSon'] = $doc["url"];
-						$pathLocal = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", ROOT_PATH."/data/deleuze/", $doc["url"]);
-						$posis[$i]['mp3Infos'] = $audio->getMp3Infos($pathLocal);	    
-						$posis[$i]['urlSonLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", WEB_ROOT."/data/deleuze/", $doc["url"]);;
-						$posis[$i]['text'] = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $doc["note"]));									
-					}
-					//vérifie si on traite une position
-					if(substr($doc['note'], 0, 33)=='{"controller":"deleuze","action":'){
-						$tags = $this->dbUTD->GetUtiTagDoc($this->user, $doc['doc_id']);
-						$posis[$i]['posis'][] = array("idDoc"=>$doc['doc_id'], "note"=>$doc['note'], "tags"=>$tags);
+		try {
+	    	$c = str_replace("::", "_", __METHOD__).md5($term); 
+		   	$posis = $this->cache->load($c);
+	        if(!$posis){
+	        	
+	        	$lu = new Flux_Lucene();
+				$lu->db = $this->db;
+
+				$dbD = new Model_DbTable_Flux_Doc($this->db);
+
+				if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+				$audio = new Flux_Audio();
+				
+				//récupère les positions du term dans les documents
+				$posis = $lu->getTermPositions(array('field'=>'cours', 'text'=>$term),array("titre", "url", "mp3", "doc_id"),true);
+	
+				//ajoute les informations du mp3
+				for ($i = 0; $i < count($posis); $i++) {
+		    		//récupère le document et son contenu
+					$arr = $dbD->findByTronc($posis[$i]['doc_id']);
+					foreach ($arr as $doc){
+						//vérifie si on traite le mp3
+						if(substr($doc['url'],-3)=="mp3" && !$json){
+							$posis[$i]['urlSon'] = $doc["url"];
+							$posis[$i]['exi'] = "lucene";
+							$pathLocal = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", ROOT_PATH."/data/deleuze/", $doc["url"]);
+							$posis[$i]['mp3Infos'] = $audio->getMp3Infos($pathLocal);	    
+							$posis[$i]['urlSonLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", WEB_ROOT."/data/deleuze/", $doc["url"]);;
+							$posis[$i]['text'] = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $doc["note"]));
+						}
+						//vérifie si on traite une position
+						if(substr($doc['note'], 0, 33)=='{"controller":"deleuze","action":' && !$json){
+							$tags = $this->dbUTD->GetUtiTagDoc($this->user, $doc['doc_id']);
+							$posis[$i]['posis'][] = array("idDoc"=>$doc['doc_id'], "note"=>$doc['note'], "tags"=>$tags);
+						}
 					}
 				}
-			}
-        	
-        	$this->cache->save($posis, $c);			
-        }
-	    
-    	return $posis;
+
+				$this->cache->save($posis, $c);			
+
+	        }
+		    
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+		return $posis;
     }
 
 

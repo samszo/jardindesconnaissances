@@ -33,7 +33,7 @@ class Flux_Site{
         $frontendOptions = array(
             'lifetime' => 3000000000000000000000000000, // temps de vie du cache en seconde
             'automatic_serialization' => true,
-        	'caching' => true //active ou desactive le cache
+        	'caching' => false //active ou desactive le cache
         );  
         $backendOptions = array(
             // Répertoire où stocker les fichiers de cache
