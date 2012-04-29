@@ -106,7 +106,7 @@ function tagcloud(config) {
 		    	  	.style("fill", function(d) {
 		    	  		if(self.exi && inUtiWords(d.text))
 		    	  			return "steelblue"; 
-		    	  		else if(self.term.indexOf(d.text)>0)
+		    	  		if(self.term && self.term.indexOf(d.text)>0)
 		    	  			return "blue";
 		    	  		else
 		    	  			return "black";
@@ -123,6 +123,8 @@ function tagcloud(config) {
 							saveTag(d.text, self.poidsTag, "tag_"+self.idDoc);
 		        		} 
 		        		if(self.global){
+		        			vis.selectAll("text").style("fill","black");
+		        			d3.select(this).style("fill","blue");
 		        			chargeTag(d.text);	
 		        		}
 		        	})
