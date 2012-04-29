@@ -68,7 +68,6 @@ class DeleuzeController extends Zend_Controller_Action {
 		}else{
 		    $this->_redirect('/auth/login');
 		}
-				
 	    $this->view->resultats = "";
     	if($this->_getParam('term', 0)){
 			$oD = new Flux_Deleuze($this->dbNom);
@@ -78,36 +77,72 @@ class DeleuzeController extends Zend_Controller_Action {
 			$this->view->term = $this->_getParam('term', 0);
     	}
 	    $this->view->ajax = false;
-    	if($this->_getParam('ajax', 0))$this->view->ajax = true;
-	    
+    	if($this->_getParam('ajax', 0))$this->view->ajax = true;    	
 	}	
 
 	/**
-	 * affichage un fragment
+	 * affichage d'un fragment
 	 */
 	public function fragmentAction() {
 		
-		$auth = Zend_Auth::getInstance();
-		if ($auth->hasIdentity()) {
-		    // l'identité existe ; on la récupère
-		    $this->view->identite = $auth->getIdentity();
-		    $ssUti = new Zend_Session_Namespace('uti');
-		    $this->view->idUti = $ssUti->idUti;
-		}else{
-		    $this->view->identite = "aucun";
-		    $this->view->idUti = -1;
+		try {
+			$auth = Zend_Auth::getInstance();
+			if ($auth->hasIdentity()) {
+			    // l'identité existe ; on la récupère
+			    $this->view->identite = $auth->getIdentity();
+			    $ssUti = new Zend_Session_Namespace('uti');
+			    $this->view->idUti = $ssUti->idUti;
+			}else{
+			    $this->view->identite = "aucun";
+			    $this->view->idUti = -1;
+			}
+					
+		    $this->view->resultats = "";
+	    	if($this->_getParam('id', 0)){
+				$oD = new Flux_Deleuze($this->dbNom);
+	    		$arrPosis = $oD->getFragment($this->_getParam('id', 0));
+				$this->view->resultats = $arrPosis;
+				$this->view->term = $this->_getParam('term', 0);
+	    	}
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
 		}
-				
-	    $this->view->resultats = "";
-    	if($this->_getParam('id', 0)){
-			$oD = new Flux_Deleuze($this->dbNom);
-    		$arrPosis = $oD->getFragment($this->_getParam('id', 0));
-			$this->view->resultats = $arrPosis;
-			$this->view->term = $this->_getParam('term', 0);
-    	}
-	    
-	}	
-	
+	    	
+	}		
+
+	/**
+	 * affichage les fragments en json
+	 */
+	public function fragmentsAction() {
+		
+		try {
+			$auth = Zend_Auth::getInstance();
+			if ($auth->hasIdentity()) {
+			    // l'identité existe ; on la récupère
+			    $this->view->identite = $auth->getIdentity();
+			    $ssUti = new Zend_Session_Namespace('uti');
+			    $this->view->idUti = $ssUti->idUti;
+			}else{
+			    $this->view->identite = "aucun";
+			    $this->view->idUti = -1;
+			}
+					
+		    $this->view->resultats = "";
+	    	if($this->_getParam('term', 0)){
+				$oD = new Flux_Deleuze($this->dbNom);
+				$oD->user = $ssUti->idUti;
+				$arrPosis = $oD->getTermPositions($this->_getParam('term', 0),true);
+				$this->view->resultats = $arrPosis;
+				$this->view->term = $this->_getParam('term', 0);
+				$this->view->getJson = $this->_getParam('json', 0);
+	    	}
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+    	
+	}		
 	
 	/**
 	 * affichage les outils de navigation dans les cours
