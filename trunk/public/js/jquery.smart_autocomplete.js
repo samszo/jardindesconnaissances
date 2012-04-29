@@ -507,7 +507,7 @@
       $(this).bind({
         keyIn: function(ev, query){ ev.smartAutocompleteData  = {'query': query }; },
         resultsReady: function(ev, results){ ev.smartAutocompleteData  = {'results': results }; }, 
-        showResults: function(ev, results){ ev.smartAutocompleteData = {'results': results } },
+        showResults: function(ev, results){ ev.smartAutocompleteData = {'results': results }; },
         noResults: function(){},
         lostFocus: function(){},
         //ajout samszo pour les sélections multiples

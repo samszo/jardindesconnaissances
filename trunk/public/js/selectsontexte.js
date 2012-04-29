@@ -241,19 +241,18 @@ function selectsontexte(config) {
     
   this.playSonSelect = function(arrExt, id, sst) {
 	  	//calcule l'intervale en seconde
-	  	sst.nbSecDeb = arrExt[0] / 1000;
-	  	sst.nbSecFin = arrExt[1] / 1000;
 	  	var d0 = new Date(arrExt[0]);
 	  	var d1 = new Date(arrExt[1]);
+	  	sst.nbSecDeb = (d0.getMinutes()*60) + d0.getSeconds();//arrExt[0] / 1000;
+	  	sst.nbSecFin = (d1.getMinutes()*60) + d1.getSeconds();//arrExt[1] / 1000;
 	  	var queryTime = sst.formatDate(d0)+" - "+sst.formatDate(d1);//+" = "+nbSecDeb+" - "+nbSecFin;
 	  	//console.log(queryTime);
 
 	  	// "funzo" is an instance method!
-	  	sst.audioW.funzo({
+	  	if(sst.audioW.readyState() > 0) sst.audioW.funzo({
 		      start: sst.nbSecDeb,
 		      end: sst.nbSecFin
-		  });	  
-	  	if(sst.audioW.readyState() > 0) sst.audioW.play(sst.nbSecDeb);
+		  }).play(sst.nbSecDeb);
 	  	
 		document.getElementById("Select_"+id).innerHTML = queryTime;
 		var arrId = id.split("_");
