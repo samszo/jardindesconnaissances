@@ -15,6 +15,67 @@ class Flux_Deleuze extends Flux_Site{
     	parent::__construct($idBase);
     }
 	
+    
+    
+    /**
+     * getLocalMp3
+     *
+     * Récupère les mp3 pour un usage local
+     * 
+     *       
+     */
+    function getLocalMp3() {
+
+    	//le temps d'exécution est illimité
+    	set_time_limit(0);
+    	//pour tracer le temps que ça prend
+    	$startTime = microtime(true);   
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		
+    	//récupère le texte des documents
+    	$upload_folder = "/data/deleuze/";
+		$arr = $this->dbD->findByType(14);
+		$i=0;
+		foreach ($arr as $doc){
+			//pour tester sur un doc
+			if($i==8){
+				try {
+			    	echo "<a href='".$doc['url']."'>".$doc['url']."</a> -> ".ROOT_PATH.$upload_folder.$doc['doc_id'].".mp3<br/>";     
+					//zend marche en local mais pas sur le serveur
+					/*				
+					$client = new Zend_Http_Client($doc['url']);
+					$client->setStream(ROOT_PATH.$upload_folder.$doc['doc_id'].".mp3"); 
+				    $response = $client->request();
+				    copy($response->getStreamName(),ROOT_PATH.$upload_folder.$doc['doc_id'].".mp3");
+				    */
+					//CURL marche sur les deux
+					//merci à http://www.webdigity.com/index.php?action=tutorial;code=45
+					$fp = fopen (ROOT_PATH.$upload_folder.$doc['doc_id'].".mp3", 'w+');//This is the file where we save the information
+					$ch = curl_init($doc['url']);//Here is the file we are downloading
+					curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+					curl_setopt($ch, CURLOPT_FILE, $fp);
+					curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+					curl_exec($ch);
+					curl_close($ch);
+					fclose($fp);				    
+				    
+			    	echo "OK transfert ";     
+				}catch (Zend_Exception $e) {
+					echo "Récupère exception: " . get_class($e) . "\n";
+				    echo "Message: " . $e->getMessage() . "\n";
+				}
+			}
+			$i++;
+			$endTime = microtime(true);  
+			$elapsed = $endTime - $startTime;  
+	    	echo ": $elapsed secondes ";     
+			echo "<a href='../".$upload_folder.$doc['doc_id'].".mp3'>".$upload_folder.$doc['doc_id']."</a><br/>";     
+		}    	
+    	
+    	
+    	
+    }
+    
     /**
      * addInfoDocLucene
      *
@@ -96,7 +157,7 @@ class Flux_Deleuze extends Flux_Site{
 				$dbD = new Model_DbTable_Flux_Doc($this->db);
 
 				if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
-				$audio = new Flux_Audio();
+				if(!$this->audio)$this->audio = new Flux_Audio();
 				
 				//récupère les positions du term dans les documents
 				$posis = $lu->getTermPositions(array('field'=>'cours', 'text'=>$term),array("titre", "url", "mp3", "doc_id"),true);
@@ -108,12 +169,8 @@ class Flux_Deleuze extends Flux_Site{
 					foreach ($arr as $doc){
 						//vérifie si on traite le mp3
 						if(substr($doc['url'],-3)=="mp3" && !$json){
-							$posis[$i]['urlSon'] = $doc["url"];
+							$posis[$i] = $this->getInfosMp3($posis[$i], $doc);
 							$posis[$i]['exi'] = "lucene";
-							$pathLocal = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", ROOT_PATH."/data/deleuze/", $doc["url"]);
-							$posis[$i]['mp3Infos'] = $audio->getMp3Infos($pathLocal);	    
-							$posis[$i]['urlSonLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", WEB_ROOT."/data/deleuze/", $doc["url"]);;
-							$posis[$i]['text'] = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $doc["note"]));
 						}
 						//vérifie si on traite une position
 						if(substr($doc['note'], 0, 33)=='{"controller":"deleuze","action":' && !$json){
@@ -134,6 +191,32 @@ class Flux_Deleuze extends Flux_Site{
 		return $posis;
     }
 
+    /**
+     * getInfosMp3
+     *
+     * récupère les information du Mp3
+     * 
+     * @param array $posi
+     * @param array $doc
+     * 
+     * @return array
+     */
+    function getInfosMp3($posi, $doc){
+    	
+    	if(!$this->audio)$this->audio = new Flux_Audio();
+    	
+		$posi['urlSon'] = $doc["url"];
+		$posi['text'] = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $doc["note"]));
+		//met au format local l'url distante
+		$pos = strrpos($doc["url"], "/");
+		$urlSon = substr($doc["url"], 0, $pos+1).$doc["doc_id"].".mp3"; 
+		$pathLocal = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", ROOT_PATH."/data/deleuze/", $urlSon);
+		$posi['urlSonLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", WEB_ROOT."/data/deleuze/", $urlSon);
+		//récupère les infos du mp3
+		$posi['mp3Infos'] = $this->audio->getMp3Infos($pathLocal);	    
+
+		return $posi;
+    }
 
     /**
      * saveAutoKeyword
@@ -258,16 +341,11 @@ class Flux_Deleuze extends Flux_Site{
 			$docMp3 = $dbD->findByUrlByParent(".mp3", $doc["tronc"]);
 			$docMp3 = $docMp3[0];
 			
+			$posis[0] = $this->getInfosMp3($posis[0], $docMp3);
 			$posis[0]['titre'] = "fragment de ".$docP["titre"];
 			$posis[0]['phrases'] = "";
 			$posis[0]['doc_id'] = $doc["tronc"];
-			$posis[0]['url'] = $docP["url"];
 			$posis[0]['exi'] = "lien";
-			$posis[0]['urlSon'] = $docMp3["url"];
-			$pathLocal = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", ROOT_PATH."/data/deleuze/", $docMp3["url"]);
-			$posis[0]['mp3Infos'] = $audio->getMp3Infos($pathLocal);	    
-			$posis[0]['urlSonLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", WEB_ROOT."/data/deleuze/", $docMp3["url"]);
-			$posis[0]['text'] = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $docMp3["note"]));									
 
 			$posis[0]['posis'][] = array("idDoc"=>$doc['doc_id'], "note"=>$doc['note'], "tags"=>-1);
         	

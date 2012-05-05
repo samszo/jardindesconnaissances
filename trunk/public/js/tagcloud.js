@@ -134,7 +134,8 @@ function tagcloud(config) {
 		        			if(self.poidsTag<1)c="yellow"; else c="red";
 		        			d3.select(this).style("fill", c);
 		        		}
-		        		if(self.global) return tooltip.style("visibility", "visible");		        		
+		        		if(self.global) 
+		        			return tooltip.style("visibility", "visible");		        		
 		        		})
 		        	.on("mouseout", function(d, i) { 
 		        		if(self.exi) d3.select(this).style("fill", "black");

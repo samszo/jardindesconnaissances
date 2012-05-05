@@ -2,14 +2,23 @@
 require_once( "../application/configs/config.php" );
 
 try {
-	
 	$application->bootstrap();
+	//$response = "OK bootstrap<br/><br/>";
+	$oD = new Flux_Deleuze();
+	$oD->user = 2;
+	//$arr = $oD->getTermPositions("intuition");
 	
+	/*
+	$oD->getLocalMp3();
+
 	$user = "luckysemiosis";
 	$pwd = "samszo";
+	
+	
+    $diigo = new Flux_Diigo($user,$pwd,"fluxDiigo");
+	*/
 
-    //$diigo = new Flux_Diigo($user,$pwd,"fluxDiigo");
-    //$diigo->saveAll();
+	//$diigo->saveAll();
     //$diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
     //$diigo->getGroupeRss("bulles");
 	//$diigo->getRequest(array("user"=>$user,"count"=>100));
@@ -31,25 +40,24 @@ try {
 		
 	//pour gérer les index Lucene
 	$lu = new Flux_Lucene();
-	//$lu->index->optimize();
-	$terms = $lu->index->terms();
-	$hits = $lu->find("body:intelligence collective");
-	$lu->getDb("fluxDiigo");
-	$lu->addDocsInfos();
+	$lu->index->optimize();
 	/*
-	$lu->getTermPositions(array('field'=>'body', 'text'=>'Justine'));
-    $lu->getUser(array("login"=>"Flux_Lucene"));
-	$lu->saveDocsTerms();
-	 */
+	$lu->getDb("flux_diigo");
+	$lu->getUser(array("login"=>"Flux_Lucene"));
+	//$hits = $lu->find("intelligence collective");
+	//$result = $lu->getTermPositions(array('field'=>'body', 'text'=>'intelligence'));
+	$Terms[] = new Zend_Search_Lucene_Index_Term(strtolower('intelligence'), 'body');
+	$Terms[] = new Zend_Search_Lucene_Index_Term(strtolower('collective'), 'body');
+	$lu->saveDocsTerms($Terms);
 	
-	/*
-	$lu->addBddDocs();
-	$hits = $lu->find("spinoza");
-	$arr="";
+	//$lu->addDocsInfos();
+	//$result = $lu->getTermPositions(array('field'=>'body', 'text'=>'intelligence'));
 	foreach ($hits as $hit) {
-	    $arr[] = array("score"=>$hit->score,"title"=>$hit->title,"titre"=>$hit->titre,"url"=>$hit->url,"mp3"=>$hit->mp3);
+	    $arr[] = array("score"=>$hit->score,"title"=>$hit->title,"url"=>$hit->url);
 	}
-	print_r($arr);
+
+	$terms = $lu->index->terms();	
+	$lu->getTermPositions(array('field'=>'body', 'text'=>'Justine'));
 	*/
 	
 	/* pour importer les classeurs google doc
@@ -86,6 +94,7 @@ try {
 	$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	*/
 	
+	/*
 	
 	$server = new Zend_Amf_Server();
 
@@ -94,7 +103,7 @@ try {
 	ZendAmfServiceBrowser::$ZEND_AMF_SERVER = $server;
 	
 	$server->setClass('Flux_delicious');
-	
+	*/
 	//$response = $server->handle();
 
 }catch (Zend_Exception $e) {
