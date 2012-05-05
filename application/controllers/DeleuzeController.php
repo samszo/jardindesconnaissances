@@ -149,6 +149,8 @@ class DeleuzeController extends Zend_Controller_Action {
 	 */
 	public function navigationAction() {
 		
+		$this->view->title = "Navigation dans les cours de Deleuze";
+		
 		$auth = Zend_Auth::getInstance();
 		if ($auth->hasIdentity()) {
 		    // l'identité existe ; on la récupère

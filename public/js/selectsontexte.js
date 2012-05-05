@@ -181,9 +181,9 @@ function selectsontexte(config) {
 	  	txtAuto.innerHTML = txt;	
 	  }
 	  
-	  function getMotByTerm(term){
+	  function getMotByTerm(txt){
 		  //calcule le mot par rapport à un term
-		  var posi = self.allTexte.indexOf(term);
+		  var posi = self.allTexte.indexOf(txt);
 		  return self.getMotByCar(posi);
 	  }
 	  

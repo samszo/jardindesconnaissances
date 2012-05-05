@@ -310,6 +310,21 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     }
     
     /**
+     * Recherche une entrée flux_doc avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param int $type
+     */
+    public function findByType($type)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_doc") )                           
+                    ->where( "f.type = ?", $type);
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+    
+    /**
      * Recherche des entrée avec une liste de paramètres
      *
      * @param array $params

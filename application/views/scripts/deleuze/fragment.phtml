@@ -69,6 +69,39 @@
 	<?php endforeach; ?>
 	<script>
 		activeTag();
+		// create our popcorn instance
+		var popcorn = sst.audioW.funzo({
+			      start: sst.nbSecDeb,
+			      end: sst.nbSecFin
+			  });
+
+		var states = function() {
+		    
+		    // store the readyState
+		    var rdy = popcorn.readyState();
+		    
+		    if ( rdy === 0 ) {
+		        console.log( "No data at all, readyState is " + rdy );
+		    } else if ( rdy === 1 ) {
+		        console.log( "We have metadata, duration is " + popcorn.duration() +
+		                     ", readyState is " + rdy );
+		    } else if ( rdy === 2 ) {
+		        console.log( "can play current location in video, readyState is " + rdy );
+		    } else if ( rdy === 3 ) {
+		        console.log( "can play current location in video and a bit more, readyState is " + rdy );
+		    }
+		    if ( rdy === 4 ) {
+		        console.log( "can play whole video at current buffer rate, readyState is " + rdy );
+			  	sst.audioW.funzo({
+				      start: sst.nbSecDeb,
+				      end: sst.nbSecFin
+				  }).play(sst.nbSecDeb);
+		    } else {
+		        setTimeout( states, 10 );
+		    }
+		}
+		    
+		states();		
 	</script>
   </body>
 </html>

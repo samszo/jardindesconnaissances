@@ -78,7 +78,8 @@
 										 			<img id="Select_upd_'.$p['idDoc'].'" onclick="updSst('.$r['doc_id'].','.($i+$j).','.$p['idDoc'].')"  src="../img/UpdateRecord.png" title="Modifier la sélection" />
 										 			<!--<img id="Select_tag_'.$p['idDoc'].'" onclick="ajoutTag(\''.$idElem.'\')"  src="../img/tag.png" title="Ajouter un tag" />-->
 										 			<img id="Select_tag+_'.$p['idDoc'].'" onclick="poidsTag(\''.$idElem.'\',1)"  src="../img/tag+.png" title="Augmente le poid d\'un tag" />
-										 			<img id="Select_tag-_'.$p['idDoc'].'" onclick="poidsTag(\''.$idElem.'\',-1)"  src="../img/tag-.png" title="Diminue le poids d\'un tag" />';
+										 			<img id="Select_tag-_'.$p['idDoc'].'" onclick="poidsTag(\''.$idElem.'\',-1)"  src="../img/tag-.png" title="Diminue le poids d\'un tag" />
+										 			<a href= "../deleuze/fragment?id='.$p['idDoc'].'"><img id="Select_lien_'.$p['idDoc'].'" src="../img/lien.png" title="Ouvre un lien direct vers le fragment" /></a>';
 										 		}else{
 										 			echo '<img id="Select_save_'.$idElem.'" onclick="saveSst('.$r['doc_id'].','.$i.')"  src="../img/AddRecord.png" title="Ajouter la sélection à votre compte" />';
 										 		}
