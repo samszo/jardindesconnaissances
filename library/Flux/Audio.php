@@ -20,6 +20,9 @@ class Flux_Audio extends Flux_Site{
   // the lower the number means longer processing time
   var $DETAIL = 800;
   
+  var $ffmpeg;
+  var $encodage = " -aq 0 -ab 8k -ar 8000 -acodec libvorbis ";
+  
 	/**
 	* constructeur de la classe
 	* 
@@ -29,8 +32,9 @@ class Flux_Audio extends Flux_Site{
 	* return Flux_Audio
 	* 
 	*/
-	public function __construct($idBase=false)
+	public function __construct($idBase=false, $ffmpeg=false)
     {
+    	$this->ffmpeg = $ffmpeg;
     	parent::__construct($idBase);
     }
 
@@ -249,6 +253,36 @@ class Flux_Audio extends Flux_Site{
 
         return $return;
 
-    } 	
-	
+    } 
+
+    function convertMp3ToOgg($src, $dst){
+    	
+    	/*merci à 
+    	 * http://www.jcartier.net/spip.php?article36
+    	 * http://doc.ubuntu-fr.org/ffmpeg
+    	 * 
+    	 */
+    	
+		$cmd = $this->ffmpeg." -i ".$src." -aq 0 -ab 8k -ar 8000 -acodec libvorbis ".$dst;		
+		exec($cmd, $arr, $op);
+
+		return $arr;
+    }
+
+    function coupe($src, $dst, $deb, $dur){
+    	
+    	/*merci à 
+    	 * http://doc.ubuntu-fr.org/ffmpeg
+    	 * 
+    	 * pour écraser
+    	 * http://www.ffmpeg.org/ffmpeg.html#toc-Main-options
+    	 * 
+    	 */
+    	
+		$cmd = $this->ffmpeg." -ss ".$deb." -t ".$dur." -i ".$src." ".$dst."";		
+		exec($cmd, $arr, $op);
+
+		return $arr;
+    }
+    
 }
