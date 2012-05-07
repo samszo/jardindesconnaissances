@@ -12,6 +12,8 @@ define ("SEP_PATH","/");
 //code de sécurité pour l'administation
 define ("CODE_ADMIN","simple");
 
+//chemin de la librairie ffmpeg
+define ("FFMEPG","C:\\ffmpeg\\bin\\ffmpeg.exe ");
 
 // Define path to application directory
 defined('APPLICATION_PATH')
