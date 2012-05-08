@@ -70,12 +70,49 @@ class Flux_Deleuze extends Flux_Site{
 			$elapsed = $endTime - $startTime;  
 	    	echo ": $elapsed secondes ";     
 			echo "<a href='../".$upload_folder.$doc['doc_id'].".mp3'>".$upload_folder.$doc['doc_id']."</a><br/>";     
-		}    	
-    	
-    	
-    	
+		}    	    	
     }
-    
+
+    /**
+     * getLocalMp3
+     *
+     * Converti les mp3 en ogg
+     * 
+     *       
+     */
+    function convertMp3ToOgg() {
+
+    	//le temps d'exécution est illimité
+    	set_time_limit(0);
+    	//pour tracer le temps que ça prend
+    	$startTime = microtime(true);   
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+    	if(!$this->audio)$this->audio = new Flux_Audio();
+		    	
+    	//récupère le texte des documents
+		$arr = $this->dbD->findByType(14);
+		$i=0; 
+		foreach ($arr as $doc){
+			$infos = $this->getInfosSon($infos, $doc);
+			//on ne converti que les mp3 qui n'ont pas de ogg
+			if($i>=0 && !$infos['oggInfos']){
+				try {
+					$this->audio->convertMp3ToOgg($infos["urlPathLocal"], $infos["urlPathLocalOgg"]);
+			    	echo "<a href='".$infos["urlSonLocalOgg"]."'>".$infos["urlSonLocalOgg"]."</a> -> <a href='".$infos["urlSonLocal"]."'>".$infos["urlSonLocal"]."</a><br/>";
+					$infos['oggInfos'] = $this->audio->getOggInfos($infos['urlPathLocalOgg']);	    
+				}catch (Zend_Exception $e) {
+					echo "Récupère exception: " . get_class($e) . "\n";
+				    echo "Message: " . $e->getMessage() . "\n";
+				}
+			}
+			$i++;
+			echo $infos['oggInfos'][12]."<br/>";
+			echo $infos['mp3Infos']['Length mm:ss']."<br/>";
+			$endTime = microtime(true);  
+			$elapsed = $endTime - $startTime;  
+	    	echo "$elapsed secondes <br/><br/>";     
+		}    	    	
+    }    
     /**
      * addInfoDocLucene
      *
@@ -169,7 +206,7 @@ class Flux_Deleuze extends Flux_Site{
 					foreach ($arr as $doc){
 						//vérifie si on traite le mp3
 						if(substr($doc['url'],-3)=="mp3" && !$json){
-							$posis[$i] = $this->getInfosMp3($posis[$i], $doc);
+							$posis[$i] = $this->getInfosSon($posis[$i], $doc);
 							$posis[$i]['exi'] = "lucene";
 						}
 						//vérifie si on traite une position
@@ -192,7 +229,7 @@ class Flux_Deleuze extends Flux_Site{
     }
 
     /**
-     * getInfosMp3
+     * getInfosSon
      *
      * récupère les information du Mp3
      * 
@@ -201,7 +238,7 @@ class Flux_Deleuze extends Flux_Site{
      * 
      * @return array
      */
-    function getInfosMp3($posi, $doc){
+    function getInfosSon($posi, $doc){
     	
     	if(!$this->audio)$this->audio = new Flux_Audio();
     	
@@ -209,12 +246,15 @@ class Flux_Deleuze extends Flux_Site{
 		$posi['text'] = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $doc["note"]));
 		//met au format local l'url distante
 		$pos = strrpos($doc["url"], "/");
-		$urlSon = substr($doc["url"], 0, $pos+1).$doc["doc_id"].".mp3"; 
-		$pathLocal = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", ROOT_PATH."/data/deleuze/", $urlSon);
-		$posi['urlSonLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", WEB_ROOT."/data/deleuze/", $urlSon);
+		$urlSon = substr($doc["url"], 0, $pos+1).$doc["doc_id"]."-.mp3"; 
+		$posi['urlPathLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", ROOT_PATH."/data/deleuze/mini/", $urlSon);
+		$posi['urlPathLocalOgg'] = str_replace(".mp3", ".ogg", $posi['urlPathLocal']);
+		$posi['urlSonLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", WEB_ROOT."/data/deleuze/mini/", $urlSon);
+		$posi['urlSonLocalOgg'] = str_replace(".mp3", ".ogg", $posi['urlSonLocal']);
 		//récupère les infos du mp3
-		$posi['mp3Infos'] = $this->audio->getMp3Infos($pathLocal);	    
-
+		$posi['mp3Infos'] = $this->audio->getMp3Infos($posi['urlPathLocal']);	    
+		$posi['oggInfos'] = $this->audio->getOggInfos($posi['urlPathLocalOgg']);	    
+		
 		return $posi;
     }
 
@@ -341,7 +381,7 @@ class Flux_Deleuze extends Flux_Site{
 			$docMp3 = $dbD->findByUrlByParent(".mp3", $doc["tronc"]);
 			$docMp3 = $docMp3[0];
 			
-			$posis[0] = $this->getInfosMp3($posis[0], $docMp3);
+			$posis[0] = $this->getInfosSon($posis[0], $docMp3);
 			$posis[0]['titre'] = "fragment de ".$docP["titre"];
 			$posis[0]['phrases'] = "";
 			$posis[0]['doc_id'] = $doc["tronc"];
