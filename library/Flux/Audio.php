@@ -26,15 +26,14 @@ class Flux_Audio extends Flux_Site{
 	/**
 	* constructeur de la classe
 	* 
-	* @param array $wavs_to_process
 	* @param string $idBase
 	* 
 	* return Flux_Audio
 	* 
 	*/
-	public function __construct($idBase=false, $ffmpeg=false)
+	public function __construct($idBase=false)
     {
-    	$this->ffmpeg = $ffmpeg;
+    	$this->ffmpeg = FFMEPG;
     	parent::__construct($idBase);
     }
 
@@ -52,18 +51,6 @@ class Flux_Audio extends Flux_Site{
 		return ($byte1 + ($byte2*256));
 	}
     
-	/**
-	* récupère les informations d'un fichier mp3
-	* 
-	* @param string $filename
-	*
-	* return array
-	*/
-	function getMp3Infos($filename) {
-		$m = new mp3file($filename);
-		return $m->get_metadata();		
-	}
-	
 	/**
 	* calcul les coordonnées de la forme audio
 	* 
@@ -263,8 +250,8 @@ class Flux_Audio extends Flux_Site{
     	 * 
     	 */
     	
-		$cmd = $this->ffmpeg." -i ".$src." -aq 0 -ab 8k -ar 8000 -acodec libvorbis ".$dst;		
-		exec($cmd, $arr, $op);
+		$cmd = $this->ffmpeg." -i ".$src." -aq 0 -ab 8k -ar 8000 -acodec libvorbis ".$dst." 2>&1";		
+		exec($cmd, $arr);
 
 		return $arr;
     }
@@ -279,10 +266,50 @@ class Flux_Audio extends Flux_Site{
     	 * 
     	 */
     	
-		$cmd = $this->ffmpeg." -ss ".$deb." -t ".$dur." -i ".$src." ".$dst."";		
-		exec($cmd, $arr, $op);
+		$cmd = $this->ffmpeg." -ss ".$deb." -t ".$dur." -i ".$src." ".$dst." 2>&1";		
+		exec($cmd, $arr);
 
 		return $arr;
     }
-    
+
+	/**
+	* récupère les informations d'un fichier ogg
+	* 
+	* @param string $src
+	*
+	* return array
+	*/
+	function getOggInfos($src) {
+		$cmd = $this->ffmpeg." -i ".$src." 2>&1";		
+		exec($cmd, $arr);
+		$data = false;
+		if(count($arr)>13){
+			//compile les informations
+			$infos1 = split(",",$arr[12]);
+			$infos2 = split(",",$arr[13]);
+			$data['Encoding'] = 'vorbis';
+	        $data['Channel Mode'] = $infos2[2];
+	        $data['Bitrate'] = $infos2[4];
+	        $dur = substr($infos1[0],11);
+	        $data['Length hh:mm:ss'] = $dur;
+	        $dur = split(":",$dur);
+	        $nbSec = ($dur[0]*3600)+($dur[1]*60)+$dur[2];
+	        $data['Length'] = $nbSec;
+		}
+				
+		return $data;
+	}    
+
+	/**
+	* récupère les informations d'un fichier mp3
+    * 
+    * @param string $filename
+    *
+    * return array
+    */
+    function getMp3Infos($filename) {
+    	$m = new mp3file($filename);
+        return $m->get_metadata();              
+	}
+	
 }
