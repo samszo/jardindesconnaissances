@@ -76,14 +76,18 @@ class Flux_Site{
      * Récupère l'identifiant d'utilisateur ou le crée
      *
      * @param array $user
+     * @param boolean $getId
      * 
+     * return integer
      */
-	function getUser($user) {
+	function getUser($user, $getId=false) {
 
 		//récupère ou enregistre l'utilisateur
 		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
-		$this->user = $this->dbU->ajouter($user);		
-
+		$idU = $this->dbU->ajouter($user);		
+		if(!$getId)$this->user = $idU;
+		
+		return $idU;
 	}
 
     /**
