@@ -208,6 +208,20 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      * Recherche une entrée flux_doc avec la valeur spécifiée
      * et retourne cette entrée.
      *
+     * @param varchar $note
+     */
+    public function findByNote($note)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_doc") )                           
+                    ->where( "f.note = ?", $note);
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+    /**
+     * Recherche une entrée flux_doc avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
      * @param varchar $titre
      */
     public function findByTitre($titre)
