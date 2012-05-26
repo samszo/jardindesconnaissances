@@ -3,12 +3,28 @@ require_once( "../application/configs/config.php" );
 
 try {
 	$application->bootstrap();
+	
+	
+    //pour gérer les compte mail
+    $gm = new Flux_Gmail("samszon","Janvier2010","flux_frontiere");
+    $gm->saveFolderMessages("veille/art", "image");
+    //$gm->saveFolderMessages("veille/labos", "image");
+    //$gm->getMessagesByFolderName("veille/intelligence collective");
+    //$gm->getDossiers();
+	
+	//$audio = new Flux_Audio(false);
+	//$audio->getOggInfos("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
+	//$audio->convertMp3ToOgg("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.mp3", "c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
+	//$audio->coupe("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.mp3", "c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106_100_10.ogg", 400, 10);
+	
+	
 	//$response = "OK bootstrap<br/><br/>";
+	/*
 	$oD = new Flux_Deleuze();
 	$oD->user = 2;
-	//$arr = $oD->getTermPositions("intuition");
+	$oD->convertMp3ToOgg();
+	$arr = $oD->getTermPositions("intuition");
 	
-	/*
 	$oD->getLocalMp3();
 
 	$user = "luckysemiosis";
@@ -24,13 +40,7 @@ try {
 	//$diigo->getRequest(array("user"=>$user,"count"=>100));
     //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));
 	
-	
-    //pour gérer les compte mail
-    //$gm = new Flux_Gmail("samszon","Janvier2010");
-    //$gm->saveFolderMessages("veille/intelligence collective", "google_alerte");
-    //$gm->getMessagesByFolderName("veille/intelligence collective");
-    //$gm->getDossiers();
-    
+	    
     /*
 	$site = new Flux_Site();
     $db = $site->getDb("fluxDeleuzeSpinoza");
@@ -39,9 +49,9 @@ try {
 	*/
 		
 	//pour gérer les index Lucene
+	/*
 	$lu = new Flux_Lucene();
 	$lu->index->optimize();
-	/*
 	$lu->getDb("flux_diigo");
 	$lu->getUser(array("login"=>"Flux_Lucene"));
 	//$hits = $lu->find("intelligence collective");
