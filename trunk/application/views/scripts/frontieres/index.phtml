@@ -1,0 +1,97 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript" src="js/labels.js"></script>
+		<script type="text/javascript" src="js/ruler.js"></script>
+		<script type="text/javascript" src="js/d3.v2.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript">
+
+		var arrTof = <?php echo json_encode($this->arr);?>;
+		var iTof = 0, posiClic, posiNote;
+		var choix = false;
+		var map;
+				
+		function start() {
+			var myOptions = {
+			  zoom: 1,
+			  center:  new google.maps.LatLng(0,0) ,
+			  mapTypeId: google.maps.MapTypeId.ROADMAP		
+			};
+			
+			map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+
+			google.maps.event.addListener(map, 'click', function(mouseEvent) {
+				if(!choix){					
+					var posiTof = new google.maps.LatLng(arrTof[iTof]['lat'], arrTof[iTof]['lng']);
+					removeRuler();
+					posiClic = mouseEvent.latLng;
+					addruler(posiClic, posiTof);
+					choix = true;
+					savePosition();
+				}
+			});
+
+			chargeTof();
+		}
+
+		function removeRuler() {
+			if(ruler1) ruler1.setMap(null);
+			if(ruler2) ruler2.setMap(null);
+			if(rulerpoly) rulerpoly.setMap(null);
+			if(ruler1label) ruler1label.setMap(null);
+		}
+
+		function chargeTof() {
+			var dT = d3.select('#tof');
+			d3.select('#selectTof').remove();
+			var url = arrTof[iTof]['url'];
+			dT.append("img")
+				.attr("id", "selectTof")
+				.attr("src", url);
+			choix = false;
+			
+		}
+
+		function nextTof() {
+			iTof++;
+			if(iTof == arrTof.length) iTof = 0;
+			removeRuler();
+			chargeTof();
+			map.setOptions({zoom: 1,center:new google.maps.LatLng(0,0)});
+		}
+
+		function savePosition() {
+			var p = {"idDoc":arrTof[iTof]['doc_id'], "lat":posiClic.lat(), "lng":posiClic.lng(), "zoom":map.getZoom(), "note":posiNote};
+			$.post("frontieres/ajout", p,
+					 function(data){
+				 		//affiche les nouvelles positions
+		 				var toto = data;
+					 });
+		}
+		
+		</script>
+		<style>
+		body { font-size: 14px; font-family:arial; line-height:20px;}
+		#titre {width:100%; margin:10px;}
+		#map_canvas { float:left; width:600px; height:500px; margin:10px;}
+		#tof { float:left; margin:10px;}
+		</style>
+	</head>
+	<body onload="start();">
+	<h1>Evaluation de la territorialité des productions artistiques</h1>
+		<table>
+			<tr>
+				<th>Cliquez sur la photo pour passer à la suivante</th>
+				<th>Cliquez sur la carte pour situer la photo</th>
+			</tr>
+			<tr>
+				<td><div id="tof"  onclick='nextTof();' ></div></td>
+				<td><div id="map_canvas"></div></td>
+			</tr>
+		</table>
+		<br/>
+	</body>
+</html>
