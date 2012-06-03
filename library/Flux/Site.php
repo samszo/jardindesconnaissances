@@ -17,12 +17,15 @@ class Flux_Site{
 	var $dbT;
 	var $dbTD;		
 	var $dbD;
+	var $dbDT;
 	var $dbIEML;
 	var $dbUIEML;
 	var $dbTrad;
 	var $dbE;
 	var $dbED;
 	var $dbET;
+	var $dbG;
+	var $dbGUD;
 	var $db;
 	var $lucene;
 	
@@ -212,6 +215,7 @@ class Flux_Site{
 		return $idT;
 	}
 
+	
     /**
      * Sauvegarde d'un tag sémantique IEML
      *
