@@ -51,6 +51,7 @@ body, html {
 	color:white;
 	background-color:black;
 	width:120px;
+	text-align:center;
 }
 #gen:hover{
 	background-color:grey;
