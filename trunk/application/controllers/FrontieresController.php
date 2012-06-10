@@ -22,7 +22,12 @@ class FrontieresController extends Zend_Controller_Action {
 		    $site = new Flux_Site();
 		    $db = $site->getDb($this->dbNom);
 			$dbUGD = new Model_DbTable_Flux_UtiGeoDoc($db);
-			$this->view->arr = $dbUGD->getAllLiens("RAND()"); 
+	    	$where = null;
+			if($this->_getParam('id', 0)){
+		    	$where = "d.doc_id = ".$this->_getParam('id', 0);			
+	    	}
+			$this->view->arr = $dbUGD->getDataLiees("RAND()",$where); 
+	    	
 
 		}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
@@ -46,7 +51,19 @@ class FrontieresController extends Zend_Controller_Action {
 				//enregistre la position
 				$idGeo = $dbG->ajouter(array("lat"=>$params['lat'],"lng"=>$params['lng'],"zoom_max"=>$params['zoom'],"maj"=>$d->get("c")));
 	    		$dbGUD->ajouter(array("doc_id"=>$params['idDoc'],"uti_id"=>$idU,"geo_id"=>$idGeo,"maj"=>$d->get("c"), "note"=>$params['note']));
-	    		//					
+	    		//calcul le tag cloud
+				$dbUTD = new Model_DbTable_Flux_UtiTagDoc($db);		
+				$tagDoc = $dbUTD->GetDocTags($params['idDoc'],"" , "", "RAND()", "10");
+				for ($i = 0; $i < count($tagDoc); $i++) {
+					$tagDoc[$i]['on'] = 1;
+				}
+				$tagRand = $dbUTD->GetUtiTags(1 ,"" , "", "RAND()", "10");
+				for ($i = 0; $i < count($tagRand); $i++) {
+					$tagRand[$i]['on'] = 0;
+				}
+				$tags = array_merge($tagDoc, $tagRand);
+				$this->view->data = $tags;
+				
 			}
 		}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
