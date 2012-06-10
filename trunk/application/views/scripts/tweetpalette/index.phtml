@@ -27,17 +27,17 @@ pageTracker._trackPageview();
 		<div id="main">
 			<div id="configArea">
 				<h2>Tweet Palette</h2>
-				<p><label>Tag de l'événement : <input id="tag_event" /></label></p>
-				<p><label>Url de l'événement : <input id="url_event" /></label></p>
+				<p><label>Tag de l'événement : <input id="tag_event" /></label><input type="checkbox" id="filtrerTag" onclick="getTweet();" /></p>
+				<p><label>Url de l'événement : <input id="url_event" /></label><input type="checkbox" id="filtrerUrl" onclick="getTweet();" /></p>
 				<p><div id="url_court" ></div></p>
-				<p><label>Utilisateur : <input id="user_event" />
-					<div><input type="checkbox" id="showAllUti" checked="true" onclick="getTweet();" /> Affiche tous les clics</div>
-				</label></p>
-				<p><label>Texte du tweet : <div id="taille_tweet"></div>
+				<p><label>Utilisateur : <input id="user_event" /></label><input type="checkbox" id="filtrerUti" onclick="getTweet();" /></p>
+				<div>(cocher pour filtrer)</div>
+				<hr/>
+				<p><label>Texte du tweet : <label id="taille_tweet"></label>
+					<textarea id="tweet_text" maxlength="64" ></textarea>
 					<input type="checkbox" id="showIeml" /> Affiche IEML
-					<textarea id="tweet_text" maxlength="140" ></textarea>
 				</label></p>
-				<div id="gen">Envoyer le tweet</div>
+				<div id="gen">Enregistrer</div>
 			</div>
 			<div id="svgArea">
 				<div id="heatmapArea" />
