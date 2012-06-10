@@ -6,6 +6,8 @@
 		<script type="text/javascript" src="js/ruler.js"></script>
 		<script type="text/javascript" src="js/d3.v2.js"></script>
 		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type='text/javascript' src="js/tagcloud.js"></script>
+		<script type='text/javascript' src="js/d3.layout.cloud.js"></script>
 		<script type="text/javascript">
 
 		var arrTof = <?php echo json_encode($this->arr);?>;
@@ -38,10 +40,15 @@
 		}
 
 		function removeRuler() {
+			//supprime les règle sur la carte
 			if(ruler1) ruler1.setMap(null);
 			if(ruler2) ruler2.setMap(null);
 			if(rulerpoly) rulerpoly.setMap(null);
 			if(ruler1label) ruler1label.setMap(null);
+			//supprime le tag cloud
+			var dV = d3.select('#visTof');
+			d3.select('#vis_tcIma').remove();
+			dV.append("div").attr("id", "vis_tcIma");			
 		}
 
 		function chargeTof() {
@@ -53,8 +60,8 @@
 				.attr("src", url);
 			choix = false;
 			
-		}
-
+		}	
+		
 		function nextTof() {
 			iTof++;
 			if(iTof == arrTof.length) iTof = 0;
@@ -67,31 +74,40 @@
 			var p = {"idDoc":arrTof[iTof]['doc_id'], "lat":posiClic.lat(), "lng":posiClic.lng(), "zoom":map.getZoom(), "note":posiNote};
 			$.post("frontieres/ajout", p,
 					 function(data){
-				 		//affiche les nouvelles positions
-		 				var toto = data;
-					 });
+				 		//affiche le tag cloud
+		 				var tcg	= new tagcloud({idDoc:"tcIma", data:data, w:600, h:300, colorTag:'white', verif:true});
+					 }, "json");
 		}
 		
 		</script>
 		<style>
-		body { font-size: 14px; font-family:arial; line-height:20px;}
-		#titre {width:100%; margin:10px;}
-		#map_canvas { float:left; width:600px; height:500px; margin:10px;}
-		#tof { float:left; margin:10px;}
+		body { font-size: 14px; font-family:arial; line-height:20px;background-color:black;color:white}
+		#main {text-align:center;margin-left: auto;margin-right: auto;width:1200px} 
+		#map_canvas { float:left; width:600px; height:300px;}
+		#tof {width:600px; height:600px;}
 		</style>
 	</head>
 	<body onload="start();">
-	<h1>Evaluation de la territorialité des productions artistiques</h1>
-		<table>
-			<tr>
-				<th>Cliquez sur la photo pour passer à la suivante</th>
-				<th>Cliquez sur la carte pour situer la photo</th>
-			</tr>
-			<tr>
-				<td><div id="tof"  onclick='nextTof();' ></div></td>
-				<td><div id="map_canvas"></div></td>
-			</tr>
-		</table>
-		<br/>
+		<div id="main">
+			<h1>Evaluation de la territorialité des productions artistiques</h1>
+				<table>
+					<tr>
+						<th>Cliquez sur l'oeuvre pour passer à la suivante</th>
+						<th>Cliquez sur la carte pour situer l'oeuvre</th>
+					</tr>
+					<tr>
+						<td><div style="text-align:center;" id="tof"  onclick='nextTof();' ></div></td>
+						<td style="vertical-align:text-top;">
+							<div id="map_canvas"></div>
+							<!-- <div>Cliquez sur les mots pour qualifier l'oeuvre</div>-->
+							<div id="visTof">
+								<!-- <div id="status_tcIma"></div>-->
+								<div id="vis_tcIma"></div>
+							</div>
+						</td>
+					</tr>
+				</table>
+				<br/>
+		</div>
 	</body>
 </html>
