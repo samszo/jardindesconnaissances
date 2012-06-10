@@ -72,12 +72,13 @@ class Flux_Tweetpalette extends Flux_Site{
      * @param string $uti
      * @param string $url
      * @param string $urlFond
-     * @param boolean $showAll
+     * @param string $event
+     * @param boolean $filtrer
      * 
      * 
      * return array
      */
-    function getPaletteClics($uti, $url, $urlFond, $showAll){
+    function getPaletteClics($uti, $url, $urlFond, $event, $filtrer){
 		//création des tables
 		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
 		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
@@ -86,17 +87,25 @@ class Flux_Tweetpalette extends Flux_Site{
 
 		$dc = "";
 		$max = 0;
-		if($showAll=="true"){
+		if($filtrer=="false"){
     		//récupère tous les clics sur le fond pour un événement
     		$DocsClic = $this->dbD->findLikeTronc($DocFond[0]["doc_id"]."_");
 		}else{
 			//récupère les données suivant les paramètres";
-			$Uti = $this->dbU->findByParams(array("login"=>$uti,"flux"=>__CLASS__));
+			if($uti!="no"){
+				$Uti = $this->dbU->findByParams(array("login"=>$uti,"flux"=>__CLASS__));
+				$idUti = $Uti[0]["uti_id"];
+			}else{
+				$idUti = false;
+			}
 			if($url!="no"){
 				$Doc = $this->dbD->findByUrl($url);
-				$DocsClic = $this->dbD->findByUtiTronc($Uti[0]["uti_id"], $DocFond[0]["doc_id"]."_".$Doc[0]["doc_id"]);						
+				$DocsClic = $this->dbD->findByUtiTronc($idUti, $DocFond[0]["doc_id"]."_".$Doc[0]["doc_id"]);						
+			}elseif($event!="no"){
+				$Doc = $this->dbD->findByTitre($event);
+				$DocsClic = $this->dbD->findByUtiTronc($idUti, $DocFond[0]["doc_id"]."_".$Doc[0]["doc_id"]);						
 			}else{
-				$DocsClic = $this->dbD->findByUtiTronc($Uti[0]["uti_id"], $DocFond[0]["doc_id"]."_", true);							
+				$DocsClic = $this->dbD->findByUtiTronc($idUti, $DocFond[0]["doc_id"]."_", true);							
 			}
     	}
 		//construction du format json correspondant à heatmap.js
