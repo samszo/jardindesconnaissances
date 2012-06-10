@@ -139,10 +139,10 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
 
     
     /**
-     * Récupère toutes les entrées Flux_utigeodoc et les données liées avec certains critères
+     * Récupère les entrées Flux_utigeodoc et les données liées avec certains critères
      * de tri, intervalles
      */
-    public function getAllLiens($order=null, $limit=0, $from=0)
+    public function getDataLiees($order=null, $where=null, $limit=0, $from=0)
     {
    	
         $query = $this->select()
@@ -157,6 +157,10 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
         if($order != null)
         {
             $query->order($order);
+        }
+        if($where != null)
+        {
+            $query->where($where);
         }
 
         if($limit != 0)

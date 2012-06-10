@@ -326,7 +326,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
      * 
      * @return array
      */
-	function GetUtiTags($idUti, $w="", $h="") {
+	function GetUtiTags($idUti, $w="", $h="", $order=null, $limit=null, $from=null) {
 
 		//définition de la requête
         $query = $this->select()
@@ -337,11 +337,66 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
         	->joinInner(array('td' => 'flux_tagdoc'),
             	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
         	->where( "utd.uti_id = ?", $idUti)
-        	->group("utd.tag_id")
-        	->order("value DESC");
+        	->group("utd.tag_id");
 		if($w!="")$query->where($w);
 		if($h!="")$query->having($h);
+		
+        if($order != null)
+        {
+            $query->order($order);
+        }else{
+        	$query->order("value DESC");
+        }
+        if($limit != 0)
+        {
+            $query->limit($limit, $from);
+        }
+		
 		return $this->fetchAll($query)->toArray(); 		
+	}
+	
+	/**
+     * Récupère les tags associés à un document
+     *
+     * @param integer $idDoc
+     * @param string $w
+     * @param string $h
+     * 
+     * @return array
+     */
+	function GetDocTags($idDoc, $where="", $h="", $order=null, $limit=null, $from=null) {
+
+		//définition de la requête
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("utd" => "flux_utitagdoc"), array("tag_id"))                           
+            ->joinInner(array('t' => 'flux_tag'),
+            	't.tag_id = utd.tag_id',array('code'))
+        	->joinInner(array('td' => 'flux_tagdoc'),
+            	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
+        	->where( "utd.doc_id = ?", $idDoc)
+        	->group("utd.tag_id")
+        	->order("value DESC");
+
+        if($order != null)
+        {
+            $query->order($order);
+        }
+        if($where != null)
+        {
+            $query->where($where);
+        }
+
+        if($limit != 0)
+        {
+            $query->limit($limit, $from);
+        }
+		
+        if($h!="")$query->having($h);
+
+
+		return $this->fetchAll($query)->toArray();
+        
 	}
 	
 	/**
