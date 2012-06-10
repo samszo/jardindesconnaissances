@@ -115,7 +115,7 @@
 			//tweet = ecriTweet();
 		   	window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweet),
 		       '',
-		       'status=no, scrollbars=no, menubar=no, width=550, height=300')
+		       'status=no, scrollbars=no, menubar=no, width=550, height=300');
 		}
 		
 		function ecriTweet() {
@@ -185,17 +185,18 @@
 
 			if(document.getElementById('url_court').value) url = document.getElementById('url_court').value;
 			else url = document.getElementById('url_event').value;
-			if(!url) url = "no";
+			if(!url || !document.getElementById('filtrerUrl').checked) url = "no";
 			
-			if(document.getElementById('tag_event').value) event = document.getElementById('tag_event').value;
+			if(document.getElementById('tag_event').value && document.getElementById('filtrerTag').checked) event = document.getElementById('tag_event').value;
 			else event = "no";
 			
-			if(document.getElementById('user_event').value) uti = document.getElementById('user_event').value;
+			if(document.getElementById('user_event').value && document.getElementById('filtrerUti').checked) uti = document.getElementById('user_event').value;
 			else uti = "no";
 
-			var showAllUti = document.getElementById('showAllUti').checked;
+			var filtrer = true;
+			if(url == "no" && event == "no" && uti == "no")filtrer=true;
 			
-			return {"idBase":idBase, "event":event, "url":url, "uti":uti, "sem":sem, "urlFond":urlFond, "showAllUti":showAllUti};
+			return {"idBase":idBase, "event":event, "url":url, "uti":uti, "sem":sem, "urlFond":urlFond, "filtrer":filtrer};
 		}
 
 		function setInput(data){
