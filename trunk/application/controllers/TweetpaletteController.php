@@ -28,9 +28,11 @@ class TweetpaletteController extends Zend_Controller_Action {
 	public function litAction() {
 		try {
 			//récupère les informations de la palette
-			if($this->_getParam('idBase', 0) && $this->_getParam('url', 0) && $this->_getParam('uti', 0) && $this->_getParam('urlFond', 0) && $this->_getParam('showAllUti', 0)){
+			if($this->_getParam('idBase', 0) && $this->_getParam('url', 0) && $this->_getParam('uti', 0) 
+			&& $this->_getParam('urlFond', 0) && $this->_getParam('filtrer', 0) && $this->_getParam('event', 0)){
 				$tp = new Flux_Tweetpalette($this->_getParam('idBase', 0));
-				$this->view->json = $tp->getPaletteClics($this->_getParam('uti', 0), $this->_getParam('url', 0), $this->_getParam('urlFond', 0), $this->_getParam('showAllUti', 0));
+				$this->view->json = $tp->getPaletteClics($this->_getParam('uti', 0), $this->_getParam('url', 0)
+				, $this->_getParam('urlFond', 0), $this->_getParam('event', 0), $this->_getParam('filtrer', 0));
 				//$s = new Flux_Stats($this->_getParam('idBase', 0));
 				//$this->view->stats = $s->GetUtiTagDoc($this->_getParam('uti', 0), $this->_getParam('url', 0));
 			}else{
