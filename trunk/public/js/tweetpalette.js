@@ -131,7 +131,7 @@
 					//calcul le degré de puissance
 					degre = "";
 					if(!sem[i].x1){
-						if(sem[i].x) degre = sem[i].x-_X;					
+						if(sem[i].x) degre = _X-sem[i].x;
 						if(sem[i].y) degre = sem[i].y-_Y;					
 					}
 					//vérifie s'il faut afficher le code IEML
