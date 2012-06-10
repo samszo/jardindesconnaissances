@@ -8,6 +8,7 @@ function tagcloud(config) {
 	this.idExi = config.idExi; 
 	this.exi;
 	this.global = config.global;  
+	this.verif = config.verif;  
 	this.txt = config.txt;  
 	this.data = config.data;
 	this.term = config.term;
@@ -23,12 +24,12 @@ function tagcloud(config) {
 	
 	this.tc = function() {
 	    var fill = d3.scale.category20b(),
-		w = 640,
+		w = 640, 
 		h = 128, hpt,
 		complete = 0,
 		statusText = d3.select("#status_"+this.idDoc),
 		maxLength = 30,
-		maxTag = 1000,
+		maxTag = 1000, colorTag = "black",
 		self = this,
 		posiTxt = document.getElementById("Select_txt_"+this.idDoc);
 
@@ -37,6 +38,7 @@ function tagcloud(config) {
 	    
 	    if(config.w) w = config.w;
 	    if(config.h) h = config.h;
+	    if(config.colorTag) colorTag = config.colorTag;
 	    
 	    if(posiTxt){
 		    hpt  = posiTxt.clientHeight;
@@ -44,6 +46,7 @@ function tagcloud(config) {
 	    }
 	    
 	    if(this.data){
+	    	if(this.verif)this.verif = this.data;
 	    	this.data = parseData();
 	    }
 	    if(this.txt){
@@ -109,7 +112,7 @@ function tagcloud(config) {
 		    	  		if(self.term && self.term.indexOf(d.text)>0)
 		    	  			return "blue";
 		    	  		else
-		    	  			return "black";
+		    	  			return colorTag;
 		    	  	})
 		        	.style("font-size", function(d) { 
 		        		return d.size + "px"; 
@@ -118,6 +121,7 @@ function tagcloud(config) {
 		    	    .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
 		        	.text(function(d) { return d.text; })
 		        	.on("click", function(d) {
+		        		var mt = d3.select(this);
 		        		if(self.exi){
 							console.log(self.idDoc+" "+d.text+" "+self.poidsTag);
 							saveTag(d.text, self.poidsTag, "tag_"+self.idDoc);
@@ -126,6 +130,16 @@ function tagcloud(config) {
 		        			vis.selectAll("text").style("fill","black");
 		        			d3.select(this).style("fill","blue");
 		        			chargeTag(d.text);	
+		        		}
+		        		if(self.verif){
+		        			var c = "red";
+		        			self.verif.forEach(function(v) {
+		        				if(v.code == d.text && v.on==1){
+		        					c = "green";
+		        					return;
+		        				}
+		        			});		        				
+		        			d3.select(this).style("fill",c);
 		        		}
 		        	})
 		        	.on("mouseover", function(d, i) { 
@@ -147,7 +161,7 @@ function tagcloud(config) {
 			        		.style("left",(event.pageX+10)+"px")
 	    	        		.text(d.text);
 	    	        	})
-		        	.attr("cursor", function() { if(self.exi || self.global) return "pointer";})
+		        	.attr("cursor", function() { if(self.exi || self.global || self.verif) return "pointer";})
 		        	;
 		}
 		function progress(d) {
