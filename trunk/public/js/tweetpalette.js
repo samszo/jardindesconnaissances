@@ -18,6 +18,9 @@
 				var pos = h337.util.mousePosition(ev);
 				xx.store.addDataPoint(pos[0],pos[1]);
 				getSemClic(pos[0], pos[1]);
+				if(iframe){
+					setTweet();				
+				}
 			};
 			
 			document.getElementById("gen").onclick = function(){
@@ -164,9 +167,9 @@
 		}
 		
 		function setTweet() {
-			
+			var p = getParamsSet();
 			$.post("tweetpalette/ajout"
-					, getParams(),
+					, p,
 					 function(data){
 						getTweet();
 					 }, "json");
@@ -194,11 +197,23 @@
 			else uti = "no";
 
 			var filtrer = true;
-			if(url == "no" && event == "no" && uti == "no")filtrer=true;
+			if(url == "no" && event == "no" && uti == "no")filtrer=false;
 			
 			return {"idBase":idBase, "event":event, "url":url, "uti":uti, "sem":sem, "urlFond":urlFond, "filtrer":filtrer};
 		}
 
+		function getParamsSet(){
+
+			if(document.getElementById('url_court').value) url = document.getElementById('url_court').value;
+			else url = document.getElementById('url_event').value;
+			if(!url) url = "no";
+			
+			if(document.getElementById('tag_event').value) event = document.getElementById('tag_event').value;
+			else event = "no";
+			
+			return {"idBase":idBase, "event":event, "url":url, "uti":idUti, "sem":sem, "urlFond":urlFond};
+		}
+		
 		function setInput(data){
 			dtInput = data;
 			//création des tableaux
