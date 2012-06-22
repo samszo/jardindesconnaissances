@@ -25,7 +25,7 @@ class Flux_Tweetpalette extends Flux_Site{
     /**
      * Enregistre les informations du flux dans la base
      *
-     * @param string $uti
+     * @param integer $uti
      * @param string $url
      * @param string $event
      * @param array $sem
@@ -44,7 +44,7 @@ class Flux_Tweetpalette extends Flux_Site{
 		if(!$this->dbUIEML)$this->dbUIEML = new Model_DbTable_Flux_UtiIeml($this->db);
 		if(!$this->dbTrad)$this->dbTrad = new Model_DbTable_Flux_Trad($this->db);
 		
-		$this->user = $this->dbU->ajouter(array("login"=>$uti,"flux"=>__CLASS__));
+		$this->user = $uti;
 		$idDoc = $this->dbD->ajouter(array("url"=>$url,"titre"=>$event));
 		$date = new Zend_Date();
 		
@@ -88,14 +88,14 @@ class Flux_Tweetpalette extends Flux_Site{
 
 		$dc = "";
 		$max = 0;
-		if($filtrer=="false"){
+		if($filtrer==="false"){
     		//récupère tous les clics sur le fond pour un événement
     		$DocsClic = $this->dbD->findLikeTronc($DocFond[0]["doc_id"]."_");
 		}else{
 			//récupère les données suivant les paramètres";
 			if($uti!="no"){
-				$Uti = $this->dbU->findByParams(array("login"=>$uti,"flux"=>__CLASS__));
-				$idUti = $Uti[0]["uti_id"];
+				$Uti = $this->dbU->findByLogin($uti);
+				$idUti = $Uti["uti_id"];
 			}else{
 				$idUti = false;
 			}
