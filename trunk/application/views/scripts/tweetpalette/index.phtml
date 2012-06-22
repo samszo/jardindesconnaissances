@@ -27,15 +27,22 @@ pageTracker._trackPageview();
 		<div id="main">
 			<div id="configArea">
 				<h2>Tweet Palette</h2>
-				<p><label>Tag de l'événement : <input id="tag_event" /></label><input type="checkbox" id="filtrerTag" onclick="getTweet();" /></p>
-				<p><label>Url de l'événement : <input id="url_event" /></label><input type="checkbox" id="filtrerUrl" onclick="getTweet();" /></p>
+				<p>Utilisateur : <?php echo $this->identite; ?></p>
+				<p>
+					<label>Tag de l'événement : <input id="tag_event" value="<?php echo $this->tag; ?>" /></label>
+					<input type="checkbox" id="filtrerTag" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
+				</p>
+				<p>
+					<label>Url de l'événement : <input id="url_event" value="<?php echo $this->url; ?>" /></label>
+					<input type="checkbox" id="filtrerUrl" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
+				</p>
 				<p><div id="url_court" ></div></p>
 				<p><label>Utilisateur : <input id="user_event" /></label><input type="checkbox" id="filtrerUti" onclick="getTweet();" /></p>
 				<div>(cocher pour filtrer)</div>
 				<hr/>
 				<p><label>Texte du tweet : <label id="taille_tweet"></label>
 					<textarea id="tweet_text" maxlength="64" ></textarea>
-					<input type="checkbox" id="showIeml" /> Affiche IEML
+					<input type="checkbox" id="showIeml" <?php if($this->iframe) echo 'checked="checked"'; ?> /> Affiche IEML
 				</label></p>
 				<div id="gen">Enregistrer</div>
 			</div>
@@ -47,7 +54,9 @@ pageTracker._trackPageview();
 		</div>
 		<script type="text/javascript">
 		var urlFond = "../data/tweetpalette/idee_taxo.svg" ;
-		var idBase = "flux_TweetPalette";
+		var idBase = '<?php echo $this->idBase; ?>';
+		var idUti = <?php echo $this->idUti; ?>;
+		var iframe = <?php echo $this->iframe; ?>;
 		
 		var grilleSvg = {
 				"oriX":477,
