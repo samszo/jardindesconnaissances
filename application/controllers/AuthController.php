@@ -1,14 +1,29 @@
 <?php
 class AuthController extends Zend_Controller_Action
 {
- 
     public function loginAction()
     {
     	try {
     		
 			$site = new Flux_Site();
-			$db = $site->getDb("flux_DeleuzeSpinoza");
+			$ssExi = new Zend_Session_Namespace('uti');
+			
+			if($this->_getParam('idBase', 0)){
+				$dbNom=$this->_getParam('idBase', 0);
+				$ssExi->dbNom = $dbNom;	
+			} 
+			elseif(!isset($ssExi->dbNom)) $dbNom="flux_DeleuzeSpinoza";
+			else $dbNom = $ssExi->dbNom;
+			//echo  $dbNom;
+			$db = $site->getDb($dbNom);
 
+			if($this->_getParam('redir', 0)){
+				$redir='/'.$this->_getParam('redir', 0);
+				$ssExi->redir = $redir;
+			}elseif(!isset($ssExi->redir)) $redir='/deleuze/navigation';
+			else $redir=$ssExi->redir; 
+			//echo  $redir;
+			
 	    	// Obtention d'une référence de l'instance du Singleton de Zend_Auth
 			$auth = Zend_Auth::getInstance();
 			$auth->clearIdentity();
@@ -37,11 +52,10 @@ class AuthController extends Zend_Controller_Action
 		            if ($result->isValid()) {		            	
 		            	//met en sessions les informations de l'existence
 		            	$r = $adapter->getResultRowObject(array('uti_id','role'));
-		            	$ssExi = new Zend_Session_Namespace('uti');
 		            	$ssExi->idUti = $r->uti_id;
 		            	$ssExi->role = $r->role;
 		                
-		                $this->_redirect('/deleuze/navigation');
+		            	$this->_redirect($redir);
 		                return;
 		            }
 				}
@@ -67,8 +81,14 @@ class AuthController extends Zend_Controller_Action
 					$formData['ip_inscription'] = $_SERVER['REMOTE_ADDR'];
 					$formData['date_inscription'] = date('Y-m-d H:i:s');
 					//print_r($formData);
-					$db = new Model_DbTable_Flux_Uti();
-					$db->ajouter($formData);
+					$ssExi = new Zend_Session_Namespace('uti');
+					//echo "ssExi->dbNom = ".$ssExi->dbNom;
+					if(isset($ssExi->dbNom)){
+						$site = new Flux_Site();
+						$db = $site->getDb($ssExi->dbNom);						
+						$dbUti = new Model_DbTable_Flux_Uti($db);
+					}else $dbUti = new Model_DbTable_Flux_Uti();					
+					$dbUti->ajouter($formData);
 					$this->_redirect('auth/login');
 				}else{
 					$form->populate($formData);
