@@ -369,10 +369,13 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         	->from( array("f" => "flux_doc") )                           
-            ->joinInner(array('utd' => 'flux_utitagdoc'),
-            	'utd.uti_id = '.$idUti.' AND utd.doc_id = f.doc_id',array('uti_id'))
 			->group("f.doc_id");
-        if($like)
+        if($idUti)
+            $query->joinInner(array('utd' => 'flux_utitagdoc'),'utd.uti_id = '.$idUti.' AND utd.doc_id = f.doc_id',array('uti_id'));
+		else
+            $query->joinInner(array('utd' => 'flux_utitagdoc'),'utd.doc_id = f.doc_id',array('uti_id'));
+		
+		if($like)
 			$query->where( "f.tronc LIKE '%".$tronc."%'");
 		else
 			$query->where( "f.tronc = ?", $tronc);

@@ -39,7 +39,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
 		$select = $this->select();
 		$select->from($this, array('uti_id'));
 		foreach($data as $k=>$v){
-			if($k!="date_inscription")
+			if($k!="date_inscription" && $k!="mdp")
 				$select->where($k.' = ?', $v);
 		}
 	    $rows = $this->fetchAll($select);        
