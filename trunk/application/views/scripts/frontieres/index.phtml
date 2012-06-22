@@ -8,106 +8,72 @@
 		<script type="text/javascript" src="js/jquery.min.js"></script>
 		<script type='text/javascript' src="js/tagcloud.js"></script>
 		<script type='text/javascript' src="js/d3.layout.cloud.js"></script>
+		<script type="text/javascript" src="js/heatmap.js"></script>
+<meta name="Description" CONTENT=">Evaluation de la territorialité des productions artistiques"/>
+<meta name="Keywords" CONTENT=">Evaluation territoire art frontière"/>
+<meta name="Author" CONTENT="Samuel Szoniecky"/>
+<meta name="verify-v1" content="WsAmN5yAjLkY3+8UmcwheVwnclyQfENPneHC3DSiGAA=" />
+<meta name="google-site-verification" content="4jXavF3D3d2PagHqRI0Jsih46vbJj1SDLr7KY8TtaGs" />
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3573757-11");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+		
 		<script type="text/javascript">
 
+		var db = "flux_frontieres";
 		var arrTof = <?php echo json_encode($this->arr);?>;
 		var iTof = 0, posiClic, posiNote;
 		var choix = false;
 		var map;
 				
-		function start() {
-			var myOptions = {
-			  zoom: 1,
-			  center:  new google.maps.LatLng(0,0) ,
-			  mapTypeId: google.maps.MapTypeId.ROADMAP		
-			};
-			
-			map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-
-
-			google.maps.event.addListener(map, 'click', function(mouseEvent) {
-				if(!choix){					
-					var posiTof = new google.maps.LatLng(arrTof[iTof]['lat'], arrTof[iTof]['lng']);
-					removeRuler();
-					posiClic = mouseEvent.latLng;
-					addruler(posiClic, posiTof);
-					choix = true;
-					savePosition();
-				}
-			});
-
-			chargeTof();
-		}
-
-		function removeRuler() {
-			//supprime les règle sur la carte
-			if(ruler1) ruler1.setMap(null);
-			if(ruler2) ruler2.setMap(null);
-			if(rulerpoly) rulerpoly.setMap(null);
-			if(ruler1label) ruler1label.setMap(null);
-			//supprime le tag cloud
-			var dV = d3.select('#visTof');
-			d3.select('#vis_tcIma').remove();
-			dV.append("div").attr("id", "vis_tcIma");			
-		}
-
-		function chargeTof() {
-			var dT = d3.select('#tof');
-			d3.select('#selectTof').remove();
-			var url = arrTof[iTof]['url'];
-			dT.append("img")
-				.attr("id", "selectTof")
-				.attr("src", url);
-			choix = false;
-			
-		}	
-		
-		function nextTof() {
-			iTof++;
-			if(iTof == arrTof.length) iTof = 0;
-			removeRuler();
-			chargeTof();
-			map.setOptions({zoom: 1,center:new google.maps.LatLng(0,0)});
-		}
-
-		function savePosition() {
-			var p = {"idDoc":arrTof[iTof]['doc_id'], "lat":posiClic.lat(), "lng":posiClic.lng(), "zoom":map.getZoom(), "note":posiNote};
-			$.post("frontieres/ajout", p,
-					 function(data){
-				 		//affiche le tag cloud
-		 				var tcg	= new tagcloud({idDoc:"tcIma", data:data, w:600, h:300, colorTag:'white', verif:true});
-					 }, "json");
-		}
 		
 		</script>
 		<style>
 		body { font-size: 14px; font-family:arial; line-height:20px;background-color:black;color:white}
-		#main {text-align:center;margin-left: auto;margin-right: auto;width:1200px} 
+		#main {text-align:center;margin-left: auto;margin-right: auto;width:1280px} 
 		#map_canvas { float:left; width:600px; height:300px;}
+		#outerdiv{width:900px;height:630px;overflow:hidden;position:relative;}
+		#inneriframe{position:absolute;top:-80px;left:-300px;width:1280px;height:1200px;}
 		#tof {width:600px; height:600px;}
 		</style>
 	</head>
-	<body onload="start();">
+	<body onload="chargeTof();">
 		<div id="main">
 			<h1>Evaluation de la territorialité des productions artistiques</h1>
 				<table>
 					<tr>
 						<th>Cliquez sur l'oeuvre pour passer à la suivante</th>
-						<th>Cliquez sur la carte pour situer l'oeuvre</th>
+						<th><label>Choisissez une carte : </label>
+							<select id="choix_carte" onchange="setCarte(this);">
+							<option></option>
+							<option>géographie</option>
+							<option>Tag Cloud</option>
+							<option>Taxonomie d'idée</option>
+							</select>
+							<p>
+								<label id="scene_1.1" style="display:none" >cliquez sur la carte pour choisir un territoire</label>
+								<label id="scene_1.2" style="display:none" >cliquez sur un mot pour qualifier l'oeuvre</label>
+								<label id="scene_1.3" style="display:none" >cliquez dans le graphique pour choisir un espace sémantique</label>
+								<label id="scene_2" style="display:none" >afficher toutes les réponses :<input type="checkbox" id="cbVoirReponses" onclick="getReponses();" /></label>
+							</p>
+						</th>
 					</tr>
 					<tr>
 						<td><div style="text-align:center;" id="tof"  onclick='nextTof();' ></div></td>
-						<td style="vertical-align:text-top;">
+						<td id="tdCarto" style="vertical-align:text-top;">
 							<div id="map_canvas"></div>
-							<!-- <div>Cliquez sur les mots pour qualifier l'oeuvre</div>-->
-							<div id="visTof">
-								<!-- <div id="status_tcIma"></div>-->
-								<div id="vis_tcIma"></div>
-							</div>
 						</td>
 					</tr>
 				</table>
 				<br/>
 		</div>
+		<script type="text/javascript" src="js/frontieres.js"></script>
 	</body>
 </html>
