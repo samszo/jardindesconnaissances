@@ -17,6 +17,11 @@
 class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
 {
     
+	/* Périmètre équatorial de la terre pour calculer l'indice de territorialité
+	 * http://fr.wikipedia.org/wiki/Terre
+	 */
+	var $periTerre = 40075.017;
+	
     /*
      * Nom de la table.
      */
@@ -47,7 +52,8 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
 		$select = $this->select();
 		$select->from($this, array('geo_id'));
 		foreach($data as $k=>$v){
-			$select->where($k.' = ?', $v);
+			if($k!="maj")
+				$select->where($k.' = ?', $v);
 		}
 	    $rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->geo_id; else $id=false;
@@ -236,5 +242,29 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
     }
     
+
+    /**
+     * calcul l'indice de territorialité pour un document
+     *
+     * @param int $idDoc
+     *
+     * @return array
+     */
+    public function calcIndTerreForDoc($idDoc)
+    {
+    	//récupère la somme des distances pour le document
+        $query = $this->select()
+			->from(array("f" => "flux_utigeodoc"),array("nb"=>"COUNT(*)", "somme"=>"SUM(note)"))
+			->group("doc_id")                           
+			->where( "f.doc_id = ?", $idDoc);
+        $result = $this->fetchAll($query)->toArray(); 
+        //calcule la moyenne des distances pour le document
+        $moyenne = $result[0]['somme']/$result[0]['nb'];
+        //calule l'indice
+        $indTerre = $moyenne/$this->periTerre/2*100;
+        
+        return $indTerre;
+        
+    }
     
 }
