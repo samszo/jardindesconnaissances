@@ -8,6 +8,7 @@
 		d3.select('#map_canvas').remove();
 		document.getElementById("scene_1.1").style.display='none';
 		document.getElementById("scene_1.2").style.display='none';
+		document.getElementById("scene_1.3").style.display='none';
 		document.getElementById("scene_2").style.display='none';
 		
 	}
@@ -34,7 +35,7 @@
 		var ifr = ele.append("div")
 			.attr("id","outerdiv")
 				.append("iframe")
-				.attr("src", "Tweetpalette?tag=frontières&url=http://www.jardindesconnaissances.com/public/frontieres?id="+arrTof[iTof]['doc_id']+"&showIeml=true&idBase="+db)
+				.attr("src", "Tweetpalette?iframe=true&tag=frontières&url=http://www.jardindesconnaissances.com/public/frontieres?id="+arrTof[iTof]['doc_id']+"&showIeml=true&idBase="+db)
 				.attr("id","inneriframe")
 				.attr("scrolling", "no");
 	}
@@ -90,6 +91,7 @@
 		iTof++;
 		if(iTof == arrTof.length) iTof = 0;
 		//removeRuler();
+		document.getElementById("choix_carte").options.selectedIndex = 0;
 		initCarte();
 		chargeTof();
 		//map.setOptions({zoom: 1,center:new google.maps.LatLng(0,0)});
