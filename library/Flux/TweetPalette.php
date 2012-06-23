@@ -53,8 +53,7 @@ class Flux_Tweetpalette extends Flux_Site{
 		//ajoute ou récupère le clic sur le fond
 		$idDocFondClic = $this->dbD->ajouter(array("tronc"=>$idDocFond."_".$idDoc,"titre"=>"clic fond"
 			,"data"=>"{x:".$sems[0]["x"].",y:".$sems[0]["y"]."}", "poids"=>1, "maj"=>$date->get("c")));
-		
-        foreach ($sems as $sem) {
+		foreach ($sems as $sem) {
         	if($sem["lib"]){
 	        	//sauvegarde le tag pour le document
 				$idT = $this->saveTag($sem["lib"], $idDoc, 1, $date->get("c"));
