@@ -107,6 +107,28 @@ class FrontieresController extends Zend_Controller_Action {
 	          echo "Message: " . $e->getMessage() . "\n";
 		}
 	}
+
+	public function resultatAction() {
+		try {
+			$auth = Zend_Auth::getInstance();
+			if ($auth->hasIdentity()) {			
+				$params = $this->getRequest()->getParams();
+				if($params){
+		    	   	//initialise les variables
+					$site = new Flux_Site();
+				    $db = $site->getDb($this->dbNom);
+		    		//calcul le tag cloud
+					$this->view->data = $this->getTagcloud($db, $params['idDoc']);					
+				}
+			    
+			}else{
+			    $this->_redirect('/auth/login?redir=tweetpalette&idBase='.$this->dbNom);
+			}	    	
+			}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+	}
 	
 	function getTagcloud($db, $idDoc) {
 		//calcul le tag cloud
