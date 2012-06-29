@@ -26,6 +26,16 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
      */
     protected $_primary = 'uti_id';
 
+    protected $_dependentTables = array(
+       "Model_DbTable_flux_actiuti"
+       ,"Model_DbTable_flux_utidoc"
+       ,"Model_DbTable_Flux_UtiGeoDoc"
+       ,"Model_DbTable_flux_utiieml"
+       ,"Model_DbTable_Flux_UtiTagDoc"
+       ,"Model_DbTable_flux_utitag"
+       ,"Model_DbTable_flux_utitagrelated"
+       ,"Model_DbTable_Flux_UtiUti"
+       );
     
     /**
      * Vérifie si une entrée Flux_Uti existe.
@@ -89,7 +99,16 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_uti.uti_id = ' . $id);
+		//suppression des données lieés
+        $dt = $this->getDependentTables();
+        foreach($dt as $t){
+        	$dbT = new $t($this->_db);
+        	if($t!="Model_DbTable_Flux_UtiUti")
+	        	$dbT->delete('uti_id = '.$id);
+	        else
+	        	$dbT->delete('uti_id_src = '.$id.' OR uti_id_dst = '.$id);
+        }            	
+    	$this->delete('flux_uti.uti_id = '.$id);
     }
     
     /**

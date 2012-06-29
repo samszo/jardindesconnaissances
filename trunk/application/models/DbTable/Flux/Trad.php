@@ -58,7 +58,7 @@ class Model_DbTable_flux_trad extends Zend_Db_Table_Abstract
     {
     	$id=false;
     	if($existe)$id = $this->existe($data);
-    	if(!$id){
+    	if(!$id){    		
     	 	$id = $this->insert($data);
     	}
     	return $id;

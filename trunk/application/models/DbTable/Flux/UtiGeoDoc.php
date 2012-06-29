@@ -250,20 +250,18 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
      *
      * @return array
      */
-    public function calcIndTerreForDoc($idDoc)
+    public function calcIndTerreForDoc($idDoc=false)
     {
     	//récupère la somme des distances pour le document
         $query = $this->select()
-			->from(array("f" => "flux_utigeodoc"),array("nb"=>"COUNT(*)", "somme"=>"SUM(note)"))
-			->group("doc_id")                           
-			->where( "f.doc_id = ?", $idDoc);
+			->from(array("f" => "flux_utigeodoc"),array("nb"=>"COUNT(*)", "somme"=>"SUM(note)", "indice"=>"COUNT(*)/SUM(note)/".$this->periTerre/2))
+			->group("doc_id")
+			->order("doc_id")
+			->where("note > 0");                           
+		if($idDoc)$query->where( "f.doc_id = ?", $idDoc);
         $result = $this->fetchAll($query)->toArray(); 
-        //calcule la moyenne des distances pour le document
-        $moyenne = $result[0]['somme']/$result[0]['nb'];
-        //calule l'indice
-        $indTerre = $moyenne/$this->periTerre/2*100;
         
-        return $indTerre;
+        return $result;
         
     }
     
