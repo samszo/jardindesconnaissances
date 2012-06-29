@@ -108,7 +108,7 @@ class Flux_Site{
 	}
 
     /**
-     * Récupère le contenu d'une url
+     * Récupère le contenu body d'une url
      *
      * @param string $url
      *   
@@ -127,6 +127,8 @@ class Flux_Site{
 		return $html;
 	}
 
+
+	
     /**
      * Ajoute des informations supplémentaire d'indexation
      *
@@ -210,7 +212,7 @@ class Flux_Site{
 		//on ajoute le lien entre le tag et l'uti avec le poids
 		$this->dbUT->ajouter(array("tag_id"=>$idT, "uti_id"=>$this->user, "poids"=>$poids));
 		//on ajoute le lien entre le tag l'utilisateur et le doc
-		$this->dbUTD->ajouter(array("uti_id"=>$this->user, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date));
+		$this->dbUTD->ajouter(array("uti_id"=>$this->user, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date, "poids"=>$poids));
 
 		return $idT;
 	}
