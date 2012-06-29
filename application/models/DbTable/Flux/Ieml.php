@@ -216,5 +216,19 @@ class Model_DbTable_flux_ieml extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
     }
     
+    /*
+     * Recherche une entrée flux_ieml avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param string $parse
+     */
+    public function findByParse($parse)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_ieml") )                           
+                    ->where( "f.parse = ?", $parse);
+
+        return $this->fetchAll($query)->toArray(); 
+    }
     
 }
