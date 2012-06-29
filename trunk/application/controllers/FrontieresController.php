@@ -12,7 +12,8 @@ require_once 'Zend/Controller/Action.php';
 class FrontieresController extends Zend_Controller_Action {
 	
 	var $dbNom = "flux_frontieres";
-
+	var $redir = '/auth/login?redir=frontieres&idBase=';
+	
 	/**
 	 * The default action - show the home page
 	 */
@@ -36,7 +37,7 @@ class FrontieresController extends Zend_Controller_Action {
 				$this->view->arr = $dbUGD->getDataLiees("RAND()",$where); 
 			    
 			}else{
-			    $this->_redirect('/auth/login?redir=tweetpalette&idBase='.$this->dbNom);
+			    $this->_redirect($this->redir.$this->dbNom);
 			}	    	
 
 		}catch (Zend_Exception $e) {
@@ -78,7 +79,7 @@ class FrontieresController extends Zend_Controller_Action {
 				}
 			    
 			}else{
-			    $this->_redirect('/auth/login?redir=tweetpalette&idBase='.$this->dbNom);
+			    $this->_redirect($this->redir.$this->dbNom);
 			}	    	
 			}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
@@ -100,7 +101,7 @@ class FrontieresController extends Zend_Controller_Action {
 				}
 			    
 			}else{
-			    $this->_redirect('/auth/login?redir=tweetpalette&idBase='.$this->dbNom);
+			    $this->_redirect($this->redir.$this->dbNom);
 			}	    	
 			}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
@@ -108,7 +109,7 @@ class FrontieresController extends Zend_Controller_Action {
 		}
 	}
 
-	public function resultatAction() {
+	public function classementAction() {
 		try {
 			$auth = Zend_Auth::getInstance();
 			if ($auth->hasIdentity()) {			
@@ -117,12 +118,15 @@ class FrontieresController extends Zend_Controller_Action {
 		    	   	//initialise les variables
 					$site = new Flux_Site();
 				    $db = $site->getDb($this->dbNom);
+				    //calcul l'indice géographique
+				    $dbGUD = new Model_DbTable_Flux_UtiGeoDoc($db);
+				    $arrGeo = $dbGUD->calcIndTerreForDoc();
 		    		//calcul le tag cloud
 					$this->view->data = $this->getTagcloud($db, $params['idDoc']);					
 				}
 			    
 			}else{
-			    $this->_redirect('/auth/login?redir=tweetpalette&idBase='.$this->dbNom);
+			    $this->_redirect($this->redir.$this->dbNom);
 			}	    	
 			}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
