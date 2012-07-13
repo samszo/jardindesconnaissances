@@ -41,7 +41,8 @@ class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
 		$select = $this->select();
 		$select->from($this, array('tag_id_src'));
 		foreach($data as $k=>$v){
-			$select->where($k.' = ?', $v);
+			if($k!="maj" && $k!="poids")
+				$select->where($k.' = ?', $v);
 		}
 	    $rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->tag_id_src; else $id=false;
@@ -61,6 +62,7 @@ class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
     	$id=false;
     	if($existe)$id = $this->existe($data);
     	if(!$id){
+    		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
     	 	$id = $this->insert($data);
     	}
     	return $id;

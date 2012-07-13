@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe qui gère les flux delicious
+ * Classe qui gère les flux statistiques
  *
  * @copyright  2011 Samuel Szoniecky
  * @license    "New" BSD License
@@ -124,51 +124,7 @@ class Flux_Stats  extends Flux_Site{
 	}
 	
 
-	/**
-     * Récupère les tags associés à une liste de tag 
-     *
-     * @param array $arrTags
-     * @param boolean $docRacine
-     * 
-     * @return array
-     */
-	function GetTagAssos($arrTags, $docRacine=true) {
 
-		//définition de la requête
-		//attention la colonne value est nécessaire pour le graphique  
-		$sql = "SELECT t1.tag_id, t1.code, SUM(td1.poids) value, COUNT(DISTINCT(td.doc_id)) nbDoc
-			FROM flux_tag t
-				INNER JOIN flux_tagdoc td ON td.tag_id = t.tag_id
-				INNER JOIN flux_tagdoc td1 ON td1.doc_id = td.doc_id
-				INNER JOIN flux_tag t1 ON t1.tag_id = td1.tag_id";
-		//vérifie si on prend les tags du document racine ou de ces éélments
-		if($docRacine){
-			$sql .= " INNER JOIN flux_doc d ON d.doc_id = td.doc_id  AND d.url != ''";
-		}else{
-			$sql .= " INNER JOIN flux_doc d ON d.doc_id = td.doc_id  AND d.url = ''";			
-		}
-		//construction de la condition des tag
-		$where = " WHERE ";
-		foreach ($arrTags as $tag) {
-			$where .= " t.code LIKE '%".$tag."%' OR ";
-		}
-		$where = substr($where, 0, -3);
-
-		//construction de la fin de requête
-		$sql = $sql.$where." GROUP BY t1.tag_id	ORDER BY value DESC";
-    	
-
-		//récupère les tags
-		$c = str_replace("::", "_", __METHOD__).md5($where); 
-	   	$arr = $this->cache->load($c);
-        if(!$arr){
-			$arr = $this->db->query($sql)->fetchAll();
-			$this->cache->save($arr, $c);			
-        }
-
-		return $arr;
-    	
-	}
 	
 	/**
      * Récupère les tags associés à un document et leur poids
@@ -191,6 +147,69 @@ class Flux_Stats  extends Flux_Site{
 
 		return $this->dbUTD->GetUtiTagDoc($rUti["uti_id"], $rDoc[0]["doc_id"]);
     	
+	}
+	
+	/**
+     * Calcul la matrice des tags associés à une liste de tag
+     *
+     * @param array $lstTags
+     * @param int $tronc
+     * 
+     * @return array
+     */
+	function GetMatriceTagAssos($lstTags, $tronc=-1) {
+		
+		$dbT = new Model_DbTable_Flux_Tag($this->db);
+		
+		//récupère la liste des tags associés
+		$arrTags = $dbT->getTagAssos($lstTags, $tronc);	    
+		//récupère les tags associés aux documents
+		$arrLiens = $dbT->getTagAssosByDoc($lstTags, $tronc);
+		//initialisation des colonnes de la matrice
+		$nbColo = count($arrTags);
+		$colo = array();
+		for ($j = 0; $j < $nbColo; $j++) {
+			$colo[]=0;
+		}
+		//initialisation de la matrice
+		$matrice = array();
+		$keyTag = array();
+		$i = 0;
+		foreach ($arrTags as $tag) {
+			$matrice[] = $colo;
+			$keyTag[$tag["tag_id"]]['num']=$i;
+			$keyTag[$tag["tag_id"]]['nbRela']=0;
+			$keyTag[$tag["tag_id"]]['nbCoo']=0;
+			$i++;			
+		}
+		//valorisation de la matrice
+		foreach ($arrLiens as $l) {
+			//récupère les tags lié un document
+			$tags = explode(",", $l['tags']);
+			foreach ($tags as $idSrc) {
+				//récupère la place du tag
+				$pSrc = $keyTag[$idSrc]['num'];
+				//met à jour la valeur de ce tag pour chaque tag lié et réciproquement
+				foreach ($tags as $idDst) {
+					if($idSrc!=$idDst){
+						$pDst = $keyTag[$idDst]['num'];
+						$matrice[$pSrc][$pDst] ++;
+						//vérifie le nombre maximum de co-occurence
+						if($matrice[$pSrc][$pDst]>$keyTag[$idSrc]['nbCoo'])$keyTag[$idSrc]['nbCoo']=$matrice[$pSrc][$pDst];
+						//incrémente la valeur le nb de Relation
+						$keyTag[$idDst]['nbRela']++;
+					}
+				}
+			}
+		}
+		//mets à jour le nombre de tag avec les calculs de relation
+		foreach ($keyTag as $kt) {
+			$arrTags[$kt['num']]['nbRela']=$kt['nbRela'];			
+			$arrTags[$kt['num']]['nbCoo']=$kt['nbCoo'];			
+		}
+		
+		$result = array("tags"=>$arrTags, "matrice"=>$matrice);
+		return $result;	    
 	}
 	
 	/*

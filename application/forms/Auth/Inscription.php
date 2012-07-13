@@ -14,22 +14,24 @@ class Form_Auth_Inscription extends Zend_Form
 		$this->setName('inscription');
 		
 		$login = new Zend_Form_Element_Text("login", array('size' => 25));
-		$loginDoesntExist = new Zend_Validate_Db_NoRecordExists('flux_uti', 'login');
+		//problème avec la connexion par défaut à la base
+		//$loginDoesntExist = new Zend_Validate_Db_NoRecordExists('flux_uti', 'login');
 		$login->setLabel('Login')
 		  ->addFilter('StripTags')
 		  ->addFilter('StringTrim')
 		  ->setRequired(true)
-		  ->addValidator($loginDoesntExist)
+		  //->addValidator($loginDoesntExist)
 		  ->addValidator('StringLength', false, array(6, 20))
 		  ->setDescription("Login entre 6 et 20 charactères.");
 		  
-		$emailDoesntExist = new Zend_Validate_Db_NoRecordExists('flux_uti', 'email');
+		//problème avec la connexion par défaut à la base
+		//$emailDoesntExist = new Zend_Validate_Db_NoRecordExists('flux_uti', 'email');
 		$email = new Zend_Form_Element_Text("email", array('size' => 25));
 		$email->setLabel('Adresse email')
 		  ->addFilter('StripTags')
 		  ->addFilter('StringTrim')
 		  ->setRequired(true)
-		  ->addValidator($emailDoesntExist)
+		  //->addValidator($emailDoesntExist)
 		  ->addValidator('EmailAddress')
 		  ->setDescription("Saisir un email valide.");		  
 

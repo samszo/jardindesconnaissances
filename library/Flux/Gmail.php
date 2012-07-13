@@ -18,7 +18,9 @@ class Flux_Gmail extends Flux_Site{
 	var $headers;
 	var $flags;
 	var $content;
-	
+	var $texte;
+	var $contentType;
+	var $i;	
     /**
      * Construction du gestionnaire de flux.
      *
@@ -88,7 +90,9 @@ class Flux_Gmail extends Flux_Site{
 		$this->imap->selectFolder($this->dossier);
 		$nbMessage = $this->imap->countMessages();
 		//parcourt tout les messages du dossier
-		for ($i = 1; $i <= $nbMessage; $i++) {
+		//pour lire dés le départ $i=1
+		for ($i = 1; $i <= 140; $i++) {
+			$this->i = $i;
 			//récupération du message
 			$this->message = $this->imap->getMessage($i);
 			//récupération des en tête
@@ -97,11 +101,15 @@ class Flux_Gmail extends Flux_Site{
 			$this->flags = $this->message->getFlags();
 			//récupération du contenu
 			$this->content = $this->message->getContent();
+			//récupère le texte du mail
+			$this->getText();
 			//traitement du mail suivant le type
 			switch ($type) {
 				case "google_alerte":
-					$t = $this->getSubjectType($this->headers["subject"]);
-					$this->saveMessageGoogleAlertContent($this->content);
+					if($this->getSubjectType($this->headers['subject'])){
+						$idD = $this->saveMail(true);
+						$this->saveMessageGoogleAlertContent($this->content);						
+					}
 					break;
 				case "image":
 					$idD = $this->saveMail();
@@ -122,6 +130,65 @@ class Flux_Gmail extends Flux_Site{
 		
 	}
 	
+	
+    /**
+     *  merci à http://wiip.fr/content/zend-mail-storage-imap
+     * retourne la valeur texte d'un message
+     */
+	public function getText()
+    {
+    	$contentTransfertEncoding = "";
+        if ($this->message->isMultipart()) {
+            foreach (new RecursiveIteratorIterator($this->message) as $part) {
+                try {
+                	$ct = $part->contentType;
+                    $text = $part->getContent();
+            		$charset = $part->getHeaderField('content-type', 'charset');
+                    if ($part->contentTransferEncoding) {
+                    	$contentTransfertEncoding = $part->contentTransferEncoding;
+                    }
+                    
+                } catch (Zend_Mail_Exception $e) {
+                    // ignore
+                }
+            }
+        } else {
+            $contentTransfertEncoding = $this->message->contentTransferEncoding;
+            $charset = $this->message->getHeaderField('content-type', 'charset');
+            $ct = $this->message->contentType;
+            $text = $this->message->getContent();
+        }
+        if (strtok($ct, ';') == 'text/html') {
+        	$text = html_entity_decode(strip_tags($text));
+        }
+        
+        // Decode the content
+        $contentTransfertEncoding = strtolower($contentTransfertEncoding);
+        switch ($contentTransfertEncoding) {
+            case 'base64':
+                $text = base64_decode($text);
+                break;
+            
+            case null:
+            case '':
+            case '7bit':
+            case '8bit':
+            case 'quoted-printable':
+                $text = quoted_printable_decode($text);
+                break;
+
+            default:
+                throw new Exception("Unknown encoding: '{$contentTransfertEncoding}'");
+        }
+
+        // Convert to UTF-8 if necessary
+        if (!isset($charset) or ($charset != 'UTF-8')) {
+            $text = utf8_encode($text);
+        }
+
+        $this->texte = $text;
+    }    
+    
 	function getSubjectType($subject){
 		
 		if(substr($subject, 0,15)=="Alerte Google -")return "google_alerte";
@@ -196,33 +263,30 @@ class Flux_Gmail extends Flux_Site{
 	}
 
 	
-    function saveMail(){
+    function saveMail($kw=false){
 				    			
 		//ajouter un document correspondant au lien
-	   	$d = new Zend_Date($this->headers["date"]);
-		$idD = $this->dbD->ajouter(array("url"=>"","titre"=>$this->headers["subject"],"tronc"=>0,"pubDate"=>$d->get("c"), "note"=>$this->content, "type"=>77));
+	   	$d = new Zend_Date($this->headers["date"],Zend_Date::RFC_2822);
+		$idD = $this->dbD->ajouter(array("url"=>"","titre"=>$this->headers["subject"],"tronc"=>0,"pubDate"=>$d->get("c"), "note"=>$this->content, "type"=>77, "branche_lft"=>$this->i));
 		
 		//ajoute un lien entre l'utilisateur qui a envoyé le mail et le document avec un poids
-		$this->getUser(array("login"=>$this->headers["from"]));
-		$this->dbUD->ajouter(array("uti_id"=>$this->user, "doc_id"=>$idD, "poids"=>1));										    
+		$idU = $this->getUser(array("login"=>$this->headers["from"]),true);
+		$this->dbUD->ajouter(array("uti_id"=>$idU, "doc_id"=>$idD, "poids"=>1));										    
 		
 		//ajoute les utilisateurs destinataire du mail
-		foreach ($this->headers["delivered-to"] as $uti) {
-			$idUdst = $this->getUser(array("login"=>$uti));
+		if(is_array($this->headers["delivered-to"])){
+			foreach ($this->headers["delivered-to"] as $uti) {
+				$idUdst = $this->getUser(array("login"=>$uti),true);
+				$this->dbUU->ajouter(array("uti_id_src"=>$this->user,"uti_id_dst"=>$idUdst));
+			}
+		}else{
+			$idUdst = $this->getUser(array("login"=>$this->headers["delivered-to"]),true);
 			$this->dbUU->ajouter(array("uti_id_src"=>$this->user,"uti_id_dst"=>$idUdst));
+		}		
+		//enregistre les mot clefs
+		if($kw){
+			$this->saveKW($idD, $this->texte);
 		}
-		
-		/*récupère les mot clefs
-	   	$arrKW = $this->getKW(strip_tags($this->content));
-	   	//enregistre les mots clefs
-	   	$i=0; 
-	   	$d = new Zend_Date();
-	   	foreach ($arrKW as $kw=>$nb){
-			$this->saveTag($kw, $idD, $nb, $d->get("c"));
-			$i++;	    			
-	   	}
-	   	*/
-		
 	   	return $idD;
 	}	
 }

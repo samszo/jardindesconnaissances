@@ -279,6 +279,23 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+
+    /**
+     * Recherche une entrée flux_doc avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param string $url
+     * 
+     * @return Array
+     */
+    public function findLikeUrl($url)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_doc") )                           
+                    ->where( "f.url LIKE '%$url%'");
+
+        return $this->fetchAll($query)->toArray(); 
+    }
     
     /**
      * Recherche une entrée flux_doc avec la valeur spécifiée

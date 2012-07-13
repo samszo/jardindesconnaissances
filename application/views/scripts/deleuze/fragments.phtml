@@ -1,0 +1,21 @@
+<?php 
+	header('Content-Type: text/html; charset=UTF-8');
+	if($this->getJson){
+		echo json_encode($this->resultats);	
+	}else{
+		echo "<table>";
+		//echo "<th>titre</th><th>url</th><th>nb de car.</th>";		
+		foreach ($this->resultats as $hit){
+			echo "<tr>";		
+		    echo "<td>".$hit["titre"]." : ".$hit["url"]."</td><td></td><td></td><td>".$hit["taille"]."</td>";
+		    echo "</tr>";		
+			foreach ($hit["phrases"] as $p){
+				echo "<tr>";		
+			    echo "<td align='right' >".$p["deb"]."</td>
+			    	<td style='padding-left:15px;' align='center' ><div style='color:green;display:inline;' >".$p["mot"]."</div></td>
+			    	<td align='left'>".$p["fin"]."</td><td align='left' >".$p["pHTML"]."</td>";
+			    echo "</tr>";		
+			}
+		}
+		echo "</table>";
+	}	

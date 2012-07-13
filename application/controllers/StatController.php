@@ -40,12 +40,22 @@ class StatController extends Zend_Controller_Action {
     public function tagassosAction()
     {
 	    $this->view->stats = "";
-    	if($this->_getParam('tags')){
-			$s = new Flux_Stats($this->_getParam('idBase', 0));
-			$this->view->stats = $s->GetTagAssos($this->_getParam('tags'),$this->_getParam('racine', 0));	    
-	    }
+		$s = new Flux_Stats($this->_getParam('idBase', 0));
+		$this->view->stats = $s->GetTagAssos($this->_getParam('tags'),$this->_getParam('tronc', 0));	    
     }	
 
+    public function matricetagassosAction()
+    {
+	    $this->view->stats = "";
+	    /** TODO 
+	     * gérer les matrices booléennes : http://en.wikipedia.org/wiki/File:LogicGates.svg goo.gl/4uIjl
+	     **/
+		$s = new Flux_Stats($this->_getParam('idBase', 0));
+		$matrice = $s->GetMatriceTagAssos($this->_getParam('tags'),$this->_getParam('tronc', -1));	    
+
+		$this->view->stats = $matrice;
+    }	
+    
     public function audiowaveAction()
     {
 	    $this->view->stats = "";

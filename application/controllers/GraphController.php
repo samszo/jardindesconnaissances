@@ -30,6 +30,19 @@ class GraphController extends Zend_Controller_Action {
 		$this->view->urlStats = "../stat/tagassos?".$arrUrl[1];	    
     }	
 
+    public function chordAction()
+    {
+	    
+	    $request = $this->getRequest();
+		$url = $request->getRequestUri();
+		$arrUrl = explode("?",$url);
+		$this->view->idBase =  $this->_getParam('idBase', 0);
+		$this->view->titre = "Matrice des co-occurences";
+		$this->view->tags = $this->_getParam('tags', 0);
+		$this->view->urlStats = "../stat/matricetagassos?".$arrUrl[1];	    
+    		    
+    }	
+    
     public function audiowaveAction()
     {
     	if($this->_getParam('idDoc', 0) && $this->_getParam('idBase', 0)){
