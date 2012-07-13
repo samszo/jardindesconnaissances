@@ -146,21 +146,99 @@ class Model_DbTable_flux_tagdoc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray();
     }
     
-    /*
+    /**
      * Recherche une entrée flux_tagdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $tag_id
+     * @param array $arrTags
+     * @param boolean $racine
+     * 
+     *@return array
      */
-    public function findByTag_id($tag_id)
+    public function findByTagId($tag_id, $arrTags, $racine=false)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_tagdoc") )                           
-                    ->where( "f.tag_id = ?", $tag_id );
+        	->from( array("td" => "flux_tagdoc") )                           
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('d' => 'flux_doc'),
+                'd.doc_id = td.doc_id')
+            ->group("d.doc_id")
+            ->order("d.titre");
+		if($racine){
+			$query->where( "d.tronc = 0");
+		}
 
+        $query = $this->getTagsCondition($query, $arrTags, $tag_id);
+		
         return $this->fetchAll($query)->toArray(); 
     }
-    /*
+
+    /**
+     * Recherche une entrée flux_tagdoc avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param string $tag_id
+     * @param array $arrTags
+     * 
+     *@return array
+     */
+    public function findDocTroncByTagId($tag_id, $arrTags=false)
+    {
+        $query = $this->select()
+        	->from( array("td" => "flux_tagdoc"),array())                           
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('d' => 'flux_doc'),
+                'd.doc_id = td.doc_id',array("idDocNote"=>"doc_id", "note"))
+            ->joinInner(array('dP' => 'flux_doc'),
+                'dP.doc_id = d.tronc',array("idDocPar"=>"doc_id", "titre"))
+            ->group("d.doc_id")
+            ->order("dP.titre");
+		
+        $query = $this->getTagsCondition($query, $arrTags, $tag_id);
+        
+		return $this->fetchAll($query)->toArray(); 
+				
+    }
+    
+    /**
+     * construction des conditions pour récupèrer les documents
+     * liés à une sélection de tag
+     *
+     * @param string $tag_id
+     * @param array $arrTags
+     * 
+     *@return array
+     */
+    function getTagsCondition($query, $arrTags, $tag_id){
+
+        //construction de la condition des tags
+		if($arrTags){
+			$where = " ";
+			foreach ($arrTags as $tag) {
+				$where .= " t.code LIKE '%".$tag."%' OR ";
+			}
+			$where = substr($where, 0, -3);
+            $query->joinInner(array('td1' => 'flux_tagdoc'),
+                	'td1.doc_id = td.doc_id',array())
+            	->joinInner(array('t' => 'flux_tag'),
+                	't.tag_id = td1.tag_id AND ('.$where.')',array());
+		}
+
+		$arrId = explode(",", $tag_id);
+		$nbId = count($arrId);
+		for ($i = 0; $i < $nbId; $i++) {
+            $query->joinLeft(array('tdT'.$i => 'flux_tagdoc'),
+                	'tdT'.$i.'.doc_id = td.doc_id  AND tdT'.$i.'.tag_id = '.$arrId[$i],array("tag_id"))
+            	->having("tdT".$i.".tag_id = ".$arrId[$i]);
+			
+		}
+    	
+		return $query;
+    }
+    
+    
+    /**
      * Recherche une entrée flux_tagdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *

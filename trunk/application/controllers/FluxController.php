@@ -41,10 +41,21 @@ class FluxController extends Zend_Controller_Action {
 
     public function docsAction()
     {
-	    $dbUD = new Model_DbTable_Flux_UtiDoc();
 		$rs = array();
+		if($this->_getParam('tag', 0) && $this->_getParam('liste', 0)){
+			$idBase = $this->_getParam('idBase', false);
+			$s = new Flux_Site($idBase);
+			$dbD = new Model_DbTable_flux_tagdoc($s->db);
+			$racine = $this->_getParam('racine', false);
+			if($idBase=="flux_zotero" && $racine){
+				$rs = $dbD->findDocTroncByTagId($this->_getParam('tag', 0),$this->_getParam('tags', 0));
+			}else{
+				$rs = $dbD->findByTagId($this->_getParam('tag', 0), $this->_getParam('tags', 0), $racine);
+			}
+		}
 	    if($this->_getParam('tag', 0) && $this->_getParam('uti', 0)){
-		    $arr = $dbUD->findDocByUtiTag($this->_getParam('uti', 0),$this->_getParam('tag', 0));
+	    	$dbUD = new Model_DbTable_Flux_UtiDoc();
+	    	$arr = $dbUD->findDocByUtiTag($this->_getParam('uti', 0),$this->_getParam('tag', 0));
 		    foreach ($arr as $d){
 		    	$arrT = $dbUD->findTagByDocUti($d["doc_id"],$d["uti_id"]);
 		    	//formatage du tableau des tags

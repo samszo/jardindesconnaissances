@@ -8,10 +8,11 @@
  */
 class Flux_Diigo extends Flux_Site{
 
-	const API_KEY = "";
+	const API_KEY = "0406bdcf70493382";
 	const API_URI = "https://secure.diigo.com";
     const API_URL = '/api/v2/bookmarks';
     const RSS_GROUP_URL = 'http://groups.diigo.com/group/';
+    const LUCENE_INDEX = '../data/diigo-index';
 	
     /**
      * Zend_Service_Rest instance
@@ -45,7 +46,9 @@ class Flux_Diigo extends Flux_Site{
 	        }
 	
 	        $json = $response->getBody();
-		    $arr = Zend_Json_Decoder::decode($json);
+		    $arr = json_decode($json);
+	        //le decode de zend est beaucoup trop long
+	        //$arr = Zend_Json_Decoder::decode($json);
 	        
 			$this->cache->save($arr, $c);
         }        
@@ -64,14 +67,14 @@ class Flux_Diigo extends Flux_Site{
 		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
     	//initialise le moteur d'indexation
 		if(!$this->lucene){
-			$this->lucene = new Flux_Lucene($this->login, $this->pwd, $this->idBase);
+			$this->lucene = new Flux_Lucene($this->login, $this->pwd, $this->idBase, false, self::LUCENE_INDEX);
 			$this->lucene->classUrl = $this;
 			$this->lucene->index->optimize();	
 		}
 		
-    	$i = 3700;
+    	$i = 1;
 		while ($i>0) {
-    		$arr = $this->getRequest(array("user"=>$this->login,"count"=>100, "start"=>$i-1));
+    		$arr = $this->getRequest(array("user"=>$this->login,"count"=>100, "start"=>$i));
     		foreach ($arr as $item){
     			$this->saveItem($item);
     		}
@@ -80,13 +83,22 @@ class Flux_Diigo extends Flux_Site{
     	$this->lucene->index->optimize();
     }
 
-    function saveItem($item){
+    function saveItem($i){
 
     	
 		//TODO ajouter les db pour graine utigraine et grainedoc 
 		//$this->getGraine(array("titre"=>"Diigo","class"=>"Flux_Diigo","url"=>"http://www.diigo.com/"));
 		//TODO ajouter la utigraine 
-				    			
+
+    	//transforme l'objet en tableau dans le cas ou on n'utilise pas le json decode de Zen
+    	$item['url'] = $i->url;
+    	$item['title'] = $i->title;
+    	$item['created_at'] = $i->created_at;
+    	$item['annotations'] = $i->annotations;
+    	$item['tags'] = $i->tags;
+    	//sinon 
+    	//$item = $i;
+    	
 		//ajouter un document correspondant au lien
 		$idD = $this->dbD->ajouter(array("url"=>$item['url'],"titre"=>$item['title'],"tronc"=>0,"pubDate"=>$item['created_at']));
 		//index le document
@@ -97,7 +109,9 @@ class Flux_Diigo extends Flux_Site{
 		//traitement des annotations
 		if(count($item['annotations'])>0){
 			foreach ($item['annotations'] as $note){
-				$this->saveContent($note, $idD);
+				$j['content'] = $note->content;
+				$j['created_at'] = $note->created_at;
+				$this->saveContent($j, $idD);
 			}
 		}		
 		//traitement des mots clefs

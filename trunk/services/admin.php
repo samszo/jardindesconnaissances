@@ -3,15 +3,38 @@ require_once( "../application/configs/config.php" );
 
 try {
 	$application->bootstrap();
-	
-	
+	$user = "luckysemiosis";
+	$pwd = "samszo";
+
     //pour gérer les compte mail
-    $gm = new Flux_Gmail("samszon","Janvier2010","flux_frontiere");
-    $gm->saveFolderMessages("veille/art", "image");
-    //$gm->saveFolderMessages("veille/labos", "image");
+    $gm = new Flux_Gmail("samszon","Janvier2010","flux_gmail_intelligence_collective");
+    //$gm->saveFolderMessages("veille/art", "image");
+    $gm->saveFolderMessages("veille/intelligence collective", "google_alerte");
     //$gm->getMessagesByFolderName("veille/intelligence collective");
     //$gm->getDossiers();
 	
+	
+	//$s = new Flux_Site("flux_zotero");
+	//$dbD = new Model_DbTable_flux_tagdoc($s->db);
+	//$rs = $dbD->findDocTroncByTagId("10", array("intelligence","collective"));
+	
+	//$s = new Flux_Stats("flux_zotero");
+	//$stats = $s->GetMatriceTagAssos(array("intelligence","collective"),-1);	    
+	
+	//$zotero = new Flux_Zotero($user);
+	//$zotero->saveAll();
+	
+    //$diigo = new Flux_Diigo($user,$pwd,"flux_diigo");
+	//$diigo->saveAll();
+    //$diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
+    //$diigo->getGroupeRss("bulles");
+	//$diigo->getRequest(array("user"=>$user,"count"=>100));
+    //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));
+	
+	//$tp = new Flux_Tweetpalette('flux_tweetpalette');
+	//$json = $tp->getPaletteClics('samszo', 'no', "../data/tweetpalette/idee_taxo.svg", 'no', true);
+	
+		
 	//$audio = new Flux_Audio(false);
 	//$audio->getOggInfos("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
 	//$audio->convertMp3ToOgg("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.mp3", "c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
@@ -27,18 +50,6 @@ try {
 	
 	$oD->getLocalMp3();
 
-	$user = "luckysemiosis";
-	$pwd = "samszo";
-	
-	
-    $diigo = new Flux_Diigo($user,$pwd,"fluxDiigo");
-	*/
-
-	//$diigo->saveAll();
-    //$diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
-    //$diigo->getGroupeRss("bulles");
-	//$diigo->getRequest(array("user"=>$user,"count"=>100));
-    //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));
 	
 	    
     /*

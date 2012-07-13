@@ -184,5 +184,94 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
     }
     
-    
+	/**
+     * Récupère les tags associés à une liste de tag 
+     *
+     * @param array $arrTags
+     * @param int $tronc
+     * 
+     * @return array
+     */
+	function getTagAssos($arrTags, $tronc=-1) {
+
+		//vérifie si on prend les tags du document racine ou de ces éléments
+		$where = " ";
+		if($tronc>-1){
+			$where = ' AND d.tronc = '.$tronc;
+		}
+		//définition de la requête
+		//attention la colonne value est nécessaire pour le graphique  
+        $query = $this->select()
+        	->from( array("t" => "flux_tag"),array())                           
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('td' => 'flux_tagdoc'),
+                'td.tag_id = t.tag_id',array("nbDoc"=>"COUNT(DISTINCT(td.doc_id))"))
+            ->joinInner(array('td1' => 'flux_tagdoc'),
+                'td1.doc_id = td.doc_id',array("value"=>"SUM(td1.poids)"))
+            ->joinInner(array('t1' => 'flux_tag'),
+                't1.tag_id = td1.tag_id',array("code","tag_id"))
+			->joinInner(array('d' => 'flux_doc'),
+                'd.doc_id = td.doc_id'.$where,array("nbDoc"=>"COUNT(DISTINCT(td.doc_id))"))
+            ->group("t1.tag_id")
+            ->order("t1.code");
+
+         if($tronc!=0){
+         	$query->joinLeft(array('dP' => 'flux_doc'),'dP.doc_id = d.tronc',array("tronc","nbTronc"=>"COUNT(DISTINCT(dP.doc_id))"));
+         }
+            
+		//construction de la condition des tags
+		$where = " ";
+		if($arrTags){
+			foreach ($arrTags as $tag) {
+				$where .= " t.code LIKE '%".$tag."%' OR ";
+			}
+			$where = substr($where, 0, -3);
+			$query->where($where);
+		}
+		
+        return $this->fetchAll($query)->toArray(); 
+		    	
+	}
+
+	
+	
+	/**
+     * Récupère les tags associés à une liste de tag par document 
+     *
+     * @param array $arrTags
+     * @param int $tronc
+     * 
+     * @return array
+     */
+	function getTagAssosByDoc($arrTags, $tronc=-1) {
+
+
+		//définition de la requête
+        $query = $this->select()
+        	->from( array("t" => "flux_tag"),array())                           
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('td' => 'flux_tagdoc'),
+                'td.tag_id = t.tag_id',array())
+            ->joinInner(array('td1' => 'flux_tagdoc'),
+                'td1.doc_id = td.doc_id',array("doc_id","tags"=>"GROUP_CONCAT(DISTINCT(td1.tag_id))"))
+            ->group("td1.doc_id")
+            ->order("td1.tag_id");
+                        
+		//vérifie si on prend les tags du document racine ou de ces éléments
+		if($tronc>-1){
+			$query->joinInner(array('d' => 'flux_doc'),'d.doc_id = td.doc_id AND d.tronc='.$tronc, array());
+		}
+		//construction de la condition des tag
+		$where = " ";
+		if($arrTags){
+			foreach ($arrTags as $tag) {
+				$where .= " t.code LIKE '%".$tag."%' OR ";
+			}
+			$where = substr($where, 0, -3);
+			$query->where($where);
+		}
+		
+        return $this->fetchAll($query)->toArray(); 		
+    	
+	}	
 }
