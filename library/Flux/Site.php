@@ -332,6 +332,8 @@ class Flux_Site{
 							foreach ($arrKW->markup->links as $kw){
 								$type=false;
 								$poids = $kw->relevance;
+								/**TODO gérer les entity_type comme des tableaux...
+								 */
 								if(isset($kw->entity_type))$type=implode(";", $kw->entity_type);
 								foreach ($kw->target as $t){
 									//enregistre le tag

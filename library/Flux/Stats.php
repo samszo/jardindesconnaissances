@@ -122,7 +122,9 @@ class Flux_Stats  extends Flux_Site{
     	return $stmt->fetchAll();
 		
 	}
+
 	
+
 
 
 	
