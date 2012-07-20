@@ -26,6 +26,12 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
      */
     protected $_primary = 'tag_id';
 
+    protected $_dependentTables = array(
+       "Model_DbTable_flux_tagdoc"
+       ,"Model_DbTable_flux_tagtag"
+       ,"Model_DbTable_flux_utitag"
+       ,"Model_DbTable_flux_utitagdoc"
+       );    
     
     /**
      * Vérifie si une entrée flux_tag existe.
@@ -87,6 +93,17 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
+    	
+		//suppression des données lieés
+        $dt = $this->getDependentTables();
+        foreach($dt as $t){
+        	$dbT = new $t($this->_db);
+        	if($t=="Model_DbTable_flux_tagtag"){
+	        	$dbT->delete('tag_id_src = '.$id);
+	        	$dbT->delete('tag_id_dst = '.$id);
+        	}else
+	        	$dbT->delete('tag_id = '.$id);
+        }        
         $this->delete('flux_tag.tag_id = ' . $id);
     }
     
@@ -274,4 +291,78 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 		
     	
 	}	
+	
+	
+	/**
+     * Décompose les tags composés  
+     *
+     * @param string $car
+     * @param boolean $hier
+     * @param boolean $sup
+     *
+     */
+	function decomposeTags($car, $hier=false, $sup=false) {
+
+		//pour tout les tag
+		//$arrT = $this->getAll();
+		
+		//uniquement pour les tag de catégorie
+        $query = $this->select()
+        	->from( array("t" => "flux_tag"))                           
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('tt' => 'flux_tagtag'),
+                'tt.tag_id_dst = t.tag_id',array())
+            ->group("t.tag_id");
+        $arrT = $this->fetchAll($query)->toArray(); 		
+            
+		foreach ($arrT as $t) {
+			//décompose par ;
+			$arr = explode($car, $t['code']);
+			if(count($arr) > 1){
+				foreach ($arr as $val) {
+					//enregistre le tag sans
+					$idTag = $this->ajouter(array("code"=>$val,"niveau"=>($t['niveau']+1)));
+					//création des liens déjà existant
+					$sql = "INSERT INTO flux_utitag (tag_id, uti_id, poids)
+						SELECT ".$idTag.", uti_id, poids
+						FROM flux_utitag
+						WHERE tag_id=".$t['tag_id']." AND tag_id != ".$idTag;
+			    	$stmt = $this->_db->query($sql);
+					echo $val." ".$idTag." flux_utitag : ".$stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+
+					$sql = "INSERT INTO flux_utitagdoc (tag_id, uti_id, doc_id, poids)
+						SELECT ".$idTag.", uti_id, doc_id, poids
+						FROM flux_utitagdoc
+						WHERE tag_id=".$t['tag_id']." AND tag_id != ".$idTag;
+			    	$stmt = $this->_db->query($sql);
+					echo $val." ".$idTag." flux_utitagdoc : ".$stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+
+					$sql = "INSERT INTO flux_tagtag (tag_id_src, tag_id_dst, poids)
+						SELECT ".$idTag.", tag_id_dst, poids
+						FROM flux_tagtag
+						WHERE tag_id_src=".$t['tag_id']." AND tag_id_src != ".$idTag;
+			    	$stmt = $this->_db->query($sql);
+					echo $val." ".$idTag." flux_tagtag src : ".$stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+					
+					$sql = "INSERT INTO flux_tagtag (tag_id_src, tag_id_dst, poids)
+						SELECT tag_id_src, ".$idTag.", poids
+						FROM flux_tagtag
+						WHERE tag_id_dst=".$t['tag_id']." AND tag_id_dst != ".$idTag;
+			    	$stmt = $this->_db->query($sql);
+					echo $val." ".$idTag." flux_tagtag dst : ".$stmt->rowCount()." ligne(s) affectée(s)<br/>"; 
+
+					$sql = "INSERT INTO flux_tagdoc (tag_id, doc_id, poids)
+						SELECT ".$idTag.", doc_id, poids
+						FROM flux_tagdoc
+						WHERE tag_id=".$t['tag_id']." AND tag_id != ".$idTag;
+			    	$stmt = $this->_db->query($sql);
+					echo $val." ".$idTag." flux_tagdoc : ".$stmt->rowCount()." ligne(s) affectée(s)<br/>"; 					
+				}
+				if($sup)$this->remove($t['tag_id']);
+				
+			}
+		}
+		
+	}
+		
 }

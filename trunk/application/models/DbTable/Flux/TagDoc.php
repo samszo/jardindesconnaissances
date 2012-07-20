@@ -10,12 +10,11 @@
 /**
  * Classe ORM qui représente la table 'flux_tagdoc'.
  *
- * @copyright  201=& Samuel Szoniecky
+ * @copyright  2012 Samuel Szoniecky
  * @license    "New" BSD License
  */
 class Model_DbTable_flux_tagdoc extends Zend_Db_Table_Abstract
-{
-    
+{     
     /*
      * Nom de la table.
      */
