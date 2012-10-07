@@ -67,7 +67,7 @@ nuage.prototype = {
 						//var e = new bulle(this, this.cx, this.y, this.data[i]["code"], p, this.data[i]);
 						//e.draw();
 						//this.bulles.push(e);
-						this.bulles.push({tag: this.data[i]["code"], poids: this.data[i]["poids"], value: this.data[i]["poids"],children:null});
+						this.bulles.push({tag: this.data[i]["code"], poids: this.data[i]["poids"], value: parseInt(this.data[i]["poids"])});
 						//ajoute les liens pour gérer la force
 						if(i>0)	this.links.push({source: this.bulles[i], target: this.bulles[i-1]});
 					}
@@ -235,79 +235,84 @@ nuage.prototype = {
 	      });
 	}
 	,fragmentation: function(data, login){
-		 var nb = data.length/32;
+		 var nbFrag = 64;
+		 var nb = data.length/nbFrag;
 		 var globalNua = this; j = 0, r = 300, format = d3.format(",d"), w = this.wCiel, duree = w*10, nappe = (this.jardin.h/2)+this.jardin.hCompost;
 		 var bubble = d3.layout.pack()
 		      .sort(null)
 		      .size([r, r]);
 		 var timer = setInterval(fragment, w);
 
+		 
 		 function fragment(){
 			
-			 if (j >= nb) return clearInterval(timer);
+			// for(j= 0; j < nb; j++){
+				 if (j >= nb) return clearInterval(timer);
 			 
-			 var deb = j*32, fin = (j+1)*32, xnua, ynua;
-			 var dtn = data.filter(function(d, i) { return i>=deb && i<=fin; });
-			 dtn = bubble.nodes({children: dtn}).filter(function(d, i) { return !d.children; });
-			 
-			 var nua = d3svg.append("svg:g")
-			 	.attr("class", "nua_"+deb+"_"+fin)
-			    .attr("transform", "translate(0,0)");
-
-			 var bulles = nua.selectAll("g.bulles_"+deb+"_"+fin)
-			 	.data(dtn)
-			    .enter().append("svg:g")
-			    .attr("class", "bulles_"+deb+"_"+fin)
-			    .attr("transform", function(d) { return "translate(" + (d.x-r) + "," + (d.y) + ")"; });
-			 bulles.transition()
-			    .duration(200)
-			    .style("opacity", Math.random())
-			    .each("end", pluie);
-			 
-			 var bulle = bulles.append("svg:g")
-			    .attr("class", "bulle");
-			 bulle.append("svg:title")
-		 		.text(function(d) {return d.tag;});
-			 bulle.append("svg:circle")
-			 	.attr("r", function(d) { return d.r; })
-				.attr("opacity",0.2)
-				.attr("fill", "black");				 
-			 bulle.append("svg:text")
-			 	.attr("text-anchor", "middle")
-			 	//.style("font", function(d) { return Math.round(d.value)+"px sans-serif"})
-			    .text(function(d) { return d.tag;});
-
-			 //création de la légende du nuage
-			 nua.append("svg:circle")
-			 	.attr("r", r/2)
-			 	.attr("cx", -r/2)
-			 	.attr("cy", r/2)
-				.attr("opacity",0.1)
-				.attr("fill", "black");				 
-			 nua.append("svg:text")
-			 	.attr("x", -r/2)
-			 	.attr("y", r)
-			 	.style("font", "16px sans-serif")
-			    .text(login);
-			 nua.append("svg:text")
-			 	.attr("x", -r/2)
-			 	.attr("y", r+20)
-			 	.style("font", "16px sans-serif")
-			    .text(deb+" : "+fin+" / "+data.length);
-			    //.text("tags de "+deb+" à "+fin+" sur "+data.length);
-			 nua.append("svg:image")
-				.attr("xlink:href","../public/img/delicious.20.gif")
-				.attr("x",-r/2-20).attr("y",r)
-				.attr("height",16).attr("width",16);
-			 
-			 nua.transition()
-			    .duration(duree)
-			    .ease("linear")
-			    .attr("transform", "translate(" + (r+w) + "," + (0) + ")")
-			    .each("end", ventRetour)
-			    ;
-			 
-			 j++;
+				 var deb = j*nbFrag, fin = (j+1)*nbFrag, xnua, ynua;
+				 var dtn = data.filter(function(d, i) {
+					 return i>=deb && i<=fin && d.value>0; 
+					 });
+				 dtn = bubble.nodes({children: dtn});
+	
+				 var nua = d3svg.append("svg:g")
+				 	.attr("class", "nua_"+deb+"_"+fin)
+				    .attr("transform", "translate(0,0)");
+				 
+				 var bulles = nua.selectAll("g.bulles_"+deb+"_"+fin)
+				 	.data(dtn)
+				    .enter().append("svg:g")
+				    .attr("class", "bulles_"+deb+"_"+fin)
+				    .attr("transform", function(d) { return "translate(" + (d.x-r) + "," + (d.y) + ")"; });
+				 bulles.transition()
+				    .duration(200)
+				    .style("opacity", Math.random())
+				    .each("end", pluie);
+				 
+				 var bulle = bulles.append("svg:g")
+				    .attr("class", "bulle");
+				 bulle.append("svg:title")
+			 		.text(function(d) {return d.tag;});
+				 bulle.append("svg:circle")
+				 	.attr("r", function(d) { return d.r; })
+					.attr("opacity",0.2)
+					.attr("fill", "black");				 
+				 bulle.append("svg:text")
+				 	.attr("text-anchor", "middle")
+				 	//.style("font", function(d) { return Math.round(d.value)+"px sans-serif"})
+				    .text(function(d) { return d.tag;});
+	
+				 //création de la légende du nuage
+				 nua.append("svg:circle")
+				 	.attr("r", r/2)
+				 	.attr("cx", -r/2)
+				 	.attr("cy", r/2)
+					.attr("opacity",0.1)
+					.attr("fill", "black");				 
+				 nua.append("svg:text")
+				 	.attr("x", -r/2)
+				 	.attr("y", r)
+				 	.style("font", "16px sans-serif")
+				    .text(login);
+				 nua.append("svg:text")
+				 	.attr("x", -r/2)
+				 	.attr("y", r+20)
+				 	.style("font", "16px sans-serif")
+				    .text(deb+" : "+fin+" / "+data.length);
+				    //.text("tags de "+deb+" à "+fin+" sur "+data.length);
+				 nua.append("svg:image")
+					.attr("xlink:href","../public/img/delicious.20.gif")
+					.attr("x",-r/2-20).attr("y",r)
+					.attr("height",16).attr("width",16);
+				 
+				 nua.transition()
+				    .duration(duree)
+				    .ease("linear")
+				    .attr("transform", "translate(" + (r+w) + "," + (0) + ")")
+				    .each("end", ventRetour)
+				    ;
+			 //}
+			j++; 
 		}
 		function ventRetour(d, i) {
 		  d3.select(this)

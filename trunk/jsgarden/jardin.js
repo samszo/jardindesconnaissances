@@ -200,8 +200,6 @@ function jardin(R, x, y, w, h){
 		var saisie = prompt("Saisissez le nom du compte delicious ou annulez", "");
 		if (saisie!=null) {
         	cultive(saisie);	
-		}else{
-        	cultive("luckysemiosis");	
 		}			
 	}
 	function cultive (compte){
