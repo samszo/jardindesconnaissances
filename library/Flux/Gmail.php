@@ -42,6 +42,7 @@ class Flux_Gmail extends Flux_Site{
     	
     }
 	
+    
     /**
      * Affiche la lsite des dossiers pour un compte mail.
      *
@@ -91,7 +92,8 @@ class Flux_Gmail extends Flux_Site{
 		$nbMessage = $this->imap->countMessages();
 		//parcourt tout les messages du dossier
 		//pour lire dés le départ $i=1
-		for ($i = 1; $i <= 140; $i++) {
+		for ($i = 1; $i <= $nbMessage; $i++) {
+		//for ($i = 1; $i <= 1181; $i++) {
 			$this->i = $i;
 			//récupération du message
 			$this->message = $this->imap->getMessage($i);
@@ -268,6 +270,8 @@ class Flux_Gmail extends Flux_Site{
 		//ajouter un document correspondant au lien
 	   	$d = new Zend_Date($this->headers["date"],Zend_Date::RFC_2822);
 		$idD = $this->dbD->ajouter(array("url"=>"","titre"=>$this->headers["subject"],"tronc"=>0,"pubDate"=>$d->get("c"), "note"=>$this->content, "type"=>77, "branche_lft"=>$this->i));
+		//ajoute un document correspondant au texte propre
+		$this->dbD->ajouter(array("url"=>"","titre"=>$this->headers["subject"],"tronc"=>$idD,"pubDate"=>$d->get("c"), "note"=>$this->texte, "type"=>57, "branche_lft"=>$this->i));
 		
 		//ajoute un lien entre l'utilisateur qui a envoyé le mail et le document avec un poids
 		$idU = $this->getUser(array("login"=>$this->headers["from"]),true);

@@ -116,5 +116,45 @@ class Flux_Zotero extends Flux_Site{
 		//TODO ajouter la grainedoc 
 		
     } 
+
+    /**
+     * sauveAmazonInfo
+     *
+     * enregistre les information d'amazon pour les document avec un ISBN
+	 * 
+     * 
+     */
+	function sauveAmazonInfo(){
+
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_flux_doc($this->db);
+    	
+    	$fA = new Flux_Amazon($this->idBase);
+    	
+    	//initialise l'utilisateur
+    	$fA->getUser(array("login"=>"Flux_Amazon"));
+    	
+    	//récupère les documents
+		$rs = $this->dbD->findByTronc("0");
+    	
+		foreach ($rs as $r) {
+			if($r['type']=="book"){
+				//vérifie si les infos amazon sont déjà enregistrées
+				$doc = $this->dbD->findFiltre("tronc=".$r["doc_id"]." AND type=39 AND note !='' AND data != ''", "doc_id");
+				if(count($doc)==0){
+					//récupère la note json
+					$obj = json_decode($r['note']);
+					//création de la requête amazon
+					$search = array('SearchIndex' => 'Books');
+					if(isset($obj->title))$search['Title'] = $obj->title;
+					//if(isset($obj->creators[0]->firstName))$search['Author'] = $obj->creators[0]->firstName." ".$obj->creators[0]->lastName;
+					//if(isset($obj->creators[0]->name))$search['Author'] = $obj->creators[0]->name;
+					//if(isset($obj->publisher))$search['Publisher'] = $obj->publisher;
+					$fA->sauveSearch($search, $r["doc_id"]);
+					echo "<br/>".$r["doc_id"]." - ".$obj->title."<br/>";
+				}
+			}
+		}
+    	
+	}    
     
 }
