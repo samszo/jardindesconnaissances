@@ -250,8 +250,6 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 		    	
 	}
 
-	
-	
 	/**
      * Récupère les tags associés à une liste de tag par document 
      *
@@ -292,7 +290,53 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     	
 	}	
 	
+	/**
+     * Récupère le nombre de tags, de type de tag et de document associé à plusieurs utilisateur
+     *
+     * @param string $idsUti
+     * @param string $typeDoc
+     * 
+     * @return array
+     */
+	function getUtiTagAssosNb($idsUti, $typeDoc=77) {
+
+
+		//définition de la requête
+        $query = "select 
+			-- * 
+			  count(distinct doc_id) nbDoc
+			 , count(distinct tag_id) nbTag
+			 , count(distinct tag_id_dst) nbType
+			FROM (
+			  select 
+			    t.tag_id
+			    ,td.doc_id
+			    ,tt.tag_id_dst
+			    ,ut1.uti_id u1
+			    ,ut2.uti_id u2
+			    ,ut3.uti_id u3
+			  
+			  from flux_tag t
+			  inner join flux_tagdoc td on td.tag_id = t.tag_id
+			  inner join flux_doc d on d.doc_id = td.doc_id and d.type = 77
+			  
+			  inner join flux_tagtag tt on tt.tag_id_src = t.tag_id
+			  inner join flux_tag tTy on tTy.tag_id = tt.tag_id_dst
+			  
+			  left join flux_utitag ut1 on ut1.tag_id = t.tag_id AND ut1.uti_id = 4
+			  
+			  left join flux_utitag ut2 on ut2.tag_id = t.tag_id AND ut2.uti_id = 5
+			  
+			  left join flux_utitag ut3 on ut3.tag_id = t.tag_id AND ut3.uti_id = 7
+			) concat
+			WHERE u1=4";
+		
+        return $this->fetchAll($query)->toArray(); 		
+    	
+	}	
 	
+	
+
 	/**
      * Décompose les tags composés  
      *

@@ -214,8 +214,10 @@ class Model_DbTable_Flux_DocTypes extends Zend_Db_Table_Abstract
     public function getIdByExtension($extension)
     {
         $arr = $this->findByExtension($extension);
+        if(isset($arr[0]['id_type']))$idType = $arr[0]['id_type'];
+        else $idType = -1;
         
-        return $arr[0]['id_type']; 
+        return $idType; 
     }
     
     /**
