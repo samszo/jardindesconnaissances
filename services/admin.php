@@ -6,10 +6,46 @@ try {
 	$user = "luckysemiosis";
 	$pwd = "samszo";
 
+	/*
+	$zotero = new Flux_Zotero($user);
+	$zotero->sauveAmazonInfo();
+	$zotero->saveAll();
+	*/
+	/*
+	$d = new Flux_Amazon("flux_diigo");
+	$d->sauveActuLivre();	
+	$d = new Flux_Decitre("flux_diigo");
+	$d->sauveActuLivre();
+	*/
+	
+	/*
+	$g = new Flux_Gurl("samszon@gmail.com", "Janvier2010", "flux_urlcourtes");
+	$g->saveUserHistory("", 0, true);
+    */
+	
+	/*
+	$s = new Flux_Site("flux_gmail_intelligence_collective");
+	$dbDoc = new Model_DbTable_Flux_Doc($s->db);
+	$arrD = $dbDoc->findByTronc(3037);
+	//$arr = $s->getKWAlchemy($arrD[0]['note']);	
+	$arr = $s->getKWYahoo($arrD[0]['note']);	
+	*/
+	
+	/*$arrD =  $dbDoc->findByType(57);
+	$i = 0;
+	foreach ($arrD as $doc_id) {
+		$d = $dbDoc->findBydoc_id($doc_id);
+		$d = $d[0];
+		$s->saveKW($d['doc_id'], $texte,"","yahoo");
+		$i++;
+	}
+	*/
+	
+	
     //pour gérer les compte mail
-    $gm = new Flux_Gmail("samszon","Janvier2010","flux_gmail_intelligence_collective");
+    //$gm = new Flux_Gmail("samszon","Janvier2010","flux_gmail_intelligence_collective");
     //$gm->saveFolderMessages("veille/art", "image");
-    $gm->saveFolderMessages("veille/intelligence collective", "google_alerte");
+    //$gm->saveFolderMessages("veille/intelligence collective", "google_alerte");
     //$gm->getMessagesByFolderName("veille/intelligence collective");
     //$gm->getDossiers();
 	
@@ -21,8 +57,6 @@ try {
 	//$s = new Flux_Stats("flux_zotero");
 	//$stats = $s->GetMatriceTagAssos(array("intelligence","collective"),-1);	    
 	
-	//$zotero = new Flux_Zotero($user);
-	//$zotero->saveAll();
 	
     //$diigo = new Flux_Diigo($user,$pwd,"flux_diigo");
 	//$diigo->saveAll();
