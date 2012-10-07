@@ -12,6 +12,12 @@ define ("SEP_PATH","/");
 //clef des API
 define ("KEY_ZEMANTA","");
 define ("KEY_ALCHEMY","");
+define ("KEY_GOOGLE_URL","");
+define ("KEY_AMAZON","");
+define ("KEY_AMAZON_PWD","");
+define ("AMAZON_PWD","");
+define ("AMAZON_AT","");
+
 
 //code de sécurité pour l'administation
 define ("CODE_ADMIN","simple");
@@ -30,11 +36,17 @@ defined('APPLICATION_ENV')
 
 
 set_include_path(ROOT_PATH.'/library');       
+
+/** Zend_Application 1.10.8
 set_include_path(get_include_path().PATH_SEPARATOR.$www."/ZendFramework-1.10.8/library");
 set_include_path(get_include_path().PATH_SEPARATOR.$www."/ZendFramework-1.10.8/extras/library");
+*/
+/** Zend_Application 1.12.0*/
+set_include_path(get_include_path().PATH_SEPARATOR.$www."/ZendFramework-1.12.0/library");
+set_include_path(get_include_path().PATH_SEPARATOR.$www."/ZendFramework-1.12.0/extras/library");
 
-/** Zend_Application */
 require_once 'Zend/Application.php';
+
 
 // *ZAMFBROWSER IMPLEMENTATION*
 set_include_path(get_include_path().PATH_SEPARATOR.$www."/ZamfBrowser/browser");
