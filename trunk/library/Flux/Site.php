@@ -29,8 +29,7 @@ class Flux_Site{
 	var $dbGUD;
 	var $db;
 	var $lucene;
-	//var $kwe = array("alchemy", "zemanta", "yahoo");
-	var $kwe = array("zemanta", "yahoo");
+	var $kwe = array("zemanta", "alchemy", "yahoo");
 	
     function __construct($idBase=false){    	
     	
@@ -123,7 +122,8 @@ class Flux_Site{
 		$html = false;
 		if(substr($url, 0, 7)!="http://")$url = urldecode($url);
 		if($cache){
-			$c = str_replace("::", "_", __METHOD__)."_".md5($url)."_".$this->getParamString($param); 
+			$c = str_replace("::", "_", __METHOD__)."_".md5($url); 
+			if($param)$c .= "_".$this->getParamString($param);
 		   	$html = $this->cache->load($c);
 		}
         if(!$html){
@@ -137,7 +137,7 @@ class Flux_Site{
 			    echo "Message: " . $e->getMessage() . "\n";
 			}				
         	if($cache)$this->cache->save($html, $c);
-        }    	
+        }
 		return $html;
 	}
 
@@ -217,16 +217,16 @@ class Flux_Site{
      *   
      * @return integer
      */
-	function saveTagTag($tagSrc, $tagDst, $poids, $date, $idSrc=-1, $idDst=-1){
+	function saveTagTag($tagSrc, $tagDst, $poids, $date, $idD, $idSrc=-1, $idDst=-1, $idUser=-1){
 
 		if(!$this->dbTT)$this->dbTT = new Model_DbTable_Flux_TagTag($this->db);
 		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
 
 		if($idSrc==-1){
-			$idSrc = $this->dbT->ajouter(array("code"=>$tagSrc));			
+			$idSrc = $this->saveTag($tagSrc, $idD, $poids, $date, $idUser);
 		}
 		if($idDst==-1){
-			$idDst = $this->dbT->ajouter(array("code"=>$tagDst));			
+			$idDst = $this->saveTag($tagDst, $idD, $poids, $date, $idUser);
 		}
 		
 		//on ajoute la relation entre les tag
@@ -268,6 +268,10 @@ class Flux_Site{
      */
 	function saveKW($idDoc, $texte, $html="", $class="all"){
 		
+		//initialise les gestionnaires de base de données
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc($this->db);
+		
 		if($class=="all"){
 			foreach ($this->kwe as $c) {
 				$result[$c] = $this->saveKW($idDoc, $texte, $html, $c);
@@ -277,13 +281,18 @@ class Flux_Site{
 		
 		//récupère les mots clefs
 		$arrKW = $this->getKW($texte, $html, $class);
+
+		//récupère la date courante
+		$d = new Zend_Date();
 		
 		//récupère l'utilisateur correspondant à la classe
 		$idUdst = $this->getUser(array("login"=>"KWE_".$class),true);
 		
-	   	//enregistre les mots clefs
+		//enregistre l'extraction de mots clefs
+		$idDe = $this->dbD->ajouter(array("titre"=>"json_".$class,"tronc"=>$idDoc,"maj"=>$d->get("c"), "type"=>78, "note"=>json_encode($arrKW)));
+		
+		//enregistre les mots clefs
 	   	if($arrKW){
-		   	$d = new Zend_Date();
 		   	$i=0;
 			switch ($class) {
 				case "autokeyword":
@@ -300,7 +309,7 @@ class Flux_Site{
 							if($kw->sentiment){
 								$poids=1;
 								if(isset($kw->sentiment->score))$poids=$kw->sentiment->score;
-								$this->saveTagTag("", $kw->sentiment->type, $poids, $d->get("c"), $idT);
+								$this->saveTagTag("", $kw->sentiment->type, $poids, $d->get("c"), $idDoc, $idT, -1, $idUdst);								
 							}
 							$i++;	    			
 					   	}
@@ -315,7 +324,7 @@ class Flux_Site{
 								foreach ($kw->types->type as $t){
 									if(isset($t->content)){
 										$poids=1;
-										$this->saveTagTag("", $t->content, $poids, $d->get("c"), $idT);
+										$this->saveTagTag("", $t->content, $poids, $d->get("c"), $idDoc, $idT, -1, $idUdst);
 									}
 								}
 							}
@@ -328,13 +337,21 @@ class Flux_Site{
 					break;
 				case "zemanta":
 					if($arrKW->status=="ok"){
+						if(isset($arrKW->keywords)){
+							foreach ($arrKW->keywords as $kw){
+								$type = $kw->scheme;
+								$poids = $kw->confidence;
+								//enregistre le tag
+								$idT = $this->saveTag($kw->name, $idDoc, $poids, $d->get("c"), $idUdst);
+								if($type){
+									$this->saveTagTag("", $type, $poids, $d->get("c"), $idDoc, $idT, -1, $idUdst);
+								}
+						   	}
+						}
 						if(isset($arrKW->markup->links)){
 							foreach ($arrKW->markup->links as $kw){
 								$type=false;
 								$poids = $kw->relevance;
-								/**TODO gérer les entity_type comme des tableaux...
-								 */
-								if(isset($kw->entity_type))$type=implode(";", $kw->entity_type);
 								foreach ($kw->target as $t){
 									//enregistre le tag
 									$idT = $this->saveTag($t->title, $idDoc, $poids, $d->get("c"), $idUdst);
@@ -345,18 +362,27 @@ class Flux_Site{
 									//enregistre le tag pour le document
 									$idTLie = $this->saveTag($t->type, $idD, $kw->confidence, $d->get("c"), $idUdst);
 									//enregistre les tags liés
-									$this->saveTagTag("", "", $poids, $d->get("c"), $idT, $idTLie);
-									if($type){
-										$this->saveTagTag("", $type, $poids, $d->get("c"), $idT);
-									}
+									$this->saveTagTag("", "", $poids, $d->get("c"), $idDoc, $idT, $idTLie, $idUdst);
+									//enregistre les types
+									if(isset($kw->entity_type)){
+										if(is_array($kw->entity_type)){
+											foreach ($kw->entity_type as $tp) {
+												//enregistre les tags liés
+												$this->saveTagTag("", $tp, $kw->confidence, $d->get("c"), $idD, $idTLie, -1, $idUdst);
+											}											
+										}else{
+											$this->saveTagTag("", $kw->entity_type, $kw->confidence, $d->get("c"), $idD, $idTLie, -1, $idUdst);
+										}
 								}
-								/**TODO compléter avec les autres champs de réponse
-								 * http://developer.zemanta.com/docs/suggest_markup/
-								 */
+									
+								}
 								$i++;	    			
 						   	}
 						}
-					}
+						/**TODO compléter avec les autres champs de réponse
+						 * http://developer.zemanta.com/docs/suggest_markup/
+						 */
+				   	}
 					break;
 			}
 	   	}
@@ -473,14 +499,14 @@ class Flux_Site{
 		
 		if($html!="")$chaine=$html;
 		else $chaine=$texte; 		
-		
+				
 		/* This are the vars you may need to modify */
 		/* Some may be placed in conf files */
 		/* Some may be generated by your application */
 		$url = 'http://api.zemanta.com/services/rest/0.0/'; //Should be in a conf file
 		 // May depend of your application context
 		$method="zemanta.suggest";
-		$method="zemanta.suggest_markup";
+		//$method="zemanta.suggest_markup";
 		
 		/* It is easier to deal with arrays */
 		$args = array(
@@ -490,11 +516,6 @@ class Flux_Site{
 		'format'=> $format
 		);
 		
-		/* Execute the request 
-		$client = new Zend_Http_Client($url);
-		$client->setParameterPost($args);
-		$response = $client->request(Zend_Http_Client::POST);
-		*/
 		$body = $this->getUrlBodyContent($url, $args, false);		
 		
 		if($format=="json"){
@@ -527,8 +548,8 @@ class Flux_Site{
 		if($html!="")$chaine=strip_tags($html);
 		else $chaine=$texte; 		
 		
-		$characters = array('=', '"');
-		$replacements = array('%3D', '%22');
+		$characters = array('=', '"', '\\');
+		$replacements = array('%3D', '%22', ' ');
 		$chaine = str_replace($characters, $replacements, $chaine);
 		
 		$query = 'SELECT * FROM contentanalysis.analyze WHERE text = "'.$chaine.'"';
@@ -577,5 +598,105 @@ class Flux_Site{
 			 </Error> 	
 		 */
 		
-	}		
+	}
+
+	
+    /**
+     * sauveImage
+     *
+     * enregistre l'image du document
+     * 
+     * @param string $url
+     * 
+     * @return array
+     */
+	function sauveImage($idDoc, $url, $titre, $chemin){
+
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+    	if(!$this->dbDT)$this->dbDT = new Model_DbTable_Flux_DocTypes($this->db);
+    	if(!$this->dbUD)$this->dbUD = new Model_DbTable_flux_utidoc($this->db);
+    	
+    	//création du répertoire de stockage de l'image
+		if(!is_dir($chemin)) @mkdir($chemin,0777,true);
+    	
+		//création des données du document
+		$extension = pathinfo($url, PATHINFO_EXTENSION);
+    	$type = $this->dbDT->getIdByExtension($extension);
+    	$arrDoc['type']=$type;
+		$path = $chemin."/".$this->idBase."_".$idDoc.".".$extension;
+		$urlLocal = str_replace(ROOT_PATH, WEB_ROOT, $path);     	
+    	$arrDoc['url']=$urlLocal;
+    	$arrDoc['titre']=$titre;
+    	$arrDoc['tronc']=$idDoc;
+    	
+    	//ajoute le document
+    	$idDoc = $this->dbD->ajouter($arrDoc);
+
+    	//création des liens avec le flux
+    	$this->dbUD->ajouter(array("doc_id"=>$idDoc,"uti_id"=>$this->user));
+    	    	    	
+		if(!is_file($path)){
+    		//enregistre l'image sur le disque local
+			if(!$img = file_get_contents($url)) { 
+			  echo 'pas de fichier : '.$url."<br/>";
+			}else{
+				if(!$f = fopen($path, 'w')) { 
+				  echo 'Ouverture du fichier impossible '.$path."<br/>";
+				}elseif (fwrite($f, $img) === FALSE) { 
+				  echo 'Ecriture impossible '.$path."<br/>";
+				}else{
+					echo 'Image '.$titre.' enregistrée : <a href="'.$urlLocal.'">local</a> -> <a href="'.$url.'">Decitre</a><br/>';
+				} 				
+			}				
+		}    	
+	} 	
+		
+	function objectToObject($instance, $className) {
+	    //merci à http://stackoverflow.com/questions/3243900/convert-cast-an-stdclass-object-to-another-class
+		return unserialize(sprintf(
+	        'O:%d:"%s"%s',
+	        strlen($className),
+	        $className,
+	        strstr(strstr(serialize($instance), '"'), ':')
+	    ));
+	}
+
+	
+	/**
+	 * Removes invalid XML
+	 *
+	 * @access public
+	 * @param string $value
+	 * @return string
+	 */
+	function stripInvalidXml($value)
+	{
+	    $ret = "";
+	    $current;
+	    if (empty($value)) 
+	    {
+	        return $ret;
+	    }
+	
+	    $length = strlen($value);
+	    for ($i=0; $i < $length; $i++)
+	    {
+	        $current = ord($value{$i});
+	        if (($current == 0x9) ||
+	            ($current == 0xA) ||
+	            ($current == 0xD) ||
+	            (($current >= 0x20) && ($current <= 0xD7FF)) ||
+	            (($current >= 0xE000) && ($current <= 0xFFFD)) ||
+	            (($current >= 0x10000) && ($current <= 0x10FFFF)))
+	        {
+	            $ret .= chr($current);
+	        }
+	        else
+	        {
+	            $ret .= " ";
+	        }
+	    }
+	    return $ret;
+	}
+	
 }
