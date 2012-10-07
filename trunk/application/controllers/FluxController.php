@@ -67,6 +67,7 @@ class FluxController extends Zend_Controller_Action {
 		    	$rs[] = $r;
 		    }
 	    }
+	    $this->view->html = $this->_getParam('html', false);		    
 	    $this->view->docs = $rs;		    
     }
     	
@@ -109,6 +110,17 @@ class FluxController extends Zend_Controller_Action {
 			    $this->_redirect('/auth/login');
 			}
 			
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+	}    
+
+	public function showshorturlAction() {
+		try {
+			$o = new Flux_Gurl(null, null, "flux_urlcourtes");
+			$this->view->docs = $o->getUrlSave();
+			$this->view->html=true;			
 		}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
 	          echo "Message: " . $e->getMessage() . "\n";
