@@ -72,7 +72,11 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     		//met à jour le poids
     		if(isset($data["poids"])){
     			$dt["poids"] = $id[0]["poids"]+$data["poids"];
-    			$dt["maj"] = $data["maj"];
+    			$this->edit($id[0]["doc_id"], $dt);
+    		} 
+    		//met à jour la note
+    		if(isset($data["note"])){
+    			$dt["note"] = $data["note"];
     			$this->edit($id[0]["doc_id"], $dt);
     		} 
     		$id = $id[0]["doc_id"];
@@ -91,7 +95,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data, $url=null)
     {
-    	if(!$data["maj"]) $data["maj"] = new Zend_Db_Expr('NOW()');
+    	if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
     	if($url)
 	        $this->update($data, 'flux_doc.url = "'. $url.'"');
     	else        
