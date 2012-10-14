@@ -11,7 +11,7 @@ require_once 'Zend/Controller/Action.php';
 
 class BiblioController extends Zend_Controller_Action {
 	
-	var $dbNom = "flux_zotero";
+	var $dbNom = "flux_diigo";
 
 	/**
 	 * The default action - show the home page
