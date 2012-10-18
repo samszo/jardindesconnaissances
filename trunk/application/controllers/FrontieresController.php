@@ -60,7 +60,10 @@ class FrontieresController extends Zend_Controller_Action {
 					$dbG = new Model_DbTable_Flux_Geos($db);
 					$dbGUD = new Model_DbTable_Flux_UtiGeoDoc($db);
 					//récupération de l'utilisateur	
-					$idU = $site->getUser(array("login"=>$_SERVER['REMOTE_ADDR'],"flux"=>"frontières","date_inscription"=>$d->get("c")));
+					//$idU = $site->getUser(array("login"=>$_SERVER['REMOTE_ADDR'],"flux"=>"frontières","date_inscription"=>$d->get("c")));
+				    $ssUti = new Zend_Session_Namespace('uti');
+				    $idU = $ssUti->idUti;
+					
 					//enregistre la position
 					$idGeo = $dbG->ajouter(array("lat"=>$params['lat'],"lng"=>$params['lng'],"zoom_max"=>$params['zoom'],"maj"=>$d->get("c")));
 		    		$dbGUD->ajouter(array("doc_id"=>$params['idDoc'],"uti_id"=>$idU,"geo_id"=>$idGeo,"maj"=>$d->get("c"), "note"=>$params['note']));
@@ -118,11 +121,12 @@ class FrontieresController extends Zend_Controller_Action {
 		    	   	//initialise les variables
 					$site = new Flux_Site();
 				    $db = $site->getDb($this->dbNom);
-				    //calcul l'indice géographique
+				    //calcul les indices géographiques
 				    $dbGUD = new Model_DbTable_Flux_UtiGeoDoc($db);
-				    $arrGeo = $dbGUD->calcIndTerreForDoc();
-		    		//calcul le tag cloud
-					$this->view->data = $this->getTagcloud($db, $params['idDoc']);					
+				    $arr["indTerreForDoc"] = $dbGUD->calcIndTerreForDoc();
+				    $arr["indTerreForUti"] = $dbGUD->calcIndTerreForUti();
+				    //envoie les données
+					$this->view->data = $arr;					
 				}
 			    
 			}else{
