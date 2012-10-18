@@ -6,6 +6,7 @@
 function tagcloud(config) {
 	this.idDoc = config.idDoc;  
 	this.idExi = config.idExi; 
+	this.sauve = config.sauve; 
 	this.exi;
 	this.global = config.global;  
 	this.verif = config.verif;  
@@ -122,10 +123,6 @@ function tagcloud(config) {
 		        	.text(function(d) { return d.text; })
 		        	.on("click", function(d) {
 		        		var mt = d3.select(this);
-		        		if(self.exi){
-							console.log(self.idDoc+" "+d.text+" "+self.poidsTag);
-							saveTag(d.text, self.poidsTag, "tag_"+self.idDoc);
-		        		} 
 		        		if(self.global){
 		        			vis.selectAll("text").style("fill","black");
 		        			d3.select(this).style("fill","blue");
@@ -133,14 +130,20 @@ function tagcloud(config) {
 		        		}
 		        		if(self.verif){
 		        			var c = "red";
+        					self.poidsTag = -1;
 		        			self.verif.forEach(function(v) {
 		        				if(v.code == d.text && v.on==1){
 		        					c = "green";
+		        					self.poidsTag = 1;
 		        					return;
 		        				}
 		        			});		        				
 		        			d3.select(this).style("fill",c);
 		        		}
+		        		if(self.exi || self.sauve){
+							console.log(self.idDoc+" "+d.text+" "+self.poidsTag);
+							saveTag(d.text, self.poidsTag, "tag_"+self.idDoc);
+		        		} 
 		        	})
 		        	.on("mouseover", function(d, i) { 
 		        		if(self.exi){
