@@ -21,6 +21,22 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
 	 * http://fr.wikipedia.org/wiki/Terre
 	 */
 	var $periTerre = 40075.017;
+	/*indice de déterriolisation
+	 * 100% = la géolocalisation des utilisateurs est aux antipodes de la référence
+	 * 0 % = la géolocalisation est égal à la référence
+	 */
+	var $indDeterre;
+
+	public function __construct($config = array())
+    {
+    	parent::__construct($config);
+		/*indice de déterriolisation
+		 * 100% = la géolocalisation des utilisateurs est aux antipodes de la référence
+		 * 0 % = la géolocalisation est égal à la référence
+		 */
+		$this->indDeterre = "SUM(note)*(100/(COUNT(*)*".($this->periTerre/2)."))";
+    }
+		
 	
     /*
      * Nom de la table.
@@ -244,7 +260,7 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
     
 
     /**
-     * calcul l'indice de territorialité pour un document
+     * calcul l'indice de territorialité pour un ou tous document
      *
      * @param int $idDoc
      *
@@ -254,11 +270,33 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
     {
     	//récupère la somme des distances pour le document
         $query = $this->select()
-			->from(array("f" => "flux_utigeodoc"),array("nb"=>"COUNT(*)", "somme"=>"SUM(note)", "indice"=>"COUNT(*)/SUM(note)/".$this->periTerre/2))
+			->from(array("f" => "flux_utigeodoc"),array("doc_id","nb"=>"COUNT(*)", "somme"=>"SUM(note)", "indice"=>$this->indDeterre))
 			->group("doc_id")
-			->order("doc_id")
+			->order("indice")
 			->where("note > 0");                           
 		if($idDoc)$query->where( "f.doc_id = ?", $idDoc);
+        $result = $this->fetchAll($query)->toArray(); 
+        
+        return $result;
+        
+    }
+
+    /**
+     * calcul l'indice de territorialité pour un ou tous utilisateur
+     *
+     * @param int $idUti
+     *
+     * @return array
+     */
+    public function calcIndTerreForUti($idUti=false)
+    {
+    	//récupère la somme des distances pour le document
+    	$query = $this->select()
+			->from(array("f" => "flux_utigeodoc"),array("uti_id","nb"=>"COUNT(*)", "somme"=>"SUM(note)", "indice"=>$this->indDeterre))
+			->group("uti_id")
+			->order("indice")
+			->where("note > 0");                           
+		if($idUti)$query->where( "f.uti_id = ?", $idUti);
         $result = $this->fetchAll($query)->toArray(); 
         
         return $result;
