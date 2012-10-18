@@ -9,7 +9,7 @@
 		<script type='text/javascript' src="js/tagcloud.js"></script>
 		<script type='text/javascript' src="js/d3.layout.cloud.js"></script>
 		<script type="text/javascript" src="js/heatmap.js"></script>
-<meta name="Description" CONTENT=">Evaluation de la territorialité des productions artistiques"/>
+<meta name="Description" CONTENT=">Evaluer la territorialité des productions artistiques"/>
 <meta name="Keywords" CONTENT=">Evaluation territoire art frontière"/>
 <meta name="Author" CONTENT="Samuel Szoniecky"/>
 <meta name="verify-v1" content="WsAmN5yAjLkY3+8UmcwheVwnclyQfENPneHC3DSiGAA=" />
@@ -32,8 +32,7 @@ pageTracker._trackPageview();
 		var iTof = 0, posiClic, posiNote;
 		var choix = false;
 		var map;
-				
-		
+						
 		</script>
 		<style>
 		body { font-size: 14px; font-family:arial; line-height:20px;background-color:black;color:white}
@@ -42,15 +41,40 @@ pageTracker._trackPageview();
 		#outerdiv{width:900px;height:630px;overflow:hidden;position:relative;}
 		#inneriframe{position:absolute;top:-80px;left:-300px;width:1280px;height:1200px;}
 		#tof {width:600px; height:600px;}
+		th {height:76px;vertical-align:top}
+		div.conteneur { 
+		  text-align:center; /* centrage horizontal */
+		}
+		
+		div.bloc { 
+		  width:100px;
+		  margin:0 3px; /* espacement horizontal des blocs */
+		  display:inline-block;
+		  vertical-align:middle;
+		  text-align:center; /* on rétablit l'alignement du texte */
+		}
 		</style>
 	</head>
 	<body onload="chargeTof();">
 		<div id="main">
-			<h1>Evaluation de la territorialité des productions artistiques</h1>
+			<h1>Evaluer la territorialité des productions artistiques</h1>
 				<table>
 					<tr>
-						<th>Cliquez sur l'oeuvre pour passer à la suivante</th>
-						<th><label>Choisissez une carte : </label>
+						<th>
+							<label>1. Choisissez une oeuvre</label>
+							<div class="conteneur" >
+								<div class="bloc">
+									<img src="img/prev.jpg" onclick='prevTof();' />
+								</div>
+								<div class="bloc">
+									<span id="numTof" ></span> sur <span id="nbTof" ></span>
+								</div>
+								<div class="bloc">
+									<img src="img/next.jpg" onclick='nextTof();' />
+								</div>
+							</div>
+						</th>
+						<th><label>2. Choisissez une carte : </label>
 							<select id="choix_carte" onchange="setCarte(this);">
 							<option></option>
 							<option>géographie</option>
@@ -58,9 +82,9 @@ pageTracker._trackPageview();
 							<option>Taxonomie d'idée</option>
 							</select>
 							<p>
-								<label id="scene_1.1" style="display:none" >cliquez sur la carte pour choisir un territoire</label>
-								<label id="scene_1.2" style="display:none" >cliquez sur un mot pour qualifier l'oeuvre</label>
-								<label id="scene_1.3" style="display:none" >cliquez dans le graphique pour choisir un espace sémantique</label>
+								<label id="scene_1.1" style="display:none" >3. cliquez sur la carte pour choisir un territoire</label>
+								<label id="scene_1.2" style="display:none" >3. cliquez sur un mot pour qualifier l'oeuvre</label>
+								<label id="scene_1.3" style="display:none" >3. cliquez dans le graphique pour choisir une coordonnée sémantique</label>
 								<label id="scene_2" style="display:none" >afficher toutes les réponses :<input type="checkbox" id="cbVoirReponses" onclick="getReponses();" /></label>
 							</p>
 						</th>
