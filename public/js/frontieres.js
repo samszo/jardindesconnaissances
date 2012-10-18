@@ -10,7 +10,7 @@
 		document.getElementById("scene_1.2").style.display='none';
 		document.getElementById("scene_1.3").style.display='none';
 		document.getElementById("scene_2").style.display='none';
-		
+
 	}
 	
 	function setCarte(sb){
@@ -84,7 +84,8 @@
 			.attr("id", "selectTof")
 			.attr("src", url);
 		choix = false;
-		
+		document.getElementById("numTof").innerHTML = iTof+1;
+		document.getElementById("nbTof").innerHTML = arrTof.length;
 	}	
 	
 	function nextTof() {
@@ -97,6 +98,16 @@
 		//map.setOptions({zoom: 1,center:new google.maps.LatLng(0,0)});
 	}
 
+	function prevTof() {
+		iTof--;
+		if(iTof == -1) iTof = 0;
+		//removeRuler();
+		document.getElementById("choix_carte").options.selectedIndex = 0;
+		initCarte();
+		chargeTof();
+		//map.setOptions({zoom: 1,center:new google.maps.LatLng(0,0)});
+	}
+	
 	function savePosition() {
 		var p = {"idDoc":arrTof[iTof]['doc_id'], "lat":posiClic.lat(), "lng":posiClic.lng(), "zoom":map.getZoom(), "note":posiNote};
 		$.post("frontieres/ajout", p,
@@ -107,7 +118,7 @@
 
 	function saveTag(tag, poids){
 		var p = {"tag":tag, "idDoc":arrTof[iTof]['doc_id'], "poids":poids, "db":db};
-		$.post("../flux/ajoututitag", p,
+		$.post("flux/ajoututitag", p,
 				 function(data){
 			 		var toto = "toto";
 				 }, "json");
@@ -119,14 +130,14 @@
 		var tcg;	
 		if(dataCloud){
 	 		//affiche le tag cloud
-			tcg	= new tagcloud({idDoc:"tcIma", data:dataCloud, w:600, h:300, colorTag:'white', verif:true});			
+			tcg	= new tagcloud({idDoc:"tcIma", data:dataCloud, w:600, h:300, colorTag:'white', verif:true, sauve:true});			
 		}else{
 			//récupère les données du tagcloud
 			var p = {"idDoc":arrTof[iTof]['doc_id'], "db":db};
 			$.post("frontieres/tagcloud", p,
 					 function(data){
 						dataCloud = data;
-						tcg	= new tagcloud({idDoc:"tcIma", data:dataCloud, w:600, h:300, colorTag:'white', verif:true});			
+						tcg	= new tagcloud({idDoc:"tcIma", data:dataCloud, w:600, h:300, colorTag:'white', verif:true, sauve:true});			
 					 }, "json");
 			
 			
