@@ -45,6 +45,40 @@ class FrontieresController extends Zend_Controller_Action {
 	          echo "Message: " . $e->getMessage() . "\n";
 		}
 	}
+
+	
+	/**
+	 * The default action - show the home page
+	 */
+	public function etudiantsAction() {
+		try {
+
+			$auth = Zend_Auth::getInstance();
+			if ($auth->hasIdentity()) {
+			    // l'identité existe ; on la récupère
+			    $this->view->identite = $auth->getIdentity();
+			    $ssUti = new Zend_Session_Namespace('uti');
+			    $this->view->idUti = $ssUti->idUti;
+				//récupère les photos et les géolocalisations
+			    $site = new Flux_Site();
+			    $db = $site->getDb($ssUti->dbNom);
+			    /*
+				$dbUGD = new Model_DbTable_Flux_UtiGeoDoc($db);
+		    	$where = null;
+				if($this->_getParam('id', 0)){
+			    	$where = "d.doc_id = ".$this->_getParam('id', 0);			
+		    	}
+				$this->view->arr = $dbUGD->getDataLiees("RAND()",$where); 
+			    */
+			}else{
+			    $this->_redirect('/auth/login?redir=frontieres&idBase='.$this->dbNom);
+			}	    	
+
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+	}
 	
 	public function ajoutAction() {
 		try {
@@ -117,17 +151,23 @@ class FrontieresController extends Zend_Controller_Action {
 			$auth = Zend_Auth::getInstance();
 			if ($auth->hasIdentity()) {			
 				$params = $this->getRequest()->getParams();
-				if($params){
+				//if($params){
 		    	   	//initialise les variables
 					$site = new Flux_Site();
 				    $db = $site->getDb($this->dbNom);
+				    $arr = array();
 				    //calcul les indices géographiques
 				    $dbGUD = new Model_DbTable_Flux_UtiGeoDoc($db);
 				    $arr["indTerreForDoc"] = $dbGUD->calcIndTerreForDoc();
 				    $arr["indTerreForUti"] = $dbGUD->calcIndTerreForUti();
+					$dbUTD = new Model_DbTable_Flux_UtiTagDoc($db);		
+				    //$arr["UtisNbTagNbDoc"] = $dbUTD->GetUtisNbTagNbDoc();
+				    $arr["indTerreTagForUti"] = $dbUTD->calcIndTerreTagForUti();
+				    $arr["indTerreTagForDoc"] = $dbUTD->calcIndTerreTagForDoc();
+				    $arr["indTerreTagForTag"] = $dbUTD->calcIndTerreTagForTag();
 				    //envoie les données
 					$this->view->data = $arr;					
-				}
+				//}
 			    
 			}else{
 			    $this->_redirect($this->redir.$this->dbNom);

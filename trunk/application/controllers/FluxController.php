@@ -82,7 +82,8 @@ class FluxController extends Zend_Controller_Action {
 				$o = new Flux_Site($this->_getParam('db', 0));
 				$o->user = $ssUti->idUti;
 				$d = new Zend_Date();
-				$this->view->data = $o->saveTag($this->_getParam('tag', 0), $this->_getParam('idDoc', 0), $this->_getParam('poids', 0),$d->get("c"));
+				$this->view->data = $o->saveTag($this->_getParam('tag', 0), $this->_getParam('idDoc', 0), $this->_getParam('poids', 0)
+					,$d->get("c"), -1, $this->_getParam('existe', true));
 				
 				$dbUTD = new Model_DbTable_Flux_UtiTagDoc($o->db);		
 				$this->view->data = $dbUTD->GetUtiTagDoc($ssUti->idUti, $this->_getParam('idDoc', 0));

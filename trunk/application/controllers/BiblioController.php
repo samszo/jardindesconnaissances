@@ -47,5 +47,23 @@ class BiblioController extends Zend_Controller_Action {
 	          echo "Message: " . $e->getMessage() . "\n";
 		}
 	}
+
+	/**
+	 * ordonner un document par rapport à un axe
+	 */
+	public function classaxeAction() {
+		try {
+			if($this->_getParam('db', 0))$this->dbNom = $this->_getParam('db'); 
+			
+			$s = new Flux_Site($db=$this->dbNom);
+
+			$this->view->biblio = $dbD->fetchAll($query)->toArray(); 					
+			
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+	}
+	
 	
 }
