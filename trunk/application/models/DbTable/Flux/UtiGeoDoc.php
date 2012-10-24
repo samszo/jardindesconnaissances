@@ -21,10 +21,6 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
 	 * http://fr.wikipedia.org/wiki/Terre
 	 */
 	var $periTerre = 40075.017;
-	/*indice de déterriolisation
-	 * 100% = la géolocalisation des utilisateurs est aux antipodes de la référence
-	 * 0 % = la géolocalisation est égal à la référence
-	 */
 	var $indDeterre;
 
 	public function __construct($config = array())

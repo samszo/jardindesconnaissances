@@ -28,7 +28,19 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
      */
     protected $_primary = 'uti_id';
 
-    
+	var $indDeterre;
+
+	public function __construct($config = array())
+    {
+    	parent::__construct($config);
+		/*indice de déterriolisation
+		 * 100% = le choix du tag des utilisateurs est aux antipodes de la référence
+		 * 0 % = la géolocalisation est égal à la référence
+		 */
+		$this->indDeterre = "SUM(poids)*(100/COUNT(*))";
+    }
+	
+	
     /**
      * Vérifie si une entrée Flux_utitagdoc existe.
      *
@@ -413,7 +425,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         	->from( array("utd" => "flux_utitagdoc")
-        		, array("utd.tag_id", "nbTag"=>"COUNT(DISTINCT utd.tag_id)", "nbDoc"=>"COUNT(DISTINCT utd.doc_id)"))                           
+        		, array("nbTag"=>"COUNT(DISTINCT utd.tag_id)", "nbDoc"=>"COUNT(DISTINCT utd.doc_id)"))                           
             ->joinInner(array('u' => 'flux_uti'),
             	'u.uti_id = utd.uti_id',array('login','utd.uti_id'))
             /*
@@ -429,5 +441,71 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
 		
         return $this->fetchAll($query)->toArray(); 		
 	}
+
+    /**
+     * calcul l'indice de territorialité des tags pour un ou tous utilisateur
+     *
+     * @param int $idUti
+     *
+     * @return array
+     */
+    public function calcIndTerreTagForUti($idUti=false)
+    {
+    	//récupère la somme des distances pour le document
+    	$query = $this->select()
+			->from(array("f" => "flux_utitagdoc"),array("uti_id","nb"=>"COUNT(*)", "somme"=>"SUM(poids)", "indice"=>$this->indDeterre))
+			->group("uti_id")
+			->order("indice")
+			->where("poids <> 0");                           
+		if($idUti)$query->where( "f.uti_id = ?", $idUti);
+        $result = $this->fetchAll($query)->toArray(); 
+        
+        return $result;
+        
+    }
 	
+    /**
+     * calcul l'indice de territorialité des tags pour un ou tous documents
+     *
+     * @param int $idDoc
+     *
+     * @return array
+     */
+    public function calcIndTerreTagForDoc($idDoc=false)
+    {
+    	//récupère la somme des distances pour le document
+    	$query = $this->select()
+			->from(array("f" => "flux_utitagdoc"),array("doc_id","nb"=>"COUNT(*)", "somme"=>"SUM(poids)", "indice"=>$this->indDeterre))
+			->group("doc_id")
+			->order("indice")
+			->where("poids <> 0");                           
+		if($idUti)$query->where( "f.doc_id = ?", $idDoc);
+        $result = $this->fetchAll($query)->toArray(); 
+        
+        return $result;
+        
+    }
+
+    /**
+     * calcul l'indice de territorialité des tags pour un ou tous tags
+     *
+     * @param int $idTag
+     *
+     * @return array
+     */
+    public function calcIndTerreTagForTag($idTag=false)
+    {
+    	//récupère la somme des distances pour le document
+    	$query = $this->select()
+			->from(array("f" => "flux_utitagdoc"),array("tag_id","nb"=>"COUNT(*)", "somme"=>"SUM(poids)", "indice"=>$this->indDeterre))
+			->group("tag_id")
+			->order("indice")
+			->where("poids <> 0");                           
+		if($idTag)$query->where( "f.tag_id = ?", $idTag);
+        $result = $this->fetchAll($query)->toArray(); 
+        
+        return $result;
+        
+    }    
+    
 }
