@@ -117,7 +117,7 @@
 	}
 
 	function saveTag(tag, poids){
-		var p = {"tag":tag, "idDoc":arrTof[iTof]['doc_id'], "poids":poids, "db":db};
+		var p = {"tag":tag, "idDoc":arrTof[iTof]['doc_id'], "poids":poids, "db":db, "existe":0};
 		$.post("flux/ajoututitag", p,
 				 function(data){
 			 		var toto = "toto";
