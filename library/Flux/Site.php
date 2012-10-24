@@ -182,10 +182,11 @@ class Flux_Site{
      * @param integer $poids
      * @param date $date
      * @param int $idUser
+     * @param boolean $existe : mettre à false pour forcer la création 
      *   
      * @return integer
      */
-	function saveTag($tag, $idD, $poids, $date, $idUser=-1){
+	function saveTag($tag, $idD, $poids, $date, $idUser=-1, $existe = true){
 
 		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
 		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
@@ -201,7 +202,7 @@ class Flux_Site{
 		//on ajoute le lien entre le tag et l'uti avec le poids
 		$this->dbUT->ajouter(array("tag_id"=>$idT, "uti_id"=>$idUser, "poids"=>$poids));
 		//on ajoute le lien entre le tag l'utilisateur et le doc
-		$this->dbUTD->ajouter(array("uti_id"=>$idUser, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date, "poids"=>$poids));
+		$this->dbUTD->ajouter(array("uti_id"=>$idUser, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date, "poids"=>$poids), $existe);
 
 		return $idT;
 	}
