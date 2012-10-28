@@ -37,7 +37,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
 		 * 100% = le choix du tag des utilisateurs est aux antipodes de la référence
 		 * 0 % = la géolocalisation est égal à la référence
 		 */
-		$this->indDeterre = "SUM(poids)*(100/COUNT(*))";
+		$this->indDeterre = "SUM(f.poids)*(100/COUNT(*))";
     }
 	
 	
@@ -453,10 +453,12 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
     	//récupère la somme des distances pour le document
     	$query = $this->select()
-			->from(array("f" => "flux_utitagdoc"),array("uti_id","nb"=>"COUNT(*)", "somme"=>"SUM(poids)", "indice"=>$this->indDeterre))
-			->group("uti_id")
+			->from(array("f" => "flux_utitagdoc"),array("uti_id","nb"=>"COUNT(*)", "somme"=>"SUM(f.poids)", "indice"=>$this->indDeterre))
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
+			->joinInner(array('d' => 'flux_doc'), "d.doc_id = f.doc_id",array("url"))
+			->group("f.uti_id")
 			->order("indice")
-			->where("poids <> 0");                           
+			->where("f.poids <> 0");                           
 		if($idUti)$query->where( "f.uti_id = ?", $idUti);
         $result = $this->fetchAll($query)->toArray(); 
         
@@ -475,10 +477,12 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
     	//récupère la somme des distances pour le document
     	$query = $this->select()
-			->from(array("f" => "flux_utitagdoc"),array("doc_id","nb"=>"COUNT(*)", "somme"=>"SUM(poids)", "indice"=>$this->indDeterre))
-			->group("doc_id")
+			->from(array("f" => "flux_utitagdoc"),array("doc_id","nb"=>"COUNT(*)", "somme"=>"SUM(f.poids)", "indice"=>$this->indDeterre))
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
+			->joinInner(array('d' => 'flux_doc'), "d.doc_id = f.doc_id",array("url"))
+			->group("f.doc_id")
 			->order("indice")
-			->where("poids <> 0");                           
+			->where("f.poids <> 0");                           
 		if($idUti)$query->where( "f.doc_id = ?", $idDoc);
         $result = $this->fetchAll($query)->toArray(); 
         
@@ -497,10 +501,12 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
     	//récupère la somme des distances pour le document
     	$query = $this->select()
-			->from(array("f" => "flux_utitagdoc"),array("tag_id","nb"=>"COUNT(*)", "somme"=>"SUM(poids)", "indice"=>$this->indDeterre))
-			->group("tag_id")
+			->from(array("f" => "flux_utitagdoc"),array("tag_id","nb"=>"COUNT(*)", "somme"=>"SUM(f.poids)", "indice"=>$this->indDeterre))
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
+			->joinInner(array('d' => 'flux_doc'), "d.doc_id = f.doc_id",array("url"))
+			->group("f.tag_id")
 			->order("indice")
-			->where("poids <> 0");                           
+			->where("f.poids <> 0");                           
 		if($idTag)$query->where( "f.tag_id = ?", $idTag);
         $result = $this->fetchAll($query)->toArray(); 
         
