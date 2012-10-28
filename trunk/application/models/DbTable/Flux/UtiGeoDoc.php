@@ -30,7 +30,7 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
 		 * 100% = la géolocalisation des utilisateurs est aux antipodes de la référence
 		 * 0 % = la géolocalisation est égal à la référence
 		 */
-		$this->indDeterre = "SUM(note)*(100/(COUNT(*)*".($this->periTerre/2)."))";
+		$this->indDeterre = "SUM(f.note)*(100/(COUNT(*)*".($this->periTerre/2)."))";
     }
 		
 	
@@ -266,10 +266,12 @@ class Model_DbTable_Flux_UtiGeoDoc extends Zend_Db_Table_Abstract
     {
     	//récupère la somme des distances pour le document
         $query = $this->select()
-			->from(array("f" => "flux_utigeodoc"),array("doc_id","nb"=>"COUNT(*)", "somme"=>"SUM(note)", "indice"=>$this->indDeterre))
-			->group("doc_id")
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
+			->from(array("f" => "flux_utigeodoc"),array("doc_id","nb"=>"COUNT(*)", "somme"=>"SUM(f.note)", "indice"=>$this->indDeterre))
+			->joinInner(array('d' => 'flux_doc'), "d.doc_id = f.doc_id",array("url"))
+			->group("f.doc_id")
 			->order("indice")
-			->where("note > 0");                           
+			->where("f.note > 0");                           
 		if($idDoc)$query->where( "f.doc_id = ?", $idDoc);
         $result = $this->fetchAll($query)->toArray(); 
         
