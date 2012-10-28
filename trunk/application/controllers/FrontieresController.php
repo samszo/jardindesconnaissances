@@ -13,6 +13,7 @@ class FrontieresController extends Zend_Controller_Action {
 	
 	var $dbNom = "flux_frontieres";
 	var $redir = '/auth/login?redir=frontieres&idBase=';
+	var $fondTweetPalette = 1218;
 	
 	/**
 	 * The default action - show the home page
@@ -160,11 +161,18 @@ class FrontieresController extends Zend_Controller_Action {
 				    $dbGUD = new Model_DbTable_Flux_UtiGeoDoc($db);
 				    $arr["indTerreForDoc"] = $dbGUD->calcIndTerreForDoc();
 				    $arr["indTerreForUti"] = $dbGUD->calcIndTerreForUti();
-					$dbUTD = new Model_DbTable_Flux_UtiTagDoc($db);		
+					$dbUTD = new Model_DbTable_Flux_UtiTagDoc($db);
+
+					//calcul les indices des tags cloud
 				    //$arr["UtisNbTagNbDoc"] = $dbUTD->GetUtisNbTagNbDoc();
 				    $arr["indTerreTagForUti"] = $dbUTD->calcIndTerreTagForUti();
 				    $arr["indTerreTagForDoc"] = $dbUTD->calcIndTerreTagForDoc();
 				    $arr["indTerreTagForTag"] = $dbUTD->calcIndTerreTagForTag();
+
+				    //calcul les indices des palettes de concepts
+				    $tp = new Flux_Tweetpalette($this->dbNom);
+				    $arr["indTerreConcept"] = $tp->getFondStat($this->fondTweetPalette);
+				    
 				    //envoie les données
 					$this->view->data = $arr;					
 				//}
