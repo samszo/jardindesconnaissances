@@ -85,8 +85,6 @@ class Flux_Tweetpalette extends Flux_Site{
 		
 		$DocFond = $this->dbD->findByUrl($urlFond);
 
-		$dc = "";
-		$max = 0;
 		if($filtrer==="false"){
     		//récupère tous les clics sur le fond pour un événement
     		$DocsClic = $this->dbD->findLikeTronc($DocFond[0]["doc_id"]."_");
@@ -109,14 +107,26 @@ class Flux_Tweetpalette extends Flux_Site{
 			}
     	}
 		//construction du format json correspondant à heatmap.js
-		foreach ($DocsClic as $d) {
+    	return $this->getHeatmapClic($DocsClic);
+    }
+    
+    /**
+     * construction du format json correspondant à heatmap.js
+     * @param array $DocsClic
+     * 
+     * return array
+     */
+    function getHeatmapClic($DocsClic){
+		$dc = "";
+		$max = 0;
+    	foreach ($DocsClic as $d) {
     		$coor = substr($d["data"],0,-1);
-    		$dc .= $coor.",count:".$d["poids"]."},";
+    		$dc .= $coor.",count:".$d["poids"].",doc_id:".$d["doc_id"]."},";
     		if($max<$d["poids"])$max=$d["poids"];
     	}    		
     	$dc = "{max: ".$max.", data: [".substr($dc,0,-1)."]}";
     	return $dc;
-    }
+    }    
     
     /**
      * récupère les inputs user, event et tag
@@ -134,4 +144,31 @@ class Flux_Tweetpalette extends Flux_Site{
     	return array("events"=>$events,"utis"=>$utis);
     }    
 	
+    /**
+     * récupère les clics sur les documents
+     * @param int $idFond
+     * 
+     * return array
+     */
+    function getFondStat($idFond){
+		//création des tables
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		$query = $this->dbD->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("d" => "flux_doc"), array("doc_id", "poids", "data"))                           
+            ->joinInner(array('dU' => 'flux_doc'), "dU.doc_id = SUBSTRING(d.tronc,LENGTH('".$idFond."_')+1)",array("idU"=>"doc_id","urlU"=>"url"))
+            ->joinInner(array('dT' => 'flux_doc'), "dT.doc_id = SUBSTRING(dU.url,INSTR(dU.url, 'id=')+3)",array("idT"=>"doc_id","urlT"=>"url","titreT"=>"titre"))
+            ->joinInner(array('utd' => 'flux_utitagdoc'), "utd.doc_id = dU.doc_id",array())
+            ->joinInner(array('u' => 'flux_uti'), "u.uti_id = utd.uti_id",array("login","uti_id"))
+            ->joinInner(array('udFkr' => 'flux_utidoc'), "udFkr.doc_id = dT.doc_id",array())
+            ->joinInner(array('uFkr' => 'flux_uti'), "uFkr.uti_id = udFkr.uti_id",array("utiFkr"=>"GROUP_CONCAT(DISTINCT uFkr.login)"))
+            ->where("(d.tronc LIKE '%".$idFond."_%')")
+            ->group("d.data");
+		
+        return $this->dbD->fetchAll($query)->toArray(); 
+				
+    }    
+    
+    
+    
 }
