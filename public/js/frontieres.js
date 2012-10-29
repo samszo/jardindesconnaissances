@@ -23,24 +23,24 @@
 		var td = d3.select('#tdCarto');
 		var divMap = td.append("div").attr("id", "map_canvas");
 		//affiche la carte sélectionnée
-		if(ind==1)getGeo();
+		if(ind==1)getGeo(document.getElementById("map_canvas"));
 		if(ind==2)getTagcloud(divMap);
-		if(ind==3)getTaxoIdee(divMap);
+		if(ind==3)getTaxoIdee(divMap, "Tweetpalette?iframe=true&tag=frontières&url=http://www.jardindesconnaissances.com/public/frontieres?id="+arrTof[iTof]['doc_id']+"&showIeml=true&idBase="+db);
 		//affiche l'instruction suivante
 		document.getElementById("scene_1."+ind).style.display='block';
 	}
 
-	function getTaxoIdee(ele){
+	function getTaxoIdee(ele, src){
 		
 		var ifr = ele.append("div")
 			.attr("id","outerdiv")
 				.append("iframe")
-				.attr("src", "Tweetpalette?iframe=true&tag=frontières&url=http://www.jardindesconnaissances.com/public/frontieres?id="+arrTof[iTof]['doc_id']+"&showIeml=true&idBase="+db)
+				.attr("src", src)
 				.attr("id","inneriframe")
 				.attr("scrolling", "no");
 	}
 	
-	function getGeo() {
+	function getGeo(ele) {
 		//pour gérer la non connexion
 		if(google){				
 			var myOptions = {
@@ -49,7 +49,7 @@
 			  mapTypeId: google.maps.MapTypeId.ROADMAP		
 			};
 			
-			map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+			map = new google.maps.Map(ele, myOptions);
 
 			google.maps.event.addListener(map, 'click', function(mouseEvent) {
 				if(!choix){					
