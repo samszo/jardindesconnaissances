@@ -601,6 +601,51 @@ class Flux_Site{
 		
 	}
 
+	/**
+     * Récupère les mots clefs avec CEPT
+     * https://cept.3scale.net/docs
+     * @param string $text
+     * @param string $action
+     * @param string $format
+     * 
+     * @return xml/array
+     */
+	function getKWCEPT($texte, $action){
+		
+		$url = 'http://api.cept.at/v1/'; 
+		
+		switch ($action) {
+			case "similarterms":
+				$url .= $action."?term=".$texte; 
+				break;
+			case "term2bitmap":
+				$url .= $action."?term=".$texte; 
+				break;
+			default:
+				;
+			break;
+		}
+		//$url .= "&app_key=".KEY_CEPT."&app_id=".KEY_CEPT_APP_ID;
+		
+		$args = array(
+		'app_key'=> KEY_CEPT,
+		'app_id'=> KEY_CEPT_APP_ID
+		);
+		
+		/* Execute the request 
+		*/
+		$body = $this->getUrlBodyContent($url, $args, false);		
+		
+		$result = json_decode($body);
+		
+		return $result;
+		
+		/* message d'erreur
+		    "errorCode": 400,
+		    "errorMessage": "at least 'term1' or 'term2' must be specified"
+		 */
+		
+	}
 	
     /**
      * sauveImage
