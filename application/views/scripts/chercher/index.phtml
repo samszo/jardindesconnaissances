@@ -1,0 +1,14 @@
+<?php
+	echo $this->form ;
+	if($this->resultats){
+		echo "<table>";
+		//echo "<th>score</th><th>title</th><th>titre</th><th>url</th><th>mp3</th>";		
+		echo "<th>score</th><th>title</th><th>url</th>";		
+		foreach ($this->resultats as $hit){
+			echo "<tr>";		
+		    //echo "<td>".$hit->score."</td><td>".$hit->title."</td><td>".$hit->titre."</td><td>".$hit->url."</td><td>".$hit->mp3."</td>";
+		    echo "<td>".$hit->score."</td><td>".$hit->title."</td><td>".$hit->url."</td>";
+		    echo "</tr>";		
+		}
+		echo "</table>";
+	}	

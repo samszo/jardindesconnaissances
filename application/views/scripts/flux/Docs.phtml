@@ -1,0 +1,10 @@
+<?php
+//header('Content-Type:application/json');
+if($this->html){
+	foreach ($this->docs as $d){
+		if($d['type']==77)
+			echo $d['doc_id']." ".$d['titre']."<br/>".$d[note]."<br/><br/><br/>";
+	}
+}else{
+	echo json_encode($this->docs);
+}	

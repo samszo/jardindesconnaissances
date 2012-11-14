@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<title>Tag Cloud Filter</title>
+		<link rel="stylesheet" href="../css/tagcloud.css" />
+		<meta name="Description" CONTENT="tagcloud pour jardin des connaissance"/>
+		<meta name="Keywords" CONTENT="tagcloud jardin connaissance"/>
+		<meta name="Author" CONTENT="Samuel Szoniecky"/>
+		<script type='text/javascript' src='../js/d3.js' ></script>
+		<script type='text/javascript' src='../js/d3.layout.cloud.js' ></script>
+		<script type="text/javascript" src="../js/jquery.min.js"></script>
+		<script type="text/javascript" src="../js/jquery.smart_autocomplete.js"></script>
+	<head>
+	<body>
+		<div id="configArea">
+			<p><label>Utilisateur : <input id="user" /></label></p>
+		</div>
+	
+	
+		<div id="status" ></div>
+		<div id="vis" ></div>
+		<script>
+		    var fill = d3.scale.category20b(),
+			idBase = "flux_DeleuzeSpinoza",
+			dtUtis = <?php echo $this->utis; ?>,
+			w = 800,
+			h= 800,
+			max = 250,
+			scale = 1,
+			complete = 0,
+			statusText = d3.select("#status"),
+			fontSize;
+
+			setInput();
+						    			
+			var svg = d3.select("#vis").append("svg")
+				.attr("width", w)
+				.attr("height", h);
+			var background = svg.append("g"),
+				vis = svg.append("g")
+					.attr("transform", "translate(" + [w >> 1, h >> 1] + ")"); 
+			
+			d3.json("<?php echo $this->urlStats; ?>", function(data) {
+				var ext = d3.extent(data.map(function(x) { return parseInt(x.value); }));
+				fontSize = d3.scale.linear().domain([ext[0],ext[1]]).range([8,128]);
+				d3.layout.cloud().size([w, h])
+					.words(data)
+				    .rotate(0)
+				    .fontSize(function(d) { return fontSize(+d.value); })
+					.text(function(d) { return d.code; })
+				    .on("word", progress)
+				    .on("end", draw)
+				    .start();
+			    
+			});
+		
+			function draw(words) {
+				var text = vis.selectAll("text")
+			        .data(words)
+				    .enter().append("text")
+			    	  	.style("fill", function(d) { return fill(d.text.toLowerCase()); })
+			        	.style("font-size", function(d) { return d.size + "px"; })
+				        .attr("text-anchor", "middle")
+			    	    .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
+			        	.text(function(d) { return d.text; })
+			        	.on("click", function(d) {alert(d.text);})
+			        	;
+			}
+			function progress(d) {
+				statusText.text(++complete + "/" + max);
+			}
+			function setInput(){
+				//création des tableaux
+				var dtU=[];
+				for (i=0;i<dtUtis.length;i++){
+					dtU.push(dtUtis[i].login);
+				}				
+		        $("#user").smartAutoComplete({source: dtU});
+			}
+			function multiSelect(item){
+			}	
+				 
+		</script>
+	</body>
+</html>
