@@ -149,37 +149,31 @@ class FrontieresController extends Zend_Controller_Action {
 
 	public function classementAction() {
 		try {
-			$auth = Zend_Auth::getInstance();
-			if ($auth->hasIdentity()) {			
-				$params = $this->getRequest()->getParams();
-				//if($params){
-		    	   	//initialise les variables
-					$site = new Flux_Site();
-				    $db = $site->getDb($this->dbNom);
-				    $arr = array();
-				    //calcul les indices géographiques
-				    $dbGUD = new Model_DbTable_Flux_UtiGeoDoc($db);
-				    $arr["indTerreForDoc"] = $dbGUD->calcIndTerreForDoc();
-				    $arr["indTerreForUti"] = $dbGUD->calcIndTerreForUti();
-					$dbUTD = new Model_DbTable_Flux_UtiTagDoc($db);
+			$params = $this->getRequest()->getParams();
+			//if($params){
+	    	   	//initialise les variables
+				$site = new Flux_Site();
+			    $db = $site->getDb($this->dbNom);
+			    $arr = array();
+			    //calcul les indices géographiques
+			    $dbGUD = new Model_DbTable_Flux_UtiGeoDoc($db);
+			    $arr["indTerreForDoc"] = $dbGUD->calcIndTerreForDoc();
+			    $arr["indTerreForUti"] = $dbGUD->calcIndTerreForUti();
+				$dbUTD = new Model_DbTable_Flux_UtiTagDoc($db);
 
-					//calcul les indices des tags cloud
-				    //$arr["UtisNbTagNbDoc"] = $dbUTD->GetUtisNbTagNbDoc();
-				    $arr["indTerreTagForUti"] = $dbUTD->calcIndTerreTagForUti();
-				    $arr["indTerreTagForDoc"] = $dbUTD->calcIndTerreTagForDoc();
-				    $arr["indTerreTagForTag"] = $dbUTD->calcIndTerreTagForTag();
+				//calcul les indices des tags cloud
+			    //$arr["UtisNbTagNbDoc"] = $dbUTD->GetUtisNbTagNbDoc();
+			    $arr["indTerreTagForUti"] = $dbUTD->calcIndTerreTagForUti();
+			    $arr["indTerreTagForDoc"] = $dbUTD->calcIndTerreTagForDoc();
+			    $arr["indTerreTagForTag"] = $dbUTD->calcIndTerreTagForTag();
 
-				    //calcul les indices des palettes de concepts
-				    $tp = new Flux_Tweetpalette($this->dbNom);
-				    $arr["indTerreConcept"] = $tp->getFondStat($this->fondTweetPalette);
-				    
-				    //envoie les données
-					$this->view->data = $arr;					
-				//}
+			    //calcul les indices des palettes de concepts
+			    $tp = new Flux_Tweetpalette($this->dbNom);
+			    $arr["indTerreConcept"] = $tp->getFondStat($this->fondTweetPalette);
 			    
-			}else{
-			    $this->_redirect($this->redir.$this->dbNom);
-			}	    	
+			    //envoie les données
+				$this->view->data = $arr;					
+			//}
 			}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
 	          echo "Message: " . $e->getMessage() . "\n";

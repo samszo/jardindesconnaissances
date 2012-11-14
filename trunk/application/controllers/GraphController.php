@@ -98,5 +98,8 @@ class GraphController extends Zend_Controller_Action {
 		*/	    
     }	
     
+    public function iemlAction()
+    {
+    }	
     
 }
