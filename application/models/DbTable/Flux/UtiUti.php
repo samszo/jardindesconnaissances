@@ -171,5 +171,6 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
-        
+    
+    
 }
