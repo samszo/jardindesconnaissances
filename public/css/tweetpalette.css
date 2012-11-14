@@ -1,0 +1,69 @@
+body, html {
+	margin:0;
+	padding:0;
+	font-family:Arial;
+	background-color:black;
+	color:white; 
+}
+#main {
+	position:relative;
+	padding:20px;
+	margin:auto;
+}
+#configArea {
+	position:relative;
+	float:left;
+	width:180px;
+	height:100%;
+	padding:10px;
+}
+#svgArea {
+	position:relative;
+	float:left;
+	width:100%;
+	height:100%;
+	border:2px dashed black;
+	width:960px;
+	height:730px;
+}
+#SVG {
+	position:absolute;
+	padding:10px;
+	width:940px;
+	height:710px;
+	top:-60px;
+	left:-80px;
+}
+#heatmapArea {
+	position:absolute;
+	width:876px;
+	height:618px;
+	top:60px;
+	left:80px;
+}
+#gen {
+	margin-top:25px;
+	padding:10px 20px 10px 20px;
+	-moz-border-radius:15px;
+	-o-border-radius:15px;
+	-webkit-border-radius:15px;
+	border-radius:15px;
+	border:2px solid black;
+	cursor:pointer;
+	color:white;
+	background-color:black;
+	width:120px;
+	text-align:center;
+}
+#gen:hover{
+	background-color:grey;
+	color:black;
+}
+#tweet_text{
+	height:200px;
+}
+
+ul li {list-style: none; cursor: pointer;}
+li.smart_autocomplete_highlight {background-color: #8d8bc4;}
+ul { margin: 10px 0; padding: 5px; background-color: #269bc9; }
+
