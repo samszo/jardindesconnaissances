@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="../js/popcorn-complete.js"></script>
+	<script>
+		var arrP; 
+	<?php 
+	//création des variables javascript
+	$initP = ""; $arrP = "";	
+	if($this->resultats){
+			$i=0;
+			foreach ($this->resultats as $doc){
+				echo "var p".$i.";";
+				$initP .= "p".$i." = Popcorn('#audio".$i."');";
+				$arrP .= "p".$i.",";
+				$i++;
+			}
+			$arrP .= -1;
+		}	
+	?>	
+    document.addEventListener('DOMContentLoaded', function () {
+        <?php 
+        	echo $initP; 
+			echo "arrP = new Array(".$arrP.");";	
+        ?>
+      }, false);
+    	
+	function gotoSegment(p, posi, taille){
+		// trace les données
+		console.log(p+" durée:"+p.duration()+" posi:"+posi+" en cours:"+p.currentTime());
+		//arrète les audios
+		var i=0;
+		for (i=0; i<arrP.length; i++)
+		{
+			var paudio = arrP[i]; 
+			if(p != paudio && paudio != -1 && !paudio.paused()){
+				paudio.pause();
+			}
+		}
+		//calcule le nombre de seconde
+		//durée en seconde / taille en nb de caractère * position du caractère 
+		var nbSeconde = p.duration() / taille * posi;
+		p.play(nbSeconde);
+
+	}
+	
+	</script>
+	</head>
+	<body>
+	<div id="footnote"></div>
+
+<?php
+	//echo $this->form ;
+	if($this->resultats){
+		//print_r($this->resultats);
+		echo "<table>";
+		echo "<th>titre</th><th>url</th><th>audio</th>";
+		$i = 0;		
+		foreach ($this->resultats as $doc){
+			echo "<tr>";		
+		    echo "<td>".$doc['titre']."</td><td>".$doc['url']."</td>
+		    <td><audio controls='controls' id='audio".$i."'>
+				<source src='".$doc['mp3']."' type='audio/mpeg' >
+			</audio></td>";
+			echo "</tr>";
+			echo "<tr><td colspan='3'><table>";
+			foreach ($doc['phrases'] as $phrase) {
+				echo "<tr>";		
+			    echo "<td ALIGN='RIGHT' VALIGN='MIDDLE'>".$phrase['deb']."</td>
+			    <td ALIGN='CENTER' VALIGN='MIDDLE'><font color='#00C000'>".$this->term."</font></td>
+			    <td ALIGN='LEFT' VALIGN='MIDDLE'>".$phrase['fin']."<br/></td>
+			    <td ALIGN='RIGHT' VALIGN='MIDDLE' onclick='gotoSegment(p".$i.",".$phrase['pHTML'].",".$doc['taille'].");' >ECOUTER</td>";
+			    echo "</tr>";
+			}		
+			echo "</table><br/><br/></td></tr>";
+			$i ++;
+		}
+		echo "</table>";
+	}
+?>
+	</body>
+</html>
+		
