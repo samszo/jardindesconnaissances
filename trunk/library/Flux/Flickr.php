@@ -63,6 +63,7 @@ class Flux_Flickr extends Flux_Site{
     	if(!$this->dbUD)$this->dbUD = new Model_DbTable_flux_utidoc($this->db);
     	if(!$this->dbG)$this->dbG = new Model_DbTable_Flux_Geos($this->db);
     	if(!$this->dbGUD)$this->dbGUD = new Model_DbTable_Flux_UtiGeoDoc($this->db);
+    	if(!$this->dbUU)$this->dbUU = new Model_DbTable_Flux_UtiUti($this->db);
     	
     	//création des données du document
     	$url = $data->Medium->uri;
@@ -86,17 +87,26 @@ class Flux_Flickr extends Flux_Site{
 
     	//création des liens avec le flux
     	$this->dbUD->ajouter(array("doc_id"=>$idDoc,"uti_id"=>$this->user));
+
+    	//récupèration du groupe
+    	$idUg = $this->getUser(array("login"=>$this->idGroupe),true);    	
+    	//création des liens avec le doc
+    	$this->dbUD->ajouter(array("doc_id"=>$idDoc,"uti_id"=>$idUg));
+    	//création des liens avec le flux
+    	$this->dbUU->ajouter(array("uti_id_src"=>$this->user,"uti_id_dst"=>$idUg));
     	
     	//récupèration de l'auteur
     	$idU = $this->getUser(array("login"=>$data->owner),true);    	
-    	//création des liens avec le flux
+    	//création des liens avec le doc
     	$this->dbUD->ajouter(array("doc_id"=>$idDoc,"uti_id"=>$idU));
+    	//création des liens entre le groupe et le membre
+    	$this->dbUU->ajouter(array("uti_id_src"=>$idUg,"uti_id_dst"=>$idU));
     	
     	//création des tags
 	   	$d = new Zend_Date();
     	$arrTag = explode(" ", $data->tags);
     	foreach ($arrTag as $tag) {
-    		$this->saveTag($tag, $idDoc, 1, $d->get("c"));
+    		$this->saveTag($tag, $idDoc, 1, $d->get("c"), $idU);
     	}
     	
     	//enregistre la géolocalisation
