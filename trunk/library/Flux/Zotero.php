@@ -8,10 +8,13 @@
  */
 class Flux_Zotero extends Flux_Site{
 
-	const API_KEY = "EDRQ98DxRu1W3jKmhEPVxCEN";
+	const API_KEY = "";
 	const API_URI = "https://api.zotero.org";
-	var $libraryID = '13594';
+	var $libraryID = '';
 	var $url = '';
+	var $idTagMostRecent;
+	var $latestEdition;
+	var $idTagLatestEdition;	
 	
 	public function __construct($login, $idBase="flux_zotero")
     {
@@ -28,7 +31,7 @@ class Flux_Zotero extends Flux_Site{
 	    	$params['key'] = self::API_KEY;
 	    	$params['content'] = "json";
 	    	$params['order'] = "dateAdded";
-	    	$params['sort'] = "asc";
+	    	if(!isset($params['sort']))$params['sort'] = "asc";
 	    	$params['format'] = "atom";
 	    	$atom = $this->getUrlBodyContent($url, $params);
 	    	$flux = Zend_Feed::importString($atom);	        
@@ -51,7 +54,7 @@ class Flux_Zotero extends Flux_Site{
     	$i = 1;
     	$this->url = self::API_URI."/users/".$this->libraryID."/items";
 		while ($i>0) {
-    		$flux = $this->getRequest($this->url,array("limit"=>99, "start"=>$i));
+    		$flux = $this->getRequest($this->url,array("limit"=>99, "start"=>$i, "sort"=>"desc"));
     		foreach ($flux as $item){
     			$this->saveItem($item);
     		}
@@ -120,7 +123,7 @@ class Flux_Zotero extends Flux_Site{
     /**
      * sauveAmazonInfo
      *
-     * enregistre les information d'amazon pour les document avec un ISBN
+     * enregistre les information d'amazon pour les document avec un titre
 	 * 
      * 
      */
@@ -156,5 +159,194 @@ class Flux_Zotero extends Flux_Site{
 		}
     	
 	}    
+	
+    /**
+     * sauveOCLCInfo
+     *
+     * enregistre les information d'OCLC pour les document avec un ISBN
+	 * http://www.oclc.org/ca/fr/default.htm
+     * 
+     */
+	function sauveOCLCInfo(){
+
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_flux_doc($this->db);
+    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+    	if(!$this->dbTT)$this->dbTT = new Model_DbTable_Flux_TagTag($this->db);
+    	
+    	//initialise les utilisateurs
+    	$this->idUserOCLC = $this->getUser(array("login"=>"oclc"));
+    	$this->idUserDewey = $this->getUser(array("login"=>"www.dewey.info"));
+    	
+    	//initialise les mots clefs
+    	$this->idTagMostPop = $this->dbT->ajouter(array("code"=>"mostPopular"));
+		$this->idTagMostRecent = $this->dbT->ajouter(array("code"=>"mostRecent"));
+		$this->idTagLatestEdition = $this->dbT->ajouter(array("code"=>"latestEdition"));
+		
+    	
+    	//récupère les documents
+		$rs = $this->dbD->findByTronc("0");
+		
+		foreach ($rs as $r) {
+			//récupère la date courante
+			if($r['type']=="book"){
+				//récupère la note json
+				$obj = json_decode($r['note']);
+				//vérification de l'isbn
+				$arrISBN = explode(" ", $obj->ISBN);
+				if($arrISBN[0]!=""){
+					//récupération de la recommandation avec le premier isbn
+					$oclc = $this->getOCLCRecommandations($arrISBN[0]);
+					if($oclc[0]){
+						//on stocke l'information dans un nouveau document
+						$xmlOCLC = $oclc[0];
+					    $arrDoc = array("url"=>$oclc[0], "tronc"=>$r['doc_id'], "data"=>$xmlOCLC->asXML(), "type"=>60);
+						$idDocOCLC = $this->dbD->ajouter($arrDoc);
+						//on récupère la définition du code dewey
+						foreach ($xmlOCLC->recommendations->ddc as $dcc) {
+							if($dcc->mostPopular){
+								$idTagOCLC = $this->sauveOCLCTag($dcc->mostPopular, $idDocOCLC);
+								//enregistre le type de mot
+								$this->dbTT->ajouter(array("tag_id_src"=>$this->idTagMostPop, "tag_id_dst"=>$idTagOCLC));
+							}
+							if($dcc->mostRecent){
+								$idTagOCLC = $this->sauveOCLCTag($dcc->mostRecent, $idDocOCLC);
+								//enregistre le type de mot
+								$this->dbTT->ajouter(array("tag_id_src"=>$this->idTagMostRecent, "tag_id_dst"=>$idTagOCLC));
+							}
+							if($dcc->latestEdition){
+								$idTagOCLC = $this->sauveOCLCTag($dcc->latestEdition, $idDocOCLC);
+								//enregistre le type de mot
+								$this->dbTT->ajouter(array("tag_id_src"=>$this->idTagLatestEdition, "tag_id_dst"=>$idTagOCLC));
+							}
+						}						
+					}
+					echo "<br/>".$r["doc_id"]." - ".$r["titre"]."<br/>";
+				}
+			}
+		}
+    	
+	}  
+
+    /**
+     * sauveOCLCTag
+     *
+     * enregistre les tags récupéré dans OCLC
+     * 
+     * @param xml $dcc
+     * @param int $idDoc
+     * 
+     * @return int
+     * 
+     */
+	function sauveOCLCTag($dcc, $idDoc){
+		
+		$d = new Zend_Date();
+		
+		//enregistre le tag pour le document
+		$nota = $dcc['sfa']."";
+		$idTagOCLC = $this->saveTag($nota, $idDoc, $dcc['holdings'], $d->get("c"), $this->idUserOCLC);
+		//on récupère les informations de dewey
+		$arrDewey = $this->getDeweyAbout($nota);
+		//si la réponse en français ne donne rien
+		if(!$arrDewey[0]->results->result){
+			// on cherche en anglais
+			$arrDewey = $this->getDeweyAbout($nota, "en");
+		}
+		$idTagDewey = $this->sauveDeweyAbout($arrDewey, $idDoc);
+		if($idTagDewey){
+			//enregistre le lien entre les deux tags
+			$this->dbTT->ajouter(array("tag_id_src"=>$idTagOCLC, "tag_id_dst"=>$idTagDewey));
+		}	
+		return $idTagOCLC; 
+	}
+	
+    /**
+     * getOCLCRecommandations
+     *
+     * récupère les recommandations d'OCLC pour un ISBN
+	 * http://www.oclc.org/ca/fr/default.htm
+	 * pour tester : http://classify.oclc.org/classify2/api_docs/classify.html
+     * 
+     * @param string $isbn
+     * 
+     * @return array
+     * 
+     */
+	function getOCLCRecommandations($isbn){
+		//création de la requête OCLC
+		$url = "http://classify.oclc.org/classify2/Classify?isbn=".$isbn."&summary=true";
+		if($xml = simplexml_load_string($this->getUrlBodyContent($url))){
+			//vérifie si une recommandation existe
+			if(!$xml->recommendations){
+				//on fait une nouvelle recherche à partir du premier swid
+				$swid = $xml->works->work[0]['swid']; 
+				$url = "http://classify.oclc.org/classify2/Classify?swid=".$swid."&summary=true";
+				$xml = simplexml_load_string($this->getUrlBodyContent($url));
+			}
+		}
+		return array($xml, $url);
+	}
+	
+
+    /**
+     * getDeweyAbout
+     *
+     * récupère les informations concernant une class Dewey
+	 * http://oclc.org/developer/documentation/dewey-web-services/using-api
+	 * pour tester : http://dewey.info/sparql.php
+     * 
+     * @param string $notation
+     * @param string $langue
+     * 
+     * @return array
+     * 
+     */
+	function getDeweyAbout($notation, $langue="fr"){
+		//création de la requête dewey
+		$query =
+		"PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+		PREFIX dct: <http://purl.org/dc/terms/>
+		
+		SELECT *
+		WHERE {
+		  ?x skos:prefLabel ?prefLabel ;
+		     skos:notation ?notation .
+		  FILTER ((?notation = ".$notation.") && langMatches( lang(?prefLabel), '".$langue."' ))
+		}";
+		$url = "http://dewey.info/sparql.php";
+		$xml = simplexml_load_string($this->getUrlBodyContent($url, array("output"=>"xml", "query"=>$query), false));
+		return array($xml, $url);
+	}
     
+    /**
+     * sauveDeweyAbout
+     *
+     * enregistre les information Dewey pour une notation
+     * 
+     * @param array $dewey
+     * @param int $idDoc
+     * 
+     * @return int
+     * 
+     */
+	function sauveDeweyAbout($dewey, $idDoc){
+		
+		$idTag = false;
+		if($dewey[0]){
+			//initialise l'utilisateur
+			$d = new Zend_Date();
+    		
+			//on stocke l'information dans un nouveau document
+			$xmlDewey = $dewey[0];
+			//on stocke l'information dans un nouveau document
+			$arrDoc = array("url"=>$dewey[0], "tronc"=>$idDoc, "data"=>$xmlDewey->asXML(), "type"=>60);
+			$idDocDewey = $this->dbD->ajouter($arrDoc);
+			//enregistre le tag pour le document
+			$label = $xmlDewey->results->result[0]->binding[1]->literal."";
+			$idTag = $this->saveTag($label, $idDoc, 0, $d->get("c"), $this->idUserDewey);
+		}	
+		return $idTag;
+		
+	}
+	
 }
