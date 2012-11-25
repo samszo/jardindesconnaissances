@@ -5,6 +5,6 @@ FROM flux_utitagdoc AS utd
  INNER JOIN flux_tag AS t ON t.tag_id = utd.tag_id
  INNER JOIN flux_tagtag tt ON tt.tag_id_src = t.tag_id
  INNER JOIN flux_tag AS td ON td.tag_id = tt.tag_id_dst
--- WHERE (d.doc_id = 1) 
+WHERE (u.uti_id = 638) 
 GROUP BY t.code
 ORDER BY nb DESC
