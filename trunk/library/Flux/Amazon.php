@@ -137,5 +137,21 @@ class Flux_Amazon extends Flux_Site{
 				$first=false;
 			}				
     	}
-	}		
+	}
+
+	
+    /**
+     * getTagDoc
+     *
+     * sauvegarde les tags d'un document Amazon
+     * 
+     * @param array $docInfos
+     * 
+     * @return array
+     */
+    function getTagDoc($doc) {
+	   	
+		echo $doc["data"];
+		
+    }	
 }

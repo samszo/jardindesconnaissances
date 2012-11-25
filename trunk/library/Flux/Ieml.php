@@ -12,8 +12,9 @@ class Flux_IEML extends Flux_Site{
   	var $XPATH_BINARY = '//@binary';
   	var $XPATH_PRIMITIVE = '//@primitiveSet';
   	var $PRIMITIVE_VALUE = array("E"=>1,"U"=>2,"A"=>4,"S"=>8,"B"=>16,"T"=>32);
-  	
-	public function __construct($idBase=false)
+  	var $LAYER_PONCT = array(":",".","-","'",",","_",";");
+
+  	public function __construct($idBase=false)
     {
     	parent::__construct($idBase);
     	
@@ -166,4 +167,119 @@ class Flux_IEML extends Flux_Site{
     	
 	}    
 	
+	/**
+	 * Génération des séquences sur une ou plusieurs couches
+	 * 
+	 * @param int $nbLayer
+	 * @param boolean $db = pour enregistrer dans une base de données
+	 * @param array $s1
+	 * @param array $s2
+	 * @param array $s3
+	 * 
+	 * @return integer
+	 */
+    function genereSequences($nbLayer=1, $db=false, $s1 = array('E','U','A','S','B','T'), $s2 = array('E','U','A','S','B','T'), $s3 = array('E','U','A','S','B','T')){
+		
+    	if($db)$db = new Model_DbTable_flux_ieml($this->db);
+    	for ($i = 0; $i < $nbLayer; $i++) {
+			$x = new ArrayMixer($this->LAYER_PONCT[$i], $this->LAYER_PONCT[$i+1], $db);
+			$x->append($s1);
+			$x->append($s2);
+			$x->append($s3);
+			$x->proceed();
+			$ls = $x->result();	
+			print_r($ls);
+			//réinitialise les tableaux
+			$s1 = $ls;	
+			$s2 = $ls;	
+			$s3 = $ls;	
+    	}
+    }	
+
+	/**
+	 * Génération d'un plan svg des séquences
+	 * 
+	 * @param array $colors
+	 * 
+	 * @return string
+	 */
+    function genereSvgPlanSeq($colors = array('E'=>"rgb(0,0,0)",'U'=>"rgb(0,255,255)",'A'=>"rgb(255,0,0)",'S'=>"rgb(0,255,0)",'B'=>"rgb(0,0,255)",'T'=>"rgb(255,255,0)")){
+		
+    	require_once("svg/Svg.php");
+    	
+		$svg = new SvgDocument("10000", "10000");
+		$dDegrad = new SvgDefs();
+		$gRect = new SvgGroup();
+		
+    	$db = new Model_DbTable_flux_ieml($this->db);
+    	$arrSeq = $db->getAll("ieml_id",100000);
+    	$i = 1;
+    	$x=10;
+    	$y=10;
+    	$r=10;
+    	$maxLigne=5;
+    	$numLigne=0;
+    	$debLigne=-1;
+    	$maxColo=3;
+    	$numColo=0;
+    	$debColo=10;
+    	$first2 = true;
+    	foreach ($arrSeq as $c){
+    		//vérifie si on traite une couche de niveau 1
+    		if($c['niveau']==1){
+    			//création d'un stop pour chaque couleur
+    			$arr = explode(":", $c['code']);
+    			//création du dégradé
+				$dDegrad->addChild(new SvgRadialGradient("lg_".$c['code'], array(0,0.5,1), array($colors[$arr[0]],$colors[$arr[1]],$colors[$arr[2]])));
+	    		//création de la bulle
+				$gRect->addChild(new SvgCircle(2*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$c['code'].")","","","c_".$c['code']));
+    		}
+    		//vérifie si on traite une couche de niveau 2
+    		if($c['niveau']==2){
+    			if($first2){
+    			 	$first2 = false;
+			    	$x=10;
+    				$numLigne = $maxLigne+2;
+    				$debLigne = $numLigne-1;
+    				$maxLigne = 1302;
+    				$numColo = 1;
+    				$debColo=10;
+    			} 
+    			$arr = explode(".", $c['code']);
+    			//création des bulles
+				$gRect->addChild(new SvgCircle(2*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$arr[0].".)","","","c_".$c['code']));
+				$x+=2*$r;
+				$gRect->addChild(new SvgCircle(2*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$arr[1].".)","","","c_".$c['code']));
+				$x+=2*$r;
+				$gRect->addChild(new SvgCircle(2*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$arr[2].".)","","","c_".$c['code']));
+				$x = $debColo;
+    		}
+    		if($maxLigne<=$numLigne){
+    			$x+=3*$r;
+		    	$numLigne = $debLigne;
+		    	if($c['niveau']==2){
+					$debColo = 5*$r+$x;
+					$x = $debColo;
+					$numColo ++;
+		    	}			
+    		}
+    		
+    		$i++;
+    		$numLigne++;
+    	}
+				
+		/*
+		$svg->asXML("test.svg");
+    	$svg->output();
+		*/
+    	
+		$dDegrad->addParent($svg);
+		$gRect->addParent($svg);
+		
+		// Send a message to the svg instance to start printing.
+		$svg->printElement();
+    	
+    }	
+    
+
 }

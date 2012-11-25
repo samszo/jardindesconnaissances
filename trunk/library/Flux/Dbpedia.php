@@ -129,6 +129,19 @@ WHERE {
      skos:notation ?notation .
   FILTER regex(?prefLabel, "jazz", "i") 
 }
+
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX dct: <http://purl.org/dc/terms/>
+
+SELECT *
+WHERE {
+  ?x skos:prefLabel ?prefLabel ;
+     skos:notation ?notation .
+  FILTER ((?notation = 306) && langMatches( lang(?prefLabel), "fr" ))
+}
+
+	   	 *
+	   	 *
 	   	 */
 	   	
 	   	$searchUrl = 'http://dbpedia.org/sparql?'
