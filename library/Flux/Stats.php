@@ -124,7 +124,29 @@ class Flux_Stats  extends Flux_Site{
 	}
 
 	
-
+	/**
+     * Permutation de tous les élément d'un tableau
+     * merci à http://stackoverflow.com/questions/5506888/permutations-all-possible-sets-of-numbers
+     * 
+     * @param array $items
+     * 
+     * @return array
+     */
+	function permute($items, $perms = array( )) {
+	    if (empty($items)) {
+	        $return = array($perms);
+	    }  else {
+	        $return = array();
+	        for ($i = count($items) - 1; $i >= 0; --$i) {
+	             $newitems = $items;
+	             $newperms = $perms;
+	         list($foo) = array_splice($newitems, $i, 1);
+	             array_unshift($newperms, $foo);
+	             $return = array_merge($return, $this->permute($newitems, $newperms));
+	         }
+	    }
+	    return $return;
+	}
 
 
 	
