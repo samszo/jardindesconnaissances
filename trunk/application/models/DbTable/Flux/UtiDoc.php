@@ -138,15 +138,15 @@ class Model_DbTable_flux_utidoc extends Zend_Db_Table_Abstract
      */
     public function findDocByUti($UtiId)
     {
-    	$sql = "SELECT d.url, d.doc_id
-    		FROM flux_Doc d 
-    		INNER JOIN flux_utidoc ud ON ud.doc_id = d.doc_id 
-    		INNER JOIN flux_Uti u ON u.uti_id = ud.uti_id AND u.uti_id  = ".$UtiId
-    		." ORDER BY ud.maj DESC";
-        $db = Zend_Db_Table::getDefaultAdapter();
-    	$stmt = $db->query($sql);
-    	return $stmt->fetchAll();
-    	
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->from(array('d' => 'flux_doc'))
+            ->joinInner(array('ud' => 'flux_utidoc'),
+            	'ud.doc_id = d.doc_id', array('maj'))
+            ->joinInner(array('u' => 'flux_uti'),
+            	"u.uti_id = ud.uti_id AND u.uti_id  = ".$UtiId, array('login'));
+            
+        return $this->fetchAll($query)->toArray(); 
     }
     
     /**
@@ -159,14 +159,16 @@ class Model_DbTable_flux_utidoc extends Zend_Db_Table_Abstract
      */
     public function findDernierDocByUti($UtiId)
     {
-    	$sql = "SELECT d.url, d.doc_id, ud.maj
-    		FROM flux_Doc d 
-    		INNER JOIN flux_utidoc ud ON ud.doc_id = d.doc_id 
-    		INNER JOIN flux_Uti u ON u.uti_id = ud.uti_id AND u.uti_id  = ".$UtiId;
-        $db = Zend_Db_Table::getDefaultAdapter();
-    	$stmt = $db->query($sql);
-    	return $stmt->fetchAll();
-    	
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->from(array('d' => 'flux_doc'))
+            ->joinInner(array('ud' => 'flux_utidoc'),
+            	'ud.doc_id = d.doc_id', array('maj'))
+            ->joinInner(array('u' => 'flux_uti'),
+            	"u.uti_id = ud.uti_id AND u.uti_id  = ".$UtiId, array('login'));
+            
+        return $this->fetchAll($query)->toArray(); 
+        
     }
     
     /*
