@@ -148,7 +148,7 @@ class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
 			ORDER BY t.code";
         $db = Zend_Db_Table::getDefaultAdapter();
     	$stmt = $db->query($sql);
-    	return $stmt->fetchAll();
+    	return $stmt->fetchAll()->toArray();
     }
 
     /**
