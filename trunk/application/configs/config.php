@@ -2,8 +2,8 @@
 date_default_timezone_set('Europe/Paris');
 setlocale (LC_TIME, 'fr_FR.utf8','fra'); 
 ini_set("memory_limit",'1600M');
-$www = "/Users/paragraphe/Documents/www";
-//$www = "C:/wamp/www";
+//$www = "/Users/paragraphe/Documents/www";
+$www = "C:/wamp/www";
 define ("WEB_ROOT","http://localhost/jardindesconnaissances");
 define ("ROOT_PATH",$www."/jardindesconnaissances");
 define ("WEB_ROOT_AJAX",WEB_ROOT."/public");
@@ -17,9 +17,13 @@ define ("KEY_AMAZON","");
 define ("KEY_AMAZON_PWD","");
 define ("AMAZON_PWD","");
 define ("AMAZON_AT","");
+define ("KEY_CEPT","");
+define ("KEY_CEPT_APP_ID","");
+define ("KEY_ZOTERO","");
+define ("ZOTERO_ID_LIB","");
 
 
-//code de sécurité pour l'administation
+//code de s�curit� pour l'administation
 define ("CODE_ADMIN","simple");
 
 //chemin de la librairie ffmpeg
@@ -48,10 +52,11 @@ require_once 'Zend/Application.php';
 set_include_path(get_include_path().PATH_SEPARATOR.$www."/ZamfBrowser/browser");
 require_once( "ZendAmfServiceBrowser.php" );
 
-//chargement des librairies supplémentaires
+//chargement des librairies suppl�mentaires
 require_once( "autokeyword.php" );
 //require_once( "AlchemyAPI.php" );
 require_once( "AlchemyAPI_CURL.php" );
+require_once( "ArrayMixer.php" );
 
 
 // Create application, bootstrap, and run

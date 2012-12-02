@@ -48,7 +48,19 @@
 					$urlTags .= "&tags[]=".$t;
 				}
 			}
-			?></h2>
+			?>
+		</h3>
+		<h3>Base de données : 
+			<select id="sBase" onselect="changeBase()" >
+			<?php 
+				foreach ($this->bases as $id=>$titre){
+					$s="";
+					if($id==$this->idBase)$s='selected="selected"'; 
+					echo "<option $s value='".$id."'>".$titre."</option>"; 
+				}
+			?>
+			</select> 
+		</h3>
 		<div id='legende'> </div>
 		<table >
 			<tr>

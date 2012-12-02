@@ -37,7 +37,8 @@ class GraphController extends Zend_Controller_Action {
 		$url = $request->getRequestUri();
 		$arrUrl = explode("?",$url);
 		$this->view->idBase =  $this->_getParam('idBase', 0);
-		$this->view->titre = "Matrice des co-occurences";
+		$this->view->bases = array("flux_diigo"=>"Diigo", "flux_zotero"=>"Zotero", " flux_gmail_intelligence_collective"=>"Google Alerte");
+		$this->view->titre = "Explorateur d'observations";
 		$this->view->tags = $this->_getParam('tags', 0);
 		$this->view->urlStats = "../stat/matricetagassos?".$arrUrl[1];	    
     		    

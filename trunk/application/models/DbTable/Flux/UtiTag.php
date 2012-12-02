@@ -141,14 +141,18 @@ class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
      */
     public function findTagByUti($uti)
     {
-		$sql = "SELECT t.code, u.login, ut.poids, ut.uti_id
-			FROM flux_utitag ut
-				INNER JOIN flux_tag t ON t.tag_id = ut.tag_id
-				INNER JOIN flux_uti u ON u.uti_id = ut.uti_id AND u.login = '".$uti."'
-			ORDER BY t.code";
-        $db = Zend_Db_Table::getDefaultAdapter();
-    	$stmt = $db->query($sql);
-    	return $stmt->fetchAll()->toArray();
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->from(array('ut' => 'flux_utitag'))
+            ->joinInner(array('t' => 'Flux_Tag'),
+            	'ut.tag_id = t.tag_id', array('code'))
+            ->joinInner(array('u' => 'Flux_Uti'),
+            	'u.uti_id = ut.uti_id ', array('login'))
+            ->where("u.login = ? ", $uti)
+            ->order(array("u.login", "t.code"));
+            
+        return $this->fetchAll($query)->toArray(); 
+
     }
 
     /**

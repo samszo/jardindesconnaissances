@@ -31,9 +31,10 @@ class FluxController extends Zend_Controller_Action {
     
     public function tagsAction()
     {
-	    $dbTags = new Model_DbTable_Flux_UtiTag();
 	    if($this->_getParam('uti', 0)){
-		    $this->view->tags = $dbTags->findTagByUti($this->_getParam('uti', 0));	    	
+			$s = new Flux_Site($this->_getParam('idBase', false));	    	
+	    	$dbTags = new Model_DbTable_Flux_UtiTag($s->db);
+			$this->view->tags = $dbTags->findTagByUti($this->_getParam('uti', 0));	    	
 	    }else{
 		    $this->view->tags = $dbTags->findTagUti();	    	
 	    }
