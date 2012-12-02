@@ -2,15 +2,16 @@
 require_once( "../application/configs/config.php" );
 
 try {
+	
 	$application->bootstrap();
-	$user = "luckysemiosis";
-	$pwd = "samszo";
+	$user = "";
+	$pwd = "";
 
-	/*
 	$zotero = new Flux_Zotero($user);
+	//$zotero->saveAll();
+	$zotero->sauveOCLCInfo();
 	$zotero->sauveAmazonInfo();
-	$zotero->saveAll();
-	*/
+	
 	/*
 	$d = new Flux_Amazon("flux_diigo");
 	$d->sauveActuLivre();	
@@ -18,6 +19,84 @@ try {
 	$d->sauveActuLivre();
 	*/
 	
+	/*
+	$ieml = new Flux_IEML("flux_ieml");
+	$ieml->genereSvgPlanSeq();	
+	//$ieml->genereSequences(2, true);
+	//$ieml->saveParse();
+	//$ieml->saveBinary();
+	//$ieml->saveScriptValeur();
+	$bin1 = "1100110001000010000010001000010000011111000100011001000111110001000110010001111110001100001011111111111111111111111101000111111111111111111111111110011000100001000001000100001000001111100010001100100011111000100011001000111111000110000101111111111111111111111100010001101000011111000010110000101111111111111";
+	$bin2 = "1100110001000010000010001000010000011111000100011001000111110001000110010001111110001100001011111111111111111111111101000111111111111111111111111110011000100001000001000100001000001111100010001100100011111000100011001000111111000110000101111111111111111111111100010001101000011111000010110000101111111111111110110001000010000010001000010000011111000100011001000111110001000110010001111100010110100011111111111111111111111010000011010001111111111111111111111";
+	$d1 = $ieml->getDistanceHamming($bin1, $bin2);
+	$d1 = $ieml->getDistanceHamming("1", "11");
+	*/	
+	
+	//$s = new Flux_Stats();
+	//$a = $s->permute(array('U','A','S','B','T','E'));
+	
+	//générateur couche 1
+	$t1 = array('E','U','A','S','B','T');
+	$t2 = array('E','U','A','S','B','T');
+	$t3 = array('E','U','A','S','B','T');
+	$x = new ArrayMixer(":");
+	$x->append($t1);
+	$x->append($t2);
+	$x->append($t3);
+	$x->proceed();
+	$c1 = $x->result();	
+	print_r($c1);
+	
+	//générateur couche 2
+	$x = new ArrayMixer(".");
+	$x->append($c1);
+	$x->append($c1);
+	$x->append($c1);
+	$x->proceed();
+	$c2 = $x->result();	
+	print_r($c2);
+	
+	$s = new Flux_Site();
+	$arr = $s->getKWCEPT("ontology", "term2bitmap");
+	
+	$tp = new Flux_Tweetpalette("flux_frontieres");
+	$db = $tp->db;
+	//$arr = $tp->getFondStat(1218);
+	
+    $dbGUD = new Model_DbTable_Flux_UtiGeoDoc($db);
+    $arr["indTerreForDoc"] = $dbGUD->calcIndTerreForDoc();
+    $arr["indTerreForUti"] = $dbGUD->calcIndTerreForUti();
+	$dbUTD = new Model_DbTable_Flux_UtiTagDoc($db);
+
+	//calcul les indices des tags cloud
+    //$arr["UtisNbTagNbDoc"] = $dbUTD->GetUtisNbTagNbDoc();
+    $arr["indTerreTagForUti"] = $dbUTD->calcIndTerreTagForUti();
+    $arr["indTerreTagForDoc"] = $dbUTD->calcIndTerreTagForDoc();
+    $arr["indTerreTagForTag"] = $dbUTD->calcIndTerreTagForTag();
+	
+	
+							
+	/*
+	$p ='<XLS
+    xmlns:xls="http://www.opengis.net/xls"
+    xmlns:gml="http://www.opengis.net/gml"
+    xmlns="http://www.opengis.net/xls"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    version="1.2"
+    xsi:schemaLocation="http://www.opengis.net/xls http://schemas.opengis.net/ols/1.2/olsAll.xsd">
+  <RequestHeader/>
+  <Request requestID="1" version="1.2" methodName="LocationUtilityService">
+   <GeocodeRequest returnFreeForm="false">
+     <Address countryCode="PositionOfInterest">
+       <freeFormAddress>rennes</freeFormAddress>
+     </Address>
+   </GeocodeRequest>
+  </Request>
+</XLS>';
+	$s = new Flux_Site();
+	$s->getUrlBodyContent("http://gpp3-wxs.ign.fr/c4p0y3y827jx03whl91uk689/geoportail/ols",array("xsl"=>$p, "output"=>"json"),false);
+	*/
+		
 	/*
 	$g = new Flux_Gurl("samszon@gmail.com", "Janvier2010", "flux_urlcourtes");
 	$g->saveUserHistory("", 0, true);
