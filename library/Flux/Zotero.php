@@ -8,7 +8,7 @@
  */
 class Flux_Zotero extends Flux_Site{
 
-	const API_KEY = "";
+	
 	const API_URI = "https://api.zotero.org";
 	var $libraryID = '';
 	var $url = '';
@@ -16,10 +16,10 @@ class Flux_Zotero extends Flux_Site{
 	var $latestEdition;
 	var $idTagLatestEdition;	
 	
-	public function __construct($login, $idBase="flux_zotero")
+	public function __construct($login, $idBase="flux_zotero", $libraryID=ZOTERO_ID_LIB)
     {
     	parent::__construct($idBase);
-    	
+    	$this->libraryID = $libraryID;
     	$this->login = $login;
     }
 		
@@ -28,7 +28,7 @@ class Flux_Zotero extends Flux_Site{
 		$c = str_replace("::", "_", __METHOD__)."_".$this->getParamString($params); 
 	   	$flux = $this->cache->load($c);
         if(!$flux){
-	    	$params['key'] = self::API_KEY;
+	    	$params['key'] = KEY_ZOTERO;
 	    	$params['content'] = "json";
 	    	$params['order'] = "dateAdded";
 	    	if(!isset($params['sort']))$params['sort'] = "asc";
