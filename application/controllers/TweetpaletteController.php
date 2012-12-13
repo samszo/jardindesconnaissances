@@ -29,6 +29,10 @@ class TweetpaletteController extends Zend_Controller_Action {
 			    $this->view->url = $this->_getParam('url');
 			    $this->view->idBase = $this->dbNom;
 			    $this->view->iframe = $this->_getParam('iframe', false);
+			    //récupère les palettes disponibles
+			    $s = new Flux_Site($this->dbNom);
+			    $dbDoc = new Model_DbTable_Flux_Doc($s->db);
+			    $this->view->palettes = $dbDoc->findByType("palette");
 			}else{
 			    $this->_redirect('/auth/login?redir=tweetpalette&idBase='.$this->dbNom);
 			}
