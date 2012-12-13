@@ -1,7 +1,7 @@
 		var tweet = "";		
-		var nbX = grilleSvg.repX.length;
-		var nbY = grilleSvg.repY.length;
-		var nbZone = grilleSvg.repZone.length;
+		var urlFond = "" ;
+		var grilleSvg;
+		var nbX, nbY, nbZone;
 		var _X, _Y;
 		var sem=[];
 		var xx;
@@ -11,18 +11,7 @@
 			
 			getTweet();
 			getInput();
-			
-			xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});
-			
-			xx.get("canvas").onclick = function(ev){
-				var pos = h337.util.mousePosition(ev);
-				xx.store.addDataPoint(pos[0],pos[1]);
-				getSemClic(pos[0], pos[1]);
-				if(iframe){
-					setTweet();				
-				}
-			};
-			
+						
 			document.getElementById("gen").onclick = function(){
 				//xx.store.generateRandomDataSet(100);
 				setTweet();				
@@ -47,6 +36,7 @@
 		}
 		
 		function getSemClic(x, y){
+			if(urlFond=="")return;
 			sem=[];
 			sem.push({"x":x,"y":y,"urlFond":urlFond});  
 			//récupère la valeur sémantique X
@@ -154,6 +144,7 @@
 		}
 
 		function getTweet() {
+			if(urlFond=="")return;
 			$.post("tweetpalette/lit"
 					, getParams(),
 					 function(data){
@@ -237,5 +228,56 @@
 	        $("#url_event").smartAutoComplete({source: dtUrl});
 	        $("#tag_event").smartAutoComplete({source: dtE});
 
+		}
+		
+		function changePalette(e){
+			var o = e.selectedOptions[0];
+			//initialise les éléments
+			d3.select('#svg').remove();
+			d3.select('#png').remove();
+			d3.select('#heatmapArea').remove();
+			
+			//charge les valeurs
+			grilleSvg = grilles[e.selectedIndex-1];
+			nbX = grilleSvg.repX.length;
+			nbY = grilleSvg.repY.length;
+			nbZone = grilleSvg.repZone.length;
+			urlFond = grilleSvg.url;
+			
+			d3.select('#svgArea')
+				.append("div")
+				.attr("id", 'heatmapArea')
+				.attr("width", grilleSvg.widthArea)
+				.attr("height", grilleSvg.heightArea)
+				.attr("top", grilleSvg.topArea)
+				.attr("left", grilleSvg.leftArea);
+				
+			//création du heatmap
+			xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});			
+			xx.get("canvas").onclick = function(ev){
+				var pos = h337.util.mousePosition(ev);
+				xx.store.addDataPoint(pos[0],pos[1]);
+				getSemClic(pos[0], pos[1]);
+				if(iframe){
+					setTweet();				
+				}
+			};
+			
+			//ajoute la valeur aux éléments
+			if(o.className=="svg"){
+				d3.select('#svgArea')
+					.append("div")
+						.attr("id", "svg");
+				d3.xml(e.value, "image/svg+xml", function(xml) {
+					var svg = document.getElementById("svg");
+					svg.appendChild(xml.documentElement);
+					});
+			}
+			if(o.className=="png"){
+				d3.select('#svgArea')
+					.append("img")
+						.attr("src", e.value)
+						.attr("id", "png");
+			}
 		}
 		
