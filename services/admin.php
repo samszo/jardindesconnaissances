@@ -4,13 +4,25 @@ require_once( "../application/configs/config.php" );
 try {
 	
 	$application->bootstrap();
-	$user = "";
-	$pwd = "";
-
+	$user = "luckysemiosis";
+	$pwd = "samszo";
+	
+	$s = new Flux_Site('flux_tweetpalette');
+	$s->sauveUtiByImage('../data/etudiants/CDNL_12-13', "étudiants CDNL 12-13");
+	$dbU = new Model_DbTable_Flux_Uti($s->db);
+	$roles = $dbU->getDistinct("role");
+	
+	
+	/*
+	$tp = new Flux_Tweetpalette('flux_tweetpalette');
+	$json = $tp->getPaletteClics('bernard stiegler', 'http://www.capdigital.com/evenements/enmi/', "../data/tweetpalette/AxePertiClair.png", 'ENMI', true);
+	*/
+	/*
 	$zotero = new Flux_Zotero($user);
 	//$zotero->saveAll();
 	$zotero->sauveOCLCInfo();
 	$zotero->sauveAmazonInfo();
+	*/
 	
 	/*
 	$d = new Flux_Amazon("flux_diigo");
@@ -35,7 +47,7 @@ try {
 	//$s = new Flux_Stats();
 	//$a = $s->permute(array('U','A','S','B','T','E'));
 	
-	//générateur couche 1
+	/*générateur couche 1
 	$t1 = array('E','U','A','S','B','T');
 	$t2 = array('E','U','A','S','B','T');
 	$t3 = array('E','U','A','S','B','T');
@@ -46,8 +58,9 @@ try {
 	$x->proceed();
 	$c1 = $x->result();	
 	print_r($c1);
+	*/
 	
-	//générateur couche 2
+	/*générateur couche 2
 	$x = new ArrayMixer(".");
 	$x->append($c1);
 	$x->append($c1);
@@ -55,7 +68,8 @@ try {
 	$x->proceed();
 	$c2 = $x->result();	
 	print_r($c2);
-	
+	*/
+	/*
 	$s = new Flux_Site();
 	$arr = $s->getKWCEPT("ontology", "term2bitmap");
 	
@@ -73,7 +87,7 @@ try {
     $arr["indTerreTagForUti"] = $dbUTD->calcIndTerreTagForUti();
     $arr["indTerreTagForDoc"] = $dbUTD->calcIndTerreTagForDoc();
     $arr["indTerreTagForTag"] = $dbUTD->calcIndTerreTagForTag();
-	
+	*/
 	
 							
 	/*
@@ -142,11 +156,7 @@ try {
     //$diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
     //$diigo->getGroupeRss("bulles");
 	//$diigo->getRequest(array("user"=>$user,"count"=>100));
-    //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));
-	
-	//$tp = new Flux_Tweetpalette('flux_tweetpalette');
-	//$json = $tp->getPaletteClics('samszo', 'no', "../data/tweetpalette/idee_taxo.svg", 'no', true);
-	
+    //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));	
 		
 	//$audio = new Flux_Audio(false);
 	//$audio->getOggInfos("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
