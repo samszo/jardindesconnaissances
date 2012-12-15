@@ -101,6 +101,7 @@ class GraphController extends Zend_Controller_Action {
     
     public function iemlAction()
     {
+		$this->view->nb = $this->_getParam('nb', 6);
     }	
     
 }
