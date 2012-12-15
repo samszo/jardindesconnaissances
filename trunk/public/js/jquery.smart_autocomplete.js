@@ -509,7 +509,8 @@
         resultsReady: function(ev, results){ ev.smartAutocompleteData  = {'results': results }; }, 
         showResults: function(ev, results){ ev.smartAutocompleteData = {'results': results }; },
         noResults: function(){},
-        lostFocus: function(){},
+        //ajout samszo pour le rafraichissement des palettes
+        lostFocus: function(){getTweet();},
         //ajout samszo pour les sélections multiples
         itemSelect: function(ev, item){ ev.smartAutocompleteData = {'item': item }; multiSelect(item);},
         itemFocus: function(ev, item){ ev.smartAutocompleteData = {'item': item }; },
