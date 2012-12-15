@@ -26,17 +26,19 @@ class Flux_Tweetpalette extends Flux_Site{
      * Enregistre les informations du flux dans la base
      *
      * @param integer $uti
+     * @param integer $exi
      * @param string $url
      * @param string $event
      * @param array $sem
      *
      * 
      */
-    function saveTweetSem($uti, $url, $event, $sems){
+    function saveTweetSem($uti, $exi, $url, $event, $sems){
 
 		//création des tables
 		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
-    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+		if(!$this->dbUU)$this->dbUU = new Model_DbTable_Flux_UtiUti($this->db);
+		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
 		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
 		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
 		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
@@ -48,19 +50,33 @@ class Flux_Tweetpalette extends Flux_Site{
 		$idDoc = $this->dbD->ajouter(array("url"=>$url,"titre"=>$event));
 		$date = new Zend_Date();
 		
+		$idExi = $this->dbU->ajouter(array("login"=>$exi));
+		
 		//ajoute ou récupère le document de fond
-		$idDocFond = $this->dbD->ajouter(array("url"=>$sems[0]["urlFond"],"titre"=>"Palette de tweet"));
+		$idDocFond = $this->dbD->ajouter(array("url"=>$sems[0]["urlFond"],"type"=>"palette"));
 		//ajoute ou récupère le clic sur le fond
 		$idDocFondClic = $this->dbD->ajouter(array("tronc"=>$idDocFond."_".$idDoc,"titre"=>"clic fond"
 			,"data"=>"{x:".$sems[0]["x"].",y:".$sems[0]["y"]."}", "poids"=>1, "maj"=>$date->get("c")));
 		foreach ($sems as $sem) {
         	if($sem["lib"]){
-	        	//sauvegarde le tag pour le document
+        		//pour l'utilisateur
+	        	//sauvegarde le tag pour le document 
 				$idT = $this->saveTag($sem["lib"], $idDoc, 1, $date->get("c"));
 	        	//sauvegarde le tag pour le fond
 				$this->saveTag($sem["lib"], $idDocFondClic, 1, $date->get("c"));
 				//sauvegarde la sémantique du tag
 				$this->saveIEML($sem["ieml"], $this->user, $idT);
+
+        		//pour l'existence
+	        	//sauvegarde le tag pour le document 
+				$idT = $this->saveTag($sem["lib"], $idDoc, 1, $date->get("c"), $idExi);
+	        	//sauvegarde le tag pour le fond
+				$this->saveTag($sem["lib"], $idDocFondClic, 1, $date->get("c"), $idExi);
+				//sauvegarde la sémantique du tag
+				$this->saveIEML($sem["ieml"], $idExi, $idT);
+				
+				//enregistre le lien entre l'utilisateur et le l'existence
+				$this->dbUU->ajouter(array("uti_id_src"=>$this->user, "uti_id_dst"=>$idExi));
         	}
         }
 	}	
@@ -138,7 +154,7 @@ class Flux_Tweetpalette extends Flux_Site{
 		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
 		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
 		
-		$events = $this->dbD->findFiltre("titre != 'clic fond' AND titre != 'Palette de tweet'", array("titre","url"));
+		$events = $this->dbD->findFiltre("titre != 'clic fond' AND type != 'palette'", array("titre","url"));
 		$utis = $this->dbU->getAll(array("login"));
 		
     	return array("events"=>$events,"utis"=>$utis);

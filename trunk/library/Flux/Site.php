@@ -696,7 +696,44 @@ class Flux_Site{
 			}				
 		}    	
 	} 	
+
+    /**
+     * sauveUtiByImage
+     *
+     * enregistre un utilisateur à partir d'une liste d'image
+     * les fichiers doivent avoir la forme nom_prenom.ext
+     * 
+     * @param string $rep
+     * @param string $role
+     * 
+     */
+	function sauveUtiByImage($rep, $role){
+
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+    	if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
+    	if(!$this->dbUD)$this->dbUD = new Model_DbTable_flux_utidoc($this->db);
 		
+		if($dossier = opendir($rep)){
+			while(false !== ($fichier = readdir($dossier))){
+				if($fichier != '.' && $fichier != '..'){			
+					$arrNom = explode("_", substr($fichier, 0, -4));
+					$foaf = '<foaf:Person>
+					   <foaf:name>'.$arrNom[1]." ".$arrNom[1].'</foaf:name>
+					   <foaf:firstName>'.$arrNom[1].'</foaf:firstName>
+					   <foaf:surname>'.$arrNom[0].'</foaf:surname>
+					   <foaf:img>'.$rep."/".$fichier.'</foaf:img>
+					</foaf:Person>';
+					//ajoute l'utilisateur
+					$idUti = $this->dbU->ajouter(array("login"=>$arrNom[1]." ".$arrNom[0],"note"=>$foaf,"role"=>$role));
+					//ajoute le document
+					$idDoc = $this->dbD->ajouter(array("url"=>$rep."/".$fichier,"type"=>"foaf:img"));
+					//met en relation l'uti et le doc
+					$this->dbUD->ajouter(array("uti_id"=>$idUti,"doc_id"=>$idDoc));
+				}
+			}
+		}
+	}	
+	
 	function objectToObject($instance, $className) {
 	    //merci à http://stackoverflow.com/questions/3243900/convert-cast-an-stdclass-object-to-another-class
 		return unserialize(sprintf(
