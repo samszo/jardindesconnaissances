@@ -13,7 +13,8 @@ class Flux_IEML extends Flux_Site{
   	var $XPATH_PRIMITIVE = '//@primitiveSet';
   	var $PRIMITIVE_VALUE = array("E"=>1,"U"=>2,"A"=>4,"S"=>8,"B"=>16,"T"=>32);
   	var $LAYER_PONCT = array(":",".","-","'",",","_",";");
-
+	var $COLORS = array('E'=>"rgb(0,0,0)",'U'=>"rgb(0,255,255)",'A'=>"rgb(255,0,0)",'S'=>"rgb(0,255,0)",'B'=>"rgb(0,0,255)",'T'=>"rgb(255,255,0)");
+	
   	public function __construct($idBase=false)
     {
     	parent::__construct($idBase);
@@ -199,66 +200,83 @@ class Flux_IEML extends Flux_Site{
 	/**
 	 * Génération d'un plan svg des séquences
 	 * 
+	 * @param int $nb
 	 * @param array $colors
 	 * 
 	 * @return string
 	 */
-    function genereSvgPlanSeq($colors = array('E'=>"rgb(0,0,0)",'U'=>"rgb(0,255,255)",'A'=>"rgb(255,0,0)",'S'=>"rgb(0,255,0)",'B'=>"rgb(0,0,255)",'T'=>"rgb(255,255,0)")){
+    function genereSvgPlanSeq($nb=1000, $colors = null){
 		
     	require_once("svg/Svg.php");
+
+    	if($colors)$this->COLORS = $colors;
     	
-		$svg = new SvgDocument("10000", "10000");
-		$dDegrad = new SvgDefs();
-		$gRect = new SvgGroup();
 		
     	$db = new Model_DbTable_flux_ieml($this->db);
-    	$arrSeq = $db->getAll("ieml_id",100000);
+    	$arrSeq = $db->getAll("ieml_id",$nb);
     	$i = 1;
     	$x=10;
-    	$y=10;
-    	$r=10;
+    	$y=30;
+    	$r=20;
     	$maxLigne=5;
     	$numLigne=0;
     	$debLigne=-1;
     	$maxColo=3;
     	$numColo=0;
     	$debColo=10;
+    	$intColo = 1;
     	$first2 = true;
+
+		$svg = new SvgDocument($nb*$r, 1302*5*$r);
+		$dDegrad = new SvgDefs();
+		$gRect = new SvgGroup();
+    	
     	foreach ($arrSeq as $c){
     		//vérifie si on traite une couche de niveau 1
     		if($c['niveau']==1){
     			//création d'un stop pour chaque couleur
     			$arr = explode(":", $c['code']);
     			//création du dégradé
-				$dDegrad->addChild(new SvgRadialGradient("lg_".$c['code'], array(0,0.5,1), array($colors[$arr[0]],$colors[$arr[1]],$colors[$arr[2]])));
+    			$dDegrad->addChild($this->genereDegrad($c['code']));
+				//$dDegrad->addChild(new SvgRadialGradient("lg_".$c['code'], array(0,0.5,1), array($this->COLORS[$arr[0]],$this->COLORS[$arr[1]],$this->COLORS[$arr[2]])));
 	    		//création de la bulle
-				$gRect->addChild(new SvgCircle(2*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$c['code'].")","","","c_".$c['code']));
+				$gRect->addChild(new SvgCircle($intColo*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$c['code'].")","","","c_".$c['code']));
     		}
     		//vérifie si on traite une couche de niveau 2
     		if($c['niveau']==2){
     			if($first2){
     			 	$first2 = false;
 			    	$x=10;
-    				$numLigne = $maxLigne+2;
+    				$numLigne = $maxLigne-1;
     				$debLigne = $numLigne-1;
     				$maxLigne = 1302;
     				$numColo = 1;
     				$debColo=10;
+    				$r += $r;
     			} 
+    			/*création de 3 bulles
     			$arr = explode(".", $c['code']);
-    			//création des bulles
 				$gRect->addChild(new SvgCircle(2*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$arr[0].".)","","","c_".$c['code']));
 				$x+=2*$r;
 				$gRect->addChild(new SvgCircle(2*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$arr[1].".)","","","c_".$c['code']));
 				$x+=2*$r;
 				$gRect->addChild(new SvgCircle(2*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$arr[2].".)","","","c_".$c['code']));
+				 = 5;
+				*/
+    			
+    			//création d'une bulle
+    			$dDegrad->addChild($this->genereDegrad($c['code']));
+	    		//création de la bulle
+				$gRect->addChild(new SvgCircle($intColo*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$c['code'].")","","","c_".$c['code']));
+    			$nextColo = 1;
+    							
 				$x = $debColo;
     		}
     		if($maxLigne<=$numLigne){
-    			$x+=3*$r;
+    			$x+=$intColo*$r;
 		    	$numLigne = $debLigne;
 		    	if($c['niveau']==2){
-					$debColo = 5*$r+$x;
+					$debColo = $nextColo*$r+$x;
 					$x = $debColo;
 					$numColo ++;
 		    	}			
@@ -281,5 +299,32 @@ class Flux_IEML extends Flux_Site{
     	
     }	
     
-
+	/**
+	 * Génération des dégradés d'une adresse
+	 * 
+	 * @param string $code
+	 * 
+	 * @return SvgRadialGradient
+	 */
+    function genereDegrad($code){
+    	
+    	$arrP = explode(":", $code);
+    	$nbColors = count($arrP)-1;
+    	$pasOffset = 1/($nbColors-1);
+    	$arrOffset = array();
+    	$arrColor = array();
+		for ($i = 0; $i < $nbColors; $i++) {
+			$p = str_replace($this->LAYER_PONCT, "", $arrP[$i]);
+			if($i==0){
+				$arrOffset[] = 0;
+			}else{
+				$arrOffset[] = $i*$pasOffset;
+			}
+			$arrColor[] = $this->COLORS[$p];
+		}    	
+    	
+		return new SvgRadialGradient("lg_".$code, $arrOffset, $arrColor);
+    	
+    }
+    
 }
