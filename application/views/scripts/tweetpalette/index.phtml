@@ -28,9 +28,29 @@ pageTracker._trackPageview();
 		<div id="main">
 			<div id="configArea">
 				<h2>Tweet Palette</h2>
-				<p>Utilisateur : <?php echo $this->identite; ?></p>
 				<hr/>
-				<p>Palettes disponibles : </p>
+				Utilisateur : <?php echo $this->identite; ?>
+				-<a href="<?php echo '../public/auth/login?redir=tweetpalette&idBase='.$this->idBase; ?>">déconnexion</a>-
+				<hr/>
+				<div>
+					<h4>Infos de l'évènement</h4>
+					<label>Url : <input class="infoEvent" id="url_event" value="<?php echo $this->url; ?>" /></label>
+					<!--  
+					<input type="checkbox" id="filtrerUrl" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
+					-->
+					<div id="url_court" ></div>
+					<label>Auteur : <input class="infoEvent" id="user_event" /></label>
+					<!--  
+					<input visible="false" type="checkbox" id="filtrerUti" onclick="getTweet();" />
+					-->
+					<label>Tag : <input class="infoEvent" id="tag_event" value="<?php echo $this->tag; ?>" /></label>
+					<!--  
+					<input visible="false" type="checkbox" id="filtrerTag" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
+					-->
+				</div>
+				<hr/>
+				<div>
+					Palettes disponibles : 
 					<select onchange="changePalette(this)" >
 					  <option value="">Choisissez une palette</option>
 					  <?php 
@@ -40,23 +60,29 @@ pageTracker._trackPageview();
 					  	}
 					  ?>
 					</select>
+				</div>
 				<hr/>
-				<p>
-					<label>Tag de l'événement : <input id="tag_event" value="<?php echo $this->tag; ?>" /></label>
-					<input type="checkbox" id="filtrerTag" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
-				</p>
-				<p>
-					<label>Url de l'événement : <input id="url_event" value="<?php echo $this->url; ?>" /></label>
-					<input type="checkbox" id="filtrerUrl" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
-				</p>
-				<p><div id="url_court" ></div></p>
-				<p><label>Utilisateur : <input id="user_event" /></label><input type="checkbox" id="filtrerUti" onclick="getTweet();" /></p>
-				<div>(cocher pour filtrer)</div>
-				<p><label>Texte du tweet : <label id="taille_tweet"></label>
+				<div>
+					Rôles disponibles : 
+					<select onchange="changeRole(this)" >
+					  <option value="">Choisissez un rôle</option>
+					  <?php 
+					  	//construction des options
+					  	foreach ($this->roles as $r) {
+						  	echo "<option value='".$r["role"]."'>".$r["role"]."</option>";
+					  	}
+					  ?>
+					</select>
+				</div>
+				<hr/>
+				<div>
+					<label>Texte du tweet : <span id="taille_tweet" /></label>
 					<textarea id="tweet_text" maxlength="140" ></textarea>
-					<input type="checkbox" id="showIeml" <?php if($this->iframe) echo 'checked="checked"'; ?> /> Affiche IEML
-				</label></p>
-				<div id="gen">Enregistrer</div>
+					<!--  
+					<input visible="false" type="checkbox" id="showIeml" <?php if($this->iframe) echo 'checked="checked"'; ?> /> Affiche IEML
+					-->
+					<div id="gen">Enregistrer</div>
+				</div>
 			</div>
 			<div id="svgArea">
 				<div id="heatmapArea" />
@@ -69,7 +95,7 @@ pageTracker._trackPageview();
 		var idBase = '<?php echo $this->idBase; ?>';
 		var idUti = <?php echo $this->idUti; ?>;
 		var iframe = '<?php echo $this->iframe; ?>';
-
+		
 		//construction du tableau des coordonnées sémantiques
 		<?php 
 		  	//construction des options
