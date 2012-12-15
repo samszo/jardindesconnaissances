@@ -12,12 +12,15 @@
 			getTweet();
 			getInput();
 						
+			//gestion des evenements
 			document.getElementById("gen").onclick = function(){
 				//xx.store.generateRandomDataSet(100);
 				setTweet();				
 				envoiTweet();
 			};
-			
+			$(".infoEvent").change(function () {
+				getTweet();	
+		        }).change();
 		};
 
 		function multiSelect(item){
@@ -117,8 +120,14 @@
 				tweet = "#"+document.getElementById('tag_event').value;
 			else
 				tweet = "";				
+			if(document.getElementById('user_event').value){
+				var a = document.getElementById('user_event').value;
+				a = a.replace(" ","_"); 
+				tweet += " @"+a;				
+			}
+			
 			var degre;					
-			var showIEML = document.getElementById('showIeml').checked;
+			var showIEML = false;//document.getElementById('showIeml').checked;
 			for (i=0;i<sem.length;i++){
 				if(sem[i].lib){
 					//calcul le degré de puissance
@@ -158,7 +167,7 @@
 		}
 		
 		function setTweet() {
-			var p = getParamsSet();
+			var p = getParams();
 			$.post("tweetpalette/ajout"
 					, p,
 					 function(data){
@@ -177,32 +186,24 @@
 
 		function getParams(){
 
-			if(document.getElementById('url_court').value) url = document.getElementById('url_court').value;
-			else url = document.getElementById('url_event').value;
-			if(!url || !document.getElementById('filtrerUrl').checked) url = "no";
+			var urlE = "no";
+			var tagE = "no";
+			var exi = "no";			
 			
-			if(document.getElementById('tag_event').value && document.getElementById('filtrerTag').checked) event = document.getElementById('tag_event').value;
-			else event = "no";
+			if(document.getElementById('url_court').value) urlE = document.getElementById('url_court').value;
+			if(document.getElementById('url_event').value) urlE = document.getElementById('url_event').value;
+			//if(!url || !document.getElementById('filtrerUrl').checked) url = "no";
 			
-			if(document.getElementById('user_event').value && document.getElementById('filtrerUti').checked) uti = document.getElementById('user_event').value;
-			else uti = "no";
+			if(document.getElementById('tag_event').value) tagE = document.getElementById('tag_event').value;
+			//if(!document.getElementById('filtrerTag').checked) event = "no";
+			
+			if(document.getElementById('user_event').value) exi = document.getElementById('user_event').value;
+			//if(!document.getElementById('filtrerUti').checked) uti = "no";
 
 			var filtrer = true;
-			if(url == "no" && event == "no" && uti == "no")filtrer=false;
+			if(urlE == "no" && tagE == "no" && exi == "no")filtrer=false;
 			
-			return {"idBase":idBase, "event":event, "url":url, "uti":uti, "sem":sem, "urlFond":urlFond, "filtrer":filtrer};
-		}
-
-		function getParamsSet(){
-
-			if(document.getElementById('url_court').value) url = document.getElementById('url_court').value;
-			else url = document.getElementById('url_event').value;
-			if(!url) url = "no";
-			
-			if(document.getElementById('tag_event').value) event = document.getElementById('tag_event').value;
-			else event = "no";
-			
-			return {"idBase":idBase, "event":event, "url":url, "uti":idUti, "sem":sem, "urlFond":urlFond};
+			return {"idBase":idBase, "event":tagE, "url":urlE, "exi":exi, "uti":idUti, "sem":sem, "urlFond":urlFond, "filtrer":filtrer};
 		}
 		
 		function setInput(data){
@@ -211,6 +212,7 @@
 			var dtE=[], e="";
 			var dtUrl=[], url="";
 			var dtU=[];
+			var dtR=[];
 			for (i=0;i<dtInput.events.length;i++){
 				//vérifie les doublons
 				if(e!=dtInput.events[i].titre)
@@ -231,11 +233,16 @@
 		}
 		
 		function changePalette(e){
+						
 			var o = e.selectedOptions[0];
 			//initialise les éléments
 			d3.select('#svg').remove();
 			d3.select('#png').remove();
-			d3.select('#heatmapArea').remove();
+			var hma = document.getElementById('heatmapArea');
+			while (hma.firstChild) {
+				hma.removeChild(hma.firstChild);
+			}
+			if(e.selectedIndex==0) return;				
 			
 			//charge les valeurs
 			grilleSvg = grilles[e.selectedIndex-1];
@@ -244,14 +251,12 @@
 			nbZone = grilleSvg.repZone.length;
 			urlFond = grilleSvg.url;
 			
-			d3.select('#svgArea')
-				.append("div")
-				.attr("id", 'heatmapArea')
-				.attr("width", grilleSvg.widthArea)
-				.attr("height", grilleSvg.heightArea)
-				.attr("top", grilleSvg.topArea)
-				.attr("left", grilleSvg.leftArea);
-				
+			//défini les style de la heatmap
+			hma.style.width = grilleSvg.widthArea;	
+			hma.style.height = grilleSvg.heightArea;
+			hma.style.top = grilleSvg.topArea;
+			hma.style.left = grilleSvg.leftArea;
+
 			//création du heatmap
 			xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});			
 			xx.get("canvas").onclick = function(ev){
@@ -262,6 +267,9 @@
 					setTweet();				
 				}
 			};
+			
+			//récupère les éléments de la base
+			getTweet();
 			
 			//ajoute la valeur aux éléments
 			if(o.className=="svg"){

@@ -42,7 +42,6 @@ body, html {
 	left:80px;
 }
 #gen {
-	margin-top:25px;
 	padding:10px 20px 10px 20px;
 	-moz-border-radius:15px;
 	-o-border-radius:15px;
@@ -52,7 +51,6 @@ body, html {
 	cursor:pointer;
 	color:white;
 	background-color:black;
-	width:120px;
 	text-align:center;
 }
 #gen:hover{
@@ -67,3 +65,7 @@ ul li {list-style: none; cursor: pointer;}
 li.smart_autocomplete_highlight {background-color: #8d8bc4;}
 ul { margin: 10px 0; padding: 5px; background-color: #269bc9; }
 
+a:link {color:white;}    /* unvisited link */
+a:visited {color:orange;} /* visited link */
+a:hover {color:green;}   /* mouse over link */
+a:active {color:red;}  /* selected link */
