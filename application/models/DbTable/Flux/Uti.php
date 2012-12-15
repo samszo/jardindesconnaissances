@@ -70,6 +70,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     	$id=false;
     	if($existe)$id = $this->existe($data);
     	if(!$id){
+    		if(!isset($data["date_inscription"]))$data["date_inscription"]= new Zend_Db_Expr('NOW()');
     	 	$id = $this->insert($data);
     	}
     	return $id;
@@ -193,20 +194,19 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     }
     
     /**
-     * Recherche des entrée avec une liste de paramètres
+     * Recherche les valeur distinct d'une colone
      *
-     * @param array $params
+     * @param string $col
      *
      * @return array
      */
-    public function findByParams($params)
+    public function getDistinct($col)
     {
-		$select = $this->select();
-		$select->from($this);
-		foreach($params as $k=>$v){
-			$select->where($k.' = ?', $v);
-		}
-		return $this->fetchAll($select)->toArray();        
+        $query = $this->select()
+        	->distinct()
+   	     	->from( array("f" => "flux_uti"),$col)
+   	     	->where($col." !=''");
+    	return $this->fetchAll($query)->toArray();        
     } 
-            
+   
 }

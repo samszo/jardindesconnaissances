@@ -142,7 +142,7 @@ class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
     public function findTagByUti($uti)
     {
         $query = $this->select()
-        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+	     	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
             ->from(array('ut' => 'flux_utitag'))
             ->joinInner(array('t' => 'Flux_Tag'),
             	'ut.tag_id = t.tag_id', array('code'))
