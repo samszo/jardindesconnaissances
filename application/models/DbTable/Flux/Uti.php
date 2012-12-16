@@ -197,13 +197,21 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
      * et retourne cette entrée.
      *
      * @param varchar $role
+     * @param boolean $img 
+     * 
+     * @return array
      */
-    public function findByRole($role)
+    public function findByRole($role, $img=false)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_uti") )                           
-                    ->where( "f.role = ?", $role );
-
+			->from( array("u" => "flux_uti") )                           
+            ->where( "u.role = ?", $role );
+		if($img){
+        	$query->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        		->joinInner(array('ud' => 'flux_utidoc'),'ud.uti_id = u.uti_id',array())
+				->joinInner(array('d' => 'flux_doc'),"d.doc_id = ud.doc_id AND type = 'foaf:img'",array('doc_id','url'));
+		}
+            
         return $this->fetchAll($query)->toArray(); 
     }
     
@@ -233,7 +241,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     	$arrRoles = $this->getDistinct("role");
     	$nbRole = count($arrRoles);
     	for ($i = 0; $i < $nbRole; $i++) {
-    		$arrUti = $this->findByRole($arrRoles[$i]["role"]);
+    		$arrUti = $this->findByRole($arrRoles[$i]["role"],true);
     		$arrRoles[$i]['utis'] = $arrUti;
     	}
     	return $arrRoles;        
