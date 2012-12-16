@@ -289,3 +289,103 @@
 			}
 		}
 		
+		function changeRole(e){
+			
+			//vérifie si on a bien sélectionné un rôle
+			if(e.selectedIndex==0) return;				
+
+			//vérifie que le conteneur existe
+			if(d3.select('#tofsActeurs'+e.selectedIndex))return;
+			
+			//récupération des données
+			var acteurs = roles[e.selectedIndex-1]['utis'];
+			
+			//création du conteneur
+			d3.select('#tofsActeurs')
+				.append("div")
+				.attr("id", 'tofsActeurs'+e.selectedIndex)
+				.selectAll(".tofsAct")
+                    .data(acteurs)
+                    .enter().append("image")
+                    	.attr("class", "tofsAct")
+                    	.attr("xlink:href", function(d) { 
+                            return t; 
+                            })
+                    .attr("width", 960)
+                    .attr("height", 500);append("rect")
+                      .attr("class", "bar")
+                      .attr("x", function(d) { 
+                              var t = x(d.maj);
+                              return t; 
+                              })
+                      .attr("width", 10)
+                      .attr("y", function(d) { 
+                              var t = fmtHeure(d.maj);
+                              t = fmtHeure.parse(t);
+                              t = y(t);
+                              var ti = y(d.maj);
+                              return t; 
+                              })
+                          .attr("fill",function(d) { 
+                                  var color = "black";
+                                  if(d.code=="travail non fait")color="magenta";
+                                  if(d.code=="abscent")color="red";
+                                  if(d.code=="retard")color="orange";
+                                  if(d.code=="présent")color="green";
+                              return color; 
+                      })
+                      .attr("height", function(d) { 
+                              return 3; 
+                              });                  ;
+.remove();
+			d3.select('#png').remove();
+			var hma = document.getElementById('heatmapArea');
+			while (hma.firstChild) {
+				hma.removeChild(hma.firstChild);
+			}
+			
+			//charge les valeurs
+			grilleSvg = grilles[e.selectedIndex-1];
+			nbX = grilleSvg.repX.length;
+			nbY = grilleSvg.repY.length;
+			nbZone = grilleSvg.repZone.length;
+			urlFond = grilleSvg.url;
+			
+			//défini les style de la heatmap
+			hma.style.width = grilleSvg.widthArea;	
+			hma.style.height = grilleSvg.heightArea;
+			hma.style.top = grilleSvg.topArea;
+			hma.style.left = grilleSvg.leftArea;
+
+			//création du heatmap
+			xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});			
+			xx.get("canvas").onclick = function(ev){
+				var pos = h337.util.mousePosition(ev);
+				xx.store.addDataPoint(pos[0],pos[1]);
+				getSemClic(pos[0], pos[1]);
+				if(iframe){
+					setTweet();				
+				}
+			};
+			
+			//récupère les éléments de la base
+			getTweet();
+			
+			//ajoute la valeur aux éléments
+			if(o.className=="svg"){
+				d3.select('#svgArea')
+					.append("div")
+						.attr("id", "svg");
+				d3.xml(e.value, "image/svg+xml", function(xml) {
+					var svg = document.getElementById("svg");
+					svg.appendChild(xml.documentElement);
+					});
+			}
+			if(o.className=="png"){
+				d3.select('#svgArea')
+					.append("img")
+						.attr("src", e.value)
+						.attr("id", "png");
+			}
+		}
+				
