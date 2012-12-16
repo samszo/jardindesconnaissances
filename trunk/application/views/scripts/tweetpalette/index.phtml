@@ -96,15 +96,18 @@ pageTracker._trackPageview();
 		var idUti = <?php echo $this->idUti; ?>;
 		var iframe = '<?php echo $this->iframe; ?>';
 		
-		//construction du tableau des coordonnées sémantiques
-		<?php 
-		  	//construction des options
-		  	echo "var grilles =  [";
+		//tableau des coordonnées sémantiques
+		var grilles =  [<?php 
+		  	//construction des options de coordonnées sémantiques
 			foreach ($this->palettes as $p) {
 			  	echo $p["data"].",";
 		  	}
-			echo "];";
-		?>		
+		?>];
+		//tableau des roles
+		var roles =  <?php 
+			  	//construction des options de coordonnées sémantiques
+			echo json_encode($this->roles);
+		?>;
 		</script>
 		<script type="text/javascript" src="js/tweetpalette.js"></script>
 	</body>
