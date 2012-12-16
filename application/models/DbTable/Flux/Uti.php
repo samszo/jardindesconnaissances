@@ -192,9 +192,23 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+    /*
+     * Recherche une entrée Flux_Uti avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param varchar $role
+     */
+    public function findByRole($role)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_uti") )                           
+                    ->where( "f.role = ?", $role );
+
+        return $this->fetchAll($query)->toArray(); 
+    }
     
     /**
-     * Recherche les valeur distinct d'une colone
+     * renoie les valeur distinct d'une colone
      *
      * @param string $col
      *
@@ -208,5 +222,21 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
    	     	->where($col." !=''");
     	return $this->fetchAll($query)->toArray();        
     } 
-   
+
+    /**
+     * renvoie les rôles et les utilisateurs associés
+     *
+     * @return array
+     */
+    public function getRolesUtis()
+    {
+    	$arrRoles = $this->getDistinct("role");
+    	$nbRole = count($arrRoles);
+    	for ($i = 0; $i < $nbRole; $i++) {
+    		$arrUti = $this->findByRole($arrRoles[$i]["role"]);
+    		$arrRoles[$i]['utis'] = $arrUti;
+    	}
+    	return $arrRoles;        
+    } 
+    
 }
