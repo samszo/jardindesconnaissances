@@ -8,9 +8,9 @@ try {
 	$pwd = "samszo";
 	
 	$s = new Flux_Site('flux_tweetpalette');
-	$s->sauveUtiByImage('../data/etudiants/CDNL_12-13', "étudiants CDNL 12-13");
+	//$s->sauveUtiByImage('../data/etudiants/CDNL_12-13', "étudiants CDNL 12-13");
 	$dbU = new Model_DbTable_Flux_Uti($s->db);
-	$roles = $dbU->getDistinct("role");
+	$roles = $dbU->getRolesUtis();
 	
 	
 	/*
