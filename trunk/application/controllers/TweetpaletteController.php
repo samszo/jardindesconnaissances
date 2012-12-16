@@ -35,7 +35,7 @@ class TweetpaletteController extends Zend_Controller_Action {
 			    $this->view->palettes = $dbDoc->findByType("palette");
 			    //récupère les rôles disponibles
 				$dbU = new Model_DbTable_Flux_Uti($s->db);
-				$this->view->roles = $dbU->getDistinct("role");
+				$this->view->roles = $dbU->getRolesUtis("role");
 			}else{
 			    $this->_redirect('/auth/login?redir=tweetpalette&idBase='.$this->dbNom);
 			}
