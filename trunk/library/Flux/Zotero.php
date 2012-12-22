@@ -311,7 +311,7 @@ class Flux_Zotero extends Flux_Site{
 		WHERE {
 		  ?x skos:prefLabel ?prefLabel ;
 		     skos:notation ?notation .
-		  FILTER ((?notation = ".$notation.") && langMatches( lang(?prefLabel), '".$langue."' ))
+		  FILTER ((?notation = '".$notation."') && langMatches( lang(?prefLabel), '".$langue."' ))
 		}";
 		$url = "http://dewey.info/sparql.php";
 		$xml = simplexml_load_string($this->getUrlBodyContent($url, array("output"=>"xml", "query"=>$query), false));
@@ -326,26 +326,38 @@ class Flux_Zotero extends Flux_Site{
      * @param array $dewey
      * @param int $idDoc
      * 
-     * @return int
+     * @return array
      * 
      */
 	function sauveDeweyAbout($dewey, $idDoc){
 		
-		$idTag = false;
-		if($dewey[0]){
-			//initialise l'utilisateur
-			$d = new Zend_Date();
-    		
-			//on stocke l'information dans un nouveau document
-			$xmlDewey = $dewey[0]->results->result[0];
-			//on stocke l'information dans un nouveau document
-			$arrDoc = array("url"=>$xmlDewey->binding[0]->url, "tronc"=>$idDoc, "data"=>$xmlDewey->asXML(), "type"=>60);
-			$idDocDewey = $this->dbD->ajouter($arrDoc);
-			//enregistre le tag pour le document
-			$label = $xmlDewey->binding[1]->literal."";
-			$idTag = $this->saveTag($label, $idDoc, 0, $d->get("c"), $this->idUserDewey);
-		}	
-		return $idTag;
+		try {
+			$idTag = false;
+			if($dewey[0]){
+				//initialise l'utilisateur
+				$d = new Zend_Date();
+	    		
+				//on stocke l'information dans un nouveau document
+				$xmlDewey = $dewey[0]->results->result[0];
+				if($xmlDewey){
+					//on stocke l'information dans un nouveau document
+					$arrDoc = array("url"=>$xmlDewey->binding[0]->uri."", "tronc"=>$idDoc, "data"=>$xmlDewey->asXML(), "type"=>60);
+					$idDocDewey = $this->dbD->ajouter($arrDoc);
+					//enregistre le tag pour le document
+					$desc = $xmlDewey->binding[1]->literal."";
+					$code = $xmlDewey->binding[2]->literal."";
+					$idTag = $this->saveTag(array("code"=>$code, "desc"=>$desc), $idDocDewey, 0, $d->get("c"));
+				}else{
+					$idTag=-1;
+					$idDocDewey=-1;
+				}
+			}	
+		}catch (Zend_Exception $e) {
+			echo "Récupère exception: " . get_class($e) . "\n";
+		    echo "Message: " . $e->getMessage() . "\n";
+		}
+			
+		return array($idTag,$idDocDewey);
 		
 	}
 	
@@ -360,25 +372,28 @@ class Flux_Zotero extends Flux_Site{
      * @return int
      * 
      */
-	function getDeweyHierarchie($dewey){
+	function getDeweyHierarchie($dewey, $idDoc=0){
 
     	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
     	if(!$this->dbD)$this->dbD = new Model_DbTable_flux_doc($this->db);
-    	$this->idUserDewey = $this->getUser(array("login"=>"www.dewey.info"));
+    	if(!$this->user)$this->user = $this->getUser(array("login"=>"www.dewey.info"));
     	
     	//parcourt l'ensemble de la chaine
 		for($i = 1; $i < strlen($dewey); $i++)
         {
         	$c = substr($dewey, 0, $i);
-        	if(substr($c, -1)==".") return;
+        	if(substr($c, -1)=="."){
+        		$i++;
+        		$c = substr($dewey, 0, $i);
+        	}         	
         	//recherche la codification dans la base
         	$tag = $this->dbT->findByCode($c);
         	if(count($tag)==0){
         		// on cherche en anglais
-				$arrDewey = $this->getDeweyAbout($c, "en");
+				$arrDewey = $this->getDeweyAbout($c, "en");	
         		//on enregistre le nouveau code
-				$idTagDewey = $this->sauveDeweyAbout($arrDewey, 0);
-				echo $idTagDewey;				
+				$idTagDoc = $this->sauveDeweyAbout($arrDewey, $idDoc);
+				echo $c." : ".$idTagDoc[0]." - ".$idTagDoc[1]."<br/>";				
         	}
         	
         }

@@ -127,7 +127,7 @@ class Flux_Site{
 		   	$html = $this->cache->load($c);
 		}
         if(!$html){
-	    	$client = new Zend_Http_Client($url);
+	    	$client = new Zend_Http_Client($url,array('timeout' => 30));
 	    	if($param)$client->setParameterGet($param);
 	    	try {
 				$response = $client->request();
@@ -196,7 +196,10 @@ class Flux_Site{
 		if($idUser==-1)$idUser=$this->user;
 		
 		//on ajoute le tag
-		$idT = $this->dbT->ajouter(array("code"=>$tag));
+		if(is_array($tag))
+			$idT = $this->dbT->ajouter($tag);
+		else
+			$idT = $this->dbT->ajouter(array("code"=>$tag));
 		//on ajoute le lien entre le tag et le doc avec le poids
 		$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD, "poids"=>$poids));
 		//on ajoute le lien entre le tag et l'uti avec le poids
