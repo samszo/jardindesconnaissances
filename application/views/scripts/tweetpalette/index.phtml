@@ -34,16 +34,17 @@ pageTracker._trackPageview();
 				<hr/>
 				<div>
 					<h4>Infos de l'évènement</h4>
-					<label>Url : <input class="infoEvent" id="url_event" value="<?php echo $this->url; ?>" /></label>
+					<label>Url :     </label><input class="infoEvent" id="url_event" value="<?php echo $this->url; ?>" />
 					<!--  
 					<input type="checkbox" id="filtrerUrl" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
 					-->
 					<div id="url_court" ></div>
-					<label>Auteur : <input class="infoEvent" id="user_event" /></label>
+					<label>Auteur : </label><br/><input class="infoEvent" id="user_event" />
 					<!--  
 					<input visible="false" type="checkbox" id="filtrerUti" onclick="getTweet();" />
 					-->
-					<label>Tag : <input class="infoEvent" id="tag_event" value="<?php echo $this->tag; ?>" /></label>
+					<br/>
+					<label>Tag : </label><br/><input class="infoEvent" id="tag_event" value="<?php echo $this->tag; ?>" />
 					<!--  
 					<input visible="false" type="checkbox" id="filtrerTag" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
 					-->
@@ -77,7 +78,7 @@ pageTracker._trackPageview();
 				<hr/>
 				<div>
 					<label>Texte du tweet : <span id="taille_tweet" /></label>
-					<textarea id="tweet_text" maxlength="140" ></textarea>
+					<textarea id="tweet_text" maxlength="140" width="180px" ></textarea>
 					<!--  
 					<input visible="false" type="checkbox" id="showIeml" <?php if($this->iframe) echo 'checked="checked"'; ?> /> Affiche IEML
 					-->
@@ -85,8 +86,8 @@ pageTracker._trackPageview();
 				</div>
 			</div>
 			<div id="svgArea">
-				<div id="heatmapArea" />
-				<img src="" id="png" />
+				<div id="heatmapArea" ></div>
+				<img src="" id="png" ></img>
 				<div id="svg"></div>
 				<div id="tofsActeurs"></div>
 			</div>
