@@ -1,11 +1,11 @@
 body,html {
     margin: 0 5px;
     font-family: Verdana,sans-serif;
+	background-color:black;
+	color:white; 
 }
 
 h1 {
-    font-size: 1.4em;
-    color: #008000;
 }
 
 a {
