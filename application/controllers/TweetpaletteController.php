@@ -97,5 +97,37 @@ class TweetpaletteController extends Zend_Controller_Action {
 	          echo "Message: " . $e->getMessage() . "\n";
 		}
 	}
+
+    public function sauveraisonAction()
+    {
+		try {
+			if($this->_getParam('idBase')) $this->dbNom = $this->_getParam('idBase');
+			$auth = Zend_Auth::getInstance();
+			if ($auth->hasIdentity()) {
+			    $s = new Flux_Site($this->dbNom);
+				$idUti = $this->_getParam('idUti', 0);			
+			    $idExi = $this->_getParam('idExi', 0);			
+		    	$raison = $this->_getParam('raison', 0);			
+		    	
+		    	$dbT = new Model_DbTable_Flux_Tag($s->db);
+		    	$idT = $dbT->ajouter(array("code"=>$raison,"desc"=>"raison"));
+		    	
+		    	$dbUT = new Model_DbTable_flux_utitag($s->db);
+		    	$dbUT->ajouter(array("uti_id"=>idExi, "tag_id"=>$idT, "maj"=> new Zend_Db_Expr('NOW()')), false);
+
+				//enregistre le lien entre l'utilisateur et le l'existence
+		    	$dbUU = new Model_DbTable_Flux_UtiUti($s->db);
+		    	$dbUU->ajouter(array("uti_id_src"=>$idUti, "uti_id_dst"=>$idExi, "eval"=>$idT, "maj"=> new Zend_Db_Expr('NOW()')),false);
+		    	
+				$this->view->data = idExi." ".$idT; 					
+			}else{
+			    $this->_redirect('/auth/login?redir=tweetpalette&idBase='.$this->dbNom);
+			}
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+		}
+    	
+    }
 	
 }
