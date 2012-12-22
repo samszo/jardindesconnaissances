@@ -7,22 +7,25 @@ try {
 	$user = "luckysemiosis";
 	$pwd = "samszo";
 	
+	/*
 	$s = new Flux_Site('flux_tweetpalette');
 	//$s->sauveUtiByImage('../data/etudiants/CDNL_12-13', "étudiants CDNL 12-13");
-	$dbU = new Model_DbTable_Flux_Uti($s->db);
-	$roles = $dbU->getRolesUtis();
-	
+	//$dbU = new Model_DbTable_Flux_Uti($s->db);
+	//$roles = $dbU->getRolesUtis();
+	$dbUU = new Model_DbTable_Flux_UtiUti($s->db);
+	$dbUU->ajouter(array("uti_id_src"=>2, "uti_id_dst"=>94, "eval"=>1));
+	*/
 	
 	/*
 	$tp = new Flux_Tweetpalette('flux_tweetpalette');
 	$json = $tp->getPaletteClics('bernard stiegler', 'http://www.capdigital.com/evenements/enmi/', "../data/tweetpalette/AxePertiClair.png", 'ENMI', true);
 	*/
-	/*
+	//
 	$zotero = new Flux_Zotero($user);
 	//$zotero->saveAll();
-	$zotero->sauveOCLCInfo();
-	$zotero->sauveAmazonInfo();
-	*/
+	//$zotero->sauveOCLCInfo();
+	//$zotero->sauveAmazonInfo();
+	$zotero->getDeweyHierarchie("001.42");
 	
 	/*
 	$d = new Flux_Amazon("flux_diigo");
