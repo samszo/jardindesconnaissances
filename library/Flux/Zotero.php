@@ -337,16 +337,65 @@ class Flux_Zotero extends Flux_Site{
 			$d = new Zend_Date();
     		
 			//on stocke l'information dans un nouveau document
-			$xmlDewey = $dewey[0];
+			$xmlDewey = $dewey[0]->results->result[0];
 			//on stocke l'information dans un nouveau document
-			$arrDoc = array("url"=>$dewey[0], "tronc"=>$idDoc, "data"=>$xmlDewey->asXML(), "type"=>60);
+			$arrDoc = array("url"=>$xmlDewey->binding[0]->url, "tronc"=>$idDoc, "data"=>$xmlDewey->asXML(), "type"=>60);
 			$idDocDewey = $this->dbD->ajouter($arrDoc);
 			//enregistre le tag pour le document
-			$label = $xmlDewey->results->result[0]->binding[1]->literal."";
+			$label = $xmlDewey->binding[1]->literal."";
 			$idTag = $this->saveTag($label, $idDoc, 0, $d->get("c"), $this->idUserDewey);
 		}	
 		return $idTag;
 		
+	}
+	
+    /**
+     * getDeweyHierarchie
+     *
+     * calcule la hiérarchie d'une classification Dewey
+     * 
+     * @param string $dewey
+     * @param int $idDoc
+     * 
+     * @return int
+     * 
+     */
+	function getDeweyHierarchie($dewey){
+
+    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_flux_doc($this->db);
+    	$this->idUserDewey = $this->getUser(array("login"=>"www.dewey.info"));
+    	
+    	//parcourt l'ensemble de la chaine
+		for($i = 1; $i < strlen($dewey); $i++)
+        {
+        	$c = substr($dewey, 0, $i);
+        	if(substr($c, -1)==".") return;
+        	//recherche la codification dans la base
+        	$tag = $this->dbT->findByCode($c);
+        	if(count($tag)==0){
+        		// on cherche en anglais
+				$arrDewey = $this->getDeweyAbout($c, "en");
+        		//on enregistre le nouveau code
+				$idTagDewey = $this->sauveDeweyAbout($arrDewey, 0);
+				echo $idTagDewey;				
+        	}
+        	
+        }
+				
+	/*
+	 * SELECT count( * ) nb, t.code, td.code, u.login
+FROM flux_utitagdoc AS utd
+INNER JOIN flux_uti AS u ON u.uti_id = utd.uti_id
+INNER JOIN flux_tag AS t ON t.tag_id = utd.tag_id
+AND t.code != ""
+INNER JOIN flux_tagtag tt ON tt.tag_id_dst = t.tag_id
+INNER JOIN flux_tag AS td ON td.tag_id = tt.tag_id_src
+WHERE (
+u.uti_id =637
+)
+GROUP BY td.code
+	 */
 	}
 	
 }

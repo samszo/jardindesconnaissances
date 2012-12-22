@@ -227,7 +227,7 @@ class Flux_IEML extends Flux_Site{
     	$intColo = 1;
     	$first2 = true;
 
-		$svg = new SvgDocument($nb*$r, 1302*5*$r);
+		$svg = new SvgDocument($nb/1302*2+1000, 1302*5*$r);
 		$dDegrad = new SvgDefs();
 		$gRect = new SvgGroup();
     	

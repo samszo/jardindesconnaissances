@@ -76,7 +76,7 @@ class Flux_Tweetpalette extends Flux_Site{
 				$this->saveIEML($sem["ieml"], $idExi, $idT);
 				
 				//enregistre le lien entre l'utilisateur et le l'existence
-				$this->dbUU->ajouter(array("uti_id_src"=>$this->user, "uti_id_dst"=>$idExi));
+				$this->dbUU->ajouter(array("uti_id_src"=>$this->user, "uti_id_dst"=>$idExi, "eval"=>$idT, "maj"=> new Zend_Db_Expr('NOW()')),false);
         	}
         }
 	}	
@@ -154,7 +154,7 @@ class Flux_Tweetpalette extends Flux_Site{
 		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
 		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
 		
-		$events = $this->dbD->findFiltre("titre != 'clic fond' AND type != 'palette'", array("titre","url"));
+		$events = $this->dbD->findFiltre("titre != 'clic fond' AND type != 'palette' AND type != 'foaf:img'", array("titre","url"));
 		$utis = $this->dbU->getAll(array("login"));
 		
     	return array("events"=>$events,"utis"=>$utis);
