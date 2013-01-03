@@ -514,4 +514,29 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
         
     }    
     
+    /**
+     * récupère les class Dewey et les documents associés
+     *
+     * @param int $idUtiDewey
+     *
+     * @return array
+     */
+    public function getDeweyTagDoc($idUtiDewey)
+    {
+    	$query = $this->select()
+			->from(array("t" => "flux_tag"))
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
+			->joinInner(array('utd' => 'flux_utitagdoc'), "utd.tag_id = t.tag_id AND utd.uti_id = ".$idUtiDewey,
+				array("nb"=>"COUNT(DISTINCT utd.doc_id)", "idsDoc"=>"GROUP_CONCAT(DISTINCT utd.doc_id)"))
+			->joinInner(array('tParent' => 'flux_tag'), "t.lft BETWEEN tParent.lft AND tParent.rgt",
+				array("idsTagParent"=>"GROUP_CONCAT(DISTINCT tParent.tag_id ORDER BY tParent.lft)"))
+			->group("t.tag_id")
+			->order("t.lft")
+			->where("t.desc != ''");                           
+        $result = $this->fetchAll($query)->toArray(); 
+        
+        return $result;
+        
+    }    
+        
 }

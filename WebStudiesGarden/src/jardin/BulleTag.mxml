@@ -5,9 +5,11 @@
 	<mx:Script>
 		<![CDATA[
 	    import flash.display.Sprite;
-	    import ws.tink.display.HitTest;
 	    import flash.geom.Rectangle;
-		import mx.events.FlexEvent;
+	    
+	    import mx.events.FlexEvent;
+	    
+	    import ws.tink.display.HitTest;
 
 		[Bindable]
 		public var pluie:Boolean=true;
@@ -25,7 +27,7 @@
 		public var tgTerre:TagCloud;
 		
 		private var FaitBulle:Boolean=true;
-					
+							
 		private function init():void
 		{
 			createTag();
@@ -154,7 +156,8 @@
 				var arrTag:Array = tgTerre.tagContainer.getChildren();
 				for each (var tag:Object in arrTag){
 					//vérifie que le tag est équivalent
-					if(tag._label == this._label){
+					//et qu'il est en place
+					if(tag._label == this._label && tag.x!=0){
 						tag.createBulle()
 						//affiche le document
 						tgTerre.DrawDoc(BulleTag(tag));

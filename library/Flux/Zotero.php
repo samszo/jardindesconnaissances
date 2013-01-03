@@ -180,8 +180,7 @@ class Flux_Zotero extends Flux_Site{
     	//initialise les mots clefs
     	$this->idTagMostPop = $this->dbT->ajouter(array("code"=>"mostPopular"));
 		$this->idTagMostRecent = $this->dbT->ajouter(array("code"=>"mostRecent"));
-		$this->idTagLatestEdition = $this->dbT->ajouter(array("code"=>"latestEdition"));
-		
+		$this->idTagLatestEdition = $this->dbT->ajouter(array("code"=>"latestEdition"));	
     	
     	//récupère les documents
 		$rs = $this->dbD->findByTronc("0");
@@ -246,17 +245,8 @@ class Flux_Zotero extends Flux_Site{
 		$nota = $dcc['sfa']."";
 		$idTagOCLC = $this->saveTag($nota, $idDoc, $dcc['holdings'], $d->get("c"), $this->idUserOCLC);
 		//on récupère les informations de dewey
-		$arrDewey = $this->getDeweyAbout($nota);
-		//si la réponse en français ne donne rien
-		if(!$arrDewey[0]->results->result){
-			// on cherche en anglais
-			$arrDewey = $this->getDeweyAbout($nota, "en");
-		}
+		$arrDewey = $this->getDeweyAbout($nota, "en");
 		$idTagDewey = $this->sauveDeweyAbout($arrDewey, $idDoc);
-		if($idTagDewey){
-			//enregistre le lien entre les deux tags
-			$this->dbTT->ajouter(array("tag_id_src"=>$idTagOCLC, "tag_id_dst"=>$idTagDewey));
-		}	
 		return $idTagOCLC; 
 	}
 	
@@ -325,11 +315,12 @@ class Flux_Zotero extends Flux_Site{
      * 
      * @param array $dewey
      * @param int $idDoc
+     * @param int $idTagParent
      * 
      * @return array
      * 
      */
-	function sauveDeweyAbout($dewey, $idDoc){
+	function sauveDeweyAbout($dewey, $idDoc, $idTagParent=-1){
 		
 		try {
 			$idTag = false;
@@ -344,9 +335,10 @@ class Flux_Zotero extends Flux_Site{
 					$arrDoc = array("url"=>$xmlDewey->binding[0]->uri."", "tronc"=>$idDoc, "data"=>$xmlDewey->asXML(), "type"=>60);
 					$idDocDewey = $this->dbD->ajouter($arrDoc);
 					//enregistre le tag pour le document
-					$desc = $xmlDewey->binding[1]->literal."";
-					$code = $xmlDewey->binding[2]->literal."";
-					$idTag = $this->saveTag(array("code"=>$code, "desc"=>$desc), $idDocDewey, 0, $d->get("c"));
+					$data['desc'] = $xmlDewey->binding[1]->literal."";
+					$data['code'] = $xmlDewey->binding[2]->literal."";
+					if($idTagParent!=-1) $data['parent'] = $idTagParent;
+					$idTag = $this->saveTag($data, $idDocDewey, 0, $d->get("c"));
 				}else{
 					$idTag=-1;
 					$idDocDewey=-1;
@@ -362,7 +354,7 @@ class Flux_Zotero extends Flux_Site{
 	}
 	
     /**
-     * getDeweyHierarchie
+     * sauveDeweyHierarchie
      *
      * calcule la hiérarchie d'une classification Dewey
      * 
@@ -372,14 +364,18 @@ class Flux_Zotero extends Flux_Site{
      * @return int
      * 
      */
-	function getDeweyHierarchie($dewey, $idDoc=0){
+	function sauveDeweyHierarchie($dewey, $idDoc=0){
 
     	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
     	if(!$this->dbD)$this->dbD = new Model_DbTable_flux_doc($this->db);
     	if(!$this->user)$this->user = $this->getUser(array("login"=>"www.dewey.info"));
     	
+    	//récupère le tag racine
+    	$idTagRacine = $this->dbT->ajouter(array("code"=>"Classification Dewey"));
+    	
     	//parcourt l'ensemble de la chaine
-		for($i = 1; $i < strlen($dewey); $i++)
+    	$idTagParent = $idTagRacine;
+		for($i = 1; $i <= strlen($dewey); $i++)
         {
         	$c = substr($dewey, 0, $i);
         	if(substr($c, -1)=="."){
@@ -392,25 +388,103 @@ class Flux_Zotero extends Flux_Site{
         		// on cherche en anglais
 				$arrDewey = $this->getDeweyAbout($c, "en");	
         		//on enregistre le nouveau code
-				$idTagDoc = $this->sauveDeweyAbout($arrDewey, $idDoc);
+				$idTagDoc = $this->sauveDeweyAbout($arrDewey, $idDoc, $idTagParent);
+				if($idTagDoc[0] != -1)
+					$idTagParent = $idTagDoc[0];
 				echo $c." : ".$idTagDoc[0]." - ".$idTagDoc[1]."<br/>";				
+        	}else{
+        		//vérifie que la hiérarchie est définie
+        		if($tag["lft"]==-1){
+        			$tag["parent"] = $idTagParent;
+        			$tag = $this->dbT->updateHierarchie($tag);
+        			$this->dbT->edit($tag["tag_id"], $tag);
+        		}
+				$idTagParent = $tag["tag_id"];
         	}
         	
         }
-				
-	/*
-	 * SELECT count( * ) nb, t.code, td.code, u.login
-FROM flux_utitagdoc AS utd
-INNER JOIN flux_uti AS u ON u.uti_id = utd.uti_id
-INNER JOIN flux_tag AS t ON t.tag_id = utd.tag_id
-AND t.code != ""
-INNER JOIN flux_tagtag tt ON tt.tag_id_dst = t.tag_id
-INNER JOIN flux_tag AS td ON td.tag_id = tt.tag_id_src
-WHERE (
-u.uti_id =637
-)
-GROUP BY td.code
-	 */
 	}
-	
+        
+    /**
+     * setDeweyTagDocHierarchie
+     *
+     * calcule les tags d'un document par rapport à la hiérarchie Dewey
+     * 
+     * @param int $idDoc
+     * 
+     * @return array
+     * 
+     */
+	function setDeweyTagDocHierarchie($idDoc){
+
+    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_flux_doc($this->db);
+    	if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+    	if(!$this->user)$this->user = $this->getUser(array("login"=>"www.dewey.info"));
+    	
+    	//récupère la classification du document par OCLC
+		$sql = "SELECT
+					tcode.tag_id idTag, tcode.code
+					, tsrc.tag_id idTagCat, tsrc.code
+					, d.doc_id
+				FROM flux_tagtag tt
+				INNER JOIN flux_tag tcode ON tcode.tag_id = tt.tag_id_dst
+				INNER JOIN flux_tag tsrc ON tsrc.tag_id = tt.tag_id_src
+				INNER JOIN flux_utitagdoc utd ON utd.tag_id = tcode.tag_id
+				INNER JOIN flux_uti u ON u.uti_id = utd.uti_id
+				INNER JOIN flux_doc dOCLC ON dOCLC.doc_id = utd.doc_id 
+				INNER JOIN flux_doc d ON d.doc_id = dOCLC.tronc 
+				WHERE tt.tag_id_src IN (845, 846, 848)  
+						AND d.titre != ''
+						AND d.doc_id = ".$idDoc."
+				GROUP BY d.doc_id
+				ORDER BY d.doc_id";    
+    	$result = $this->db->fetchAll($sql);    	
+		
+    	
+    	//parcours les classification OCLC
+		$d = new Zend_Date();
+		foreach ($result as $class) {
+    		//récupère la hiérarchie de la classification
+    		$arrH = $this->dbT->getFullPath($class['idTag']);
+    		//création du tag pour chaque élément
+    		foreach ($arrH as $classH) {
+    			$this->saveTag($classH['code'], $idDoc, 1, $d->get("c"));
+    		}
+    	}
+        	
+	}
+        
+    /**
+     * getDeweyTagDoc
+     *
+     * renvoie la hiérarchie Dewey avec les document associé
+     * 
+     * @param int $idUtiDewey
+     * @param int $idTagRacineDewey
+     * 
+     * @return array
+     * 
+     */
+	function getDeweyTagDoc($idUtiDewey=638, $idTagRacineDewey=1811){
+
+		$c = str_replace("::", "_", __METHOD__)."_".$idUtiDewey."_".$idTagRacineDewey; 
+	   	$flux = $this->cache->load($c);
+        if(!$flux){
+		
+			if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+			$arr = $this->dbUTD->getDeweyTagDoc($idUtiDewey);
+			
+			//construction de la hiérarchie
+			$result[] = array("desc"=>"Classification Dewey", "niveau"=>0, "tag_id"=>$idTagRacineDewey);
+			foreach ($arr as $d) {
+				//récupère la hiérarchie
+				$arrParent = explode(",", $d['idsTagParent']);
+				$result = $this->getArrHier($d, $arrParent, $result);
+			}
+			$flux = $result[0];
+			$this->cache->save($flux, $c);
+        }
+		return $flux;
+	}	
 }

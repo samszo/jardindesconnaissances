@@ -4,10 +4,15 @@ package jardin
     import flash.events.*;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
-	
+    
+    import mx.rpc.events.*;
+    import mx.rpc.http.HTTPService;
+		
 	public class DocHerbe extends Sprite
 	{
+		[Bindable]
 		public var _url:String;
+		
 		public var _tgTerre:TagCloud;
 		public var _tgCiel:TagCloud;
 		public var _tag:BulleTag;
@@ -29,13 +34,15 @@ package jardin
         }
         public function send():void
         {
-            var request:URLRequest = new URLRequest(_url);
-            var variables:URLLoader = new URLLoader();
-            
-            variables.addEventListener(Event.COMPLETE, completeHandler);
+			var serviceHttp:HTTPService = new HTTPService();
+			serviceHttp.useProxy = false;
+			serviceHttp.url = this._url;
+			serviceHttp.resultFormat = "e4x";
+			serviceHttp.addEventListener(ResultEvent.RESULT, completeHandler);
+			serviceHttp.addEventListener(FaultEvent.FAULT, faultHandler);
             try
             {
-                variables.load(request);
+				serviceHttp.send();
             } 
             catch (error:Error)
             {
@@ -44,12 +51,19 @@ package jardin
         	
         }
 
-        private function completeHandler(event:Event):void
+        private function completeHandler(event:ResultEvent):void
         {
-	        var loader:URLLoader = URLLoader(event.target);
-   			build(new XML(loader.data));	        
+	        if(event.result){
+				var rss:XML = XML(event.result); 
+				build(rss);	        
+			}
         }
 
+		private function faultHandler(event:FaultEvent):void
+		{
+			trace("Unable to load URL: " + event.fault.faultString);
+		}
+		
         private function build(xml:XML):void
 		{
 						
@@ -57,15 +71,15 @@ package jardin
 			var items:XMLList = xml.channel.item;
 
 			//création de la tige	        
-	        _tgTerre.graphics.beginFill(4823581,0.5);
-	        _tgTerre.graphics.lineStyle(1, 7929610,0.5);
+	        _tgTerre.herbes.graphics.beginFill(4823581,0.5);
+	        _tgTerre.herbes.graphics.lineStyle(1, 7929610,0.5);
    			var brgSize:int=16;
 	        var hautHerbe:Number = brgSize*items.length();
 	        var h:Number= hautHerbe+_tag.y+(_tag.height*2);
 	        var x:Number=_tag.x+(_tag.width/2)
 	        var y:Number=_tag.y-h+30;//30 = y de tagContainer
-	        _tgTerre.graphics.drawRect(x, y, 3, h);
-	        _tgTerre.graphics.endFill();
+	        _tgTerre.herbes.graphics.drawRect(x, y, 3, h);
+	        _tgTerre.herbes.graphics.endFill();
 
 			var u:String;
 			if(!items.length()){

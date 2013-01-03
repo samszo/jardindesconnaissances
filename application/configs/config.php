@@ -10,17 +10,17 @@ define ("WEB_ROOT_AJAX",WEB_ROOT."/public");
 define ("SEP_PATH","/");
 
 //clef des API
-define ("KEY_ZEMANTA","");
-define ("KEY_ALCHEMY","");
-define ("KEY_GOOGLE_URL","");
-define ("KEY_AMAZON","");
-define ("KEY_AMAZON_PWD","");
-define ("AMAZON_PWD","");
-define ("AMAZON_AT","");
-define ("KEY_CEPT","");
-define ("KEY_CEPT_APP_ID","");
-define ("KEY_ZOTERO","");
-define ("ZOTERO_ID_LIB","");
+define ("KEY_ZEMANTA","jwgahgorrgg1bbbwauyvvooe");
+define ("KEY_ALCHEMY","aeaeab33edf52025a7f8c6793ccc7e7089d21101");
+define ("KEY_GOOGLE_URL","AIzaSyD2OD3Il6Y0hk6d5rIj0wKoZqoAdyr1ADM");
+define ("KEY_AMAZON","AKIAIC4CV6SURX5KQTGQ");
+define ("KEY_AMAZON_PWD","35U0np/f0eIAN85RWT3Avx4oMnruiikq2hEzMcZO");
+define ("AMAZON_PWD","35U0np/f0eIAN85RWT3Avx4oMnruiikq2hEzMcZO");
+define ("AMAZON_AT","jardindesconn-20");
+define ("KEY_CEPT","9860d14cae339b3d8c8e7892e62e8b38");
+define ("KEY_CEPT_APP_ID","ebf66988");
+define ("KEY_ZOTERO","EDRQ98DxRu1W3jKmhEPVxCEN");
+define ("ZOTERO_ID_LIB","13594");
 
 
 //code de s�curit� pour l'administation
@@ -41,9 +41,9 @@ defined('APPLICATION_ENV')
 
 set_include_path(ROOT_PATH.'/library');       
 
-/** Zend_Application 1.12.0*/
-set_include_path(get_include_path().PATH_SEPARATOR.$www."/ZendFramework-1.12.0/library");
-set_include_path(get_include_path().PATH_SEPARATOR.$www."/ZendFramework-1.12.0/extras/library");
+/** Zend Framework*/
+set_include_path(get_include_path().PATH_SEPARATOR.$www."/Zend/library");
+set_include_path(get_include_path().PATH_SEPARATOR.$www."/Zend/extras/library");
 
 require_once 'Zend/Application.php';
 

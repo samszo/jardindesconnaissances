@@ -56,19 +56,120 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
      *
      * @param array $data
      * @param boolean $existe
+     * @param boolean $rData
      *  
      * @return integer
      */
-    public function ajouter($data, $existe=true)
+    public function ajouter($data, $existe=true, $rData=false)
     {
     	$id=false;
-    	if($existe)$id = $this->existe($data);
+    	
+        if($existe)$id = $this->existe($data);
     	if(!$id){
-    	 	$id = $this->insert($data);
-    	}
-    	return $id;
+    		$data = $this->updateHierarchie($data);
+    		$data["tag_id"] = $this->insert($data);
+    	}else{
+	    	$data["tag_id"] = $id;
+	    	//on met à jour les information
+	    	$this->edit($id, $data);   		
+    	}    	
+    	if($rData)
+	    	return $data;
+    	else
+	    	return $data["tag_id"];
+    	
     } 
-           
+
+    /**
+     * Modifie la hiérarchie d'une entrée.
+     *
+     * @param array $data
+     *  
+     * @return array
+     */
+    public function updateHierarchie($data){
+    	
+    		if(isset($data["parent"])){
+	    		//récupère les information du parent
+	    		$arrP = $this->findByTag_id($data["parent"]);
+	    		//gestion des hiérarchies gauche droite
+	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
+	    		//vérifie si le parent à des enfants
+	    		$arr = $this->findByParent($data["parent"]);
+	    		if(count($arr)>0){
+	    			//met à jour les niveaux 
+	    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
+	    			$stmt = $this->_db->query($sql);
+	    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
+	    			$stmt = $this->_db->query($sql);
+	    			//
+	    			$data['lft'] = $arr[0]['rgt']+1;
+	    			$data['rgt'] = $arr[0]['rgt']+2;
+	    		}else{
+	    			//récupère les informations du parent
+	    			$arr = $this->findByTag_id($data["parent"]);
+	    			//met à jour les niveaux 
+	    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['lft'];
+	    			$stmt = $this->_db->query($sql);
+	    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arr[0]['lft'];
+	    			$stmt = $this->_db->query($sql);
+	    			//
+	    			$data['lft'] = $arr[0]['lft']+1;
+	    			$data['rgt'] = $arr[0]['lft']+2;
+	    		}    		
+	    		$data['niveau'] = $arrP[0]['niveau']+1;
+    		}
+    		if(!isset($data['lft']))$data['lft']=-1;    		
+    		if(!isset($data['rgt']))$data['rgt']=-1;    		
+    		
+    		return $data;
+    }
+
+     /*
+     * Recherche une entrée avec la valeur spécifiée
+     * et retourne la liste de tous ses parents
+     *
+     * @param integer $idTag
+     * @param string $order
+     * 
+     * @return array
+     */
+    public function getFullPath($idTag, $order="lft")
+    {
+        $query = $this->select()
+                ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->from(array('node' => 'flux_tag'),array("parLib"=>"code"))
+            ->joinInner(array('parent' => 'flux_tag'),
+                'node.lft BETWEEN parent.lft AND parent.rgt',array('code', 'desc', 'tag_id', 'niveau'))
+            ->where( "node.tag_id = ?", $idTag)
+            ->order("parent.".$order);        
+        $result = $this->fetchAll($query);
+        return $result->toArray(); 
+    }
+
+     /*
+     * Recherche une entrée avec la valeur spécifiée
+     * et retourne la liste de tous ses enfants
+     *
+     * @param integer $idTag
+     * @param string $order
+     * @return array
+     */
+    public function getFullChild($idTag, $order="lft")
+    {
+        $query = $this->select()
+                ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->from(array('node' => 'flux_tag'),array('libO'=>'code', 'idTag0'=>'tag_id'))
+            ->joinInner(array('enfants' => 'flux_tag'),
+                'enfants.lft BETWEEN node.lft AND node.rgt',array('code', 'desc', 'tag_id', 'parent', 'niveau'))
+            ->where( "node.tag_id = ?", $idTag)
+           	->order("enfants.".$order);        
+		$result = $this->fetchAll($query);
+        return $result->toArray(); 
+    }
+    
+    
+    
     /**
      * Recherche une entrée flux_tag avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
