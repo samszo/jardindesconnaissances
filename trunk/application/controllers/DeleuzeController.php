@@ -160,9 +160,9 @@ class DeleuzeController extends Zend_Controller_Action {
 		}else{
 		    $this->_redirect('/auth/login');
 		}
-		
+		$oD = new Flux_Deleuze($this->dbNom);
 		//récupère les utilisateurs avec des mots clefs
-		$dbUTD = new Model_DbTable_Flux_UtiTagDoc();
+		$dbUTD = new Model_DbTable_Flux_UtiTagDoc($oD->db);
 		$this->view->cribles = $dbUTD->GetUtisNbTagNbDoc("u.role = 'crible'");
 		
 	}	

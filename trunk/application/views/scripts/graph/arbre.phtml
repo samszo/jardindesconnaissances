@@ -69,17 +69,17 @@
        	var divElem2 = d3.select("#chart");
 
        	var svg = divElem2.append("svg:svg")
-            .attr("width", 800)
-            .attr("height", 800)
+            .attr("width", "800")
+            .attr("height", "800")
             .append("svg:g");
- 
-		arrGrn.push(new graine({id:"grn1", svg:svg, r:32, x:100, y:100}));
+               	
+		//arrGrn.push(new graine({id:"grn1", svg:svg, r:32, x:100, y:100}));
 
-		arrBll.push(new bulle({id:"bulle1", svg:svg}));
+		arrBll.push(new bulle({id:"bulle1", svg:svg, urlJson:"../stat/dewey"}));
 
-		arrBrc.push(new branche({id:"brc1", svg:svg, x:200, y:200, points:[{x:0, y:60},{x:50, y:110},{x:90, y:70},{x:140, y:100}]}));
+		//arrBrc.push(new branche({id:"brc1", svg:svg, x:200, y:200, points:[{x:0, y:60},{x:50, y:110},{x:90, y:70},{x:140, y:100}]}));
                     
-		arrRcn.push(new racine({id:"rcn1", svg:svg, x:100, y:100, points:[{x:0, y:60},{x:50, y:110},{x:90, y:70},{x:140, y:100}]}));
+		//arrRcn.push(new racine({id:"rcn1", svg:svg, x:100, y:100, points:[{x:0, y:60},{x:50, y:110},{x:90, y:70},{x:140, y:100}]}));
 
 	</script>	
   </body>

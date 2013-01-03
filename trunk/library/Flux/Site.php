@@ -36,7 +36,7 @@ class Flux_Site{
     	$this->getDb($idBase);
     	
         $frontendOptions = array(
-            'lifetime' => 3000000000000000000000000000, // temps de vie du cache en seconde
+            'lifetime' => 30000, // temps de vie du cache en seconde
             'automatic_serialization' => true,
         	'caching' => true //active ou desactive le cache
         );  
@@ -95,6 +95,58 @@ class Flux_Site{
 		return $idU;
 	}
 
+    /**
+     * getArrHier
+     * 
+     * Création d'un tableau hiérarchique à partir d'un tableau de parent
+     *
+     * @param array $arr
+     * @param array $result
+     * @param int $niv
+     * 
+     * return $arr
+     */
+	function getArrHier($arr, $arrParent, $result= array(), $niv=0) {
+
+		if($arr['niveau']==$niv){
+			$result[]=$arr;
+		}
+		$i=0;
+		//recherche le bon parent
+		foreach ($result as $parent){
+			if($parent["tag_id"]==$arrParent[$niv])break;
+			$i++;
+		}
+		if(!isset($result[$i]['children'])){
+			$result[$i]['children']= array();			
+		}
+		if($niv<$arr['niveau']){
+			$result[$i]['children'] = $this->getArrHier($arr, $arrParent, $result[$i]['children'], $niv+1);
+			/*recherche le bon parent
+			$j=0;
+			foreach ($result[$i]['children'] as $child){
+				if($child["tag_id"]==$arrParent[$niv+1])break;
+				$j++;
+			}
+			$result[$i]['children'][$j]=$arrChild[$j]; 
+			*/
+		}
+		/*
+		if($arr['niveau']==$niv){
+			$result[$arrParent[$niv]] = $arr;	
+			return $result;
+		}
+		if(!isset($result[$arrParent[$niv]]['children'])){
+			$result[$arrParent[$niv]]['children']= array();			
+		}
+		if($niv<$arr['niveau']){
+			$arrChild = $this->getArrHier($arr, $arrParent, $result[$arrParent[$niv]]['children'],$niv+1);
+			$result[$arrParent[$niv]]['children'][$arrParent[$niv+1]]=$arrChild[$arrParent[$niv+1]];
+		}
+		*/
+		return $result;
+	}
+	
     /**
      * Récupère l'identifiant de la graine ou la crée
      *
@@ -197,9 +249,9 @@ class Flux_Site{
 		
 		//on ajoute le tag
 		if(is_array($tag))
-			$idT = $this->dbT->ajouter($tag);
+			$idT = $this->dbT->ajouter($tag, $existe);
 		else
-			$idT = $this->dbT->ajouter(array("code"=>$tag));
+			$idT = $this->dbT->ajouter(array("code"=>$tag), $existe);
 		//on ajoute le lien entre le tag et le doc avec le poids
 		$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD, "poids"=>$poids));
 		//on ajoute le lien entre le tag et l'uti avec le poids
