@@ -170,6 +170,27 @@ class Model_DbTable_flux_utidoc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
         
     }
+
+    /**
+     * Renvoie le nombre de document pour un ensemble d'utilisateur
+     *
+     * @param string $idsUti
+
+     * @return array
+     */
+    public function getNbDocByUti($idsUti=false)
+    {
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->from(array('u' => 'flux_uti'))
+            ->joinInner(array('ud' => 'flux_utidoc'),
+            	'ud.uti_id = u.uti_id', array('nbDoc'=>"count(ud.doc_id)"))
+            ->group("u.uti_id");
+        if($idsUti)$query->where("u.uti_id IN (".$idsUti.")");
+            
+        return $this->fetchAll($query)->toArray(); 
+        
+    }
     
     /*
      * Recherche une entrée flux_utidoc avec la valeur spécifiée

@@ -150,6 +150,24 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+    
+    /*
+     * Recherche des entrées Flux_Uti avec la valeur spécifiée
+     * et retourne ces entrées.
+     *
+     * @param string $ids
+     * @param string $champ
+     * 
+     */
+    public function findIn($ids, $champ)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_uti") )                           
+                    ->where( "f.".$champ." IN (".$ids.")" );
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+    
     /*
      * Recherche une entrée Flux_Uti avec la valeur spécifiée
      * et retourne cette entrée.

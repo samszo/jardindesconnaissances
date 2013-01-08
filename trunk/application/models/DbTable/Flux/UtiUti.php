@@ -39,7 +39,8 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
 		$select = $this->select();
 		$select->from($this, array('uti_id_src'));
 		foreach($data as $k=>$v){
-			$select->where($k.' = ?', $v);
+			if($k!='eval')
+				$select->where($k.' = ?', $v);
 		}
 	    $rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->uti_id_src; else $id=false;
@@ -61,8 +62,11 @@ class Model_DbTable_Flux_UtiUti extends Zend_Db_Table_Abstract
     	if(!$id){
     	 	$id = $this->insert($data);
     	}
+    	
     	return $id;
     } 
+    
+
            
     /**
      * Recherche une entrée flux_utiuti avec la clef primaire spécifiée
