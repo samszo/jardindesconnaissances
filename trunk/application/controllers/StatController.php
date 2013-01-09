@@ -63,11 +63,5 @@ class StatController extends Zend_Controller_Action {
 		$this->view->stats = $audio->getWave("../data/audios/01_10-02-81_9A.wav");	    
     }	
 
-    public function deweyAction()
-    {
-		$z = new Flux_Zotero();
-		$this->view->stats = $z->getDeweyTagDoc();
-    	
-    }
     
 }
