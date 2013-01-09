@@ -19,13 +19,14 @@ class Form_Auth_Login extends Zend_Form
  
         $this->addElement('submit', 'submit', array(
             'ignore'   => true,
-            'label'    => 'Login',
+            'label'    => 'Connexion',
             ));
 
         $this->addElement('submit', 'crea', array(
             'ignore'	=> true,
             'label'		=> "Inscription",
-            ));
-            
+            'description'		=> "Si vous n'avez pas de login, vous pouvez vous inscrire."
+        ));
+        
     }
 }
