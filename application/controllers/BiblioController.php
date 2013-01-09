@@ -65,5 +65,29 @@ class BiblioController extends Zend_Controller_Action {
 		}
 	}
 	
-	
+    public function deweyAction()
+    {
+		$z = new Flux_Zotero();
+		$this->view->stats = $z->getDeweyTagDoc();
+    	
+    }
+
+    public function bookdetailAction()
+    {
+		if($this->_getParam('idsDoc', 0)){
+			$z = new Flux_Zotero("");
+			$this->view->biblio = $z->getDocDetail($this->_getParam('idsDoc'));
+		}
+    	    	
+    }
+    
+    public function utidetailAction()
+    {
+		$s = new Flux_Site($this->_getParam('db', 0));
+		$dbUD = new Model_DbTable_flux_utidoc($s->db);
+		$arr = $dbUD->getNbDocByUti($this->_getParam('idsUti', 0));
+		$this->view->biblio = array("login"=>"auteurs","nbDoc"=>count($arr),"children"=>$arr);			
+    	    	
+    }
+    
 }
