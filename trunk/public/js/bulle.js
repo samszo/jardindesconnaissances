@@ -6,7 +6,10 @@
 function bulle(config) {
 	this.id = config.id;  
 	this.svg = config.svg;  
-	this.urlJson = config.urlJson;  
+	this.urlJson = config.urlJson;
+	this.urlBookDetail = config.urlBookDetail;
+	this.urlUtiDetail = config.urlUtiDetail;
+	this.r = config.r;
 	//this.x = config.x;  
 	//this.y = config.y;  
 	//this.points = config.points;
@@ -15,9 +18,8 @@ function bulle(config) {
 		
 		var self = this;
 		
-		var r = 800,
-	    x = d3.scale.linear().range([0, r]),
-	    y = d3.scale.linear().range([0, r]),
+	    var x = d3.scale.linear().range([0, self.r]),
+	    y = d3.scale.linear().range([0, self.r]),
 	    node,
 	    root;
 
@@ -26,7 +28,7 @@ function bulle(config) {
 		    .attr("transform", "translate(" + 0 + "," + 0 + ")");		
 		
 		var pack = d3.layout.pack()
-		    .size([r, r])
+		    .size([self.r, self.r])
 		    .value(function(d) { 
 		    	return d.nb;
 		    	});
@@ -65,8 +67,7 @@ function bulle(config) {
 		        		.style("top", (event.pageY+10)+"px")
 		        		.style("left",(event.pageX+10)+"px")
     	        		.text(d.desc);
-    	        	})
-	        		
+    	        	})	        		
 		      .on("click", function(d) { return zoom(node == d ? root : d); });
 	
 		  vis.selectAll("text")
@@ -76,7 +77,7 @@ function bulle(config) {
 		    	  return d.children.length > 0 ? "parent" : "child"; 
 		    	  })
 		      .attr("x", function(d) { return d.x; })
-		      .attr("y", function(d) { return d.children.length > 0 ? d.y : d.y+2; })
+		      .attr("y", function(d) { return d.children.length > 0 ? d.y-2 : d.y; })
 		      //.attr("dy", ".35em")
 		      .attr("text-anchor", "middle")
 		      .style("font-size", function(d) { 
@@ -90,7 +91,8 @@ function bulle(config) {
 		});
 	
 		function zoom(d, i) {
-		  var k = r / d.r / 2;
+			getDetail(d);
+		  var k = self.r / d.r / 2;
 		  var n = d.niveau;
 		  x.domain([d.x - d.r, d.x + d.r]);
 		  y.domain([d.y - d.r, d.y + d.r]);
@@ -109,7 +111,7 @@ function bulle(config) {
 	
 		  t.selectAll("text")
 		      .attr("x", function(d) { return x(d.x); })
-		      .attr("y", function(d) { return y(d.children.length > 0 ? d.y : d.y+2); })
+		      .attr("y", function(d) { return y(d.children.length > 0 ? d.y-2 : d.y); })
 		      .style("font-size", function(d) { 
 		    	  //return d.niveau == 0 ? (r/20*k)+"px" : (r/20/d.niveau*k)+"px"; 
 		    	  return k * d.r/6+"px"; 
@@ -132,6 +134,23 @@ function bulle(config) {
 		  d3.event.stopPropagation();
 		}
 
+		function getDetail(d) {
+			if(d.idsDoc){
+				d3.json(self.urlBookDetail+d.idsDoc, function(data) {
+					var idsUti = "", nbUti = data.length;
+					for(var i=0; i < nbUti; i++){
+						idsUti += data[i].idsUti;
+					}
+					d3.select("#grn").remove();
+					if(idsUti) new graine({id:"grn", svg:svgGraine, urlJson:"../biblio/utidetail?db=flux_zotero&idsUti="+idsUti, r:10, x:100, y:10});
+					d3.select("#brc").remove();
+					if(nbUti) new branche({id:"brc", svg:svgBranche, w:600, h:"100%", root:data});
+
+				});
+
+			}
+		}
+		
   };
 	  
   return this.bulle();
