@@ -11,6 +11,7 @@ function graine(config) {
 	this.y = config.y;  
 	this.points = new Array();
 	this.g;
+	this.urlJson = config.urlJson;
 	
 	this.graine = function() {
 		
@@ -21,12 +22,15 @@ function graine(config) {
 	        .y(function(d){return d.y;})
 	        .interpolate("linear"); 
 
-    	var tooltip = d3.select("body")
+        if(!d3.select("#"+self.id+"_tooltip")){
+        	var tooltip = d3.select("body")
 		    .append("div")
+	    	.attr("id", self.id+"_tooltip")
 		    .style("position", "absolute")
 		    .style("z-index", "10")
 		    .style("visibility", "hidden")
-		    .text("a simple tooltip");
+		    .text("a simple tooltip");       	
+        }
         
 		var r = 100,
 	    x = d3.scale.linear().range([0, r]),
@@ -34,20 +38,41 @@ function graine(config) {
 	    node,
 	    root;
 
+		if(d3.select("#"+self.id)){
+			d3.select("#"+self.id).remove();
+		}
+
 		var vis = self.svg.append("svg:g")
 	    	.attr("id", self.id)
-	    	.attr("class", "graine")
-		    .attr("transform", "translate(" + 400 + "," + 100 + ")");		
-		
-		var pack = d3.layout.pack()
-		    .size([r, r])
-		    .value(function(d) { return d.size; });
-		
-		d3.json("../js/flare.json", function(data) {
+	    	.attr("class", "graine");
+		    //.attr("transform", "translate(" + 400 + "," + 100 + ")");		
+				
+		d3.json(self.urlJson, function(data) {
 		  node = root = data;
 	
-		  var nodes = pack.nodes(root);
-	
+			/*pour positionner les graines en hiérachie fractale
+			var pack = d3.layout.pack()
+				    .size([r, r])
+				    .value(function(d) { 
+				    	return d.nbDoc; 
+				    	});
+		  	var nodes = pack.nodes(root);
+			*/
+		  //pour positionner les graine en colonne
+			var nodes = [], oY = self.y, nbUti = node.children.length;
+			for(var i=0; i < nbUti; i++){
+				var n = node.children[i];
+				//on ne prend pas les rôles spéciaux
+				if(n.role != ""){
+					  n.x = self.x+(self.r*2);
+					  n.r = self.r * n.nbDoc;
+					  n.y = oY+n.r;
+					  nodes.push(n);
+					  oY = n.y+n.r;
+				}
+			}
+		  //
+
 		  vis.selectAll("path")
 		      .data(nodes)
 		    .enter().append("svg:path")
@@ -65,21 +90,20 @@ function graine(config) {
 				.attr("class", function(d) { return d.children ? "parent" : "child"; })
 				.attr("x", function(d) { return d.x; })
 				.attr("y", function(d) { return d.y; })
-				.attr("dy", ".35em")
 				.attr("text-anchor", "middle")
-				.style("opacity", function(d) { return d.r > 20 ? 1 : 0; })
+				//.style("opacity", function(d) { return d.r > 20 ? 1 : 0; })
 				.on("mouseover", function(){
 						return tooltip.style("visibility", "visible");
 						})
 				.on("mousemove", function(d){
-					var name = d.name;
+					var name = d.login;
 					return tooltip
 						.style("top", (event.pageY-20)+"px")
 						.style("left",(event.pageX-20)+"px")
 						.text(name);
 					})
 				.on("mouseout", function(){return tooltip.style("visibility", "hidden");})
-				.text(function(d) { return d.name; });
+				.text(function(d) { return d.login; });
 	
 		  d3.select(window).on("click", function() { zoom(root); });
 		});
