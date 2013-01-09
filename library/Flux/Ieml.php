@@ -14,6 +14,7 @@ class Flux_IEML extends Flux_Site{
   	var $PRIMITIVE_VALUE = array("E"=>1,"U"=>2,"A"=>4,"S"=>8,"B"=>16,"T"=>32);
   	var $LAYER_PONCT = array(":",".","-","'",",","_",";");
 	var $COLORS = array('E'=>"rgb(0,0,0)",'U'=>"rgb(0,255,255)",'A'=>"rgb(255,0,0)",'S'=>"rgb(0,255,0)",'B'=>"rgb(0,0,255)",'T'=>"rgb(255,255,0)");
+	//var $COLORS = array('E'=>"rgb(20,0,0)",'U'=>"rgb(0,40,0)",'A'=>"rgb(0,0,60)",'S'=>"rgb(80,80,0)",'B'=>"rgb(0,100,100)",'T'=>"rgb(120,0,120)");
 	
   	public function __construct($idBase=false)
     {
@@ -203,7 +204,7 @@ class Flux_IEML extends Flux_Site{
 	 * @param int $nb
 	 * @param array $colors
 	 * 
-	 * @return string
+	 * @return SvgDocument
 	 */
     function genereSvgPlanSeq($nb=1000, $colors = null){
 		
@@ -240,7 +241,7 @@ class Flux_IEML extends Flux_Site{
     			$dDegrad->addChild($this->genereDegrad($c['code']));
 				//$dDegrad->addChild(new SvgRadialGradient("lg_".$c['code'], array(0,0.5,1), array($this->COLORS[$arr[0]],$this->COLORS[$arr[1]],$this->COLORS[$arr[2]])));
 	    		//création de la bulle
-				$gRect->addChild(new SvgCircle($intColo*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$c['code'].")","","","c_".$c['code']));
+				$gRect->addChild(new SvgCircle($intColo*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#rg_".$c['code'].")","","","c_".$c['code']));
     		}
     		//vérifie si on traite une couche de niveau 2
     		if($c['niveau']==2){
@@ -267,7 +268,7 @@ class Flux_IEML extends Flux_Site{
     			//création d'une bulle
     			$dDegrad->addChild($this->genereDegrad($c['code']));
 	    		//création de la bulle
-				$gRect->addChild(new SvgCircle($intColo*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$c['code'].")","","","c_".$c['code']));
+				$gRect->addChild(new SvgCircle($intColo*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#rg_".$c['code'].")","","","c_".$c['code']));
     			$nextColo = 1;
     							
 				$x = $debColo;
@@ -294,23 +295,95 @@ class Flux_IEML extends Flux_Site{
 		$dDegrad->addParent($svg);
 		$gRect->addParent($svg);
 		
-		// Send a message to the svg instance to start printing.
-		$svg->printElement();
+		return $svg;
     	
     }	
+
+	/**
+	 * Génération d'un plan svg d'une adresse IEML
+	 * 
+	 * @param array $ieml
+	 * 
+	 * @return SvgDocument
+	 */
+    function genereSvgAdresse($ieml){
+		
+    	require_once("svg/Svg.php");
+    	
+    	$db = new Model_DbTable_flux_ieml($this->db);
+
+    	//récupère le détail de l'adresse
+    	$arr = $db->findByCode($ieml['code']);    	
+    	if(count($arr)==0){
+    		$xml = $this->getParse($ieml['code'], true);
+    		$ieml['parse'] = $xml->asXML();
+    		$arr[0]['ieml_id'] = $db->ajouter($ieml);	
+    	}else{
+    		if($arr[0]['parse']==""){
+	    		$xml = $this->getParse($arr[0]['code'], true);
+	    		$arr[0]['parse'] = $xml->asXML();
+    			$db->edit($arr[0]['ieml_id'], array("parse"=>$arr[0]['parse']));
+    		}
+    		$xml = simplexml_load_string($arr[0]['parse']);
+    	}
+	    $result = $xml->xpath('//@primitiveSet');
+    	//arsort($result);
+    	
+	    //construction de la liste des primitives
+	    $prims = "";
+		foreach ($result as $value) {
+			$arrPrim = explode(",", substr($value, 1,-1));
+			foreach ($arrPrim as $p){
+				$prims .= str_replace("'", "", trim($p)).":";				
+			}
+		}
+		//construction du svg
+		$taille = 6*count($result);
+		$marge = 10;
+		$svg = new SvgDocument();
+		$dDegrad = new SvgDefs();
+		$gRect = new SvgGroup();
+		
+		//création du dégradé radial
+    	$dDegrad->addChild($this->genereDegrad($prims));
+		
+    	//création du dégradé linéaire
+    	$dDegrad->addChild($this->genereDegrad($prims,"linéaire"));
+    	
+    	//création de la bulle
+		$gRect->addChild(new SvgCircle($taille/2+$marge, $taille/2+$marge, $taille/2, "fill:url(#rg_".$prims.")","","","c_".$prims));
+    	//création de la barre
+		$gRect->addChild(new SvgRect($taille+$marge, $marge, $taille/2, $marge*2, "fill:url(#lg_".$prims.")","","","b_".$prims));
+    	//création des textes
+		$gRect->addChild(new SvgText($taille+$marge, $marge*6, stripslashes($arr[0]['code'])));
+		$gRect->addChild(new SvgText($taille+$marge, $marge*8, stripslashes($arr[0]['desc'])));
+		
+		/*
+		$svg->asXML("test.svg");
+    	$svg->output();
+		*/
+    	
+		$dDegrad->addParent($svg);
+		$gRect->addParent($svg);
+		
+		return $svg;
+    	
+    }	
+        
     
 	/**
 	 * Génération des dégradés d'une adresse
 	 * 
 	 * @param string $code
+	 * @param string $type
 	 * 
 	 * @return SvgRadialGradient
 	 */
-    function genereDegrad($code){
+    function genereDegrad($code, $type="radial"){
     	
     	$arrP = explode(":", $code);
     	$nbColors = count($arrP)-1;
-    	$pasOffset = 1/($nbColors-1);
+    	$pasOffset = 1/$nbColors;
     	$arrOffset = array();
     	$arrColor = array();
 		for ($i = 0; $i < $nbColors; $i++) {
@@ -322,9 +395,12 @@ class Flux_IEML extends Flux_Site{
 			}
 			$arrColor[] = $this->COLORS[$p];
 		}    	
-    	
-		return new SvgRadialGradient("lg_".$code, $arrOffset, $arrColor);
-    	
+
+		if($type=="radial")
+			return new SvgRadialGradient("rg_".$code, $arrOffset, $arrColor);
+		else
+			return new SvgLinearGradient("lg_".$code, $arrOffset, $arrColor);
+		
     }
     
 }

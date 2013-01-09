@@ -219,7 +219,7 @@ class Flux_Stats  extends Flux_Site{
 						$pDst = $keyTag[$idDst]['num'];
 						$matrice[$pSrc][$pDst] ++;
 						//vérifie le nombre maximum de co-occurence
-						if($matrice[$pSrc][$pDst]>$keyTag[$idSrc]['nbCoo'])$keyTag[$idSrc]['nbCoo']=$matrice[$pSrc][$pDst];
+						if($matrice[$pSrc][$pDst] > $keyTag[$idSrc]['nbCoo']) $keyTag[$idSrc]['nbCoo']=$matrice[$pSrc][$pDst];
 						//incrémente la valeur le nb de Relation
 						$keyTag[$idDst]['nbRela']++;
 					}
