@@ -487,4 +487,51 @@ class Flux_Zotero extends Flux_Site{
         }
 		return $flux;
 	}	
+    /**
+     * getDocDetail
+     *
+     * renvoie le détail des documents
+     * 
+     * @param int $idsDoc
+     * 
+     * @return array
+     * 
+     */
+	function getDocDetail($idsDoc){
+
+		$c = str_replace("::", "_", __METHOD__)."_".$idsDoc; 
+	   	$flux = false;//$this->cache->load($c);
+        if(!$flux){
+		
+			$dbD = new Model_DbTable_Flux_Doc($this->db);
+
+	        $query = $dbD->select()
+	        	->setIntegrityCheck(false)
+	        	->from(array("d" => "flux_doc"),array("doc_id","url","titre"))
+	        	->joinInner(array('dAmz' => 'flux_doc'),'dAmz.tronc = d.doc_id AND dAmz.type = 39'
+	            	,array('dAmzTitre'=>'dAmz.titre', 'dAmzUrl'=>'dAmz.url'))
+	            ->joinInner(array('dTof' => 'flux_doc'),'dTof.tronc = dAmz.doc_id'
+	            	,array('dTofTitre'=>'dTof.titre', 'dTofUrl'=> 'dTof.url'))
+				->joinInner(array('ud' => 'flux_utidoc'), "ud.doc_id = d.doc_id",
+					array("idsUti"=>"GROUP_CONCAT(DISTINCT ud.uti_id)"))
+	            ->group("d.doc_id")
+				->where("d.doc_id IN (".$idsDoc.")");
+			$flux = $dbD->fetchAll($query)->toArray(); 					
+			$result = array();
+			$result[] = array("titre"=>"document", "nbDoc"=>0);
+			foreach ($flux as $book) {
+				//récupère les note pour le livre
+				$notes = $dbD->findByParams(array("tronc"=>$book['doc_id'], "type"=>"note"));
+				//met à jour le livre
+				$book['nbNote'] = count($notes);
+				if($book['nbNote'] > 0){
+					$book['children']=$notes;
+				}
+				$result[] = $book;
+			}
+			
+			//$this->cache->save($flux, $c);
+        }
+		return $result;
+	}		
 }

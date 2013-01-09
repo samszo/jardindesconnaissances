@@ -122,28 +122,8 @@ class Flux_Site{
 		}
 		if($niv<$arr['niveau']){
 			$result[$i]['children'] = $this->getArrHier($arr, $arrParent, $result[$i]['children'], $niv+1);
-			/*recherche le bon parent
-			$j=0;
-			foreach ($result[$i]['children'] as $child){
-				if($child["tag_id"]==$arrParent[$niv+1])break;
-				$j++;
-			}
-			$result[$i]['children'][$j]=$arrChild[$j]; 
-			*/
 		}
-		/*
-		if($arr['niveau']==$niv){
-			$result[$arrParent[$niv]] = $arr;	
-			return $result;
-		}
-		if(!isset($result[$arrParent[$niv]]['children'])){
-			$result[$arrParent[$niv]]['children']= array();			
-		}
-		if($niv<$arr['niveau']){
-			$arrChild = $this->getArrHier($arr, $arrParent, $result[$arrParent[$niv]]['children'],$niv+1);
-			$result[$arrParent[$niv]]['children'][$arrParent[$niv+1]]=$arrChild[$arrParent[$niv+1]];
-		}
-		*/
+
 		return $result;
 	}
 	
