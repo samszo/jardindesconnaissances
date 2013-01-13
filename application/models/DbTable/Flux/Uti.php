@@ -222,7 +222,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     public function findByRole($role, $img=false)
     {
         $query = $this->select()
-			->from( array("u" => "flux_uti") )                           
+			->from( array("u" => "flux_uti"),array("login","uti_id") )                           
             ->where( "u.role = ?", $role );
 		if($img){
         	$query->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
