@@ -68,10 +68,11 @@ class Flux_Site{
  		$db = Zend_Db_Table::getDefaultAdapter();
     	if($idBase){
     		//change la connexion à la base
-			$arr = $db->getConfig();
+    		$arr = $db->getConfig();
 			$arr['dbname']=$idBase;
 			$db = Zend_Db::factory('PDO_MYSQL', $arr);	
     	}
+      	
     	$this->db = $db;
     	$this->idBase = $idBase;
     	return $db;
@@ -114,7 +115,7 @@ class Flux_Site{
 		$i=0;
 		//recherche le bon parent
 		foreach ($result as $parent){
-			if($parent["tag_id"]==$arrParent[$niv])break;
+			if($parent["tag_id"]==$arrParent[$niv]['tag_id'])break;
 			$i++;
 		}
 		if(!isset($result[$i]['children'])){

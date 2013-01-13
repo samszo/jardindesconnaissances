@@ -469,17 +469,21 @@ class Flux_Zotero extends Flux_Site{
 	function getDeweyTagDoc($idUtiDewey=638, $idTagRacineDewey=1811){
 
 		$c = str_replace("::", "_", __METHOD__)."_".$idUtiDewey."_".$idTagRacineDewey; 
-	   	$flux = $this->cache->load($c);
+	   	$flux = false;//$this->cache->load($c);
         if(!$flux){
 		
 			if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+			if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+			
 			$arr = $this->dbUTD->getDeweyTagDoc($idUtiDewey);
 			
 			//construction de la hiérarchie
 			$result[] = array("desc"=>"Classification Dewey", "niveau"=>0, "tag_id"=>$idTagRacineDewey);
 			foreach ($arr as $d) {
 				//récupère la hiérarchie
-				$arrParent = explode(",", $d['idsTagParent']);
+				// problème de performance
+				//$arrParent = explode(",", $d['idsTagParent']);
+				$arrParent = $this->dbT->getFullPath($d['tag_id']);
 				$result = $this->getArrHier($d, $arrParent, $result);
 			}
 			$flux = $result[0];
@@ -507,7 +511,7 @@ class Flux_Zotero extends Flux_Site{
 
 	        $query = $dbD->select()
 	        	->setIntegrityCheck(false)
-	        	->from(array("d" => "flux_doc"),array("doc_id","url","titre"))
+	        	->from(array("d" => "flux_doc"),array("doc_id","url","titre","type"))
 	        	->joinInner(array('dAmz' => 'flux_doc'),'dAmz.tronc = d.doc_id AND dAmz.type = 39'
 	            	,array('dAmzTitre'=>'dAmz.titre', 'dAmzUrl'=>'dAmz.url'))
 	            ->joinInner(array('dTof' => 'flux_doc'),'dTof.tronc = dAmz.doc_id'
@@ -518,16 +522,24 @@ class Flux_Zotero extends Flux_Site{
 				->where("d.doc_id IN (".$idsDoc.")");
 			$flux = $dbD->fetchAll($query)->toArray(); 					
 			$result = array();
-			$result[] = array("titre"=>"document", "nbDoc"=>0);
+			$result = array("titre"=>"documents", "nbDoc"=>0, "children"=>array(), "idsUti"=>"", "type"=>"racine");
 			foreach ($flux as $book) {
 				//récupère les note pour le livre
 				$notes = $dbD->findByParams(array("tronc"=>$book['doc_id'], "type"=>"note"));
 				//met à jour le livre
-				$book['nbNote'] = count($notes);
-				if($book['nbNote'] > 0){
-					$book['children']=$notes;
+				$book['nbDoc'] = count($notes);
+				//ajoute le nombre mot pour la note
+				for ($i = 0; $i < $book['nbDoc']; $i++) {
+					$notes[$i]["nbDoc"] = str_word_count($notes[$i]["note"]);
+					$notes[$i]["note"] = strip_tags($notes[$i]["note"]); 
 				}
-				$result[] = $book;
+				if($book['nbDoc'] > 0){
+					$book['children']=$notes;
+					//rassemble les résultat dans la racine
+					$result['nbDoc'] += $book['nbDoc'];
+					$result['idsUti'] .= $book['idsUti'];
+				}
+				$result["children"][] = $book;
 			}
 			
 			//$this->cache->save($flux, $c);
