@@ -1,14 +1,17 @@
 /**
  * 
  * 
- * 
+ * merci beaucoup à http://bl.ocks.org/1167173
+ * http://www-cs-students.stanford.edu/~amitp/Articles/HexLOS.html
  */
 function graine(config) {
 	this.id = config.id;  
-	this.svg = config.svg;  
+	this.div = config.div;  
 	this.r = config.r;  
 	this.x = config.x;  
 	this.y = config.y;  
+	this.h = config.h;  
+	this.w = config.w;  
 	this.points = new Array();
 	this.g;
 	this.urlJson = config.urlJson;
@@ -16,152 +19,320 @@ function graine(config) {
 	this.graine = function() {
 		
 		var self = this;
-				
-        var line = d3.svg.line()
-	        .x(function(d){return d.x;})
-	        .y(function(d){return d.y;})
-	        .interpolate("linear"); 
 
-        if(!d3.select("#"+self.id+"_tooltip")){
-        	var tooltip = d3.select("body")
-		    .append("div")
-	    	.attr("id", self.id+"_tooltip")
-		    .style("position", "absolute")
-		    .style("z-index", "10")
-		    .style("visibility", "hidden")
-		    .text("a simple tooltip");       	
-        }
-        
-		var r = 100,
-	    x = d3.scale.linear().range([0, r]),
-	    y = d3.scale.linear().range([0, r]),
-	    node,
-	    root;
-
-		if(d3.select("#"+self.id)){
-			d3.select("#"+self.id).remove();
-		}
-
-		var vis = self.svg.append("svg:g")
-	    	.attr("id", self.id)
-	    	.attr("class", "graine");
-		    //.attr("transform", "translate(" + 400 + "," + 100 + ")");		
-				
-		d3.json(self.urlJson, function(data) {
-		  node = root = data;
+       	var vis = self.div.append("svg:svg")
+       		.attr("x", config.x)
+	        .attr("width", self.w)
+	        .attr("height", self.h)
+	        .attr("id", self.id)
+	        .append("svg:g");               	
+		
+        var tooltip;
+        tooltip = d3.select('body')
+        	.append('div')
+        	.classed('tooltip', true);
+                
+		var data=[];
+		
+		var size = 100, // hexagon size
+	    radius = 25, // map radius
+	    tilted = true, // true is horizontal alignment
+		padding = 1;
 	
-			/*pour positionner les graines en hiérachie fractale
-			var pack = d3.layout.pack()
-				    .size([r, r])
-				    .value(function(d) { 
-				    	return d.nbDoc; 
-				    	});
-		  	var nodes = pack.nodes(root);
-			*/
-		  //pour positionner les graine en colonne
-			var nodes = [], oY = self.y, nbUti = node.children.length;
-			for(var i=0; i < nbUti; i++){
-				var n = node.children[i];
-				//on ne prend pas les rôles spéciaux
-				if(n.role != ""){
-					  n.x = self.x+(self.r*2);
-					  n.r = self.r * n.nbDoc;
-					  n.y = oY+n.r;
-					  nodes.push(n);
-					  oY = n.y+n.r;
-				}
-			}
-		  //
-
-		  vis.selectAll("path")
-		      .data(nodes)
-		    .enter().append("svg:path")
-		    	.attr("class", function(d) { return d.children ? "parent" : "child"; })
-	        	.attr("d", function(d) { 
-	        		return line(getCirclePoint(d.x, d.y, d.r));
-	        		})
-	        	.on("click", function(d) { 
-	        		return zoom(node == d ? root : d); 
-	        		});
-	
-		  vis.selectAll("text")
-		      .data(nodes)
-		    .enter().append("svg:text")
-				.attr("class", function(d) { return d.children ? "parent" : "child"; })
-				.attr("x", function(d) { return d.x; })
-				.attr("y", function(d) { return d.y; })
-				.attr("text-anchor", "middle")
-				//.style("opacity", function(d) { return d.r > 20 ? 1 : 0; })
-				.on("mouseover", function(){
-						return tooltip.style("visibility", "visible");
-						})
-				.on("mousemove", function(d){
-					var name = d.login;
-					return tooltip
-						.style("top", (event.pageY-20)+"px")
-						.style("left",(event.pageX-20)+"px")
-						.text(name);
-					})
-				.on("mouseout", function(){return tooltip.style("visibility", "hidden");})
-				.text(function(d) { return d.login; });
-	
-		  d3.select(window).on("click", function() { zoom(root); });
+		var translate = [0, 0];
+	    
+	    // binding events over 'svg' only
+	    vis.on('mousedown', mouseDrag)
+	        .on('mousewheel', mouseScroll) // webkit
+	        .on('DOMMouseScroll', mouseScroll); // firefox
+	    /*    
+	    vis.append('svg:rect')
+	        .classed('bounds', true)
+	        .attr('x', padding)
+	        .attr('y', padding)
+	        .attr('width', self.w - padding * 2)
+	        .attr('height', self.h - padding * 2);
+		*/
+	    /* crosshair
+	    vis.append('svg:circle')
+	        .classed('bounds', true)
+	        .attr('cx', self.w / 2)
+	        .attr('cy', self.h / 2)
+	        .attr('r', 20);
+        */
+	    
+		d3.json(self.urlJson, function(result) {		        		    
+		    fillMap(result.children);
+		    position();
+		    render();
 		});
-	
-		function zoom(d, i) {
-		  var k = r / d.r / 2;
-		  x.domain([d.x - d.r, d.x + d.r]);
-		  y.domain([d.y - d.r, d.y + d.r]);
-	
-		  var tG = self.svg.transition()
-	      .duration(d3.event.altKey ? 7500 : 750);
-		  var t = vis.transition()
-	      	.duration(d3.event.altKey ? 7500 : 750);
-	
-		  t.selectAll("path")
-		  		.attr("d", function(d) {
-		  			return line(getCirclePoint(x(d.x), y(d.y), k * d.r));
-		  			});
-	
-		  t.selectAll("text")
-		      .attr("x", function(d) { 
-		    	  return x(d.x); 
-		    	  })
-		      .attr("y", function(d) { return y(d.y); })
-		      .style("opacity", function(d) { return k * d.r > 20 ? 1 : 0; });
-	
-		  var v = d.depth > 0 ? "hidden" : "visible";
-		  tG.selectAll(".bulle")
-		  	.attr("visibility", v);
-		  tG.selectAll(".branche")
-		  	.attr("visibility", v);
-		  tG.selectAll(".racine")
-		  	.attr("visibility", v);
-		  
-		  node = d;
-		  
-		  d3.event.stopPropagation();
+		
+		
+		function fillMap(result) {
+		    var id = 0,
+		        limit1 = 0,
+		        limit2 = radius
+		        nbUti = result.length, uti = 0;
+		    //création de la grille
+		    for (var j = -radius; j <= radius; j++) {
+		        var i = limit1;
+		        while (i <= limit2) {
+		            data.push({
+		                id: id++,
+		                coordinates: [i, j],
+		                lastSelected: 0,
+		                type: 'regular',
+		                idUti: -1,
+		                login: "",
+		                nbDoc: -1,
+		                role: "",
+		                resource: false
+		            });		        				        		
+		            i++;
+		        }
+		        if (j < 0) {
+		            limit1--;
+		        } else {
+		            limit2--;
+		        }
+		    }
+		    //remplissage des données du centre à la périphérie
+		    i = 0, ps = [];
+		    for (var uti = 0; uti < nbUti; uti++) {
+		    	//met à jour les données
+			    for (var j = 0; j <= i+1; j++) {
+			    	if(uti < nbUti && !ps[i+"_"+j]){
+			    		updateData(i, j, result[uti]);
+				    	ps[i+"_"+j]=true;
+			            uti ++;
+			    	}
+		            if(uti < nbUti && !ps[i+"_"+(-j)]){
+		            	updateData(i, -j, result[uti]);
+				    	ps[i+"_"+-j]=true;
+			            uti ++;
+		            }
+		            if(uti < nbUti && !ps[-i+"_"+j]){
+		            	updateData(-i, j, result[uti]);
+				    	ps[-i+"_"+j]=true;
+			            uti ++;
+		            }
+		            if(uti < nbUti && -i != -1 && -j != -1  && !ps[-i+"_"+(-j)]){
+		            	updateData(-i, -j, result[uti]);
+				    	ps[-i+"_"+-j]=true;
+			            uti ++;			    	
+		            }
+			    }
+	            i ++;
+        	}
+		    
 		}
-        
-        
-		function getCirclePoint(x, y, r){
-			var _x;
-			var _y;
-			var nbPoint = 6;
-			var pi = Math.PI;
-			var i;
-			var points=[];
-			//calcule les points du polygone
-			for(var i=0; i < nbPoint; i++){
-				_x = (Math.cos(2 * i * pi / nbPoint)*r)+x;
-				_y = (Math.sin(2 * i * pi / nbPoint)*r)+y;
-				points.push({"x":_x,"y":_y});
-			}
-			//pour fermer le polygone, on ajoute le premier point
-			points.push({"x":points[0].x,"y":points[0].y});
-			
-			return points;
-			
+		
+		function updateData(i, j, uti) {
+	    	//trouve le bon hexagone
+	    	var hexa = data.filter(function(d) { return d.coordinates[0] == i && d.coordinates[1] == j; });
+	    	hexa = hexa[0];
+	    	//met à jour les données
+	    	data[hexa["id"]].idUti = uti["uti_id"];
+	    	data[hexa["id"]].login = uti["login"];
+	    	data[hexa["id"]].nbDoc = uti["nbDoc"];
+	    	data[hexa["id"]].role = uti["role"];
+	    	data[hexa["id"]].resource = true;			
+		}
+		
+		function position() {
+		    // http://goo.gl/8djhT
+		    var stepX = tilted ? size * 3 / 4 : Math.sqrt(3) * size / 2,
+		        stepY = tilted ? Math.sqrt(3) * size / 2 : size * 3 / 4,
+		        offset = size / Math.sqrt(3) * 3 / 4
+		    data.map(function(d) {
+		        var i = d.coordinates[0],
+		            j = d.coordinates[1],
+		            x = stepX * i + (!tilted ? offset * j : 0) + self.w / 2,
+		            y = stepY * j + (tilted ? offset * i : 0) + self.h / 2;
+		        d.centroid = [Math.round(x * 1e2) / 1e2, Math.round(y * 1e2) / 1e2];
+		        d.visible = !outbounds(x, y);
+		    });
+		}
+
+		function render() {
+		    renderMap();
+		}
+
+		function renderMap() {
+		    var grid = vis.selectAll('polygon.tile')
+		        .data(getVisibleData(), function(d) { return d.id; });
+
+		    grid.enter()
+		        .sort(function(a, b) { return a.id - b.id; })
+		        .append('svg:polygon')
+		        .classed('tile', true)
+		        .classed('selected', function(d) { return !~(d.type.search('r')); })
+		        .classed('resource', function(d) { return d.resource; })
+		        .attr('points', function(d) {
+		            return hex(d.centroid, size, tilted).join(' ');
+		        })
+		        .on('mouseover', mouseOver)
+		        .on('mousemove', mouseMove)
+		        .on('mouseout', mouseOut)
+		        .on('mousedown', click);
+			  grid.enter()
+		        .sort(function(a, b) { return a.id - b.id; })
+		        .append("svg:text")
+				    .attr("x",function(d) { return d.centroid[0]; })
+				    .attr("y",function(d) { return d.centroid[1]; })
+				    .text(function(d) { return d.login; })
+		    
+		    grid.exit().remove();
+		}
+
+		// Custom drag behavior (replacing 'zoom')
+		function mouseDrag() {
+		    var m0 = d3.svg.mouse(this),
+		        that = this,
+		        previousMove = [0, 0];
+		    
+		    d3.select('body').on('mousemove', function() {
+		        var m1 = d3.svg.mouse(that),
+		            shift = d3.event.shiftKey,
+		            ctrl = d3.event.ctrlKey,
+		            alt = d3.event.altKey,
+		            x = ctrl ? 0 : m1[0] - m0[0] - previousMove[0],
+		            y = shift ? 0 : m1[1] - m0[1] - previousMove[1];
+		        
+		        move(x, y);
+		        previousMove[0] += x;
+		        previousMove[1] += y;
+		    });
+		    
+		    d3.select('body').on('mouseup', function() {
+		        d3.select('body')
+		            .on('mousemove', null)
+		            .on('mouseup', null);
+		    });
+		    
+		    d3.event.preventDefault();
+		}
+		//
+
+		function move(x, y) {
+		    translate[0] += x;
+		    translate[1] += y;
+
+		    moveMap();
+		}
+
+		function moveMap() {
+		    var dx = translate[0],
+		        dy = translate[1];
+
+		    // Update data
+		    data.filter(function(d) {
+		        var x = d.centroid[0] + dx,
+		            y = d.centroid[1] + dy;
+		        return d.visible && outbounds(x, y);
+		    }).map(function(d) {
+		        d.visible = false;
+		        return d;
+		    });
+		    
+		    data.filter(function(d) {
+		        var x = d.centroid[0] + dx,
+		            y = d.centroid[1] + dy;
+		        return !d.visible && !outbounds(x, y);
+		    }).map(function(d) {
+		        d.visible = true;
+		        return d;
+		    });
+		    //
+		    
+		    renderMap();
+		    
+		    vis.selectAll('.tile')
+		        .attr('transform', 'translate(' + [dx, dy] + ')');
+		}
+
+		function outbounds(x, y) {
+		    return x < padding || x > self.w - padding || y < padding || y > self.h - padding;
+		}
+
+		function removeAll() {
+		    vis.selectAll('.tile').remove();
+		}
+
+		function hex(centroid) {
+		    var a = size / 2, 
+		        b = (Math.sqrt(3) * a) / 2,
+		        x = centroid[0],
+		        y = centroid[1];
+		    return tilted
+		        ? [[x - a / 2, y - b], [x - a, y], [x - a / 2, y + b], [x + a / 2, y + b], [x + a, y], [x + a / 2, y - b]]
+		        : [[x - b, y - a / 2], [x - b, y + a / 2], [x, y + a], [x + b, y + a / 2], [x + b, y - a / 2], [x, y - a]];
+		}
+
+		// d3 mouse events
+		function mouseOver(d, i) {
+		    d3.select(this).classed('over', true);
+		    tooltip.text(d.id + ' (' + d.coordinates + ') / ' + d.lastSelected + ' : ' + d.login)
+		        .classed('visible', true);
+		}
+
+		function mouseMove(d, i) {
+		    tooltip.style('top', (d3.event.pageY - 20) + 'px')
+		        .style('left', (d3.event.pageX + 20) + 'px');
+		}
+
+		function mouseOut(d, i) {
+		    d3.select(this).classed('over', false);
+		    tooltip.classed('visible', false);
+		}
+
+		function click(d, i) {
+		    var element = d3.select(this),
+		        selected = element.classed('selected');
+		        
+		        element.classed('selected', !selected);
+		        d.type = selected ? 'regular' : 'selected';
+		        d.lastSelected = +d3.event.timeStamp;
+		        
+		        tooltip.text(d.id + ' (' + d.coordinates + ') / ' + d.lastSelected);
+		}
+
+		function mouseScroll(d, i) {
+		    var e = d3.event,
+		        delta = e.wheelDelta ? e.wheelDelta : e.detail ? -e.detail : 0;
+		    if (delta > 0) {
+		        scrollUp();
+		    } else {
+		        scrollDown();
+		    }
+		    d3.event.preventDefault();
+		}
+		//
+
+		function scrollDown() {
+		    if (size > 20) {
+		        zoom(-20); // zoom out
+		    }
+		}
+
+		function scrollUp() {
+		    if (size < 80) {
+		        zoom(20); // zoom in
+		    }
+		}
+
+		function zoom(amount) {
+		    var proportion = (size + amount) / size,
+		        dx = translate[0] * proportion - translate[0],
+		        dy = translate[1] * proportion - translate[1];
+		    size += amount;
+		    removeAll();
+		    position();
+		    move(dx, dy);
+		}
+
+		function getVisibleData() { 
+		    return data.filter(function(d) { return d.visible; });
 		}
 
   };

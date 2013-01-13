@@ -137,14 +137,16 @@ function bulle(config) {
 		function getDetail(d) {
 			if(d.idsDoc){
 				d3.json(self.urlBookDetail+d.idsDoc, function(data) {
-					var idsUti = "", nbUti = data.length;
+					var idsUti = "", nbUti = data.children.length;
+					/*
 					for(var i=0; i < nbUti; i++){
 						idsUti += data[i].idsUti;
 					}
+					*/
 					d3.select("#grn").remove();
-					if(idsUti) new graine({id:"grn", svg:svgGraine, urlJson:"../biblio/utidetail?db=flux_zotero&idsUti="+idsUti, r:10, x:100, y:10});
-					d3.select("#brc").remove();
-					if(nbUti) new branche({id:"brc", svg:svgBranche, w:600, h:"100%", root:data});
+					if(data.idsUti) new graine({id:"grn", div:divElem2, x:300, y:10, w:300, h:600, urlJson:"../biblio/utidetail?db=flux_zotero&idsUti="+data.idsUti, r:10});
+					//d3.select("#brc").remove();
+					//if(nbUti) new branche({id:"brc", div:divElem2, x:900, w:600, h:600, root:data});
 
 				});
 
