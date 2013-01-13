@@ -523,18 +523,29 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
      */
     public function getDeweyTagDoc($idUtiDewey)
     {
+		/* ATTENTION
+		 * problème de debug avec les requêtes complexes ???
+		 * 
+		 */    	
     	$query = $this->select()
-			->from(array("t" => "flux_tag"))
+			->from(array("t" => "flux_tag"),array("tag_id", "code", "desc", "niveau", "parent"))
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
-			->joinInner(array('utd' => 'flux_utitagdoc'), "utd.tag_id = t.tag_id AND utd.uti_id = ".$idUtiDewey,
-				array("nb"=>"COUNT(DISTINCT utd.doc_id)", "idsDoc"=>"GROUP_CONCAT(DISTINCT utd.doc_id)"))
-			->joinInner(array('tParent' => 'flux_tag'), "t.lft BETWEEN tParent.lft AND tParent.rgt",
+			->joinInner(array('utd' => 'flux_utitagdoc'), "utd.tag_id = t.tag_id AND utd.uti_id = ".$idUtiDewey
+				,array("nb"=>"COUNT(DISTINCT utd.doc_id)", "idsDoc"=>new Zend_Db_Expr("GROUP_CONCAT(DISTINCT utd.doc_id)")))
+		/*    	 problème de performance en récupérant la hiérarchie directement dans la requête
+				->joinInner(array('tParent' => 'flux_tag'), "t.lft BETWEEN tParent.lft AND tParent.rgt",
 				array("idsTagParent"=>"GROUP_CONCAT(DISTINCT tParent.tag_id ORDER BY tParent.lft)"))
+    	*/ 
 			->group("t.tag_id")
 			->order("t.lft")
 			->where("t.desc != ''");                           
         $result = $this->fetchAll($query)->toArray(); 
-        
+        /*
+		$sql = "SELECT `t`.`tag_id`, `t`.`code`, `t`.`desc`, `t`.`niveau`, `t`.`parent`, COUNT(DISTINCT utd.doc_id) AS `nb`, GROUP_CONCAT(DISTINCT utd.doc_id) AS `idsDoc` FROM `flux_tag` AS `t`
+ INNER JOIN `flux_utitagdoc` AS `utd` ON utd.tag_id = t.tag_id AND utd.uti_id = 638 WHERE (t.desc != '') GROUP BY `t`.`tag_id` ORDER BY `t`.`lft` ASC";
+		$stmt = $this->_db->query($sql);
+    	$result = $stmt->fetchAll();
+        */
         return $result;
         
     }    
