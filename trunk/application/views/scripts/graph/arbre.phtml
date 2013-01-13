@@ -2,7 +2,11 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="../css/colorbrewer.css" />
+	<link rel="stylesheet" type="text/css" href="../css/colorbrewer.stroke.css" />
+
 	<script type='text/javascript' src="../js/d3.v3.js"></script>
+
 	<script type='text/javascript' src="../js/graine.js"></script>
 	<script type='text/javascript' src="../js/branche.js"></script>
 	<script type='text/javascript' src="../js/racine.js"></script>
@@ -67,6 +71,48 @@
 		  cursor: pointer;
 		  fill: steelblue;
 		}
+		
+.bounds {
+    stroke: red;
+    fill: none;
+}
+
+.tile {
+    stroke: black;
+    stroke-width: 1px;
+    fill: black;
+    fill-opacity: 0.05;
+}
+
+.tile.resource {
+    fill: grey;
+    fill-opacity: 0.8;
+}
+
+.over {
+    fill: red !important;
+    fill-opacity: 0.8 !important;
+}
+
+.selected {
+    fill: yellow;
+    fill-opacity: 0.8 !important;
+}
+
+div.tooltip {
+    background: white;
+    padding: 0px 2px;
+    position: absolute;
+    z-index: 10;
+    visibility: hidden;
+    font-size: 0.8em;
+    font-family: sans-serif;
+}
+
+div.visible {
+    visibility: visible !important;
+}		
+		
 		</style>
 </head>
 <body>
@@ -80,25 +126,13 @@
 
        	var svgBulle = divElem2.append("svg:svg")
             .attr("width", "300")
-            .attr("height", "100%")
+            .attr("height", "600")
             .attr("id", "svgBulle")
             .append("svg:g");
 		arrBll.push(new bulle({id:"bulle1", svg:svgBulle, r:300, urlJson:"../biblio/dewey", urlBookDetail:"../biblio/bookdetail?idsDoc="}));
         
-       	var svgGraine = divElem2.append("svg:svg")
-	        .attr("x", "300")
-	        .attr("width", "300")
-	        .attr("height", "100%")
-	        .attr("id", "svgGraine")
-	        .append("svg:g");               	
 		//arrGrn.push(new graine({id:"grn1", svg:svgGraine, urlJson:"../biblio/utidetail?db=flux_zotero", r:6, x:10, y:10}));
 		
-       	var svgBranche = divElem2.append("svg:svg")
-        .attr("x", "600")
-        .attr("width", "600")
-        .attr("height", "100%")
-        .attr("id", "svgBranche")
-        .append("svg:g");               	
 		//arrBrc.push(new branche({id:"brc1", svg:svg, x:200, y:200, points:[{x:0, y:60},{x:50, y:110},{x:90, y:70},{x:140, y:100}]}));
                     
 		//arrRcn.push(new racine({id:"rcn1", svg:svg, x:100, y:100, points:[{x:0, y:60},{x:50, y:110},{x:90, y:70},{x:140, y:100}]}));
