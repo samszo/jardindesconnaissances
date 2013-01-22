@@ -183,13 +183,12 @@ class Flux_Zotero extends Flux_Site{
 		$this->idTagLatestEdition = $this->dbT->ajouter(array("code"=>"latestEdition"));	
     	
     	//récupère les documents
-		$rs = $this->dbD->findByTronc("0");
+		$rs = $this->dbD->getAll();
 		
 		foreach ($rs as $r) {
-			//récupère la date courante
-			if($r['type']=="book"){
-				//récupère la note json
-				$obj = json_decode($r['note']);
+			//récupère la note json
+			$obj = json_decode($r['note']);
+			if($obj && property_exists($obj, 'ISBN')){
 				//vérification de l'isbn
 				$arrISBN = explode(" ", $obj->ISBN);
 				if($arrISBN[0]!=""){
@@ -422,6 +421,9 @@ class Flux_Zotero extends Flux_Site{
     	if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
     	if(!$this->user)$this->user = $this->getUser(array("login"=>"www.dewey.info"));
     	
+    	//suprime les tag déjà attribués
+    	$this->dbUTD->removeDocTagUti($idDoc, false, $this->user);
+    	
     	//récupère la classification du document par OCLC
 		$sql = "SELECT
 					tcode.tag_id idTag, tcode.code
@@ -449,7 +451,9 @@ class Flux_Zotero extends Flux_Site{
     		$arrH = $this->dbT->getFullPath($class['idTag']);
     		//création du tag pour chaque élément
     		foreach ($arrH as $classH) {
-    			$this->saveTag($classH['code'], $idDoc, 1, $d->get("c"));
+    			if($classH['code']!=""){
+	    			$this->saveTag($classH['code'], $idDoc, 1, $d->get("c"));
+    			}
     		}
     	}
         	
@@ -535,10 +539,13 @@ class Flux_Zotero extends Flux_Site{
 				}
 				if($book['nbDoc'] > 0){
 					$book['children']=$notes;
-					//rassemble les résultat dans la racine
-					$result['nbDoc'] += $book['nbDoc'];
-					$result['idsUti'] .= $book['idsUti'];
+				}else{
+					$book['nbDoc'] = 1;
 				}
+				//rassemble les résultat dans la racine
+				$result['nbDoc'] += $book['nbDoc'];
+				if($result['idsUti'])$result['idsUti'].=","; 
+				$result['idsUti'] .= $book['idsUti'];
 				$result["children"][] = $book;
 			}
 			
