@@ -106,6 +106,31 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     }
 
     /**
+     * Recherche une entrée Flux_utitagdoc avec la clef primaire spécifiée
+     * et supprime cette entrée.
+     *
+     * @param integer $idDoc
+     * @param integer $idTag
+     * @param integer $idUti
+     *
+     * @return void
+     */
+    public function removeDocTagUti($idDoc=false, $idTag=false, $idUti=false)
+    {
+    	$where = "";
+    	if($idDoc) $where = 'flux_utitagdoc.doc_id = ' . $idDoc;
+    	if($idTag){
+    		if($where) $where.= " AND ";
+    		$where .= 'flux_utitagdoc.tag_id = ' . $idTag;
+    	}
+    	if($idUti){
+    		if($where) $where.= " AND ";
+    		$where .= 'flux_utitagdoc.uti_id = ' . $idUti;
+    	}
+    	if($where) $this->delete($where);
+    }
+
+    /**
      * Recherche les entrées avec la clef primaire spécifiée
      * et supprime ces entrées.
      *
@@ -532,6 +557,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
 			->joinInner(array('utd' => 'flux_utitagdoc'), "utd.tag_id = t.tag_id AND utd.uti_id = ".$idUtiDewey
 				,array("nb"=>"COUNT(DISTINCT utd.doc_id)", "idsDoc"=>new Zend_Db_Expr("GROUP_CONCAT(DISTINCT utd.doc_id)")))
+			->joinInner(array('d' => 'flux_doc'), "d.doc_id = utd.doc_id AND d.titre != ''",array())
 		/*    	 problème de performance en récupérant la hiérarchie directement dans la requête
 				->joinInner(array('tParent' => 'flux_tag'), "t.lft BETWEEN tParent.lft AND tParent.rgt",
 				array("idsTagParent"=>"GROUP_CONCAT(DISTINCT tParent.tag_id ORDER BY tParent.lft)"))
