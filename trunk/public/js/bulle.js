@@ -135,6 +135,8 @@ function bulle(config) {
 		}
 
 		function getDetail(d) {
+			d3.select("#grn").remove();
+			d3.select("#brc").remove();
 			if(d.idsDoc){
 				d3.json(self.urlBookDetail+d.idsDoc, function(data) {
 					var idsUti = "", nbUti = data.children.length;
@@ -143,10 +145,11 @@ function bulle(config) {
 						idsUti += data[i].idsUti;
 					}
 					*/
-					d3.select("#grn").remove();
-					if(data.idsUti) new graine({id:"grn", div:divElem2, x:300, y:10, w:300, h:600, urlJson:"../biblio/utidetail?db=flux_zotero&idsUti="+data.idsUti, r:10});
-					//d3.select("#brc").remove();
-					//if(nbUti) new branche({id:"brc", div:divElem2, x:900, w:600, h:600, root:data});
+					if(nbUti && data.idsUti){
+						var grn = new graine({id:"grn", div:divElem2, x:300, y:10, w:300, h:600, urlJson:"../biblio/utidetail?db=flux_zotero&idsUti="+data.idsUti, r:10});
+						var brc = new branche({id:"brc", div:divElem2, x:900, w:600, h:600, root:data});
+						grn.branches=brc;
+					}
 
 				});
 
