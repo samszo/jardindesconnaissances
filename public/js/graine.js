@@ -15,6 +15,7 @@ function graine(config) {
 	this.points = new Array();
 	this.g;
 	this.urlJson = config.urlJson;
+	this.branches = config.branches;
 	
 	this.graine = function() {
 		
@@ -42,8 +43,8 @@ function graine(config) {
 		var translate = [0, 0];
 	    
 	    // binding events over 'svg' only
-	    vis.on('mousedown', mouseDrag)
-	        .on('mousewheel', mouseScroll) // webkit
+	    // problème avec svg.mouse vis.on('mousedown', mouseDrag)
+	        vis.on('mousewheel', mouseScroll) // webkit
 	        .on('DOMMouseScroll', mouseScroll); // firefox
 	    /*    
 	    vis.append('svg:rect')
@@ -161,6 +162,7 @@ function graine(config) {
 		function renderMap() {
 		    var grid = vis.selectAll('polygon.tile')
 		        .data(getVisibleData(), function(d) { return d.id; });
+		    vis.selectAll('text').remove();
 
 		    grid.enter()
 		        .sort(function(a, b) { return a.id - b.id; })
@@ -174,13 +176,15 @@ function graine(config) {
 		        .on('mouseover', mouseOver)
 		        .on('mousemove', mouseMove)
 		        .on('mouseout', mouseOut)
-		        .on('mousedown', click);
+		        .on('mousedown', mouseDown);
 			  grid.enter()
 		        .sort(function(a, b) { return a.id - b.id; })
 		        .append("svg:text")
+		        	.attr("text-anchor", "middle")
+		        	.style("font-size", size/8)
 				    .attr("x",function(d) { return d.centroid[0]; })
 				    .attr("y",function(d) { return d.centroid[1]; })
-				    .text(function(d) { return d.login; })
+				    .text(function(d) { return d.login; });
 		    
 		    grid.exit().remove();
 		}
@@ -203,7 +207,6 @@ function graine(config) {
 		        previousMove[0] += x;
 		        previousMove[1] += y;
 		    });
-		    
 		    d3.select('body').on('mouseup', function() {
 		        d3.select('body')
 		            .on('mousemove', null)
@@ -286,7 +289,7 @@ function graine(config) {
 		    tooltip.classed('visible', false);
 		}
 
-		function click(d, i) {
+		function mouseDown(d, i) {
 		    var element = d3.select(this),
 		        selected = element.classed('selected');
 		        
@@ -295,6 +298,10 @@ function graine(config) {
 		        d.lastSelected = +d3.event.timeStamp;
 		        
 		        tooltip.text(d.id + ' (' + d.coordinates + ') / ' + d.lastSelected);
+		        
+		        //on met à jour la branche
+		        self.branches.filtreUti(d.idUti);
+		        
 		}
 
 		function mouseScroll(d, i) {
@@ -316,7 +323,7 @@ function graine(config) {
 		}
 
 		function scrollUp() {
-		    if (size < 80) {
+		    if (size <= 80) {
 		        zoom(20); // zoom in
 		    }
 		}
@@ -334,8 +341,7 @@ function graine(config) {
 		function getVisibleData() { 
 		    return data.filter(function(d) { return d.visible; });
 		}
-
+				
   };
-	  
   return this.graine();
 }

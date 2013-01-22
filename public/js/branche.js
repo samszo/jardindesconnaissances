@@ -10,6 +10,7 @@ function branche(config) {
 	this.w = config.w;  
 	this.h = config.h;  
 	this.root = config.root;
+	this.render;
 	
 	this.branche = function() {
 		
@@ -31,7 +32,7 @@ function branche(config) {
 		    .style("position", "absolute")
 		    .style("z-index", "10")
 		    .style("visibility", "hidden")
-		    .style("font","32px sans-serif")
+		    .style("font","12px sans-serif")
 		    .style("background-color","white")		    
 		    .text("a simple tooltip");
        	
@@ -40,57 +41,64 @@ function branche(config) {
 	    	return d.nbDoc; 
 	    	});
 
-	  var g = vis.selectAll("g")
-	      .data(partition.nodes(self.root))
-	    .enter().append("svg:g")
-	      .attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; })
-	      .on("click", click);
-
-	  var kx = self.w / self.root.dx,
-	      ky = self.h / 1;
-	  
-		g.append("svg:rect")
-	      .attr("width", self.root.dy * kx)
-	      .attr("height", function(d) {return d.dx * ky; })
-	      .attr("class", function(d) { return d.children ? "parent" : "child"; });
-
-		g.append("svg:text")
-	      .attr("transform", transform)
-	      //.attr("dy", ".35em")
-	      .style("opacity", function(d) { 
-	    	  if(d.type == "book") return 0;
-	    	  return d.dx * ky > 12 ? 1 : 0; 
-	    	  })
-	      .text(function(d) { return d.type == "book" ? d.titre : d.note; })
+	  var kx, ky, g;
 		
-		g.append("svg:image")
-	    .attr("xlink:href", function(d) { 
-	    	if(d.type == "book"){
-	    		return d.dTofUrl ? d.dTofUrl : "../img/question.jpg";
-	    	}
-	    	})
-        	.on("mouseover", function(d, i) { 
-        			return tooltip.style("visibility", "visible");		        		
-        		})
-        	.on("mouseout", function(d, i) { 
-        		return tooltip.style("visibility", "hidden");
-        		})
-	        .on("mousemove", function(d, i){
-	        	var txt = "";
-    			d.type == "book" ? txt=d.titre : txt=d.note;     	        	
-	        	return tooltip
-	        		.style("top", (event.pageY+10)+"px")
-	        		.style("left",(event.pageX+10)+"px")
-	        		.text(txt);
-	        	})	        			      
-	    .attr("width", function(d) { return d.dx * ky;})
-	    .attr("height", function(d) { return d.dx * ky;});
-		
-
+	self.render = function (donnees) {
+	
+		  g = vis.selectAll("g").remove();
+		  
+		  g = vis.selectAll("g")
+		      .data(partition.nodes(donnees))
+		    .enter().append("svg:g")
+		      .attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; })
+		      .on("click", click);
+	
+		  kx = self.w / donnees.dx;
+		  ky = self.h / 1;
+		  
+			g.append("svg:rect")
+		      .attr("width", donnees.dy * kx)
+		      .attr("height", function(d) {return d.dx * ky; })
+		      .attr("class", function(d) { return d.children ? "parent" : "child"; });
+	
+			g.append("svg:text")
+		      .attr("transform", transform)
+		      //.attr("dy", ".35em")
+		      .style("opacity", function(d) { 
+		    	  if(d.type == "book") return 0;
+		    	  return d.dx * ky > 12 ? 1 : 0; 
+		    	  })
+		      .text(function(d) { return d.type == "book" ? d.titre : d.note; })
+			
+			g.append("svg:image")
+		    .attr("xlink:href", function(d) { 
+		    	if(d.type == "book"){
+		    		return d.dTofUrl ? d.dTofUrl : "../img/question.jpg";
+		    	}
+		    	})
+	        	.on("mouseover", function(d, i) { 
+	        			return tooltip.style("visibility", "visible");		        		
+	        		})
+	        	.on("mouseout", function(d, i) { 
+	        		return tooltip.style("visibility", "hidden");
+	        		})
+		        .on("mousemove", function(d, i){
+		        	var txt = "";
+	    			d.type == "book" ? txt=d.titre : txt=d.note;     	        	
+		        	return tooltip
+		        		.style("top", (event.pageY+10)+"px")
+		        		.style("left",(event.pageX+10)+"px")
+		        		.text(txt);
+		        	})	        			      
+		    .attr("width", function(d) { return d.dx * ky;})
+		    .attr("height", function(d) { return d.dx * ky;});
+			
+	
+		  
+		  d3.select(window)
+		      .on("click", function() { click(donnees); })
+	  }
 	  
-	  d3.select(window)
-	      .on("click", function() { click(self.root); })
-
 	  function click(d) {
 	    if (!d.children) return;
 
@@ -125,7 +133,21 @@ function branche(config) {
 	    return "translate(8," + d.dx * ky / 2 + ")";
 	  }
 
+		self.render(self.root);	  
+	  
 	};
+
+	this.filtreUti = function(idUti) {
+    	var data = this.root.children.filter(function(d) { 
+    		var arrUti = d.idsUti.split(",");
+    		var inArr = false;
+    		arrUti.forEach(function(e){
+    			if(e == idUti) inArr = true; 
+    			});
+    		return inArr;
+    		});
+    	this.render(data);
+	}
 	  
   return this.branche();
 }
