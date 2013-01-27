@@ -33,7 +33,7 @@ function graine(config) {
         	.append('div')
         	.classed('tooltip', true);
                 
-		var data=[];
+		var data=[], nbUti;
 		
 		var size = 100, // hexagon size
 	    radius = 25, // map radius
@@ -72,8 +72,9 @@ function graine(config) {
 		function fillMap(result) {
 		    var id = 0,
 		        limit1 = 0,
-		        limit2 = radius
-		        nbUti = result.length, uti = 0;
+		        limit2 = radius,
+		        uti = 0;
+		    nbUti = result.length;
 		    //création de la grille
 		    for (var j = -radius; j <= radius; j++) {
 		        var i = limit1;
@@ -157,12 +158,21 @@ function graine(config) {
 
 		function render() {
 		    renderMap();
+		    //zoom suivant le nombre de graine
+		    if(nbUti > 19) zoom(-nbUti);
+		    /*
+		    if(nbUti > 19 && nbUti <= 41) zoom(-20);
+		    if(nbUti > 41 && nbUti <= 61) zoom(-40);
+		    if(nbUti > 61 && nbUti <= 81) zoom(-60);
+		    if(nbUti > 81) zoom(-80);
+			*/
 		}
 
 		function renderMap() {
 		    var grid = vis.selectAll('polygon.tile')
-		        .data(getVisibleData(), function(d) { return d.id; });
-		    vis.selectAll('text').remove();
+		        .data(getVisibleData(), function(d) { 
+		        	return d.id; 
+		        	});
 
 		    grid.enter()
 		        .sort(function(a, b) { return a.id - b.id; })
@@ -172,21 +182,38 @@ function graine(config) {
 		        .classed('resource', function(d) { return d.resource; })
 		        .attr('points', function(d) {
 		            return hex(d.centroid, size, tilted).join(' ');
-		        })
-		        .on('mouseover', mouseOver)
-		        .on('mousemove', mouseMove)
-		        .on('mouseout', mouseOut)
-		        .on('mousedown', mouseDown);
+		        });
 			  grid.enter()
 		        .sort(function(a, b) { return a.id - b.id; })
+		        /*
 		        .append("svg:text")
 		        	.attr("text-anchor", "middle")
 		        	.style("font-size", size/8)
 				    .attr("x",function(d) { return d.centroid[0]; })
 				    .attr("y",function(d) { return d.centroid[1]; })
-				    .text(function(d) { return d.login; });
-		    
+				    .text(function(d) { 
+				    	return d.login; 
+				    	});
+			    */
+			    .append("svg:foreignObject")
+			      .attr("class", "fot")
+			      .attr("x",function(d) { return d.centroid[0]-size*0.8/2; })
+			      .attr("y",function(d) { return d.centroid[1]-size*0.8/2; })
+			      .attr("width", size*0.8)
+			      .attr("height", size*0.8)
+			      .append("xhtml:body")
+			      .attr("class", "fotBodyGraine")
+			      .html(function(d) { 
+			    	  return "<div class='fotDivGraine' style='font:"+(size/8)+"px Arial' >"+d.login+"</div>";
+			    	  })
+			  	  .style("line-height", size*0.8+"px")
+		        .on('mouseover', mouseOver)
+		        .on('mousemove', mouseMove)
+		        .on('mouseout', mouseOut)
+		        .on('mousedown', mouseDown);
+			  
 		    grid.exit().remove();
+		    
 		}
 
 		// Custom drag behavior (replacing 'zoom')
@@ -260,6 +287,8 @@ function graine(config) {
 
 		function removeAll() {
 		    vis.selectAll('.tile').remove();
+		    //vis.selectAll('text').remove();
+		    vis.selectAll('.fot').remove();
 		}
 
 		function hex(centroid) {
@@ -275,7 +304,9 @@ function graine(config) {
 		// d3 mouse events
 		function mouseOver(d, i) {
 		    d3.select(this).classed('over', true);
-		    tooltip.text(d.id + ' (' + d.coordinates + ') / ' + d.lastSelected + ' : ' + d.login)
+		    //var txt = d.id + ' (' + d.coordinates + ') / ' + d.lastSelected + ' : ' + d.login;
+		    var txt = d.login;
+		    tooltip.text(txt)
 		        .classed('visible', true);
 		}
 

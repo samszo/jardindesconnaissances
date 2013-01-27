@@ -5,11 +5,14 @@
  */
 function bulle(config) {
 	this.id = config.id;  
-	this.svg = config.svg;  
+	this.div = config.div;  
+	this.svg;  
 	this.urlJson = config.urlJson;
 	this.urlBookDetail = config.urlBookDetail;
 	this.urlUtiDetail = config.urlUtiDetail;
 	this.r = config.r;
+	this.h = config.h;  
+	this.w = config.w;  
 	//this.x = config.x;  
 	//this.y = config.y;  
 	//this.points = config.points;
@@ -17,6 +20,12 @@ function bulle(config) {
 	this.bulle = function() {
 		
 		var self = this;
+
+		self.svg = self.div.append("svg:svg")
+	        .attr("width", self.w)
+	        .attr("height", self.h)
+	        .attr("id", self.id)
+	        .append("svg:g");
 		
 	    var x = d3.scale.linear().range([0, self.r]),
 	    y = d3.scale.linear().range([0, self.r]),
@@ -56,7 +65,7 @@ function bulle(config) {
 		      .attr("cx", function(d) { return d.x; })
 		      .attr("cy", function(d) { return d.y })
 		      .attr("r", function(d) { return d.r; })
-	        	.on("mouseover", function(d, i) { 
+		      .on("mouseover", function(d, i) { 
 	        			return tooltip.style("visibility", "visible");		        		
 	        		})
 	        	.on("mouseout", function(d, i) { 
@@ -68,9 +77,10 @@ function bulle(config) {
 		        		.style("left",(event.pageX+10)+"px")
     	        		.text(d.desc);
     	        	})	        		
-		      .on("click", function(d) { return zoom(node == d ? root : d); });
+    	        .on("click", function(d) { return zoom(node == d ? root : d); });		  
+
 	
-		  vis.selectAll("text")
+ 		  vis.selectAll("text")
 		      .data(nodes)
 		    .enter().append("svg:text")
 		      .attr("class", function(d) { 
@@ -86,6 +96,7 @@ function bulle(config) {
 		    	  })
 		      .style("opacity", function(d) { return d.niveau < 2 && d.niveau >= 0  ? 1 : 0; })
 		      .text(function(d) { return d.desc; });
+		  
 	
 		  d3.select(window).on("click", function() { zoom(root); });
 		});
@@ -119,7 +130,7 @@ function bulle(config) {
 		      .style("opacity", function(d) { 
 		    	  return d.niveau < parseInt(n+1) && d.niveau >= n ? 1 : 0; 
 		    	  });
-	
+		  
 		  var v = d.depth > 0 ? "hidden" : "visible";
 		 /*
 		  tG.selectAll(".graine")
@@ -139,15 +150,11 @@ function bulle(config) {
 			d3.select("#brc").remove();
 			if(d.idsDoc){
 				d3.json(self.urlBookDetail+d.idsDoc, function(data) {
-					var idsUti = "", nbUti = data.children.length;
-					/*
-					for(var i=0; i < nbUti; i++){
-						idsUti += data[i].idsUti;
-					}
-					*/
+					tc = new tagcloud({idDoc:"gTC", div:divTagCloud, data:data.tags, w:300, h:300, global:true});						
+					var nbUti = data.children.length;
 					if(nbUti && data.idsUti){
-						var grn = new graine({id:"grn", div:divElem2, x:300, y:10, w:300, h:600, urlJson:"../biblio/utidetail?db=flux_zotero&idsUti="+data.idsUti, r:10});
-						var brc = new branche({id:"brc", div:divElem2, x:900, w:600, h:600, root:data});
+						grn = new graine({id:"grn", div:divUtiExa, x:0, y:0, w:300, h:600, urlJson:"../biblio/utidetail?db=flux_zotero&idsUti="+data.idsUti, r:10});
+						brc = new branche({id:"brc", titre:"Bibliographie", div:divDocBranches, x:0, w:680, h:600, root:data});
 						grn.branches=brc;
 					}
 
