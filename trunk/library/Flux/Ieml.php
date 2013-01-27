@@ -6,7 +6,7 @@
  * @license    "New" BSD License
  * 
  */
-class Flux_IEML extends Flux_Site{
+class Flux_Ieml extends Flux_Site{
 
   	var $PATH_STAR_PARSER = 'http://starparser.ieml.org/cgi-bin/star2xml.cgi?iemlExpression=';
   	var $XPATH_BINARY = '//@binary';
@@ -61,7 +61,7 @@ class Flux_IEML extends Flux_Site{
 	 */
     function saveParse(){
 
-    	$this->dbIEML = new Model_DbTable_flux_ieml($this->db);
+    	$this->dbIEML = new Model_DbTable_Flux_Ieml($this->db);
     	
     	//récupère les tag ieml sans parser
     	$arr = $this->dbIEML->findByParse("");
@@ -77,7 +77,7 @@ class Flux_IEML extends Flux_Site{
 	 */
     function saveBinary(){
 
-    	$this->dbIEML = new Model_DbTable_flux_ieml($this->db);
+    	$this->dbIEML = new Model_DbTable_Flux_Ieml($this->db);
     	
     	//récupère les tag ieml sans parser
     	$arr = $this->dbIEML->getAll();
@@ -96,7 +96,7 @@ class Flux_IEML extends Flux_Site{
 	 */
     function saveScriptValeur(){
 
-    	$this->dbIEML = new Model_DbTable_flux_ieml($this->db);
+    	$this->dbIEML = new Model_DbTable_Flux_Ieml($this->db);
     	
     	//récupère les tag ieml sans parser
     	$arr = $this->dbIEML->getAll();
@@ -182,7 +182,7 @@ class Flux_IEML extends Flux_Site{
 	 */
     function genereSequences($nbLayer=1, $db=false, $s1 = array('E','U','A','S','B','T'), $s2 = array('E','U','A','S','B','T'), $s3 = array('E','U','A','S','B','T')){
 		
-    	if($db)$db = new Model_DbTable_flux_ieml($this->db);
+    	if($db)$db = new Model_DbTable_Flux_Ieml($this->db);
     	for ($i = 0; $i < $nbLayer; $i++) {
 			$x = new ArrayMixer($this->LAYER_PONCT[$i], $this->LAYER_PONCT[$i+1], $db);
 			$x->append($s1);
@@ -213,7 +213,7 @@ class Flux_IEML extends Flux_Site{
     	if($colors)$this->COLORS = $colors;
     	
 		
-    	$db = new Model_DbTable_flux_ieml($this->db);
+    	$db = new Model_DbTable_Flux_Ieml($this->db);
     	$arrSeq = $db->getAll("ieml_id",$nb);
     	$i = 1;
     	$x=10;
@@ -228,7 +228,7 @@ class Flux_IEML extends Flux_Site{
     	$intColo = 1;
     	$first2 = true;
 
-		$svg = new SvgDocument($nb/1302*2+1000, 1302*5*$r);
+    	$svg = new SvgDocument($nb/1302*2+1000, 1302*5*$r);
 		$dDegrad = new SvgDefs();
 		$gRect = new SvgGroup();
     	
@@ -264,7 +264,6 @@ class Flux_IEML extends Flux_Site{
 				$gRect->addChild(new SvgCircle(2*$r+$x, 2*$r*$numLigne+$y, $r, "fill:url(#lg_".$arr[2].".)","","","c_".$c['code']));
 				 = 5;
 				*/
-    			
     			//création d'une bulle
     			$dDegrad->addChild($this->genereDegrad($c['code']));
 	    		//création de la bulle
@@ -310,7 +309,7 @@ class Flux_IEML extends Flux_Site{
 		
     	require_once("svg/Svg.php");
     	
-    	$db = new Model_DbTable_flux_ieml($this->db);
+    	$db = new Model_DbTable_Flux_Ieml($this->db);
 
     	//récupère le détail de l'adresse
     	$arr = $db->findByCode($ieml['code']);    	
