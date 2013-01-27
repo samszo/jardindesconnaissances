@@ -11,7 +11,7 @@ require_once 'Zend/Controller/Action.php';
 
 class TweetpaletteController extends Zend_Controller_Action {
 	
-	var $dbNom = "flux_TweetPalette";
+	var $dbNom = "flux_tweetpalette";
 	
 	/**
 	 * The default action - show the home page

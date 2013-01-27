@@ -68,6 +68,12 @@ class FluxController extends Zend_Controller_Action {
 		    	$rs[] = $r;
 		    }
 	    }
+	    if($this->_getParam('idsDoc', 0)){
+			$idBase = $this->_getParam('idBase');
+			$s = new Flux_Site($idBase);
+	    	$dbUTD = new Model_DbTable_Flux_UtiTagDoc($s->db);
+	    	$rs = $dbUTD->GetDocTags($this->_getParam('idsDoc'));
+	    }
 	    $this->view->html = $this->_getParam('html', false);		    
 	    $this->view->docs = $rs;		    
     }
