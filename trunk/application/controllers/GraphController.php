@@ -101,16 +101,20 @@ class GraphController extends Zend_Controller_Action {
     
     public function iemlAction()
     {
- 		set_time_limit(0); 
-    	$ieml = new Flux_IEML("flux_ieml");
-    	
-    	if($this->_getParam('ieml', 0)){
-    		$this->view->svg = $ieml->genereSvgAdresse(array("code"=>$this->_getParam('ieml')));    		
-    	}else{
-			//$ieml->genereSequences(3,true);
-			$this->view->svg = $ieml->genereSvgPlanSeq($this->_getParam('nb', 6));		
-    	}
-    	
+    	try {
+	 		set_time_limit(0); 
+	 		
+	 		$ieml = new Flux_Ieml("flux_ieml");
+	 		if($this->_getParam('ieml', 0)){
+	    		$this->view->svg = $ieml->genereSvgAdresse(array("code"=>$this->_getParam('ieml')));    		
+	    	}else{
+				//$ieml->genereSequences(3,true);
+				$this->view->svg = $ieml->genereSvgPlanSeq($this->_getParam('nb', 6));
+	    	}
+		}catch (Zend_Exception $e) {
+			echo "Récupère exception: " . get_class($e) . "\n";
+		    echo "Message: " . $e->getMessage() . "\n";
+		}
     }	
     
 }
