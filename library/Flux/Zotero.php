@@ -15,6 +15,7 @@ class Flux_Zotero extends Flux_Site{
 	var $idTagMostRecent;
 	var $latestEdition;
 	var $idTagLatestEdition;	
+	var $idUtiDewey = 638;	
 	
 	public function __construct($login, $idBase="flux_zotero", $libraryID=ZOTERO_ID_LIB)
     {
@@ -473,7 +474,7 @@ class Flux_Zotero extends Flux_Site{
 	function getDeweyTagDoc($idUtiDewey=638, $idTagRacineDewey=1811){
 
 		$c = str_replace("::", "_", __METHOD__)."_".$idUtiDewey."_".$idTagRacineDewey; 
-	   	$flux = false;//$this->cache->load($c);
+	   	$flux = $this->cache->load($c);
         if(!$flux){
 		
 			if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
@@ -512,8 +513,10 @@ class Flux_Zotero extends Flux_Site{
         if(!$flux){
 		
 			$dbD = new Model_DbTable_Flux_Doc($this->db);
-
-	        $query = $dbD->select()
+			$dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+			
+	        //récupère les utilisateurs et les notes
+			$query = $dbD->select()
 	        	->setIntegrityCheck(false)
 	        	->from(array("d" => "flux_doc"),array("doc_id","url","titre","type"))
 	        	->joinInner(array('dAmz' => 'flux_doc'),'dAmz.tronc = d.doc_id AND dAmz.type = 39'
@@ -522,26 +525,39 @@ class Flux_Zotero extends Flux_Site{
 	            	,array('dTofTitre'=>'dTof.titre', 'dTofUrl'=> 'dTof.url'))
 				->joinInner(array('ud' => 'flux_utidoc'), "ud.doc_id = d.doc_id",
 					array("idsUti"=>"GROUP_CONCAT(DISTINCT ud.uti_id)"))
-	            ->group("d.doc_id")
+				->joinInner(array('u' => 'flux_uti'), "u.uti_id = ud.uti_id AND u.role != ''",array())
+				->group("d.doc_id")
 				->where("d.doc_id IN (".$idsDoc.")");
 			$flux = $dbD->fetchAll($query)->toArray(); 					
 			$result = array();
-			$result = array("titre"=>"documents", "nbDoc"=>0, "children"=>array(), "idsUti"=>"", "type"=>"racine");
+			$result = array("titre"=>"Bibliographie", "nbDoc"=>0, "tags"=>array(), "children"=>array(), "idsUti"=>"", "type"=>"racine", "visible"=>true);
 			foreach ($flux as $book) {
 				//récupère les note pour le livre
 				$notes = $dbD->findByParams(array("tronc"=>$book['doc_id'], "type"=>"note"));
 				//met à jour le livre
 				$book['nbDoc'] = count($notes);
-				//ajoute le nombre mot pour la note
+				//ajoute les complément d'information pour la note
 				for ($i = 0; $i < $book['nbDoc']; $i++) {
+					$notes[$i]["visible"] = true;
+					// nombre mot 
 					$notes[$i]["nbDoc"] = str_word_count($notes[$i]["note"]);
+					//nettoie les tags afficher un texte propre
 					$notes[$i]["note"] = strip_tags($notes[$i]["note"]); 
+					//ajoute les tags liés au note à l'exeption des tags dewey
+					$notes[$i]["tags"] = $dbUTD->GetUtiTagDoc(false,$notes[$i]["doc_id"],"utd.uti_id !=".$this->idUtiDewey);
+					$result["tags"] = array_merge($result["tags"],$notes[$i]["tags"]); 
 				}
 				if($book['nbDoc'] > 0){
+					//ajoute les notes
 					$book['children']=$notes;
 				}else{
+					$book['children']=array();
 					$book['nbDoc'] = 1;
 				}
+				$book["visible"] = true;
+				//ajoute les tags
+				$book['tags'] = $dbUTD->GetUtiTagDoc(false,$book['doc_id'],"utd.uti_id !=".$this->idUtiDewey); 
+				$result["tags"] = array_merge($result["tags"],$book['tags']); 
 				//rassemble les résultat dans la racine
 				$result['nbDoc'] += $book['nbDoc'];
 				if($result['idsUti'])$result['idsUti'].=","; 
@@ -550,6 +566,44 @@ class Flux_Zotero extends Flux_Site{
 			}
 			
 			//$this->cache->save($flux, $c);
+        }
+		return $result;
+	}
+
+    /**
+     * getDocTags
+     *
+     * renvoie la liste des tags pour les notes
+     * 
+     * @param int $idsDoc
+     * 
+     * @return array
+     * 
+     */
+	function getDocTags($idsDoc){
+
+		$c = str_replace("::", "_", __METHOD__)."_".$idsDoc; 
+	   	$flux = false;//$this->cache->load($c);
+        if(!$flux){
+		
+			$dbD = new Model_DbTable_Flux_Doc($this->db);
+			//définition de la requête
+	        $query = $dbD->select()
+	        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+	        	->from( array("utd" => "flux_utitagdoc"), array("tag_id"))                           
+	            ->joinInner(array('t' => 'flux_tag'),
+	            	't.tag_id = utd.tag_id',array('code'))
+	        	->joinInner(array('td' => 'flux_tagdoc'),
+	            	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
+	        	->joinInner(array('d' => 'flux_doc'),
+	            	'd.doc_id = utd.doc_id',array('doc_id'))
+	        	->joinInner(array('u' => 'flux_uti'),
+	            	"u.uti_id = utd.uti_id AND u.login != 'oclc'",array('login'))
+	        	->where("d.tronc IN (".$idsDoc.")")
+	        	->group("utd.tag_id")
+	        	->order("value DESC");
+			
+			$result = $dbD->fetchAll($query)->toArray(); 					
         }
 		return $result;
 	}		
