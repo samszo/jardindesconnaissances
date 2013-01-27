@@ -13,7 +13,7 @@
  * @copyright  201=& Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_flux_ieml extends Zend_Db_Table_Abstract
+class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
 {
     
     /*

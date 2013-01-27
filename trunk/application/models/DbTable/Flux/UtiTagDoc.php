@@ -267,8 +267,8 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     public function findByDoc_id($doc_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_utitagdoc") )                           
-                    ->where( "f.doc_id = ?", $doc_id );
+			->from( array("f" => "flux_utitagdoc") )                           
+            ->where( "f.doc_id = ?", $doc_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
@@ -333,24 +333,26 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
      *
      * @param integer $idUti
      * @param integer $idDoc
+     * @param string $where
      * 
      * @return array
      */
-	function GetUtiTagDoc($idUti, $idDoc) {
+	function GetUtiTagDoc($idUti=false, $idDoc=false, $where="") {
 
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc"), array("tag_id"))                           
+        	->from( array("utd" => "flux_utitagdoc"), array("tag_id","doc_id","uti_id"))                           
             ->joinInner(array('t' => 'flux_tag'),
             	't.tag_id = utd.tag_id',array('code'))
         	->joinInner(array('td' => 'flux_tagdoc'),
             	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
-        	->where( "utd.uti_id = ?", $idUti)
-        	->where( "utd.doc_id = ?", $idDoc)
         	->group("utd.tag_id")
         	->order("value DESC");
-
+        	if($idUti)$query->where( "utd.uti_id = ?", $idUti);
+        	if($idDoc)$query->where( "utd.doc_id = ?", $idDoc);
+        	if($where)$query->where($where);
+        	
         return $this->fetchAll($query)->toArray(); 		
 	}
 
@@ -393,15 +395,15 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
 	}
 	
 	/**
-     * Récupère les tags associés à un document
+     * Récupère les tags associés à une liste de document
      *
-     * @param integer $idDoc
+     * @param integer $idsDoc
      * @param string $w
      * @param string $h
      * 
      * @return array
      */
-	function GetDocTags($idDoc, $where="", $h="", $order=null, $limit=null, $from=null) {
+	function GetDocTags($idsDoc, $where="", $h="", $order=null, $limit=null, $from=null) {
 
 		//définition de la requête
         $query = $this->select()
@@ -411,7 +413,9 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
             	't.tag_id = utd.tag_id',array('code'))
         	->joinInner(array('td' => 'flux_tagdoc'),
             	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
-        	->where( "utd.doc_id = ?", $idDoc)
+        	->joinInner(array('d' => 'flux_doc'),
+            	'd.doc_id = utd.doc_id',array('doc_id', 'titre'))
+        	->where("utd.doc_id IN (".$idsDoc.")")
         	->group("utd.tag_id")
         	->order("value DESC");
 
