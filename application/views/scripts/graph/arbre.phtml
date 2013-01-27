@@ -2,6 +2,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="../css/arbre.css" />
 	<link rel="stylesheet" type="text/css" href="../css/colorbrewer.css" />
 	<link rel="stylesheet" type="text/css" href="../css/colorbrewer.stroke.css" />
 
@@ -11,131 +12,41 @@
 	<script type='text/javascript' src="../js/branche.js"></script>
 	<script type='text/javascript' src="../js/racine.js"></script>
 	<script type='text/javascript' src="../js/bulle.js"></script>
-	<style>	
-		text {
-		  font-size: 10px;
-		  pointer-events: none;
-		}
-		
-		text.parent {
-		  fill: steelblue;
-		}
-		
-		circle {
-		  fill: #ccc;
-		  stroke: #999;
-		  pointer-events: all;
-		}
-		
-		circle.parent {
-		  fill: steelblue;
-		  fill-opacity: .1;
-		  stroke: steelblue;
-		}
-		
-		circle.parent:hover {
-		  stroke-width: .5px;
-		}
-		
-		circle.child {
-		  pointer-events: all;
-		}
-
-		path {
-		  fill: #ccc;
-		  stroke: #999;
-		  pointer-events: all;
-		}
-		
-		path.parent {
-		  fill: steelblue;
-		  fill-opacity: .1;
-		  stroke: steelblue;
-		}
-		
-		path.parent:hover {
-		  stroke-width: .5px;
-		}
-		
-		path.child {
-		  pointer-events: none;
-		}
-
-		rect {
-		  stroke: #eee;
-		  fill: #aaa;
-		  fill-opacity: .8;
-		}
-		
-		rect.parent {
-		  cursor: pointer;
-		  fill: steelblue;
-		}
-		
-.bounds {
-    stroke: red;
-    fill: none;
-}
-
-.tile {
-    stroke: black;
-    stroke-width: 1px;
-    fill: black;
-    fill-opacity: 0.05;
-}
-
-.tile.resource {
-    fill: grey;
-    fill-opacity: 0.8;
-}
-
-.over {
-    fill: red !important;
-    fill-opacity: 0.8 !important;
-}
-
-.selected {
-    fill: yellow;
-    fill-opacity: 0.8 !important;
-}
-
-div.tooltip {
-    background: white;
-    padding: 0px 2px;
-    position: absolute;
-    z-index: 10;
-    visibility: hidden;
-    font-size: 12px;
-    font-family: sans-serif;
-}
-
-div.visible {
-    visibility: visible !important;
-}		
-		
-		</style>
+	<script type='text/javascript' src="../js/tagcloud.js"></script>
+	<script type='text/javascript' src="../js/d3.layout.cloud.js"></script>
 </head>
-<body>
-	<div id="chart"></div>
+<body id="bodyGlobal" >
+	<div id="divGlobal">
+		<div id="divCenter">
+			<h1>Explorateur allégorique</h1>
+			<div id="divTag">
+				<h2>Concepts - terroirs</h2>
+				<div id="divTagDewey"></div>
+				<div id="divTagCloud">
+					<div id="status_gTC"></div>
+					<div id="select_txt_gTC"></div>
+				</div>
+			</div>
+			<div id="divUtiExa">
+				<h2>Acteurs - graines</h2>
+			</div>
+			<div id="divDocBranches">
+				<h2>Documents - branches</h2>
+			</div>
+		</div>	
+	</div>	
 	<script type="text/javascript">
-		var arrGrn = [];
-		var arrBll = [];
-		var arrBrc = [];
-		var arrRcn = [];
-       	var divElem2 = d3.select("#chart");
-
-       	var svgBulle = divElem2.append("svg:svg")
-            .attr("width", "300")
-            .attr("height", "600")
-            .attr("id", "svgBulle")
-            .append("svg:g");
-		arrBll.push(new bulle({id:"bulle1", svg:svgBulle, r:300, urlJson:"../biblio/dewey", urlBookDetail:"../biblio/bookdetail?idsDoc="}));
-        
-		//arrGrn.push(new graine({id:"grn1", svg:svgGraine, urlJson:"../biblio/utidetail?db=flux_zotero", r:6, x:10, y:10}));
+       	var divTagDewey = d3.select("#divTagDewey");
+       	var divTagCloud = d3.select("#divTagCloud");
+       	var divUtiExa = d3.select("#divUtiExa");
+       	var divDocBranches = d3.select("#divDocBranches");
+		var tc, grn, brc;
 		
-		//arrBrc.push(new branche({id:"brc1", svg:svg, x:200, y:200, points:[{x:0, y:60},{x:50, y:110},{x:90, y:70},{x:140, y:100}]}));
-                    
-		//arrRcn.push(new racine({id:"rcn1", svg:svg, x:100, y:100, points:[{x:0, y:60},{x:50, y:110},{x:90, y:70},{x:140, y:100}]}));
+		var bulleDewey = new bulle({id:"bulleDewey", div:divTagDewey, w:300, h:300, r:300, urlJson:"../biblio/dewey", urlBookDetail:"../biblio/bookdetail?idsDoc="});
+
+		function chargeTag(tag){
+			brc.filtreTag(tag);
+		}
 
 	</script>	
   </body>
