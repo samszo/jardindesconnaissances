@@ -11,6 +11,7 @@ function branche(config) {
 	this.h = config.h;  
 	this.root = config.root;
 	this.render;
+	this.titre = config.titre;
 	
 	this.branche = function() {
 		
@@ -37,8 +38,9 @@ function branche(config) {
 		    .text("a simple tooltip");
        	
 	var partition = d3.layout.partition()
-	    .value(function(d) { 
-	    	return d.nbDoc; 
+	    .value(function(d) {
+	    	if(d.visible)
+	    		return d.nbDoc; 
 	    	});
 
 	  var kx, ky, g;
@@ -61,6 +63,7 @@ function branche(config) {
 		      .attr("height", function(d) {return d.dx * ky; })
 		      .attr("class", function(d) { return d.children ? "parent" : "child"; });
 	
+			/*
 			g.append("svg:text")
 		      .attr("transform", transform)
 		      //.attr("dy", ".35em")
@@ -68,8 +71,25 @@ function branche(config) {
 		    	  if(d.type == "book") return 0;
 		    	  return d.dx * ky > 12 ? 1 : 0; 
 		    	  })
-		      .text(function(d) { return d.type == "book" ? d.titre : d.note; })
-			
+		      .text(function(d) { 
+		    	  return d.type == "note" ? d.note : d.titre; 
+		    	  })
+		    */	  
+		    g.append("svg:foreignObject")
+		      .attr("class", "fot")
+		      .attr("width", donnees.dy * kx)
+		      .attr("height", function(d) {return d.dx * ky; })
+		      .append("xhtml:body")
+		      .attr("class", "fotBody")
+		      .html(function(d) { 
+		    	  var txt = "";
+		    	  if(d.dx * ky > 12 && d.type != "book")
+		    		  d.type == "note" ? txt = d.note : txt = d.titre; 
+		    	  return txt;
+	    	  })
+		      .style("font", "12px Arial");
+
+		    	  
 			g.append("svg:image")
 		    .attr("xlink:href", function(d) { 
 		    	if(d.type == "book"){
@@ -115,12 +135,24 @@ function branche(config) {
 	        .attr("width", d.dy * kx)
 	        .attr("height", function(d) { return d.dx * ky; });
 
+	    /*
 	    t.select("text")
 	        .attr("transform", transform)
 	        .style("opacity", function(d) { 
 		    	if(d.type == "book") return 0;
 	        	return d.dx * ky > 12 ? 1 : 0; 
 	        	});
+		*/
+	    var b = t.select(".fot")
+	      .attr("width", d.dy * kx)
+	      .attr("height", function(d) {return d.dx * ky; })
+	      .select(".fotBody")
+		      .text(function(d) { 
+		    	  var txt = "";
+		    	  if(d.dx * ky > 12 && d.type != "book")
+		    		  d.type == "note" ? txt = d.note : txt = d.titre; 
+		    	  return txt;
+		      });
 
 	    t.select("image")
 	        .attr("width", d.dy * kx)
@@ -138,16 +170,51 @@ function branche(config) {
 	};
 
 	this.filtreUti = function(idUti) {
-    	var data = this.root.children.filter(function(d) { 
+    	var nbDoc = 0;
+    	var idsUti = "";
+		var donnees = this.root.children.filter(function(d) { 
     		var arrUti = d.idsUti.split(",");
     		var inArr = false;
     		arrUti.forEach(function(e){
-    			if(e == idUti) inArr = true; 
-    			});
+    			if(e == idUti){
+    				inArr = true;
+    				nbDoc += d.nbDoc; 
+    			}
+    		});
     		return inArr;
     		});
-    	this.render(data);
+    	this.render({titre:this.titre, nbDoc:nbDoc, children:donnees, idsUti:"", type:"racine"});
 	}
-	  
+
+	this.filtreTag = function(tag) {
+    	var nbDoc = 0;
+    	var idsUti = "";
+		//il faut faire deux passes pour ne pas changer le tableau original
+    	//on filtre les livres
+    	var donnees =  this.root.children.filter(function(d) { 
+    		//vérifie les tag du livre
+    		d.visible = false;
+    		d.tags.forEach(function(e){
+    			if(e.code == tag.text)d.visible = true;
+    		});
+    		//filtre les notes si on n'a pas trouvé le tag dans le document
+			if(!d.show){
+				d.children.forEach(function(n) { 
+		    		//vérifie les tags des notes
+    				n.visible = false;
+		    		n.tags.forEach(function(t){
+		    			if(t.code == tag.text){
+		    				d.visible = true;
+		    				n.visible = true;
+		    			}
+		    		});
+	    		});
+			}
+			return d.visible;
+   		});    	
+    	this.render({titre:this.titre, nbDoc:nbDoc, children:donnees, idsUti:"", type:"racine", visible:true});
+    	
+	}
+	
   return this.branche();
 }
