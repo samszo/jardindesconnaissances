@@ -4,8 +4,10 @@ require_once( "../application/configs/config.php" );
 try {
 	
 	$application->bootstrap();
+
 	$user = "luckysemiosis";
 	$pwd = "samszo";
+	
 
 	/*
 	$s = new Flux_Site('flux_zotero');
@@ -18,10 +20,11 @@ try {
 	/*
 	$s = new Flux_Site('flux_tweetpalette');
 	//$s->sauveUtiByImage('../data/etudiants/CDNL_12-13', "étudiants CDNL 12-13");
-	//$dbU = new Model_DbTable_Flux_Uti($s->db);
-	//$roles = $dbU->getRolesUtis();
-	$dbUU = new Model_DbTable_Flux_UtiUti($s->db);
-	$dbUU->ajouter(array("uti_id_src"=>2, "uti_id_dst"=>94, "eval"=>1));
+	$dbU = new Model_DbTable_Flux_Uti($s->db);
+	$roles = $dbU->getRolesUtis();
+	print_r($roles);
+	//$dbUU = new Model_DbTable_Flux_UtiUti($s->db);
+	//$dbUU->ajouter(array("uti_id_src"=>2, "uti_id_dst"=>94, "eval"=>1));
 	*/
 	
 	/*
@@ -31,124 +34,15 @@ try {
 	//
 	$zotero = new Flux_Zotero($user);
 	$arr = $zotero->getDeweyTagDoc();
+	print_r($arr);
+	/*
 	//$zotero->saveAll();
 	//$zotero->sauveOCLCInfo();
 	//$zotero->sauveAmazonInfo();
 	$code = simplexml_load_string("<DataTable>
 <Table1><tag_id>1574</tag_id><code>853</code></Table1>
-<Table1><tag_id>1576</tag_id><code>306.01</code></Table1>
-<Table1><tag_id>1577</tag_id><code>712.01</code></Table1>
-<Table1><tag_id>1578</tag_id><code>153.753</code></Table1>
-<Table1><tag_id>1581</tag_id><code>199.492</code></Table1>
-<Table1><tag_id>1583</tag_id><code>126</code></Table1>
-<Table1><tag_id>1584</tag_id><code>193</code></Table1>
-<Table1><tag_id>1585</tag_id><code>499.99</code></Table1>
-<Table1><tag_id>1587</tag_id><code>153.15</code></Table1>
-<Table1><tag_id>1592</tag_id><code>520</code></Table1>
-<Table1><tag_id>1594</tag_id><code>100</code></Table1>
-<Table1><tag_id>1598</tag_id><code>120</code></Table1>
-<Table1><tag_id>1600</tag_id><code>330</code></Table1>
-<Table1><tag_id>1612</tag_id><code>003.54</code></Table1>
-<Table1><tag_id>1614</tag_id><code>006.332</code></Table1>
-<Table1><tag_id>1618</tag_id><code>704.03</code></Table1>
-<Table1><tag_id>1619</tag_id><code>701.03</code></Table1>
-<Table1><tag_id>1622</tag_id><code>910.01</code></Table1>
-<Table1><tag_id>1624</tag_id><code>115</code></Table1>
-<Table1><tag_id>1627</tag_id><code>701.17</code></Table1>
-<Table1><tag_id>1628</tag_id><code>380</code></Table1>
-<Table1><tag_id>1630</tag_id><code>303.4833</code></Table1>
-<Table1><tag_id>1631</tag_id><code>025.0427</code></Table1>
-<Table1><tag_id>1633</tag_id><code>006.696</code></Table1>
-<Table1><tag_id>1635</tag_id><code>306.46</code></Table1>
-<Table1><tag_id>1643</tag_id><code>621.366</code></Table1>
-<Table1><tag_id>1644</tag_id><code>621.3827</code></Table1>
-<Table1><tag_id>1646</tag_id><code>004.678</code></Table1>
-<Table1><tag_id>1647</tag_id><code>006.331</code></Table1>
-<Table1><tag_id>1649</tag_id><code>006.312</code></Table1>
-<Table1><tag_id>1651</tag_id><code>302.231</code></Table1>
-<Table1><tag_id>1653</tag_id><code>155.26</code></Table1>
-<Table1><tag_id>1656</tag_id><code>801.93</code></Table1>
-<Table1><tag_id>1657</tag_id><code>601</code></Table1>
-<Table1><tag_id>1660</tag_id><code>169</code></Table1>
-<Table1><tag_id>1661</tag_id><code>813.54</code></Table1>
-<Table1><tag_id>1663</tag_id><code>005.754</code></Table1>
-<Table1><tag_id>1664</tag_id><code>371.337</code></Table1>
-<Table1><tag_id>1665</tag_id><code>303.484</code></Table1>
-<Table1><tag_id>1666</tag_id><code>190</code></Table1>
-<Table1><tag_id>1667</tag_id><code>005.12</code></Table1>
-<Table1><tag_id>1669</tag_id><code>323.042</code></Table1>
-<Table1><tag_id>1671</tag_id><code>658.312</code></Table1>
-<Table1><tag_id>1675</tag_id><code>005.131</code></Table1>
-<Table1><tag_id>1676</tag_id><code>133</code></Table1>
-<Table1><tag_id>1677</tag_id><code>501</code></Table1>
-<Table1><tag_id>1678</tag_id><code>003.857</code></Table1>
-<Table1><tag_id>1679</tag_id><code>191</code></Table1>
-<Table1><tag_id>1680</tag_id><code>154</code></Table1>
-<Table1><tag_id>1683</tag_id><code>780.92</code></Table1>
-<Table1><tag_id>1685</tag_id><code>750</code></Table1>
-<Table1><tag_id>1689</tag_id><code>759.046</code></Table1>
-<Table1><tag_id>1690</tag_id><code>709.033</code></Table1>
-<Table1><tag_id>1691</tag_id><code>160</code></Table1>
-<Table1><tag_id>1692</tag_id><code>192</code></Table1>
-<Table1><tag_id>1696</tag_id><code>841.914</code></Table1>
-<Table1><tag_id>1697</tag_id><code>910.285</code></Table1>
-<Table1><tag_id>1699</tag_id><code>901</code></Table1>
-<Table1><tag_id>1700</tag_id><code>710</code></Table1>
-<Table1><tag_id>1703</tag_id><code>181.12</code></Table1>
-<Table1><tag_id>1704</tag_id><code>910.92</code></Table1>
-<Table1><tag_id>1706</tag_id><code>352.367</code></Table1>
-<Table1><tag_id>1707</tag_id><code>808</code></Table1>
-<Table1><tag_id>1710</tag_id><code>162</code></Table1>
-<Table1><tag_id>1711</tag_id><code>412</code></Table1>
-<Table1><tag_id>1713</tag_id><code>740</code></Table1>
-<Table1><tag_id>1714</tag_id><code>153.42</code></Table1>
-<Table1><tag_id>1718</tag_id><code>005.74</code></Table1>
-<Table1><tag_id>1720</tag_id><code>411</code></Table1>
-<Table1><tag_id>1725</tag_id><code>530.11</code></Table1>
-<Table1><tag_id>1726</tag_id><code>530.01</code></Table1>
-<Table1><tag_id>1727</tag_id><code>306.42</code></Table1>
-<Table1><tag_id>1729</tag_id><code>514</code></Table1>
-<Table1><tag_id>1731</tag_id><code>306.44</code></Table1>
-<Table1><tag_id>1734</tag_id><code>302.54</code></Table1>
-<Table1><tag_id>1735</tag_id><code>121.68</code></Table1>
-<Table1><tag_id>1737</tag_id><code>890</code></Table1>
-<Table1><tag_id>1739</tag_id><code>195</code></Table1>
-<Table1><tag_id>1740</tag_id><code>153.69</code></Table1>
-<Table1><tag_id>1741</tag_id><code>616.8914</code></Table1>
-<Table1><tag_id>1742</tag_id><code>297.39</code></Table1>
-<Table1><tag_id>1743</tag_id><code>658.402</code></Table1>
-<Table1><tag_id>1744</tag_id><code>658.45</code></Table1>
-<Table1><tag_id>1745</tag_id><code>658.406</code></Table1>
-<Table1><tag_id>1746</tag_id><code>658.4038</code></Table1>
-<Table1><tag_id>1747</tag_id><code>401.41</code></Table1>
-<Table1><tag_id>1749</tag_id><code>400</code></Table1>
-<Table1><tag_id>1750</tag_id><code>306.45</code></Table1>
-<Table1><tag_id>1751</tag_id><code>609</code></Table1>
-<Table1><tag_id>1754</tag_id><code>306.47</code></Table1>
-<Table1><tag_id>1756</tag_id><code>591.56</code></Table1>
-<Table1><tag_id>1757</tag_id><code>809.93364</code></Table1>
-<Table1><tag_id>1760</tag_id><code>111.85</code></Table1>
-<Table1><tag_id>1765</tag_id><code>843.914</code></Table1>
-<Table1><tag_id>1767</tag_id><code>301.01</code></Table1>
-<Table1><tag_id>1770</tag_id><code>759.06</code></Table1>
-<Table1><tag_id>1776</tag_id><code>401.43</code></Table1>
-<Table1><tag_id>1778</tag_id><code>530.12</code></Table1>
-<Table1><tag_id>1781</tag_id><code>110</code></Table1>
-<Table1><tag_id>1783</tag_id><code>025.177</code></Table1>
-<Table1><tag_id>1785</tag_id><code>152.46</code></Table1>
-<Table1><tag_id>1795</tag_id><code>303.4834</code></Table1>
-<Table1><tag_id>1799</tag_id><code>152.14</code></Table1>
-<Table1><tag_id>1800</tag_id><code>760</code></Table1>
-<Table1><tag_id>1801</tag_id><code>001.4226028566</code></Table1>
-<Table1><tag_id>1802</tag_id><code>370.152</code></Table1>
-<Table1><tag_id>1803</tag_id><code>410.92</code></Table1>
-<Table1><tag_id>1804</tag_id><code>146.44</code></Table1>
-<Table1><tag_id>1806</tag_id><code>833</code></Table1>
-<Table1><tag_id>1808</tag_id><code>818.5407</code></Table1>
-<Table1><tag_id>1809</tag_id><code>909.82</code></Table1>
 <Table1><tag_id>1810</tag_id><code>415</code></Table1>	
 </DataTable>
-	
 	");
 	$time_start = microtime(true);
 	foreach ($code->Table1 as $tag) {
@@ -160,7 +54,8 @@ try {
 		$time = $time_end - $time_start;
 		echo $time." ".$tag->tag_id." : ".$tag->code." - ".$tag->desc."<br/>";
 	}
-	//
+	*/
+	
 	/*
 	$d = new Flux_Amazon("flux_diigo");
 	$d->sauveActuLivre();	
