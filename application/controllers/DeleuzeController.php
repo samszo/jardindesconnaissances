@@ -59,7 +59,8 @@ class DeleuzeController extends Zend_Controller_Action {
 	 */
 	public function positionAction() {
 		
-		$auth = Zend_Auth::getInstance();
+		
+    	$auth = Zend_Auth::getInstance();
 		if ($auth->hasIdentity()) {
 		    // l'identité existe ; on la récupère
 		    $this->view->identite = $auth->getIdentity();
@@ -68,7 +69,7 @@ class DeleuzeController extends Zend_Controller_Action {
 		}else{
 		    $this->_redirect('/auth/login');
 		}
-	    $this->view->resultats = "";
+		$this->view->resultats = "";
     	if($this->_getParam('term', 0)){
 			$oD = new Flux_Deleuze($this->dbNom);
 			$oD->user = $ssUti->idUti;
