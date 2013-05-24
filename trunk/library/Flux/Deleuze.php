@@ -183,11 +183,10 @@ class Flux_Deleuze extends Flux_Site{
      */
     function getTermPositions($term, $json=false) {
 
-		try {
+    	try {
 	    	$c = str_replace("::", "_", __METHOD__).md5($term); 
 		   	$posis = $this->cache->load($c);
-	        if(!$posis){
-	        	
+		   	if(!$posis){
 	        	$lu = new Flux_Lucene();
 				$lu->db = $this->db;
 
