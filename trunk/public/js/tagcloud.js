@@ -67,7 +67,7 @@ function tagcloud(config) {
 		    	if(self.verif)self.verif = self.data;
 		    	self.data = parseData();
 		    }
-		    if(this.txt){
+		    if(self.txt){
 		    	self.data=parseText();
 		    	//hypertextualise seulement les sélections des utilisateurs
 		    	if(self.exi){

@@ -25,7 +25,7 @@
 		//affiche la carte sélectionnée
 		if(ind==1)getGeo(document.getElementById("map_canvas"));
 		if(ind==2)getTagcloud(divMap);
-		if(ind==3)getTaxoIdee(divMap, "Tweetpalette?iframe=true&tag=frontières&url=http://www.jardindesconnaissances.com/public/frontieres?id="+arrTof[iTof]['doc_id']+"&showIeml=true&idBase="+db);
+		if(ind==3)getTaxoIdee(divMap, "Tweetpalette?idPalette=2&iframe=true&tag=frontières&url=/public/frontieres?id="+arrTof[iTof]['doc_id']+"&showIeml=true&idBase="+db);
 		//affiche l'instruction suivante
 		document.getElementById("scene_1."+ind).style.display='block';
 	}

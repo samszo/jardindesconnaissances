@@ -23,6 +23,8 @@
 			$(".infoEvent").change(function () {
 				getTweet();	
 		        }).change();
+			//chargement d'une palette par défaut	
+			changePalette(document.getElementById("selectPalette"));
 		};
 
 		function multiSelect(item){
