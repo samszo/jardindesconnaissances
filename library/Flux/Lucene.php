@@ -31,6 +31,17 @@ class Flux_Lucene extends Flux_Site{
     		
     }
 
+    function normalize ($string){
+    	$a = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ
+ßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ';
+    	$b = 'aaaaaaaceeeeiiiidnoooooouuuuy
+bsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
+    	$string = utf8_decode($string);
+    	$string = strtr($string, utf8_decode($a), $b);
+    	$string = strtolower($string);
+    	return utf8_encode($string);
+    }
+    
     function addDoc($DocInfos, $replace=false) {
     	$url = $DocInfos["url"];
     	//vérifie si le document existe

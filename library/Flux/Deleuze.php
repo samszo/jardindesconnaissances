@@ -188,7 +188,8 @@ class Flux_Deleuze extends Flux_Site{
 		   	$posis = $this->cache->load($c);
 		   	if(!$posis){
 	        	$lu = new Flux_Lucene();
-				$lu->db = $this->db;
+				//$lu->index->optimize();
+	        	$lu->db = $this->db;
 
 				$dbD = new Model_DbTable_Flux_Doc($this->db);
 
@@ -196,7 +197,8 @@ class Flux_Deleuze extends Flux_Site{
 				if(!$this->audio)$this->audio = new Flux_Audio();
 				
 				//récupère les positions du term dans les documents
-				$posis = $lu->getTermPositions(array('field'=>'cours', 'text'=>$term),array("titre", "url", "mp3", "doc_id"),true);
+				$passToIndexer = $lu->normalize($term);
+				$posis = $lu->getTermPositions(array('field'=>'cours', 'text'=>$passToIndexer),array("titre", "url", "mp3", "doc_id"),true);
 	
 				//ajoute les informations du mp3
 				for ($i = 0; $i < count($posis); $i++) {
