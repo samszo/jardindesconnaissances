@@ -224,7 +224,8 @@
 		function chargeTag(tag){
 			cursor_wait();
 			d3.select('#gPosi').html("");
-			var p = {"term":tag.text, "ajax":true};
+			if(tag.x)tag = tag.text;
+			var p = {"term":tag, "ajax":true};
 			$.post("../deleuze/position", p,
 					 function(data){
 				 		//affiche les nouvelles positions
