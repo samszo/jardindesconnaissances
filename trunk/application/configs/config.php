@@ -10,6 +10,17 @@ define ("WEB_ROOT_AJAX",WEB_ROOT."/public");
 define ("SEP_PATH","/");
 
 //clef des API
+define ("KEY_ZEMANTA","");
+define ("KEY_ALCHEMY","");
+define ("KEY_GOOGLE_URL","");
+define ("KEY_AMAZON","");
+define ("KEY_AMAZON_PWD","");
+define ("AMAZON_PWD","");
+define ("AMAZON_AT","");
+define ("KEY_CEPT","");
+define ("KEY_CEPT_APP_ID","");
+define ("KEY_ZOTERO","");
+define ("ZOTERO_ID_LIB","");
 
 
 //code de s�curit� pour l'administation
@@ -30,7 +41,7 @@ defined('APPLICATION_ENV')
 
 set_include_path(ROOT_PATH.'/library');       
 
-/** Zend Framework*/
+/** Zend_Application*/
 set_include_path(get_include_path().PATH_SEPARATOR.$www."/Zend/library");
 set_include_path(get_include_path().PATH_SEPARATOR.$www."/Zend/extras/library");
 
