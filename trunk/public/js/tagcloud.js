@@ -74,7 +74,7 @@ function tagcloud(config) {
 			    	hypertextualise();	    		
 		    	}
 			    //colorise le term de la recherche
-			    showTerm();
+			    if(self.term)showTerm();
 		    	posiTxt.innerHTML = self.txt;
 		    }
 		    
