@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<title>Tag Cloud Filter</title>
+		<link rel="stylesheet" href="../css/tagcloud.css" />
+		<meta name="Description" CONTENT="comparaison de tagcloud"/>
+		<meta name="Keywords" CONTENT="tagcloud comparaison jardin connaissance"/>
+		<meta name="Author" CONTENT="Samuel Szoniecky"/>
+		<script type='text/javascript' src='../js/d3.v3.js' ></script>
+		<script type='text/javascript' src='../js/tagcloud.js' ></script>
+		<script type='text/javascript' src="../js/d3.layout.cloud.js"></script>
+	<head>
+	<body>
+		<div id="status_main" ></div>
+		<div id="posiTxt" ></div>
+		<div id="vis_main" ></div>
+		<script>
+			var data = eval(<?php echo json_encode($this->data) ?>);
+			var totTxt= "";
+			data.forEach(function(doc) {
+				totTxt += doc.data;
+			});
+			tcGlobal = new tagcloud({idDoc:"main", txt:totTxt, w:800, h:800, global:true});
+		</script>
+	</body>
+</html>
