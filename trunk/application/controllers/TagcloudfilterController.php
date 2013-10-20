@@ -73,5 +73,19 @@ class TagcloudfilterController extends Zend_Controller_Action {
 	          print_r($e);
 		}
 	}
+
+	public function compareAction() {
+		try {
+			//récupère les informations pour les input
+			$idBase = "flux_h2ptm";
+			$s = new Flux_Site($idBase);					
+			$db = new Model_DbTable_Flux_Doc($s->db);
+			$this->view->data = $db->getAll();			
+		}catch (Zend_Exception $e) {
+	          echo "Récupère exception: " . get_class($e) . "\n";
+	          echo "Message: " . $e->getMessage() . "\n";
+	          print_r($e);
+		}
+	}
 	
 }
