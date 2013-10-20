@@ -248,7 +248,7 @@
 			while (hma.firstChild) {
 				hma.removeChild(hma.firstChild);
 			}
-			if(e.selectedIndex==0) return;				
+			if(!e || e.selectedIndex==0) return;				
 			
 			//charge les valeurs
 			grilleSvg = grilles[e.selectedIndex-1];
@@ -257,7 +257,7 @@
 			nbZone = grilleSvg.repZone.length;
 			urlFond = grilleSvg.url;
 			
-			//défini les style de la heatmap
+			//défini les styles de la heatmap
 			hma.style.width = grilleSvg.widthArea;	
 			hma.style.height = grilleSvg.heightArea;
 			hma.style.top = grilleSvg.topArea;
