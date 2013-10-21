@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tweetpalette
+ * GAPAII
  * 
  * @author : samuel szoniecky
  * @version 
@@ -9,9 +9,9 @@
 
 require_once 'Zend/Controller/Action.php';
 
-class TweetpaletteController extends Zend_Controller_Action {
+class GapaiiController extends Zend_Controller_Action {
 	
-	var $dbNom = "flux_gapai";
+	var $dbNom = "flux_gapaii";
 	
 	/**
 	 * The default action - show the home page
