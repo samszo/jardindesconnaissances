@@ -20,10 +20,15 @@
 		<script src="js/gapaii/jquery.poptrox-2.2.js"></script>
 		<script src="js/gapaii/skel.min.js"></script>
 		<script src="js/gapaii/init.js"></script>
+		<script src="js/gapaii/gapaii.js"></script>
 		<noscript>
 			<link rel="stylesheet" href="css/gapaii/skel-noscript.css" />
 			<link rel="stylesheet" href="css/gapaii/style.css" />
 		</noscript>
+		<script type="text/javascript">
+			var idBase="<?php echo $this->idBase; ?>";
+			var idUti=-1;				
+		</script>
 	</head>
 	<body>
 
@@ -34,35 +39,65 @@
 					<p>Evaluation Proverbiales</p>
 				</header>
 				<footer>
-					<a href="#banner" class="button style2 scrolly">Proceed as anticipated</a>
+					<a href="#first" class="button style2 scrolly">Inscription</a>
+					<a href="#second" class="button style2 scrolly">Connexion</a>
 				</footer>
 			</section>
-		
-		<!-- Banner -->
-			<section id="banner">
-				<header>
-					<h2>This is Overflow</h2>
-				</header>
-				<p>A brand new site template designed by <a href="http://n33.co">AJ</a> for <a href="http://html5up.net/">HTML5 UP</a>.<br />
-				It’s fully responsive, built on <a href="http://skeljs.org">skelJS</a>, and of course entirely free<br />
-				under the <a href="http://html5up.net/license/">Creative Commons license</a>.</p>
-				<footer>
-					<a href="#first" class="button style2 scrolly">Act on this message</a>
-				</footer>
-			</section>
-		
 		<!-- Feature 1 -->
 			<article id="first" class="container box style1 right">
 				<a href="http://ineedchemicalx.deviantart.com/art/Time-goes-by-too-fast-335982438" class="image full"><img src="images/pic01.jpg" alt="" /></a>
 				<div class="inner">
 					<header>
-						<h2>Lorem ipsum<br />
-						dolor sit amet</h2>
+						<h2>Inscription</h2>
 					</header>
-					<p>Tortor faucibus ullamcorper nec tempus purus sed penatibus. Lacinia pellentesque eleifend vitae est elit tristique velit tempus etiam.</p>
+					<form id="inscription" name="inscription" enctype="application/x-www-form-urlencoded" action="/jardindesconnaissances/public/auth/inscription" method="post">
+						<div class="row half">
+							<input type="hidden" id="ajax" name="ajax" value="true" />
+							<div class="6u"><input type="text" class="text" id="login" name="login" value="" placeholder="Login" /></div>
+							<div class="6u"><input type="password" class="text" id="mdp" name="mdp" value="" placeholder="Mot de passe" /></div>
+						</div>
+						<div class="row half">
+							<div class="12u">
+								<input type="text" class="text" id="email" name="email" value="" placeholder="Email" />
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="12u">
+								<ul class="actions">
+									<li><input type="submit" class="button form" name="envoyer" id="boutonenvoyer" value="envoyer"></li>
+								</ul>
+							</div>
+						</div>
+					</form>
 				</div>
 			</article>
 		
+		<!-- Feature 2 -->
+			<article id="second" class="container box style1 left">
+				<a href="http://ineedchemicalx.deviantart.com/art/Time-goes-by-too-fast-335982438" class="image full"><img src="images/pic01.jpg" alt="" /></a>
+				<div class="inner">
+					<header>
+						<h2>Connexion</h2>
+					</header>
+					<form id="connexion" name="connexion" enctype="application/x-www-form-urlencoded" action="/jardindesconnaissances/public/auth/login" method="post">
+						<div class="row half">
+							<input type="hidden" name="ajax" value="true" />
+							<input type="hidden" name="idBase" value="<?php echo $this->idBase; ?>" />
+							<div class="6u"><input type="text" class="text" id="login" name="login" value="" placeholder="Login" /></div>
+							<div class="6u"><input type="password" class="text" id="password" name="password" value="" placeholder="Mot de passe" /></div>
+						</div>
+						<div class="row">
+							<div class="12u">
+								<ul class="actions">
+									<li><input type="submit" class="button form" name="submit" id="submit" value="Connexion"></li>
+								</ul>
+							</div>
+						</div>
+					</form>					
+				</div>
+			</article>
+
 		<!-- Feature 2 -->
 			<article class="container box style1 left">
 				<a href="http://ineedchemicalx.deviantart.com/art/Kingdom-of-the-Wind-348268044" class="image full"><img src="images/pic02.jpg" alt="" /></a>
