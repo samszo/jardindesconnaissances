@@ -1,0 +1,158 @@
+		
+		text {
+		  font-size: 10px;
+		  pointer-events: all;
+		}
+		
+		text.parent {
+		  fill: steelblue;
+		}
+		
+		circle {
+		  fill: #ccc;
+		  stroke: #999;
+		  pointer-events: all;
+		}
+		
+		circle.parent {
+		  fill: steelblue;
+		  fill-opacity: .1;
+		  stroke: steelblue;
+		}
+		
+		circle.parent:hover {
+		  stroke-width: .5px;
+		}
+		
+		circle.child {
+		  pointer-events: all;
+		}
+
+		path {
+		  fill: #ccc;
+		  stroke: #999;
+		  pointer-events: all;
+		}
+		
+		path.parent {
+		  fill: steelblue;
+		  fill-opacity: .1;
+		  stroke: steelblue;
+		}
+		
+		path.parent:hover {
+		  stroke-width: .5px;
+		}
+		
+		path.child {
+		  pointer-events: none;
+		}
+
+		rect {
+		  stroke: #eee;
+		  fill: #aaa;
+		  fill-opacity: .8;
+		}
+		
+		rect.parent {
+		  cursor: pointer;
+		  fill: steelblue;
+		}
+		
+	.bounds {
+	    stroke: red;
+	    fill: none;
+	}
+	
+	.tile {
+	    stroke: black;
+	    stroke-width: 1px;
+	    fill: black;
+	    fill-opacity: 0.05;
+	}
+	
+	.tile.resource {
+	    fill: grey;
+	    fill-opacity: 0.8;
+	}
+	
+	.over {
+	    fill: red !important;
+	    fill-opacity: 0.8 !important;
+	}
+	
+	.selected {
+	    fill: yellow;
+	    fill-opacity: 0.8 !important;
+	}
+	
+	div.tooltip {
+	    background: white;
+	    padding: 0px 2px;
+	    position: absolute;
+	    z-index: 10;
+	    visibility: hidden;
+	    font-size: 12px;
+	    font-family: sans-serif;
+	}
+	
+	div.visible {
+	    visibility: visible !important;
+	}		
+	
+	.fotBodyGraine{
+	}
+	
+	.fotDivGraine{
+	  vertical-align:middle;
+	  display:inline-block;
+	  line-height:1.2; /* on rétablit le line-height */
+	  text-align:center; /* ... et l'alignement du texte */
+	}
+
+	#bodyGlobal{
+		background-color:black;
+	}
+	h2{
+	  text-align:center;		
+	}
+	#divGlobal{
+		margin-left: auto;
+		margin-right: auto;
+		width:1300px;
+		height:1000px;
+		background-color:white; 
+	}
+	#divCenter{
+		margin-left: 10px;
+		vertical-align:middle;
+		display:inline-block;
+	 }
+	#divTag{
+		 width:300px; 
+		 #background-color:blue; 
+		 float:left; 
+	 }
+	 #divTagDewey{
+	 	width:300px;
+	 	height:300px; 
+		#background-color:red; 
+	 }
+	 #divTagCloud{
+		 width:300px;
+	 	 height:300px; 
+		 #background-color:green; 
+	 }
+	 #divUtiExa{
+		 float:left; 
+		 width:300px;
+	 	 height:600px; 
+		 #background-color:black; 
+	 }
+	 #divDocBranches{
+		 float:left; 
+		 width:680px;
+	 	 height:600px; 
+		 #background-color:orange; 
+	 }
+	
