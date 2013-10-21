@@ -1,15 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8" />
-	<title>Jardin des connaissances : inscription</title>
-	<link rel="stylesheet" href="../css/site.css" />
-</head>
-<body>
-	<h1>Le jardin des connaissances</h1>
-	<?php
+<?php
+	if($this->ajax){
+		echo $this->idUti;
+	}else{
 		$this->form->setAction($this->url());
-		echo $this->form;
-	?>
-  </body>
-</html>	
+		echo '<!DOCTYPE html>
+		<html>
+		<head>
+			<meta charset="utf-8" />
+			<title>Jardin des connaissances : login</title>
+			<link rel="stylesheet" href="../css/site.css" />
+		</head>
+		<body>
+			<h1>Le jardin des connaissances</h1>
+			'.$this->form.'
+		  </body>
+		</html>	';	
+	}
+?>
