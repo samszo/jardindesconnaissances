@@ -55,8 +55,13 @@ class AuthController extends Zend_Controller_Action
 		            	$ssExi->idUti = $r->uti_id;
 		            	$ssExi->role = $r->role;
 		                
-		            	$this->_redirect($redir);
-		                return;
+		            	if(isset($formData["ajax"])){
+		            		$this->view->idUti = $ssExi->idUti;
+		            		$this->view->ajax = true;
+		            	}else{
+			            	$this->_redirect($redir);
+			                return;
+		            	}
 		            }
 				}
 	        }
@@ -75,9 +80,13 @@ class AuthController extends Zend_Controller_Action
     		$this->view->form = $form = new Form_Auth_Inscription();
    	    	if($this->getRequest()->isPost()){
 				$formData = $this->getRequest()->getPost();
+				$this->view->ajax = isset($formData['ajax']);
 				if($form->isValid($formData)){
 					//supprime les données du bouton
-					unset($formData['envoyer']);
+					unset($formData['envoyer']);					
+					//supprime les données du type de reponse
+					unset($formData['ajax']);					
+					
 					$formData['ip_inscription'] = $_SERVER['REMOTE_ADDR'];
 					$formData['date_inscription'] = date('Y-m-d H:i:s');
 					//print_r($formData);
@@ -88,10 +97,16 @@ class AuthController extends Zend_Controller_Action
 						$db = $site->getDb($ssExi->dbNom);						
 						$dbUti = new Model_DbTable_Flux_Uti($db);
 					}else $dbUti = new Model_DbTable_Flux_Uti();					
-					$dbUti->ajouter($formData);
-					$this->_redirect('auth/login');
+					$idUti = $dbUti->ajouter($formData);
+					if($this->view->ajax)
+						$this->view->idUti = $idUti;
+					else
+						$this->_redirect('auth/login');
 				}else{
-					$form->populate($formData);
+					if($this->view->ajax)
+						$this->view->idUti = -1;
+					else
+						$form->populate($formData);
 				}
 				
 			}    			        
@@ -101,4 +116,5 @@ class AuthController extends Zend_Controller_Action
 		    echo "Message: " . $e->getMessage() . "\n";
 		}	        
     }
+    
 }

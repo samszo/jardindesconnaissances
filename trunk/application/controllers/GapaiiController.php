@@ -25,10 +25,8 @@ class GapaiiController extends Zend_Controller_Action {
 			    $this->view->identite = $auth->getIdentity();
 			    $ssUti = new Zend_Session_Namespace('uti');
 			    $this->view->idUti = $ssUti->idUti;
-			    $this->view->idBase = $this->dbNom;
-			}else{
-			    $this->_redirect('/auth/login?redir=gapai&idBase='.$this->dbNom);
 			}
+		    $this->view->idBase = $this->dbNom;
 		}catch (Zend_Exception $e) {
 	          echo "Récupère exception: " . get_class($e) . "\n";
 	          echo "Message: " . $e->getMessage() . "\n";
