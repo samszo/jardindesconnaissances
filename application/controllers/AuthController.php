@@ -16,13 +16,15 @@ class AuthController extends Zend_Controller_Action
 			else $dbNom = $ssExi->dbNom;
 			//echo  $dbNom;
 			$db = $site->getDb($dbNom);
-
+			
+			if(isset($ssExi->redir)){
+				$redir=$ssExi->redir;
+			} 
 			if($this->_getParam('redir', 0)){
 				$redir='/'.$this->_getParam('redir', 0);
 				$ssExi->redir = $redir;
-			}elseif(!isset($ssExi->redir)) $redir='/deleuze/navigation';
-			else $redir=$ssExi->redir; 
-			//echo  $redir;
+			}
+			echo  $redir;
 			
 	    	// Obtention d'une référence de l'instance du Singleton de Zend_Auth
 			$auth = Zend_Auth::getInstance();
@@ -33,8 +35,10 @@ class AuthController extends Zend_Controller_Action
 			if ($this->getRequest()->isPost()) {
 		        $formData = $this->getRequest()->getPost();
 		        
-		        if(isset($formData["crea"]))$this->_redirect('auth/inscription');
-				
+		        if(isset($formData["crea"])) $this->_redirect('auth/inscription');
+		        if(isset($formData["ajax"])) $this->view->ajax = true;
+		        else $this->view->ajax = false;
+		        
 		        if ($loginForm->isValid($formData)) {
 		            $adapter = new Zend_Auth_Adapter_DbTable(
 		                $db,
@@ -55,12 +59,26 @@ class AuthController extends Zend_Controller_Action
 		            	$ssExi->idUti = $r->uti_id;
 		            	$ssExi->role = $r->role;
 		                
-		            	if(isset($formData["ajax"])){
+		            	if($this->view->ajax){
 		            		$this->view->idUti = $ssExi->idUti;
-		            		$this->view->ajax = true;
 		            	}else{
 			            	$this->_redirect($redir);
 			                return;
+		            	}
+		            }else{
+		            	switch ($result->getCode()) {
+		            		case 0:
+								$this->view->erreur = "Problème d'identification. Veuillez contacter le webmaster.";		            	
+			            		break;		            		
+		            		case -1:
+								$this->view->erreur = "Le login n'a pas été trouvé.";		            	
+			            		break;		            		
+		            		case -2:
+								$this->view->erreur = "Le login est ambigue.";		            	
+			            		break;		            		
+		            		case -2:
+								$this->view->erreur = "Le login et/ou le mot de passe ne sont pas bons.";		            	
+			            		break;		            		
 		            	}
 		            }
 				}
@@ -81,11 +99,12 @@ class AuthController extends Zend_Controller_Action
    	    	if($this->getRequest()->isPost()){
 				$formData = $this->getRequest()->getPost();
 				$this->view->ajax = isset($formData['ajax']);
+				if(isset($formData['idBase']))$ssExi->dbNom=$formData['idBase'];						
 				if($form->isValid($formData)){
-					//supprime les données du bouton
+					//supprime les données superflux
 					unset($formData['envoyer']);					
-					//supprime les données du type de reponse
 					unset($formData['ajax']);					
+					unset($formData['idBase']);					
 					
 					$formData['ip_inscription'] = $_SERVER['REMOTE_ADDR'];
 					$formData['date_inscription'] = date('Y-m-d H:i:s');
