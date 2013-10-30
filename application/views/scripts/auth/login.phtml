@@ -1,6 +1,7 @@
 <?php
 	if($this->ajax){
 		echo $this->idUti;
+		echo $this->erreur;
 	}else{
 		$this->form->setAction($this->url());
 		echo '<!DOCTYPE html>
@@ -12,6 +13,7 @@
 		</head>
 		<body>
 			<h1>Le jardin des connaissances</h1>
+			<h4>'.$this->erreur.'</h4>
 			'.$this->form.'
 		  </body>
 		</html>	';	

@@ -1,5 +1,5 @@
 <?php
-
+	
 ?>
 <!DOCTYPE HTML>
 <!--
@@ -28,7 +28,13 @@
 		<script type="text/javascript">
 			var idBase="<?php echo $this->idBase; ?>";
 			var idUti=-1;				
-		</script>
+		    var urlGen = "http://localhost/generateur/services/api.php?oeu=6";
+	        function load(idDiv, idCpt) {
+	            d3.text(urlGen+"&cpt="+idCpt, function(fragment) {
+	                d3.select("#"+idDiv).html(fragment);
+	            });
+	        }
+	    </script>
 	</head>
 	<body>
 
@@ -36,7 +42,7 @@
 			<section id="header">
 				<header>
 					<h1>GAPAII</h1>
-					<p>Evaluation Proverbiales</p>
+					<p>Interprétations Proverbiales</p>
 				</header>
 				<footer>
 					<a href="#first" class="button style2 scrolly">Inscription</a>
@@ -45,14 +51,15 @@
 			</section>
 		<!-- Feature 1 -->
 			<article id="first" class="container box style1 right">
-				<a href="http://ineedchemicalx.deviantart.com/art/Time-goes-by-too-fast-335982438" class="image full"><img src="images/pic01.jpg" alt="" /></a>
+				<a href="http://ineedchemicalx.deviantart.com/art/Time-goes-by-too-fast-335982438" class="image full"><img src="img/gapaii/pic01.jpg" alt="" /></a>
 				<div class="inner">
 					<header>
 						<h2>Inscription</h2>
 					</header>
-					<form id="inscription" name="inscription" enctype="application/x-www-form-urlencoded" action="/jardindesconnaissances/public/auth/inscription" method="post">
+					<form id="inscription" name="inscription" enctype="application/x-www-form-urlencoded" action="<?php echo WEB_ROOT;?>/public/auth/inscription" method="post">
 						<div class="row half">
 							<input type="hidden" id="ajax" name="ajax" value="true" />
+							<input type="hidden" name="idBase" value="<?php echo $this->idBase; ?>" />
 							<div class="6u"><input type="text" class="text" id="login" name="login" value="" placeholder="Login" /></div>
 							<div class="6u"><input type="password" class="text" id="mdp" name="mdp" value="" placeholder="Mot de passe" /></div>
 						</div>
@@ -75,17 +82,17 @@
 		
 		<!-- Feature 2 -->
 			<article id="second" class="container box style1 left">
-				<a href="http://ineedchemicalx.deviantart.com/art/Time-goes-by-too-fast-335982438" class="image full"><img src="images/pic01.jpg" alt="" /></a>
+				<a href="http://ineedchemicalx.deviantart.com/art/Time-goes-by-too-fast-335982438" class="image full"><img src="img/gapaii/pic01.jpg" alt="" /></a>
 				<div class="inner">
 					<header>
 						<h2>Connexion</h2>
 					</header>
-					<form id="connexion" name="connexion" enctype="application/x-www-form-urlencoded" action="/jardindesconnaissances/public/auth/login" method="post">
+					<form id="connexion" name="connexion" enctype="application/x-www-form-urlencoded" action="<?php echo WEB_ROOT;?>/public/auth/login" method="post">
 						<div class="row half">
 							<input type="hidden" name="ajax" value="true" />
 							<input type="hidden" name="idBase" value="<?php echo $this->idBase; ?>" />
-							<div class="6u"><input type="text" class="text" id="login" name="login" value="" placeholder="Login" /></div>
-							<div class="6u"><input type="password" class="text" id="password" name="password" value="" placeholder="Mot de passe" /></div>
+							<div class="6u"><input type="text" class="text" name="login" value="" placeholder="Login" /></div>
+							<div class="6u"><input type="password" class="text" name="password" value="" placeholder="Mot de passe" /></div>
 						</div>
 						<div class="row">
 							<div class="12u">
@@ -100,35 +107,28 @@
 
 		<!-- Feature 2 -->
 			<article class="container box style1 left">
-				<a href="http://ineedchemicalx.deviantart.com/art/Kingdom-of-the-Wind-348268044" class="image full"><img src="images/pic02.jpg" alt="" /></a>
+				<a href="http://ineedchemicalx.deviantart.com/art/Kingdom-of-the-Wind-348268044" class="image full"><img src="img/gapaii/pic02.jpg" alt="" /></a>
 				<div class="inner">
 					<header>
-						<h2>Mollis posuere<br />
-						lectus lacus</h2>
+						<h2>Proverbes</h2>
 					</header>
-					<p>Rhoncus mattis egestas sed fusce sodales rutrum et etiam ullamcorper. Etiam egestas scelerisque ac duis magna lorem ipsum dolor.</p>
+					<p id="genPro"></p>
+					<input type="submit" class="button form" name="submit" id="submit" value="Génère">
 				</div>
 			</article>
 		
 		<!-- Portfolio -->
 			<article class="container box style2">
 				<header>
-					<h2>Magnis parturient</h2>
-					<p>Justo phasellus et aenean dignissim<br />
-					placerat cubilia purus lectus.</p>
+					<h2>Partenaires du projet</h2>
+					<p></p>
 				</header>
 				<div class="inner gallery">
 					<div class="row flush">
-						<div class="3u"><a href="images/fulls/01.jpg" class="image full"><img src="images/thumbs/01.jpg" alt="" title="Ad infinitum" /></a></div>
-						<div class="3u"><a href="images/fulls/02.jpg" class="image full"><img src="images/thumbs/02.jpg" alt="" title="Dressed in Clarity" /></a></div>
-						<div class="3u"><a href="images/fulls/03.jpg" class="image full"><img src="images/thumbs/03.jpg" alt="" title="Raven" /></a></div>
-						<div class="3u"><a href="images/fulls/04.jpg" class="image full"><img src="images/thumbs/04.jpg" alt="" title="I'll have a cup of Disneyland, please" /></a></div>
-					</div>
-					<div class="row flush">
-						<div class="3u"><a href="images/fulls/05.jpg" class="image full"><img src="images/thumbs/05.jpg" alt="" title="Cherish" /></a></div>
-						<div class="3u"><a href="images/fulls/06.jpg" class="image full"><img src="images/thumbs/06.jpg" alt="" title="Different." /></a></div>
-						<div class="3u"><a href="images/fulls/07.jpg" class="image full"><img src="images/thumbs/07.jpg" alt="" title="History was made here" /></a></div>
-						<div class="3u"><a href="images/fulls/08.jpg" class="image full"><img src="images/thumbs/08.jpg" alt="" title="People come and go and walk away" /></a></div>
+						<div class="3u"><a href="img/gapaii/fulls/02.jpg" class="image full"><img src="img/logoArtsH2H.png" alt="" title="LABEX ARTS H2H" /></a></div>
+						<div class="3u"><a href="http://www.paragraphe.info" class="image full"><img src="img/logo_paragraphe.gif" alt="" title="Laboratoire Paragraphe" /></a></div>
+						<div class="3u"><a href="img/gapaii/fulls/03.jpg" class="image full"><img src="img/logoDIPRALANG.png" alt="" title="Laboratoire DIPRALANG" /></a></div>
+						<div class="3u"><a href="img/gapaii/fulls/04.jpg" class="image full"><img src="img/logoUMR7023.png" alt="" title="Laboratoire" /></a></div>
 					</div>
 				</div>
 			</article>
