@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Google Visualization API Sample</title>
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript">
+    google.load('visualization', '1', {packages: ['geochart']});
+
+    function drawVisualization() {
+
+      /*
+    	var data = google.visualization.arrayToDataTable([
+            ['Pays', 'Conférence', 'Jury'],
+            ['Argentina',1,1],
+            ['Belgium',9,9],
+            ['Brasil',3,3],
+            ['Bulgaria',1,1],
+            ['Canada',5,5],
+            ['Dubai',1,1],
+            ['Espana',1,1],
+            ['Finland',1,1],
+            ['Grèce',3,3],
+            ['Haïti',1,1],
+            ['Hong Kong',2,2],
+            ['India',1,1],
+            ['Ireland',2,2],
+            ['Italia',6,6],
+            ["Cote d'Ivoire",1,1],
+            ['Japan',1,1],
+            ['Malta',1,1],
+            ['Marocco',3,3],
+            ['Mexico',1,1],
+            ['Rwanda',1,1],
+            ['Senegal',1,1],
+            ['Sweeden',3,3],
+            ['United Kingdom',10,10],
+            ['United States',4,4],
+            ['Vietnam',1,1],
+            ['Algeria',1,1],
+            ['Germany',1,1],
+            ['Austria',1,1],
+            ['Kosovo',1,1],
+            ['Denmark',1,1],
+            ['Greece',1,1],
+            ['Norway',2,2],
+            ['Netherlands',4,4],
+            ['Russia',1,1],
+            ['Switzerland',4,4],
+            ['Tunisia',6,6],
+            ['Turkey',1,1]
+            ]);
+     */
+     
+ 	var data = google.visualization.arrayToDataTable([
+	['Ville', 'Contacts'],
+     ['Aix en Provence',7],
+     ['Ajaccio',1],
+     ['Avignon',2],
+     ['Beaune',1],
+     ['Besançon',3],
+     ['Biarritz',1],
+     ['Bordeaux',6],
+     ['Brest',1],
+     ['Chambéry',1],
+     ['Dijon',2],
+     ['Douai',1],
+     ['Grenoble',9],
+     ['Hyeres',1],
+     ['Lille',8],
+     ['Lorient',1],
+     ['Lyon',12],
+     ['Marseille',6],
+     ['Metz',6],
+     ['Montélimar',4],
+     ['Montpellier',4],
+     ['Nancy',5],
+     ['Nantes',1],
+     ['Nice',2],
+     ['Orléans',1],
+     ['Perpignan',1],
+     ['Poitiers',2],
+     ['Reims',1],
+     ['Rennes',3],
+     ['Rouen',2],
+     ['Saint-Etienne',4],
+     ['Saint-Nazaire',1],
+     ['Strasbourg',4],
+     ['Tarbes',1],
+     ['Toulouse',14],
+     ['Tours',4],
+     ['Valenciennes',3],
+     ]);
+
+	var options = {
+		region: 'FR',
+        displayMode: 'markers',
+        colorAxis: {colors: ['green', 'blue']},
+		width: 400, 
+		height: 300
+      };
+      
+      var geochart = new google.visualization.GeoChart(
+          document.getElementById('visualization'));
+      geochart.draw(data, options);
+    }
+    
+
+    google.setOnLoadCallback(drawVisualization);
+  </script>
+</head>
+<body style="font-family: Arial;border: 0 none;">
+<div id="visualization"></div>
+</body>
+</html>
+​
