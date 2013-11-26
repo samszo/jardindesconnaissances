@@ -31,10 +31,11 @@ try {
 	$tp = new Flux_Tweetpalette('flux_tweetpalette');
 	$json = $tp->getPaletteClics('bernard stiegler', 'http://www.capdigital.com/evenements/enmi/', "../data/tweetpalette/AxePertiClair.png", 'ENMI', true);
 	*/
-	//
+	/*
 	$zotero = new Flux_Zotero($user);
 	$arr = $zotero->getDeweyTagDoc();
 	print_r($arr);
+	*/
 	/*
 	//$zotero->saveAll();
 	//$zotero->sauveOCLCInfo();
@@ -197,13 +198,12 @@ try {
 	
 	
 	//$response = "OK bootstrap<br/><br/>";
-	/*
-	$oD = new Flux_Deleuze();
+	//
+	$oD = new Flux_Deleuze("flux_DeleuzeSpinoza");
 	$oD->user = 2;
-	$oD->convertMp3ToOgg();
-	$arr = $oD->getTermPositions("intuition");
-	
-	$oD->getLocalMp3();
+	//$oD->convertMp3ToOgg();
+	$arr = $oD->getTermPositions("médiocre");	
+	//$oD->getLocalMp3();
 
 	
 	    
