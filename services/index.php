@@ -11,7 +11,7 @@ try {
 	
 	$server = new Zend_Amf_Server();
 	
-	$server->setClass('Flux_tagOcrible');
+	//$server->setClass('Flux_tagOcrible');
 	
 	$response = $server->handle();
 
