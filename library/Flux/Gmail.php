@@ -92,8 +92,8 @@ class Flux_Gmail extends Flux_Site{
 		$nbMessage = $this->imap->countMessages();
 		//parcourt tout les messages du dossier
 		//pour lire dés le départ $i=1
-		for ($i = 1; $i <= $nbMessage; $i++) {
-		//for ($i = 1; $i <= 1181; $i++) {
+		for ($i = 20; $i <= $nbMessage; $i++) {
+		//for ($i = 1000; $i <= 1181; $i++) {
 			$this->i = $i;
 			//récupération du message
 			$this->message = $this->imap->getMessage($i);
@@ -120,8 +120,15 @@ class Flux_Gmail extends Flux_Site{
 				case "rhizome":
 					if($this->headers["return-path"]=="<discuss@rhizome.org>" || $this->headers["return-path"]=="<announce@rhizome.org>"){
 						//enregistre le document
-						
 						$this->saveRhizomeContent($this->content);						
+					}
+					break;
+				case "ADIT":
+					if($this->headers["return-path"]!="<automates-intelligents-html-owner@kiosqueist.com>" && $this->headers["return-path"]!="<ilcf-owner@forums.intelligence-complexite.org>"){
+						//enregistre le document
+						$idD = $this->saveMail();
+						//déconstruction du document						
+						$this->saveMessageADDITContent($this->content);						
 					}
 					break;
 				default:
@@ -196,6 +203,14 @@ class Flux_Gmail extends Flux_Site{
 		if(substr($subject, 0,15)=="Alerte Google -")return "google_alerte";
 		
 		return "";
+	}
+
+	function saveMessageADDITContent($content){
+		//charge le contenu dans un dom
+		$dom = new Zend_Dom_Query($content);
+		//récupère les éléments de l'alerte
+		$results = $dom->query('//td');
+	
 	}
 	
 	function saveMessageGoogleAlertContent($content){
