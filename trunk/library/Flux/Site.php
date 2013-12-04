@@ -30,8 +30,20 @@ class Flux_Site{
 	var $db;
 	var $lucene;
 	var $kwe = array("zemanta", "alchemy", "yahoo");
+    //pour l'optimisation
+    var $bTrace = false;
+    var $echoTrace = false;
+    var $temps_debut;
+    var $temps_inter;
+    var $temps_nb=0;
 	
     function __construct($idBase=false){    	
+    	
+    	/*
+    	$this->bTrace = $trace; // pour afficher les traces   	
+    	$this->temps_debut = microtime(true);
+		$this->trace("DEBUT ".__METHOD__);
+    	*/
     	
     	$this->getDb($idBase);
     	
@@ -51,6 +63,28 @@ class Flux_Site{
                                      $backendOptions); 
     }
 
+	/**
+	* fonction pour tracer l'éxécution du code
+	*
+    * @param string $message
+    * 
+    */
+	public function trace($message){
+		if($this->bTrace){
+			$temps_fin = microtime(true);
+			$tG = str_replace(".",",",round($temps_fin - $this->temps_debut, 4));
+			$tI = str_replace(".",",",round($temps_fin - $this->temps_inter, 4));
+			$mess = $this->temps_nb." | ".$message." |".$tG."|".$tI."<br/>";
+			if($this->echoTrace)
+				$this->echoTrace .= $mess;
+			else
+				echo $mess;
+			$this->temps_inter = $temps_fin;
+			$this->temps_nb ++;
+		}		
+	}
+    
+    
     /**
     * @param string $c
     */
