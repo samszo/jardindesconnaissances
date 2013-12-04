@@ -8,6 +8,11 @@ try {
 	$user = "luckysemiosis";
 	$pwd = "samszo";
 	
+	
+	$eval = new Flux_Eval('flux_gapaii');
+	$eval->saveSem('flux_gapaii', $idDoc, $idUti, $sem);
+
+	
 
 	/*
 	$s = new Flux_Site('flux_zotero');
@@ -157,7 +162,8 @@ try {
 	$arr = $s->getKWYahoo($arrD[0]['note']);	
 	*/
 	
-	/*$arrD =  $dbDoc->findByType(57);
+	/*
+	$arrD =  $dbDoc->findByType(57);
 	$i = 0;
 	foreach ($arrD as $doc_id) {
 		$d = $dbDoc->findBydoc_id($doc_id);
@@ -166,7 +172,17 @@ try {
 		$i++;
 	}
 	*/
-	
+
+	/*
+	$s = new Flux_Site("flux_h2ptm");
+	$dbDoc = new Model_DbTable_Flux_Doc($s->db);
+	$arrD = $dbDoc->getAll();
+	$i = 0;
+	foreach ($arrD as $d) {
+		$s->saveKW($d['doc_id'], $d['data'],"","autokeyword");
+		$i++;
+	}
+	*/
 	
     //pour gérer les compte mail
     //$gm = new Flux_Gmail("samszon","Janvier2010","flux_gmail_intelligence_collective");
@@ -180,9 +196,10 @@ try {
 	//$dbD = new Model_DbTable_flux_tagdoc($s->db);
 	//$rs = $dbD->findDocTroncByTagId("10", array("intelligence","collective"));
 	
-	//$s = new Flux_Stats("flux_zotero");
-	//$stats = $s->GetMatriceTagAssos(array("intelligence","collective"),-1);	    
-	
+	/*
+	$s = new Flux_Stats("flux_zotero");
+	$stats = $s->GetMatriceTagAssos(array("intelligence","collective"),-1);	    
+	*/
 	
     //$diigo = new Flux_Diigo($user,$pwd,"flux_diigo");
 	//$diigo->saveAll();
@@ -191,19 +208,20 @@ try {
 	//$diigo->getRequest(array("user"=>$user,"count"=>100));
     //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));	
 		
-	//$audio = new Flux_Audio(false);
+	$audio = new Flux_Audio(false);
 	//$audio->getOggInfos("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
 	//$audio->convertMp3ToOgg("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.mp3", "c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
 	//$audio->coupe("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.mp3", "c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106_100_10.ogg", 400, 10);
-	
+	$arr = $audio->getWave("../data/audios/De_0954881269_10112013_18h02_527fbc5098a68.wav");	    
 	
 	//$response = "OK bootstrap<br/><br/>";
-	//
-	$oD = new Flux_Deleuze("flux_DeleuzeSpinoza");
+	/*
+	$oD = new Flux_Deleuze();
 	$oD->user = 2;
-	//$oD->convertMp3ToOgg();
-	$arr = $oD->getTermPositions("médiocre");	
-	//$oD->getLocalMp3();
+	$oD->convertMp3ToOgg();
+	$arr = $oD->getTermPositions("intuition");
+	
+	$oD->getLocalMp3();
 
 	
 	    
