@@ -40,10 +40,12 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
 		$select->from($this, array('ieml_id'));
 		foreach($data as $k=>$v){
 			$select->where($k.' = ?', $v);
+	    	echo($k." = ".$v);       
 		}
-	    $rows = $this->fetchAll($select);        
+	    $rows = $this->fetchAll($select); 
 	    if($rows->count()>0)$id=$rows[0]->ieml_id; else $id=false;
-        return $id;
+	    echo($id);       
+	    return $id;
     } 
         
     /**

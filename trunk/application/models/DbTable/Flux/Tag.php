@@ -310,11 +310,11 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
      * 
      * @return array
      */
-	function getTagAssos($arrTags, $tronc=-1) {
+	function getTagAssos($arrTags, $tronc=0) {
 
 		//vérifie si on prend les tags du document racine ou de ces éléments
 		$where = " ";
-		if($tronc>-1){
+		if($tronc>0){
 			$where = ' AND d.tronc = '.$tronc;
 		}
 		//définition de la requête
@@ -333,7 +333,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
             ->group("t1.tag_id")
             ->order("t1.code");
 
-         if($tronc!=0){
+         if($tronc > 0){
          	$query->joinLeft(array('dP' => 'flux_doc'),'dP.doc_id = d.tronc',array("tronc","nbTronc"=>"COUNT(DISTINCT(dP.doc_id))"));
          }
             
