@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+  
+  <head data-gwd-animation-mode="proMode">
+    <title>Navigation dans les évaluations</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="../js/d3.v3.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript">
+    	var utis = <?php echo json_encode($this->utis); ?>;
+    	var docs = <?php echo json_encode($this->docs); ?>;
+    	var tags = <?php echo json_encode($this->tags); ?>;
+    	var links = <?php echo json_encode($this->links); ?>;
+    	var idBase = '<?php echo $this->idBase; ?>';
+		var svg;
+		var visDocText;
+		var distCielTerre = 300;
+		
+		function init(){
+	    	//création du svg
+	         svg = d3.select("#viz")
+		        .append("svg:svg")
+	    	    .attr("width", 800)
+	        	.attr("height", 440)
+		        .append("svg:g");
+
+		 	//creaLinks();
+	    	creaDocs();
+	    	creaUtis();
+	    	creaTags();
+		}
+
+		function creaDocs(){
+			var x = 400, y = 10, fontSize=20;
+			visDocText = svg.selectAll(".gDoc")
+		      .data(docs)
+		      .enter()
+		      .append("svg:g")
+				.attr("class", "gDoc")	            
+				.attr("id", function(d, i) {  return "gDoc"+d.doc_id; })
+		      .on("mouseover", function(d){
+	            	/* enhance all the links that end here
+	                enhanceNode (d);
+	                d3.select(this)
+	                    .style('fill',control.options.routeFocusStroke);
+                    */
+                    console.log(d.data);
+	            });
+			visDocText.append("svg:text")
+	            .attr("x", function(d, i) {
+	                return x;
+	            })
+	            .attr("y", function(d, i) {
+	                return y-(distCielTerre*i);
+	            })
+				.attr("class", function(d) { 
+		    	  return "txtDoc"; 
+		    	 })
+	            .style("font-size",fontSize + "px")
+	            .text(function(d) {
+	                return d.data;
+	            })
+		      .attr("text-anchor", "middle");
+            var txtFrere;
+			visDocText.append("svg:rect")
+	            .attr("x", function(d, i) {
+	            	txtFrere = this.parentElement.childNodes[0]
+	                return txtFrere.offsetLeft-fontSize;
+	            })
+	            .attr("y", function(d, i) {
+	                return y-(distCielTerre*i)-fontSize;
+	            })
+			    .style("fill","none")
+			    .style("stroke","black")
+	            .attr("width", function(d, i) {
+	            	txtFrere = this.parentElement.childNodes[0]
+	                return txtFrere.offsetWidth+(fontSize*2);
+	            })
+	            .attr("height", function(d, i) {
+	            	txtFrere = this.parentElement.childNodes[0]
+	                return txtFrere.offsetHeight+(fontSize/2);
+	            });
+            
+			visDocText.transition()
+				    .duration(0)
+				    .style("font-size",fontSize + "px")
+				    //.each("end", apparitionContinu);				    
+				     .each("end", pluieContinu);
+	            
+		}
+
+		function pluieRetour(d, i) {
+			  d3.select(this)
+			    .transition()
+			    .ease("linear")
+			    .duration(0)
+			    .attr("transform", function(d) {return "translate(0, 0)";})
+			    .each("end", pluieContinu);
+			}		 
+		function pluieContinu(d, i) {
+			var idDoc = this.__data__.doc_id;
+			d3.select(this)
+			  	.transition()
+			    .duration(docs.length*distCielTerre*20)
+			    .ease("linear")
+			    .attr("transform", function(d) {return "translate(0, "+(docs.length*distCielTerre)+")";})
+			    .each("end", pluieRetour);
+		    /*
+			d3.select("#gLink"+idDoc)
+			  	.transition()
+			    .duration(docs.length*distCielTerre*20)
+			    .ease("linear")
+			    .attr("d", function(d) {
+					var docLien = d3.select("#gDoc"+idDoc)[0][0];
+					var nd = "m 400,"+docLien.offsetTop+" 600,"+distCielTerre; 
+			    	return nd;
+				    })
+			    .each("end", pluieRetour);	    
+		    */							  
+		}		 
+
+		function apparitionContinu(d, i) {
+			var idDoc = this.__data__.doc_id;
+			d3.select(this)
+			  	.transition()
+			    .duration(10000)
+			    .ease("linear")
+			    .attr("transform", function(d) {return "scale(1000, 1000)";})
+			    .each("end", apparitionRetour);
+		}		 
+		function apparitionRetour(d, i) {
+			  d3.select(this)
+			    .transition()
+			    .ease("linear")
+			    .duration(0)
+			    .attr("transform", function(d) {return "translate(0, 0)";})
+			    .each("end", apparitionContinu);
+			}		 
+		
+		
+
+		function creaUtis() {
+			var x = 300, y = 240, pas=110, exaSize=100;
+			//création du cercle de l'intériorité
+			svg.append("svg:circle")
+			    .attr("cx",400)
+			    .attr("cy",8240)
+			    .attr("r",8000)
+			    .style("fill","black");
+
+			//création des utilisateurs
+			var visUtiExa = svg.selectAll("gUti")
+		      	.data(utis)
+				.enter()
+		        .append('svg:g')
+		        .attr("id", function(d, i) {  return "gUti"+d.uti_id; })	            
+		        .attr("class", "gUti");
+			visUtiExa.append('svg:polygon')
+		        .classed('tile', true)
+			    .style("stroke","white")
+		        .attr('points', function(d, i) {
+		            return hex([x+(pas*i),y], exaSize, false).join(' ');
+		        });		    
+			visUtiExa.append("svg:text")
+		        	.attr("text-anchor", "middle")
+		        	.style("font-size", 16)
+				    .style("fill","white")
+				    .attr("x",function(d, i) { return x+(pas*i) })
+				    .attr("y",function(d, i) { return y })
+				    .text(function(d) { 
+				    	return d.login; 
+				    	});
+	        
+		}
+		
+		function creaTags() {
+			var x = 100, y = 360, pas=70, bulleSize=30;
+			var visTagBulle = svg.selectAll(".gTag")
+		      	.data(tags)
+				.enter()
+		        .append('svg:g')
+		        .attr("id", function(d, i) {  return "gTag"+d.tag_id; })	            
+		        .attr("class","gTag") ;
+			visTagBulle.append('svg:circle')
+		      .attr("cx", function(d,i) { 
+			      return x+(pas*i); 
+			      })
+		      .attr("cy", function(d, i) { 
+		    	  return y
+			      })
+		      .attr("r", function(d) { return bulleSize; })
+		      .style("fill","white")
+		      .style("stroke","black")
+		      ;
+			visTagBulle.append("svg:text")
+		        	.attr("text-anchor", "middle")
+		        	.style("font-size", 16)
+				    .style("fill","black")
+				    .attr("x",function(d,i) { 
+					      return x+(pas*i); 
+				      })
+				    .attr("y", y)
+				    .text(function(d) { 
+				    	return d.code; 
+				    	});
+	        
+		}
+		function hex(centroid, size, tilted) {
+		    var a = size / 2, 
+		        b = (Math.sqrt(3) * a) / 2,
+		        x = centroid[0],
+		        y = centroid[1];
+		    return tilted
+		        ? [[x - a / 2, y - b], [x - a, y], [x - a / 2, y + b], [x + a / 2, y + b], [x + a, y], [x + a / 2, y - b]]
+		        : [[x - b, y - a / 2], [x - b, y + a / 2], [x, y + a], [x + b, y + a / 2], [x + b, y - a / 2], [x, y - a]];
+		}
+
+		function creaLinks() {
+			var x = 200, y = 360, pas=70;
+			var visLinksPath = svg.selectAll(".gLink")
+		      	.data(links)
+				.enter()
+		        .append('svg:path')
+		        .attr("id", function(d, i) {  return "gLink"+d.doc_id; })	            
+		        .attr("class","gLink")
+			    .attr("d", function(d,i) { 
+			      return "m 400,0 "+(x+(pas*i))+","+y+" 10,10 20,20";
+			      })
+		      .style("stroke","black")
+		      .style("stroke-width",2)
+		      ;
+		}
+		
+    	
+    </script>
+    <style type="text/css">
+      html, body {
+        width: 800px;
+        height: 440px;
+        margin: 0px;
+      }
+    </style>
+  </head>
+  
+  <body onload="init()" >
+  	<div id="viz">
+  	</div>
+  
+  </body>
+</html>
