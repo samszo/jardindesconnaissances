@@ -21,7 +21,7 @@ class Form_Auth_Inscription extends Zend_Form
 		  ->addFilter('StringTrim')
 		  ->setRequired(true)
 		  //->addValidator($loginDoesntExist)
-		  ->addValidator('StringLength', false, array(6, 20))
+		  ->addValidator('StringLength', false, array(3, 20))
 		  ->setDescription("Login entre 6 et 20 charactères.");
 		  
 		//problème avec la connexion par défaut à la base
