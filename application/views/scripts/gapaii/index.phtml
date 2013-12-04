@@ -15,7 +15,9 @@
 		<meta name="Description" CONTENT="Appareil de capture sémantique pour l'interprétation de proverbes par des cartographies sémantiques"/>
 		<meta name="Keywords" CONTENT="proverbe interprétation cartographie appareil capture sémantique"/>
 		<meta name="Author" CONTENT="Samuel Szoniecky"/>
+		<!--  
 		<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,300italic" rel="stylesheet" type="text/css" />
+		-->
 		<script src="js/jquery.min.js"></script>
 		<script src="js/d3.v3.js"></script>
 		<script src="js/gapaii/jquery.poptrox-2.2.js"></script>
@@ -28,14 +30,11 @@
 		</noscript>
 		<script type="text/javascript">
 			var idBase="<?php echo $this->idBase; ?>";
-			var idUti=-1;				
-		    var urlGen = "http://localhost/generateur/services/api.php?oeu=6";
-	        function load(idDiv, idCpt) {
-	            d3.text(urlGen+"&cpt="+idCpt, function(fragment) {
-	                d3.select("#"+idDiv).html(fragment);
-	            });
-	        }
-	    </script>
+			var idUti= <?php echo $this->idUti; ?>;
+			var idOeu = <?php echo $this->idOeu; ?>;				
+			var idDoc = <?php echo $this->idDoc; ?>;				
+		    var urlGen = "http://localhost/generateur/services/api.php?oeu="+idOeu;
+	     </script>
 	</head>
 	<body>
 
@@ -106,29 +105,66 @@
 			</article>
 
 		<!-- Feature 2 -->
-			<article class="container box style1 left">
-				<a href="http://ineedchemicalx.deviantart.com/art/Kingdom-of-the-Wind-348268044" class="image full"><img src="img/gapaii/pic02.jpg" alt="" /></a>
-				<div class="inner">
-					<header>
-						<h2>Proverbes</h2>
-					</header>
-					<form>
-						<div class="row half">
-							<div class="6u" id="genPro"><br/></div>
+			<article id="generation" class="container box style3" >
+				<header>
+					<h2>Génération de proverbes</h2>
+				</header>
+				<form>
+					<div class="row">
+						<div id="genPro"><br/></div>
+					</div>
+					<div class="row">
+						<div class="12u">
+							<ul class="actions">
+								<li><a class="button form" onclick="load('genPro', <?php echo $this->idCpt; ?>)" >Génèrer</a>   <a class="button form" onclick="evaluer()" >Evaluer</a></li>
+							</ul>
 						</div>
-						<div class="row">
-							<div class="12u">
-								<ul class="actions">
-									<li><a class="button form" onclick="load('genPro', 157823)" >Génère</a></li>
-								</ul>
-							</div>
-						</div>
-					</form>					
-				</div>
+					</div>
+				</form>					
 			</article>
+			
+			<article id="evaluer" class="container box style3" >
+				<header>
+					<h2>Evaluations du proverbe</h2>
+				</header>
+				<form>
+					<div class="row" style="margin-left:auto;margin-right:auto;">
+						<iframe id="ifEval" src=""  scrolling="no" width="800" height="440">
+						  <p>Votre navigateur ne supporte pas l'élément iframe</p>
+						</iframe>														
+					</div>
+					<div class="row">
+						<div class="12u">
+							<ul class="actions">
+								<li><a href="#naviguer" class="button form" onclick="naviguer()" >Voir les interprétations</a></li>
+							</ul>
+						</div>
+					</div>
+				</form>					
+			</article>			
+
+			<article id="naviguer" class="container box style3" >
+				<header>
+					<h2>Naviguer dans les interprétation</h2>
+				</header>
+				<form>
+					<div class="row" style="margin-left:auto;margin-right:auto;">
+						<iframe id="ifNavig" src="eval/navigation"  scrolling="no" width="800" height="440">
+						  <p>Votre navigateur ne supporte pas l'élément iframe</p>
+						</iframe>														
+					</div>
+					<div class="row">
+						<div class="12u">
+							<ul class="actions">
+								<li><a href="#partenaires" class="button form" >Partenaires du projet</a></li>
+							</ul>
+						</div>
+					</div>
+				</form>					
+			</article>			
 		
 		<!-- Portfolio -->
-			<article class="container box style2">
+			<article id="partenaires" class="container box style2">
 				<header>
 					<h2>Partenaires du projet</h2>
 					<p></p>

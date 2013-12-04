@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  
+  <head data-gwd-animation-mode="proMode">
+    <title>axes d'évaluation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="js/d3.v3.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/heatmap.js"></script>
+    <script type="text/javascript" src="js/axesEval.js"></script>
+    <script type="text/javascript">
+    	var idUti = <?php echo $this->uti[0]["uti_id"]; ?>;
+    	var idDoc = <?php echo $this->doc[0]["doc_id"]; ?>;
+    	var idBase = '<?php echo $this->idBase; ?>';
+    	var urlSaveEvalSem = '<?php echo $this->urlSaveEvalSem; ?>';
+    </script>
+    <style type="text/css">
+      html, body {
+        width: 800px;
+        height: 440px;
+        margin: 0px;
+      }
+      body {
+        background-color: transparent;
+        -webkit-transform: perspective(1400px) matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        -webkit-transform-style: preserve-3d;
+      }
+      .gwd-svg-wtpx {
+        color: rgb(0, 0, 0);
+        width: 545.5px;
+        height: 682px;
+        -webkit-transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -2, -250, 0, 1);
+        -webkit-transform-style: preserve-3d;
+      }
+      .gwd-div-henp {
+        position: absolute;
+        width: 315px;
+        height: 16px;
+        font-family:'Times New Roman';
+        text-align: center;
+        left: 201px;
+        top: 17px;
+      }
+      .gwd-div-t7xr {
+        height: auto;
+        left: 0px;
+        position: absolute;
+        top: 0px;
+        width: auto;
+      }
+      .gwd-div-gpf5 {
+        width: 315px;
+        left: 201px;
+        top: 398px;
+      }
+      .gwd-div-8o44 {
+        width: 158px;
+        -webkit-transform-origin: 79px 21px 0px;
+        -webkit-transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        height: 16px;
+        left: 16px;
+        top: 208px;
+      }
+      .gwd-div-mluy {
+        text-align: right;
+      }
+      .gwd-div-gz28 {
+        width: 158px;
+        left: 542px;
+        top: 208px;
+      }
+      .gwd-div-63rf {
+        height: 18px;
+        width: 158px;
+      }
+      .gwd-div-hy8u {
+        left: 9px;
+        top: 208px;
+      }
+      .gwd-div-ar8g {
+        left: 201px;
+        top: 14px;
+      }
+      #heatmapArea {
+        position: absolute;
+        width: 319px;
+        height: 318px;
+        left: 199px;
+        top: 57px;
+        -webkit-transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        -webkit-transform-style: preserve-3d;
+      }
+      #titre {
+        position: absolute;
+        left: 10px;
+        top: -10px;
+      }
+      #uti {
+        position: absolute;
+        left: 10px;
+        top: 30px;
+      }
+      #doc {
+        position: absolute;
+        left: 10px;
+        top: 80px;
+      }
+      h3 {
+      	margin: 6px;	
+	  }
+      h4 {
+      	margin-top: 2px;	
+      	margin-left: 12px;	
+		margin-bottom:2px;
+	  }
+      #docData {
+      	margin-top: 6px;	
+		width: 180px;
+      }
+	  
+    </style>
+  </head>
+  
+  <body>
+    <svg id="svg3707" class="gwd-svg-wtpx">
+      <defs id="defs3709">
+        <marker refX="0" refY="0" orient="auto" id="Arrow1Lstart" style="overflow:visible">
+          <path d="M 0,0 5,-5 -12.5,0 5,5 0,0 z" transform="matrix(0.8,0,0,0.8,10,0)" id="path3763" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"></path>
+        </marker>
+        <marker refX="0" refY="0" orient="auto" id="Arrow1Lend" style="overflow:visible">
+          <path d="M 0,0 5,-5 -12.5,0 5,5 0,0 z" transform="matrix(-0.8,0,0,-0.8,-10,0)" id="path3766" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"></path>
+        </marker>
+        <marker refX="0" refY="0" orient="auto" id="marker3729" style="overflow:visible">
+          <path d="M 0,0 5,-5 -12.5,0 5,5 0,0 z" transform="matrix(0.8,0,0,0.8,10,0)" id="path3731" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"></path>
+        </marker>
+        <marker refX="0" refY="0" orient="auto" id="marker3733" style="overflow:visible">
+          <path d="M 0,0 5,-5 -12.5,0 5,5 0,0 z" transform="matrix(-0.8,0,0,-0.8,-10,0)" id="path3735" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"></path>
+        </marker>
+      </defs>
+      <g id="layer1">
+        <g transform="matrix(0.00140085,-0.99999902,0.99999902,0.00140085,132.44884,72.170925)" id="g3057-7">
+          <path d="m -394.11525,50.57148 1e-5,300.56837 0,54.49563" id="path2987-2" style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow1Lstart);marker-end:url(#Arrow1Lend)"></path>
+          <path d="m -571.68982,228.10349 300.56837,-1e-5 54.49563,0" id="path2987-9-3" style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow1Lstart);marker-end:url(#Arrow1Lend)"></path>
+          <rect width="319.05795" height="319.05795" x="68.574509" y="234.58627" transform="matrix(0,1,-1,0,0,0)" id="rect4474-6" style="fill:none;stroke:#000000;stroke-width:0.94206107;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"></rect>
+        </g>
+      </g>
+    </svg>
+    <div id="titre">
+	    <h2>Evaluations</h2>
+    </div>    
+    <div id="uti">
+	    <h3>de l'utilisateur :</h3>
+	    <h4 id="utiLogin"><?php echo $this->uti[0]["login"]; ?></h4>
+    </div>    
+    <div id="doc">
+	    <h3>pour le proverbe :</h3>
+	    <!-- <h4 id="docTitre"><?php echo $this->doc[0]["titre"]; ?></h4> -->
+	    <h5 id="docData"><?php echo $this->doc[0]["data"]; ?></h5>
+    </div>    
+    <div class="gwd-div-henp gwd-div-ar8g" id="divN">
+      <select id="catN" onchange="setHeatMap()">
+        <option value="">Choisissez une catégorie</option>
+        <option id="catN1" ieml="E:U:.M:M:.-E:U:.s.-',k.o.-n.o.-s.u.-',E:.-',_" >juste</option>
+        <option id="catN2" ieml="E:U:.M:M:.-E:U:.s.-',b.o.-m.o.-s.u.-',E:.-',_" >beau</option>
+      </select>
+    </div>
+    <div class="gwd-div-henp gwd-div-gpf5" id="divS">
+      <select id="catS" onchange="setHeatMap()">
+        <option value="">Choisissez une catégorie</option>
+        <option id="catS1" ieml="E:U:.M:M:.-E:U:.s.-',k.o.-n.o.-s.u.-'E:U:A:.-',E:.-',_">injuste</option>
+        <option id="catS2" ieml="E:U:.M:M:.-E:U:.s.-',b.o.-m.o.-s.u.-'E:U:A:.-',E:.-',_">laid</option>
+      </select>
+    </div>
+    <div class="gwd-div-henp gwd-div-8o44 gwd-div-hy8u" id="divW">
+      <select id="catW" onchange="setHeatMap()">
+        <option value="">Choisissez une catégorie</option>
+        <option id="catW1" ieml="E:A:.M:M:.-E:U:.s.-',t.o.-d.o.-s.u.-'E:U:A:.-',E:.-',_">stupide</option>
+        <option id="catW2" ieml="E:A:.M:M:.-E:U:.s.-',m.o.-n.o.-s.u.-'E:U:A:.-',E:.-',_">dément</option>
+      </select>
+    </div>
+    <div class="gwd-div-henp gwd-div-8o44 gwd-div-gz28 editable" id="divE">
+      <select id="catE" onchange="setHeatMap()">
+        <option value="">Choisissez une catégorie</option>
+        <option id="catE1" ieml="E:A:.M:M:.-E:U:.s.-',t.o.-d.o.-s.u.-',E:.-',_">pertinent</option>
+        <option id="catE2" ieml="E:A:.M:M:.-E:U:.s.-',m.o.-n.o.-s.u.-',E:.-',_">sage</option>
+      </select>
+    </div>
+    <div id="heatmapArea"></div>
+  </body>
+
+</html>
