@@ -8,10 +8,13 @@ try {
 	$user = "luckysemiosis";
 	$pwd = "samszo";
 	
+	$addit = new Flux_Adit("flux_sic");
+	$addit->getAllBE();
 	
+	/*
 	$eval = new Flux_Eval('flux_gapaii');
 	$eval->saveSem('flux_gapaii', $idDoc, $idUti, $sem);
-
+	*/
 	
 
 	/*
@@ -184,13 +187,13 @@ try {
 	}
 	*/
 	
-    //pour gérer les compte mail
-    //$gm = new Flux_Gmail("samszon","Janvier2010","flux_gmail_intelligence_collective");
-    //$gm->saveFolderMessages("veille/art", "image");
-    //$gm->saveFolderMessages("veille/intelligence collective", "google_alerte");
-    //$gm->getMessagesByFolderName("veille/intelligence collective");
-    //$gm->getDossiers();
-	
+    /*pour gérer les compte mail
+    $gm = new Flux_Gmail("samszon","Avril2013","flux_sic");
+    $gm->saveFolderMessages("veille/labos", "ADIT");
+    $gm->saveFolderMessages("veille/intelligence collective", "google_alerte");
+    $gm->getMessagesByFolderName("veille/intelligence collective");
+    $gm->getDossiers();
+	*/
 	
 	//$s = new Flux_Site("flux_zotero");
 	//$dbD = new Model_DbTable_flux_tagdoc($s->db);
@@ -207,12 +210,14 @@ try {
     //$diigo->getGroupeRss("bulles");
 	//$diigo->getRequest(array("user"=>$user,"count"=>100));
     //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));	
-		
+
+	/*
 	$audio = new Flux_Audio(false);
 	//$audio->getOggInfos("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
 	//$audio->convertMp3ToOgg("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.mp3", "c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
 	//$audio->coupe("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.mp3", "c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106_100_10.ogg", 400, 10);
 	$arr = $audio->getWave("../data/audios/De_0954881269_10112013_18h02_527fbc5098a68.wav");	    
+	*/
 	
 	//$response = "OK bootstrap<br/><br/>";
 	/*
