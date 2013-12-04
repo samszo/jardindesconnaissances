@@ -61,7 +61,7 @@ class Flux_Audio extends Flux_Site{
 	function getWave($filename) {
 		
 		$c = str_replace("::", "_", __METHOD__)."_".md5($filename); 
-	   	$arrCoor = $this->cache->load($c);
+	   	$arrCoor = false;//$this->cache->load($c);
         if(!$arrCoor){
 		
         	//récupère les informations du fichier pour calculer le temps
@@ -144,7 +144,7 @@ class Flux_Audio extends Flux_Site{
 				
 	          // don't bother plotting if it is a zero point
 	          if ($y1 != $y2){
-	            $arrCoor[] = array("x1"=>$x1, "y1"=>$y1, "x2"=>$nbX, "y2"=>$y2, "date"=>$date);
+	            $arrCoor[] = array("x1"=>$x1, "y1"=>$y1, "x2"=>$nbX, "y2"=>$y2, "date"=>$date, "data"=>$data, "point"=>$data_point);
 	            $nbX++;   	          	
 	          }
 	          
