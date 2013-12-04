@@ -40,8 +40,9 @@ class GraphController extends Zend_Controller_Action {
 		$this->view->bases = array("flux_h2ptm"=>"H2ptm", "flux_diigo"=>"Diigo", "flux_zotero"=>"Zotero", " flux_gmail_intelligence_collective"=>"Google Alerte");
 		$this->view->titre = "Explorateur d'observations";
 		$this->view->tags = $this->_getParam('tags', 0);
-		$this->view->urlStats = "../stat/matricetagassos?".$arrUrl[1];	    
-    		    
+		//$this->view->urlStats = "../stat/matricetagassos?".$arrUrl[1];	    
+		$this->view->urlStats = "http://localhost/jdc/data/matricetagassos.json";	    
+		
     }	
     
     public function audiowaveAction()
