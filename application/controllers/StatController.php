@@ -60,7 +60,7 @@ class StatController extends Zend_Controller_Action {
     {
 	    $this->view->stats = "";
     	$audio = new Flux_Audio();
-		$this->view->stats = $audio->getWave("../data/audios/01_10-02-81_9A.wav");	    
+		$this->view->stats = $audio->getWave("../data/audios/De_0954881269_10112013_18h02_527fbc5098a68.wav");	    
     }	
 
     

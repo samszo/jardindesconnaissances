@@ -55,10 +55,10 @@ class FluxController extends Zend_Controller_Action {
 			}
 		}
 	    if($this->_getParam('tag', 0) && $this->_getParam('uti', 0)){
-	    	$dbUD = new Model_DbTable_Flux_UtiDoc();
-	    	$arr = $dbUD->findDocByUtiTag($this->_getParam('uti', 0),$this->_getParam('tag', 0));
+	    	$dbUTD = new Model_DbTable_Flux_UtiTagDoc();
+	    	$arr = $dbUTD->findByTagLogin($this->_getParam('tag', 0),$this->_getParam('uti', 0));
 		    foreach ($arr as $d){
-		    	$arrT = $dbUD->findTagByDocUti($d["doc_id"],$d["uti_id"]);
+		    	$arrT = $dbUTD->GetUtiTagDoc($d["uti_id"],$d["doc_id"]);
 		    	//formatage du tableau des tags
 		    	$tags = array();
 		    	foreach ($arrT as $t){
