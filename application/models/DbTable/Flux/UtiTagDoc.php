@@ -238,6 +238,31 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
     }
 
+    /**
+     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param string $tag
+     * @param string $login
+     * 
+     * @return array
+     */
+    public function findByTagLogin($tag, $login)
+    {
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("utd" => "flux_utitagdoc") )                           
+            ->joinInner(array('t' => 'flux_tag'),
+            	't.tag_id = utd.tag_id',array('code'))
+            ->joinInner(array('u' => 'flux_uti'),
+            	'u.uti_id = utd.uti_id AND u.login = "'.$login.'"',array())
+            ->joinInner(array('d' => 'flux_doc'),
+            	'd.doc_id = utd.doc_id',array('url','titre','pubDate'))
+        	->where( "t.code LIKE '%".$tag."%'");
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+    
     /*
      * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
      * et retourne cette entrée.
@@ -297,10 +322,10 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     public function findDocsByUsersTags($users, $tags)
     {
 	    //défiition de la requête
-		$sql = "select d.doc_id, d.url, d.titre, d.branche, d.tronc, d.poids, d.maj, d.pubDate, d.note 
+		$sql = "select d.doc_id, d.url, d.titre, d.branche_lft, d.branche_rgt, d.tronc, d.poids, d.maj, d.pubDate, d.note 
 		from flux_utitagdoc utd
 			inner join flux_doc d on d.doc_id = utd.doc_id
-		where utd.tag_id IN (".tags.") AND utd.uti_id IN (".$users.")  
+		where utd.tag_id IN (".$tags.") AND utd.uti_id IN (".$users.")  
 		group by d.doc_id";
         $db = Zend_Db_Table::getDefaultAdapter();
     	$stmt = $db->query($sql);
