@@ -63,6 +63,7 @@ function load(idDiv, idCpt) {
     d3.text(urlGen+"&cpt="+idCpt, function(fragment) {
     	cursor_clear();
     	d3.select("#"+idDiv).html(fragment);
+    	paroleGen(idDiv, fragment);
         saveGen(idDiv, fragment, idCpt);
     });
 }
@@ -74,6 +75,15 @@ function saveGen(titre, txt, idCpt) {
 		 function(data){
 			console.log(data);
 			idDoc = data;
+		 });
+}
+
+function paroleGen(idDiv, txt) {
+	var p = {"txt":txt};
+	$.post("flux/parole"
+		, p,
+		 function(fragment){
+	    	d3.select("#"+idDiv+"Audio").html(fragment);
 		 });
 }
 
