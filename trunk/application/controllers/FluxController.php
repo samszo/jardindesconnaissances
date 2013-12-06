@@ -134,5 +134,12 @@ class FluxController extends Zend_Controller_Action {
 	          echo "Message: " . $e->getMessage() . "\n";
 		}
 	}    
+
+	public function paroleAction() {
+		    if($this->_getParam('txt', 0)){			
+				$o = new Flux_Audio();
+				$this->view->file = $o->getGoogleParole($this->_getParam('txt'));
+		    }
+	}    
 	
 }
