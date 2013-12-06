@@ -14,14 +14,15 @@ require_once( "../library/mp3file.php" );
 
 class Flux_Audio extends Flux_Site{
 
-  
-  // how much detail we want. Larger number means less detail
-  // (basically, how many bytes/frames to skip processing)
-  // the lower the number means longer processing time
-  var $DETAIL = 800;
-  
-  var $ffmpeg;
-  var $encodage = " -aq 0 -ab 8k -ar 8000 -acodec libvorbis ";
+	var $pathSound;
+	var $urlSound;
+	
+	// how much detail we want. Larger number means less detail
+	// (basically, how many bytes/frames to skip processing)
+	// the lower the number means longer processing time
+	var $DETAIL = 800;  
+	var $ffmpeg;
+	var $encodage = " -aq 0 -ab 8k -ar 8000 -acodec libvorbis ";
   
 	/**
 	* constructeur de la classe
@@ -35,8 +36,37 @@ class Flux_Audio extends Flux_Site{
     {
     	$this->ffmpeg = FFMEPG;
     	parent::__construct($idBase);
+    	$this->pathSound = ROOT_PATH."/data/audios/";
+    	$this->urlSound = WEB_ROOT."/data/audios/";
+    	
     }
 
+	/**
+	 * création avec Google Translate d'un fichier de parole en mp3 à partir d'un texte
+	 *
+	 * @param string $parole
+
+	 * @return string 
+	 */
+	function getGoogleParole($txt)
+	{
+		$parole = urlencode($txt);
+		$nbCaract = strlen($parole);
+		
+		// Save the MP3 file in this folder with the .mp3 extension 
+		$fic = md5($parole).".mp3";
+		$file = $this->pathSound.$fic;
+		$url = $this->urlSound.$fic;
+		
+		// If the MP3 file exists, do not create a new request
+		if (!file_exists($file)) {
+	    	$mp3 = file_get_contents('http://translate.google.com/translate_tts?ie=UTF-8&q='.$parole.'&tl=fr&textlen='.$nbCaract.'&idx=0&total=1');
+			file_put_contents($file, $mp3);
+		}
+		return $url;
+	}
+    
+    
 	/**
 	* trouve la valeur heaxdécimale
 	* 

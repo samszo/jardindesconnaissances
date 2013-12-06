@@ -99,21 +99,41 @@ class Flux_Adit extends Flux_Site{
 		foreach ($results as $r) {
 			$pays = $r->nodeValue;
 		}
-		$results = $dom->query('//p/span[@class="style42"]');
+		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[1]/td[3]/p/span[3]');
         foreach ($results as $r) {
 			$date = $r->nodeValue;
 		}
 		
-		$results = $dom->query('//p/span[@class="style42"]');
+		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[3]/td[1]/p[1]/span[1]');
 		foreach ($results as $r) {
 			$domaine = $r->nodeValue;
 		}
 
-		$results = $dom->query('.style17');
+		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[3]/td[1]/p[1]/span[2]');
         foreach ($results as $r) {
 			$titre = $r->nodeValue;
 		}
 				
+		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[3]/td[1]/p[3]/span');
+        foreach ($results as $r) {
+			$contenu = $r->nodeValue;
+		}
+		
+		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[7]/td[2]/p/span');
+        foreach ($results as $r) {
+			$source = $r->nodeValue;
+		}
+		
+		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[8]/td[2]/p/span');
+        foreach ($results as $r) {
+			$auteurs = $r->nodeValue;
+		}
+		
+		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[6]/td[2]/p/span');
+        foreach ($results as $r) {
+			$contact = $r->nodeValue;
+		}
+		
 		$this->dbD->edit($idDoc, array("data"=>$html));
 								
 		$this->trace("FIN ".__METHOD__);
