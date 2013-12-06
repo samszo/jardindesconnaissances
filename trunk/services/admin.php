@@ -187,10 +187,11 @@ try {
 	}
 	*/
 	
-    /*pour gérer les compte mail
-    $gm = new Flux_Gmail("samszon","Avril2013","flux_sic");
-    $gm->saveFolderMessages("veille/labos", "ADIT");
-    $gm->saveFolderMessages("veille/intelligence collective", "google_alerte");
+    //pour g�rer les compte mail
+    $gm = new Flux_Gmail("samszon","F�vrier2013","flux_gmail_intelligence_collective");
+    $gm->saveFolderMessages("veille/art", "image");
+    /*
+	$gm->saveFolderMessages("veille/intelligence collective", "google_alerte");
     $gm->getMessagesByFolderName("veille/intelligence collective");
     $gm->getDossiers();
 	*/
@@ -210,14 +211,12 @@ try {
     //$diigo->getGroupeRss("bulles");
 	//$diigo->getRequest(array("user"=>$user,"count"=>100));
     //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));	
-
-	/*
+		
 	$audio = new Flux_Audio(false);
 	//$audio->getOggInfos("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
 	//$audio->convertMp3ToOgg("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.mp3", "c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
 	//$audio->coupe("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.mp3", "c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106_100_10.ogg", 400, 10);
 	$arr = $audio->getWave("../data/audios/De_0954881269_10112013_18h02_527fbc5098a68.wav");	    
-	*/
 	
 	//$response = "OK bootstrap<br/><br/>";
 	/*
