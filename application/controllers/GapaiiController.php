@@ -12,10 +12,10 @@ require_once 'Zend/Controller/Action.php';
 class GapaiiController extends Zend_Controller_Action {
 	
 	var $dbNom = "flux_gapaii";
-	var $idOeu = 6;
+	var $idOeu = 6;//37;//
 	var $idUti = 2;
 	var $idDoc = 1;
-	var $idCpt = 157829;
+	var $idCpt = 157829;// poeme stein 158393;//158278 - test poème;//;
 
 	/**
 	 * The default action - show the home page
@@ -48,7 +48,7 @@ class GapaiiController extends Zend_Controller_Action {
 			$this->view->idDoc = $idDoc;
 		}
 	}
-	
+		
 	public function savesemevalAction() {
 		//récupère les informations de la palette
 		//print_r($this->getRequest()->getParams());
