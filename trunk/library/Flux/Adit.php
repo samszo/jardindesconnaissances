@@ -35,7 +35,7 @@ class Flux_Adit extends Flux_Site{
     	$this->getUser(array("login"=>"Flux_Addit"));
     	
     	//la récupération des buulletins se fait à partir des pages de résultat
-    	for ($i = 1; $i < 1352; $i++) {
+    	for ($i = 435; $i < 1361; $i++) {
     		$this->getPageBE($i);
     	}
 
@@ -53,7 +53,8 @@ class Flux_Adit extends Flux_Site{
 	 */
 	function getPageBE($numPage){
     	$this->trace("DEBUT ".__METHOD__);
-		
+    	$this->trace("numPage ".$numPage);
+    	
     	//récupère la page
 		$html = $this->getUrlBodyContent($this->urlAllBE.$numPage);
 		//récupère les urls de la page
@@ -95,47 +96,64 @@ class Flux_Adit extends Flux_Site{
 		$dom = new Zend_Dom_Query($html);
 		
 		//récupère les infos
-		$results = $dom->query('.style32');
-		foreach ($results as $r) {
-			$pays = $r->nodeValue;
-		}
-		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[1]/td[3]/p/span[3]');
+		$results = $dom->query('//tr[1]/td[3]/p/span[@class="style42"]');
         foreach ($results as $r) {
-			$date = $r->nodeValue;
+        	//attention aux &nbsp
+			$date = str_replace(' ','',html_entity_decode($r->nodeValue));
+			$date = substr($r->nodeValue, 4);
+			$sqlDate = new Zend_Db_Expr("STR_TO_DATE('".$date." 00:00:00', '%e/%c/%Y %H:%i:%s')");
 		}
-		
-		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[3]/td[1]/p[1]/span[1]');
-		foreach ($results as $r) {
-			$domaine = $r->nodeValue;
-		}
-
-		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[3]/td[1]/p[1]/span[2]');
+		$results = $dom->query('//tr[3]/td[1]/p[@class="style96"]/span[@class="style17"]');
         foreach ($results as $r) {
 			$titre = $r->nodeValue;
 		}
-				
-		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[3]/td[1]/p[3]/span');
+		$results = $dom->query('//table/tr[7]/td/table/tr[3]/td[1]');
         foreach ($results as $r) {
-			$contenu = $r->nodeValue;
+			$contenu = $this->getInnerHtml($r);
+		}		
+		//mise à jour du document
+		$this->dbD->edit($idDoc,array("titre"=>$titre,"maj"=> $sqlDate,"note"=>$contenu));
+		
+		//récupération des mots clefs
+		$results = $dom->query('//tr[3]/td[1]/p[@class="style96"]/span[@class="style42"]');
+		foreach ($results as $r) {
+			$domaine = $r->nodeValue;
+			$this->saveTag(array("code"=>$domaine, "desc"=>"domaine"), $idDoc, 1, $sqlDate, $this->user);
+		}
+		$results = $dom->query('.style32');
+		foreach ($results as $r) {
+			$pays = $r->nodeValue;
+			$arr = explode(" ",$pays);
+			$this->saveTag(array("code"=>$arr[1], "desc"=>"pays"), $idDoc, 1, $sqlDate, $this->user);
 		}
 		
-		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[7]/td[2]/p/span');
-        foreach ($results as $r) {
-			$source = $r->nodeValue;
-		}
-		
-		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[8]/td[2]/p/span');
-        foreach ($results as $r) {
-			$auteurs = $r->nodeValue;
-		}
-		
-		$results = $dom->query('//*[@id="LayoutTable"]/table/tbody/tr[7]/td/table/tbody/tr[6]/td[2]/p/span');
-        foreach ($results as $r) {
-			$contact = $r->nodeValue;
-		}
-		
-		$this->dbD->edit($idDoc, array("data"=>$html));
-								
+		//traitement des sources contact rédacteurs
+    	for ($i = 0; $i < 3; $i++) {
+			$results = $dom->query('//table/tr[7]/td/table/tr['.(6+$i).']/td[1]');
+	        foreach ($results as $r) {
+				$type = trim($r->nodeValue);
+				if($type=="Sources :" || $type=="Pour en savoir plus, contacts :"){
+					$results = $dom->query('//table/tr[7]/td/table/tr['.(6+$i).']/td[2]');
+			        foreach ($results as $rv) {
+						$value = $rv->nodeValue;
+			        }
+			        //ajoute un sous document
+			        $idDocS = $this->dbD->ajouter(array("data"=>$value, "tronc"=>$idDoc));
+			        //avec le tag du type
+					$this->saveTag($type, $idDocS, 1, $sqlDate, $this->user);
+				}
+				if($type=="Rédacteurs :"){
+					$results = $dom->query('//table/tr[7]/td/table/tr['.(6+$i).']/td[2]');
+			        foreach ($results as $rv) {
+						$value = $rv->nodeValue;
+			        }
+			        //ajoute un nouveau rédacteur					
+					$idRedac = $this->getUser(array("login"=>$value),false);
+					$this->saveTag("Rédacteurs", $idDoc, 1, $sqlDate, $idRedac);
+				}
+	        }
+    	}
+												
 		$this->trace("FIN ".__METHOD__);
 		
     }	

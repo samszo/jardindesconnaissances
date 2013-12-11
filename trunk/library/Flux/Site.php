@@ -208,7 +208,22 @@ class Flux_Site{
 		return $html;
 	}
 
-
+    /**
+     * récupère le contenu HTML d'un DOMElement
+     *
+     * @param DOMElement $node
+     *   
+     * @return string
+     */
+	function getInnerHtml( $node ) { 
+	    $innerHTML= ''; 
+	    $children = $node->childNodes; 
+	    foreach ($children as $child) { 
+	        $innerHTML .= $child->ownerDocument->saveXML( $child ); 
+	    } 
+	
+	    return $innerHTML; 
+	} 
 	
     /**
      * Ajoute des informations supplémentaire d'indexation
@@ -676,8 +691,7 @@ class Flux_Site{
      * https://cept.3scale.net/docs
      * @param string $text
      * @param string $action
-     * @param string $format
-     * 
+    * 
      * @return xml/array
      */
 	function getKWCEPT($texte, $action){
@@ -722,7 +736,10 @@ class Flux_Site{
      *
      * enregistre l'image du document
      * 
+     * @param int $idDoc
      * @param string $url
+     * @param string $titre
+     * @param string $chemin
      * 
      * @return array
      */
