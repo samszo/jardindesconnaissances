@@ -14,9 +14,14 @@ class GraphController extends Zend_Controller_Action {
 	 * The default action - show the home page
 	 */
 	public function indexAction() {
-		$this->view->title = "Graphiques disponibles";
-	    $this->view->headTitle($this->view->title, 'PREPEND');
-	    $this->view->stats = array("tags pour un utilisateur", "utilisateurs en relation");
+		try {			
+			$this->view->title = "Graphiques disponibles";
+		    $this->view->headTitle($this->view->title, 'PREPEND');
+		    $this->view->stats = array("tags pour un utilisateur", "utilisateurs en relation");
+		}catch (Zend_Exception $e) {
+			echo "Récupère exception: " . get_class($e) . "\n";
+		    echo "Message: " . $e->getMessage() . "\n";
+		}
 	}
 
     public function bullesAction()
