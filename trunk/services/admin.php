@@ -7,6 +7,12 @@ try {
 
 	$user = "luckysemiosis";
 	$pwd = "samszo";
+
+	/*
+	$ieml = new Flux_IEML("flux_ieml");
+	//$ieml->genereSequences(3,true);
+	$ieml->genereSvgPlanSeq();		
+	*/
 	
 	$addit = new Flux_Adit("flux_sic");
 	$addit->getAllBE();
@@ -28,8 +34,8 @@ try {
 	/*
 	$s = new Flux_Site('flux_tweetpalette');
 	//$s->sauveUtiByImage('../data/etudiants/CDNL_12-13', "étudiants CDNL 12-13");
-	$dbU = new Model_DbTable_Flux_Uti($s->db);
-	$roles = $dbU->getRolesUtis();
+	//$dbU = new Model_DbTable_Flux_Uti($s->db);
+	//$roles = $dbU->getRolesUtis();
 	print_r($roles);
 	//$dbUU = new Model_DbTable_Flux_UtiUti($s->db);
 	//$dbUU->ajouter(array("uti_id_src"=>2, "uti_id_dst"=>94, "eval"=>1));

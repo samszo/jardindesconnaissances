@@ -13,7 +13,7 @@ try {
 	
 	//$server->setClass('Flux_tagOcrible');
 	
-	$response = $server->handle();
+	//$response = $server->handle();
 
 }catch (Zend_Exception $e) {
 	echo "Récupère exception: " . get_class($e) . "\n";
