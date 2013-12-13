@@ -15,6 +15,7 @@
 		var svg;
 		var visDocText;
 		var distCielTerre = 300;
+		var tempo = 4000;
 		
 		function init(){
 	    	//création du svg
@@ -50,9 +51,13 @@
 	            .attr("x", function(d, i) {
 	                return x;
 	            })
+	            //pour l'apparition
+	            .attr("y", -distCielTerre)	            
+	            /*uniquement pour la pluie
 	            .attr("y", function(d, i) {
 	                return y-(distCielTerre*i);
 	            })
+	            */
 				.attr("class", function(d) { 
 		    	  return "txtDoc"; 
 		    	 })
@@ -67,9 +72,14 @@
 	            	txtFrere = this.parentElement.childNodes[0]
 	                return txtFrere.offsetLeft-fontSize;
 	            })
+	            //pour l'apparition
+	            .attr("y", -distCielTerre)
+	            //
+	            /*pour la pluie
 	            .attr("y", function(d, i) {
 	                return y-(distCielTerre*i)-fontSize;
 	            })
+	            */
 			    .style("fill","none")
 			    .style("stroke","black")
 	            .attr("width", function(d, i) {
@@ -80,13 +90,13 @@
 	            	txtFrere = this.parentElement.childNodes[0]
 	                return txtFrere.offsetHeight+(fontSize/2);
 	            });
-            
+            //
 			visDocText.transition()
 				    .duration(0)
 				    .style("font-size",fontSize + "px")
-				    //.each("end", apparitionContinu);				    
-				     .each("end", pluieContinu);
-	            
+				    .each("end", apparitionWait);				    
+				    //.each("end", pluieContinu);
+	         //   
 		}
 
 		function pluieRetour(d, i) {
@@ -119,21 +129,40 @@
 		    */							  
 		}		 
 
+		function apparitionWait(d, i) {
+			d3.select(this)
+			  	.transition()
+			    .duration(tempo*i)
+			    .ease("linear")
+			    .attr("transform", function(d) {return "scale(0, 0)";})
+			    .each("end", apparitionIci);
+		}		 
+		function apparitionIci(d, i) {
+			d3.select(this)
+			  	.transition()
+			    .duration(1)
+			    .ease("linear")
+			    .attr("transform", function(d) {return "translate(0, "+distCielTerre*1.5+")";})
+			    .each("end", apparitionContinu);
+		}		 
+		
 		function apparitionContinu(d, i) {
 			var idDoc = this.__data__.doc_id;
 			d3.select(this)
 			  	.transition()
-			    .duration(10000)
+			    .duration(tempo)
 			    .ease("linear")
-			    .attr("transform", function(d) {return "scale(1000, 1000)";})
+			    .attr("transform", function(d) {return "matrix(0,0,0,0,0,100)";})
 			    .each("end", apparitionRetour);
 		}		 
 		function apparitionRetour(d, i) {
-			  d3.select(this)
+			d3.select(this)
+				.attr("transform", function(d) {return "translate(0, "+-distCielTerre+")";})
+			d3.select(this)
 			    .transition()
 			    .ease("linear")
-			    .duration(0)
-			    .attr("transform", function(d) {return "translate(0, 0)";})
+			    .duration(tempo)
+			    .attr("transform", function(d) {return "scale(0, 0)";})
 			    .each("end", apparitionContinu);
 			}		 
 		
