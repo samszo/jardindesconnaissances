@@ -37,6 +37,7 @@ $(document).ready(function() {
         if(login == '' || mdp == '') {
             alert('Les champs doivent êtres remplis');
         } else {
+        	var dt = $(this).serialize();
             $.ajax({
                 url: $(this).attr('action'),
                 type: $(this).attr('method'),
