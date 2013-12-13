@@ -117,4 +117,24 @@ class Flux_Gdata extends Flux_Site{
 		
 	}
 	
+	public function getPicassaAlbum(){
+		
+		$service = Zend_Gdata_Photos::AUTH_SERVICE_NAME;
+		$client = Zend_Gdata_ClientLogin::getHttpClient("thyp1314@gmail.com", "Hypermedia1314", $service);
+		$service = new Zend_Gdata_Photos($client);
+		 
+		//$userFeed = $service->getUserFeed("thyp1314");
+		
+		$query = new Zend_Gdata_Photos_PhotoQuery();
+		$query->setUser("thyp1314");
+		$query->setAlbumId("1");
+		$albumFeed = $service->getAlbumFeed($query);
+		
+		$query->setPhotoId("100");
+		$photoFeed = $service->getPhotoFeed($query);
+
+		$toto = "";
+   		
+	}
+	
 }
