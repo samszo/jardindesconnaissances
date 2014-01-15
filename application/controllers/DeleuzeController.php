@@ -220,5 +220,9 @@ class DeleuzeController extends Zend_Controller_Action {
 	          echo "Message: " . $e->getMessage() . "\n";
 		}
 	}
+
+	public function chercheAction() {
+		$oD = new Flux_Deleuze($this->dbNom);
+	}
 	
 }
