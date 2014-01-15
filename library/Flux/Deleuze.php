@@ -15,6 +15,33 @@ class Flux_Deleuze extends Flux_Site{
     	parent::__construct($idBase);
     }
 	
+    /**
+     * cherche
+     *
+     * Recherche une expression dans le texte d'un cours
+     * 
+     * @param string $txt
+     * @return array
+     *       
+     */
+    function cherche($txt) {
+
+    	$dbD = new Model_DbTable_Spip_Articles($this->db);
+		$arr = $dbD->findFullText($txt);
+    	
+		$i=0;
+		foreach ($arr as $doc){
+			//on exclue les articles des rubriques menu
+			if($doc["id_parent"]==0){
+				//on récupère les extraits de texte
+				$frags = explode($txt, $doc["texte"]);
+				//on les ajoute à la réponse
+				$arr[$i]["frags"] = $frags;
+			}
+			$i++;
+		} 
+		return $arr;   	    	
+    }
     
     
     /**
