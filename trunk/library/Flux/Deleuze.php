@@ -26,17 +26,27 @@ class Flux_Deleuze extends Flux_Site{
      */
     function cherche($txt) {
 
+    	$luc = new Flux_Lucene();
     	$dbD = new Model_DbTable_Spip_Articles($this->db);
 		$arr = $dbD->findFullText($txt);
     	
 		$i=0;
 		foreach ($arr as $doc){
 			//on exclue les articles des rubriques menu
-			if($doc["id_parent"]==0){
+			if($doc["id_parent"]!=0){
 				//on récupère les extraits de texte
-				$frags = explode($txt, $doc["texte"]);
-				//on les ajoute à la réponse
-				$arr[$i]["frags"] = $frags;
+				//$frags = explode($txt, utf8_encode($doc["texte"]));
+				$frags = $luc->getSegments(utf8_encode($doc["texte"]), $txt);
+				//récupère les phrases
+				$phrases = $luc->getPhrases($frags, false, null);
+				//on ajoute les phrases à la réponse
+				$arr[$i]["phrases"] = $phrases;
+				//ajoute le lien ver l'url complète
+				$arr[$i]["fichier"] = "http://193.54.152.233/dev-deleuze.fr/".$arr[$i]["fichier"];
+				//supprime le texte complet
+				unset($arr[$i]["texte"]);				
+			}else{
+				unset($arr[$i]);				
 			}
 			$i++;
 		} 
