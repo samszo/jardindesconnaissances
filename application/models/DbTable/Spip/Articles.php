@@ -42,7 +42,12 @@ class Model_DbTable_Spip_Articles extends Zend_Db_Table_Abstract
         	->from( array("a" => "spip_articles"), array("score"=>"MATCH(fulltxt) AGAINST('".$txt."')", "titre", "texte", "id_article", "id_rubrique") )                           
             ->joinInner(array('r' => 'spip_rubriques'),
                 'r.id_rubrique = a.id_rubrique',array('rubTitre'=>'titre', 'id_parent'))
-        	->where("MATCH(fulltxt) AGAINST('".$txt."')")
+            ->joinLeft(array('da' => 'spip_documents_articles'),
+                'da.id_article = a.id_article',array())
+            ->joinLeft(array('d' => 'spip_documents'),
+                'd.id_document = da.id_document',array('docTitre'=>'titre', 'fichier', 'id_type'))
+            ->where("MATCH(fulltxt) AGAINST('".$txt."')")
+        	->order("r.id_rubrique")
 			;
 		
         return $this->fetchAll($query)->toArray(); 
