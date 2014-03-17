@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Tissu de l'âme - monade</title>
+	<style>
+	   html, body, div, canvas {
+	            width: 100%;
+	            height: 100%;
+	            padding: 0;
+	            margin: 0;
+	            overflow: hidden;
+	    }
+	</style>
+	<script src="../js/3D/babylon.js"></script>
+	<script src="../js/3D/hand.js"></script>
+ </head>
+ 	<body>
+		<div id="rootDiv">
+  			<canvas id="renderCanvas"></canvas>
+		</div>
+	</body>
+	<script type="text/javascript">
+
+	window.onload = function(){
+		var canvas = document.getElementById("renderCanvas");
+		// Check support
+	    if (!BABYLON.Engine.isSupported()) {
+	        window.alert('Browser not supported');
+	    } else {
+	        // Babylon
+	        var engine = new BABYLON.Engine(canvas, true);
+	
+	        //Creating scene (in "scene_tuto.js")
+	        scene = createScene(engine);
+	
+	        scene.activeCamera.attachControl(canvas);
+
+	        // Once the scene is loaded, just register a render loop to render it
+	        engine.runRenderLoop(function () {
+	            scene.render();
+	        });
+	
+	        // Resize
+	        window.addEventListener("resize", function () {
+	            engine.resize();
+	        });
+	    }
+	}     	
+	function createScene(engine) {
+	    //Creation of the scene 
+		var scene = new BABYLON.Scene(engine);
+		// Creating a camera looking to the zero point (0,0,0), a light, and a sphere of size 1
+		var camera = new BABYLON.ArcRotateCamera("Camera", 1, 0.8, 10, new BABYLON.Vector3(0, 0, 0), scene);
+		var light0 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 0, 10), scene);
+		var origin = BABYLON.Mesh.CreateSphere("origin", 10, 1.0, scene);
+
+		return scene;    
+	}
+	</script>
+</html>

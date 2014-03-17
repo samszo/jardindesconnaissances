@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  
+  <head >
+    <title>Branches documentaires</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="../js/d3.v3.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/treeBranche.js"></script>
+    <script type="text/javascript">
+		function init(){	    
+		 	var dndT = new treeBranche({id:"dndT", div:"#vizTree", url:"../data/flare.json", w:$(document).width(), h:$(document).height()});
+		}
+    </script>
+    <style type="text/css">
+      
+	.node {
+	    cursor: pointer;
+	  }
+	
+	  .overlay{
+	      background-color:#EEE;
+	  }
+	   
+	  .node circle {
+	    fill: #fff;
+	    stroke: steelblue;
+	    stroke-width: 1.5px;
+	  }
+	   
+	  .node text {
+	    font-size:10px; 
+	    font-family:sans-serif;
+	  }
+	   
+	  .link {
+	    fill: none;
+	    stroke: #ccc;
+	    stroke-width: 1.5px;
+	  }
+	
+	  .templink {
+	    fill: none;
+	    stroke: red;
+	    stroke-width: 3px;
+	  }
+	
+	  .ghostCircle.show{
+	      display:block;
+	  }
+	
+	  .ghostCircle, .activeDrag .ghostCircle{
+	       display: none;
+	  }
+      
+    </style>
+  </head>
+  
+  <body onload="init()" >
+  	<div id="vizTree" >
+  	</div>
+  
+  </body>
+</html>
