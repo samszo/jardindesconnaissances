@@ -89,6 +89,11 @@ class GraphController extends Zend_Controller_Action {
 		$url = $request->getRequestUri();
 		$arrUrl = explode("?",$url);		
     }	
+
+    public function branchesAction()
+    {
+    }	
+    
     
     public function sunburstAction()
     {

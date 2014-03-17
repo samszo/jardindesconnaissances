@@ -24,7 +24,7 @@ class AuthController extends Zend_Controller_Action
 				$redir='/'.$this->_getParam('redir', 0);
 				$ssExi->redir = $redir;
 			}
-			echo  $redir;
+			//echo  $redir;
 			
 	    	// Obtention d'une référence de l'instance du Singleton de Zend_Auth
 			$auth = Zend_Auth::getInstance();

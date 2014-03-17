@@ -222,7 +222,11 @@ class DeleuzeController extends Zend_Controller_Action {
 	}
 
 	public function chercheAction() {
-		$oD = new Flux_Deleuze($this->dbNom);
+	    if($this->_getParam('term', 0)){
+			$oD = new Flux_Deleuze('deleuze');
+			//echo $this->_getParam('term');
+			$this->view->data = $oD->cherche($this->_getParam('term'));		
+	    }
 	}
 	
 }
