@@ -1,3 +1,9 @@
 <?php
-echo json_encode($this->data);
+//pour l'exécution du script dans une page extérieur au domaine
+header('Access-Control-Allow-Origin: *');
+header("X-XSS-Protection: 0");	
+
+$json = json_encode($this->data);
+if($json) echo $json;
+else print_r($this->data);
 		

@@ -6,36 +6,53 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <script type="text/javascript" src="../js/d3.v3.js"></script>
     <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <!--   
+    -->
+    <script type="text/javascript" src="../js/treeBranche.js"></script>
+    <script type="text/javascript" src="../js/zoom.js"></script>
     <script type="text/javascript">
     	var utis = <?php echo json_encode($this->utis); ?>;
     	var docs = <?php echo json_encode($this->docs); ?>;
     	var tags = <?php echo json_encode($this->tags); ?>;
     	var links = <?php echo json_encode($this->links); ?>;
     	var idBase = '<?php echo $this->idBase; ?>';
-		var svg;
+		var svg, svgGroup;
 		var visDocText;
 		var distCielTerre = 300;
 		var tempo = 10000;
 		var xMid = 400;
 		var nbDoc = docs.length;
-		
+		var pas=110, exaSize=100;
+
+		//pour bouger un élément dessus
+		d3.selection.prototype.moveToFront = function() {
+			  return this.each(function(){
+			    this.parentNode.appendChild(this);
+			  });
+			};
+					
 		function init(){
 	    	//création du svg
-	         svg = d3.select("#viz")
+	        svg = d3.select("#viz")
 		        .append("svg:svg")
 	    	    .attr("width", 800)
 	        	.attr("height", 440)
-		        .append("svg:g");
+		        .attr("class", "overlay")
+		        .call(zoomListener);
+		    // Append a group which holds all nodes and which the zoom Listener can act upon.
+		    svgGroup = svg.append("g");
 
-		 	creaLinks();
 	    	creaDocs();
 	    	creaUtis();
 	    	creaTags();
+		 	creaLinks();
+		 	var dndT = new treeBranche({svgGroup:svgGroup, id:"dndT", url:"../data/flare.json", x:200, y:200, w:100, h:100});
+		 	
 		}
 
 		function creaDocs(){
 			var y = 10, fontSize=20;
-			visDocText = svg.selectAll(".gDoc")
+			visDocText = svgGroup.selectAll(".gDoc")
 		      .data(docs)
 		      .enter()
 		      .append("svg:g")
@@ -178,42 +195,68 @@
 		
 
 		function creaUtis() {
-			var y = 240, pas=110, exaSize=100;
+			var y = 240;
 			//création du cercle de l'intériorité
-			svg.append("svg:circle")
+			svgGroup.append("svg:circle")
 			    .attr("cx",400)
 			    .attr("cy",8240)
 			    .attr("r",8000)
 			    .style("fill","black");
 
 			//création des utilisateurs
-			var visUtiExa = svg.selectAll("gUti")
+			var visUtiExa = svgGroup.selectAll(".clsUti")
 		      	.data(utis)
 				.enter()
 		        .append('svg:g')
 		        .attr("id", function(d, i) {  return "gUti"+d.uti_id; })	            
-		        .attr("class", "gUti");
+		        .attr("class", "clsUti");
+	        //création de l'exagone
 			visUtiExa.append('svg:polygon')
 		        .classed('tile', true)
 			    .style("stroke","white")
 		        .attr('points', function(d, i) {
-		            return hex([xMid+(pas*i),y], exaSize, false).join(' ');
-		        });		    
+			        var x = alterneX(pas, i); 			        
+			        return hex([x,y], exaSize, false).join(' ');
+		        });
+	        //création du texte		    
 			visUtiExa.append("svg:text")
 		        	.attr("text-anchor", "middle")
 		        	.style("font-size", 16)
 				    .style("fill","white")
-				    .attr("x",function(d, i) { return xMid+(pas*i) })
-				    .attr("y",function(d, i) { return y })
+				    .attr("x",function(d, i) { 
+					    return alterneX(pas, i); 
+					    })
+				    .attr("y",y)
 				    .text(function(d) { 
 				    	return d.login; 
 				    	});
-	        
+	        //création de l'arbre des documents
+			utis.forEach(function(u, i) {
+				var g = svgGroup.select("#gUti"+u.uti_id); 
+			    var bbUti = g[0][0].getBBox();
+			    var x = bbUti.x+(bbUti.width/2);
+			    var y = bbUti.y-32;				
+			 	//var dndT = new treeBranche({svgGroup:g, id:"dndT_"+u.uti_id, url:"../data/flare.json", x:x, y:y, w:100, h:100});
+		    });		        				
+	
 		}
 		
+		function alterneX(pas, i) {
+	        //placement alterné droite-gauche
+	        var x;
+	        if (i%2 == 0){
+		       if(i>1)i--;
+			   x = xMid+(pas*i);
+	        }else{
+			   if(i>1)i--;
+			   x = xMid-(pas*i);
+	        }
+			return x;
+		}
+
 		function creaTags() {
 			var x = 100, y = 360, pas=70, bulleSize=30;
-			var visTagBulle = svg.selectAll(".gTag")
+			var visTagBulle = svgGroup.selectAll(".gTag")
 		      	.data(tags)
 				.enter()
 		        .append('svg:g')
@@ -232,6 +275,7 @@
 		      ;
 			visTagBulle.append("svg:text")
 		        	.attr("text-anchor", "middle")
+			        .attr("id", function(d, i) {  return "gTagTxt"+d.tag_id; })	            
 		        	.style("font-size", 16)
 				    .style("fill","black")
 				    .attr("x",function(d,i) { 
@@ -255,20 +299,38 @@
 
 		function creaLinks() {
 			var x = 200, y = 360, pas=70;
-			var visLinksPath = svg.selectAll(".gLink")
+			var visLinksPath = svgGroup.selectAll(".gLink")
 		      	.data(links)
 				.enter()
 		        .append('svg:path')
-		        .attr("id", function(d, i) {  return "gLink"+d.doc_id; })	            
+		        .attr("id", function(d) {  
+			        return "gLink"+d.utitagdoc_id; 
+			        })	            
 		        .attr("class","gLink")
 			    .attr("d", function(d,i) { 
-			      return "m 400,0 "+(x+(pas*i))+","+y+" 10,10 20,20";
+				    //récupère les pôles du lien
+				    var gUti = d3.select("#gUti"+d.uti_id);
+				    var bbUti = gUti[0][0].getBBox()
+				    var gTag = d3.select("#gTagTxt"+d.tag_id);
+				    var bbTag = gTag[0][0].getBBox();
+				    //construction du lien
+				    var d = "M "+(bbTag.x+(bbTag.width/2))+","+bbTag.y //on part du centre du tag
+				    	+" "+(bbUti.x+(bbUti.width/2))+","+(bbUti.y+bbUti.height) //on va au bas de l'exagone
+				    	+" "+(bbUti.x+(bbUti.width/2))+","+(bbUti.y-32) //on va au dessus de l'exagone
+				    	+" "+10*i+",10"; // on fini en haut de droite à gauche				    	
+			      	return d;
+			      	//return "m 400,0 "+(x+(pas*i))+","+y+" 10,10 20,20";
 			      })
-		      .style("stroke","black")
+		      .style("stroke","red")
+		      .style("fill","none")
 		      .style("stroke-width",2)
 		      ;
+			//remet l'utilisateur au premier plan
+			var utis = d3.selectAll(".clsUti");
+		    utis.moveToFront();
+		    //création des liens
+		    
 		}
-		
     	
     </script>
     <style type="text/css">
@@ -277,12 +339,51 @@
         height: 440px;
         margin: 0px;
       }
+	
+	.node {
+	    cursor: pointer;
+	  }
+	
+	  .overlay{
+	      background-color:#EEE;
+	  }
+	   
+	  .node circle {
+	    fill: #fff;
+	    stroke: steelblue;
+	    stroke-width: 1.5px;
+	  }
+	   
+	  .node text {
+	    font-size:10px; 
+	    font-family:sans-serif;
+	  }
+	   
+	  .link {
+	    fill: none;
+	    stroke: #ccc;
+	    stroke-width: 1.5px;
+	  }
+	
+	  .templink {
+	    fill: none;
+	    stroke: red;
+	    stroke-width: 3px;
+	  }
+	
+	  .ghostCircle.show{
+	      display:block;
+	  }
+	
+	  .ghostCircle, .activeDrag .ghostCircle{
+	       display: none;
+	  }
+      	      
     </style>
   </head>
   
   <body onload="init()" >
   	<div id="viz">
-  	</div>
-  
+  	</div>  
   </body>
 </html>

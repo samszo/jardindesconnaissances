@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title>Semantics Frames</title>
+		<style>
+			html, body {
+				height: 100%;
+			}
+
+			body {
+				background-color: #000000;
+				margin: 0;
+				font-family: Helvetica, sans-serif;
+				overflow: hidden;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+			#info {
+				position: absolute;
+				width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				font-weight: bold;
+				text-align: center;
+				z-index: 1;
+			}
+
+			#menu {
+				position: absolute;
+				bottom: 20px;
+				width: 100%;
+				text-align: center;
+			}
+
+			.element {
+				width: 300px;
+				height: 300px;
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
+				border: 1px solid rgba(127,255,255,0.25);
+				text-align: center;
+				cursor: default;
+			}
+
+			.element:hover {
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
+				border: 1px solid rgba(127,255,255,0.75);
+			}
+
+				.element .number {
+					position: absolute;
+					top: 20px;
+					right: 20px;
+					font-size: 12px;
+					color: rgba(127,255,255,0.75);
+				}
+
+				.element .symbol {
+					position: absolute;
+					top: 40px;
+					left: 0px;
+					right: 0px;
+					font-size: 60px;
+					font-weight: bold;
+					color: rgba(255,255,255,0.75);
+					text-shadow: 0 0 10px rgba(0,255,255,0.95);
+				}
+
+				.element .details {
+					position: absolute;
+					bottom: 15px;
+					left: 0px;
+					right: 0px;
+					font-size: 12px;
+					color: rgba(127,255,255,0.75);
+				}
+
+			button {
+				color: rgba(127,255,255,0.75);
+				background: transparent;
+				outline: 1px solid rgba(127,255,255,0.75);
+				border: 0px;
+				padding: 5px 10px;
+				cursor: pointer;
+			}
+			button:hover {
+				background-color: rgba(0,255,255,0.5);
+			}
+			button:active {
+				color: #000000;
+				background-color: rgba(0,255,255,0.75);
+			}
+			
+			#search {
+				position: absolute;
+				width: 100%;
+				color: rgba(127,255,255,0.75);
+				padding: 20px;
+				text-align: center;
+			}
+
+			#search input {
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
+				border: 1px solid rgba(127,255,255,0.25);
+				color: rgba(127,255,255,0.75);
+				outline: 1px solid rgba(127,255,255,0.75);
+				background-color: transparent;
+				border: 1px solid rgba(127,255,255,0.75);
+				padding: 10px;
+				font-size: 20px;
+				text-transform: uppercase;
+				-webkit-border-radius: 0px; /* workaround for ios safari */
+			}
+
+			#search button {
+				color: rgba(127,255,255,0.75);
+				background-color: transparent;
+				border: 1px solid rgba(127,255,255,0.75);
+				padding: 10px;
+				font-size: 20px;
+				text-transform: uppercase;
+				cursor: pointer;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<script src="js/jquery-1.9.1.js"></script>
+		<script src="js/three.min.js"></script>
+		<script src="js/tween.min.js"></script>
+		<script src="js/TrackballControls.js"></script>
+		<script src="js/CSS3DRenderer.js"></script>
+
+		<div id="container"></div>
+		<div id="search"><input id="query" type="text" value="liberté"><button id="button">cherche</button></div>
+
+		<script>
+
+			var urlWiktio = "http://wiktionary.dbpedia.org/sparql?default-graph-uri=&query=SELECT+distinct+*%0D%0AFROM+%3Chttp%3A%2F%2Fwiktionary.dbpedia.org%3E+%0D%0AWHERE+%7B%0D%0A++%3Flexword+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23label%3E+%22trip%22%40en+.%0D%0A++%3Flexword+%3Chttp%3A%2F%2Fwww.monnet-project.eu%2Flemon%23sense%3E+%3Fsense+.++%0D%0A++%3Fsense+%3Chttp%3A%2F%2Fwiktionary.dbpedia.org%2Fterms%2FhasMeaning%3E+%3Fmeaning%0D%0A%7D%0D%0A&format=text%2Fhtml&timeout=0&debug=on";
+			var camera, scene, renderer;
+			var controls;
+
+			var objects = [];
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 3000;
+
+				scene = new THREE.Scene();
+
+				//
+
+				renderer = new THREE.CSS3DRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.style.position = 'absolute';
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				//
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.rotateSpeed = 0.5;
+				controls.minDistance = 500;
+				controls.maxDistance = 6000;
+				controls.addEventListener( 'change', render );
+
+				var button = document.getElementById( 'button' );
+				button.addEventListener( 'click', function ( event ) {
+
+					search( query.value );
+					//getRottenTomatoes(query.value);
+
+				}, false );
+
+				if ( window.location.hash.length > 0 ) {
+
+					query.value = window.location.hash.substr( 1 );
+
+				}
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				search( query.value );
+				
+			}
+
+			function search( query ) {
+
+				window.location.hash = query;
+
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+					( function () {
+
+						var object = scene.children[ i ];
+						var delay = Math.random() * 100;
+
+						new TWEEN.Tween( object.position )
+							.to( { y: - 2000 }, 1000 )
+							.delay( delay )
+							.easing( TWEEN.Easing.Exponential.In )
+							.onComplete( function () {
+
+								scene.remove( object );
+
+							} )
+							.start();
+
+					} )();
+
+				}
+
+				var request = new XMLHttpRequest();
+				request.addEventListener( 'load', onData, false );
+				request.open( 'GET', 'http://localhost/jdc/public/deleuze/cherche?term=' + query, true );
+				request.send( null );
+
+			}
+
+			function getRottenTomatoes(query){
+				
+				var url = "rt.php"
+				var p = {"q":query};
+				$.get(url, p,
+						 function(data){
+					 		console.log(data);
+						 }, "json");
+				
+			}
+			
+			function onData( event ) {
+				var data3D = [];
+				var data = JSON.parse( event.target.responseText );
+				//construction des données à afficher
+				var niv=1, idRub=-1, nbArt=0;  
+				for ( var i = 0; i < data.length; i ++ ) {
+					/*les résultats s'affichent dans une grille
+					niveau 1 = rubrique
+					niveau 2 = article
+					niveau 3 = phrase
+					*/
+					var d = data[i];
+					if(idRub!=d.id_rubrique){
+						idRub=d.id_rubrique;
+						nbArt ++;
+						nbArt=0;
+						//on ajoute l'objet correspondant à la rubrique
+						var object = {titre:d.rubTitre, score:nbArt, niv:30, id:d.id_rubrique};
+						data3D.push(object);
+					}
+					//on ajoute l'objet correspondant à l'article
+					var object = {titre:d.titre, score:d.score, niv:31, id:d.id_article};
+					data3D.push(object);
+					//on ajoute l'objet correspondant à la citation
+					d.phrases.forEach(function(p) {
+						var object = {titre:p.deb+p.mot+p.fin, niv:32, id:d.id_article+d.p};
+						data3D.push(object);					
+					});
+				}
+				var grid = getTarget(data3D, "deleuze");
+				transform(grid, 2000);
+			}
+
+			function getElement(data) {
+				var element = document.createElement( 'div' );
+				element.className = 'element';
+				element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
+
+				var symbol = document.createElement( 'div' );
+				symbol.className = 'symbol';
+				symbol.textContent = data.score;
+				element.appendChild( symbol );
+
+				var details = document.createElement( 'div' );
+				details.className = 'details';
+				details.innerHTML = data.titre;
+				element.appendChild( details );
+
+				return element;				
+			}
+
+			
+			function getTarget(data, type) {
+
+				var grid = [];
+
+				// on affiche les élement dans des grilles parallèles
+				for ( var i = 0; i < data.length; i ++) {
+
+					var element = getElement(data[i], type);
+					
+					var object = new THREE.CSS3DObject( element );
+					object.position.x = Math.random() * 4000 - 2000;
+					object.position.y = Math.random() * 4000 - 2000;
+					object.position.z = Math.random() * 4000 - 2000;
+					scene.add( object );
+
+					objects.push( object );
+
+					var object = new THREE.Object3D();
+					object.position.x = ( ( i % 5 ) * 400 ) - 800;
+					object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;
+					object.position.z = ( Math.floor( i / 25 ) ) * 1000 - 2000;
+
+					grid.push( object );
+
+				}
+
+				return grid;				
+			}
+			
+			function transform( targets, duration ) {
+
+				TWEEN.removeAll();
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+					var target = targets[ i ];
+
+					new TWEEN.Tween( object.position )
+						.to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
+						.easing( TWEEN.Easing.Exponential.InOut )
+						.start();
+
+					new TWEEN.Tween( object.rotation )
+						.to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration )
+						.easing( TWEEN.Easing.Exponential.InOut )
+						.start();
+
+				}
+
+				new TWEEN.Tween( this )
+					.to( {}, duration * 2 )
+					.onUpdate( render )
+					.start();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				TWEEN.update();
+
+				controls.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
