@@ -31,8 +31,8 @@ $(document).ready(function() {
 
     $('#connexion').on('submit', function() {
     	 
-        var login = $('#login').val();
-        var mdp = $('#password').val();
+        var login = $('#conLogin').val();
+        var mdp = $('#conPass').val();
  
         if(login == '' || mdp == '') {
             alert('Les champs doivent êtres remplis');
@@ -96,7 +96,7 @@ function evaluer() {
 }
 
 function naviguer() {
-	document.getElementById('ifEval').src = "eval/navigation";
+	document.getElementById('ifNavig').src = "eval/navigation";
 	$(document.body).animate({
 	    'scrollTop': $('#naviguer').offset().top
 	}, 1000);	
