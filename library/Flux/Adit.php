@@ -35,7 +35,7 @@ class Flux_Adit extends Flux_Site{
     	$this->getUser(array("login"=>"Flux_Addit"));
     	
     	//la récupération des buulletins se fait à partir des pages de résultat
-    	for ($i = 345; $i < 1379; $i++) {
+    	for ($i = 1; $i < 1380; $i++) {
     	//for ($i = 1 ; $i < 2; $i++) {
     		$this->getPageBE($i);
     	}
