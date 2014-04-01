@@ -172,6 +172,95 @@ class Flux_Stats  extends Flux_Site{
 		return $this->dbUTD->GetUtiTagDoc($rUti["uti_id"], $rDoc[0]["doc_id"]);
     	
 	}
+
+	/**
+     * Calcul l'historique de l'utilisation d'une liste de tags
+     *
+     * @param array 	$lstTags
+     * @param int 		$tronc
+     * @param string 	$dateUnit unité de la date : year, month...
+     * 
+     * @return array
+     */
+	function GetTagHisto($lstTags, $tronc=-1, $dateUnit="") {
+		
+		$c = str_replace("::", "_", __METHOD__); 
+		$c .= "_".$this->getParamString($lstTags);
+		$c .= "_".$tronc."_".$dateUnit;
+		$arr = $this->cache->load($c);
+        if(!$arr){
+	   		
+			$dbT = new Model_DbTable_Flux_Tag($this->db);
+			$dbD = new Model_DbTable_Flux_Doc($this->db);
+			
+			//récupère l'intervale de temps des documents
+			$arrDocInt = $dbD->getHistoInterval("",$dateUnit);
+			
+			//récupère l'historique des tags associés
+			$arrTags = $dbT->getTagHisto($lstTags, $tronc, $dateUnit);	    
+	
+			//création du tableau des dates
+			$result = array();
+			$oCode = "";
+			$nb=0;$maxNb=0;
+			$nbTag=count($arrTags);
+			$nbInt=count($arrDocInt);
+			$t = $this->initArrInt($nbInt);
+			for ($i = 0; $i < $nbTag; $i++) {
+				$d = $arrTags[$i];
+				if($i==0) $oCode=$d['code'];
+				if($oCode!=$d['code']){
+					$r = array("tag_id"=>$d['tag_id'], "code"=>$d['code'], "nb"=>$nb, "temps"=>$t);
+					$result[]=$r;
+					$t = $this->initArrInt($nbInt);
+					$nb=0;
+					$oCode=$d['code'];
+				}
+				$k = $this->getKeyDocInt($arrDocInt, $d['temps']);
+				$t[$k] = intval($d['nb']);
+				if($maxNb<$t[$k])$maxNb=$t[$k];
+				$nb += $t[$k];
+			}
+			$arr = array("maxTagNb"=>$maxNb, "dateDocInt"=>$arrDocInt, "tagHisto"=>$result);
+			$this->cache->save($arr, $c);
+        }
+			
+		return $arr;
+	}
+	
+	function initArrInt($nb){
+		//initialise le tableau des intervals
+		$t = "";
+		for ($j = 0; $j < $nb; $j++) {
+			$t[] = 0;
+		}
+		return $t;
+	}
+	
+	function getKeyDocInt($arr, $temps){
+		
+		foreach ($arr as $k => $val) {
+			if($val['temps']==$temps) return intval($k);
+		}
+	}
+	
+	/**
+     * Calcul les tags associés à une liste de tag
+     *
+     * @param array $lstTags
+     * @param int $tronc
+     * 
+     * @return array
+     */
+	function GetTagAssos($lstTags, $tronc=-1) {
+		
+		$dbT = new Model_DbTable_Flux_Tag($this->db);
+		
+		//récupère la liste des tags associés
+		$arrTags = $dbT->getTagAssos($lstTags, $tronc);	    
+
+		return $arrTags;
+	}
 	
 	/**
      * Calcul la matrice des tags associés à une liste de tag
