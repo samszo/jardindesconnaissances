@@ -33,6 +33,7 @@ function tagcloud(config) {
 		statusText = d3.select("#status_"+this.idDoc),
 		maxLength = 30,
 		maxTag = 1000, colorTag = "black",
+		minmaxFont = [8, 96];
 		self = this,
 		posiTxt = d3.select("#select_txt_"+this.idDoc);
 
@@ -101,7 +102,7 @@ function tagcloud(config) {
 			    .text("a simple tooltip");
 			
 			ext = d3.extent(self.data.map(function(x) { return parseInt(x.value); }));
-			fontSize = d3.scale.log().domain([ext[0],ext[1]]).range([8, 128]);
+			fontSize = d3.scale.log().domain([ext[0],ext[1]]).range(minmaxFont);
 			d3.layout.cloud().size([w, h])
 				.words(self.data)
 			    .rotate(0)
@@ -246,7 +247,10 @@ function tagcloud(config) {
 					tags[wlc] = d.value;
 				j++;
 			});
-			tags = d3.entries(tags).sort(function(a, b) { return b.value - a.value; });
+			//ordre valeur
+			//tags = d3.entries(tags).sort(function(a, b) { return b.value - a.value; });
+			//ordre alphabétique 
+			tags = d3.entries(tags).sort(function(a, b) { return b.code - a.code; });
 			tags.forEach(function(d) {
 				d.key = cases[d.key];
 				});
