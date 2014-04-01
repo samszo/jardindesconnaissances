@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<title>Tag Histo</title>
+		<link rel="stylesheet" href="css/taghisto.css" />
+		<meta name="Description" CONTENT="Explorateur historique de tag pour le jardin des connaissances"/>
+		<meta name="Keywords" CONTENT="tagcloud filtre historique jardin connaissances"/>
+		<meta name="Author" CONTENT="Samuel Szoniecky"/>
+		<script type='text/javascript' src='js/d3.v3.js' ></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/jquery.smart_autocomplete.js"></script>
+	<head>
+	<body>
+
+    <div id="title">
+      <h2 id='titreYears' >De 1950 à 2010 :</h2>
+      <h1>Exploration historique des Tags</h1>
+    </div>
+    <div id="content">
+      <div id="left_side">
+        <form id="search">
+          <input src="img/search.png" type="image">
+          <input autocomplete="off" type="text" style="width: 457px;">
+          <a class="clear" href="#" style="display: none">
+            <img src="img/clear.png">
+          </a>
+        </form>
+        <div id="tags_list_container" style="height: 403px;"><ul></ul></div>
+      </div>
+      <div id="right_side" style="width: 1076px;">
+        <div id="bottom" style="width: 938px;">
+			<svg width="1117" height="419" id="svgGraph">
+	          <defs>
+	            <clipPath id="graphs_clip_path">
+	              <rect x="75" y="0" width="932" height="419"></rect>
+	            </clipPath>
+	          </defs>
+	          <rect id="playground_bg" x="75" y="50" width="932" height="289"></rect>
+	          <g class="axis" id="x_axis" transform="translate(0, 345)"><line class="tick minor" y2="0" x2="0" transform="translate(113.83333333333333,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(191.5,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(269.1666666666667,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(346.83333333333337,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(424.5,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(502.16666666666663,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(579.8333333333333,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(657.5,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(735.1666666666667,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(812.8333333333333,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(890.5,0)" style="opacity: 1;"></line><line class="tick minor" y2="0" x2="0" transform="translate(968.1666666666667,0)" style="opacity: 1;"></line><g class="tick major" transform="translate(75,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1950</text></g><g class="tick major" transform="translate(152.66666666666666,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1955</text></g><g class="tick major" transform="translate(230.33333333333331,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1960</text></g><g class="tick major" transform="translate(308,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1965</text></g><g class="tick major" transform="translate(385.66666666666663,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1970</text></g><g class="tick major" transform="translate(463.33333333333337,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1975</text></g><g class="tick major" transform="translate(541,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1980</text></g><g class="tick major" transform="translate(618.6666666666667,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1985</text></g><g class="tick major" transform="translate(696.3333333333333,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1990</text></g><g class="tick major" transform="translate(774,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">1995</text></g><g class="tick major" transform="translate(851.6666666666667,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">2000</text></g><g class="tick major" transform="translate(929.3333333333333,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">2005</text></g><g class="tick major" transform="translate(1007,0)" style="opacity: 1;"><line y2="-289" x2="0"></line><text y="3" x="0" dy=".71em" style="text-anchor: middle;">2010</text></g><path class="domain" d="M75,1V0H1007V1"></path></g>
+	          <g class="axis" id="y_axis" transform="translate(75, 0)"><g class="tick major" transform="translate(0,339)" style="opacity: 1;"><line x2="932" y2="0"></line><text x="-3" y="0" dy=".32em" style="text-anchor: end;">0</text></g><g class="tick major" transform="translate(0,290.8333333333333)" style="opacity: 1;"><line x2="932" y2="0"></line><text x="-3" y="0" dy=".32em" style="text-anchor: end;">50</text></g><g class="tick major" transform="translate(0,242.66666666666666)" style="opacity: 1;"><line x2="932" y2="0"></line><text x="-3" y="0" dy=".32em" style="text-anchor: end;">100</text></g><g class="tick major" transform="translate(0,194.5)" style="opacity: 1;"><line x2="932" y2="0"></line><text x="-3" y="0" dy=".32em" style="text-anchor: end;">150</text></g><g class="tick major" transform="translate(0,146.33333333333331)" style="opacity: 1;"><line x2="932" y2="0"></line><text x="-3" y="0" dy=".32em" style="text-anchor: end;">200</text></g><g class="tick major" transform="translate(0,98.16666666666666)" style="opacity: 1;"><line x2="932" y2="0"></line><text x="-3" y="0" dy=".32em" style="text-anchor: end;">250</text></g><g class="tick major" transform="translate(0,50)" style="opacity: 1;"><line x2="932" y2="0"></line><text x="-3" y="0" dy=".32em" style="text-anchor: end;">300</text></g><path class="domain" d="M-1,50H0V339H-1"></path></g>
+	          <g id="tags">
+	            <g id="lines"></g>
+	            <g id="circles"></g>
+	            <g id="labels"></g>
+	          </g>
+	          <g id="popup" opacity="0" transform="translate(687 70)"><rect class="bg" width="300" height="150"></rect><text class="year" x="10" y="27">1955</text></g>
+	          <g id="year_zoomers" transform="translate(75 373)"><g transform="translate(0 0)"><rect x="0" y="0" height="32" width="147"></rect><text y="18" x="73.5"><tspan>années </tspan><tspan class="year">1950</tspan></text></g><g transform="translate(157 0)"><rect x="0" y="0" height="32" width="147"></rect><text y="18" x="73.5"><tspan>années </tspan><tspan class="year">1960</tspan></text></g><g transform="translate(314 0)"><rect x="0" y="0" height="32" width="147"></rect><text y="18" x="73.5"><tspan>années </tspan><tspan class="year">1970</tspan></text></g><g transform="translate(471 0)"><rect x="0" y="0" height="32" width="147"></rect><text y="18" x="73.5"><tspan>années </tspan><tspan class="year">1980</tspan></text></g><g transform="translate(628 0)"><rect x="0" y="0" height="32" width="147"></rect><text y="18" x="73.5"><tspan>années </tspan><tspan class="year">1990</tspan></text></g><g transform="translate(785 0)"><rect x="0" y="0" height="32" width="147"></rect><text y="18" x="73.5"><tspan>années </tspan><tspan class="year">2000</tspan></text></g></g>
+	        </svg>
+	      <div class="share_link">
+            Partagez ces résultats avec ce lien :
+            <br>
+            <input id="share_result" type="text">
+          </div>
+          <div class="links">
+            <div class="social">
+          </div>
+          <div class="spacer"></div>
+          <div class="explanations">
+	          merci beaucoup à <a href="http://dataaddict.fr/prenoms/" target="_blank">dataaddict.fr</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    		<script>
+		    var fill = d3.scale.category20b(),
+			idBase = '<?php echo $this->idBase; ?>',
+			w = 800,
+			h= 800,
+			max = 250,
+			scale = 1,
+			complete = 0,
+			statusText = d3.select("#status"),
+			fontSize,
+			dataTag, max_tag;
+			var years, _i, _results;
+		    var duration = 1000;
+			//setInput();
+
+			var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+	       	var axis, x_axis, y_axis;
+			var line_generator, redraw_existing_labels, redraw_existing_lines, transform_for_tag_label, update_lines, update_y_axis, year_zoomers;
+			
+			var svg = d3.select("#svgGraph");
+			var background = svg.append("g"),
+				vis = svg.append("g")
+					.attr("transform", "translate(" + [w >> 1, h >> 1] + ")"); 
+
+	       var colors = ["#4c5d91", "#4c92b9", "#53a488", "#a5ad5c", "#e0da2f", "#b98c6f", "#d57599", "#a15599"];
+		   var tag_color_scale = d3.scale.ordinal().range(colors.slice(0, 5));
+		   var tags_lis;
+	       var tags_selection = (function() {
+	          var tags;
+	          tags = [];
+	          tags.add = function(tag) {
+	            return tags.push(tag);
+	          };
+	          tags.remove = function(tag) {
+	            var i;
+	            i = tags.indexOf(tag);
+	            return tags.splice(i, 1);
+	          };
+	          return tags;
+	        })();
+			
+			d3.json("<?php echo $this->urlStats; ?>", function(data) {
+				years = data.dateDocInt
+				dataTag = data.tagHisto;
+				max_tag = data.maxTagNb;
+				//var tcGlobal = new tagcloud({idDoc:"gTC", data:dataTag, w:300, h:300, global:true});
+
+				axis = (function() {
+			              var full_range;
+			              full_range = d3.extent(years);
+			              full_range = d3.extent(years.map(function(x) { return parseInt(x.temps); }));
+			              return {
+			                x: d3.scale.linear().domain(full_range),
+			                y: d3.scale.linear().domain([0, 300])
+			              };
+			            })();
+				
+		      	tags_lis = d3.select("#tags_list_container ul").selectAll("li")
+		      		.data(dataTag)
+		      		.enter().append("li")
+		      		.call(update_class_for_tag(years))
+				    .text(function(d) {
+				          return d.code;
+				        })
+		        	.on("click", function(d) {			        	
+				          console.log(d.code);
+				          var selected;
+				          selected = d3.select(this).classed("selected");
+				          add_remove((selected ? "remove" : "add"), d);
+				          return false;
+				        });							    
+		        $("#tags_list_container ul li").after(" ");
+
+		        
+				x_axis = d3.svg.axis().scale(axis.x).orient("bottom").tickValues((function() {
+	                var _i, _len, _ref, _results;
+	                _ref = years;
+	                _results = [];
+	                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+	                  year = _ref[_i];
+	                  if (year % 5 === 0) {
+	                    _results.push(year);
+	                  }
+	                }
+	                return _results;
+	              })()).tickFormat(String).tickSubdivide(1).tickSize(6, 1);
+
+		    	y_axis = d3.svg.axis().scale(axis.y).orient("left").tickFormat(String).ticks(6);
+
+				line_generator = d3.svg.line().x(function(pt, i) {
+	                return axis.x(parseInt(years[i].temps));
+	              }).y(axis.y).tension(0.1).interpolate("linear");
+
+		    	
+			});//fin chargement du json
+
+	        function add_remove(msg, tag_data) {
+	            var sel;
+	            sel = tags_lis.filter(function(d) {
+	              return d === tag_data;
+	            });
+	            if (msg === "add") {
+	                tags_selection.add(tag_data);
+		            sel.style("background-color", tag_color_scale(tag_data.code)).classed("selected", true);	              
+	            } else {
+					tags_selection.remove(tag_data);
+					sel.style("background-color", "").classed("selected", false);
+	            }
+                update_lines();
+	          };
+			
+          function update_class_for_tag(years) {
+	          var max_tag = 10;
+	          return function(sel) {
+	            return sel.each(function(dataTag) {
+		          var t = d3.select(this);  
+	              var font_size, i, level, line_height, tag_data_max, sizes, _ref;
+	              tag_data_max = this.__data__.nb;
+	              i = tag_data_max / max_tag;
+	              level = i > 1 ? 4 : i > 0.8 ? 3 : i > 0.5 ? 2 : i > 0.3 ? 1 : 0;
+	              sizes = [[0.9, 1], [1.2, 0.7], [1.7, 0.625], [2.0, 0.55], [2.5, 0.47]];
+	              _ref = sizes[level], font_size = _ref[0], line_height = _ref[1];
+	              return d3.select(this).style("line-height", line_height).style("font-size", font_size * 14 + "px");
+	            });
+	          };
+	        };
+
+	      function max_for_tags(tags_data, years_array) {
+	            if (years_array == null) {
+	              years_array = years;
+	            }
+	            return d3.max(tags_data, function(data) {
+	              var count, i;
+	              return d3.max((function() {
+	                var _j, _len, _ref, _ref1, _results1;
+	                _ref = data.temps;
+	                _results1 = [];
+	                for (i = _j = 0, _len = _ref.length; _j < _len; i = ++_j) {
+	                  count = _ref[i];
+	                  _ref1 = parseInt(years[i].temps);
+	                  var idx = __indexOf.call(years_array, _ref1)
+	                  if (idx >= 0) {
+	                    _results1.push(count);
+	                  }
+	                }
+	                return _results1;
+	              })());
+	            }) || 0;
+	        };
+	        
+			transform_for_tag_label = function(labels_selection, translate_y_to_zero) {
+	                if (translate_y_to_zero == null) {
+	                  translate_y_to_zero = false;
+	                }
+	                return labels_selection.attr("transform", function(tag_data) {
+	                  var count, i, max_count, max_year, pt, year_range, _i, _j, _len, _ref, _ref1, _ref2, _results;
+	                  year_range = (function() {
+	                    _results = [];
+	                    for (var _i = _ref = axis.x.domain()[0], _ref1 = axis.x.domain()[1]; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; _ref <= _ref1 ? _i++ : _i--){ _results.push(_i); }
+	                    return _results;
+	                  }).apply(this);
+	                  max_count = 0;
+	                  max_year = year_range[0];
+	                  _ref2 = prenom_data.years;
+	                  for (i = _j = 0, _len = _ref2.length; _j < _len; i = ++_j) {
+	                    count = _ref2[i];
+	                    year = years[0] + i;
+	                    if (__indexOf.call(year_range, year) < 0) {
+	                      continue;
+	                    }
+	                    if (count > max_count) {
+	                      max_count = count;
+	                      max_year = year;
+	                    }
+	                  }
+	                  pt = [axis.x(max_year) + 5, axis.y(max_count) - 15];
+	                  if (translate_y_to_zero) {
+	                    pt[1] = axis.y.range()[0];
+	                  }
+	                  return "translate(" + pt[0] + " " + pt[1] + ")";
+	                });
+	              };
+
+	  		redraw_existing_lines = function(lines) {
+                return lines.style("clip-path", "url(#graphs_clip_path)").select("g path").attr("d", function(prenom_data) {
+                  return line_generator(prenom_data.years);
+                });
+              };
+
+			redraw_existing_labels = function(labels) {
+	                return labels.call(transform_for_tag_label);
+	        };
+	                    
+	  	    year_zoomers = d3.select("#year_zoomers").selectAll("g").data((function() {
+                var i, ticks;
+                ticks = [1950, 1960, 1970, 1980, 1990, 2000, 2011];
+                return ticks = ((function() {
+                  var _i, _len, _results;
+                  _results = [];
+                  for (i = _i = 0, _len = ticks.length; _i < _len; i = ++_i) {
+                    year = ticks[i];
+                    if (ticks[i + 1]) {
+                      _results.push([year, ticks[i + 1]]);
+                    } else {
+                      _results.push(void 0);
+                    }
+                  }
+                  return _results;
+                })()).filter(function(r) {
+                  return r != null;
+                });
+              })()).enter().append("g");
+            
+	        year_zoomers.on("click", function(range) {
+	                var g, l, that;
+	                g = d3.select(this);
+	                g.classed("selected", !g.classed("selected"));
+	                that = this;
+	                year_zoomers.filter(function() {
+	                  return this !== that;
+	                }).classed("selected", false);
+	                l = years.length;
+	                if (g.classed("selected")) {
+	                  range = [Math.max(years[0], range[0] - 1), Math.min(years[l - 1], range[1] + 1)];
+	                } else {
+	                  range = [years[0], years[l - 1]];
+	                }
+	                return PubSub.publish("year_range_update", range);
+	        });
+	        
+			h = 32;
+	        year_zoomers.append("rect").attr("x", 0).attr("y", 0).attr("height", h);
+	        year_zoomers.append("text").attr("y", h / 2 + 2).call(function(t) {
+	                t.append("tspan").text("années ");
+	                return t.append("tspan").classed("year", true).text(function(range) {
+	                  return range[0];
+	                });
+	              });
+            
+			update_y_axis = function(max) {
+	                max = Math.max(max, 300);
+	                axis.y.domain([0, max]);
+	                svg.select("#y_axis").transition().duration(duration).call(y_axis);
+	                //return PubSub.publishSync("axis:y:update");
+	              };
+	        
+			update_lines = function() {
+	                var bbox, clip_path_id, disappear, el, initial_line, labels, left_to_right_appear_transition, lines, margin, new_labels, new_lines, new_max, transform, x_pos, _i, _ref, _ref1, _results;
+	                new_max = max_for_tags(tags_selection, (function() {
+	                  _results = [];
+	                  for (var _i = _ref = axis.x.domain()[0], _ref1 = axis.x.domain()[1]; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; _ref <= _ref1 ? _i++ : _i--){
+		                   _results.push(_i); 
+		                   }
+	                  return _results;
+	                }).apply(this));
+	                
+	                update_y_axis(new_max);
+	                initial_line = line_generator((function() {
+	                  var _j, _len, _ref2, _results1;
+	                  _ref2 = years;
+	                  _results1 = [];
+	                  for (_j = 0, _len = _ref2.length; _j < _len; _j++) {
+	                    year = parseInt(_ref2[_j].temps);
+	                    _results1.push(0);
+	                  }
+	                  return _results1;
+	                })());
+	                lines = svg.select("#tags #lines").selectAll("g").data(tags_selection, function(d) {
+	                  return d.tag_id;
+	                });
+	                
+		        new_lines = lines.enter().append("g").attr("opacity", 1).classed("line", true);
+
+                margin = {
+                  vertical: 2,
+                  horizontal: 10
+                };
+                x_pos = axis.x.range()[0] + 25;
+                if (false && (el = _.last((d3.selectAll("g.label")[0])))) {
+                  bbox = el.getBBox();
+                  transform = d3.transform(d3.select(el).attr("transform"));
+                  x_pos = transform.translate[0] + bbox.width + margin.horizontal;
+                }
+                lines.transition().duration(duration).call(redraw_existing_lines);
+                clip_path_id = function(prenom_data, i) {
+                  return "clip_path_prenom_" + i;
+                };
+                
+	            new_lines.append("clipPath").attr("class", "clippath").attr("id", clip_path_id).append("rect").attr("x", axis.x.range()[0]).attr("width", 0).attr("y", axis.y.range()[1] - 10).attr("height", axis.y.range()[0] - axis.y.range()[1] + 20);
+	            new_lines.append("path").attr("stroke", tag_color_scale).style("clip-path", function(tag_data, i) {
+	                  return "url(#" + (clip_path_id(tag_data, i)) + ")";
+	                }).attr("d", function(tag_data) {
+	                  return line_generator(tag_data.temps);
+	                });
+                
+	            left_to_right_appear_transition = new_lines.transition().duration(duration).ease("linear");
+	            left_to_right_appear_transition.select(".clippath").remove().select("rect").attr("width", axis.x.range()[1] - axis.x.range()[0]);
+	            left_to_right_appear_transition.select("path").each('end', function() {
+	                  return d3.select(this).style("clip-path", "url(#graphs_clip_path)");
+	                });
+	            labels = svg.select("#tags #labels").selectAll("g").data(tags_selection, function(d) {
+	                  return d.unique_id;
+	                });
+	            labels.transition().duration(duration).call(redraw_existing_labels);
+	                new_labels = labels.enter().append("g").attr("opacity", 1).on('click', function(tag_data) {
+	                  return add_remove("remove", tag_data);
+	                }).style('cursor', 'pointer').each(function(tag_data, data_index) {
+	                  var g, padding, rect, text;
+	                  g = d3.select(this);
+	                  g.call(transform_for_tag_label);
+	                  padding = {
+	                    top: 6,
+	                    bottom: 3,
+	                    horizontal: 10
+	                  };
+	                  rect = g.append("rect");
+	                  text = g.append("text").text(function(d) {
+	                    return d.prenom_sexued;
+	                  }).attr("x", padding.horizontal).attr("y", 0);
+	                  bbox = text.node().getBBox();
+	                  x_pos += bbox.width + padding.horizontal * 2 + margin.horizontal;
+	                  return rect.attr("fill", tag_color_scale).attr("x", bbox.x + bbox.width / 2).attr("y", bbox.y + bbox.height / 2).transition().duration(duration).attr("x", bbox.x - padding.horizontal).attr("y", bbox.y - padding.top).attr("width", bbox.width + padding.horizontal * 2).attr("height", bbox.height + padding.bottom + padding.top);
+	                });
+	                
+	          function disappear(sel) {
+	                  return sel.exit().transition().ease('exp-out').duration(duration).attr("opacity", 0).remove();
+	                };
+	                disappear(lines).select("g.line path").attr("d", initial_line);
+	                disappear(labels).call(transform_for_tag_label, true);
+	                //return popup.update();
+	              };
+
+              transform_for_tag_label = function(labels_selection, translate_y_to_zero) {
+                  if (translate_y_to_zero == null) {
+                    translate_y_to_zero = false;
+                  }
+                  return labels_selection.attr("transform", function(tag_data) {
+                    var count, i, max_count, max_year, pt, year_range, _i, _j, _len, _ref, _ref1, _ref2, _results;
+                    year_range = (function() {
+                      _results = [];
+                      for (var _i = _ref = axis.x.domain()[0], _ref1 = axis.x.domain()[1]; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; _ref <= _ref1 ? _i++ : _i--){ _results.push(_i); }
+                      return _results;
+                    }).apply(this);
+                    max_count = 0;
+                    max_year = year_range[0];
+                    _ref2 = tag_data.temps;
+                    for (i = _j = 0, _len = _ref2.length; _j < _len; i = ++_j) {
+                      count = _ref2[i];
+                      year = years[0] + i;
+                      if (__indexOf.call(year_range, year) < 0) {
+                        continue;
+                      }
+                      if (count > max_count) {
+                        max_count = count;
+                        max_year = year;
+                      }
+                    }
+                    pt = [axis.x(max_year) + 5, axis.y(max_count) - 15];
+                    if (translate_y_to_zero) {
+                      pt[1] = axis.y.range()[0];
+                    }
+                    return "translate(" + pt[0] + " " + pt[1] + ")";
+                  });
+                };
+	              
+		</script>
+	</body>
+</html>
