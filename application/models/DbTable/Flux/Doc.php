@@ -422,4 +422,43 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
     } 
     
+    
+	/**
+     * Récupère les intervales historique des documents 
+     *
+     * @param int 		$tronc
+     * @param string 	$dateUnit unité de la date : year, month...
+     * 
+     * @return array
+     */
+	function getHistoInterval($tronc="", $dateUnit="") {
+
+		//élimine les date nulles
+		$where = "d.maj != 0";
+		
+		//vérifie si on prend les tags du document racine ou de ces éléments
+		if($tronc){
+			$where = ' AND d.tronc = '.$tronc;
+		}
+		if($dateUnit){
+			$dateUnit = 'DATE_FORMAT(d.maj, "%'.$dateUnit.'")';
+		}else $dateUnit = "d.maj";
+		//définition de la requête
+		//attention la colonne value est nécessaire pour le graphique  
+		/*		
+		SELECT DATE_FORMAT(d.maj, "%Y") temps, count(d.doc_id)
+		    FROM flux_doc d
+		   WHERE DATE_FORMAT(d.maj, "%Y") != "0000"
+		GROUP BY temps
+		ORDER BY temps
+		*/		
+        $query = $this->select()
+        	->from( array("d" => "flux_doc"),array("temps"=>$dateUnit, "nb"=>"COUNT(*)"))                           
+            ->group(array("temps"))
+            ->order(array($dateUnit))
+            ->where($where);
+		
+        return $this->fetchAll($query)->toArray(); 
+		    	
+	}    
 }
