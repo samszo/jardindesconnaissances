@@ -352,6 +352,71 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 	}
 
 	/**
+     * Récupère l'historique d'une liste de tag 
+     *
+     * @param array 	$arrTags
+     * @param int 		$tronc
+     * @param string 	$dateUnit unité de la date : year, month...
+     * 
+     * @return array
+     */
+	function getTagHisto($arrTags, $tronc=0, $dateUnit="") {
+
+		//vérifie si on prend les tags du document racine ou de ces éléments
+		$where = " AND d.maj !=0 ";
+		if($tronc>0){
+			$where = ' AND d.tronc = '.$tronc;
+		}
+		if($dateUnit){
+			$dateUnit = 'DATE_FORMAT(d.maj, "%'.$dateUnit.'")';
+		}else $dateUnit = "d.maj";
+		//définition de la requête
+		//attention la colonne value est nécessaire pour le graphique  
+		/*		
+		SELECT t.code,
+		         t.desc,
+		         DATE_FORMAT(d.maj, "%Y") temps,
+		         count(*) nb,
+		         count(DISTINCT utd.uti_id) nbUti,
+		         count(DISTINCT utd.doc_id) nbDoc
+		    FROM flux_tag t
+		         INNER JOIN flux_utitagdoc utd ON utd.tag_id = t.tag_id
+		         INNER JOIN flux_doc d ON utd.doc_id = d.doc_id
+		   WHERE t.code LIKE "%information%" OR t.code LIKE "%communication%"
+		GROUP BY t.code, temps
+		ORDER BY t.code, temps
+		*/		
+        $query = $this->select()
+        	->from( array("t" => "flux_tag"),array("code", "desc", "nb"=>"COUNT(*)"))                           
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('utd' => 'flux_utitagdoc'),
+                'utd.tag_id = t.tag_id',array("nbUti"=>"COUNT(DISTINCT(utd.uti_id))", "nbDoc"=>"COUNT(DISTINCT(utd.doc_id))"))
+			->joinInner(array('d' => 'flux_doc'),
+                'd.doc_id = utd.doc_id'.$where,array("temps"=>$dateUnit))
+            ->group(array("t.code","temps"))
+            ->order(array("t.code",$dateUnit));
+            
+         if($tronc > 0){
+         	$query->joinLeft(array('dP' => 'flux_doc'),'dP.doc_id = d.tronc',array("tronc","nbTronc"=>"COUNT(DISTINCT(dP.doc_id))"));
+         }
+            
+		//construction de la condition des tags
+		$where = " ";
+		if($arrTags){
+			foreach ($arrTags as $tag) {
+				$where .= " t.code LIKE '%".$tag."%' OR ";
+			}
+			$where = substr($where, 0, -3);
+			$query->where($where);
+		}
+		
+        return $this->fetchAll($query)->toArray(); 
+		    	
+	}
+	
+	
+	
+	/**
      * Récupère les tags associés à une liste de tag par document 
      *
      * @param array $arrTags
