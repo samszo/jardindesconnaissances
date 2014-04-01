@@ -44,6 +44,16 @@ class StatController extends Zend_Controller_Action {
 		$this->view->stats = $s->GetTagAssos($this->_getParam('tags'),$this->_getParam('tronc', 0));	    
     }	
 
+    public function taghistoAction()
+    {
+	    $this->view->stats = "";
+		$s = new Flux_Stats($this->_getParam('idBase', 0));
+		$t = $this->_getParam('temps', "");
+		$this->view->stats = $s->GetTagHisto($this->_getParam('tags'),$this->_getParam('tronc', 0),$t);	    
+    }	
+    
+    
+    
     public function matricetagassosAction()
     {
 	    $this->view->stats = "";
