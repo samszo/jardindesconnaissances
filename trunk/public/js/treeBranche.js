@@ -356,7 +356,7 @@ function treeBranche(config) {
 		        childCount(0, root);
 		        var newHeight = d3.max(levelWidth) * 25; // 25 pixels per line  
 		        tree = tree.size([newHeight, viewerWidth]);
-		
+						
 		        // Compute the new tree layout.
 		        var nodes = tree.nodes(root).reverse(),
 		            links = tree.links(nodes);
@@ -515,12 +515,12 @@ function treeBranche(config) {
 				
 		    // Define the root
 		    root = treeData;
-		    root.x0 = viewerHeight / 2;
+		    root.x0 = 0;
 		    root.y0 = 0;
 		
 		    // Layout the tree initially and center on the root node.
 		    update(root);
-		    //centerNode(root);
+		    centerNode(root);
 		});
 	};	
 	return this.treeBranche();

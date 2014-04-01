@@ -1,0 +1,187 @@
+@import url(normalize.css);
+@import url(fonts.css);
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0; }
+
+body {
+  font-family: "HelveticaLTStd-Roman", sans-serif;
+  font-size: 18px;
+  padding: 0 17px 17px;
+  color: #666666;
+  background-color: white; }
+
+#title {
+  margin-left: 19px;
+  margin-top: 1em;
+  margin-bottom: 1em; }
+  #title h1, #title h2 {
+    margin: 0; }
+  #title h2 {
+    font-size: 24px;
+    margin-bottom: -4px; }
+  #title h1 {
+    font-family: "HelveticaLTStd-Bold";
+    color: #4c92b9;
+    font-size: 35px; }
+
+.spacer {
+  clear: both; }
+
+#content {
+  min-width: 960px; }
+  #content #left_side {
+    float: left;
+    min-width: 250px;
+    width: 33%; }
+    #content #left_side form#search {
+      margin-left: -5px;
+      margin-bottom: 1em; }
+      #content #left_side form#search input[type=image] {
+        position: relative;
+        left: 32px;
+        top: 6px; }
+      #content #left_side form#search .clear {
+        top: 6px; }
+      #content #left_side form#search input[type=text] {
+        color: #333333;
+        padding-left: 32px;
+        font-family: "HelveticaLTStd-Roman";
+        width: 311px;
+        font-size: 19px; }
+      #content #left_side form#search a {
+        position: relative;
+        right: 28px;
+        color: red;
+        font-family: sans-serif;
+        text-decoration: none; }
+    #content #left_side #tags_list_container {
+      height: 400px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      padding: 0 1em; }
+      #content #left_side #tags_list_container .loading {
+        margin-top: 33%;
+        text-align: center;
+        font-size: 0.8em;
+        color: #cbcbcb; }
+      #content #left_side #tags_list_container ul {
+        text-align: justify;
+        margin: 0;
+        padding: 10px 0; }
+        #content #left_side #tags_list_container ul li {
+          display: inline-block;
+          list-style-type: none;
+          white-space: nowrap;
+          cursor: pointer;
+          padding: 3px; }
+          #content #left_side #tags_list_container ul li.h {
+            color: #4c92b9; }
+          #content #left_side #tags_list_container ul li.f {
+            color: #d57599; }
+          #content #left_side #tags_list_container ul li.selected {
+            line-height: 1 !important;
+            color: white !important; }
+  #content #right_side {
+    float: left; }
+    #content #right_side #bottom {
+      margin-bottom: 20px;
+      padding-left: 74px;
+      padding-top: 14px;
+      font-size: 12px;
+      color: #4c92b9; }
+      #content #right_side #bottom input[type=text] {
+        color: #333333;
+        width: 100%; }
+      #content #right_side #bottom a {
+        text-decoration: none; }
+      #content #right_side #bottom .share_link {
+        float: left;
+        width: 260px;
+        margin-top: -9px; }
+      #content #right_side #bottom .links {
+        float: right;
+        width: 210px; }
+      #content #right_side #bottom .social {
+        float: left;
+        margin-top: -9px;
+        width: 117px; }
+        #content #right_side #bottom .social > * {
+          display: block; }
+      #content #right_side #bottom .logo {
+        margin-top: -8px;
+        margin-left: -5px;
+        float: left; }
+      #content #right_side #bottom .explanations {
+        margin-top: 1em; }
+  #content svg {
+    margin-top: -50px; }
+    #content svg #y_axis .major:nth-child(1) {
+      visibility: hidden; }
+    #content svg g.axis text {
+      fill: #4c92b9;
+      font-size: 13px; }
+    #content svg g.axis .tick line {
+      stroke: #666666;
+      stroke-dasharray: 2, 3;
+      stroke-width: 0.3px; }
+    #content svg g.axis path.domain {
+      fill: none; }
+    #content svg #prenoms #lines > g path {
+      stroke-width: 3px;
+      fill: none; }
+    #content svg #prenoms #lines > g circle {
+      stroke: none; }
+    #content svg #prenoms #labels > g text {
+      fill: white; }
+    #content svg g.year_zoomers {
+      cursor: pointer; }
+      #content svg g.year_zoomers text {
+        fill: white; }
+    #content svg g#popup {
+      font-family: "HelveticaLTStd-Roman";
+      font-size: 14px;
+      color: #666666; }
+      #content svg g#popup > .bg {
+        fill: black;
+        opacity: 0.13; }
+      #content svg g#popup .year {
+        fill: white;
+        font-size: 24px;
+        font-family: "HelveticaLTStd-Bold"; }
+      #content svg g#popup .bar {
+        stroke-dasharray: 2, 3;
+        stroke-width: 0.3px;
+        stroke: black; }
+      #content svg g#popup .prenom_summary text {
+        font-size: 14px;
+        fill: #666666; }
+      #content svg g#popup .prenom_summary .bg {
+        fill: white; }
+    #content svg #playground_bg {
+      fill: #edf4f8; }
+    #content svg #playground {
+      fill: black;
+      opacity: 0; }
+    #content svg #year_zoomers {
+      font-family: "HelveticaLTStd-Roman";
+      font-size: 13px; }
+      #content svg #year_zoomers text {
+        text-anchor: middle; }
+      #content svg #year_zoomers > g {
+        pointer-events: visibleFill;
+        cursor: pointer; }
+        #content svg #year_zoomers > g text {
+          fill: #4c92b9; }
+        #content svg #year_zoomers > g.selected text {
+          fill: white; }
+        #content svg #year_zoomers > g.selected rect {
+          fill: #4c92b9;
+          stroke: none; }
+        #content svg #year_zoomers > g rect {
+          stroke: #cbcbcb;
+          stroke-width: 1px;
+          fill: none; }
+        #content svg #year_zoomers > g tspan.year {
+          font-family: "HelveticaLTStd-Bold"; }
