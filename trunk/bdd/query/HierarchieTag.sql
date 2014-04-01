@@ -1,4 +1,4 @@
-﻿/*
+/*
 SELECT node.*
 FROM flux_tag AS node,
         flux_tag AS parent
