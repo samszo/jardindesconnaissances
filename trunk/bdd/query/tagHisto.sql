@@ -7,6 +7,6 @@ SELECT t.code,
     FROM flux_tag t
          INNER JOIN flux_utitagdoc utd ON utd.tag_id = t.tag_id
          INNER JOIN flux_doc d ON utd.doc_id = d.doc_id
-   WHERE t.code LIKE "%information%" OR t.code LIKE "%communication%"
+   WHERE d.titre LIKE "%numerique%"
 GROUP BY t.code, year
 ORDER BY t.code, year

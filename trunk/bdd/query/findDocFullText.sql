@@ -1,0 +1,2 @@
+SELECT doc_id, titre, MATCH (titre, note) AGAINST ("science* de l'information et de la communication") AS score
+FROM flux_doc WHERE MATCH (titre, note) AGAINST ("science* de l'information et de la communication");

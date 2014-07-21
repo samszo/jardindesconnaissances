@@ -1,4 +1,5 @@
-SELECT t.code,
+SELECT t.tag_id,
+	t.code,
          t.desc,
          DATE_FORMAT(d.maj, "%Y") year,
          count(*) nb,
