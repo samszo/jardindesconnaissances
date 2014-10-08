@@ -53,6 +53,17 @@ class EvalController extends Zend_Controller_Action
     }
     
     /**
+     * gestion des évaluations d'étudiants
+     * 
+     * return array
+     */
+    public function etuAction(){
+	    
+    }    
+    
+    
+    
+    /**
      * construction du format json correspondant à heatmap.js
      * @param array $DocsClic
      * 
@@ -69,7 +80,6 @@ class EvalController extends Zend_Controller_Action
     	$dc = "{max: ".$max.", data: [".substr($dc,0,-1)."]}";
     	return $dc;
     }    
-    
     
     
 }

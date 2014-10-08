@@ -60,7 +60,7 @@ class DeleuzeController extends Zend_Controller_Action {
 	public function positionAction() {
 		
 		
-    	$auth = Zend_Auth::getInstance();
+		$auth = Zend_Auth::getInstance();
 		if ($auth->hasIdentity()) {
 		    // l'identité existe ; on la récupère
 		    $this->view->identite = $auth->getIdentity();
@@ -71,16 +71,45 @@ class DeleuzeController extends Zend_Controller_Action {
 		}
 		$this->view->resultats = "";
     	if($this->_getParam('term', 0)){
-			$oD = new Flux_Deleuze($this->dbNom);
-			$oD->user = $ssUti->idUti;
-    		$arrPosis = $oD->getTermPositions($this->_getParam('term', 0));
-			$this->view->resultats = $arrPosis;
+    		$oD = new Flux_Deleuze($this->dbNom);
+    		$oD->user = $ssUti->idUti;
+    		$arrPosis = $oD->getTermPositions($this->_getParam('term', 0), true, true, null, $this->_getParam('idDoc', false));
+    		$this->view->resultats = $arrPosis;
 			$this->view->term = $this->_getParam('term', 0);
     	}
 	    $this->view->ajax = false;
     	if($this->_getParam('ajax', 0))$this->view->ajax = true;    	
 	}	
 
+	/**
+	 * affichage des positions d'un term
+	 */
+	public function positionsAction() {
+		
+		
+		$auth = Zend_Auth::getInstance();
+		if ($auth->hasIdentity()) {
+		    // l'identité existe ; on la récupère
+		    $this->view->identite = $auth->getIdentity();
+		    $ssUti = new Zend_Session_Namespace('uti');
+		    $this->view->idUti = $ssUti->idUti;
+		}else{
+		    $this->_redirect('/auth/login');
+		}
+		$this->view->resultats = "";
+    	if($this->_getParam('term', 0)){
+    		$oD = new Flux_Deleuze($this->dbNom);
+    		$oD->user = $ssUti->idUti;
+    		$arrPosis = $oD->getTermPositions($this->_getParam('term', 0), true, true, "tronc");
+    		echo $this->_getParam('term', 0);
+    		$this->view->resultats = $arrPosis;
+			$this->view->term = $this->_getParam('term', 0);
+    	}
+	    $this->view->ajax = false;
+    	if($this->_getParam('ajax', 0))$this->view->ajax = true;    	
+	}	
+	
+	
 	/**
 	 * affichage d'un fragment
 	 */

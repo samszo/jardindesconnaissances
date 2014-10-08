@@ -10,6 +10,9 @@
 require_once 'Zend/Controller/Action.php';
 
 class GraphController extends Zend_Controller_Action {
+
+	var $formatTemps = array("jourheure"=>"%d-%c-%y %H h");
+	
 	/**
 	 * The default action - show the home page
 	 */
@@ -42,7 +45,7 @@ class GraphController extends Zend_Controller_Action {
 		$url = $request->getRequestUri();
 		$arrUrl = explode("?",$url);
 		$this->view->idBase =  $this->_getParam('idBase', 0);
-		$this->view->bases = array("flux_h2ptm"=>"H2ptm", "flux_diigo"=>"Diigo", "flux_zotero"=>"Zotero", " flux_gmail_intelligence_collective"=>"Google Alerte");
+		$this->view->bases = array("flux_sic_new"=>"SFSIC", "flux_h2ptm"=>"H2ptm", "flux_diigo"=>"Diigo", "flux_zotero"=>"Zotero", " flux_gmail_intelligence_collective"=>"Google Alerte");
 		$this->view->titre = "Explorateur d'observations";
 		$this->view->tags = $this->_getParam('tags', 0);
 		//$this->view->urlStats = "../stat/matricetagassos?".$arrUrl[1];	    
@@ -159,4 +162,77 @@ class GraphController extends Zend_Controller_Action {
     	
     }	
     
+    public function editeurAction()
+    {
+    	if($this->_getParam('stat')){
+    		//on récupère les data des stats
+    		switch ($this->_getParam('stat')) {
+    			case "histopubli":
+    				$s = new Flux_Site($this->_getParam('idBase'));
+    				$dbD = new Model_DbTable_Flux_Doc($s->db);
+    				if($this->_getParam('temps') && $this->formatTemps[$this->_getParam('temps')]){
+    					$ft = $this->formatTemps[$this->_getParam('temps')];
+    				}else $ft = "%d-%c-%y";
+    				$arr = $dbD->getHistoPubli($this->_getParam('tronc',""), $ft);
+    				$data[] = array("date", "nb d'extraction");
+    				foreach ($arr as $vals) {
+    					$data[]=array($vals['temps'],intval($vals['nb']));
+    				}
+			    	$this->view->data = json_encode($data);
+    			break;
+    			case "geo":
+    				$oStat = new Flux_Stats($this->_getParam('idBase'));
+    				$q = $this->_getParam('q');
+    				if($q){
+	    				$arr = $oStat->GetTagNbDocFT($q, "pays");
+	    				//$data[] = array("geo", "pertinence totale", "nb de document");
+	    				$data[] = array("geo", "pertinence");
+	    				foreach ($arr as $vals) {
+	    					if($q=="tout")
+		    					$p = intval($vals['nbDoc']);
+	    					else
+		    					$p = intval($vals['score'])/intval($vals['nbDoc']);
+	    					//$info = intval($vals['score'])." ".intval($vals['nbDoc']);
+	    					//$data[]=array($vals['code'], intval($vals['score']), intval($vals['nbDoc']));
+	    					$data[]=array($vals['code'], $p);
+	    				}
+    				}
+    				if($this->_getParam('tags')){
+	    				$arr = $oStat->GetTagNbDoc($this->_getParam('tags'), "pays");
+	    				$data[] = array("geo", "nbDoc");
+	    				foreach ($arr as $vals) {
+	    					$data[]=array($vals['code'], intval($vals['nbDoc']));
+	    				}
+    				}
+    				$this->view->data = json_encode($data);
+    		}
+    	}else{
+			//défini les data du graphique
+	    	//attention suivant le type les datas ne sont pas les mêmes
+	    	$this->view->data = $this->_getParam('data', "[['pas de data'],['0']]");
+    	}
+    	
+    	//défini le titre du graphique
+    	$this->view->titre = $this->_getParam('titre', 'sans titre');
+		//défini le type de graphique la liste est ici : https://developers.google.com/chart/interactive/docs/gallery
+		// voir si celui-ci est intéressant : https://developers.google.com/chart/interactive/docs/gallery/annotationchart    	
+    	$this->view->type = $this->_getParam('type', 'ColumnChart');
+    	
+    }	
+    
+    public function areaAction()
+    {
+    }	
+    
+    public function candlestickAction()
+    {
+    }	
+    
+    public function googletreemapAction(){
+    	
+    }
+
+    public function d3treemapAction(){
+    	
+    }
 }

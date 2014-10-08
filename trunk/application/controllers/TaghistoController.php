@@ -15,10 +15,17 @@ class TaghistoController extends Zend_Controller_Action {
 	 */
 	public function indexAction() {
 	    $request = $this->getRequest();
-		$idBase = "flux_sic";
-		$s = new Flux_Site($idBase);		
+		$idBase = $this->_getParam('idBase', 0);
+		$s = new Flux_Site($idBase);
 		$this->view->idBase = $idBase;	    
-		$this->view->urlStats = "stat/taghisto?idBase=".$idBase."&temps=Y";	    
+		$tags = $this->_getParam('tags', 0);
+		$pTags = "";
+		if($tags){
+			foreach ($tags as $t) {
+				$pTags .= "&tags[]=".$t;
+			}
+		}
+		$this->view->urlStats = "stat/taghisto?idBase=".$idBase."&temps=Y".$pTags."&q=".$this->_getParam('q', 0);	    
 	}
 	
 }

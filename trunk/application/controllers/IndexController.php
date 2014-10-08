@@ -20,8 +20,18 @@ class IndexController extends Zend_Controller_Action
 		    	$rs[] = $r;
 		}
 		*/
+    	
+    	if($this->_getParam('cleanCache')){
+    		$s = new Flux_Site();
+    		// nettoie tous les enregistrements du cache
+    		$s->cache->clean(Zend_Cache::CLEANING_MODE_ALL);
+    		echo "cache nettoyé";
+    		if($this->_getParam('url')) $this->_redirect($this->_getParam('url')."?logout=1");
+    	}
+    	
     }
 
+    
 }
 
 
