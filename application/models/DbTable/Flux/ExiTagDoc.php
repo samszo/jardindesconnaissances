@@ -1,48 +1,41 @@
 <?php
 /**
- * Ce fichier contient la classe Flux_utitagdoc.
+ * Ce fichier contient la classe Flux_exitagdoc.
  *
- * @copyright  2008 Gabriel Malkas
- * @copyright  2010 Samuel Szoniecky
+ * @copyright  2014 Samuel Szoniecky
  * @license    "New" BSD License
 */
 
 
 /**
- * Classe ORM qui représente la table 'flux_utitagdoc'.
+ * Classe ORM qui représente la table 'flux_exitagdoc'.
  *
- * @copyright  2008 Gabriel Malkas
- * @copyright  2010 Samuel Szoniecky
+ * @copyright  2014 Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
+class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
 {
     
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_utitagdoc';
+    protected $_name = 'flux_exitagdoc';
     
     /*
      * Clef primaire de la table.
      */
-    protected $_primary = 'uti_id';
+    protected $_primary = 'exitagdoc_id';
 
-	var $indDeterre;
 
 	public function __construct($config = array())
     {
     	parent::__construct($config);
-		/*indice de déterriolisation
-		 * 100% = le choix du tag des utilisateurs est aux antipodes de la référence
-		 * 0 % = la géolocalisation est égal à la référence
-		 */
-		$this->indDeterre = "SUM(f.poids)*(100/COUNT(*))";
+
     }
 	
 	
     /**
-     * Vérifie si une entrée Flux_utitagdoc existe.
+     * Vérifie si une entrée Flux_exitagdoc existe.
      *
      * @param array $data
      *
@@ -51,17 +44,17 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     public function existe($data)
     {
 		$select = $this->select();
-		$select->from($this, array('uti_id'));
-		$select->where('uti_id = ?', $data['uti_id']);
+		$select->from($this, array('exitagdoc_id'));
+		$select->where('exi_id = ?', $data['exi_id']);
 		$select->where('tag_id = ?', $data['tag_id']);
 		$select->where('doc_id = ?', $data['doc_id']);
 		$rows = $this->fetchAll($select);        
-	    if($rows->count()>0)$id=$rows[0]->uti_id; else $id=false;
+	    if($rows->count()>0)$id=$rows[0]->exitagdoc_id; else $id=false;
         return $id;
     } 
         
     /**
-     * Ajoute une entrée Flux_utitagdoc.
+     * Ajoute une entrée Flux_exitagdoc.
      *
      * @param array $data
      * @param boolean $existe
@@ -73,9 +66,11 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     	$id=false;
     	if($existe)$id = $this->existe($data);
     	if(!$id){
-    	 	$id = $this->insert($data);
+    		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
+    		$id = $this->insert($data);
     	}else{
     		//met à jour le poids
+    		$data['exitagdoc_id'] = $id;
     		$this->ajoutPoids($data);    		
     	}
     	return $id;
@@ -91,12 +86,12 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     public function ajoutPoids($data)
     {
     	if(!isset($data["poids"]))$data["poids"]=1;        
-		$sql = 'UPDATE flux_utitag SET poids = poids + '.$data["poids"].' WHERE tag_id = '.$data["tag_id"].' AND uti_id ='.$data["uti_id"];
+		$sql = 'UPDATE flux_exitagdoc SET poids = poids + '.$data["poids"].' WHERE exitagdoc_id = '.$data["exitagdoc_id"];
     	$this->_db->query($sql);    
     }
     
     /**
-     * Recherche une entrée Flux_utitagdoc avec la clef primaire spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
      * @param integer $id
@@ -106,11 +101,11 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
-        $this->update($data, 'flux_utitagdoc.uti_id = ' . $id);
+        $this->update($data, 'flux_exitagdoc.uti_id = ' . $id);
     }
     
     /**
-     * Recherche une entrée Flux_utitagdoc avec la clef primaire spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $id
@@ -119,11 +114,11 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_utitagdoc.uti_id = ' . $id);
+        $this->delete('flux_exitagdoc.uti_id = ' . $id);
     }
 
     /**
-     * Recherche une entrée Flux_utitagdoc avec la clef primaire spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $idDoc
@@ -135,14 +130,14 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     public function removeDocTagUti($idDoc=false, $idTag=false, $idUti=false)
     {
     	$where = "";
-    	if($idDoc) $where = 'flux_utitagdoc.doc_id = ' . $idDoc;
+    	if($idDoc) $where = 'flux_exitagdoc.doc_id = ' . $idDoc;
     	if($idTag){
     		if($where) $where.= " AND ";
-    		$where .= 'flux_utitagdoc.tag_id = ' . $idTag;
+    		$where .= 'flux_exitagdoc.tag_id = ' . $idTag;
     	}
     	if($idUti){
     		if($where) $where.= " AND ";
-    		$where .= 'flux_utitagdoc.uti_id = ' . $idUti;
+    		$where .= 'flux_exitagdoc.uti_id = ' . $idUti;
     	}
     	if($where) $this->delete($where);
     }
@@ -161,13 +156,13 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     }
     
     /**
-     * Récupère toutes les entrées Flux_utitagdoc avec certains critères
+     * Récupère toutes les entrées Flux_exitagdoc avec certains critères
      * de tri, intervalles
      */
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_utitagdoc" => "flux_utitagdoc") );
+                    ->from( array("flux_exitagdoc" => "flux_exitagdoc") );
                     
         if($order != null)
         {
@@ -183,7 +178,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     }
     
     /*
-     * Retourne les entrées de Flux_utitagdoc
+     * Retourne les entrées de Flux_exitagdoc
      * 
      *
      * 
@@ -192,7 +187,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc") )                           
+        	->from( array("utd" => "flux_exitagdoc") )                           
             ->joinInner(array('t' => 'flux_tag'),
             	't.tag_id = utd.tag_id',array('code'))
         	->joinInner(array('d' => 'flux_doc'),
@@ -202,7 +197,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     }
     
     /*
-     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $uti_id
@@ -210,13 +205,13 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     public function findByUti_id($uti_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_utitagdoc") )                           
+                    ->from( array("f" => "flux_exitagdoc") )                           
                     ->where( "f.uti_id = ?", $uti_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $tag_id
@@ -225,7 +220,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc") )                           
+        	->from( array("utd" => "flux_exitagdoc") )                           
             ->joinInner(array('t' => 'flux_tag'),
             	't.tag_id = utd.tag_id',array('code'))
         	->joinInner(array('d' => 'flux_doc'),
@@ -236,7 +231,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     }
 
     /*
-     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $tag
@@ -245,7 +240,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc") )                           
+        	->from( array("utd" => "flux_exitagdoc") )                           
             ->joinInner(array('t' => 'flux_tag'),
             	't.tag_id = utd.tag_id',array('code'))
         	->joinInner(array('d' => 'flux_doc'),
@@ -256,7 +251,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     }
 
     /**
-     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param string $tag
@@ -268,7 +263,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc") )                           
+        	->from( array("utd" => "flux_exitagdoc") )                           
             ->joinInner(array('t' => 'flux_tag'),
             	't.tag_id = utd.tag_id',array('code'))
             ->joinInner(array('u' => 'flux_uti'),
@@ -281,7 +276,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     }
     
     /*
-     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $url
@@ -290,7 +285,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc") )                           
+        	->from( array("utd" => "flux_exitagdoc") )                           
             ->joinInner(array('t' => 'flux_tag'),
             	't.tag_id = utd.tag_id',array('code'))
         	->joinInner(array('d' => 'flux_doc'),
@@ -301,7 +296,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     }
     
     /*
-     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param int $doc_id
@@ -309,13 +304,13 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     public function findByDoc_id($doc_id)
     {
         $query = $this->select()
-			->from( array("f" => "flux_utitagdoc") )                           
+			->from( array("f" => "flux_exitagdoc") )                           
             ->where( "f.doc_id = ?", $doc_id );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_utitagdoc avec la valeur spécifiée
+     * Recherche une entrée Flux_exitagdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
      * @param datetime $maj
@@ -323,7 +318,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     public function findByMaj($maj)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_utitagdoc") )                           
+                    ->from( array("f" => "flux_exitagdoc") )                           
                     ->where( "f.maj = ?", $maj );
 
         return $this->fetchAll($query)->toArray(); 
@@ -340,7 +335,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
 	    //défiition de la requête
 		$sql = "select d.doc_id, d.url, d.titre, d.branche_lft, d.branche_rgt, d.tronc, d.poids, d.maj, d.pubDate, d.note 
-		from flux_utitagdoc utd
+		from flux_exitagdoc utd
 			inner join flux_doc d on d.doc_id = utd.doc_id
 		where utd.tag_id IN (".$tags.") AND utd.uti_id IN (".$users.")  
 		group by d.doc_id";
@@ -359,7 +354,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
 	    //défiition de la requête
 		$sql = "SELECT `d`.*, `u`.*, `t`.*, utd.* 
-			FROM `flux_utitagdoc` AS `utd` 
+			FROM `flux_exitagdoc` AS `utd` 
 		 		INNER JOIN `flux_doc` AS `d` ON d.doc_id=utd.doc_id
 		 		INNER JOIN `flux_uti` AS `u` ON u.uti_id = utd.uti_id
 		 		INNER JOIN `flux_tag` AS `t` ON t.tag_id = utd.tag_id 
@@ -379,12 +374,12 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
      * 
      * @return array
      */
-	function GetUtiTagDoc($idUti=false, $idDoc=false, $where="") {
+	function GetExiTagDoc($idUti=false, $idDoc=false, $where="") {
 
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc"), array("tag_id","doc_id","uti_id"))                           
+        	->from( array("utd" => "flux_exitagdoc"), array("tag_id","doc_id","uti_id"))                           
             ->joinInner(array('t' => 'flux_tag'),
             	't.tag_id = utd.tag_id',array('code'))
         	->joinInner(array('td' => 'flux_tagdoc'),
@@ -412,7 +407,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc"), array("tag_id"))                           
+        	->from( array("utd" => "flux_exitagdoc"), array("tag_id"))                           
             ->joinInner(array('t' => 'flux_tag'),
             	't.tag_id = utd.tag_id',array('code'))
         	->joinInner(array('td' => 'flux_tagdoc'),
@@ -450,7 +445,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc"), array("tag_id"))                           
+        	->from( array("utd" => "flux_exitagdoc"), array("tag_id"))                           
             ->joinInner(array('t' => 'flux_tag'),
             	't.tag_id = utd.tag_id',array('code'))
         	->joinInner(array('td' => 'flux_tagdoc'),
@@ -495,7 +490,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_utitagdoc")
+        	->from( array("utd" => "flux_exitagdoc")
         		, array("nbTag"=>"COUNT(DISTINCT utd.tag_id)", "nbDoc"=>"COUNT(DISTINCT utd.doc_id)"))                           
             ->joinInner(array('u' => 'flux_uti'),
             	'u.uti_id = utd.uti_id',array('login','utd.uti_id'))
@@ -513,113 +508,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 		
 	}
 
-    /**
-     * calcul l'indice de territorialité des tags pour un ou tous utilisateur
-     *
-     * @param int $idUti
-     *
-     * @return array
-     */
-    public function calcIndTerreTagForUti($idUti=false)
-    {
-    	//récupère la somme des distances pour le document
-    	$query = $this->select()
-			->from(array("f" => "flux_utitagdoc"),array("uti_id","nb"=>"COUNT(*)", "somme"=>"SUM(f.poids)", "indice"=>$this->indDeterre))
-        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
-			->joinInner(array('d' => 'flux_doc'), "d.doc_id = f.doc_id",array("url"))
-			->group("f.uti_id")
-			->order("indice")
-			->where("f.poids <> 0");                           
-		if($idUti)$query->where( "f.uti_id = ?", $idUti);
-        $result = $this->fetchAll($query)->toArray(); 
-        
-        return $result;
-        
-    }
-	
-    /**
-     * calcul l'indice de territorialité des tags pour un ou tous documents
-     *
-     * @param int $idDoc
-     *
-     * @return array
-     */
-    public function calcIndTerreTagForDoc($idDoc=false)
-    {
-    	//récupère la somme des distances pour le document
-    	$query = $this->select()
-			->from(array("f" => "flux_utitagdoc"),array("doc_id","nb"=>"COUNT(*)", "somme"=>"SUM(f.poids)", "indice"=>$this->indDeterre))
-        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
-			->joinInner(array('d' => 'flux_doc'), "d.doc_id = f.doc_id",array("url"))
-			->group("f.doc_id")
-			->order("indice")
-			->where("f.poids <> 0");                           
-		if($idUti)$query->where( "f.doc_id = ?", $idDoc);
-        $result = $this->fetchAll($query)->toArray(); 
-        
-        return $result;
-        
-    }
 
-    /**
-     * calcul l'indice de territorialité des tags pour un ou tous tags
-     *
-     * @param int $idTag
-     *
-     * @return array
-     */
-    public function calcIndTerreTagForTag($idTag=false)
-    {
-    	//récupère la somme des distances pour le document
-    	$query = $this->select()
-			->from(array("f" => "flux_utitagdoc"),array("tag_id","nb"=>"COUNT(*)", "somme"=>"SUM(f.poids)", "indice"=>$this->indDeterre))
-        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
-			->joinInner(array('d' => 'flux_doc'), "d.doc_id = f.doc_id",array("url"))
-			->group("f.tag_id")
-			->order("indice")
-			->where("f.poids <> 0");                           
-		if($idTag)$query->where( "f.tag_id = ?", $idTag);
-        $result = $this->fetchAll($query)->toArray(); 
-        
-        return $result;
-        
-    }    
-    
-    /**
-     * récupère les class Dewey et les documents associés
-     *
-     * @param int $idUtiDewey
-     *
-     * @return array
-     */
-    public function getDeweyTagDoc($idUtiDewey)
-    {
-		/* ATTENTION
-		 * problème de debug avec les requêtes complexes ???
-		 * 
-		 */    	
-    	$query = $this->select()
-			->from(array("t" => "flux_tag"),array("tag_id", "code", "desc", "niveau", "parent"))
-        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
-			->joinInner(array('utd' => 'flux_utitagdoc'), "utd.tag_id = t.tag_id AND utd.uti_id = ".$idUtiDewey
-				,array("nb"=>"COUNT(DISTINCT utd.doc_id)", "idsDoc"=>new Zend_Db_Expr("GROUP_CONCAT(DISTINCT utd.doc_id)")))
-			->joinInner(array('d' => 'flux_doc'), "d.doc_id = utd.doc_id AND d.titre != ''",array())
-		/*    	 problème de performance en récupérant la hiérarchie directement dans la requête
-				->joinInner(array('tParent' => 'flux_tag'), "t.lft BETWEEN tParent.lft AND tParent.rgt",
-				array("idsTagParent"=>"GROUP_CONCAT(DISTINCT tParent.tag_id ORDER BY tParent.lft)"))
-    	*/ 
-			->group("t.tag_id")
-			->order("t.branche_lft")
-			->where("t.desc != ''");                           
-        $result = $this->fetchAll($query)->toArray(); 
-        /*
-		$sql = "SELECT `t`.`tag_id`, `t`.`code`, `t`.`desc`, `t`.`niveau`, `t`.`parent`, COUNT(DISTINCT utd.doc_id) AS `nb`, GROUP_CONCAT(DISTINCT utd.doc_id) AS `idsDoc` FROM `flux_tag` AS `t`
- INNER JOIN `flux_utitagdoc` AS `utd` ON utd.tag_id = t.tag_id AND utd.uti_id = 638 WHERE (t.desc != '') GROUP BY `t`.`tag_id` ORDER BY `t`.`lft` ASC";
-		$stmt = $this->_db->query($sql);
-    	$result = $stmt->fetchAll();
-        */
-        return $result;
-        
-    }    
+   
         
 }

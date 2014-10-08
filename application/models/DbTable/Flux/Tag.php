@@ -30,7 +30,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
        "Model_DbTable_flux_tagdoc"
        ,"Model_DbTable_flux_tagtag"
        ,"Model_DbTable_flux_utitag"
-       ,"Model_DbTable_flux_utitagdoc"
+       ,"Model_DbTable_Flux_UtiTagDoc"
        );    
     
     /**
@@ -67,16 +67,13 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         if($existe)$id = $this->existe($data);
     	if(!$id){
     		$data = $this->updateHierarchie($data);
-    		$data["tag_id"] = $this->insert($data);
-    	}else{
-	    	$data["tag_id"] = $id;
-	    	//on met à jour les information
-	    	$this->edit($id, $data);   		
-    	}    	
-    	if($rData)
-	    	return $data;
-    	else
-	    	return $data["tag_id"];
+    		$id = $this->insert($data);
+    	}
+    	    	
+    	if($rs)
+    		return $this->findByTag_id($id);
+	    else
+	    	return $id;
     	
     } 
 
@@ -119,9 +116,10 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 	    		}    		
 	    		$data['niveau'] = $arrP[0]['niveau']+1;
     		}
-    		if(!isset($data['lft']))$data['lft']=-1;    		
-    		if(!isset($data['rgt']))$data['rgt']=-1;    		
-    		
+    		if(!isset($data['lft']))$data['lft']=0;    		
+    		if(!isset($data['rgt']))$data['rgt']=1;    		
+    		if(!isset($data['niveau']))$data['niveau']=1;    		
+    		    		
     		return $data;
     }
 
@@ -158,7 +156,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     public function getFullChild($idTag, $order="lft")
     {
         $query = $this->select()
-                ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
             ->from(array('node' => 'flux_tag'),array('libO'=>'code', 'idTag0'=>'tag_id'))
             ->joinInner(array('enfants' => 'flux_tag'),
                 'enfants.lft BETWEEN node.lft AND node.rgt',array('code', 'desc', 'tag_id', 'parent', 'niveau'))
@@ -241,8 +239,8 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         $query = $this->select()
                     ->from( array("f" => "flux_tag") )                           
                     ->where( "f.tag_id = ?", $tag_id );
-
-        return $this->fetchAll($query)->toArray(); 
+		$arr = $this->fetchAll($query)->toArray();
+        return count($arr) ? $arr[0] : false; 
     }
     /*
      * Recherche une entrée flux_tag avec la valeur spécifiée
@@ -259,6 +257,21 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 		$arr = $this->fetchAll($query)->toArray();
         return $arr[0]; 
     }
+    /*
+     * Recherche une entrée flux_tag avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param varchar $code
+     */
+    public function findByCodeLike($code)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_tag") )                           
+                    ->where( "f.code like '%$code%'");
+
+		return $this->fetchAll($query)->toArray();
+    }
+    
     /*
      * Recherche une entrée flux_tag avec la valeur spécifiée
      * et retourne cette entrée.
@@ -357,10 +370,11 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
      * @param array 	$arrTags
      * @param int 		$tronc
      * @param string 	$dateUnit unité de la date : year, month...
+     * @param string 	$q requête full text
      * 
      * @return array
      */
-	function getTagHisto($arrTags, $tronc=0, $dateUnit="") {
+	function getTagHisto($arrTags, $tronc=0, $dateUnit="", $q="") {
 
 		//vérifie si on prend les tags du document racine ou de ces éléments
 		$where = " AND d.maj !=0 ";
@@ -370,6 +384,13 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 		if($dateUnit){
 			$dateUnit = 'DATE_FORMAT(d.maj, "%'.$dateUnit.'")';
 		}else $dateUnit = "d.maj";
+		
+		if($q){
+			$score = "MATCH (d.titre, d.note) AGAINST ('".$q."')";
+		}else{
+			$score = "COUNT(1)";
+		}
+		
 		//définition de la requête
 		//attention la colonne value est nécessaire pour le graphique  
 		/*		
@@ -387,12 +408,12 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 		ORDER BY t.code, temps
 		*/		
         $query = $this->select()
-        	->from( array("t" => "flux_tag"),array("code", "desc", "nb"=>"COUNT(*)"))                           
+        	->from( array("t" => "flux_tag"),array("tag_id", "code", "desc", "nb"=>"COUNT(*)"))                           
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
             ->joinInner(array('utd' => 'flux_utitagdoc'),
                 'utd.tag_id = t.tag_id',array("nbUti"=>"COUNT(DISTINCT(utd.uti_id))", "nbDoc"=>"COUNT(DISTINCT(utd.doc_id))"))
 			->joinInner(array('d' => 'flux_doc'),
-                'd.doc_id = utd.doc_id'.$where,array("temps"=>$dateUnit))
+                'd.doc_id = utd.doc_id'.$where,array("temps"=>$dateUnit,"score"=> new Zend_Db_Expr("SUM(".$score.")")))
             ->group(array("t.code","temps"))
             ->order(array("t.code",$dateUnit));
             
@@ -407,10 +428,14 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 				$where .= " t.code LIKE '%".$tag."%' OR ";
 			}
 			$where = substr($where, 0, -3);
-			$query->where($where);
 		}
+		if($q){
+			if($where != " ") $where = "(".$where.") AND ".$score;
+			else $where = $score;
+		}
+		$query->where($where);
 		
-        return $this->fetchAll($query)->toArray(); 
+		return $this->fetchAll($query)->toArray(); 
 		    	
 	}
 	
@@ -574,5 +599,6 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 		}
 		
 	}
-		
+
+	
 }
