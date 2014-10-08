@@ -35,6 +35,7 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
        ,"Model_DbTable_flux_utitag"
        ,"Model_DbTable_flux_utitagrelated"
        ,"Model_DbTable_Flux_UtiUti"
+       ,"Model_DbTable_Flux_UtiExi"
        );
     
     /**
@@ -48,10 +49,8 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     {
 		$select = $this->select();
 		$select->from($this, array('uti_id'));
-		foreach($data as $k=>$v){
-			if($k!="date_inscription" && $k!="mdp")
-				$select->where($k.' = ?', $v);
-		}
+		//seul le login est obligatoire et discriminant
+		$select->where('login = ?', $data['login']);
 	    $rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->uti_id; else $id=false;
         return $id;

@@ -155,7 +155,7 @@ class Model_DbTable_flux_tagdoc extends Zend_Db_Table_Abstract
      * 
      *@return array
      */
-    public function findByTagId($tag_id, $arrTags, $racine=false)
+    public function findByTagId($tag_id, $arrTags=false, $racine=false)
     {
         $query = $this->select()
         	->from( array("td" => "flux_tagdoc") )                           
@@ -251,6 +251,22 @@ class Model_DbTable_flux_tagdoc extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+    
+    /**
+     * Recherche une entrée flux_tagdoc avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param int $doc_id
+     */
+    public function findByTag_id($doc_id)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_tagdoc") )                           
+                    ->where( "f.tag_id = ?", $doc_id );
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+    
     /*
     select *
 from flux_Tag t

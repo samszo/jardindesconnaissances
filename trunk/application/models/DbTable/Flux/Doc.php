@@ -30,9 +30,10 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
 		'Model_DbTable_Flux_UtiDoc'
 		,'Model_DbTable_Flux_TagDoc'
 		,'Model_DbTable_Flux_UtiTagDoc'
+		,'Model_DbTable_Flux_ExiTagDoc'
 		);
-    
-    
+        
+		
     /**
      * Vérifie si une entrée flux_doc existe.
      *
@@ -45,7 +46,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
 		$select = $this->select();
 		$select->from($this);
 		foreach($data as $k=>$v){
-			if($k!="maj" && $k!="poids"  && $k!="note" )
+			if($k!="pubDate" && $k!="maj" && $k!="poids"  && $k!="note"  && $k!="data" )
 				$select->where($k.' = ?', $v);
 		}
 		$rows = $this->fetchAll($select);        
@@ -58,18 +59,20 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      *
      * @param array $data
      * @param boolean $existe
+     * @param boolean $rs
      *  
      * @return integer
      */
-    public function ajouter($data, $existe=true)
+    public function ajouter($data, $existe=true, $rs=false)
     {
     	$id=false;
     	if($existe)$id = $this->existe($data);
     	if(!$id){
+    		$data = $this->updateHierarchie($data);
     		if(!isset($data["pubDate"])) $data["pubDate"] = new Zend_Db_Expr('NOW()');
     	 	$id = $this->insert($data);
     	}else{
-    		//met à jour le poids
+    		/*met à jour le poids
     		if(isset($data["poids"])){
     			$dt["poids"] = $id[0]["poids"]+$data["poids"];
     			$this->edit($id[0]["doc_id"], $dt);
@@ -78,12 +81,96 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     		if(isset($data["note"])){
     			$dt["note"] = $data["note"];
     			$this->edit($id[0]["doc_id"], $dt);
-    		} 
+    		}
+    		*/
     		$id = $id[0]["doc_id"];
     	}
-    	return $id;
+    	if($rs)
+    		return $this->findBydoc_id($id);
+	    else
+	    	return $id;
+    	
     }     
+
+    /**
+     * deconstrution du document pour en faire une monade
+     * 
+     * @param array $data
+     * @param int 	$idMon
+     * 
+     * return array
+     */
+    public function monadisation($data, $idMon){
+    	
+    	//vérification de l'url
+    	if(substr($data['url'], 0,31)=="https://groups.diigo.com/group/" 
+    		&& !strrpos($data['url'], "/content/")===false){
+    			$arr = $this->_db->getConfig();
+	    		$diigo = new Flux_Diigo("","",$arr['dbname']);
+	    		$diigo->getCompoGroupItem($data, $idMon);
+    	}
+    	
+    }
     
+	/**
+     * Modifie la hiérarchie d'une entrée.
+     *
+     * @param array $data
+     *  
+     * @return array
+     */
+    public function updateHierarchie($data){
+    	
+    		if(isset($data["parent"])){
+	    		//récupère les information du parent
+	    		$arrP = $this->findBydoc_id($data["parent"]);
+	    		//gestion des hiérarchies gauche droite
+	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
+	    		//vérifie si le parent à des enfants
+	    		$arr = $this->findByParent($data["parent"]);
+	    		if(count($arr)>0){
+	    			//met à jour les niveaux 
+	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
+	    			$stmt = $this->_db->query($sql);
+	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
+	    			$stmt = $this->_db->query($sql);
+	    			//
+	    			$data['lft'] = $arr[0]['rgt']+1;
+	    			$data['rgt'] = $arr[0]['rgt']+2;
+	    		}else{
+	    			//met à jour les niveaux 
+	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arrP[0]['lft'];
+	    			$stmt = $this->_db->query($sql);
+	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arrP[0]['lft'];
+	    			$stmt = $this->_db->query($sql);
+	    			//
+	    			$data['lft'] = $arr[0]['lft']+1;
+	    			$data['rgt'] = $arr[0]['lft']+2;
+	    		}    		
+	    		$data['niveau'] = $arrP[0]['niveau']+1;
+    		}
+    		if(!isset($data['lft']))$data['lft']=0;    		
+    		if(!isset($data['rgt']))$data['rgt']=1;    		
+    		if(!isset($data['niveau']))$data['niveau']=1;    		
+    		
+    		return $data;
+    }    
+    
+    /**
+     * Recherche une entrée flux_tag avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param char $parent
+     */
+    public function findByParent($parent)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_doc") )                           
+                    ->where( "f.parent = ?", $parent );
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+        
     /**
      * Recherche une entrée flux_doc avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
@@ -114,7 +201,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     public function remove($id)
     {
     	foreach($this->_dependentTables as $t){
-			$tEnfs = new $t();
+			$tEnfs = new $t($this->_db);
 			$tEnfs->removeDoc($id);
 		}
     	$this->delete('flux_doc.doc_id = ' . $id);
@@ -191,8 +278,8 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
         $query = $this->select()
                     ->from( array("f" => "flux_doc") )                           
                     ->where( "f.doc_id = ?", $doc_id );
-
-        return $this->fetchAll($query)->toArray(); 
+		$arr = $this->fetchAll($query)->toArray();
+        return count($arr) ? $arr[0] : false; 
     }
     /**
      * Recherche une entrée flux_doc avec la valeur spécifiée
@@ -461,4 +548,145 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
 		    	
 	}    
+
+	/**
+     * Calcul l'historique de date de publication
+     *
+     * @param string 	$tronc
+     * @param array 	$formatDate = format mysql de la date
+     * 
+     * @return array
+     */
+	function getHistoPubli($tronc="", $formatDate="%d-%c-%y") {
+
+		//définition de la requête
+		/*		
+		SELECT 
+		  temps,
+		 count(*) nb
+		    FROM flux_doc d
+		   WHERE d.tronc = '".$tronc."'
+		GROUP BY temps
+		ORDER BY temps
+		*/		
+        $query = $this->select()
+        	->from( array("d" => "flux_doc"),array("temps"=>"DATE_FORMAT(d.pubDate, '".$formatDate."')", "nb"=>"COUNT(*)"))                           
+            ->group(array("temps"))
+            ->order(array($dateUnit));
+		//vérifie si on prend les tags du document racine ou de ces éléments
+		if($tronc){
+			$query->where('d.tronc = '.$tronc);
+		}
+		
+        return $this->fetchAll($query)->toArray(); 
+		    	
+	}    
+
+	/**
+     * retourne l'historique des évaluations
+     *
+     * @param string 	$titre
+     * @param array 	$formatDate = format mysql de la date
+     * 
+     * @return array
+     */
+	function getHistoEval($titre="axesEval", $dateUnit="%d-%c-%y") {
+
+		if($dateUnit){
+			$dateUnit = 'DATE_FORMAT(utd.maj, "'.$dateUnit.'")';
+		}else $dateUnit = "utd.maj";
+		
+		//définition de la requête
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("d" => "flux_doc"),array("doc_id","tronc","data"))                           
+            ->joinInner(array('utd' => 'flux_utitagdoc'),'utd.doc_id = d.doc_id'
+            	,array("temps"=>$dateUnit
+            		, "nbEval"=>"COUNT(DISTINCT utd.utitagdoc_id)"
+            		, "temps"=>$dateUnit
+            		, "idsTag"=>"GROUP_CONCAT(DISTINCT utd.tag_id)"
+            		, "idsUti"=>"GROUP_CONCAT(DISTINCT utd.uti_id)"
+            		, "dPoids"=>"GROUP_CONCAT(DISTINCT utd.poids)"
+            		, "poids"=>"SUM(utd.poids)"
+            		))
+        	->group(array("d.data"))
+            ->order(array($dateUnit));
+		/*            
+		SELECT d.doc_id
+	, d.data
+	, d.tronc
+	, COUNT(DISTINCT utd.utitagdoc_id) nbEval
+	, DATE_FORMAT(utd.maj, '%d-%c-%y %h:%i:%s') temps
+	, GROUP_CONCAT(DISTINCT utd.tag_id) idsTag
+	, GROUP_CONCAT(DISTINCT utd.uti_id) idsUti
+	, GROUP_CONCAT(DISTINCT utd.poids) dPoids
+    , SUM(utd.poids) poids
+FROM flux_doc d
+	INNER JOIN flux_utitagdoc utd ON utd.doc_id = d.doc_id
+WHERE d.titre = 'axesEval'
+ GROUP BY d.data 
+ order by temps
+		*/            
+		//vérifie si on prend les tags du document racine ou de ces éléments
+		if($titre){
+			$query->where('d.titre = ?', $titre);
+		}
+		
+        return $this->fetchAll($query)->toArray(); 
+		    	
+	}    
+
+	
+    /**
+     * Recherche des entrées avec une requête fulltext
+     *
+     * @param string	$txt
+     * @param string	$type
+     * @param boolean	$group
+     * @param string	$order
+     * @param int		$idDoc
+     *
+     * @return array
+     */
+    public function findFullText($txt, $type, $group, $order = "score DESC", $idDoc=false)
+    {
+    	$txt = str_replace("'", " ", $txt);
+        $query = $this->select()
+            ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("d" => "flux_doc"), array("score"=>"MATCH(d.note) AGAINST('".$txt."')", "titre", "texte"=>"note", "doc_id", "tronc", "url") )                           
+            ->where("MATCH(d.note) AGAINST('".$txt."')")
+        	->order($order)
+			;
+		if($idDoc)
+			$query->where("d.doc_id = ?", $idDoc);
+		if($type)
+			$query->where("d.type = ?", $type);
+		if($group)
+			$query->group(array("d.doc_id"));
+			
+			
+        return $this->fetchAll($query)->toArray(); 
+    } 
+
+    
+     /**
+     * Recherche une entrée avec la valeur spécifiée
+     * et retourne la liste de tous ses enfants
+     *
+     * @param integer $idDoc
+     * @param string $order
+     * @return array
+     */
+    public function getFullChild($idDoc, $order="lft")
+    {
+        $query = $this->select()
+                ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->from(array('d' => 'flux_doc'),array('titreO'=>'titre', 'doc_id0'=>'doc_id'))
+            ->joinInner(array('enf' => 'flux_doc'),
+                'enf.lft BETWEEN d.lft AND d.rgt',array('titre', 'doc_id', 'url', 'niveau'))
+            ->where( "d.doc_id = ?", $idDoc)
+           	->order("enf.".$order);        
+        $result = $this->fetchAll($query);
+        return $result->toArray(); 
+    }    
 }

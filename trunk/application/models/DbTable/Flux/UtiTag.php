@@ -189,6 +189,22 @@ class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+
+    /**
+     * Recherche une entrée flux_utitag avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param int $uti_id
+     */
+    public function findByUti_id($uti_id)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_utitag") )                           
+                    ->where( "f.uti_id = ?", $uti_id );
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+    
     /*
      * Recherche une entrée flux_utitag avec la valeur spécifiée
      * et retourne cette entrée.
