@@ -4,7 +4,7 @@
   <head data-gwd-animation-mode="proMode">
     <title>Navigation dans les évaluations</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script type="text/javascript" src="../js/d3.v3.js"></script>
+    <script type="text/javascript" src="../js/d3.js"></script>
     <script type="text/javascript" src="../js/jquery.min.js"></script>
     <!--   
     -->
@@ -46,7 +46,6 @@
 	    	creaUtis();
 	    	creaTags();
 		 	creaLinks();
-		 	//var dndT = new treeBranche({svgGroup:svgGroup, id:"dndT", url:"../data/flare.json", x:200, y:200, w:100, h:100});
 		 	
 		}
 
@@ -55,7 +54,7 @@
 			visDocText = svgGroup.selectAll(".gDoc")
 		      .data(docs)
 		      .enter()
-		      .append("svg:g")
+		      .append("g")
 				.attr("class", "gDoc")	            
 				.attr("id", function(d, i) {  return "gDoc"+d.doc_id; })
 		      .on("mouseover", function(d){
@@ -230,13 +229,14 @@
 				    .text(function(d) { 
 				    	return d.login; 
 				    	});
-	        //création de l'arbre des documents
+	        //création de l'arbre des documents pour chaque utilisateur
 			utis.forEach(function(u, i) {
 				var g = svgGroup.select("#gUti"+u.uti_id); 
 			    var bbUti = g[0][0].getBBox();
-			    var x = bbUti.x+(bbUti.width/2);
-			    var y = bbUti.y-32;				
-			 	var dndT = new treeBranche({svgGroup:svgGroup, id:"dndT_"+u.uti_id, url:"../data/flare.json", x:x, y:y, w:0, h:0});
+			    var x = bbUti.x+(bbUti.width/2)+12;
+			    var y = bbUti.y;	
+			    if(i==0)				
+				 	var dndT = new treeBranche({svgGroup:svgGroup, id:"dndT_"+u.uti_id, url:"../data/flare.json", x:x, y:y, w:0, h:0});
 		    });		        				
 	
 		}
@@ -259,7 +259,7 @@
 			var visTagBulle = svgGroup.selectAll(".gTag")
 		      	.data(tags)
 				.enter()
-		        .append('svg:g')
+		        .append('g')
 		        .attr("id", function(d, i) {  return "gTag"+d.tag_id; })	            
 		        .attr("class","gTag") ;
 			visTagBulle.append('svg:circle')

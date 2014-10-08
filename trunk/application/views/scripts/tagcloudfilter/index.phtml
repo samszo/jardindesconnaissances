@@ -24,9 +24,9 @@
 		    var fill = d3.scale.category20b(),
 			idBase = "flux_diigo",
 			dtUtis = <?php echo $this->utis; ?>,
-			w = 800,
-			h= 800,
-			max = 250,
+			w = 1400,
+			h = 1000,
+			max = 2500,
 			scale = 1,
 			complete = 0,
 			statusText = d3.select("#status"),
@@ -43,7 +43,7 @@
 			
 			d3.json("<?php echo $this->urlStats; ?>", function(data) {
 				var ext = d3.extent(data.map(function(x) { return parseInt(x.value); }));
-				fontSize = d3.scale.linear().domain([ext[0],ext[1]]).range([8,128]);
+				fontSize = d3.scale.linear().domain([ext[0],ext[1]]).range([16,128]);
 				d3.layout.cloud().size([w, h])
 					.words(data)
 				    .rotate(0)

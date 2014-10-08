@@ -1,0 +1,37 @@
+<?php
+		echo "<div class='halPubli' xmlns:dc='http://purl.org/dc/elements/1.1/'>";
+		//
+		foreach ($this->canal->channel->item as $i) {			
+	    	//récupère les infos dublin core
+			$dc = $i->children('http://purl.org/dc/elements/1.1/');
+			echo '<p>';
+			echo '<span >'.$i->category.'</span> ';
+			echo '(<span property="dc:date" >'.$dc->date.'</span>) : ';
+			foreach ($dc->creator as $c) {
+			    echo '<span property="dc:creator">'.$c.'</span> - ';
+			}
+			echo '<br/><span property="dc:title">'.$i->title.'</span><br/>';
+			foreach ($dc->publisher as $p) {
+			    echo '<span property="dc:publisher">'.$p.'</span> - ';
+			}    	
+			$mc = $dc->coverage;
+			$mc = explode(";", $mc);
+			echo '<br/>';
+			foreach ($mc as $m) {
+			    echo '<span property="dc:coverage">'.$m.'</span> - ';
+			}
+			echo '<br/>';
+			echo '<span property="dc:subject">'.$dc->subject.'</span>';
+			
+			//echo '<span property="dc:description">'.$dc->description.'</span>';
+			echo '<span property="dc:type" style="visibility:hidden;">'.$dc->type.'</span>';
+			echo '<br/><a href="'.$i->link.'" property="dc:identifier">fiche HAL</a>';
+			
+			//récupère les infos media
+			//$media = $i->children('http://search.yahoo.com/mrss/');
+
+			echo '</p>';
+			
+		}
+		//
+		echo "</div>";

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+  
+  <head data-gwd-animation-mode="proMode">
+    <title>Indice de Complexité Exitentielle</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="js/d3.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/queue.v1.min.js" ></script>
+    <script type="text/javascript" src="js/zoom.js"></script>
+    <script type="text/javascript" src="js/treemapDoc.js"></script>
+	<script type="text/javascript" src="js/jquery.smart_autocomplete.js"></script>
+    <script type="text/javascript">
+    	var idUti = <?php echo json_encode($this->idUti); ?>;
+    	var idBase = '<?php echo $this->idBase; ?>';
+		var dtMonades = eval(<?php echo json_encode($this->monades); ?>);
+		var svg, svgGroup, tooltip;
+		var svgExi, svgTag, svgLien;
+		var dataMon;
+		var diaFind, diaAjoutDoc;
+		var tableauX = 308, tableauY = 30;
+		var tableauXDoc = tableauX+20, tableauYDoc = tableauY;
+		var x, brush;
+
+		var sin30 = Math.pow(3,1/2)/2;
+		var cos30 = .5;
+		
+		//définition des paramètre d'interactivité
+		//attention à l'ordre qui doit correspondre à celui du DOM
+	    var paramsBtn = [
+	        	         {id:'g3064', fct:ajoutDoc, mes:"ajouter un document à la monade"}
+	        	         ,{id:'image7852', fct:ajoutMonade, mes:"ajouter une nouvelle monade"}
+	        	         ,{id:'image7917', fct:removeMonade, mes:"supprimer une monade"}
+	        	         ,{id:'image8047', fct:findMonade, mes:"chercher une monade"}
+	        	         ,{id:'image8054', fct:ajoutMonade, mes:"ajouter une nouvelle monade"}
+	        	         ,{id:'image8056', fct:findMonade, mes:"chercher une monade"}
+	        	         
+	        	    	];
+	    var paramsIn = [
+	        	         {id:'tspan7773', mes:"----------", lib:"titre"}
+	        	         ,{id:'tspan4197', mes:"00000000", lib:"nbDoc"}
+	        	         ,{id:'tspan4262', mes:"00000000", lib:"nbTag"}
+	        	         ,{id:'tspan4272', mes:"00000000", lib:"nbUti"}
+	        	         ,{id:'tspan4282', mes:"00000000", lib:"nbLien"}
+	        	         ,{id:'tspan5672', mes:"00000000", lib:"matrice"}
+	        	         ,{id:'tspan5703', mes:"00000000", lib:"indice"}
+	        	         ,{id:'tspan5634', mes:"N", lib:"niveau"}
+	        	    	];
+
+		
+		function init(){
+		 	//charge l'IHM SVG
+		 	chargeIHM();
+
+		 	//définie les fenêtres de dialogue
+		 	diaFind = document.getElementById('diagFind'); 
+			if(!('show' in diaFind)){ 
+				document.getElementById('promptCompat').className = 'no_dialog'; 
+			} 
+			diaFind.addEventListener('close', function() { 
+				console.log('Fermeture. ', this.returnValue); 
+			});
+			diaAjoutDoc = document.getElementById('diagAjoutDoc'); 
+			if(!('show' in diaAjoutDoc)){ 
+				document.getElementById('promptCompat').className = 'no_dialog'; 
+			} 
+			diaFind.addEventListener('close', function() { 
+				console.log('Fermeture. ', this.returnValue); 
+			});
+			
+			//charge l'autocomplétion
+			/*problème de cuche avec la boite de dialogue
+			var acMonades=[];
+			dtMonades.forEach(function(mon){
+				acMonades.push(mon.monade_id+' - '+mon.titre);
+	    	});		
+			$("#monade_event").smartAutoComplete({source: acMonades});
+		 	*/
+		}
+		
+	    //charge le svg
+	    //merci à http://bl.ocks.org/KoGor/8162640
+	    function chargeIHM(){
+	    	queue()
+	    		.defer(d3.xml, "img/ICE.svg", "image/svg+xml")
+	    		.await(IHMcharge);
+	    }
+	    function IHMcharge(error, xml){
+	    	//Adding our svg file to HTML document
+			var importedNode = document.importNode(xml.documentElement, true);
+    	  	d3.select("#viz").node().appendChild(importedNode);
+    	  	svg = d3.select("#svg3153");
+    	  	//ajoute l'écouteur de zoom
+    	  	svgGroup = d3.select("#tableau")
+		        .attr("class", "overlay")
+		        .call(zoomListener);
+	        //ajoute le tooltip
+			tooltip = d3.select("body").append("div")
+			    .attr("class", "tooltip")
+			    .style("opacity", 1e-6);	        
+    	  	//ajoute les fonctions aux boutons
+	    	paramsBtn.forEach(function(btn){
+	    		var cb = document.getElementById(btn.id);
+		    	var a = document.createAttribute("class");
+		    	a.value = "btn";
+		    	cb.setAttributeNode(a);
+		    	cb.addEventListener("click", btn.fct, false);
+	    	});
+	    	d3.selectAll(".btn")
+		        .data(paramsBtn)
+		        .attr("cursor", "pointer")
+			    .on("mouseover", mouseover)
+			    .on("mousemove", mousemove)
+			    .on("mouseout", mouseout);
+	    	    	  	
+	    }
+
+		function mouseover() {
+			tooltip.transition()
+			      .duration(500)
+			      .style("opacity", 1);
+		}
+
+		function mousemove(d, i) {
+			tooltip.text(d.mes)
+		      .style("left", (d3.event.pageX) + "px")
+		      .style("top", (d3.event.pageY - 44) + "px");
+		}
+
+		function mouseout() {
+			tooltip.transition()
+		      .duration(500)
+		      .style("opacity", 1e-6);
+		}
+
+		function ajoutMonade() {
+			var titre = prompt("Donner un titre à la monade", "Ma monade");
+			if (titre != null) {
+				var p = {"titre":titre, "db":idBase};
+				$.post("ice/ajoutmonade", p,
+						 function(data){
+							dataMon = data;
+							setParams(1);
+						 }, "json");
+			}			
+		}
+
+		function removeMonade() {
+			if(!dataMon){
+				alert("Aucune monade n'est chargée.");	
+			}else{
+				var r = confirm("Confirmer la suppression");
+				if (r == true) {
+					var p = {"idMon":dataMon.monade_id, "db":idBase};
+					$.post("ice/removemonade", p,
+							 function(data){
+								initParams();
+							 });
+				}
+			}			
+		}
+
+
+		function getMonade(idMon) {
+			var p = {"idMon":idMon, "db":idBase};
+			$.post("ice/getmonade", p,
+					 function(data){
+						dataMon = data;
+						setParams(1);
+					 }, "json");
+		}
+		
+		function findMonade() {
+			diaFind.showModal();
+		}
+
+		function ajoutDoc() {
+			if(!dataMon){
+				alert("Veillez charger une monade.");	
+			}else{
+				diaAjoutDoc.showModal();
+			}			
+			
+		}
+
+
+		function setDoc() {
+			var titre = $("#field1")[0].value;
+			var url = $("#field2")[0].value;
+			if (url != null || titre != null) {
+				//calcul la place du nouveau document
+				
+				var p = {"idMon":dataMon.monade_id, data:{"titre":titre, "url":url, "niveau":1, "parent":0}, "db":idBase};
+				$.post("ice/ajoutdoc", p,
+						 function(data){
+							diagAjoutDoc.close();
+							dataMon = data;
+							setParams(1);
+						 }, "json");
+			}else{
+				alert("Veillez remplir tous les chmaps.")
+			}
+		}
+
+		function removeMonade() {
+			if(!dataMon){
+				alert("Aucune monade n'est chargée.");	
+			}else{
+				var r = confirm("Confirmer la suppression");
+				if (r == true) {
+					var p = {"idMon":dataMon.monade_id, "db":idBase};
+					$.post("ice/removemonade", p,
+							 function(data){
+								initParams();
+							 });
+				}
+			}			
+		}
+
+		
+		function initParams(){
+			dataMon = false;
+			
+			paramsIn.forEach(function(pIn){
+				d3.select("#"+pIn.id).text(pIn.mes);
+			});
+		}
+
+		function setParams(niv){
+						
+			//getTreeMapDoc(dataMon["ICE"][niv-1]["docs"]);
+			setSvgDoc(dataMon["ICE"][niv]["docs"]);
+			setSvgExi(dataMon["ICE"][niv]["exis"]);
+			setSvgTag(dataMon["ICE"][niv]["tags"]);
+			setSvgLien(dataMon["ICE"][niv]["rapports"]);
+			
+						 			
+			paramsIn.forEach(function(pIn){
+				//affiche le texte correspondant à la donnée
+				var txt="";
+				if(pIn.lib=="titre")txt = dataMon.titre;
+				if(pIn.lib=="nbDoc")txt = dataMon["ICE"][niv-1].nbDoc;
+				if(pIn.lib=="nbTag")txt = dataMon["ICE"][niv-1].nbTag;
+				if(pIn.lib=="nbUti")txt = dataMon["ICE"][niv-1].nbUti;
+				if(pIn.lib=="nbLien")txt = dataMon["ICE"][niv-1].nbLien;
+				if(pIn.lib=="matrice")txt = dataMon["ICE"][niv-1].matrice;
+				if(pIn.lib=="indice")txt = dataMon["ICE"][niv-1].indice;
+				//if(pIn.lib=="niveau")txt = dataMon["ICE"].length;
+				d3.select("#"+pIn.id).text(txt);
+			});
+			
+			/*construction de la sélection des échelles
+			merci à  http://bl.ocks.org/mbostock/1667367
+			*/
+			var wEch = 239, hEch = 20;
+			x = d3.scale.linear().range([0, wEch]).domain([0, dataMon["ICE"].length]);
+			var y = d3.scale.linear().range([hEch, 0]).domain([0, dataMon["ICE"].length]);
+			var xAxis = d3.svg.axis().scale(x).orient("bottom");
+			xAxis.ticks(dataMon["ICE"].length)
+			brush = d3.svg.brush()
+			    .x(x)
+			    .extent([0, dataMon["ICE"].length])
+			    .on("brush", brushed);				
+			var area = d3.svg.area()
+			    .interpolate("monotone")
+			    .x(function(d) { return x(d.niveau); })
+		    	.y0(hEch)
+		    	.y1(function(d) { return y(d.niveau); });
+			svg.append("defs").append("clipPath")
+			    .attr("id", "clip")
+			  .append("rect")
+			    .attr("width", wEch)
+			    .attr("height", hEch);		    	
+			var context = svg.append("g")
+			    .attr("class", "context")
+			    .attr("transform", "translate(38,522)");			    
+			context.append("path")
+		      .datum(dataMon["ICE"])
+		      .attr("class", "area")
+		      .attr("d", area);
+			context.append("g")
+		      .attr("class", "x axis")
+		      .attr("transform", "translate(0," + hEch + ")")
+		      .call(xAxis);
+			context.append("g")
+		      .attr("class", "x brush")
+		      .call(brush)
+		    .selectAll("rect")
+		      .attr("y", 10)
+		      .attr("height", hEch-5);
+
+			//suppression de l'annonce d'accueil
+			d3.select("#g3102").remove();
+			
+
+		}	
+		
+		function setSvgExi(dataExis){
+			//construction des documents avec les données conservées dans la base
+			var color = d3.scale.category20c(); //todo: une couleur par type de documents : html, texte, image, son...
+
+			//instancie les data svg
+			dataExis.forEach(function(d){
+				d.dt = JSON.parse(d.svgData);
+			});
+			
+			if(svgExi)svgExi.remove();
+			svgExi = svg
+				.append("svg:g")
+			    .attr("id", "svgExi");		
+			    //.attr("transform", "translate("+(tableauX+20)+","+(tableauY+160)+")");			
+		      
+		  	var cell = svgExi.selectAll("g")
+		    	.data(dataExis)
+		    	.enter().append("svg:g")
+		      		.attr("class", "cellExi")
+		      		.on("click", function(d) { 
+			      		return zoom(node == d.parent ? root : d.parent); 
+			      	});
+
+
+		  	cell.append("svg:ellipse")
+		      .attr("cx", function(d) { return d.dt.centroid[0]; })
+		      .attr("cy", function(d) { return d.dt.centroid[1]+(d.dt.ry); })
+		      .attr("rx", function(d) { return d.dt.rx; })
+		      .attr("ry", function(d) { return d.dt.ry; })
+		      .attr("style", function(d) { return d.dt.style; });
+		  	cell.append("svg:polygon")
+				.attr('points', function(d) {
+					d.points = hex(d.dt.centroid, d.dt.ry, true);
+					return d.points.join(' ');
+				})
+		      .attr("style", function(d) { return d.dt.style; });	
+		  	cell.append("svg:text")
+		      .attr("x",function(d) { return d.dt.centroid[0]; })
+		      .attr("y",function(d) { return d.dt.centroid[1]; })
+		      .attr("style", function(d) { return style="font-size:"+d.dt.ry/3+"px"; })
+		      .attr("text-anchor", "middle")
+		      .text(function(d) { 
+			      return d.nom; 
+			      });
+			
+		}		
+
+		function setSvgTag(dataTags){
+			//construction des documents avec les données conservées dans la base
+			var color = d3.scale.category20c(); //todo: une couleur par type de documents : html, texte, image, son...
+
+			//instancie les data svg
+			dataTags.forEach(function(svg){
+				svg.dt = JSON.parse(svg.svgData);
+			});
+
+			/**
+			TODO:faire des mise à jour plutôt que de tout supprimer et rrécréer
+			**/
+			if(svgTag)svgTag.remove();
+			svgTag = svg
+				.append("svg:g")
+			    .attr("id", "svgTag");		
+			    //.attr("transform", "translate("+(tableauX+20)+","+(tableauY+300)+")");			
+		      
+		  	var cell = svgTag.selectAll("g")
+		    	.data(dataTags)
+		    	.enter().append("svg:g")
+		      		.attr("class", "cellTag")
+		      		.on("click", function(d) { 
+			      		return zoom(node == d.parent ? root : d.parent); 
+			      	});
+
+		  	//
+		  	cell.append("svg:polygon")
+				.attr('points', function(d) {
+					d.points = triangle(d.dt.centroid, d.dt.size); 
+					return d.points.join(' ');
+				})
+		      	.attr("style", function(d) { return d.dt.style; });	
+			//addTriangle(100, 100, 50);
+			
+		  	cell.append("svg:text")
+		      .attr("x", function(d) { return d.dt.centroid[0]; })
+		      .attr("y", function(d) { return d.dt.centroid[1]; })
+		      .attr("style", function(d) { return style="font-size:"+d.dt.size/3+"px"; })
+		      .attr("text-anchor", "middle")
+		      .text(function(d) { 
+			      return d.code; 
+			      });
+			
+		}		
+
+
+		function setSvgLien(dataLiens){
+			//construction des documents avec les données conservées dans la base
+			var color = d3.scale.category20c(); //todo: une couleur par type de documents : html, texte, image, son...
+
+			//instancie les data svg
+			var dt, coorG = [];
+			dataLiens.forEach(function(svg){
+				var coorDE = [];
+				var coorET = [];
+				//récupère les coordonées des objets liés
+				rootDoc.children.forEach(function(d){
+					if(d.doc_id == svg.doc_id){
+						dt = JSON.parse(d.svgData);
+						//coorDE.push({x:dt.x+(dt.w/2),y:dt.y+(dt.h)});
+						var cX = d.x+(d.dx/2)+tableauXDoc;	
+						var cY = d.y+(d.dy)+tableauYDoc;					
+						coorDE.push({x:cX,y:cY});
+						coorG.push({x:cX, y:cY, id:d.doc_id, type:"doc", style:dt.style});
+					}
+				});
+				dataMon["ICE"][svg.niveau-1]["exis"].forEach(function(d){
+					if(d.exi_id == svg.exi_id){
+						dt = JSON.parse(d.svgData);
+						//point en haut de l'exa
+						coorDE.push({x:dt.centroid[0],y:d.points[0][1]});
+						coorG.push({x:dt.centroid[0],y:d.points[0][1], id:d.exi_id, type:"exi", style:dt.style});
+						//point en bas de l'exa
+						coorET.push({x:dt.centroid[0],y:d.points[2][1]});
+						coorG.push({x:dt.centroid[0],y:d.points[2][1], id:d.exi_id, type:"exi", style:dt.style});
+					}
+				});
+				dataMon["ICE"][svg.niveau-1]["tags"].forEach(function(d){
+					if(d.tag_id == svg.tag_id){
+						dt = JSON.parse(d.svgData);
+						//point en haut du triangle
+						coorET.push({x:dt.centroid[0],y:d.points[0][1]});
+						coorG.push({x:dt.centroid[0],y:d.points[0][1], id:d.tag_id, type:"tag", style:dt.style});
+					}
+				});				
+				svg.dt = JSON.parse(svg.svgData);
+				svg.coorET = coorET;
+				svg.coorDE = coorDE;
+			});
+			
+			if(svgLien)svgLien.remove();
+			svgLien = svg
+				.append("svg:g")
+			    .attr("id", "svgLien");			
+
+			var lineFunction = d3.svg.line()
+			    .x(function(d) { return d.x; })
+			    .y(function(d) { return d.y; })
+			    .interpolate("basis");
+			
+		  	var cellDE = svgLien.selectAll("g")
+		    	.data(dataLiens)
+		    	.enter().append("path")
+			  		.attr("d", function(d) { 
+				  		return lineFunction(d.coorDE); 
+				  		})
+			      	.attr("style", function(d) { return d.dt.style; });	
+
+		  	var cellET = svgLien.selectAll("g")
+		    	.data(dataLiens)
+		    	.enter().append("path")
+			  		.attr("d", function(d) { 
+				  		return lineFunction(d.coorET); 
+				  		})
+			      	.attr("style", function(d) { return d.dt.style; });	
+
+			//récupère l'ensemble des points
+			
+		  	svgLien.selectAll("circle")
+		    	.data(coorG)
+		  		.enter().append("svg:circle")
+			    	.attr("cx", function(d) { 
+				    	return d.x; 
+				    	})
+			    	.attr("cy", function(d) { return d.y; })
+			    	.attr("r", 4.5)
+			    	.attr("style", function(d) { return d.style; });
+			
+		  	
+		}		
+
+		
+		function hex(centroid, size, tilted) {
+		    var a = size / 2, 
+		        b = (Math.sqrt(3) * a) / 2,
+		        x = centroid[0],
+		        y = centroid[1];
+		    return tilted
+		        ? [[x - a / 2, y - b], [x - a, y], [x - a / 2, y + b], [x + a / 2, y + b], [x + a, y], [x + a / 2, y - b]]
+		        : [[x - b, y - a / 2], [x - b, y + a / 2], [x, y + a], [x + b, y + a / 2], [x + b, y - a / 2], [x, y - a]];
+		}
+		
+		//triangle centered at (cx, cy) with circumradius r
+		//merci à https://github.com/1wheel/BizarreSierpinskiTriangle
+		function addTriangle(cx, cy, r){
+			var triangle = svg.append('polygon')
+				.attr('fill', 'white')
+				.attr('points', (cx) 	+','+ 	(cy) 	+' '+ 
+								(cx) 	+','+ 	(cy)	+' '+
+								(cx) 	+','+ 	(cy))
+				.transition()
+				.duration(600)
+				.delay(10)
+					.attr('fill', '#'+Math.floor(Math.random()*16777215).toString(16))
+					.attr('points', (cx) 			+','+ 	(cy-r) 			+' '+ 
+									(cx-r*sin30) 	+','+ 	(cy + r*cos30)	+' '+
+									(cx+r*sin30) 	+','+ 	(cy + r*cos30))
+		}
+
+
+		function triangle(centroid, r){
+			var cx = centroid[0];
+			var cy = centroid[1];
+			return [[cx, cy-r], [cx-r*sin30, cy + r*cos30], [cx+r*sin30, cy + r*cos30]];
+			/*
+			return (cx) 			+','+ 	(cy-r) 			+' '+ 
+					(cx-r*sin30) 	+','+ 	(cy + r*cos30)	+' '+
+					(cx+r*sin30) 	+','+ 	(cy + r*cos30);
+			*/			
+		}
+
+		
+		function brushed() {
+			var ext = brush.empty() ? x.domain() : brush.extent();
+			console.log(ext);
+		}
+			
+		function changeMonade(e){
+			diaFind.close();
+			if(!e || e.selectedIndex==0) return;				
+			
+			//charge les valeurs
+			getMonade(e.value);			
+
+		}		
+    </script>
+	<link rel="stylesheet" href="css/ice.css" />
+    
+    
+  </head>
+  
+  <body onload="init()" >
+  	<div id="viz">
+  	</div>  
+  	
+
+	<p id="promptCompat">Votre navigateur ne pend pas en charge les balises <code><dialog></code></p> 
+	<dialog id="diagFind" close> 
+		Monades disponibles :
+		<!-- <input id="monade_event" />  -->
+		<select onchange="changeMonade(this)" >
+		  <option value="">Choisissez une monade</option>
+		  <?php 
+		  	//construction des options
+		  	foreach ($this->monades as $m) {
+			  	echo "<option id='optMon".$m["monade_id"]."' value='".$m["monade_id"]."'>".$m["titre"]."</option>";
+		  	}
+		  ?>
+		</select>
+		<div class="boutons">
+			<button onclick="diaFind.close()">Fermer</button> 
+		</div> 
+	</dialog> 
+	<dialog id="diagAjoutDoc" close> 
+		<div id="field2-container" >
+               <label for="field2">Titre : </label>
+               <input type="text" name="field1" id="field1" required="required">
+          </div>
+           
+           
+          <div id="field1-container" >
+               <label for="field1">Url : </label>
+               <input type="url" name="field2" id="field2" required="required">
+          </div>
+          <div class="boutons">
+			<button onclick="diagAjoutDoc.close()">Fermer</button> 
+			<button onclick="setDoc()">Ajouter</button> 
+		</div> 
+	</dialog> 
+
+</body> 
+</html>	
+
+  </body>
+</html>

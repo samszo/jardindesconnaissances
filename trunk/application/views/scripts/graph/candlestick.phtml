@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Google Visualization API Sample
+    </title>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', {packages: ['corechart']});
+    </script>
+    <script type="text/javascript">
+      function drawVisualization() {
+        var data = google.visualization.arrayToDataTable([
+            ['Initiale', 9.39573E-34, 3.75829E-33, 1.55593E-29, 7.75614E-15],
+            ['Finale', 9.49627E-34, 3.79851E-33, 1.57258E-29, 8.34262E-15],
+            ['SIC - TIC', 9.10383E-31, 3.64153E-30, 1.50759E-26, 2.61346E-13],
+          // Treat first row as data as well.
+        ], true);
+
+        var options = {
+                width: 600, height: 400,
+                title: 'Comparaison des complexités existentielles',
+                vAxis: {title: 'Somme des dimensions',logScale:true},
+                legend: { position: 'bottom' },
+        };
+
+        var chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+
+      google.setOnLoadCallback(drawVisualization);
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+  </body>
+</html>
