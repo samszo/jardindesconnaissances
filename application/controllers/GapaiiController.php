@@ -58,5 +58,12 @@ class GapaiiController extends Zend_Controller_Action {
 			//$this->view->sem = $this->_getParam('sem');
 		}else echo "pas de donnée !";
 	}
+
+	public function getevalAction() {
+		//récupère les critère de l'évaluation
+		//print_r($this->getRequest()->getParams());
+		$g = new Flux_Gapaii($this->_getParam('idBase', $this->dbNom));
+		$this->view->data = $g->getEval($this->_getParam('idDoc'), $this->_getParam('idUti'), $this->_getParam('idTag'));
+	}
 	
 }

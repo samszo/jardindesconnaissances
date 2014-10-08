@@ -17,12 +17,14 @@ class TagcloudfilterController extends Zend_Controller_Action {
 	    $request = $this->getRequest();
 		$url = $request->getRequestUri();
 		$arrUrl = explode("?",$url);
-		$idBase = "flux_diigo";
+		$idBase = $this->_getParam('idBase', "flux_diigo");
 		$s = new Flux_Site($idBase);		
 		$dbU = new Model_DbTable_Flux_Uti($s->db);
 		$this->view->utis = json_encode($dbU->getAll(array("login")));
-		
-		$this->view->urlStats = "stat/tagassos?idBase=".$idBase."&tags[]=intelligence&tags[]=collective";	    
+		if($this->_getParam('idUti'))
+			$this->view->urlStats = "stat/taguti?idBase=".$idBase."&idUti=".$this->_getParam('idUti');	    
+		else
+			$this->view->urlStats = "stat/tagassos?idBase=".$idBase;//."&tags[]=information&tags[]=communication";	    
 	}
 
 	/**

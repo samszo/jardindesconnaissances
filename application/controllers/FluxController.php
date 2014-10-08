@@ -103,8 +103,8 @@ class FluxController extends Zend_Controller_Action {
 	          echo "Récupère exception: " . get_class($e) . "\n";
 	          echo "Message: " . $e->getMessage() . "\n";
 		}
-	}    
-	
+	}       
+		
 	public function gettutitagsAction() {
 		try {
 			$auth = Zend_Auth::getInstance();
@@ -141,5 +141,12 @@ class FluxController extends Zend_Controller_Action {
 				$this->view->file = $o->getGoogleParole($this->_getParam('txt'));
 		    }
 	}    
+
+	public function savekwurlAction() {
+	    if($this->_getParam('idBase', 0) && $this->_getParam('url', 0)){			
+
+	    }
+	}    
+	
 	
 }
