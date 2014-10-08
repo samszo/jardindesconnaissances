@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Jardin des connaissances : plannings</title>
+	<meta name="Description" CONTENT="jardin connaissances planning cours"/>
+	<meta name="Keywords" CONTENT="jardin connaissances planning cours"/>
+	<meta name="Author" CONTENT="Samuel Szoniecky"/>
+	<script type="text/javascript" src="js/d3.js"></script>
+	<script type="text/javascript" src="js/cal-heatmap.js"></script>
+	<script src="js/jquery.min.js"></script>
+  	<script src="js/jquery-ui.min.js"></script>
+	<script src="js/jquery.ui.datepicker-fr.js"></script>
+  	
+  	<link rel="stylesheet" href="css/cal-heatmap.css" />
+	<link rel="stylesheet" href="css/planning.css" />
+	<link rel="stylesheet" href="css/jquery/smoothness/jquery-ui.css" />		
+	<script>
+
+		var db = '<?php echo $this->dbNom; ?>';
+
+		var $intervenants;
+	    var $cours;
+		var $etudiants;
+		var $statistiques;
+		
+	    $(function() {
+		    $("#datepickerMax").datepicker($.datepicker.regional["fr"]);
+		    $("#datepickerMin").datepicker($.datepicker.regional["fr"]);
+		    
+		  });
+
+	    $(document).ready(function() {
+			$intervenants = $('#intervenants');
+		    $cours = $('#cours');
+			$etudiants = $('#etudiants');
+			$statistiques = $('#statistiques');
+
+			//création de la liste des statistiques
+			arrStat.forEach(function(d, i) {
+				$statistiques.append('<option value="'+ i +'">'+  d +'</option>');					
+			});
+			//création des divs pour les stats
+			var ts = d3.select("#tabStat")
+				.selectAll("div")
+				.data(arrStat)
+				.enter()
+				.append("div")
+					.attr("id",function(d, i) {
+						 return "tabStat"+i;
+						 })
+					.style("display",'none');
+			ts.append("img")
+				.attr("src","img/clear.png").on("click",cacheDiv);
+			ts.append("class").attr("class","titreStat").text(function(d) {return d;});
+				
+	    });		  		
+	</script>	
+	
+</head>
+	<body>
+	  <div class="request">
+	    <?php if (isset($this->authUrl)): ?>
+	      <a class='login' href='<?php echo $this->authUrl; ?>'>Connexion aux Planning de Google !</a>
+	    <?php else: ?>
+	    	<a class='logout' href='?logout=1'>Déconecter</a>
+	    	<a class='logout' href='../public/?cleanCache=1&url=/planning'>Actualiser</a>
+			<span>Planning disponibles :</span>
+			<select name="planning" size="1" onChange='choixPlanning(this)' >
+				<option >Choisir un planning</option>
+				<?php foreach($this->plannings as $p) : ?>
+					<option value="<?php echo $p['id']; ?>"><?php echo $p['summary']; ?></option>
+				<?php endforeach; ?>		
+			</select>		
+	    <?php endif ?>
+	    Date de début: <input type="text" id="datepickerMin" value="01/09/2014" />
+	    Date de fin: <input type="text" id="datepickerMax" value="30/09/2015" />
+	  </div>
+	  <div>
+		<select id="cours" name="cours">
+		    <option value="">-- Cours --</option>
+		</select>
+		 
+		<select id="intervenants" name="intervenants"  onChange='choixInt(this)'>
+		    <option value="">-- Intervenants --</option>
+		</select>	  
+		 
+		<select id="etudiants" name="etudiants">
+		    <option value="">-- Etudiants --</option>
+		</select>	  
+
+		<select id="statistiques" name="statistiques" onChange='choixStat(this)'>
+		    <option value="">-- Satistiques --</option>
+		</select>	  
+	  </div>
+	  	<table>
+	  	<tr>
+	  	<td><button class="btn" id="btnPrev">&#8592;</button></td>
+	  	<td><div id="cal-heatmap" /></td>
+	  	<td><button class="btn" id="btnNext">&#8594;</button></td>
+	  	</tr>
+	  	</table>		
+		
+		<div id="tabStat"></div>
+		
+		<div id="info-events"></div>
+		<div id="cal-events"></div>
+		<script type="text/javascript">
+			//http://kamisama.github.io/cal-heatmap/#cellRadius
+			var gData, gDataCal, dataCour, idxCour, dataInt, idxInt;
+			var urlCou = {"CDNL":"../data/planning/CDNL14-15_cours.csv"};
+			var urlInt = {"CDNL":"../data/planning/CDNL14-15_intervenants.csv"};
+			var arrStat = ["Nb d'heure par type d'intervenant","Nb d'heure par cours","Nb d'heure par intervenants","Planning par intervenants"];
+			var calY;
+			var calD;
+			var jourFormat = d3.time.format("%x");
+			var heureFormat = d3.time.format("%X");
+			var planningFormat1 = d3.time.format("%A %d %B %Y de %H:%M");
+			var planningFormat2 = d3.time.format(" à %H:%M");
+			var cumulInt = new Array(), arrListeCou;
+			var cumulCou = new Array(), arrListeInt
+			var cumulType = new Array(), dataType;
+			var cumulPlanInt = new Array(), arrPlanInt;
+			var nbCou, nbInt, nbEvent;
+			var sizeCell = 24;
+			var arrColor = ['#377eb8','#f781bf','#ff7f00','#a65628','#984ea3', '#984ea3','#ffff33','#e41a1c','#4daf4a']
+			var nbMotif = 1, arrCreaMotif = [];
+			
+			function getDataPlanning(sltPlan){
+				if(urlCou[sltPlan.label] && urlInt[sltPlan.label]){					
+					//chargement des données depuis les fichiers csv
+					d3.csv(urlCou[sltPlan.label], function(data1) {
+						dataCour = data1;
+				    	nbCou = dataCour.length;
+						//création de l'index des cours
+						idxCour = [];
+						dataCour.forEach(function(d) {
+							idxCour.push(d["Code EC"]);
+							$cours.append('<option value="'+ d["Code EC"] +'">'+  d["Intitulés des EC"] +'</option>');					
+						});
+						
+						d3.csv(urlInt[sltPlan.label], function(data3) {
+							dataInt = data3;
+					    	nbInt = dataInt.length;
+							//création de l'index des intervenants
+							idxInt = [];
+							dataInt.forEach(function(d) {
+								idxInt.push(d["Nom"]);
+								$intervenants.append('<option value="'+ d["Nom"] +'">'+  d["Prénom"] +' '+  d["Nom"] +'</option>');					
+							});
+
+							creaPlanning(sltPlan.value);				
+						});
+					});
+				}else{
+					alert("pas de données de cours pour ce planning");
+				}
+			}				
+
+			function cacheDiv(e, i){
+				document.getElementById("tabStat"+i).style.display = 'none';
+			}
+
+			function choixPlanning(select) {
+				dataType = false;
+				arrListeCou = false;
+				gData = false;
+				var opt = select.selectedOptions[0];
+				getDataPlanning(opt);
+			} 
+
+			function choixInt(select) {
+				var opt = select.selectedOptions[0];
+				var filtered = gData.filter(function(d) {
+					if(!d.summary) return false;
+					return d.summary.indexOf(opt.label) >= 0;	
+				});
+				calY.update(filtered);			
+			} 
+
+
+			
+			function choixStat(select) {
+				var opt = select.selectedOptions[0];
+				var ts = document.getElementById("tabStat"+opt.value);
+				if(ts.style.display == 'none') ts.style.display = 'inline';
+				if(opt.value==0){					
+					if(!dataType){
+						dataType = new Array();
+						for(var x in cumulType){
+							dataType.push({"Nb d'heure":cumulType[x]["nbHeure"], "Nb d'heure TD":cumulType[x]["nbHeureTD"],'Type':cumulType[x]["Type"]});
+						}
+						creaTable("#tabStat0", dataType, ["Type", "Nb d'heure", "Nb d'heure TD"], [null, "Nb d'heure","Nb d'heure TD"]);
+					}					
+				}
+				if(opt.value==1){
+					if(!arrListeInt){
+						arrListeInt = true						
+						for(var i=0; i < nbCou; i++){
+							dataCour[i]["Nb d'heure"]=cumulCou[dataCour[i]["Code EC"]]["nbHeure"];
+							dataCour[i]["Nb d'heure TD"]=cumulCou[dataCour[i]["Code EC"]]["nbHeureTD"];
+							dataCour[i]["intervenants"]=cumulCou[dataCour[i]["Code EC"]]["intervenants"];
+							//construction de la liste pour le planning général
+							if(cumulCou[dataCour[i]["Code EC"]]["nbHeure"]>0){
+								dataCour[i]["intervenants"].forEach(function(d) {
+									if(!dataCour[i]["liste des intervenants"]) dataCour[i]["liste des intervenants"]=d.Nom+" : "+d.nbSeance+" => "+d.nbHeure+" H";
+									else dataCour[i]["liste des intervenants"] += "; "+d.Nom+" : "+d.nbSeance+" => "+d.nbHeure+" H";
+								});	
+							}
+						}
+						//création du tableau des cours
+					    creaTable("#tabStat1", dataCour, ["Intitulés des UE", "Code EC", "Intitulés des EC", "Code Apogée", "Nb d'heure", "Nb d'heure TD", "liste des intervenants"],[null, null, null, null, "Nb d'heure","Nb d'heure TD", null]);
+					}
+				}				
+				if(opt.value==2){
+					if(!arrListeInt){
+						arrListeInt = true;
+						for(var i=0; i < nbInt; i++){
+							dataInt[i]["Nb d'heure"]=cumulInt[dataInt[i]["Nom"]]["nbHeure"];
+							dataInt[i]["Nb d'heure TD"]=cumulInt[dataInt[i]["Nom"]]["nbHeureTD"];
+							dataInt[i]["cours"]=cumulInt[dataInt[i]["Nom"]]["cours"];
+							//construction de la liste pour le planning général
+							if(cumulInt[dataInt[i]["Nom"]]["nbHeure"]>0){
+								dataInt[i]["cours"].forEach(function(d) {
+									if(!dataInt[i]["liste des cours"]) dataInt[i]["liste des cours"]=d.cours+" : "+d.nbSeance+" => "+d.nbHeure+" H";
+									else dataInt[i]["liste des cours"] += "; "+d.cours+" : "+d.nbSeance+" => "+d.nbHeure+" H";
+								});
+							}
+						}
+						//création du tableau des intervenants
+					    creaTable("#tabStat2", dataInt, ["Civilité", "Prénom", "Nom", "Nb d'heure", "Nb d'heure TD", "Type", "liste des cours"], [null, null, null, "Nb d'heure","Nb d'heure TD", null, null]);
+					}
+
+				}
+				if(opt.value==3){
+					if(!arrPlanInt){
+						arrPlanInt = true;
+						//tri le tableau
+						cumulPlanInt.sort(function mysortfunction(a, b) {
+
+							  var o1 = a.intervenant.toLowerCase();
+							  var o2 = b.intervenant.toLowerCase();
+
+							  var p1 = a.dateTri;
+							  var p2 = b.dateTri;
+
+							  if (o1 != o2) {
+							    if (o1 < o2) return -1;
+							    if (o1 > o2) return 1;
+							    return 0;
+							  }
+							  if (p1 < p2) return -1;
+							  if (p1 > p2) return 1;
+							  return 0;
+							});
+						
+						//création du tableau des planning pour les intervenants
+					    creaTable("#tabStat3", cumulPlanInt, ['intervenant','date','lieu'], [null, null, null]);
+					}
+
+				}
+
+				
+			} 
+						
+			
+			var parser = function(data) {
+				if(!gData) gData = data;
+				gDataCal = data
+
+				//initialisation des cumuls
+				for(var i=0; i < nbInt; i++){
+					cumulType[dataInt[i]["Type"]]={"nbHeure":0,'nbHeureTD':0,'Type':dataInt[i]["Type"]};
+					cumulInt[dataInt[i]["Nom"]]= {'nbHeure':0,'nbHeureTD':0,'cours':[]};
+				}
+				for(var i=0; i < nbCou; i++){
+					cumulCou[dataCour[i]["Code EC"]]= {'nbHeure':0,'nbHeureTD':0,'intervenants':[]};
+				}
+
+				//calcule les data pour le calendrier
+				var rs = [];
+				var arrMotif = [];
+				var idMotif;				
+				var oldDate = 0;
+				var idxDate = 0;
+				var iC;
+				gDataCal.forEach(function(d) {
+					if(d.summary){
+						//récupère le code du cours
+						var arrCours = d.summary.split(":")
+						if(arrCours.length >= 3){
+							var ec = arrCours[0].trim();
+							var interv = arrCours[2].trim();
+							//récupère l'index du cours
+							iC = idxCour.indexOf(ec);
+							if(iC==-1){
+								 console.log("index du cours non trouvé :"+ec);
+							}
+							d['idxCour']=iC;
+							//récupère l'index de l'intervenant
+							var arrInt = interv.split(" ");
+							var iI;
+							//vérifie si l'intervenenat a un prénom
+							if(arrInt.length > 1)
+								iI = idxInt.indexOf(arrInt[1]);
+							else
+								iI = idxInt.indexOf(interv);
+							if(iI==-1){
+								 console.log("index de l'intervenant non trouvé :"+interv);
+							}
+							d['idxInt']=iI;
+	
+							//on ne prend en compte qu'une date par jour
+							var curDate = new Date(d.start);
+							var finDate = new Date(d.end);
+							var sStart = jourFormat(curDate);
+							var dateStart = jourFormat.parse(sStart);
+							var heureStart = curDate.getHours();
+							if(i>=0){
+								if(!dataCour[iC]){
+									 console.log("cours non trouvé :"+iC);
+								}else{
+									var nbH = d.duree/3600;
+									var nbHCM = dataCour[iC]['%CM'] ? (dataCour[iC]['%CM']/100)*nbH : 0;
+									var nbHTD = dataCour[iC]['%TD'] ? (dataCour[iC]['%TD']/100)*nbH : 0;
+									var nbHTP = dataCour[iC]['%TP'] ? (dataCour[iC]['%TP']/100)*nbH : 0;
+									var nbTD = (nbHCM*1.5)+nbHTP+nbHTD;
+									nbTD =  Math.round(nbTD*100)/100;
+									//console.log(dateStart+' '+iC+' '+iI+' CM='+nbHCM.toFixed(2)+' TD='+nbHTD.toFixed(2)+' TP='+nbHTP.toFixed(2)+' ='+nbTD);
+									//incrémente le compteur de cours
+									cumulCou[dataCour[iC]["Code EC"]]["nbHeure"] += nbH;
+									cumulCou[dataCour[iC]["Code EC"]]["nbHeureTD"] += nbTD;
+									//incrémente le compteur des intervenants
+									cumulInt[dataInt[iI]["Nom"]]["nbHeure"] += nbH;
+									cumulInt[dataInt[iI]["Nom"]]["nbHeureTD"] += nbTD;
+									//incrémente le compteur des types d'intervenants
+									cumulType[dataInt[iI]["Type"]]["nbHeure"]+=nbH;
+									cumulType[dataInt[iI]["Type"]]["nbHeureTD"]+=nbTD;
+
+									//ajoute les liens entre les intervenants et les cours
+									var itemFind = findArrayObjProp(cumulInt[dataInt[iI]["Nom"]]["cours"],"cours",dataCour[iC]["Code EC"]); 
+									if(itemFind==-1)
+										cumulInt[dataInt[iI]["Nom"]]["cours"].push({"cours":dataCour[iC]["Code EC"],"nbSeance":1,"nbHeure":nbH,"nbHeureTD":nbTD});
+									else{
+										cumulInt[dataInt[iI]["Nom"]]["cours"][itemFind].nbSeance += 1;
+										cumulInt[dataInt[iI]["Nom"]]["cours"][itemFind].nbHeure += nbH;
+										cumulInt[dataInt[iI]["Nom"]]["cours"][itemFind].nbHeureTD += nbTD;
+									}
+
+									// ajoute les liens entre les cours et les intervenants
+									itemFind = findArrayObjProp(cumulCou[dataCour[iC]["Code EC"]]["intervenants"],"Nom",dataInt[iI]["Nom"]); 
+									if(itemFind==-1)
+										cumulCou[dataCour[iC]["Code EC"]]["intervenants"].push({"Nom":dataInt[iI]["Nom"],"nbSeance":1,"nbHeure":nbH,"nbHeureTD":nbTD});
+									else{
+										cumulCou[dataCour[iC]["Code EC"]]["intervenants"][itemFind].nbSeance += 1;
+										cumulCou[dataCour[iC]["Code EC"]]["intervenants"][itemFind].nbHeure += nbH;
+										cumulCou[dataCour[iC]["Code EC"]]["intervenants"][itemFind].nbHeureTD += nbTD;
+									}
+
+									//ajoute le détail du planning par intervenant
+									cumulPlanInt.push({'intervenant':dataInt[iI]["Prénom"]+" "+dataInt[iI]["Nom"],'dateTri':curDate,'date':planningFormat1(curDate)+planningFormat2(finDate),'lieu':d.location});
+									
+									idxDate = dateStart.getTime()/1000;
+									//la valeur correspond au code couleur correspondant à la journée
+									//rs[idxDate]=parseInt(dataCour[iC]['code jour']);
+									//construction du motif
+									if(oldDate != idxDate && oldDate!=0){
+										//on ajoute le motif
+										idMotif = creaMotif(arrMotif);
+										//la valeur correspond à l'identifiant du motif
+										rs[oldDate]=idMotif;//nbMotif;
+										//rinitialise les valeurs
+										arrMotif = [];
+										oldDate = 0;
+									}
+									//on calcule la position du motif
+									var y = (sizeCell/24)*heureStart;
+									var h = (sizeCell/24)*nbH;
+									//on ajoute une couleur au motif
+							        arrMotif.push({id:dataCour[iC]['code jour'], color:arrColor[dataCour[iC]['code jour']], 'y':y, 'h':h});										
+									oldDate = idxDate;
+									
+								}
+							}
+						}else{
+							console.log("résumé de l'événement au mauvais format : "+d);
+						}
+					}else{
+						console.log("pas de résumé dans l'évènement : "+d);
+					}
+				});
+				//création du dernier modif
+				if(dataCour[iC]){
+					idMotif = creaMotif(arrMotif);
+					rs[oldDate]=idMotif;
+				}
+
+				//création des styles pour les cours
+				var style = ""; 
+				dataCour.forEach(function(d) {
+					style += ".q"+d['code couleur']+"{fill: "+arrColor[d['code jour']]+";background-color: "+arrColor[d['code jour']]+";}";
+				});
+				var S = document.createElement('style');
+				S.setAttribute("type", "text/css");
+				var T = document.createTextNode(style);
+    			S.appendChild(T);
+				var H = document.getElementsByTagName('head')[0];
+				H.appendChild(S);
+				//
+				
+				/*creation des dégradé
+				calY.root.append("linearGradient")
+				      .attr("id", "temperature-gradient")
+				      .attr("gradientUnits", "objectBoundingBox")
+				      .attr("x1", 0).attr("y1", 0)
+				      .attr("x2", 0).attr("y2", 1)//sizeCell
+				    .selectAll("stop")
+				      .data([
+				        {offset: "0%", color: "steelblue", opacity:"0.5"},
+				       // {offset: "50%", color: "gray", opacity:"0.5"},
+				        {offset: "100%", color: "red", opacity:"0.5"}
+				      ])
+				    .enter().append("stop")
+				      .attr("offset", function(d) { return d.offset; })
+				      //.attr("stop-opacity", function(d) { return d.opacity; })
+				      .attr("stop-color", function(d) { return d.color; });				
+				*/
+				return rs;
+			};
+
+
+			function creaMotif(arrMotif){
+				//création de l'identifiant du motif
+				var id = "";
+				arrMotif.forEach(function(d, i) {
+					id += d.id;
+				});
+				//vérifie si le motif existe
+				if(!arrCreaMotif[id]){					
+					//création du motif
+					arrCreaMotif[id] = nbMotif;
+					calY.root.append("pattern")
+					      .attr("id", "motif_"+arrCreaMotif[id])
+					      .attr("patternUnits", "objectBoundingBox")
+					      .attr("x", 0).attr("y", 0)
+					      .attr("width", sizeCell).attr("height", sizeCell)
+					    .selectAll("rect")
+					      .data(arrMotif)
+					    .enter().append("rect")
+					      .attr("fill", function(d) { return d.color; })
+					      .attr("x", 0)				
+					      .attr("y", function(d) { return d.y; })				
+					      .attr("width", sizeCell)				
+					      .attr("height",  function(d) { return d.h; });
+					nbMotif ++;									
+				}
+				//console.log("creaMotif: nbMotif="+nbMotif+", idMotif="+id+" => "+arrCreaMotif[id]);
+				return arrCreaMotif[id];
+			}
+			
+			function findArrayObjProp(arr, prop, val){
+				var verif = -1;
+				arr.forEach(function(d, i) {
+					if(d[prop]==val) verif=i;
+				});
+				return verif;
+			}
+			
+			function creaPlanning(idCal){
+
+				var dtMin = $("#datepickerMin").datepicker("getDate");
+				var dtMax = $("#datepickerMax").datepicker("getDate");
+	
+				if(!calY){
+					calY = new CalHeatMap();				
+					calY.init({
+						domain:"month", subDomain: "day",cellSize: sizeCell, subDomainTextFormat: "%d", cellPadding: 4, domainMargin: 6
+						,range:6
+						,legend: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+						,start: dtMin
+						,data:"planning/events?idCal="+idCal+"&timeMax="+dtMax.toISOString()+"&timeMin="+dtMin.toISOString()
+						,onClick: function(date, nb) {
+							//récupère les datas correspondant à la date
+							var rs = getData(date);
+							//affiche les datas
+							showData(rs);
+						}
+						,afterLoadData: parser
+						,displayLegend: false, tooltip:false
+						,previousSelector: "#btnPrev"
+						,nextSelector: "#btnNext"											
+						});				
+				}else{
+					calY.update("planning/events?idCal="+idCal+"&timeMax="+dtMax.toISOString()+"&timeMin="+dtMin.toISOString());
+				}
+			}
+						
+			function getData(date){
+				var filtered = gDataCal.filter(function(d) {
+					var start = new Date(d.start);
+					return start.toDateString() == date.toDateString();	
+				});
+				return filtered;
+			}
+			function showData(rs){
+				var html = "";
+				var dtCour = [];
+				var dateStart;
+				/*tri pour afficher les événements dans l'ordre
+				rs.sort(function (a, b) {
+				    if (a.startTS > b.startTS)
+				      return 1;
+				    if (a.startTS < b.startTS)
+				      return -1;
+				    // a doit être égale à b
+				    return 0;
+				});
+				*/				
+				rs.forEach(function(d) {
+					//html += "<p>"+d.id+" start:"+d.start+" end:"+d.end+" duree:"+d.duree+" résumé:"+d.summary+" location:"+d.location+"</p>";
+					var dS = new Date(d.start);	
+					var dE = new Date(d.end);	
+					var cc = parseInt(dataCour[d.idxCour]["code couleur"]);	
+					var ts = parseInt(d.startTS);
+					html += "<p >"+heureFormat(dS)+" - "+heureFormat(dE)+" "+d.summary+" ("+d.location+")</p>";
+					var nbMin = d.duree/60;	
+					//création des data pour chaque unité
+					for (var i = 0; i < nbMin; i++) {
+						dtCour[ts]= cc;					
+						ts += 60;
+					}
+					if(!dateStart) dateStart = new Date(d.start);	
+				});				
+				d3.select("#info-events").html(html);
+				d3.select("#cal-events").html("");
+				calD = new CalHeatMap();
+				/*
+				pour personalise les couleurs il faut chaque item de 1 à n dans la légence
+				*/				
+				calD.init({
+					domain:"hour",subDomain: "min",cellSize: 14,cellPadding:0, domainMargin:0
+					,start: dateStart					
+					,legend: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150]
+					,range:10
+					,colLimit: 60
+					,itemSelector: "#cal-events"
+					,verticalOrientation: true
+					,label: {
+						position: "left",
+						width: 46
+					}
+					,data:dtCour
+					,onClick: function(date, nb) {
+						console.log(date+" : "+nb);
+					}
+					,displayLegend: false
+					});				
+			}
+
+			function creaTable(id, dataCell, columns, totCols){
+
+				//création du tableau des cours
+				var table = d3.select(id).append("table"),
+		        	thead = table.append("thead"),
+		        	tbody = table.append("tbody");
+
+			    // append the header row
+			    thead.append("tr")
+			        .selectAll("th")
+			        .data(columns)
+			        .enter()
+			        .append("th")
+			            .text(function(column) { return column; });
+			    
+			    // create a row for each object in the data
+			    var rows = tbody.selectAll("tr")
+			        .data(dataCell)
+			        .enter()
+			        .append("tr");
+
+			    // create a cell in each row for each column
+			    var cells = rows.selectAll("td")
+			        .data(function(row) {
+			            return columns.map(function(column) {
+			                return {column: column, value: row[column]};
+			            });
+			        })
+			        .enter()
+			        .append("td")
+			        .html(function(d){
+				    	var html;
+				    	if(d.column == "Planning"){
+				    		html="<div id='"+d.value+"' />";
+				    	}else{
+				    		html= d.value;
+				    	}
+				    	return html;
+				    	});	
+		    	
+	        	//vérifie s'il faut ajouter un ligne de total
+	        	if(totCols){
+	        		// creation de la ligne de total
+				    var rowTot = tbody.append("tr");
+				    //ajout des cellulles de total
+					rowTot.selectAll("td")
+				        .data(function() {
+				            return totCols.map(function(col) {
+					            if(col==null) return {value: null};
+					            //calcul la somme de la colone
+					            sum = 0;
+					            dataCell.forEach(function(d) {
+									if (!isNaN(Number(d[col]))) sum += Number(d[col]);	
+					            });
+				                return {value: sum};
+				            });  
+				        })
+				        .enter()
+				        .append("td")
+				        .html(function(d){
+					    	var html;
+					    	html= d.value;
+					    	return html;
+					    	});					    		        	
+	        	}
+
+			    
+			}			
+		</script>
+  </body>
+</html>	

@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+  <head> 
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/> 
+    <title> 
+      Jardin des connaissances : Editeur de graphique
+    </title> 
+    <script type="text/javascript" src="//www.google.com/jsapi"></script> 
+    <script type="text/javascript"> 
+      google.load('visualization', '1', {packages: ['charteditor']});
+    </script> 
+    <script type="text/javascript"> 
+    var wrapper;
+    
+    function init() {
+      wrapper = getWrapper();
+      wrapper.draw();
+    }
+    
+    function openEditor() {
+      // Handler for the "Open Editor" button.
+      var editor = new google.visualization.ChartEditor();
+      google.visualization.events.addListener(editor, 'ok',
+        function() {
+          wrapper = editor.getChartWrapper();
+          wrapper.draw(document.getElementById('visualization'));
+      });
+      editor.openDialog(wrapper);
+    }
+
+    
+	function getWrapper(){
+		var dt = google.visualization.arrayToDataTable(<?php echo $this->data; ?>);
+		var ct = "<?php echo $this->type; ?>";
+		var opt = {'title': "<?php echo $this->titre; ?>"};
+		if(ct=="GeoChart") opt = {'colorAxis': {minValue: 0,  colors: ['#FF0000', '#00FF00']}};
+		
+		var w = new google.visualization.ChartWrapper({
+		    chartType: ct,
+		    dataTable: dt,
+		    options: opt,
+		    containerId: 'visualization'
+		  });
+		  return w;
+	}
+    
+    google.setOnLoadCallback(init);
+    
+    </script> 
+  </head> 
+  <body style="font-family: Arial;border: 0 none;"> 
+    <input type='button' onclick='openEditor()' value='Editer le graphique'> 
+    <div id='visualization' style="width:600px;height:400px"> 
+  </body> 
+</html> 

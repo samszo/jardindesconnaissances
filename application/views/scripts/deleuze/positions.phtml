@@ -1,0 +1,50 @@
+<?php if(!$this->ajax) : ?>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script type='text/javascript' src="../js/popcorn-complete.js"></script>
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type='text/javascript' src="../js/d3.v2.js"></script>
+	<script type='text/javascript' src="../js/d3.time.js"></script>
+	<script type='text/javascript' src="../js/d3.layout.cloud.js"></script>
+	<script type='text/javascript' src="../js/selectsontexte.js"></script>
+	<script type='text/javascript' src="../js/selectbar.js"></script>
+	<script type='text/javascript' src="../js/tagcloud.js"></script>
+	<script type='text/javascript' src="../js/deleuze.js"></script>
+
+	<link rel="stylesheet" href="../css/deleuze.css" />
+	
+	<script>
+
+		var db = "flux_DeleuzeSpinoza";
+		var idExi = '<?php echo $this->idUti; ?>';
+		var mailExi = '<?php echo $this->identite; ?>';
+	</script>	
+	
+</head>
+<body>
+<?php endif; ?>
+
+	<?php foreach($this->resultats as $r) : ?>
+		<div class="ref" id="ref_<?php echo $r['doc_id']; ?>" >
+		<?php if($r['tronc']!=$oTronc) : ?>
+			<hr/>			
+			<div ><?php 
+			$oTronc = $r['tronc'];
+			echo $r['tronc']; ?>
+			" </div>
+			<hr/>			
+		<?php endif; ?>
+		<?php echo $r['titre']; ?>
+				
+		</div>
+	<?php endforeach; ?>
+<?php if(!$this->ajax) : ?>
+	<script>
+		activeTag();
+	</script>
+  </body>
+</html>
+<?php endif; ?>
+	
