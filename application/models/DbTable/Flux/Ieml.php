@@ -116,24 +116,6 @@ class Model_DbTable_Flux_Ieml extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray();
     }
 
-    /**
-     * Récupère les spécifications des colonnes flux_ieml 
-     */
-    public function getCols(){
-
-    	$arr = array("cols"=>array(
-    	   	array("titre"=>"ieml_id","champ"=>"ieml_id","visible"=>true),
-    	array("titre"=>"code","champ"=>"code","visible"=>true),
-    	array("titre"=>"desc","champ"=>"desc","visible"=>true),
-    	array("titre"=>"niveau","champ"=>"niveau","visible"=>true),
-    	array("titre"=>"parent","champ"=>"parent","visible"=>true),
-    	array("titre"=>"maj","champ"=>"maj","visible"=>true),
-        	
-    		));    	
-    	return $arr;
-		
-    }     
-    
     /*
      * Recherche une entrée flux_ieml avec la valeur spécifiée
      * et retourne cette entrée.

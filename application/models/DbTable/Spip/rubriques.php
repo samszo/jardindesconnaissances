@@ -191,16 +191,20 @@ class Model_DbTable_Spip_rubriques extends Zend_Db_Table_Abstract
      * Recherche une entrée Spip_rubriques avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param text $titre
+     * @param text 		$titre
+     * @param boolean 	$like
      *
      * @return array
      */
-    public function findByTitre($titre)
+    public function findByTitre($titre, $like=FALSE)
     {
         $query = $this->select()
-                    ->from( array("s" => "spip_rubriques") )                           
-                    ->where( "s.titre = ?", $titre );
-
+			->from( array("s" => "spip_rubriques") );
+		if($like)
+			$query->where( "s.titre LIKE '%".$titre."%'" );
+		else
+			$query->where( "s.titre = ?", $titre );
+		
         return $this->fetchAll($query)->toArray(); 
     }
     	/**
