@@ -92,4 +92,12 @@ class BiblioController extends Zend_Controller_Action {
 		$this->view->biblio = array("login"=>"auteurs","nbDoc"=>count($arr),"children"=>$arr);			
     }
     
+    public function getcoinsAction()
+    {
+    }
+    
+    public function getdublincoreAction()
+    {
+    	
+    }
 }
