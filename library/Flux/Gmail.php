@@ -20,7 +20,9 @@ class Flux_Gmail extends Flux_Site{
 	var $content;
 	var $texte;
 	var $contentType;
-	var $i;	
+	var $i;
+	var $transport;
+	
     /**
      * Construction du gestionnaire de flux.
      *
@@ -39,9 +41,46 @@ class Flux_Gmail extends Flux_Site{
     	$this->pwd = $pwd;
     	
     	$this->imap = new Zend_Mail_Storage_Imap(array('host'=> 'imap.gmail.com','user'=> $this->mail,'password' => $this->pwd, 'port' => 993,'ssl' => true));
+
+		//SMTP server configuration
+		$smtpHost = 'smtp.gmail.com';
+		$smtpConf = array(
+		  'auth' => 'login',
+		  'ssl' => 'ssl',
+		  'port' => '465',
+		  'username' => $this->mail,
+		  'password' => $this->pwd
+		);
+		$this->transport = new Zend_Mail_Transport_Smtp($smtpHost, $smtpConf);   
     	
     }
 	
+    /**
+     * Envoie un mail
+     *
+     * @param string $to
+     * @param string $by
+     * @param string $sujet
+     * @param string $body
+     * 
+     */
+    function sendMail($to, $by, $sujet, $body){
+    	
+    	try {
+		 	 
+		    $mail = new Zend_Mail('UTF-8'); 
+		    $mail->addTo($to);    
+		    $mail->setFrom($by);
+		    $mail->setSubject($sujet);
+		    $mail->setBodyHtml($body);
+		 
+			$mail->send($this->transport);   
+			 
+    	} catch (Exception $e) {
+		    echo $e->getMessage();
+		}    	
+    }
+    
     
     /**
      * Affiche la lsite des dossiers pour un compte mail.

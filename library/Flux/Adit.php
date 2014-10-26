@@ -75,10 +75,11 @@ class Flux_Adit extends Flux_Site{
      *
      * sauvegarde les informations d'un Bulletin électronique
      * 
-     * @param string $url
+     * @param string 	$url
+     * @param array		$dataDoc
      * 
      */
-    function sauveInfoBE($url) {
+    function sauveInfoBE($url, $dataDoc=false) {
 	   	
     	$this->trace("DEBUT ".__METHOD__);
     	$this->trace("url ".$url);
@@ -90,9 +91,18 @@ class Flux_Adit extends Flux_Site{
 		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
 		if(!$this->dbUU)$this->dbUU = new Model_DbTable_Flux_UtiUti($this->db);
 		
-		$html = $this->getUrlBodyContent($url);
-		$idDoc = $this->dbD->ajouter(array("data"=>$html, "url"=>$url));
-		
+		if(!$dataDoc){
+			$html = $this->getUrlBodyContent($url);
+			$idDoc = $this->dbD->ajouter(array("data"=>$html, "url"=>$url));
+		}else{
+			if(!$dataDoc['data']){
+				$this->trace("FIN DATA VIDE ".__METHOD__);
+				return "";
+			}
+			$html = $dataDoc['data'];
+			$idDoc = $dataDoc['doc_id'];
+		}
+				
 		//charge le document
 		$dom = new Zend_Dom_Query($html);
 		
@@ -108,13 +118,14 @@ class Flux_Adit extends Flux_Site{
         foreach ($results as $r) {
 			$titre = $r->nodeValue;
 		}
-		$results = $dom->query('//table/tr[7]/td/table/tr[3]/td[1]');
-        foreach ($results as $r) {
-			$contenu = $this->getInnerHtml($r);
+		if(!$dataDoc){
+			$results = $dom->query('//table/tr[7]/td/table/tr[3]/td[1]');
+	        foreach ($results as $r) {
+				$contenu = $this->getInnerHtml($r);
+			}		
+			//mise à jour du document
+			$this->dbD->edit($idDoc,array("titre"=>$titre,"maj"=> $sqlDate,"note"=>$contenu));
 		}		
-		//mise à jour du document
-		$this->dbD->edit($idDoc,array("titre"=>$titre,"maj"=> $sqlDate,"note"=>$contenu));
-		
 		//récupération des mots clefs
 		$results = $dom->query('//tr[3]/td[1]/p[@class="style96"]/span[@class="style42"]');
 		foreach ($results as $r) {
@@ -148,8 +159,8 @@ class Flux_Adit extends Flux_Site{
 			        foreach ($results as $rv) {
 						$value = $rv->nodeValue;
 			        }
-			        //ajoute un nouveau rédacteur					
-					$idRedac = $this->getUser(array("login"=>$value),false);
+			        //ajoute un nouveau rédacteur
+					$idRedac = $this->getUser(array("login"=>$value),true);
 					$this->saveTag("Rédacteurs", $idDoc, 1, $sqlDate, $idRedac);
 				}
 	        }
@@ -158,5 +169,43 @@ class Flux_Adit extends Flux_Site{
 		$this->trace("FIN ".__METHOD__);
 		
     }	
+
+	/**
+	 * traiteAllDoc
+	 *
+	 * relance l'extraction à partir des sources html
+	 *
+     * 
+	 *
+	 */
+	function traiteAllDoc(){
+
+		set_time_limit(98000);
+		$this->bTrace = true; // pour afficher les traces
+    	$this->temps_debut = microtime(true);
+    	$this->trace("DEBUT ".__METHOD__);
+		
+		//initialisation des objets
+		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc($this->db);
+		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
+		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+		if(!$this->dbUU)$this->dbUU = new Model_DbTable_Flux_UtiUti($this->db);
+		
+    	//initialise l'utilisateur
+    	$this->getUser(array("login"=>"Flux_Addit"));
+		
+    	//récupère tous les bulletins
+		$arrBlt = $this->dbD->findFiltre("tronc = '' AND doc_id between 196718 AND 250000", array("doc_id", "data"));
+		//$arrBlt = $this->dbD->findFiltre("tronc = ''", array("doc_id", "data"));
+		foreach ($arrBlt as $blt) {
+			$this->trace("doc_id ".$blt['doc_id']);
+			$this->sauveInfoBE("", $blt);
+		}
+		
+		$this->trace("FIN ".__METHOD__);
+		
+	}
 	
 }

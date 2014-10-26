@@ -34,7 +34,8 @@ class Flux_Audio extends Flux_Site{
 	*/
 	public function __construct($idBase=false)
     {
-    	$this->ffmpeg = FFMEPG;
+    	//$this->ffmpeg = FFMEPG;
+    	$this->ffmpeg = "/applications/ffmpeg/ffmpeg";
     	parent::__construct($idBase);
     	$this->pathSound = ROOT_PATH."/data/audios/";
     	$this->urlSound = WEB_ROOT."/data/audios/";
@@ -282,7 +283,7 @@ class Flux_Audio extends Flux_Site{
     	
 		$cmd = $this->ffmpeg." -i ".$src." -aq 0 -ab 8k -ar 8000 -acodec libvorbis ".$dst." 2>&1";		
 		exec($cmd, $arr);
-
+		
 		return $arr;
     }
 
