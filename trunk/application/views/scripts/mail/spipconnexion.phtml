@@ -1,0 +1,47 @@
+Salut <?php echo $this->prenom;?>,<br/>
+tu trouveras ci-dessous le mail automatique que je vais envoyer à chaque membre de CiTU.<br/>
+la liste est ici : https://docs.google.com/spreadsheets/d/1COtT8lxA0WHO7qQlrEjZFKdIh9XhD_nitMD_ks03WEA/edit?usp=sharing
+<br/>tu peux la modifier<br/>
+<br/>
+merci d'avance pour tes remarques et commentaires<br/>
+<br/>
+Samuel
+<br/><br/>
+ps: <br/>
+j'ai envoyé ce mail aux membres permanents de Citu.
+<br/>
+<br/>
+-----------------------------------------
+<br/>
+Bonjour <?php echo $this->prenom;?>,<br/>
+<br/>
+Suite à la refonte du site <?php echo $this->site;?>, nous avons créer des articles pour chaque membre.<br/>
+Voici la liste des articles te concernant : <br/>
+<?php 
+	foreach ($this->arrArt as $art) {
+		echo "- <a href='".$this->urlVoir.$art['id_article']."' >".utf8_decode($art['titre'])."</a><br/>";
+	}
+?>
+Pour modifier ces articles, il faut te connecter au site avec les paramètres suivants : <br/>
+Login : <?php echo $this->login;?><br/>
+Mdp : <?php echo $this->mdp;?><br/>
+
+Voici le lien vers la rubrique où les articles à modifier sont rangés : <a href='<?php echo $this->urlEcrire.$this->arrRub['id_rubrique'];?>' ><?php echo utf8_decode($this->arrRub['titre']);?></a><br/>
+Voici un mode d'emploi pour l'édition des articles : http://ww2.ac-poitiers.fr/guide/spip.php?article101<br/>
+<br/>
+Tu peux aussi modifier les informations concernant ton compte ici : <a href="<?php echo $this->urlAuteur.$this->arrAut['id_auteur'];?>" ><?php echo utf8_decode($this->arrAut['nom']);?></a><br/>
+<br/>
+ATTENTION : <br/>
+Pour l'instant, le site n'est pas à son adresse définitive, il faut attendre un peu pour communiquer les liens.<br/>
+Mais les informations que tu saisiras seront bien prises en compte.<br/>
+Je te tiendrais informé quand tous sera en place...
+<br/>
+<br/>
+D'autre part, pour optimiser la rédaction des rapports du labo et homogénéiser le traitement des bibliographies, nous allons récupérer automatiquement les références de tes travaux sur la plateforme HAL de Paris 8 : https://hal-univ-paris8.archives-ouvertes.fr/<br/>
+Si tu n'as pas encore de compte HAL, il faudrait que tu t'en crée un et que tu saississes les références de tes travaux.<br/>
+Voici des tutoriaux pour t'aider : <a href="https://hal-univ-paris8.archives-ouvertes.fr/public/s-inscrire-dans-hal.pdf" target="_blank">S’inscrire</a> et <a href="https://hal-univ-paris8.archives-ouvertes.fr/public/deposer-dans-hal.pdf" target="_blank">Déposer</a><br/>
+<br/>
+Pour plus d'information tu peux me contacter : <?php echo $this->mailContact;?><br/>
+<br/>
+Bien à toi,<br/>
+<?php echo $this->nomContact;?><br/>
