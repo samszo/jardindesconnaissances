@@ -127,24 +127,6 @@ class Flux_Tweetpalette extends Flux_Site{
     }
     
     /**
-     * construction du format json correspondant à heatmap.js
-     * @param array $DocsClic
-     * 
-     * return array
-     */
-    function getHeatmapClic($DocsClic){
-		$dc = "";
-		$max = 0;
-    	foreach ($DocsClic as $d) {
-    		$coor = substr($d["data"],0,-1);
-    		$dc .= $coor.",count:".$d["poids"].",doc_id:".$d["doc_id"]."},";
-    		if($max<$d["poids"])$max=$d["poids"];
-    	}    		
-    	$dc = "{max: ".$max.", data: [".substr($dc,0,-1)."]}";
-    	return $dc;
-    }    
-    
-    /**
      * récupère les inputs user, event et tag
      * 
      * return array

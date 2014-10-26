@@ -368,8 +368,7 @@ class Flux_Ieml extends Flux_Site{
 		return $svg;
     	
     }	
-        
-    
+            
 	/**
 	 * Génération des dégradés d'une adresse
 	 * 
@@ -401,5 +400,44 @@ class Flux_Ieml extends Flux_Site{
 			return new SvgLinearGradient("lg_".$code, $arrOffset, $arrColor);
 		
     }
+    
+	/**
+	 * importation d'un tableau IEML en SVG
+	 * 
+	 * @param string $urlSVG
+	 * 
+	 */
+    function importSVG($urlSVG){
+
+    	$this->bTrace = true; // pour afficher les traces
+    	$this->temps_debut = microtime(true);
+    	$this->trace("DEBUT ".__METHOD__);
+    	$this->trace("urlSVG = ".$urlSVG);    	
+    	
+    	//récupère la page
+		$html = $this->getUrlBodyContent($urlSVG);
+		$dom = new Zend_Dom_Query($html);
+		
+		//récupère les graphiques parents
+		$results = $dom->query('//*[@id="parent_1"]');
+		foreach ($results as $r) {
+			$s = simplexml_import_dom($r);
+			foreach ($s->g as $g) {
+				foreach ($g->g[0]->g[0]->text[0]->tspan as $t) {
+					$this->trace((string)$t);					
+				}
+			}
+		}		
+
+		//récupère les graphiques 
+		$results = $dom->query('//*[@id="tspan5478"]');
+		foreach ($results as $r) {
+			$this->trace($r->nodeValue);					
+		}		
+		
+    	$this->trace("FIN ".__METHOD__);
+    	
+    }
+    
     
 }

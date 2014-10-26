@@ -29,7 +29,7 @@ class Flux_Site{
 	var $dbGUD;
 	var $db;
 	var $lucene;
-	var $kwe = array("zemanta", "alchemy", "yahoo");
+	var $kwe = array("autokeyword","zemanta", "alchemy", "opencalais", "yahoo", "textalytics","aylien");
     //pour l'optimisation
     var $bTrace = false;
     var $echoTrace = false;
@@ -48,7 +48,7 @@ class Flux_Site{
     	$this->getDb($idBase);
     	
         $frontendOptions = array(
-            'lifetime' => 30000, // temps de vie du cache en seconde
+            'lifetime' => 30000000, // temps de vie du cache en seconde
             'automatic_serialization' => true,
         	'caching' => true //active ou desactive le cache
         );  
@@ -77,8 +77,11 @@ class Flux_Site{
 			$mess = $this->temps_nb." | ".$message." |".$tG."|".$tI."<br/>";
 			if($this->echoTrace)
 				$this->echoTrace .= $mess;
-			else
+			else{
 				echo $mess;
+				ob_flush();
+		        flush();				
+			}
 			$this->temps_inter = $temps_fin;
 			$this->temps_nb ++;
 		}		
@@ -91,6 +94,19 @@ class Flux_Site{
     function removeCache($c){
         $res = $this->manager->remove($c);
     }
+    
+    /**
+    * supprime un répertoire sur le serveur
+    * @param string $dir
+    * @return Zend_Db_Table
+    */
+    public function removeRep($dir) { 
+   		$files = array_diff(scandir($dir), array('.','..')); 
+	    foreach ($files as $file) { 
+	      (is_dir("$dir/$file")) ? $this->removeRep("$dir/$file") : unlink("$dir/$file"); 
+	    } 
+	    return rmdir($dir); 
+	} 
     
     /**
      * retourne une connexion à une base de donnée suivant son nom
@@ -185,7 +201,7 @@ class Flux_Site{
      *   
      * @return string
      */
-	function getUrlBodyContent($url, $param=false, $cache=true) {
+	function getUrlBodyContent($url, $param=false, $cache=true, $method=null) {
 		$html = false;
 		if(substr($url, 0, 7)!="http://")$url = urldecode($url);
 		if($cache){
@@ -195,9 +211,10 @@ class Flux_Site{
 		}
         if(!$html){
 	    	$client = new Zend_Http_Client($url,array('timeout' => 30));
-	    	if($param)$client->setParameterGet($param);
+	    	if($param && !$method)$client->setParameterGet($param);
+	    	if($param && $method==Zend_Http_Client::POST)$client->setParameterPost($param);
 	    	try {
-				$response = $client->request();
+				$response = $client->request($method);
 				$html = $response->getBody();
 			}catch (Zend_Exception $e) {
 				echo "Récupère exception: " . get_class($e) . "\n";
@@ -208,6 +225,33 @@ class Flux_Site{
 		return $html;
 	}
 
+	/**
+     * création d'un tableau à partir d'un csv
+     *
+     * @param string $file = adresse du fichier
+     * 
+     */
+    function csvToArray($file, $tailleCol="0", $sep=";"){
+		ini_set("memory_limit",'1024M');
+    	$this->trace("DEBUT ".__METHOD__);     	
+	    if (($handle = fopen($file, "rb")) !== FALSE) {
+    		$this->trace("Traitement des lignes : ".ini_get("memory_limit"));     	
+	    	$i=0;
+    		while (($data = fgetcsv($handle, $tailleCol, $sep)) !== FALSE) {
+    			$num = count($data);
+ 				$numTot = count($csvarray);
+ 				//$this->trace("$numTot -> $num fields in line $i:");
+        		$csvarray[] = $data;
+    			$i++;
+	    	}
+	    	$this->trace("FIN Traitement des lignes");     	
+	        fclose($handle);
+	    }
+    	
+    	$this->trace("FIN ".__METHOD__);     	
+		return $csvarray;		
+	}	
+	
     /**
      * récupère le contenu HTML d'un DOMElement
      *
@@ -265,31 +309,40 @@ class Flux_Site{
      * @param date $date
      * @param int $idUser
      * @param boolean $existe : mettre à false pour forcer la création 
+     * @param boolean $utd : renvoie l'identifiant Uti Tag Doc 
      *   
      * @return integer
      */
-	function saveTag($tag, $idD, $poids, $date, $idUser=-1, $existe = true){
+	function saveTag($tag, $idD, $poids, $date=0, $idUser=0, $existe = true, $utd=false){
 
 		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
 		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
 		if(!$this->dbUT)$this->dbUT = new Model_DbTable_Flux_UtiTag($this->db);
 		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
 		
-		if($idUser==-1)$idUser=$this->user;
+		if(!$date){
+			$d = new Zend_Date();
+	    	$date= $d->get("c");			
+		}
+		
+		if(!$idUser)$idUser=$this->user;
 		
 		//on ajoute le tag
 		if(is_array($tag))
-			$idT = $this->dbT->ajouter($tag, $existe);
+			$idT = $this->dbT->ajouter($tag, true);
 		else
-			$idT = $this->dbT->ajouter(array("code"=>$tag), $existe);
+			$idT = $this->dbT->ajouter(array("code"=>$tag), true);
 		//on ajoute le lien entre le tag et le doc avec le poids
-		$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD, "poids"=>$poids));
+		$this->dbTD->ajouter(array("tag_id"=>$idT, "doc_id"=>$idD, "poids"=>$poids, "maj"=>$date));
 		//on ajoute le lien entre le tag et l'uti avec le poids
-		$this->dbUT->ajouter(array("tag_id"=>$idT, "uti_id"=>$idUser, "poids"=>$poids));
+		$this->dbUT->ajouter(array("tag_id"=>$idT, "uti_id"=>$idUser, "poids"=>$poids, "maj"=>$date));
 		//on ajoute le lien entre le tag l'utilisateur et le doc
-		$this->dbUTD->ajouter(array("uti_id"=>$idUser, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date, "poids"=>$poids), $existe);
+		$idUTD = $this->dbUTD->ajouter(array("uti_id"=>$idUser, "tag_id"=>$idT, "doc_id"=>$idD, "maj"=>$date, "poids"=>$poids), $existe);
 
-		return $idT;
+		if($utd)
+			return $idUTD;
+		else
+			return $idT;
 	}
 
 	
@@ -363,10 +416,11 @@ class Flux_Site{
 				$result[$c] = $this->saveKW($idDoc, $texte, $html, $c);
 			}
 			return $result;
+		}else{
+			//récupère les mots clefs
+			$arrKW = $this->getKW($texte, $html, $class);			
 		}
 		
-		//récupère les mots clefs
-		$arrKW = $this->getKW($texte, $html, $class);
 
 		//récupère la date courante
 		$d = new Zend_Date();
@@ -402,9 +456,9 @@ class Flux_Site{
 					}
 					break;
 				case "yahoo":
-					if(isset($arrKW->query->results->entities)){
-						foreach ($arrKW->query->results->entities->entity as $kw){
-							$idT = $this->saveTag($kw->text->content, $idDoc, $kw->score, $d->get("c"), $idUdst);
+					if(isset($arrKW->query->results->yctCategories)){
+						foreach ($arrKW->query->results->yctCategories as $kw){
+							$idT = $this->saveTag($kw->content, $idDoc, $kw->score, $d->get("c"), $idUdst);
 							//enregistre les types
 							if(isset($kw->types)){							
 								foreach ($kw->types->type as $t){
@@ -420,6 +474,27 @@ class Flux_Site{
 							$i++;	    			
 					   	}
 					}
+					break;
+				case "aylien":
+					foreach ($arrKW as $lbl=>$kw){
+						foreach ($kw as $w){
+							$this->saveTagTag($lbl, $w, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);							
+						}
+				   	}
+					break;
+				case "textalytics":
+					foreach ($arrKW as $lbl=>$kw){
+						foreach ($kw as $w){
+							$this->saveTagTag($lbl, $w, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);							
+						}
+				   	}
+					break;
+				case "opencalais":
+					foreach ($arrKW as $lbl=>$kw){
+						foreach ($kw as $w){
+							$this->saveTagTag($lbl, $w, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);							
+						}
+				   	}
 					break;
 				case "zemanta":
 					if($arrKW->status=="ok"){
@@ -476,6 +551,53 @@ class Flux_Site{
 	}
 
     /**
+     * enregistre les mots clefs des fichiers d'un répertoire
+     *
+     * @param string $rep
+     *   
+     * @return array
+     */
+	function saveKWFicRep($rep){
+    	//
+    	$this->bTrace = true; // pour afficher les traces   	
+    	$this->temps_debut = microtime(true);
+		$this->trace("DEBUT ".__METHOD__);
+    	//
+		
+		//initialise les objets
+		$pdfParse = new pdfParser();
+		$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		
+		//récupère les fichiers	
+		$globOut = glob($rep);
+		foreach ($globOut as $filename) {
+			$path_parts = pathinfo($filename);
+	        $this->trace($filename);
+			switch ($path_parts['extension']) {
+				case "pdf":
+					$type = 35;
+					$pdf = Zend_Pdf::load($filename);
+					$contents = false;//$pdfParse->pdf2txt($pdf->render());
+					break;
+				case "doc":
+					$type = 27;
+					$docObj = new DocxConversion($filename);
+					$contents = $docObj->convertToText();
+					break;
+			}
+			if($contents){
+	        	$this->trace($contents);
+				//enregistre le document
+	        	$idDoc = $this->dbD->ajouter(array("titre"=>$path_parts['filename'],"url"=>$filename, "type"=>$type, "note"=>$contents));
+	        	//enregistre les mots clefs
+				//var $kwe = array("autokeyword","zemanta", "alchemy", "opencalais", "yahoo", "textalytics","aylien");
+	        	$this->saveKW($idDoc, $contents,"","aylien");	        
+			}
+	    }
+		
+	}
+	
+	/**
      * Récupère les mots clefs d'une chaine
      *
      * @param string $texte
@@ -501,6 +623,12 @@ class Flux_Site{
 			case "zemanta":
 				$rs = $this->getKWZemanta($texte, $html);
 				break;
+			case "opencalais":
+				$rs = $this->getKWOpencalais($texte, $html);
+			case "textalytics":
+				$rs = $this->getKWTextalytics($texte, $html);
+			case "aylien":
+				$rs = $this->getKWAylien($texte, $html);
 		}
 		return $rs;		
 	}	
@@ -599,15 +727,19 @@ class Flux_Site{
 		'method'=> $method,
 		'api_key'=> KEY_ZEMANTA,
 		'text'=> $chaine,
-		'format'=> $format
+		'format'=> $format,
+		'return_rdf_links'=>1
 		);
 		
-		$body = $this->getUrlBodyContent($url, $args, false);		
+		//problème à résoudre marche pas sur mac ???
+		$response = $this->getUrlBodyContent($url, $args, false, Zend_Http_Client::POST);		
+		
+		
 		
 		if($format=="json"){
-			$result = json_decode($body);
+			$result = json_decode($response);
 		}else{
-			$result = simplexml_load_string($body);
+			$result = simplexml_load_string($response);
 		}
 		
 		
@@ -615,6 +747,47 @@ class Flux_Site{
 		return $result;		
 	}	
 
+	/**
+     * Récupère le contenu d'une page html avec des argument POST
+     * @param string $url
+     * @param array $args
+     * 
+     * @return string
+     */
+	function getUrlPostContent($url, $args){
+
+		/* Here we build the data we want to POST */
+		$data = "";
+		foreach($args as $key=>$value)
+		{
+			$data .= ($data != "")?"&":"";
+			$data .= urlencode($key)."=".urlencode($value);
+		}
+		
+		/* Here we build the POST request */
+		$params = array('http' => array(
+			'method' => 'POST',
+			'Content-type'=> 'application/x-www-form-urlencoded',
+			'Content-length' =>strlen($data),
+			'content' => $data
+		));
+		
+		/* Here we send the post request */
+		$ctx = stream_context_create($params); // We build the POST context of the request
+		$fp = @fopen($url, 'rb', false, $ctx); // We open a stream and send the	   request
+		if ($fp){
+			/* Finaly, herewe get the response of Zementa */
+			$response = @stream_get_contents($fp);
+			if ($response === false){
+				$response = "Problem reading data from ".$url.", ".$php_errormsg;
+			}
+			fclose($fp); // We close the stream
+		}else{
+			$response = "Problem reading data from ".$url.", ".$php_errormsg;
+		}
+		return $response;		
+	}
+	
 	/**
      * Récupère les mots clefs avec Yahoo
      * http://developer.yahoo.com/search/content/V2/contentAnalysis.html
@@ -639,6 +812,8 @@ class Flux_Site{
 		$chaine = str_replace($characters, $replacements, $chaine);
 		
 		$query = 'SELECT * FROM contentanalysis.analyze WHERE text = "'.$chaine.'"';
+		$query = 'SELECT * FROM contentanalysis.analyze WHERE url = "http://sfsic2014.sciencesconf.org/program/details"';
+		
 
 		/* It is easier to deal with arrays 
 		text	 string (required if url parameter is not used)	 The content to perform analysis (UTF-8 encoded).
@@ -659,7 +834,7 @@ class Flux_Site{
 		$response = $client->request(Zend_Http_Client::POST);	
 		$body = $response->getBody();		
 		*/
-		$body = $this->getUrlBodyContent($url, $args, false);		
+		$body = $this->getUrlBodyContent($url, $args, false, Zend_Http_Client::POST);		
 		
 		if($format=="json"){
 			$result = json_decode($body);
@@ -685,7 +860,86 @@ class Flux_Site{
 		 */
 		
 	}
+	
+	
 
+	/**
+     * Récupère les mots clefs avec getKWTextalytics
+     * https://textalytics.com/core/topics-info#doc
+     * @param string $texte
+     * @param string $html
+     * 
+     * @return array
+     */
+	function getKWTextalytics($texte, $html){
+		
+		if($html!="")$chaine= strip_tags($html);
+		else $chaine=$texte; 		
+		
+		$url = "http://textalytics.com/core/topics-1.2";
+				
+		$args = array(
+			'key'=> KEY_TEXTALYTICS,
+			'lang'=> "fr",
+			'txt'=>$chaine,
+			'tt'=>"a"
+		);
+		
+		/* Execute the request 
+		*/
+		$body = $this->getUrlBodyContent($url, $args, false, Zend_Http_Client::POST);		
+		
+		$result = json_decode($body);
+		
+		return $result;
+						
+	}
+
+	/**
+     * Récupère les mots clefs avec getKWAylien
+     * https://textalytics.com/core/topics-info#doc
+     * @param string $texte
+     * @param string $html
+     * @param string $url
+     * 
+     * @return array
+     */
+	function getKWAylien($texte, $html, $url=""){
+		
+		if($html!="")$chaine= strip_tags($html);
+		else $chaine=$texte; 		
+		
+		$aylien = new Flux_Aylien();
+		
+		$result = $aylien->getAnalyses($texte, $url);
+		
+		return $result;
+						
+	}
+	
+	/**
+     * Récupère les mots clefs avec Open calais
+     * http://www.opencalais.com/documentation/opencalais-documentation
+     * @param string $texte
+     * @param string $html
+     * 
+     * @return array
+     */
+	function getKWOpencalais($texte, $html){
+		
+		if($html!="")$chaine= strip_tags($html);
+		else $chaine=$texte; 		
+		
+		$oc = new OpenCalais(KEY_OPENCALAIS);
+		//$oc->outputFormat = "Application/JSON";
+				
+		$result = $oc->getEntities($chaine);
+		
+		return $result;
+				
+	}
+	
+	
 	/**
      * Récupère les mots clefs avec CEPT
      * https://cept.3scale.net/docs
@@ -741,7 +995,7 @@ class Flux_Site{
      * @param string $titre
      * @param string $chemin
      * 
-     * @return array
+     * @return int
      */
 	function sauveImage($idDoc, $url, $titre, $chemin){
 
@@ -778,10 +1032,11 @@ class Flux_Site{
 				}elseif (fwrite($f, $img) === FALSE) { 
 				  echo 'Ecriture impossible '.$path."<br/>";
 				}else{
-					echo 'Image '.$titre.' enregistrée : <a href="'.$urlLocal.'">local</a> -> <a href="'.$url.'">Decitre</a><br/>';
+					echo 'Image '.$titre.' enregistrée : <a href="'.$urlLocal.'">local</a> -> <a href="'.$url.'">En ligne</a><br/>';
 				} 				
 			}				
-		}    	
+		} 
+		return $idDoc;   	
 	} 	
 
     /**
@@ -868,5 +1123,76 @@ class Flux_Site{
 	    }
 	    return $ret;
 	}
+
+		
+	/**
+	 * tri un tableau par une de ces clefs
+	 *
+	 * @param array $array
+	 * @param string $on
+	 * @param string $order
+	 * 
+	 * @return array
+	 */
+	function array_sort($array, $on, $order=SORT_ASC)
+	{
+	    $new_array = array();
+	    $sortable_array = array();
+	
+	    if (count($array) > 0) {
+	        foreach ($array as $k => $v) {
+	            if (is_array($v)) {
+	                foreach ($v as $k2 => $v2) {
+	                    if ($k2 == $on) {
+	                        $sortable_array[$k] = $v2;
+	                    }
+	                }
+	            } else {
+	                $sortable_array[$k] = $v;
+	            }
+	        }
+	
+	        switch ($order) {
+	            case SORT_ASC:
+	                asort($sortable_array);
+	            break;
+	            case SORT_DESC:
+	                arsort($sortable_array);
+	            break;
+	        }
+	
+	        foreach ($sortable_array as $k => $v) {
+	            $new_array[$k] = $array[$k];
+	        }
+	    }
+	
+	    return $new_array;
+	}	
+	
+    /**
+     * construction du format json correspondant à heatmap.js
+     * @param array 	$DocsClic
+     * @param boolean 	$json
+     * 
+     * return array
+     */
+    function getHeatmapClic($DocsClic, $json=false){
+		$dc = "";
+		$max = 0;
+    	foreach ($DocsClic as $d) {
+    		if($json){
+    			$js = json_decode($d["data"]);
+    			$dc .= "{x:".$js->x.",y:".$js->y.",count:".$d["nbEval"].",doc_id:".$d["doc_id"]."},";  			
+    		    if($max<$d["nbEval"])$max=$d["nbEval"];    			
+    		}else{
+	    		$coor = substr($d["data"],0,-1);
+	    		$dc .= $coor.",count:".$d["poids"].",doc_id:".$d["doc_id"]."},";    			
+    			if($max<$d["poids"])$max=$d["poids"];
+    		}
+    	}    		
+    	$dc = "{max: ".$max.", data: [".substr($dc,0,-1)."]}";
+    	return $dc;
+    }    
+    
 	
 }

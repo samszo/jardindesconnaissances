@@ -213,57 +213,73 @@ class Flux_Deleuze extends Flux_Site{
      *
      * Récupère les positions d'un term dans les document texte et mp3
      * 
-     * @param string $term
-     * @param boolean $json
+     * @param string 	$term
+     * @param boolean 	$json
+     * @param boolean 	$bdd
+     * @param string 	$order
+     * @param int		$idDoc
      * 
      * @return array
      */
-    function getTermPositions($term, $json=false) {
+    function getTermPositions($term, $json=false, $bdd=false, $order = "score DESC", $idDoc=false) {
 
-    	try {
-	    	$c = str_replace("::", "_", __METHOD__).md5($term); 
-		   	$posis = $this->cache->load($c);
-		   	if(!$posis){
-	        	$lu = new Flux_Lucene();
+    	$c = str_replace("::", "_", __METHOD__).md5($term); 
+	   	$posis = false;//$this->cache->load($c);
+	   	if(!$posis){
+	        $lu = new Flux_Lucene();
+	   		$dbD = new Model_DbTable_Flux_Doc($this->db);
+
+			if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+			if(!$this->audio)$this->audio = new Flux_Audio();
+			
+			//récupère les positions du term dans les documents
+			if($bdd){
+				$arr = $dbD->findFullText($term, 48, true, $order, $idDoc);
+				$posis="";
+				foreach ($arr as $ps) {
+					$segs = $lu->getSegments($ps["texte"], $term);
+					if(count($segs)>1){		    	
+			    		$phrases = $lu->getPhrases($segs, $find, $ps);
+					    $ps["taille"]=strlen($ps["texte"]);
+					    $ps["phrases"]=$phrases;
+					    $posis[] = $ps;
+			    	}							
+				}
+			}else{
 				//$lu->index->optimize();
 	        	$lu->db = $this->db;
-
-				$dbD = new Model_DbTable_Flux_Doc($this->db);
-
-				if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
-				if(!$this->audio)$this->audio = new Flux_Audio();
-				
-				//récupère les positions du term dans les documents
 				$passToIndexer = $lu->normalize($term);
-				$posis = $lu->getTermPositions(array('field'=>'cours', 'text'=>$passToIndexer),array("titre", "url", "mp3", "doc_id"),true);
-	
-				//ajoute les informations du mp3
-				for ($i = 0; $i < count($posis); $i++) {
-		    		//récupère le document et son contenu
-					$arr = $dbD->findByTronc($posis[$i]['doc_id']);
-					foreach ($arr as $doc){
-						//vérifie si on traite le mp3
-						if(substr($doc['url'],-3)=="mp3" && !$json){
-							$posis[$i] = $this->getInfosSon($posis[$i], $doc);
-							$posis[$i]['exi'] = "lucene";
-						}
-						//vérifie si on traite une position
-						if(substr($doc['note'], 0, 33)=='{"controller":"deleuze","action":' && !$json){
-							$tags = $this->dbUTD->GetUtiTagDoc($this->user, $doc['doc_id']);
-							$posis[$i]['posis'][] = array("idDoc"=>$doc['doc_id'], "note"=>$doc['note'], "tags"=>$tags);
-						}
+				$posis = $lu->getTermPositions(array('field'=>'cours', 'texte'=>$passToIndexer),array("titre", "url", "mp3", "doc_id"),true);					
+			}				
+			
+			//ajoute les informations du mp3
+			for ($i = 0; $i < count($posis); $i++) {
+	    		//récupère le document et son contenu
+				$arr = $dbD->findByTronc($posis[$i]['doc_id']);
+	    		foreach ($arr as $doc){
+					//vérifie si on traite le mp3
+					if(substr($doc['url'],-3)=="mp3"){
+						$posis[$i] = $this->getInfosSon($posis[$i], $doc);
+						$posis[$i]['exi'] = "lucene";
+					}
+					//vérifie si on traite une position
+					if(substr($doc['note'], 0, 33)=='{"controller":"deleuze","action":'){
+						$tags = $this->dbUTD->GetUtiTagDoc($this->user, $doc['doc_id']);
+						$posis[$i]['posis'][] = array("idDoc"=>$doc['doc_id'], "note"=>$doc['note'], "tags"=>$tags);
 					}
 				}
+			}
+			//supprime les cours qui n'ont pas de mp3
+			$result = "";
+			foreach ($posis as $p) {
+				if(isset($p['mp3Infos']))$result[]=$p;
+			}
 
-				$this->cache->save($posis, $c);			
+			$this->cache->save($result, $c);			
 
-	        }
-		    
-		}catch (Zend_Exception $e) {
-	          echo "Récupère exception: " . get_class($e) . "\n";
-	          echo "Message: " . $e->getMessage() . "\n";
-		}
-		return $posis;
+        }
+	    
+		return $result;
     }
 
     /**
@@ -283,8 +299,9 @@ class Flux_Deleuze extends Flux_Site{
 		$posi['urlSon'] = $doc["url"];
 		$posi['text'] = htmlspecialchars(preg_replace("/(\r\n|\n|\r)/", " ", $doc["note"]));
 		//met au format local l'url distante
-		$pos = strrpos($doc["url"], "/");
-		$urlSon = substr($doc["url"], 0, $pos+1).$doc["doc_id"]."-.mp3"; 
+		//$pos = strrpos($doc["url"], "/");
+		//$urlSon = substr($doc["url"], 0, $pos+1).$doc["doc_id"]."-.mp3"; 
+		$urlSon = $doc["url"]; 
 		$posi['urlPathLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", ROOT_PATH."/data/deleuze/mini/", $urlSon);
 		$posi['urlPathLocalOgg'] = str_replace(".mp3", ".ogg", $posi['urlPathLocal']);
 		$posi['urlSonLocal'] = str_replace("http://www2.univ-paris8.fr/deleuze/IMG/mp3/", WEB_ROOT."/data/deleuze/mini/", $urlSon);

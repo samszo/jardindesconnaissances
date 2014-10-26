@@ -47,19 +47,44 @@ class Flux_Gapaii extends Flux_Site{
 		
 		//ajoute ou récupère le clic sur le fond
 		$idDocClic = $this->dbD->ajouter(array("tronc"=>$idDoc,"titre"=>$sem["titre"]
-			,"data"=>"{x:".$sem["x"].",y:".$sem["y"]."}", "maj"=>$date->get("c")));
+			,"data"=> json_encode($sem) , "maj"=>$date->get("c")),false);
 		foreach ($sem["sems"] as $sem) {
         	if($sem["lib"]){
 	        	//sauvegarde le tag pour le document et l'utilisateur
-				$idT = $this->saveTag($sem["lib"], $idDoc, 1, $date->get("c"), $idUti);
+	        	//pas nécessaire car on peut le retrouver par le tronc
+				//$idT = $this->saveTag($sem["lib"], $idDoc, 1, $date->get("c"), $idUti);
         		//sauvegarde le tag pour le clic sur le document et l'utilisateur
-				$idT = $this->saveTag($sem["lib"], $idDocClic, 1, $date->get("c"), $idUti);
+				$idT = $this->saveTag($sem["lib"], $idDocClic, $sem["degre"], $date->get("c"), $idUti, false);
 				//sauvegarde la sémantique du tag
 				$this->saveIEML($sem["ieml"], $idUti, $idT);
         	}
         }
 	}	
 
+    /**
+     * Récupère les informations d'évaluation sémantique pour une base un document et un utilisateur
+     *
+     * @param integer 	$idDoc
+     * @param integer 	$idUti
+     * @param integer 	$idTag
+     *
+     * @return array
+     */
+    function getEval($idDoc, $idUti, $idTag){
+
+		//création des tables
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+				
+		//récupère les évaluations
+		$evals = $this->dbD->getHistoEval();
+		//calcul les données pour heatmap
+		$arrHM = $this->getHeatmapClic($evals, true);
+		$result["histo"] = $evals;
+		$result["hm"] = $arrHM;
+		
+		return $result;
+	}	
+	
     /**
      * Enregistre un texte génératif avec sa sémantique
      *
