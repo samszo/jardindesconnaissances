@@ -139,15 +139,15 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
 	    			$data['rgt'] = $arr[0]['rgt']+2;
 	    		}else{
 	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arrP[0]['lft'];
+	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arrP['lft'];
 	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arrP[0]['lft'];
+	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arrP['lft'];
 	    			$stmt = $this->_db->query($sql);
 	    			//
 	    			$data['lft'] = $arr[0]['lft']+1;
 	    			$data['rgt'] = $arr[0]['lft']+2;
 	    		}    		
-	    		$data['niveau'] = $arrP[0]['niveau']+1;
+	    		$data['niveau'] = $arrP['niveau']+1;
     		}
     		if(!isset($data['lft']))$data['lft']=0;    		
     		if(!isset($data['rgt']))$data['rgt']=1;    		
