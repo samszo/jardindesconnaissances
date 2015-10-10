@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><?php echo $this->title; ?></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="js/d3.v3.min.js"></script>
+    <script type="text/javascript" src="js/queue.v1.min.js" ></script>
+    <script type="text/javascript" src="js/jquery.min.js" ></script>
+    <script type="text/javascript">
+    		var urlService = "http://localhost/jdc/public/";
+		var idBase = "flux_tritag";
+		var uti = <?php echo json_encode($this->uti); ?>;
+		var tags;
+    		var svgGlobal;
+    		var arrInteraction = {"sources":[
+								{"type":"tritag","idClick":"#g4581","idSelect":"#rect4554","fonction":selectSource}
+								,{"type":"twitter","idClick":"#g4625","idSelect":"#rect4603","fonction":selectSource}
+								,{"type":"delicious","idClick":"#g4629","idSelect":"#rect4623","fonction":selectSource}
+								,{"type":"diigo","idClick":"#g9756","idSelect":"#rect9687","fonction":selectSource}
+    		                    ]
+    							,"cribles":[
+								{"idClick":"#g10192","idSelect":"#rect10124","fonction":selectCrible}
+								,{"idClick":"#g10200","idSelect":"#rect10140","fonction":selectCrible}
+								,{"idClick":"#g10263","idSelect":"#rect10251","fonction":selectCrible}
+								,{"idClick":"#g10296","idSelect":"#rect10211","fonction":selectCrible}
+    		    					]};
+    		
+		function init(){
+			//vérifie si un utilisateur est connecté
+			if(uti){
+				queue()
+		    			.defer(d3.xml, "svg/tritag1.svg", "image/svg+xml")
+					.await(chargeIHM1);						 						
+			}else{
+				queue()
+		    			.defer(d3.xml, "svg/tritag0.svg", "image/svg+xml")
+	    				.await(chargeIHM0);
+			}
+    		}
+	    function initIHM(xml){
+	    		//Adding our svg file to HTML document
+			var importedNode = document.importNode(xml.documentElement, true);
+
+			//initialise le div conteneur
+			$("#viz").empty();			
+			var v = document.getElementById("viz");
+		  	v.appendChild(importedNode);
+
+			//adaptation à la taille de l'écran
+		  	//redimensionne le div
+		  	var h = document.body.clientHeight;
+		  	var w = document.body.clientWidth;
+		  	var marge = 10;
+		  	v.setAttribute("style","width: "+w+"px;height: "+h+"px;");
+		  	//redimensionne le svg
+		  	var svgBB = document.getElementById("svgGlobal").getBBox();
+		  	svgGlobal = d3.select("#svgGlobal")
+		  		.attr("width","100%")
+		  		.attr("height","100%")
+		  		.attr("viewBox","0 0 "+(svgBB.width+marge)+" "+(svgBB.height+marge));
+		  		//.attr("preserveAspectRatio","xMid yMid");		    
+		}
+
+		function chargeIHM0(error, xml){
+
+			initIHM(xml);
+			
+			//ajoute les input pour la saisie
+			var bbLogin = document.getElementById("g4536").getBBox();
+		    addHtmlInSvg(d3.select("#g4536")
+				    , '<input class="txtInput" type="text" id="iptLogin" required="required" />'
+				    , bbLogin.height, bbLogin.width, bbLogin.x, bbLogin.y);
+			var bbMdp = document.getElementById("g4536").getBBox();
+		    addHtmlInSvg(d3.select("#g4554")
+				    , '<input class="txtInput" type="password" id="iptMdp" required="required" />'
+				    , bbMdp.height, bbMdp.width, bbMdp.x, bbMdp.y);
+			//ajoute les interactions			
+			d3.select("#g4637").on('click',connexion).attr("cursor", "pointer");
+			d3.select("#g4642").on('click',inscription).attr("cursor", "pointer");
+		  	
+	    }
+	    function chargeIHM1(error, xml){
+
+			initIHM(xml);
+
+			//affiche le login
+			d3.select("#tspan4507").text(uti.login);			
+
+			//intéractive les sources
+			initInteractions(arrInteraction.sources);
+			initInteractions(arrInteraction.cribles);
+
+			//ajoute l'évenement de déconnexion
+			d3.select("#image9842").on('click',function(){
+					deconexion();
+				}).attr("cursor", "pointer");
+		  	
+	    }	
+	    function initInteractions(arr){
+			arr.forEach(function(s){
+				d3.select(s.idSelect).style("stroke","white");
+				var g =d3.select(s.idClick)
+					.attr("cursor", "pointer")
+					.on('click',s.fonction);
+				g.data(s);					
+			});					    
+		}
+	    
+	    function selectSource(){
+		    var g = changeSelectGraph("#"+this.id, arrInteraction.sources);
+		    var login;
+		    if(g.type=="tritag"){
+			    login = uti.login;
+		    }else{
+			    login = prompt("Quel est le login ?", "");			    
+		    }
+		    //récupère les tags de l'utilisateur
+			var p = {"idBase":idBase, "uti":login, "flux":g.type};
+			$.post(urlService+"flux/tags", p,
+					 function(data){
+				 		//enregistre les tags de l'uti
+				 		tags = data;
+					 }, "json");
+		    
+	    }    
+	    function selectCrible(){
+		    var g = changeSelectGraph("#"+this.id, arrInteraction.cribles);		    
+	    }    
+		function changeSelectGraph(id, arr){
+			var sG;
+			arr.forEach(function(s){
+				if(id==s.idClick){
+					sG = s;
+					d3.select(s.idSelect).style("stroke","red");							    
+				}else{
+					d3.select(s.idSelect).style("stroke","white");							    
+				}
+			});
+			return sG;			
+		}
+	    function connexion(){
+	    		getAuth("login");
+	    }
+	    function inscription(){
+			getAuth("inscription");
+	    }
+		function deconexion(){
+			window.location.assign(urlService+'auth/login?redir=tritag&ajax=true');
+		}
+		function getAuth(type){
+			var login = document.getElementById("iptLogin").value;
+			var mdp = document.getElementById("iptMdp").value;
+			if (login != "" || mdp != "") {
+				var p = {"idBase":idBase, "login":login, "mdp":mdp, "ajax":1};
+				$.post(urlService+"auth/"+type, p,
+						 function(data){
+					 		if(data.erreur){
+					 			showMessage(data.erreur,"rect4739");
+					 		}else{
+						 		//enregistre les infos de l'uti
+						 		uti = data.uti;
+						 		//charge l'écran suivant
+								queue()
+						    			.defer(d3.xml, "svg/tritag1.svg", "image/svg+xml")
+					    				.await(chargeIHM1);						 		
+					 		}					 		
+						 }, "json");
+			}else{
+				showMessage("Veillez remplir tous les champs.","rect4739");
+			}
+		}
+		function showMessage(mess, idCont){
+		  	var bb = document.getElementById(idCont).getBBox();
+			var marge = 20;
+			var wDiv = bb.width-(marge*2);
+			var hDiv = bb.height-(marge*2);
+			var xDiv = bb.x+marge;
+			var yDiv = bb.y+marge;
+			var gMess = svgGlobal.append("g")
+				.attr("id","gMess")
+				.on('click',function(){
+					d3.select(this).remove();
+					})
+				.attr("cursor", "pointer");
+			gMess.append("rect")
+				.attr('x', bb.x)
+				.attr('y', bb.y)
+	            .attr('width', bb.width)
+	            .attr('height', bb.height)
+	            .attr('fill','red');
+		    addHtmlInSvg(gMess, mess, hDiv, wDiv, xDiv, yDiv);
+	      	/*      
+		    gMess.append("text")
+				.attr('x', parseInt(bb.attr('x')) + parseInt(bb.attr('width'))/2 )
+				.attr('y', parseInt(bb.attr('y')) + parseInt(bb.attr('height'))/2 )
+				.style("text-anchor","middle")
+				.attr("font-size", "20px")
+		        .text(mess);
+			*/	
+		}		
+	    function addHtmlInSvg(svg, HTML, h, w, x, y){
+			var divStyle = "line-height:"+h+"px;height:"+h+"px;width:"+w;
+			svg.append('foreignObject')
+	            .attr('x', x)
+	            .attr('y', y)
+	            .attr('width', w)
+	            .attr('height', h)
+	            .append("xhtml:body")
+	            		.attr("xmlns","http://www.w3.org/1999/xhtml")
+	            		.attr("class","bodyInput")
+					.html('<div style="'+divStyle+'" >'+HTML+'</div>');						    
+	    }
+    </script>
+	<style type="text/css">	
+	     html, body {
+	        width: 100%;
+	        height: 100%;
+	        background-color:#222;
+	      }
+		div#viz {
+		    background-color:black;
+		}
+		.txtInput {
+			width:98%;
+		}
+		.bodyInput {
+			background-color:white;margin:0;
+		}
+		
+	</style>
+	<body onload="init()" >
+		<div id="viz"></div>
+		<script>
+		/*
+		var width = 240,
+		    height = 125,
+		    radius = 20;
+		
+		var drag = d3.behavior.drag()
+		    .origin(function(d) { return d; })
+		    .on("drag", dragmove);
+		
+		var svg = d3.select("body").append("div").selectAll("svg")
+		    .data(d3.range(16).map(function() { return {x: width / 2, y: height / 2}; }))
+		  .enter().append("svg")
+		    .attr("width", width)
+		    .attr("height", height);
+		
+		svg.append("circle")
+		    .attr("r", radius)
+		    .attr("cx", function(d) { return d.x; })
+		    .attr("cy", function(d) { return d.y; })
+		    .call(drag);
+		
+		function dragmove(d) {
+		  d3.select(this)
+		      .attr("cx", d.x = Math.max(radius, Math.min(width - radius, d3.event.x)))
+		      .attr("cy", d.y = Math.max(radius, Math.min(height - radius, d3.event.y)));
+		}
+		*/
+		</script>
+	</body>
+</html>

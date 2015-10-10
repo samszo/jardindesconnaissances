@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<title>Crible</title>
+		<link rel="stylesheet" href="css/criblepalette.css" />
+	    <script type='text/javascript' src='js/d3.v2.js' ></script>
+		<script type="text/javascript" src="js/heatmap.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/jquery.smart_autocomplete.js"></script>
+<meta name="Description" CONTENT="cartographie pour cribler un événement"/>
+<meta name="Keywords" CONTENT="cartographie ieml twitter pallette tweet sémantique crible"/>
+<meta name="Author" CONTENT="Samuel Szoniecky"/>
+	</head>
+	<body>
+		<div id="main">
+			<div id="configArea">
+				<h2>Palette de cribles</h2>
+				<hr/>
+				Utilisateur : <?php echo $this->identite; ?>
+				-<a href="<?php echo '../public/auth/login?redir=tweetpalette&idBase='.$this->idBase; ?>">déconnexion</a>-
+				<hr/>
+				<div>
+					<div>
+						Palettes disponibles : 
+						<select onchange="changePalette(this)" >
+						  <option value="">Choisissez une palette</option>
+						  <?php 
+						  	//construction des options
+						  	foreach ($this->palettes as $p) {
+							  	echo "<option id='".$p["doc_id"]."' data='eval(".$p["data"].")' class='".$p["note"]."' value='".$p["url"]."'>".$p["titre"]."</option>";
+						  	}
+						  ?>
+						</select>
+					</div>
+					<hr/>
+					<div>
+						Rôles disponibles : 
+						<select onchange="changeRole(this)" >
+						  <option value="">Choisissez un rôle</option>
+						  <?php 
+						  	//construction des options
+						  	foreach ($this->roles as $r) {
+							  	echo "<option value='".$r["role"]."'>".$r["role"]."</option>";
+						  	}
+						  ?>
+						</select>
+					</div>
+					<hr/>
+					<h3>Evénement</h4>				
+					<label>Document :     </label><input onchange="changeUrl(this)" class="infoEvent" id="url_event" value="<?php echo $this->url; ?>" />
+					<!--  
+					<input type="checkbox" id="filtrerUrl" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
+					-->
+					<div id="url_court" ></div>
+					<label>Acteur : </label><br/><input class="infoEvent" id="user_event" />
+					<!--  
+					<input visible="false" type="checkbox" id="filtrerUti" onclick="getTweet();" />
+					-->
+					<br/>
+					<label>Tag : </label><br/><input class="infoEvent" id="tag_event" value="<?php echo $this->tag; ?>" />
+					<!--  
+					<input visible="false" type="checkbox" id="filtrerTag" onclick="getTweet();" <?php if($this->iframe) echo 'checked="checked"'; ?> />
+					-->
+				</div>
+				<hr/>
+				<div>
+					<label>Catégorie : <span id="taille_tweet" /></label>
+					<textarea id="tweet_text" maxlength="140" width="180px" ></textarea>
+					<!--  					
+					<br/>
+					<input visible="false" type="checkbox" id="showIeml" <?php if($this->iframe) echo 'checked="checked"'; ?> /> Affiche IEML
+					-->
+					<div id="gen">Enregistrer</div>
+				</div>
+			</div>
+			<div id="svgArea">
+				<div id="heatmapArea" ></div>
+				<img src="" id="png" ></img>
+				<div id="svg"></div>
+			</div>
+			<div id="tofsActeurs"></div>
+			<div id="docArea">
+				<iframe style="width:100%;height:100%;"
+				 id="ifDoc" src=""></iframe>
+			</div>
+			
+		</div>
+		<script type="text/javascript">
+		var idBase = '<?php echo $this->idBase; ?>';
+		var idUti = <?php echo $this->idUti; ?>;
+		var iframe = '<?php echo $this->iframe; ?>';
+		
+		//tableau des coordonnées sémantiques
+		var grilles =  [<?php 
+		  	//construction des options de coordonnées sémantiques
+			foreach ($this->palettes as $p) {
+			  	echo $p["data"].",";
+		  	}
+		?>];
+		//tableau des roles
+		var roles =  <?php 
+			  	//construction des options de roles
+			echo json_encode($this->roles);
+		?>;
+		</script>
+		<script type="text/javascript" src="js/criblepalette.js"></script>
+	</body>
+</html>

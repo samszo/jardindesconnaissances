@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title><?php echo $this->titre;  ?></title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/keshif.js" charset="utf-8"></script>
+	<script type="text/javascript" src="js/papaparse.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="js/moment.min.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="css/keshif.css" type="text/css" />
+    <link rel="stylesheet" href="css/keshifStyle.css" type="text/css" />    
+    <link rel="stylesheet" href="css/font-awesome.css" />
+    
+    <script type="text/javascript" >
+    $(document).ready(function() {
+        new kshf.Browser({
+            domID : "#chart_div",
+            categoryTextWidth: 250,
+            source : {
+                dirPath: '../data/biolographes/',
+                fileType: 'csv',
+                sheets : [ {name:"HistoireBiologie", id:'idFait'} ]
+            },
+            facets: [
+	            {
+	                facetTitle: "tags"
+	            },
+	            {
+	                facetTitle: "nature"
+	            },
+	            {
+		            facetTitle: "acteur",
+		            layout: 'right'
+	            },         
+	            {
+	                facetTitle: "Année",
+	                catItemMap : function(d){
+		                var dt = new Date(moment(d.data.start+"-01-01","YYYY-MM-DD"));
+		                //console.log(d.data.start+" = "+dt);
+		                return dt
+	                },
+	                intervalScale: 'time',
+	                layout: 'bottom'
+	            }	            
+        		],   
+            itemDisplay: {
+                sortColWidth: 72,
+                sortingOpts : [
+                    {name:'Année', value : function(d){ return d.data.start;}}
+                ],
+                textSearch : "Faits",
+                detailsToggle : "Multi",
+                contentFunc : function(d){
+
+                    var str="";
+                    str+="<div class=\"iteminfo iteminfo_0\">";
+                    str+=d.data.fait;
+                    str+="</div>";
+
+                    return str;                    
+                    //return "<div >"+d.data.fait+"</div>";
+                }
+            }
+        });
+    });    
+    </script>
+    
+    
+  </head>
+        <style>
+            #chart_div {
+                width:1024px;
+                height:700px;
+            }
+        </style>
+	</head>
+    <body >
+        <div class="contents"><div id="chart_div"></div></div>
+    </body>
+  </body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Directed Graph Editor</title>
+    <link rel="stylesheet" href="../css/grapheditor.css">
+	<link rel="stylesheet" href="../css/jquery/ui-lightness/jquery-ui-1.10.4.min.css">
+  </head>
+  
+  <body >
+  	<div id="tools">
+  		<p>Utilisateur : <span id="utiConnect">anonyme</span></p>
+  		<hr/>
+		<label for="saveGraph">Graph(s) enregistré(s) :</label>
+		<br/>	
+		<select id="saveGraph" onchange="" >
+		</select>  		
+  		<hr/>
+		<div class="boutons" id="btnGraph">
+	  		<img class="imgButton" alt="enregistrer" onclick="diagSauvDoc.showModal()" src="../img/cloud182.png">
+	  		<img class="imgButton" alt="ajouter" src="../img/add83.png">
+	  		<img class="imgButton" alt="supprimer" src="../img/trash34.png">
+		</div>
+  	</div>
+	<div id="viz"></div>
+  
+		<dialog id="dlgNoeud" close>
+			<h3>Ajout d'un noeud</h3>
+			<p>
+				<label for="typeNoeud">Type de noeud:</label>	
+				<select id="typeNoeud" name="type" onchange="setAutocomplete(this.value)" >
+				  <option value="ACTEURS">Acteur</option>
+				  <option value="EVENEMENTS">Evènements</option>
+				  <option value="REFERENCES">Références</option>
+				  <option value="CONCEPTS">Concept</option>
+				</select>
+				<br/><br/>
+				<label for="nameNoeud">Valeur:</label>	
+				<input id="autocomplete" title="type &quot;a&quot;">
+			</p>
+			<div class="boutons">
+				<button id="cancel" onclick="dialogNoeud.close()">Annuler</button>
+				<button id="addNode" onclick="dialogNoeud.returnValue">Ajout du noeud</button>
+			</div>
+			
+		</dialog>
+		<dialog id="dlgLien" close>
+			<h3>Ajout d'un lien</h3>
+			<p>
+				<label for="typeLien">Type de liens:</label>	
+				<select id="typeLien" name="typeLien" >
+				</select>
+				<br/><br/>
+			</p>
+			<div class="boutons">
+				<button id="cancel" onclick="dialogLien.close()">Annuler</button>
+				<button id="addLien" onclick="dialogLien.returnValue">Ajout du Lien</button>
+			</div>			
+		</dialog>
+		<dialog id="dlgActeur" close>
+			<h3>Ajout d'un acteur</h3>
+			<p style="vertical-align:middle;">
+				<label for="nomActeur">Nom :</label><input id="nomActeur" />
+		  		<img class="imgButton" alt="chercher un auteur" onclick="findAuteur()" src="../img/search26.png">
+			</p>
+			<div id="resultActeur" class="ui-widget" style="display:none;">
+				<p id="resultActeurNb" />
+				<div style="overflow: scroll;height:200px">
+					<table id="resultActeurAjout" style="width:100%;" class="ui-widget ui-widget-content">
+						<thead>
+							<tr class="ui-widget-header " >
+								<th>Auteur</th>
+								<th>Choisir</th>
+								<th>+ d'info</th>
+							</tr>
+						</thead>
+						<tbody >
+						</tbody>
+					</table>
+				</div>
+			</div>			
+			<p>
+				<label for="prenomActeur">Prénom :</label><input id="prenomActeur" />
+			</p>
+			<p>
+				<label for="professionActeur">Profession :</label><input id="professionActeur" />
+			</p>
+			<p>
+				<label for="specialiteActeur">Spécialité :</label><input id="specialiteActeur" />
+			</p>
+			<p>
+				<label for="dtNait">Date de naissance :</label>	
+				<input type="date" id="dtNait" name="dtNait" />
+			<p>
+			<p>
+				<label for="dtMort">Date de mort :</label>	
+				<input type="date" id="dtMort" name="dtMort" />
+			<p>
+			<div class="boutons">
+				<button id="cancel" onclick="dialogActeur.close()">Annuler</button>
+				<button id="addActeur" onclick="dialogActeur.returnValue">Ajout de l'acteur</button>
+			</div>
+			<script type="text/javascript" >
+			var dtAuteurFind;
+			function findAuteur(){
+				var nom = $("#nomActeur")[0].value;
+				//supprime les résultats
+				d3.selectAll("#resultActeurAjout tbody tr").remove();
+				d3.select("#resultActeurNb").text("");
+				$.post("../flux/databnfterm?term="+nom, null,
+						 function(data){
+					 		//ne récupère que les personnes
+					 		dtAuteurFind = data.filter(function(d){
+						 		return d.raw_category=="Person";
+					 			});
+				 			if(dtAuteurFind.length==0)showMessage("Aucun auteur trouvé.");
+				 			d3.select("#resultActeurNb").text(dtAuteurFind[0].category);
+				 			dtAuteurFind.forEach(function(d, i){
+					 			//affiche le résultat
+					 			d3.selectAll("#resultActeur").style("display","inline");
+				 				$( "#resultActeurAjout tbody" ).append( "<tr>" +
+				 						"<td>" + d.label + "</td>" +
+				 						"<td style='text-align:center;'><img class='imgButton' alt='selectionne l'auteur' onclick='selectAuteur("+i+")' src='../img/document96.png'></td>" +					
+				 						"<td style='text-align:center;'><a href='" + d.value + "' target='_blank'><img class='imgButton' alt='affiche infos auteur' src='../img/cloud181.png'></a></td>" +					
+				 					"</tr>" );					 			
+				 			})
+						 }, "json");
+			}
+			function selectAuteur(i){
+				//récupère la bio de l'auteur
+				//"http://data.bnf.fr/10945257"
+				var idBNF = dtAuteurFind[i].value.substring(19);
+				$.post("../flux/databnfbio?idBNF="+idBNF, null,
+						 function(data){
+					 		var dt = data.results.bindings;
+				 			if(dt.length==0)showMessage("Aucunne référence dans data.bnf.fr");
+				 			else{
+				        			document.querySelector('#nomActeur').value = dt[0].nom.value;		
+				        			document.querySelector('#prenomActeur').value = dt[0].prenom.value;
+				        			document.querySelector('#dtNait').value = dt[0].date1.value;
+				        			document.querySelector('#dtMort').value = dt[0].date2.value;
+				 			}
+						 }, "json");
+				
+			}
+			
+			</script>			
+		</dialog>
+		<dialog id="dlgEvent" close>
+			<style>
+				.ui-autocomplete-category {
+					font-weight: bold;
+					padding: .2em .4em;
+					margin: .8em 0 .2em;
+					line-height: 1.5;
+				}
+				.ui-autocomplete {
+					max-height: 300px;
+					overflow-y: auto;
+					/* prevent horizontal scrollbar */
+					overflow-x: hidden;
+				}				
+			</style>
+			<h3 id="titreEvent">Précisions spatio-temporelles</h3>
+			<div id="event-contain" class="ui-widget">
+				<table id="events-ajout" style="width:100%;" class="ui-widget ui-widget-content">
+					<thead>
+						<tr class="ui-widget-header ">
+							<th>Début</th>
+							<th>Fin</th>
+							<th>Lieu</th>
+							<th>Pays</th>
+							<th>Ville</th>
+							<th>Adresse</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+			<h3 >Compléter le formulaire pour ajouter des précisions</h3>			
+			<table id="events" style="width:600px;">
+				<thead>
+					<tr class="ui-widget-header ">
+						<th>Quand ?</th>
+						<th>Où ?</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr >
+						<td  style="vertical-align:top;width:200px;">
+							<label for="dtDeb">Date de début :</label>	
+							<input type="date" id="dtDeb" name="dtDeb" />
+							<br/> <br/>
+							<label for="dtFin">Date de fin :</label>	
+							<input type="date" id="dtFin" name="dtFin" />						
+						</td>
+						<td>
+							<label for="dtLieu">Lieu :</label>	
+							<select id="typeNoeud" name="typeLieu" onchange="setAutocompleteLieu(this.value)" >
+							<option value="Académies">Académies</option>
+							  <option value="Universités françaises">Universités françaises</option>
+							  <option value="Sociétés savantes françaises">Sociétés savantes françaises</option>
+							  <option value="Universités allemandes">Universités allemandes</option>
+							  <option value="Sociétés savantes allemandes">Sociétés savantes allemandes</option>
+							  <option value="Espaces de sociabilité">Espaces de sociabilité</option>
+							  <option value="Autres lieux de savoirs">Autres lieux de savoirs</option>
+							  <option value="Villégiatures">Villégiatures</option>
+							</select>							
+							<input id="dtLieu" name="dtLieu" style="width:100%;" />
+							<br/>
+							<label for="dtPays">Pays :</label>	
+							<input id="dtPays" name="dtPays" style="width:100%;" />
+							<br/>
+							<label for="dtVille">Ville :</label>	
+							<input id="dtVille" name="dtVille" style="width:100%;" />
+							<br/>
+							<label for="dtAdresse">Adresse :</label>	
+							<input id="dtAdresse" name="dtAdresse" style="width:100%;" />
+						</td>
+					</tr>
+				</tbody>
+			</table>	
+			<br/>	
+			<div class="boutons">
+				<button id="addEvent" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+					<span class="ui-button-text">Ajouter</span>
+				</button>				
+				<button id="cancelEvent"  onclick="dialogEvent.close()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+					<span class="ui-button-text">Fermer</span>
+				</button>				
+			</div>			
+		</dialog>
+		<dialog id="diagLogin" close> 
+			<script type="text/javascript" >
+			function connecte(){
+				getAuth("login");
+			}		
+			function inscrit(){
+				getAuth("inscription");
+			}		
+			function deconexion(){
+				window.location.assign('../public/auth/login?redir=graph/grapheditor&ajax=true');
+			}
+			function getAuth(type){
+				var login = $("#iptLogin")[0].value;
+				var mdp = $("#iptMdp")[0].value;
+				if (login != "" || mdp != "") {
+					var p = {"idBase":idBase, "login":login, "mdp":mdp, "ajax":1};
+					$.post("../auth/"+type, p,
+							 function(data){
+						 		if(data.erreur){
+						 			showMessage(data.erreur);
+						 		}else{
+							 		//enregistre les infos de l'uti
+							 		uti = data.uti;
+									//affichage des infos de l'utilisateur
+									document.getElementById("utiConnect").innerHTML = uti.login;
+									//affichage des boutons de traitement
+							  		d3.selectAll(".imgButton").style("display","inline");									
+									diagLogin.close();						 		
+						 		}					 		
+							 }, "json");
+				}else{
+					showMessage("Veillez remplir tous les champs.");
+				}
+			}
+			
+			</script>		
+		
+			<label for="iptLogin">Login : </label>
+            <input type="text" name="iptLogin" id="iptLogin" required="required">
+            <label for="iptlogin">Mot de passe : </label>
+            <input type="password" name="iptMdp" id="iptMdp" required="required">
+	        <div class="boutons">
+				<button onclick="diagLogin.close()">Fermer</button> 
+				<button onclick="connecte()">Connexion</button> 
+				<button onclick="inscrit()">Inscription</button> 
+			</div> 
+		</dialog> 
+		<dialog id="diagSauvDoc" close> 
+			<script type="text/javascript" >
+			function saveDoc(){
+				var titre = $("#docTitre")[0].value;
+				var tronc = "graph";
+				var data = svg.document.innerHTML;
+				if (titre) {
+					var p = {"idUti":uti.uti_id, "idBase":idBase, "titre":titre, "tronc":tronc, "data":data};
+					$.post("../flux/sauvedoc", p,
+							 function(data){
+						 		if(data.erreur){
+						 			showMessage(data.erreur);
+						 		}else{
+									showMessage("Graph enregistré.");
+							  		diagSauvDoc.close();						 		
+						 		}					 		
+							 }, "json");
+				}else{
+					showMessage("Veillez remplir tous les champs.");
+				}
+			}
+			
+			</script>		
+		
+			<label for="docTitre">Titre du graph : </label>
+            <input type="text" name="docTitre" id="docTitre" required="required">
+	        <div class="boutons">
+				<button onclick="diagSauvDoc.close()">Annuler</button> 
+				<button onclick="saveDoc()">Enregistrer</button> 
+			</div> 
+		</dialog> 
+		<dialog id="diagMess" close> 
+			<div id="mess" ></div>
+	        <div class="boutons">
+				<button onclick="diagMess.close()">Fermer</button> 
+			</div> 
+		</dialog> 
+				
+	</body>
+
+  <script type="text/javascript" src="../js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="../js/jquery.min.js"></script>
+  <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="../js/grapheditor.js"></script>
+  <script type="text/javascript">
+  	var idBase = '<?php echo $this->idBase; ?>';
+  	var connect = <?php echo $this->connect; ?>;
+  	var uti;
+  	if(connect){
+  	  	diagLogin.showModal();
+  		d3.selectAll(".imgButton").style("display","none");
+  	}
+  </script>
+</html>

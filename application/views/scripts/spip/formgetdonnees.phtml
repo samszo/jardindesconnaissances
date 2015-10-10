@@ -1,0 +1,3 @@
+<?php
+	if($this->erreur) echo '{"erreur":"'.$this->erreur.'"}';
+	elseif ($this->rs) echo json_encode($this->rs);	

@@ -1,0 +1,7 @@
+<?php
+	if (isset($this->google)){
+		echo "Résultat de l'authentification Google<br/>";
+		echo $this->google->token;		
+	}
+	if($this->content)echo $this->content;
+		

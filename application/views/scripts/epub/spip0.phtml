@@ -1,0 +1,126 @@
+<?php
+error_reporting(E_ALL | E_STRICT);
+ini_set('error_reporting', E_ALL | E_STRICT);
+ini_set('display_errors', 1);
+
+// Example.
+// Create a test book for download.
+// ePub uses XHTML 1.1, preferably strict.
+// This is the minimalistic version.
+
+// This is for the example, this is the XHTML 1.1 header
+$content_start =
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+. "<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:epub=\"http://www.idpf.org/2007/ops\">\n"
+. "<head>"
+. "<meta http-equiv=\"Default-Style\" content=\"text/html; charset=utf-8\" />\n"
+. "<link rel=\"stylesheet\" type=\"text/css\" href=\"styles.css\" />\n"
+. "<title>".$this->titreLivre."</title>\n"
+. "</head>\n"
+. "<body>\n";
+
+$bookEnd = "</body>\n</html>\n";
+
+// setting timezone for time functions used for logging to work properly
+date_default_timezone_set('Europe/Berlin');
+
+$fileDir = './PHPePub';
+
+include_once("EPub.php");
+
+$book = new EPub(EPub::BOOK_VERSION_EPUB3, "fr", EPub::DIRECTION_LEFT_TO_RIGHT); // no argumetns gives us the default ePub 2, lang=en and dir="ltr"
+
+// Title and Identifier are mandatory!
+$book->setTitle($this->titreLivre);
+$book->setIdentifier("http://JohnJaneDoePublications.com/books/TestBookSimple.html", EPub::IDENTIFIER_URI); // Could also be the ISBN number, prefered for published books, or a UUID.
+$book->setLanguage("fr"); // Not needed, but included for the example, Language is mandatory, but EPub defaults to "en". Use RFC3066 Language codes, such as "en", "da", "fr" etc.
+$book->setDescription("This is a brief description\nA test ePub book as an example of building a book in PHP");
+$book->setAuthor("John Doe Johnson", "Johnson, John Doe");
+$book->setPublisher("John and Jane Doe Publications", "http://JohnJaneDoePublications.com/"); // I hope this is a non existant address :)
+$book->setDate(time()); // Strictly not needed as the book date defaults to time().
+$book->setRights("Copyright and licence information specific for the book."); // As this is generated, this _could_ contain the name or licence information of the user who purchased the book, if needed. If this is used that way, the identifier must also be made unique for the book.
+$book->setSourceURL("http://JohnJaneDoePublications.com/books/TestBookSimple.html");
+
+// A book need styling, in this case we use static text, but it could have been a file.
+$cssData = "body {\n  margin-left: .5em;\n  margin-right: .5em;\n  text-align: justify;\n}\n\np {\n  font-family: serif;\n  font-size: 10pt;\n  text-align: justify;\n  text-indent: 1em;\n  margin-top: 0px;\n  margin-bottom: 1ex;\n}\n\nh1, h2 {\n  font-family: sans-serif;\n  font-style: italic;\n  text-align: center;\n  background-color: #6b879c;\n  color: white;\n  width: 100%;\n}\n\nh1 {\n    margin-bottom: 2px;\n}\n\nh2 {\n    margin-top: -2px;\n    margin-bottom: 2px;\n}\n";
+$book->addCSSFile("styles.css", "css1", $cssData);
+
+// Add cover page
+$cover = $content_start . "<h1>Test Book</h1>\n<h2>By: John Doe Johnson</h2>\n" . $bookEnd;
+$book->addChapter("Notices", "Cover.html", $cover);
+
+$chapter1 = $content_start . "<h1>Chapter 1</h1>\n"
+    . "<h2>Mon SVG qu'il est beau</h2>\n"
+    . "	<img onclick='setinfo()' src='http://localhost/livre-postnum/data/trombi/THYP1415/21.jpg' alt='Quevin'  />\n"
+    . "	<img src='.../icones/timeR.jpg' />\n"
+    . "<p id='lbl1' >Mon image est belle</p>\n"
+    . "<p id='lbl2' >Mon image est belle</p>\n"
+	. '<script type="text/javascript">'
+	. '	function setinfo(){'
+	. '		document.getElementById("lbl1").innerHTML = "YOUOUHHOUUU !";'
+	/*
+	. '	    alert("Name: " + navigator.epubReadingSystem.name +'
+	. '	          " / version: " + navigator.epubReadingSystem.version +'
+	. '	          " / layoutStyle " + navigator.epubReadingSystem.layoutStyle);'
+	*/
+	. '		document.getElementById("lbl2").innerHTML = "trop fort !";'
+	. '	}'
+	. '	</script>'     
+    /*
+	.'<ul>
+	<li role="button"
+	tabindex="0" onclick="setinfo()">Louder</li>
+	<li role="button" tabindex="0"
+	onclick="setinfo()">Softer</li> </ul>'    
+    . '<script type="text/javascript" src="../js/d3.v3.min.js">
+	<div id="chartContainer">
+  	</div>
+    '*/
+    . $bookEnd;
+$book->addChapter("Chapter 1: Lorem ipsum", "Chapter001.html", $chapter1, true, EPub::EXTERNAL_REF_ADD);
+
+$chapter2 = $content_start
+	. '<div class="page">
+
+	<div class="clearfix header">
+	<strong class="h1" id="logo"><a rel="start home" href="http://gapai.univ-paris8.fr/CreaTIC/livre-postnum/spip/" title="Accueil">Livre Post Numérique</a></strong>
+	
+</div>	<div class="nav clearfix  none" id="nav">
+	<ul>
+		
+		<li class="on"><a href="spip.php?rubrique1">Livre de voyage</a></li>
+		
+	</ul>
+</div>	
+	<div class="main">
+		
+		<div class="wrapper hfeed">
+		<div class="content hentry" id="content">
+			<p class="arbo"><a href="http://gapai.univ-paris8.fr/CreaTIC/livre-postnum/spip/">Accueil</a> &gt; <a href="spip.php?rubrique1">Livre de voyage</a> &gt; <a href="spip.php?rubrique2">Fez</a> &gt; <a href="spip.php?rubrique3">Carte Niveau 1 : le Maroc</a> &gt; <strong class="on">Maroc, à la croisée des cultures</strong></p>
+			<div class="chapo surlignable"><p>Palais chérifiens entourés de somptueux jardins, souks desquels s’échappe l’odeur mystérieuse des épices, la fantasia et ses rites éclatants… il serait dommage d’en rester à ce décor de théâtre haut en couleurs lorsque l’on part au Maroc. L’important, c’est ce qui se passe en coulisses. C’est en s’aventurant hors des sentiers balisés, en allant respectueusement à la rencontre des gens qui l’occupent, que l’on s’immergera dans la vie populaire marocaine, que l’on en découvrira la richesse culturelle et la beauté de ses lieux. <br class="autobr">
+Le Maroc, c’est aussi une succession de paysages variés, oscillant entre milieu côtier, vertes vallées, plaines fertiles, plateaux désertiques et oasis. Les voyageurs en quête de nature et d’authenticité seront comblés.</p></div>
+			<div class="texte surlignable clearfix"><p><span class="spip_document_741 spip_documents spip_documents_center">
+<img src="http://gapai.univ-paris8.fr/CreaTIC/livre-postnum/spip/local/cache-vignettes/L500xH334/img_9218_-_copie-a8031.jpg" width="500" height="334" alt=""></span><br class="autobr">
+Carte d’identité du Maroc</p>
+
+<p><img src="http://gapai.univ-paris8.fr/CreaTIC/livre-postnum/spip/local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Population&nbsp;: 32 309 000 habitants (estimation 2012).<br><img src="local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Superficie&nbsp;: 710 850 km² avec le Sahara occidental et 446 550 km² sans.<br><img src="local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Capitale&nbsp;: Rabat (1 750 000 habitants).<br><img src="local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Densité de population&nbsp;: environ 72 hab./km² (sans le Sahara occidental).<br><img src="local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Langues&nbsp;: arabe classique et amazigh (langues officielles). Parmi les langues véhiculaires&nbsp;: arabe dialectal, idiomes berbères (rifain, braber, chleuh et zénète), français (courant dans l’administration), espagnol (utilisé localement dans le Nord).<br><img src="local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Régime&nbsp;: monarchie constitutionnelle.<br><img src="local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Chef de l’État&nbsp;: le roi Mohammed VI (depuis juillet 1999). <br><img src="local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Monnaie&nbsp;: le dirham.<br><img src="local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Salaire minimum garanti&nbsp;: environ 2 300 Dh (environ 210 €) net.<br><img src="local/cache-vignettes/L8xH11/puce-32883.gif" width="8" height="11" class="puce" alt="-">&nbsp;Sites inscrits au Patrimoine mondial de l’Unesco&nbsp;: les médinas de Fès (1981) et de Marrakech (1985), le ksar d’Aït-Benhaddou (1987), la ville historique de Meknès (1996) et la médina de Tétouan (1997), le site de Volubilis (1997), la médina d’Essaouira (2001), la cité portugaise d’El-Jadida (2004), et Rabat, capitale moderne et ville historique&nbsp;: un patrimoine en partage (2012) et Rabat (2012).</p></div>
+		
+			
+			
+		
+	
+		</div><!--.content-->
+		</div><!--.wrapper-->
+	
+	</div><!--.main-->
+</div>'
+    . $bookEnd;
+$book->addChapter("Chapter 2: Spip Article", "Chapter002.html", $chapter2, true, EPub::EXTERNAL_REF_ADD);
+
+$book->finalize(); // Finalize the book, and build the archive.
+
+// Send the book to the client. ".epub" will be appended if missing.
+$zipData = $book->sendBook($this->titreLivre);
+
+// After this point your script should call exit. If anything is written to the output,
+// it'll be appended to the end of the book, causing the epub file to become corrupt.

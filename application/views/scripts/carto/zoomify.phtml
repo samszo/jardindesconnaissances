@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="../css/leaflet.css" />
+		<script type='text/javascript' src="../js/d3.v2.js"></script>
+		<script type="text/javascript" src="../js/leaflet/leaflet.js"></script>
+		<script type="text/javascript" src="../js/leaflet/L.TileLayer.Zoomify.js"></script> 	
+		<style type="text/css">
+	        html, body, #carto {
+	            width: 100%;
+	            height: 100%;
+	            padding: 0;
+	            margin: 0;
+	        }
+	    </style>
+    </head>
+<body>
+	<div id="carto"></div>
+	<script type="text/javascript">
+	var map = L.map('carto').setView(new L.LatLng(0,0), 0);
+
+	L.tileLayer.zoomify('../../data/carte/planFes/', {
+	    width: 8121,
+	    height: 5816,
+	    tolerance: 0.8,
+	    attribution: 'Photo: Sam Szo'
+	}).addTo(map);	
+	
+	</script>	
+  </body>
+</html>	
