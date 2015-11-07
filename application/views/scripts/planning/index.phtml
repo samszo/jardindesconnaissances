@@ -11,10 +11,12 @@
 	<script src="js/jquery.min.js"></script>
   	<script src="js/jquery-ui.min.js"></script>
 	<script src="js/jquery.ui.datepicker-fr.js"></script>
+	<script src="js/loading.js"></script>
   	
   	<link rel="stylesheet" href="css/cal-heatmap.css" />
 	<link rel="stylesheet" href="css/planning.css" />
 	<link rel="stylesheet" href="css/jquery/smoothness/jquery-ui.css" />		
+	<link rel="stylesheet" href="css/loading.css" />		
 	<script>
 
 		var db = '<?php echo $this->dbNom; ?>';
@@ -52,13 +54,23 @@
 					.style("display",'none');
 			ts.append("img")
 				.attr("src","img/clear.png").on("click",cacheDiv);
-			ts.append("class").attr("class","titreStat").text(function(d) {return d;});
+			ts.append("class").attr("class","titreStat")
+				.text(function(d) {
+					return d;
+					});
+			ts.append("div")
+				.attr("id",function(d, i) {
+				 	return "tabStat"+i+"cont";
+				 });
+
 				
-	    });		  		
+	    });
+	    		  		
 	</script>	
 	
 </head>
 	<body>
+	  <div id="loadingScreen"></div>	
 	  <div class="request">
 	    <?php if (isset($this->authUrl)): ?>
 	      <a class='login' href='<?php echo $this->authUrl; ?>'>Connexion aux Planning de Google !</a>
@@ -73,24 +85,28 @@
 				<?php endforeach; ?>		
 			</select>		
 	    <?php endif ?>
-	    Date de début: <input type="text" id="datepickerMin" value="01/09/2014" />
-	    Date de fin: <input type="text" id="datepickerMax" value="30/09/2015" />
+	    Date de début: <input type="text" id="datepickerMin" value="01/09/2015" />
+	    Date de fin: <input type="text" id="datepickerMax" value="30/09/2016" />
 	  </div>
 	  <div>
-		<select id="cours" name="cours">
-		    <option value="">-- Cours --</option>
+		<label for="cours">Cours :</label>
+		<select id="cours" name="cours" onChange='choixCour(this)'>
+		    <option value="">Choisissez un cours</option>
 		</select>
 		 
-		<select id="intervenants" name="intervenants"  onChange='choixInt(this)'>
-		    <option value="">-- Intervenants --</option>
+		<label for="intervenants">Intervenants :</label>
+		<select id="intervenants" name="intervenants" onChange='choixInt(this)'>
+		    <option value="">Choisissez un intervenant</option>
 		</select>	  
 		 
+		<label for="etudiants">Etudiants :</label>
 		<select id="etudiants" name="etudiants">
-		    <option value="">-- Etudiants --</option>
+		    <option value=""></option>
 		</select>	  
 
+		<label for="satistiques">Satistiques :</label>
 		<select id="statistiques" name="statistiques" onChange='choixStat(this)'>
-		    <option value="">-- Satistiques --</option>
+		    <option value="">Choisissez une statistique</option>
 		</select>	  
 	  </div>
 	  	<table>
@@ -107,9 +123,38 @@
 		<div id="cal-events"></div>
 		<script type="text/javascript">
 			//http://kamisama.github.io/cal-heatmap/#cellRadius
+			var urlCouTot = "flux/google?type=css&gDocId=1vXOt_DiLRVdBWF9qw-XiP_DTFgmmM9cuZSMMnZyA3qo";
+			var urlIntTot = "flux/google?type=css&gDocId=1R_Drqn_lubZgjkmu3kHicDt9GMFhqm-J7RyTmJVNtJs";
 			var gData, gDataCal, dataCour, idxCour, dataInt, idxInt;
-			var urlCou = {"CDNL":"../data/planning/CDNL14-15_cours.csv"};
-			var urlInt = {"CDNL":"../data/planning/CDNL14-15_intervenants.csv"};
+			//var urlCou = {"L3 PRO CDNL":"../data/planning/CDNL14-15_cours.csv"};
+			var urlCou = {
+					"Master 2 THYP":urlCouTot
+					,"Master 2 PTN":urlCouTot
+					,"L3 PRO CDNL":urlCouTot
+					,"Master 2 NET":"flux/google?type=css&gDocId=1gYZxHacQ-dy7mHpIKbxKlAu1YLTSs-4SrJEmoVdFolU"
+					,"Master 1 CEN":urlCouTot
+					,"Master 1 GSI":urlCouTot
+					,"Master 2 GSI":urlCouTot
+					,"Master 2 AVUN":urlCouTot
+					,"Master 2 CEN":urlCouTot
+					,"CreaTIC Hypermedia":urlCouTot
+					};
+			//var urlInt = {"L3 PRO CDNL":"../data/planning/CDNL14-15_intervenants.csv"};
+			var urlInt = {
+					"Master 2 THYP":urlIntTot
+					,"Master 2 PTN":urlIntTot
+					,"L3 PRO CDNL":urlIntTot
+					,"Master 2 NET":"flux/google?type=css&gDocId=1fvVB3bDR74KnYgBhKJgttzqqwygfpuD_OaCu9zOgZ7A"
+					,"Master 1 CEN":urlIntTot
+					,"Master 1 GSI":urlIntTot
+					,"Master 2 GSI":urlIntTot
+					,"Master 2 AVUN":urlIntTot
+					,"Master 2 CEN":urlIntTot
+					,"CreaTIC Hypermedia":urlIntTot
+					};
+					
+		
+			
 			var arrStat = ["Nb d'heure par type d'intervenant","Nb d'heure par cours","Nb d'heure par intervenants","Planning par intervenants"];
 			var calY;
 			var calD;
@@ -127,23 +172,31 @@
 			var nbMotif = 1, arrCreaMotif = [];
 			
 			function getDataPlanning(sltPlan){
+				//if(urlCou[sltPlan.label] && urlInt[sltPlan.label]){					
 				if(urlCou[sltPlan.label] && urlInt[sltPlan.label]){					
 					//chargement des données depuis les fichiers csv
+					waitingDialog({});
 					d3.csv(urlCou[sltPlan.label], function(data1) {
 						dataCour = data1;
-				    	nbCou = dataCour.length;
+				    		nbCou = dataCour.length;
+				    		//suppression des options
+				    		$cours.find('option').remove();				    		
 						//création de l'index des cours
 						idxCour = [];
+						$cours.append('<option value="">Tous les cours</option>');											
 						dataCour.forEach(function(d) {
-							idxCour.push(d["Code EC"]);
-							$cours.append('<option value="'+ d["Code EC"] +'">'+  d["Intitulés des EC"] +'</option>');					
+							idxCour.push(d["Code Apogée"]);
+							$cours.append('<option value="'+ d["Code Apogée"] +'">'+d["Code Apogée"]+" "+d["Intitulés des EC"] +'</option>');					
 						});
 						
 						d3.csv(urlInt[sltPlan.label], function(data3) {
 							dataInt = data3;
-					    	nbInt = dataInt.length;
+					    		nbInt = dataInt.length;
+					    		//suppression des options				    			
+					    		$intervenants.find('option').remove();				    						    							    		
 							//création de l'index des intervenants
 							idxInt = [];
+							$intervenants.append('<option value="">Tous les intervenants</option>');											
 							dataInt.forEach(function(d) {
 								idxInt.push(d["Nom"]);
 								$intervenants.append('<option value="'+ d["Nom"] +'">'+  d["Prénom"] +' '+  d["Nom"] +'</option>');					
@@ -171,110 +224,125 @@
 
 			function choixInt(select) {
 				var opt = select.selectedOptions[0];
-				var filtered = gData.filter(function(d) {
-					if(!d.summary) return false;
-					return d.summary.indexOf(opt.label) >= 0;	
-				});
-				calY.update(filtered);			
+				if(opt.label=="Tous les intervenants") calY.update(gData);
+				else{
+					var filtered = gData.filter(function(d) {
+						if(!d.summary) return false;
+						return d.summary.indexOf(opt.label) >= 0;	
+					});
+					calY.update(filtered);
+				}			
 			} 
 
 
+			function choixCour(select) {
+				var opt = select.selectedOptions[0];
+				if(opt.label=="Tous les cours") calY.update(gData);
+				else{
+					var filtered = gData.filter(function(d) {
+						if(!d.summary) return false;
+						var arrCour = d.summary.split(":");
+						return arrCour[0].trim()==opt.value;	
+					});
+					calY.update(filtered);
+				}			
+			} 
 			
 			function choixStat(select) {
+				if(!nbCou)return;
+				waitingDialog({});
 				var opt = select.selectedOptions[0];
 				var ts = document.getElementById("tabStat"+opt.value);
 				if(ts.style.display == 'none') ts.style.display = 'inline';
+				$('#tabStat'+opt.value+"cont").html('');				
 				if(opt.value==0){					
-					if(!dataType){
-						dataType = new Array();
-						for(var x in cumulType){
-							dataType.push({"Nb d'heure":cumulType[x]["nbHeure"], "Nb d'heure TD":cumulType[x]["nbHeureTD"],'Type':cumulType[x]["Type"]});
-						}
-						creaTable("#tabStat0", dataType, ["Type", "Nb d'heure", "Nb d'heure TD"], [null, "Nb d'heure","Nb d'heure TD"]);
-					}					
+					dataType = new Array();
+					for(var x in cumulType){
+						dataType.push({"Nb d'heure":cumulType[x]["nbHeure"], "Nb d'heure TD":cumulType[x]["nbHeureTD"], "Nb d'heure Tutorat":cumulType[x]["nbHeureTuto"]
+						,'Type':cumulType[x]["Type"], "Nb d'heure Stage":cumulType[x]["nbHeureStage"], "Nb d'heure Contrat Pro":cumulType[x]["nbHeurePro"], "Nb d'heure Jury":cumulType[x]["nbHeureJury"]});
+					}
+					creaTable("#tabStat0cont", dataType, ["Type", "Nb d'heure", "Nb d'heure TD", "Nb d'heure Tutorat", "Nb d'heure Stage", "Nb d'heure Contrat Pro", "Nb d'heure Jury"]
+						, [null, "Nb d'heure","Nb d'heure TD", "Nb d'heure Tutorat", "Nb d'heure Stage", "Nb d'heure Contrat Pro", "Nb d'heure Jury"]);
 				}
 				if(opt.value==1){
-					if(!arrListeInt){
-						arrListeInt = true						
-						for(var i=0; i < nbCou; i++){
-							dataCour[i]["Nb d'heure"]=cumulCou[dataCour[i]["Code EC"]]["nbHeure"];
-							dataCour[i]["Nb d'heure TD"]=cumulCou[dataCour[i]["Code EC"]]["nbHeureTD"];
-							dataCour[i]["intervenants"]=cumulCou[dataCour[i]["Code EC"]]["intervenants"];
-							//construction de la liste pour le planning général
-							if(cumulCou[dataCour[i]["Code EC"]]["nbHeure"]>0){
-								dataCour[i]["intervenants"].forEach(function(d) {
-									if(!dataCour[i]["liste des intervenants"]) dataCour[i]["liste des intervenants"]=d.Nom+" : "+d.nbSeance+" => "+d.nbHeure+" H";
-									else dataCour[i]["liste des intervenants"] += "; "+d.Nom+" : "+d.nbSeance+" => "+d.nbHeure+" H";
-								});	
-							}
+					for(var i=0; i < nbCou; i++){
+						dataCour[i]["Nb d'heure"]=cumulCou[dataCour[i]["Code Apogée"]]["nbHeure"];
+						dataCour[i]["Nb d'heure TD"]=cumulCou[dataCour[i]["Code Apogée"]]["nbHeureTD"];
+						dataCour[i]["intervenants"]=cumulCou[dataCour[i]["Code Apogée"]]["intervenants"];
+						//construction de la liste pour le planning général
+						if(cumulCou[dataCour[i]["Code Apogée"]]["nbHeure"]>0){
+							dataCour[i]["intervenants"].forEach(function(d) {
+								if(!dataCour[i]["liste des intervenants"]) dataCour[i]["liste des intervenants"]=d.Nom+" : "+d.nbSeance+" => "+d.nbHeure+" H";
+								else dataCour[i]["liste des intervenants"] += "; "+d.Nom+" : "+d.nbSeance+" => "+d.nbHeure+" H";
+							});	
 						}
-						//création du tableau des cours
-					    creaTable("#tabStat1", dataCour, ["Intitulés des UE", "Code EC", "Intitulés des EC", "Code Apogée", "Nb d'heure", "Nb d'heure TD", "liste des intervenants"],[null, null, null, null, "Nb d'heure","Nb d'heure TD", null]);
 					}
+					//création du tableau des cours
+				    creaTable("#tabStat1cont", dataCour, ["Intitulés des UE", "Code Apogée", "Intitulés des EC", "Code Apogée", "New Apogée","Nb d'heure", "Nb d'heure TD", "liste des intervenants"],[null, null, null, null, "Nb d'heure","Nb d'heure TD", null]);
 				}				
 				if(opt.value==2){
-					if(!arrListeInt){
-						arrListeInt = true;
-						for(var i=0; i < nbInt; i++){
-							dataInt[i]["Nb d'heure"]=cumulInt[dataInt[i]["Nom"]]["nbHeure"];
-							dataInt[i]["Nb d'heure TD"]=cumulInt[dataInt[i]["Nom"]]["nbHeureTD"];
-							dataInt[i]["cours"]=cumulInt[dataInt[i]["Nom"]]["cours"];
-							//construction de la liste pour le planning général
-							if(cumulInt[dataInt[i]["Nom"]]["nbHeure"]>0){
-								dataInt[i]["cours"].forEach(function(d) {
-									if(!dataInt[i]["liste des cours"]) dataInt[i]["liste des cours"]=d.cours+" : "+d.nbSeance+" => "+d.nbHeure+" H";
-									else dataInt[i]["liste des cours"] += "; "+d.cours+" : "+d.nbSeance+" => "+d.nbHeure+" H";
-								});
-							}
+					var dataCol = ["Civilité", "Prénom", "Nom", "Mail", "Téléphone","Nb d'heure", "Nb d'heure TD", "Type"];
+					var dataColLib = [null, null, null, null, null, "Nb d'heure","Nb d'heure TD", null, null];
+					for(var i=0; i < nbInt; i++){
+						dataInt[i]["Nb d'heure"]=cumulInt[dataInt[i]["Nom"]]["nbHeure"];
+						dataInt[i]["Nb d'heure TD"]=cumulInt[dataInt[i]["Nom"]]["nbHeureTD"];
+						dataInt[i]["cours"]=cumulInt[dataInt[i]["Nom"]]["cours"];
+						//construction de la liste pour le planning général
+						if(cumulInt[dataInt[i]["Nom"]]["nbHeure"]>0){
+							dataInt[i]["cours"].forEach(function(d) {
+								var libListeCours = d.cours+" : nb séance = "+d.nbSeance+" : "+d.nbHeure+" H"+" = "+d.nbHeureTD+" HTD";
+								if(!dataInt[i]["liste des cours"]) dataInt[i]["liste des cours"]=libListeCours;
+								else dataInt[i]["liste des cours"] += "; "+libListeCours;
+								if(!dataCol[d.cours+" HTD"]){
+									dataCol.push(d.cours+" HTD");
+									dataColLib.push(null);
+								}
+								dataInt[i][d.cours+" HTD"]=d.nbHeureTD;
+							});
 						}
-						//création du tableau des intervenants
-					    creaTable("#tabStat2", dataInt, ["Civilité", "Prénom", "Nom", "Nb d'heure", "Nb d'heure TD", "Type", "liste des cours"], [null, null, null, "Nb d'heure","Nb d'heure TD", null, null]);
 					}
-
+					//création du tableau des intervenants
+				    creaTable("#tabStat2cont", dataInt, dataCol, dataColLib);
 				}
 				if(opt.value==3){
-					if(!arrPlanInt){
-						arrPlanInt = true;
-						//tri le tableau
-						cumulPlanInt.sort(function mysortfunction(a, b) {
+					//tri le tableau
+					cumulPlanInt.sort(function mysortfunction(a, b) {
 
-							  var o1 = a.intervenant.toLowerCase();
-							  var o2 = b.intervenant.toLowerCase();
+						  var o1 = a.intervenant.toLowerCase();
+						  var o2 = b.intervenant.toLowerCase();
 
-							  var p1 = a.dateTri;
-							  var p2 = b.dateTri;
+						  var p1 = a.dateTri;
+						  var p2 = b.dateTri;
 
-							  if (o1 != o2) {
-							    if (o1 < o2) return -1;
-							    if (o1 > o2) return 1;
-							    return 0;
-							  }
-							  if (p1 < p2) return -1;
-							  if (p1 > p2) return 1;
-							  return 0;
-							});
-						
-						//création du tableau des planning pour les intervenants
-					    creaTable("#tabStat3", cumulPlanInt, ['intervenant','date','lieu'], [null, null, null]);
-					}
-
+						  if (o1 != o2) {
+						    if (o1 < o2) return -1;
+						    if (o1 > o2) return 1;
+						    return 0;
+						  }
+						  if (p1 < p2) return -1;
+						  if (p1 > p2) return 1;
+						  return 0;
+						});
+					
+					//création du tableau des planning pour les intervenants
+				    creaTable("#tabStat3cont", cumulPlanInt, ['intervenant','date','cours','lieu'], [null, null, null, null]);
 				}
-
-				
+				closeWaitingDialog();
 			} 
 						
 			
 			var parser = function(data) {
+				waitingDialog({});
 				if(!gData) gData = data;
 				gDataCal = data
 
 				//initialisation des cumuls
 				for(var i=0; i < nbInt; i++){
-					cumulType[dataInt[i]["Type"]]={"nbHeure":0,'nbHeureTD':0,'Type':dataInt[i]["Type"]};
+					cumulType[dataInt[i]["Type"]]={"nbHeure":0,'nbHeureTD':0,'nbHeureTuto':0,'nbHeurePro':0,'nbHeureStage':0,'nbHeureJury':0,'Type':dataInt[i]["Type"]};
 					cumulInt[dataInt[i]["Nom"]]= {'nbHeure':0,'nbHeureTD':0,'cours':[]};
 				}
 				for(var i=0; i < nbCou; i++){
-					cumulCou[dataCour[i]["Code EC"]]= {'nbHeure':0,'nbHeureTD':0,'intervenants':[]};
+					cumulCou[dataCour[i]["Code Apogée"]]= {'nbHeure':0,'nbHeureTD':0,'intervenants':[]};
 				}
 
 				//calcule les data pour le calendrier
@@ -297,18 +365,23 @@
 								 console.log("index du cours non trouvé :"+ec);
 							}
 							d['idxCour']=iC;
-							//récupère l'index de l'intervenant
-							var arrInt = interv.split(" ");
-							var iI;
-							//vérifie si l'intervenenat a un prénom
-							if(arrInt.length > 1)
-								iI = idxInt.indexOf(arrInt[1]);
-							else
-								iI = idxInt.indexOf(interv);
-							if(iI==-1){
-								 console.log("index de l'intervenant non trouvé :"+interv);
-							}
-							d['idxInt']=iI;
+							
+							//récupère les index des intervenants
+							d['idxInt']=[];
+							var arrInts = interv.split(",");							
+							arrInts.forEach(function(npInt){
+								var arrInt = npInt.trim().split(" ");
+								var iI;
+								//vérifie si l'intervenenat a un prénom
+								if(arrInt.length > 1)
+									iI = idxInt.indexOf(arrInt[1]);
+								else
+									iI = idxInt.indexOf(interv);
+								if(iI==-1){
+									 console.log("index de l'intervenant non trouvé :"+interv);
+								}
+								d['idxInt'].push(iI);
+							});
 	
 							//on ne prend en compte qu'une date par jour
 							var curDate = new Date(d.start);
@@ -328,65 +401,85 @@
 									nbTD =  Math.round(nbTD*100)/100;
 									//console.log(dateStart+' '+iC+' '+iI+' CM='+nbHCM.toFixed(2)+' TD='+nbHTD.toFixed(2)+' TP='+nbHTP.toFixed(2)+' ='+nbTD);
 									//incrémente le compteur de cours
-									cumulCou[dataCour[iC]["Code EC"]]["nbHeure"] += nbH;
-									cumulCou[dataCour[iC]["Code EC"]]["nbHeureTD"] += nbTD;
+									cumulCou[dataCour[iC]["Code Apogée"]]["nbHeure"] += nbH;
+									cumulCou[dataCour[iC]["Code Apogée"]]["nbHeureTD"] += nbTD;
 									//incrémente le compteur des intervenants
-									cumulInt[dataInt[iI]["Nom"]]["nbHeure"] += nbH;
-									cumulInt[dataInt[iI]["Nom"]]["nbHeureTD"] += nbTD;
-									//incrémente le compteur des types d'intervenants
-									cumulType[dataInt[iI]["Type"]]["nbHeure"]+=nbH;
-									cumulType[dataInt[iI]["Type"]]["nbHeureTD"]+=nbTD;
+									d['idxInt'].forEach(function(iI){
+										cumulInt[dataInt[iI]["Nom"]]["nbHeure"] += nbH;
+										cumulInt[dataInt[iI]["Nom"]]["nbHeureTD"] += nbTD;
+										//incrémente le compteur des types d'intervenants
+										if(ec=="TUTORAT"){
+											cumulType[dataInt[iI]["Type"]]["nbHeureTuto"]+=nbH;
+										}else if(ec=="STAGE"){
+											cumulType[dataInt[iI]["Type"]]["nbHeureStage"]+=nbH;
+										}else if(ec=="CONTRAT"){
+											cumulType[dataInt[iI]["Type"]]["nbHeurePro"]+=nbH;
+										}else if(ec=="JURY"){
+											cumulType[dataInt[iI]["Type"]]["nbHeureJury"]+=nbH;
+										}else{
+											cumulType[dataInt[iI]["Type"]]["nbHeure"]+=nbH;
+											cumulType[dataInt[iI]["Type"]]["nbHeureTD"]+=nbTD;
+										}
 
-									//ajoute les liens entre les intervenants et les cours
-									var itemFind = findArrayObjProp(cumulInt[dataInt[iI]["Nom"]]["cours"],"cours",dataCour[iC]["Code EC"]); 
-									if(itemFind==-1)
-										cumulInt[dataInt[iI]["Nom"]]["cours"].push({"cours":dataCour[iC]["Code EC"],"nbSeance":1,"nbHeure":nbH,"nbHeureTD":nbTD});
-									else{
-										cumulInt[dataInt[iI]["Nom"]]["cours"][itemFind].nbSeance += 1;
-										cumulInt[dataInt[iI]["Nom"]]["cours"][itemFind].nbHeure += nbH;
-										cumulInt[dataInt[iI]["Nom"]]["cours"][itemFind].nbHeureTD += nbTD;
-									}
+										//ajoute les liens entre les intervenants et les cours
+										var libCours;
+										if(dataCour[iC]["New Apogée"] != "?")
+											libCours = dataCour[iC]["New Apogée"];
+										else
+											libCours = dataCour[iC]["Code Apogée"];
+										libCours += " - "+dataCour[iC]["Intitulés des EC"];
+										var itemFind = findArrayObjProp(cumulInt[dataInt[iI]["Nom"]]["cours"],"cours",libCours); 
+										if(itemFind==-1)
+											cumulInt[dataInt[iI]["Nom"]]["cours"].push({"cours":libCours,"nbSeance":1,"nbHeure":nbH,"nbHeureTD":nbTD});
+										else{
+											cumulInt[dataInt[iI]["Nom"]]["cours"][itemFind].nbSeance += 1;
+											cumulInt[dataInt[iI]["Nom"]]["cours"][itemFind].nbHeure += nbH;
+											cumulInt[dataInt[iI]["Nom"]]["cours"][itemFind].nbHeureTD += nbTD;
+										}
 
-									// ajoute les liens entre les cours et les intervenants
-									itemFind = findArrayObjProp(cumulCou[dataCour[iC]["Code EC"]]["intervenants"],"Nom",dataInt[iI]["Nom"]); 
-									if(itemFind==-1)
-										cumulCou[dataCour[iC]["Code EC"]]["intervenants"].push({"Nom":dataInt[iI]["Nom"],"nbSeance":1,"nbHeure":nbH,"nbHeureTD":nbTD});
-									else{
-										cumulCou[dataCour[iC]["Code EC"]]["intervenants"][itemFind].nbSeance += 1;
-										cumulCou[dataCour[iC]["Code EC"]]["intervenants"][itemFind].nbHeure += nbH;
-										cumulCou[dataCour[iC]["Code EC"]]["intervenants"][itemFind].nbHeureTD += nbTD;
-									}
+										// ajoute les liens entre les cours et les intervenants
+										itemFind = findArrayObjProp(cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"],"Nom",dataInt[iI]["Nom"]); 
+										if(itemFind==-1)
+											cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"].push({"Nom":dataInt[iI]["Nom"],"nbSeance":1,"nbHeure":nbH,"nbHeureTD":nbTD});
+										else{
+											cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"][itemFind].nbSeance += 1;
+											cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"][itemFind].nbHeure += nbH;
+											cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"][itemFind].nbHeureTD += nbTD;
+										}
 
-									//ajoute le détail du planning par intervenant
-									cumulPlanInt.push({'intervenant':dataInt[iI]["Prénom"]+" "+dataInt[iI]["Nom"],'dateTri':curDate,'date':planningFormat1(curDate)+planningFormat2(finDate),'lieu':d.location});
-									
-									idxDate = dateStart.getTime()/1000;
-									//la valeur correspond au code couleur correspondant à la journée
-									//rs[idxDate]=parseInt(dataCour[iC]['code jour']);
-									//construction du motif
-									if(oldDate != idxDate && oldDate!=0){
-										//on ajoute le motif
-										idMotif = creaMotif(arrMotif);
-										//la valeur correspond à l'identifiant du motif
-										rs[oldDate]=idMotif;//nbMotif;
-										//rinitialise les valeurs
-										arrMotif = [];
-										oldDate = 0;
-									}
-									//on calcule la position du motif
-									var y = (sizeCell/24)*heureStart;
-									var h = (sizeCell/24)*nbH;
-									//on ajoute une couleur au motif
-							        arrMotif.push({id:dataCour[iC]['code jour'], color:arrColor[dataCour[iC]['code jour']], 'y':y, 'h':h});										
-									oldDate = idxDate;
-									
+										//ajoute le détail du planning par intervenant
+										cumulPlanInt.push({'intervenant':dataInt[iI]["Prénom"]+" "+dataInt[iI]["Nom"],'dateTri':curDate,'date':planningFormat1(curDate)+planningFormat2(finDate)
+											,'cours':dataCour[iC]["Code Apogée"]+" - "+dataCour[iC]["Intitulés des EC"],'lieu':d.location});
+										
+										idxDate = dateStart.getTime()/1000;
+										//la valeur correspond au code couleur correspondant à la journée
+										//rs[idxDate]=parseInt(dataCour[iC]['code jour']);
+										//construction du motif
+										if(oldDate != idxDate && oldDate!=0){
+											//on ajoute le motif
+											idMotif = creaMotif(arrMotif);
+											//la valeur correspond à l'identifiant du motif
+											rs[oldDate]=idMotif;//nbMotif;
+											//rinitialise les valeurs
+											arrMotif = [];
+											oldDate = 0;
+										}
+										//on calcule la position du motif
+										var y = (sizeCell/24)*heureStart;
+										var h = (sizeCell/24)*nbH;
+										//on ajoute une couleur au motif
+								        arrMotif.push({id:dataCour[iC]['code jour'], color:arrColor[dataCour[iC]['code jour']], 'y':y, 'h':h});										
+										oldDate = idxDate;
+										
+									});
+	
 								}
 							}
 						}else{
-							console.log("résumé de l'événement au mauvais format : "+d);
+							console.log("résumé de l'événement au mauvais format : "+dump(d));
 						}
 					}else{
-						console.log("pas de résumé dans l'évènement : "+d);
+						console.log("pas de résumé dans l'évènement : ");
 					}
 				});
 				//création du dernier modif
@@ -403,7 +496,7 @@
 				var S = document.createElement('style');
 				S.setAttribute("type", "text/css");
 				var T = document.createTextNode(style);
-    			S.appendChild(T);
+    				S.appendChild(T);
 				var H = document.getElementsByTagName('head')[0];
 				H.appendChild(S);
 				//
@@ -425,6 +518,7 @@
 				      //.attr("stop-opacity", function(d) { return d.opacity; })
 				      .attr("stop-color", function(d) { return d.color; });				
 				*/
+				closeWaitingDialog();				
 				return rs;
 			};
 
@@ -465,17 +559,37 @@
 				});
 				return verif;
 			}
-			
+
+			function dateDiff(date1, date2){
+			    var diff = {}                           // Initialisation du retour
+			    var tmp = date2 - date1;
+			 
+			    tmp = Math.floor(tmp/1000);             // Nombre de secondes entre les 2 dates
+			    diff.sec = tmp % 60;                    // Extraction du nombre de secondes
+			 
+			    tmp = Math.floor((tmp-diff.sec)/60);    // Nombre de minutes (partie entière)
+			    diff.min = tmp % 60;                    // Extraction du nombre de minutes
+			 
+			    tmp = Math.floor((tmp-diff.min)/60);    // Nombre d'heures (entières)
+			    diff.hour = tmp % 24;                   // Extraction du nombre d'heures
+			     
+			    tmp = Math.floor((tmp-diff.hour)/24);   // Nombre de jours restants
+			    diff.day = tmp;
+			     
+			    return diff;
+			}			
 			function creaPlanning(idCal){
 
+				waitingDialog({});
 				var dtMin = $("#datepickerMin").datepicker("getDate");
 				var dtMax = $("#datepickerMax").datepicker("getDate");
-	
+				var diffDate = dateDiff(dtMin, dtMax); 
+				var nbMois = parseInt(diffDate.day/30);
 				if(!calY){
 					calY = new CalHeatMap();				
 					calY.init({
 						domain:"month", subDomain: "day",cellSize: sizeCell, subDomainTextFormat: "%d", cellPadding: 4, domainMargin: 6
-						,range:6
+						,range:nbMois
 						,legend: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 						,start: dtMin
 						,data:"planning/events?idCal="+idCal+"&timeMax="+dtMax.toISOString()+"&timeMin="+dtMin.toISOString()
@@ -625,6 +739,42 @@
 
 			    
 			}			
-		</script>
+
+			/**
+			 * Function : dump()
+			 * Arguments: The data - array,hash(associative array),object
+			 *    The level - OPTIONAL
+			 * Returns  : The textual representation of the array.
+			 * This function was inspired by the print_r function of PHP.
+			 * This will accept some data as the argument and return a
+			 * text that will be a more readable version of the
+			 * array/hash/object that is given.
+			 * Docs: http://www.openjs.com/scripts/others/dump_function_php_print_r.php
+			 */
+			function dump(arr,level) {
+				var dumped_text = "";
+				if(!level) level = 0;
+				
+				//The padding given at the beginning of the line.
+				var level_padding = "";
+				for(var j=0;j<level+1;j++) level_padding += "    ";
+				
+				if(typeof(arr) == 'object') { //Array/Hashes/Objects 
+					for(var item in arr) {
+						var value = arr[item];
+						
+						if(typeof(value) == 'object') { //If it is an array,
+							dumped_text += level_padding + "'" + item + "' ...\n";
+							dumped_text += dump(value,level+1);
+						} else {
+							dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
+						}
+					}
+				} else { //Stings/Chars/Numbers etc.
+					dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+				}
+				return dumped_text;
+			}			
+			</script>
   </body>
 </html>	

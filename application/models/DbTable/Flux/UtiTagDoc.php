@@ -92,7 +92,7 @@ class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
     {
     	if(!isset($data["poids"]))$data["poids"]=1;        
 		$sql = 'UPDATE flux_utitag SET poids = poids + '.$data["poids"].' WHERE tag_id = '.$data["tag_id"].' AND uti_id ='.$data["uti_id"];
-    	$this->_db->query($sql);    
+    		$this->_db->query($sql);    
     }
     
     /**

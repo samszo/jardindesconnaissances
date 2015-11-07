@@ -3,10 +3,21 @@ require_once( "../application/configs/config.php" );
 
 try {
 	$application->bootstrap();
+	$s = new Flux_Site(false,true);
+	$s->trace("DEBUT TEST");		
 	
 	$user = "luckysemiosis";
 	$pwd = "samszo";
 
+	/*
+	$client = new Google_Client();
+	$client->setClientId(KEY_GOOGLE_CLIENT_ID);
+	$client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
+	$client->setRedirectUri('http://localhost/jdc/public/auth/google');
+	$client->addScope("https://www.google.com/calendar/feeds/");
+	$url = $client->createAuthUrl();
+	*/
+	
 	/*
 	$ieml = new Flux_IEML("flux_ieml");
 	//$ieml->genereSequences(3,true);
@@ -210,19 +221,26 @@ try {
 	//$rs = $dbD->findDocTroncByTagId("10", array("intelligence","collective"));
 	
 	
-	$s = new Flux_Stats("flux_sic");
-	$stats = $s->GetTagHisto(array("information","communication"),"", "Y");	    
+	//$s = new Flux_Stats("flux_sic");
+	//$stats = $s->GetTagHisto(array("information","communication"),"", "Y");	    
 	//$stats = $s->GetMatriceTagAssos(array("intelligence","collective"),-1);	    
 	//$s->forceCalcul = true;
 	//$s->update("simple");
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
-    //$diigo = new Flux_Diigo($user,$pwd,"flux_diigo");
-	//$diigo->saveAll();
-    //$diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
-    //$diigo->getGroupeRss("bulles");
-	//$diigo->getRequest(array("user"=>$user,"count"=>100));
-    //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));	
+    $diigo = new Flux_Diigo("luckysemiosis","samszo","flux_evaletu",true);
+    $diigo->bTraceFlush = true;
+    $arrCompte = array("ernestovi","Arso972","milounis","crazyyoshi","Ghislainguy","noelno","wumiolabisi","BCottereau","carolinemourer","DjamelMeziane","elographicdesigner","nazadounet","Sissiwiki","arzouz");
+    $arrCompte = array("FatihiZakaria","jean888","ettanass","elyaagoubimhamed","thypbast","kesraoui","Elalami90","Yannmahuet","herrhilmi","mkrayem","babachir","darkmido","elmounjide","abdel1314","elmiloudiasmae","taoufik072","NKalmouni","faizaelmoufid","samiaMALKI","brenda78","BDalila","yasmina1");
+    foreach ($arrCompte as $c) {
+    		$diigo->saveAll($c);
+	}
+	/*
+    $diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
+    $diigo->getGroupeRss("bulles");
+	$diigo->getRequest(array("user"=>$user,"count"=>100));
+    $diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));	
+	*/
 		
 	//$audio = new Flux_Audio(false);
 	//$audio->getOggInfos("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
@@ -311,13 +329,15 @@ try {
 	*/
 	//$response = $server->handle();
 
+	$s->trace("FIN TEST");			
+	
 }catch (Zend_Exception $e) {
 	 echo "<h1>Erreur d'exécution</h1>
-  <h2>".$this->message."</h2>
+  <h2>".$e->message."</h2>
   <h3>Exception information:</h3>
-  <p><b>Message:</b>".$this->exception->getMessage()."</p>
+  <p><b>Message:</b>".$e->exception->getMessage()."</p>
   <h3>Stack trace:</h3>
-  <pre>".$this->exception->getTraceAsString()."</pre>
+  <pre>".$e->exception->getTraceAsString()."</pre>
   <h3>Request Parameters:</h3>
   <pre>".var_export($this->request->getParams(), true)."</pre>";
 }

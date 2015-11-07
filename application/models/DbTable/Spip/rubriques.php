@@ -28,10 +28,13 @@ class Model_DbTable_Spip_rubriques extends Zend_Db_Table_Abstract
     protected $_primary = 'id_rubrique';
 	
 
+	//ATTENTION SPIP 3 supprime 
+	// Model_DbTable_Spip_auteursrubriques remplacé par spip_auteurs_liens
+	// Model_DbTable_Spip_motsrubriques remplacé par spip_auteurs_liens Model_DbTable_Spip_motsliens
     protected $_dependentTables = array(
-       "Model_DbTable_Spip_auteursrubriques"
+    		"Model_DbTable_Spip_auteursliens"
        ,"Model_DbTable_Spip_documentsliens"
-       ,"Model_DbTable_Spip_motsrubriques"
+       ,"Model_DbTable_Spip_motsliens"
        ,"Model_DbTable_Spip_articles"
        );
     
@@ -103,12 +106,12 @@ class Model_DbTable_Spip_rubriques extends Zend_Db_Table_Abstract
         foreach($dt as $t){
         	//echo $t;
         	$dbT = new $t($this->_db);
-        	if($t=="Model_DbTable_Spip_documentsliens")
-		        $dbT->delete('objet="rubrique" AND id_objet = '.$id);
+        	if($t=="Model_DbTable_Spip_documentsliens" || $t=="Model_DbTable_Spip_auteursliens" || $t=="Model_DbTable_Spip_motsliens" )
+		    $dbT->delete('objet="rubrique" AND id_objet = '.$id);
         	elseif($t=="Model_DbTable_Spip_articles")
-		        $dbT->removeRub($id);
-		    else
-		        $dbT->delete('id_rubrique = '.$id);
+		    $dbT->removeRub($id);
+		else
+			$dbT->delete('id_rubrique = '.$id);
         }            	    	
     	$this->delete('spip_rubriques.id_rubrique = ' . $id);
     	
@@ -124,11 +127,11 @@ class Model_DbTable_Spip_rubriques extends Zend_Db_Table_Abstract
      */
     public function removeAll($id)
     {
-    	$arr = $this->findById_parent($id);
-    	foreach ($arr as $rub) {
-    		$this->removeAll($rub["id_rubrique"]);
-    	}
-    	$this->remove($id);
+	    	$arr = $this->findById_parent($id);
+	    	foreach ($arr as $rub) {
+	    		$this->removeAll($rub["id_rubrique"]);
+	    	}
+	    	$this->remove($id);
     }
     
     /**
@@ -169,7 +172,8 @@ class Model_DbTable_Spip_rubriques extends Zend_Db_Table_Abstract
                     ->from( array("s" => "spip_rubriques") )                           
                     ->where( "s.id_rubrique = ?", $id_rubrique );
 
-        return $this->fetchAll($query)->toArray(); 
+         $rs = $this->fetchAll($query)->toArray(); 
+         if(count($rs))return $rs[0]; else return false;
     }
     	/**
      * Recherche une entrée Spip_rubriques avec la valeur spécifiée

@@ -68,9 +68,10 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     	$id=false;
     	if($existe)$id = $this->existe($data);
     	if(!$id){
-    		$data = $this->updateHierarchie($data);
     		if(!isset($data["pubDate"])) $data["pubDate"] = new Zend_Db_Expr('NOW()');
-    	 	$id = $this->insert($data);
+    		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
+    		$dt = $this->updateHierarchie($data);
+    		$id = $this->insert($dt);
     	}else{
     		/*met à jour le poids
     		if(isset($data["poids"])){
@@ -82,12 +83,12 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     			$dt["note"] = $data["note"];
     			$this->edit($id[0]["doc_id"], $dt);
     		}
-    		*/
+    		*/    		
     		$id = $id[0]["doc_id"];
     	}
     	if($rs)
     		return $this->findBydoc_id($id);
-	    else
+	else
 	    	return $id;
     	
     }     
@@ -123,31 +124,31 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     	
     		if(isset($data["parent"])){
 	    		//récupère les information du parent
-	    		$arrP = $this->findBydoc_id($data["parent"]);
+	    		$arr = $this->findBydoc_id($data["parent"]);
 	    		//gestion des hiérarchies gauche droite
 	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
 	    		//vérifie si le parent à des enfants
-	    		$arr = $this->findByParent($data["parent"]);
-	    		if(count($arr)>0){
+	    		$arrP = $this->findByParent($data["parent"]);
+	    		if(count($arrP)>0){
 	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
+	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arr['rgt'];
 	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
+	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arr['rgt'];
 	    			$stmt = $this->_db->query($sql);
 	    			//
-	    			$data['lft'] = $arr[0]['rgt']+1;
-	    			$data['rgt'] = $arr[0]['rgt']+2;
+	    			$data['lft'] = $arr['rgt']+1;
+	    			$data['rgt'] = $arr['rgt']+2;
 	    		}else{
 	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arrP['lft'];
+	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arr['lft'];
 	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arrP['lft'];
+	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arr['lft'];
 	    			$stmt = $this->_db->query($sql);
 	    			//
-	    			$data['lft'] = $arr[0]['lft']+1;
-	    			$data['rgt'] = $arr[0]['lft']+2;
+	    			$data['lft'] = $arr['lft']+1;
+	    			$data['rgt'] = $arr['lft']+2;
 	    		}    		
-	    		$data['niveau'] = $arrP['niveau']+1;
+	    		$data['niveau'] = $arr['niveau']+1;
     		}
     		if(!isset($data['lft']))$data['lft']=0;    		
     		if(!isset($data['rgt']))$data['rgt']=1;    		
@@ -258,13 +259,12 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     public function findLastDoc($UtiId)
     {
-    	$sql = "SELECT Max(d.maj) maj
-    		FROM flux_doc d 
-    		INNER JOIN flux_UtiDoc ud ON ud.doc_id = d.doc_id 
-    		INNER JOIN flux_Uti u ON u.uti_id = ud.uti_id AND u.uti_id  = ".$UtiId;
-        $db = Zend_Db_Table::getDefaultAdapter();
-    	$stmt = $db->query($sql);
-    	return $stmt->fetchAll();
+	    	$sql = "SELECT Max(d.maj) maj
+	    		FROM flux_doc d 
+	    		INNER JOIN flux_UtiDoc ud ON ud.doc_id = d.doc_id 
+	    		INNER JOIN flux_Uti u ON u.uti_id = ud.uti_id AND u.uti_id  = ".$UtiId;
+	    	$stmt = $this->_db->query($sql);
+	    	return $stmt->fetchAll();
     }
         
     /**
@@ -323,18 +323,34 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
-    /**
+/**
      * Recherche une entrée flux_doc avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param varchar $tronc
+     * @param varchar 	$tronc
+     * @param boolean 	$avecUti
+     * @param array 		$rows
+     * 
+     * @return array
      */
-    public function findByTronc($tronc)
+    public function findByTronc($tronc, $avecUti=false, $rows=false)
     {
-        $query = $this->select()
-                    ->from( array("f" => "flux_doc") )                           
-                    ->where( "f.tronc = ?", $tronc );
-
+    		if($rows){
+    			$query = $this->select()
+            		->from( array("f" => "flux_doc"), $rows)                           
+                ->where( "f.tronc = ?", $tronc );
+    		}else{
+    			$query = $this->select()
+            		->from( array("f" => "flux_doc"))                           
+                ->where( "f.tronc = ?", $tronc );
+    		}
+    			
+        if($avecUti){
+            $query->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            		->joinInner(array('ud' => 'flux_utidoc'),'ud.doc_id = f.doc_id',array('maj', 'poids'))
+            		->joinInner(array('u' => 'flux_uti'),'ud.uti_id = u.uti_id',array('uti_id',"login"));            
+        }
+                    
         return $this->fetchAll($query)->toArray(); 
     }
     /**
@@ -479,9 +495,9 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
         	->from( array("f" => "flux_doc") )                           
 			->group("f.doc_id");
         if($idUti)
-            $query->joinInner(array('utd' => 'flux_utitagdoc'),'utd.uti_id = '.$idUti.' AND utd.doc_id = f.doc_id',array('uti_id'));
+            $query->joinInner(array('utd' => 'flux_utitagdoc'),'utd.uti_id = '.$idUti.' AND utd.doc_id = f.doc_id',array('uti_id',"login"));
 		else
-            $query->joinInner(array('utd' => 'flux_utitagdoc'),'utd.doc_id = f.doc_id',array('uti_id'));
+            $query->joinInner(array('utd' => 'flux_utitagdoc'),'utd.doc_id = f.doc_id',array('uti_id', "login"));
 		
 		if($like)
 			$query->where( "f.tronc LIKE '%".$tronc."%'");
@@ -490,6 +506,25 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
 		
         return $this->fetchAll($query)->toArray(); 
     } 
+    
+    /**
+     * Recherche des entrée pour un utilisateur
+     *
+     * @param integer $idUti
+     *
+     * @return array
+     */
+    public function findByUti($idUti)
+    {
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("f" => "flux_doc") )                           
+			->group("f.doc_id");
+        $query->joinInner(array('utd' => 'flux_utitagdoc'),'utd.uti_id = '.$idUti.' AND utd.doc_id = f.doc_id',array('uti_id',"login"));
+		
+        return $this->fetchAll($query)->toArray(); 
+    } 
+    
     
     /**
      * Recherche des entrées avec une filtre
@@ -689,4 +724,28 @@ WHERE d.titre = 'axesEval'
         $result = $this->fetchAll($query);
         return $result->toArray(); 
     }    
+    
+    
+     /**
+     * Copie un document et tous ses enfants
+     *
+     * @param integer $idDoc
+     * @param integer $idParent
+     * 
+     * @return array
+     */
+    public function copie($idDoc, $idParent=0)
+    {
+    		$arr = $this->findBydoc_id($idDoc);
+    		unset($arr["doc_id"]);
+    		unset($arr["pubDate"]);
+    		unset($arr["maj"]);
+    		unset($arr["lft"]);
+    		unset($arr["rgt"]);
+    		if($idParent)$arr["parent"]=$idParent;
+    		$dt = $this->ajouter($arr,false,true);
+
+        return $dt; 
+    }    
+    
 }

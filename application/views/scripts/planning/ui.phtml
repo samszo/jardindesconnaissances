@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+	    <title>Planning - Tableau de bord</title>
+	    <link rel="stylesheet" type="text/css" href="../css/w2ui.css" />
+	    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+		<script type="text/javascript">
+			//pour la gestion des vues ajax
+			var urlP = "";
+			var fctInit = false;
+			var rsCalendar = <?php echo  json_encode($this->plannings); ?>;
+			
+			var rsInter, idxInter, rsCour, idxCour;
+		</script>		
+		<script type="text/javascript" src="../js/d3.js"></script>
+	    <script type="text/javascript" src="../js/jquery.min.js"></script>
+	    <script type="text/javascript" src="../js/w2ui.js"></script>
+		<script type="text/javascript">
+			//pur la gestion des vues ajax
+			function init() {
+			};		
+		</script>		
+	</head>
+	<body onload="init()">
+	
+		<div id="layoutMain" style="width: 100%; height: 800px;"></div>
+		
+		<script type="text/javascript">
+
+	    var pstyle = 'border: 1px solid #dfdfdf; padding: 5px;';
+	    var config = {
+			    layoutMain: {
+			        name: 'layoutMain',
+			        padding: 4,
+			        panels: [
+			            { type: 'top', size: 50, resizable: false, style: pstyle, content: '<div id="toolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>' },
+			            { type: 'left', size: 200, resizable: true, style: pstyle, content: 'mettre ici les photos' },
+			            { type: 'main', style: pstyle, resizable: true, content: 'main', size:'100%'  },
+			            { type: 'right', size: 200, resizable: true, style: pstyle, content: 'mettre ici la légende' },
+			            { type: 'bottom', size: 50, resizable: false, style: pstyle, content: 'mettre ici la date' }
+			       	]
+			    },
+			    tbMain : {
+				    name: 'tbMain',
+				    items: [
+			            { type: 'menu',   id: 'mnuP', caption: 'Plannings', icon: 'fa-calendar'
+				            , items: rsCalendar},
+				        { type: 'break',  id: 'break' },
+			            { type: 'menu',   id: 'mnuI', caption: 'Intervenants', icon:'fa-group'
+				            , items: rsInter},
+				        { type: 'break',  id: 'break0' },
+			            { type: 'menu',   id: 'mnuC', caption: 'Cours', icon:'fa-book'
+				            , items: rsCour},
+				        { type: 'button',  id: 'tbEtudiant', caption: 'Etudiants', icon:'fa-book'},
+				        { type: 'break',  id: 'break1' },
+				        { type: 'button',  id: 'tbCour', caption: 'Cours', icon:'fa-language'},
+				        { type: 'break',  id: 'break2' },
+				        { type: 'button',  id: 'tbStat', caption: 'Statistiques', icon:'fa-language'},
+				        { type: 'break',  id: 'break3' },
+				        { type: 'spacer' },
+				        { type: 'button',  id: 'actu',  caption: 'actualiser', icon: 'fa-refresh' },
+				        { type: 'break',  id: 'break4' },
+				        { type: 'button',  id: 'utiSignOut',  caption: 'déconnexion', icon: 'fa-sign-out' }
+				    ],
+		            onClick: function (event) {
+		                if (event.target == 'utiSignOut') {
+			                	document.location.href="..<?php  echo $this->redirect; ?>&logout=1";
+		                }
+		                if (event.target.substring(0, 4) == 'mnuP' && event.subItem) {
+			                	//charge le calendrier
+		                		getDataPlanning(event.subItem);
+		                }
+		            }
+			    },
+			    gridCalendrier: { 
+			        name: 'gridCalendrier', 
+					header: 'Calendrier',		
+			        show: { 
+						header			: false,		
+			            toolbar			: false,
+						toolbarReload   : false,
+						toolbarColumns  : false,
+			            	toolbarSearch   : false,
+			            	toolbarAdd      : false,
+			            	toolbarDelete   : false,
+			            	toolbarSave		: false,
+			        },
+			        columnGroups: [
+						{ caption: 'SEPTEMBRE', span: 6}
+			        ],
+			        columns: [         
+			            { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
+			            { field: 'jour', caption: 'Date', size: '80px', sortable: true, resizable: true},
+			            { field: 'nbHeure', caption: 'cours', size: '50px', sortable: true, resizable: true},
+			            { field: 'nbHeureJury', caption: 'jury', size: '50px', sortable: true, resizable: true},
+			            { field: 'nbHeureTuto', caption: 'tutorat', size: '50px', sortable: true, resizable: true},
+			            { field: 'nbHeurePro', caption: 'contrat', size: '50px', sortable: true, resizable: true},
+			            { field: 'nbHeureStage', caption: 'stage', size: '50px', sortable: true, resizable: true},
+			        ],
+			        toolbar: {
+			            items: [
+			                { id: 'export', type: 'button', caption: 'Exporter', icon: 'fa-file' }
+			            ],
+			            onClick: function (event) {
+			            }
+			        }
+			    }
+	    }		
+		$(function () {
+					    
+		    $('#layoutMain').w2layout(config.layoutMain);
+		    w2ui.layoutMain.content('top', $().w2toolbar(config.tbMain)); 
+		    w2ui.layoutMain.content('main', $().w2grid(config.gridCalendrier)); 		    
+
+		});
+
+		var urlCouTot = "../flux/google?type=css&gDocId=1vXOt_DiLRVdBWF9qw-XiP_DTFgmmM9cuZSMMnZyA3qo";
+		var urlIntTot = "../flux/google?type=css&gDocId=1R_Drqn_lubZgjkmu3kHicDt9GMFhqm-J7RyTmJVNtJs";
+		var gData, gDataCal, dataCour, idxCour, dataInt, idxInt;
+		//var urlCou = {"L3 PRO CDNL":"../data/planning/CDNL14-15_cours.csv"};
+		var urlCou = {
+				"Master 2 THYP":urlCouTot
+				,"Master 2 PTN":urlCouTot
+				,"L3 PRO CDNL":urlCouTot
+				,"Master 2 NET":"../flux/google?type=css&gDocId=1gYZxHacQ-dy7mHpIKbxKlAu1YLTSs-4SrJEmoVdFolU"
+				,"Master 1 CEN":urlCouTot
+				,"Master 1 GSI":urlCouTot
+				,"Master 2 GSI":urlCouTot
+				,"Master 2 AVUN":urlCouTot
+				,"Master 2 CEN":urlCouTot
+				,"CreaTIC Hypermedia":urlCouTot
+				};
+		//var urlInt = {"L3 PRO CDNL":"../data/planning/CDNL14-15_intervenants.csv"};
+		var urlInt = {
+				"Master 2 THYP":urlIntTot
+				,"Master 2 PTN":urlIntTot
+				,"L3 PRO CDNL":urlIntTot
+				,"Master 2 NET":"../flux/google?type=css&gDocId=1fvVB3bDR74KnYgBhKJgttzqqwygfpuD_OaCu9zOgZ7A"
+				,"Master 1 CEN":urlIntTot
+				,"Master 1 GSI":urlIntTot
+				,"Master 2 GSI":urlIntTot
+				,"Master 2 AVUN":urlIntTot
+				,"Master 2 CEN":urlIntTot
+				,"CreaTIC Hypermedia":urlIntTot
+				};
+
+		function lock (msg) {
+		    w2popup.lock(msg, true);
+		}
+				
+	    function getDataPlanning(sltPlan){
+			if(urlCou[sltPlan.text] && urlInt[sltPlan.text]){	
+				lock("Veuillez patienter pendant le chargement des données");				
+				//chargement des données depuis les fichiers csv
+				d3.csv(urlCou[sltPlan.text], function(data1) {
+					rsCour = data1;
+					//création de l'index des cours
+					idxCour = [];
+					rsCour.forEach(function(d) {
+						idxCour.push(d["Code Apogée"]);
+						d.text = d["Code Apogée"]+" "+d["Intitulés des EC"];
+					});
+					//rafraichi le menu
+					var it = w2ui['tbMain'].get('mnuC');
+					it.items = rsCour;
+					w2ui['tbMain'].refresh('mnuC');
+					
+					d3.csv(urlInt[sltPlan.text], function(data3) {
+						rsInter = data3;
+						//création de l'index des intervenants
+						idxInt = [];
+						rsInter.forEach(function(d) {
+							idxInt.push(d["Nom"]);
+							d.text = d["Prénom"] +' '+  d["Nom"];
+						});
+						//rafraichi le menu
+						var it = w2ui['tbMain'].get('mnuI');
+						it.items = rsInter;
+						w2ui['tbMain'].refresh('mnuI');
+						//creaPlanning(sltPlan.value);				
+					});
+				});
+			}else{
+				alert("pas de données de cours pour ce planning");
+			}
+		}
+		
+		</script>
+	
+	</body>
+</html>

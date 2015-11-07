@@ -49,8 +49,8 @@ class ICEController extends Zend_Controller_Action {
 				//on créer une nouvelle monade
 				$dbM = new Model_DbTable_Flux_Monade($o->db);
 				$r = $dbM->creer(array("titre"=>$this->_getParam('titre'), "uti_id"=>$ssUti->idUti));				
-    			$r["ICE"] = $dbM->getICE($r["monade_id"]);    			
-    			$this->view->data = $r;
+	    			$r["ICE"] = $dbM->getICE($r["monade_id"]);    			
+	    			$this->view->data = $r;
     			//
 			}else{
 				if(isset($ssUti->redir))
@@ -70,8 +70,8 @@ class ICEController extends Zend_Controller_Action {
 				//on ajoute un nouveau document pour la monade
 				$dbM = new Model_DbTable_Flux_Monade($o->db);
 				$dbM->ajoutDoc($this->_getParam('idMon'), $this->_getParam('data'));				
-    			$r["ICE"] = $dbM->getICE($this->_getParam('idMon'));    			
-    			$this->view->data = $r;
+    				$r["ICE"] = $dbM->getICE($this->_getParam('idMon'));    			
+    				$this->view->data = $r;
     			//
 			}else{
 				if(isset($ssUti->redir))

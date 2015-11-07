@@ -70,7 +70,7 @@ class Model_DbTable_Flux_Monade extends Zend_Db_Table_Abstract
      */
     public function creer($data, $existe=true)
     {
-    	$r = $this->ajouter(array("titre"=>$data['titre']));
+    		$r = $this->ajouter(array("titre"=>$data['titre']));
 		//on la lie à l'utilisateur
 		$dbUM = new Model_DbTable_flux_UtiMonade($this->_db);
 		$dbUM->ajouter(array("uti_id"=>$data['uti_id'], "monade_id"=>$r["monade_id"]));
@@ -138,7 +138,6 @@ class Model_DbTable_Flux_Monade extends Zend_Db_Table_Abstract
 		$dbD = new Model_DbTable_Flux_Doc($this->_db);
 		$data = $dbD->ajouter($data, true, true);
 		
-		// on ajoute une définition svg
 		// on ajoute une définition svg
 		if(!$this->dbSvg)$this->dbSvg = new Model_DbTable_Flux_Svg($this->_db);
 		//pour le rapport

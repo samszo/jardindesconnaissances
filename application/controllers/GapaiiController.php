@@ -65,5 +65,8 @@ class GapaiiController extends Zend_Controller_Action {
 		$g = new Flux_Gapaii($this->_getParam('idBase', $this->dbNom));
 		$this->view->data = $g->getEval($this->_getParam('idDoc'), $this->_getParam('idUti'), $this->_getParam('idTag'));
 	}
-	
+
+	/**TODO: utiliser ce type de requête pour proposer des images plutôt que des mots
+	 * http://thenounproject.com/search/?q=animal
+	 */
 }

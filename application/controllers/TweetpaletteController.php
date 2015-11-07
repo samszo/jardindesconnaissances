@@ -24,7 +24,7 @@ class TweetpaletteController extends Zend_Controller_Action {
 			    // l'identité existe ; on la récupère
 			    $this->view->identite = $auth->getIdentity();
 			    $ssUti = new Zend_Session_Namespace('uti');
-			    $this->view->idUti = $ssUti->idUti;
+			    $this->view->idUti = 1;//$ssUti->idUti;
 			    $this->view->tag = $this->_getParam('tag');
 			    $this->view->url = $this->_getParam('url');
 			    $this->view->idBase = $this->dbNom;

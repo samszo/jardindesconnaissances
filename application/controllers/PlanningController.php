@@ -12,8 +12,6 @@ require_once 'Zend/Controller/Action.php';
 class PlanningController extends Zend_Controller_Action {
 	
 	var $dbNom = "flux_etu";
- 	var $client_id = '77330937798-6h0j3fcu56mi3vt54mal0j5sg37ijkug.apps.googleusercontent.com';
- 	var $client_secret = 'FlimbY2obkI3p6zUYtsMyfdx';
 		
 	/**
 	 * The default action - show the home page
@@ -21,14 +19,14 @@ class PlanningController extends Zend_Controller_Action {
 	public function indexAction() {
 
 		$this->view->dbNom = $this->dbNom;
-		$ssPlan = new Zend_Session_Namespace('planning');
+		$ssPlan = new Zend_Session_Namespace('google');
 		
 		if(!$ssPlan->client){
 			$client = new Google_Client();
-			$client->setClientId($this->client_id);
-			$client->setClientSecret($this->client_secret);
+			$client->setClientId(KEY_GOOGLE_CLIENT_ID);
+			$client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
 			$client->setRedirectUri('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/planning");
-			$client->addScope("https://www.googleapis.com/auth/calendar");
+			$client->addScope(array("https://www.googleapis.com/auth/calendar","https://www.googleapis.com/auth/drive"));
 			$ssPlan->client = $client;
 		}else
 			$client = $ssPlan->client;			
@@ -38,7 +36,9 @@ class PlanningController extends Zend_Controller_Action {
 		  local access token in this case
 		************************************************/
 		if ($this->_getParam('logout')) {
-		  $ssPlan->token = false;
+		  	$ssPlan->token = false;
+			unset($_SESSION['upload_token']);		  	
+		  	Zend_Session::namespaceUnset('google');		  	
 		}
 		
 		/************************************************
@@ -69,21 +69,6 @@ class PlanningController extends Zend_Controller_Action {
 		if ($ssPlan->token) {
 		  	//echo "token=".$ssPlan->token;
 		  	$this->verifExpireToken($ssPlan);
-			/*
-		  	$client->setAccessToken($ssPlan->token);
-			if ($client->isAccessTokenExpired()) {
-			    $ssPlan->token=false;
-			    $this->_redirect('/planning');
-			}else{
-				$gCal = new Flux_Gcalendar($ssPlan->token);
-				//vérifie si le calendrier est géré
-				$arrCal = $gCal->getListeCalendar();
-				foreach ($arrCal as $cal) {
-					if($cal["access"]!="reader")$planning[]=$cal;
-				}
-				$this->view->plannings = $planning; 				
-			}
-			*/		  	
 			$gCal = new Flux_Gcalendar($ssPlan->token);
 			//vérifie si le calendrier est géré
 			$arrCal = $gCal->getListeCalendar();
@@ -95,25 +80,38 @@ class PlanningController extends Zend_Controller_Action {
 		}else{
 		  $this->view->authUrl = $client->createAuthUrl();						
 		}			
-		
 	}
 
 	/**
 	 * action permettant de recupérer les données d'un calendrier
 	 */
 	public function eventsAction() {
-		$ssPlan = new Zend_Session_Namespace('planning');			
+		$ssPlan = new Zend_Session_Namespace('google');			
 		if ($this->_getParam('idCal') && $ssPlan->token) {
 			$gCal = new Flux_Gcalendar($ssPlan->token);
 			$optParams = array();
 			if($this->_getParam('timeMax')) $optParams["timeMax"]=$this->_getParam('timeMax');
 			if($this->_getParam('timeMin')) $optParams["timeMin"]=$this->_getParam('timeMin');
-			$this->view->data = $gCal->getListeEvents($this->_getParam('idCal'), $optParams);			
-			
+			$this->view->data = $gCal->getListeEvents($this->_getParam('idCal'), $optParams);						
 		}
 		
 	}
 
+	/**
+	 * action permettant d'afficher le tableau de bord
+	 */
+	public function uiAction() {
+
+		$ssPlan = new Zend_Session_Namespace('google');
+		$this->view->redirect = '/auth/google?scopes[]=Calendar&scopes[]=Drive&redir='.urlencode('/planning/ui');		
+		if(!$ssPlan->client){
+			$this->_redirect($this->view->redirect);			
+		}else{
+			$this->view->plannings = $this->getUserCalendar($ssPlan);
+		}
+		
+	}	
+	
 	private function verifExpireToken($ssPlan){
 		$ssPlan->client->setAccessToken($ssPlan->token);
 		if ($ssPlan->client->isAccessTokenExpired()) {
@@ -122,4 +120,21 @@ class PlanningController extends Zend_Controller_Action {
 		}
 	}
 	
+	private function getUserCalendar($ssPlan){
+	  	$this->verifExpireToken($ssPlan);
+	  	$s = new Flux_Site();
+		$gCal = new Flux_Gcalendar($ssPlan->token);
+		//vérifie si le calendrier est géré
+		$arrCal = $gCal->getListeCalendar();
+		foreach ($arrCal as $cal) {
+			$p = array("text"=>$cal["summary"],"id"=>$cal["id"]);
+			if($cal["access"]!="reader")$planning[$cal["summary"]]=$p;
+		}
+		//tri le résultat
+		ksort($planning);
+		foreach ($planning as $p) {
+		    $sPlan[]=$p;
+		}				
+		return $sPlan;						
+	}
 }

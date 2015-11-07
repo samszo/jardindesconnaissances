@@ -77,13 +77,20 @@ class GraphController extends Zend_Controller_Action {
 	    $request = $this->getRequest();
 		$url = $request->getRequestUri();
 		$arrUrl = explode("?",$url);
-		$idBase = "flux_DeleuzeSpinoza";
-		$s = new Flux_Site($idBase);		
+		$this->view->idBase = $this->_getParam('idBase', "flux_DeleuzeSpinoza");
+		$s = new Flux_Site($this->view->idBase);		
 		$dbU = new Model_DbTable_Flux_Uti($s->db);
 		$this->view->utis = json_encode($dbU->getAll(array("login")));
 		
-		//$this->view->urlStats = "../stat/tagassos?idBase=".$idBase."&tags[]=intelligence&tags[]=collective";	    
-		$this->view->urlStats = "../stat/tagassos?idBase=".$idBase."&tags[]=rapport";	    
+		$this->view->idUti = $this->_getParam('idUti');
+		$this->view->svg = $this->_getParam('svg');
+		if($this->view->idUti){
+			$this->view->urlStats = "../stat/taguti?idBase=".$this->view->idBase."&idUti=".$this->view->idUti;	    
+		}else{
+			//$this->view->urlStats = "../stat/tagassos?idBase=".$idBase."&tags[]=intelligence&tags[]=collective";	    
+			$this->view->urlStats = "../stat/tagassos?idBase=".$this->view->idBase."&tags[]=rapport";	    
+		}
+		
     }	
 
     public function arbreAction()
@@ -235,4 +242,15 @@ class GraphController extends Zend_Controller_Action {
     public function d3treemapAction(){
     	
     }
+    
+    public function grapheditorAction(){
+		$this->view->connect =  $this->_getParam('connect', 1);
+    		$this->view->idBase =  $this->_getParam('idBase', "flux_biolographes");
+    	
+    }
+    
+    public function barsmatrixAction(){
+    	
+    }
+    
 }

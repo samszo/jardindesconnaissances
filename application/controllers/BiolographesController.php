@@ -28,7 +28,6 @@ class BiolographesController extends Zend_Controller_Action {
 
     public function editeurAction()
     {
-    		//controller pour l'éditeur
 		$this->view->connect =  $this->_getParam('connect', 0);
     		$this->view->idBase =  $this->_getParam('idBase', "flux_biolographes");
     }	    

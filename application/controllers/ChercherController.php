@@ -38,7 +38,7 @@ class ChercherController extends Zend_Controller_Action {
 	 */
 	public function resultatAction() {
 	    $this->view->resultats = "";
-    	if($this->_getParam('recherche', 0)){
+    		if($this->_getParam('recherche', 0)){
 			$lu = new Flux_Lucene(null, null, "flux_DeleuzeSpinoza", false, '../data/deleuze-index');
 			$hits = $lu->find($this->_getParam('recherche', 0));
 			$arr="";

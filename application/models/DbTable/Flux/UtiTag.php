@@ -136,10 +136,11 @@ class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
      * et retourne les entrées.
      *
      * @param string $uti
+     * @param string $flux
      * 
      * @return array
      */
-    public function findTagByUti($uti)
+    public function findTagByUti($uti, $flux="")
     {
         $query = $this->select()
 	     	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
@@ -150,7 +151,7 @@ class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
             	'u.uti_id = ut.uti_id ', array('login'))
             ->where("u.login = ? ", $uti)
             ->order(array("u.login", "t.code"));
-            
+        if($flux)$query->where("u.flux = ? ", $flux);    
         return $this->fetchAll($query)->toArray(); 
 
     }
@@ -194,18 +195,28 @@ class Model_DbTable_flux_utitag extends Zend_Db_Table_Abstract
      * Recherche une entrée flux_utitag avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param int $uti_id
+     * @param int 		$uti_id
+     * @param string 	$flux
+     * 
+     * @return array
      */
-    public function findByUti_id($uti_id)
+    public function findTagByUtiId($uti_id, $flux="")
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_utitag") )                           
-                    ->where( "f.uti_id = ?", $uti_id );
-
+	     	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->from(array('ut' => 'flux_utitag'))
+            ->joinInner(array('t' => 'Flux_Tag'),
+            	'ut.tag_id = t.tag_id', array('code'))
+            ->joinInner(array('u' => 'Flux_Uti'),
+            	'u.uti_id = ut.uti_id ', array('login'))
+            ->where("u.uti_id = ? ", $uti_id)
+            ->order(array("t.code"));
+        if($flux)$query->where("u.flux = ? ", $flux);    
+            
         return $this->fetchAll($query)->toArray(); 
     }
     
-    /*
+    /**
      * Recherche une entrée flux_utitag avec la valeur spécifiée
      * et retourne cette entrée.
      *

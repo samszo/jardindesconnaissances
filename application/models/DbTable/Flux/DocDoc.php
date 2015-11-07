@@ -1,36 +1,34 @@
 <?php
 /**
- * Ce fichier contient la classe Flux_tagtag.
+ * Ce fichier contient la classe Flux_docdoc.
  *
- * @copyright  2008 Gabriel Malkas
- * @copyright  2010 Samuel Szoniecky
+ * @copyright  2014 Samuel Szoniecky
  * @license    "New" BSD License
 */
 
 
 /**
- * Classe ORM qui représente la table 'flux_tagtag'.
+ * Classe ORM qui représente la table 'flux_docdoc'.
  *
- * @copyright  2008 Gabriel Malkas
- * @copyright  2010 Samuel Szoniecky
+ * @copyright  2014 Samuel Szoniecky
  * @license    "New" BSD License
  */
-class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
+class Model_DbTable_Flux_DocDoc extends Zend_Db_Table_Abstract
 {
     
     /*
      * Nom de la table.
      */
-    protected $_name = 'flux_tagtag';
+    protected $_name = 'flux_docdoc';
     
     /*
      * Clef primaire de la table.
      */
-    protected $_primary = 'tag_id_src';
+    protected $_primary = array('doc_id_src','doc_id_dst');
 
     
     /**
-     * Vérifie si une entrée Flux_tagtag existe.
+     * Vérifie si une entrée Flux_docdoc existe.
      *
      * @param array $data
      *
@@ -39,18 +37,18 @@ class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
     public function existe($data)
     {
 		$select = $this->select();
-		$select->from($this, array('tag_id_src'));
+		$select->from($this, array('doc_id_src'));
 		foreach($data as $k=>$v){
 			if($k!="maj" && $k!="poids")
 				$select->where($k.' = ?', $v);
 		}
 	    $rows = $this->fetchAll($select);        
-	    if($rows->count()>0)$id=$rows[0]->tag_id_src; else $id=false;
+	    if($rows->count()>0)$id=$rows[0]->doc_id_src; else $id=false;
         return $id;
     } 
         
     /**
-     * Ajoute une entrée Flux_tagtag.
+     * Ajoute une entrée Flux_docdoc.
      *
      * @param array $data
      * @param boolean $existe
@@ -71,6 +69,19 @@ class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
 	    	return $id;
     } 
 
+	/**
+     * Recherche une entrée avec la clef étrangère spécifiée
+     * et supprime ces entrées.
+     *
+     * @param integer $idDoc
+     *
+     * @return void
+     */
+    public function removeDoc($idDoc)
+    {
+        $this->delete(' doc_id_src = ' . $idDoc);
+        $this->delete(' doc_id_dst = ' . $idDoc);
+    }    
     /**
      * mise à jour du poids.
      *
@@ -81,12 +92,12 @@ class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
     public function ajoutPoids($data)
     {
     	if(!isset($data["poids"]))$data["poids"]=1;        
-		$sql = 'UPDATE flux_tagtag SET poids = poids + '.$data["poids"].' WHERE tag_id_src = '.$data["tag_id_src"].' AND tag_id_dst ='.$data["tag_id_dst"];
+		$sql = 'UPDATE flux_docdoc SET poids = poids + '.$data["poids"].' WHERE doc_id_src = '.$data["doc_id_src"].' AND doc_id_dst ='.$data["doc_id_dst"];
     		$this->_db->query($sql);    
-    }    
+    }
     
     /**
-     * Recherche une entrée Flux_tagtag avec la clef primaire spécifiée
+     * Recherche une entrée Flux_docdoc avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
      * @param integer $id
@@ -96,11 +107,11 @@ class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
-        $this->update($data, 'flux_tagtag.tag_id_src = ' . $id);
+        $this->update($data, 'flux_docdoc.doc_id_src = ' . $id);
     }
     
     /**
-     * Recherche une entrée Flux_tagtag avec la clef primaire spécifiée
+     * Recherche une entrée Flux_docdoc avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $id
@@ -109,17 +120,17 @@ class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-        $this->delete('flux_tagtag.tag_id_src = ' . $id);
+        $this->delete('flux_docdoc.doc_id_src = ' . $id);
     }
     
     /**
-     * Récupère toutes les entrées Flux_tagtag avec certains critères
+     * Récupère toutes les entrées Flux_docdoc avec certains critères
      * de tri, intervalles
      */
     public function getAll($order=null, $limit=0, $from=0)
     {
         $query = $this->select()
-                    ->from( array("flux_tagtag" => "flux_tagtag") );
+                    ->from( array("flux_docdoc" => "flux_docdoc") );
                     
         if($order != null)
         {
@@ -135,13 +146,13 @@ class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
     }
 
     /**
-     * Récupère les spécifications des colonnes Flux_tagtag 
+     * Récupère les spécifications des colonnes Flux_docdoc 
      */
     public function getCols(){
 
     	$arr = array("cols"=>array(
-    	   	array("titre"=>"tag_id_src","champ"=>"tag_id_src","visible"=>true),
-    	array("titre"=>"tag_id_dst","champ"=>"tag_id_dst","visible"=>true),
+    	   	array("titre"=>"doc_id_src","champ"=>"doc_id_src","visible"=>true),
+    	array("titre"=>"doc_id_dst","champ"=>"doc_id_dst","visible"=>true),
         	
     		));    	
     	return $arr;
@@ -149,30 +160,30 @@ class Model_DbTable_Flux_TagTag extends Zend_Db_Table_Abstract
     }     
     
     /*
-     * Recherche une entrée Flux_tagtag avec la valeur spécifiée
+     * Recherche une entrée Flux_docdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param int $tag_id_src
+     * @param int $doc_id_src
      */
-    public function findByTag_id_src($tag_id_src)
+    public function findBydoc_id_src($doc_id_src)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_tagtag") )                           
-                    ->where( "f.tag_id_src = ?", $tag_id_src );
+                    ->from( array("f" => "flux_docdoc") )                           
+                    ->where( "f.doc_id_src = ?", $doc_id_src );
 
         return $this->fetchAll($query)->toArray(); 
     }
     /*
-     * Recherche une entrée Flux_tagtag avec la valeur spécifiée
+     * Recherche une entrée Flux_docdoc avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param int $tag_id_dst
+     * @param int $doc_id_dst
      */
-    public function findByTag_id_dst($tag_id_dst)
+    public function findBydoc_id_dst($doc_id_dst)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_tagtag") )                           
-                    ->where( "f.tag_id_dst = ?", $tag_id_dst );
+                    ->from( array("f" => "flux_docdoc") )                           
+                    ->where( "f.doc_id_dst = ?", $doc_id_dst );
 
         return $this->fetchAll($query)->toArray(); 
     }

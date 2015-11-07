@@ -14,8 +14,7 @@
  * @copyright  2014 Samuel Szoniecky
  * @license    "New" BSD License
  */
-//ATTENTION le "s" de Models est nécessaire pour une compatibilité entre application et serveur
-class Models_DbTable_Spip_forms extends Zend_Db_Table_Abstract
+class Model_DbTable_Spip_forms extends Zend_Db_Table_Abstract
 {
     
     /*
@@ -439,6 +438,76 @@ class Models_DbTable_Spip_forms extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+    	/**
+     * renvoie les données d'un formulaire
+     *
+     * @param int $idForm
+     *
+     * @return array
+     */
+    public function getDonneesDetails($idForm)
+    {
+        $arrForm = $this->findById_form($idForm);
+        
+        $dbC = new Model_DbTable_Spip_formsxchamps($this->_db);
+        $arrChamp = $dbC->findById_form($idForm);
+        
+        $dbD = new Model_DbTable_Spip_formsxdonnees($this->_db);
+        $arrDonnees = $dbD->findByIdForm($idForm);
+         
+        
+        return array("form"=>$arrForm,"champs"=>$arrChamp,"donnees"=>$arrDonnees); 
+    }
     
+    	/**
+     * renvoie proprement les données d'un formulaire 
+     *
+     * @param int $idForm
+     * @param string 	$statut
+     *
+     * @return array
+     */
+    public function getDonneesDetailsPropre($idForm, $auteur=true, $statut="publie")
+    {
+        $arrForm = $this->findById_form($idForm);
+        
+        $dbC = new Model_DbTable_Spip_formsxchamps($this->_db);
+        $arrChamp = $dbC->findById_form($idForm);
+
+        //création de la requète
+        $expIdArticle = "SUBSTRING(fd.url,INSTR(fd.url, 'id_article=')+11)";
+        $query = $this->select()
+            ->from( array("fd" => "spip_forms_donnees")
+            		, array("id_donnee", "date", "url", "ip", "idArticle"=>new Zend_Db_Expr($expIdArticle)) 
+            		)                           
+			->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+			->joinInner(array('autEval' => 'spip_auteurs')
+				,"autEval.id_auteur = fd.id_auteur",array('auteurEval'=>'nom'))
+			->joinInner(array('art' => 'spip_articles')
+				,"art.id_article = ".$expIdArticle,array('titre'));
+		if($auteur){
+			$query->joinInner(array('al' => 'spip_auteurs_liens')
+				,"al.id_objet = art.id_article AND al.objet = 'article'",array())	
+			->joinInner(array('autArt' => 'spip_auteurs')
+			,"autArt.id_auteur = al.id_auteur",array('auteurArt'=>'nom'));
+		}
+		$query->where( "fd.statut = ?", $statut )
+            ->where( "fd.id_form = ?", $idForm );
+        foreach ($arrChamp as $champ) {
+			if($champ["type"]=="select"){
+				$query->joinInner(array('fdc'.$champ["rang"] => 'spip_forms_donnees_champs')
+					,"fdc".$champ["rang"].".id_donnee = fd.id_donnee AND fdc".$champ["rang"].".champ = '".$champ["champ"]."'",array())				
+					->joinInner(array('fcc'.$champ["rang"] => 'spip_forms_champs_choix')
+					,"fcc".$champ["rang"].".id_form = fd.id_form AND fcc".$champ["rang"].".champ = '".$champ["champ"]."' AND  fcc".$champ["rang"].".choix = fdc".$champ["rang"].".valeur ",array($champ["titre"]=>'titre'));				
+			}else{
+				$query->joinInner(array('fdc'.$champ["rang"] => 'spip_forms_donnees_champs')
+					,"fdc".$champ["rang"].".id_donnee = fd.id_donnee AND fdc".$champ["rang"].".champ = '".$champ["champ"]."'",array($champ["titre"]=>'valeur'));				
+			}
+        }
+        //exécution de la requête
+        $arrDonnees = $this->fetchAll($query)->toArray();          
+        
+        return array("form"=>$arrForm,"donnees"=>$arrDonnees); 
+    }
     
 }

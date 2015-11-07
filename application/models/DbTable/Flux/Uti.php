@@ -51,7 +51,8 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
 		$select->from($this, array('uti_id'));
 		//seul le login est obligatoire et discriminant
 		$select->where('login = ?', $data['login']);
-	    $rows = $this->fetchAll($select);        
+		if(isset($data['flux']))$select->where('flux = ?', $data['flux']);
+		$rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->uti_id; else $id=false;
         return $id;
     } 
@@ -64,13 +65,21 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
      *  
      * @return integer
      */
-    public function ajouter($data, $existe=true)
+    public function ajouter($data, $existe=true, $rs=false)
     {
     	$id=false;
-    	if($existe)$id = $this->existe($data);
+    	if($existe)$id = $this->existe($data);    			
     	if(!$id){
     		if(!isset($data["date_inscription"]))$data["date_inscription"]= new Zend_Db_Expr('NOW()');
     	 	$id = $this->insert($data);
+    	 	$err = "";
+    	}else{
+    		$err = "le login existe déjà";
+    	}
+    	if($rs){
+    		$rs = $this->findByuti_id($id);	
+    		$rs["erreur"]=$err;
+    		return $rs;
     	}
     	return $id;
     } 
@@ -215,18 +224,24 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
      *
      * @param varchar $role
      * @param boolean $img 
+     * @param boolean $login 
      * 
      * @return array
      */
-    public function findByRole($role, $img=false)
+    public function findByRole($role, $img=false, $login=false)
     {
         $query = $this->select()
 			->from( array("u" => "flux_uti"),array("login","uti_id") )                           
             ->where( "u.role = ?", $role );
 		if($img){
-        	$query->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        		->joinInner(array('ud' => 'flux_utidoc'),'ud.uti_id = u.uti_id',array())
-				->joinInner(array('d' => 'flux_doc'),"d.doc_id = ud.doc_id AND type = 'foaf:img'",array('doc_id','url'));
+			if($login)
+		        	$query->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+					->joinInner(array('d' => 'flux_doc'),"d.titre = u.login",array('doc_id','url'));
+			else{
+		        	$query->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+		        		->joinInner(array('ud' => 'flux_utidoc'),'ud.uti_id = u.uti_id',array())
+						->joinInner(array('d' => 'flux_doc'),"d.doc_id = ud.doc_id AND type = 'foaf:img'",array('doc_id','url'));
+			}
 		}
             
         return $this->fetchAll($query)->toArray(); 
@@ -258,7 +273,10 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     	$arrRoles = $this->getDistinct("role");
     	$nbRole = count($arrRoles);
     	for ($i = 0; $i < $nbRole; $i++) {
-    		$arrUti = $this->findByRole($arrRoles[$i]["role"],true);
+    		//pour la base flux_tweetpalette
+    		//$arrUti = $this->findByRole($arrRoles[$i]["role"],true);
+    		//pour la base flux_etu
+    		$arrUti = $this->findByRole($arrRoles[$i]["role"],true, true);
     		$arrRoles[$i]['utis'] = $arrUti;
     	}
     	return $arrRoles;        
