@@ -1,0 +1,503 @@
+id;code;desc;poids;nbDoc
+695;Technologie de l'information et de la communication;domaine;355;1064
+2551;Science et technologies de l'information et de la communication;domaine;2;756
+953;Technologies de l'information;domaine;660;331
+4178;Télécommuications - Autoroutes de l'information;domaine;2;146
+350;Espace;domaine;215;123
+2029;Informatique et télécommunications;domaine;162;100
+485;NTIC;domaine;161;86
+360;Politique de la recherche;domaine;147;76
+336;TIC;domaine;172;75
+337;Informatique;domaine;91;60
+824;Télécommunications;domaine;98;58
+356;Politique scientifique;domaine;125;56
+333;Politique technologique;domaine;124;54
+322;Environnement;domaine;83;49
+509;En bref;domaine;90;44
+334;Médecine;domaine;78;41
+662;Techniques de l'information et de la communication;domaine;101;38
+381;Innovation;domaine;65;37
+1844;Baromètre;domaine;72;36
+1067;Politique scientifique et technologique;domaine;72;36
+329;Energie;domaine;70;35
+980;Politique scientifique et technique;domaine;66;32
+513;Nouvelles technologies;domaine;67;31
+359;Energie & Environnement;domaine;80;29
+916;Conférence;domaine;2;26
+2812;Régulation;domaine;52;26
+362;Physique;domaine;63;25
+342;électronique;domaine;38;24
+735;Télécommunication;domaine;29;24
+335;Aéronautique;domaine;26;22
+3900;Télécoms - Informatique;domaine;44;22
+372;Nanotechnologies;domaine;23;20
+328;Biologie;domaine;27;19
+404;Innovation et valorisation de la recherche;domaine;51;19
+367;Transports;domaine;40;19
+473;Coopération;domaine;38;18
+346;Focus;domaine;45;18
+650;Dossier;domaine;32;17
+344;Evènement;domaine;31;17
+1130;Innovation et transfert de technologie;domaine;42;17
+444;Sciences physiques et nanotechnologies;domaine;36;17
+1056;Publication;domaine;8;16
+522;Sciences de la Vie;domaine;36;16
+2802;Spécial;domaine;32;16
+3984;Informatique - Electronique - Communication;domaine;30;15
+3557;Technologies de l'information - Communications;domaine;30;15
+1907;Actualité - Innovation;domaine;0;14
+3140;Dossier sectoriel;domaine;28;14
+875;Optoélectronique;domaine;11;14
+3694;Politique & organisation de la recherche;domaine;28;14
+978;STIC;domaine;29;14
+476;Editorial;domaine;18;13
+2612;Politique de la recherche - Enseignement supérieur;domaine;26;13
+607;Politique de recherche;domaine;26;13
+364;Santé;domaine;17;13
+658;Sécurité;domaine;22;13
+1968;Telecoms;domaine;26;13
+2124;Informatique-Télécommunication;domaine;24;12
+332;Electromobilité;domaine;28;11
+578;En direct des labos;domaine;25;11
+636;Industrie;domaine;22;11
+1269;Internet;domaine;22;11
+1896;POLITIQUE ET ORGANISATION DE LA RECHERCHE;domaine;22;11
+446;Robotique;domaine;21;11
+981;Sciences de l'ingénieur;domaine;22;11
+1906;Sciences et Technologies de l'Information et des Télécommunications;domaine;4;11
+486;spatial;domaine;18;11
+887;Education;domaine;16;10
+2139;Législation;domaine;20;10
+521;Optique;domaine;19;10
+461;Politique scientifique, innovation, universités;domaine;30;10
+595;Recherche Agronomique;domaine;0;10
+2122;Réseaux et télécommunications;domaine;20;10
+4449;Science des aliments;domaine;0;10
+2318;Construction - Transports;domaine;18;9
+369;Evènements;domaine;21;9
+2738;Informatique, robotique et micro-électronique;domaine;18;9
+1750;Stratégie et politique technologique;domaine;18;9
+682;Technologie;domaine;19;9
+493;technologies;domaine;18;9
+386;Agronomie;domaine;10;8
+780;Automobile;domaine;16;8
+1256;Evénements scientifiques;domaine;17;8
+343;Matériaux;domaine;15;8
+3812;Mécanique - Energétique;domaine;16;8
+2750;Politique et vie scientifique et technologique;domaine;16;8
+442;Recherche;domaine;18;8
+4001;Salons - Expositions à Singapour;domaine;6;8
+1879;Sciences de l'information et de la communication;domaine;20;8
+1901;Stratégies et politiques technologiques;domaine;20;8
+1902;Article de synthèse;domaine;18;7
+558;Astrophysique;domaine;5;7
+323;chimie;domaine;10;7
+1631;Communication;domaine;2;7
+3847;Informatique - Electronique - Télécommunications;domaine;14;7
+495;Mathématiques;domaine;12;7
+1206;Médecine - Santé;domaine;14;7
+838;Nucléaire;domaine;10;7
+792;Politique;domaine;10;7
+2161;Politique et organisation de la vie scientifique;domaine;14;7
+3315;Science de l'information;domaine;14;7
+1489;Bâtiment;domaine;0;6
+543;Collaboration;domaine;0;6
+517;Colloque;domaine;0;6
+423;Enseignement supérieur;domaine;8;6
+2625;Informatique - Télécommunications;domaine;12;6
+590;Informatique et TIC;domaine;18;6
+1493;Sciences et technologies de l'information;domaine;12;6
+551;Sciences humaines et sociales;domaine;12;6
+3617;Travaux Publics;domaine;0;6
+456;Agenda;domaine;10;5
+1131;Appel à projets;domaine;10;5
+537;Coopération internationale;domaine;10;5
+628;Divers;domaine;12;5
+2527;Electronique et Optoélectronique;domaine;10;5
+596;En ce moment au Danemark;domaine;15;5
+4498;Energétique;domaine;0;5
+954;Entreprise;domaine;2;5
+2534;Evènements et conférences;domaine;10;5
+2949;Humanité - Sciences sociales;domaine;10;5
+3215;Informatique - Electronique;domaine;10;5
+1609;L'Autriche et l'Espace européen de la recherche;domaine;10;5
+1245;Logistique;domaine;6;5
+361;Mécanique;domaine;0;5
+2170;Médecine, santé;domaine;10;5
+377;Neurosciences;domaine;6;5
+3411;Politique et informations générales scientifiques;domaine;10;5
+1032;Prix;domaine;7;5
+1910;Sciences de l'homme et de la société;domaine;10;5
+2600;Sciences de l'information;domaine;10;5
+462;Sciences de la vie et santé;domaine;15;5
+701;Sciences physiques et de la matière;domaine;11;5
+556;séminaire;domaine;0;5
+1397;Télécom;domaine;7;5
+704;Transport;domaine;8;5
+602;Université;domaine;2;5
+506;Astronomie;domaine;4;4
+400;Brèves;domaine;8;4
+2367;Communication du service scientifique;domaine;8;4
+1023;Coopération scientifique et technologique;domaine;5;4
+2141;Coopération Universitaire, Scientifique et Technologique ;domaine;8;4
+589;Défense;domaine;0;4
+4511;Observation de la Terre;domaine;0;4
+531;Océanographie;domaine;4;4
+3177;Politique et informations scientifiques;domaine;8;4
+3066;Politique scientifique - Universités - Formations;domaine;8;4
+1005;R&D industrielle;domaine;11;4
+1047;Recherche et Développement;domaine;8;4
+1216;Réseaux et Télécoms;domaine;8;4
+1069;Science;domaine;8;4
+554;Sciences humaines;domaine;10;4
+3023;Sciences physiques et de l'ingénieur;domaine;8;4
+1679;Sécurité informatique;domaine;8;4
+4471;Arts;domaine;0;3
+4410;Big Data;domaine;9;3
+3479;Congrès et conventions;domaine;6;3
+613;Coopération scientifique;domaine;7;3
+710;Distinction;domaine;0;3
+2271;Environnement - Sciences du globe;domaine;6;3
+2488;Evènements & Conférences;domaine;6;3
+1162;Evènements en Suède;domaine;6;3
+366;Imagerie médicale;domaine;0;3
+4474;Information scientifique;domaine;0;3
+3944;Informatique - Electronique - Communications;domaine;6;3
+3241;Informatique appliquée;domaine;4;3
+1136;Informatique et technologies de l'information et des télécommunications;domaine;6;3
+2639;Instrumentation;domaine;0;3
+2884;Mécanique, Transport, Génie Civil;domaine;6;3
+892;Photonique;domaine;6;3
+2152;Physique, Chimie;domaine;6;3
+2035;Politique scientifique & informations générales;domaine;6;3
+1034;Politique scientifique et fonds européens;domaine;7;3
+3531;Robotique et Micro-Systèmes;domaine;6;3
+528;Santé - Medecine;domaine;6;3
+370;Société;domaine;9;3
+3167;Technologies de l'information - Robotique;domaine;6;3
+4465;Technologies de l'Information et des Télécommunications;domaine;0;3
+3946;Télécommunications & Informatique;domaine;6;3
+2696;Vie scientifique;domaine;6;3
+663;Acoustique;domaine;4;2
+2793;Actualités scientifiques;domaine;4;2
+739;Aérospatial;domaine;4;2
+450;agriculture;domaine;3;2
+4205;Anniversaire;domaine;0;2
+1099;Appel à Participation;domaine;4;2
+4688;Appels d'offre;domaine;0;2
+349;Au coeur des régions;domaine;4;2
+4652;Autoroutes de l'information;domaine;0;2
+913;Biomédical;domaine;2;2
+4679;Biotechnologies;domaine;0;2
+4668;Cinquantenaire du CNET;domaine;0;2
+382;climat;domaine;4;2
+1697;Conférences, distinctions, événements divers;domaine;4;2
+1841;Congrès;domaine;0;2
+1010;Congrès Smart City Expo;domaine;6;2
+1799;Coopération européenne scientifique;domaine;4;2
+3918;Domaine Spatial ;domaine;4;2
+616;Efficacité énergétique;domaine;6;2
+3916;Electronique - Opto-électronique;domaine;4;2
+2009;Electronique - Optoélectronique;domaine;4;2
+3575;Electronique, optoélectronique;domaine;4;2
+507;Energie et environnement;domaine;4;2
+326;Génétique;domaine;5;2
+1150;Géographie;domaine;2;2
+1581;Innovation et technologie;domaine;4;2
+1078;Innovations;domaine;4;2
+587;Institutions;domaine;3;2
+2175;Intelligence Artificielle;domaine;4;2
+489;Matériaux et nanotechnologies;domaine;6;2
+2948;Mathématiques - Physique;domaine;4;2
+4522;Navigation par satellites;domaine;0;2
+852;Neurobiologie;domaine;5;2
+906;Nouveau rapport;domaine;0;2
+1525;Nouvelles technologies de l'information et de la communication;domaine;2;2
+3949;NTIC et Société de l'Information;domaine;4;2
+3645;Organisations de la Politique scientifique et technologique;domaine;4;2
+4689;partenariats;domaine;0;2
+925;Physique des particules;domaine;2;2
+3636;Physique et Chimie;domaine;4;2
+1426;Physique et matériaux;domaine;4;2
+1315;Planétologie;domaine;0;2
+993;Politique d'innovation;domaine;5;2
+716;Politique de l'innovation;domaine;4;2
+2320;Politique de la recherche et de l'enseignement;domaine;4;2
+1945;Politique scientifique - Relations internationales;domaine;4;2
+2374;Politique scientifique et éducation;domaine;4;2
+2185;Politique scientifique et informations générales;domaine;4;2
+1074;Prix et distinctions ;domaine;4;2
+1050;Programme COMET;domaine;2;2
+3927;Recherche et Technologie;domaine;4;2
+866;Recherche spatiale;domaine;4;2
+318;Récompense;domaine;3;2
+2019;Rencontre;domaine;0;2
+2032;Réseaux & Télécommunications;domaine;4;2
+1190;Science et société;domaine;4;2
+1823;Science et technologie de l'information;domaine;4;2
+3333;sciences alimentaires;domaine;0;2
+431;Sciences de la Terre;domaine;5;2
+1458;Sciences du globe - Energie - Environnement;domaine;0;2
+1021;Sciences du vivant;domaine;4;2
+1492;Sciences médicales;domaine;4;2
+1550;Société Fraunhofer;domaine;4;2
+4091;Spécial Foresight;domaine;4;2
+1378;Stratégie et Politique;domaine;4;2
+907;Technologie de l'Information;domaine;3;2
+1839;Technologie de l'Information et des Télécommunications;domaine;4;2
+3229;Télécommunications et technologies de l'information;domaine;4;2
+2419;Télématique;domaine;4;2
+3864;Tic et Société de l'Information;domaine;4;2
+4554;7ème PCRD;domaine;0;1
+483;A la Une;domaine;3;1
+671;Accord;domaine;3;1
+4510;Action humanitaire;domaine;0;1
+2085;Activités en émergence;domaine;2;1
+1006;Actualité scientifique;domaine;0;1
+724;Actualités;domaine;0;1
+3686;Actualités du site internet;domaine;0;1
+609;agro-alimentaire;domaine;0;1
+4670;Agrochimie;domaine;0;1
+1554;Annonces;domaine;0;1
+2022;Appel à candidature;domaine;0;1
+4457;Appels à projets;domaine;0;1
+3451;Applications Multimédia;domaine;2;1
+1170;Apprentissage virtuel;domaine;2;1
+327;archéologie;domaine;3;1
+617;Arctique;domaine;3;1
+1473;Audiovisuel;domaine;2;1
+3157;Automatique;domaine;0;1
+1555;Bilan;domaine;2;1
+3960;Bio médecine;domaine;2;1
+747;Bioaccoustique;domaine;3;1
+600;Bioéthique;domaine;2;1
+1030;Biologie cellulaire;domaine;0;1
+3050;Biologie Médecine Santé;domaine;2;1
+3670;Biosystèmes.;domaine;2;1
+331;Biotechnologie;domaine;3;1
+4494;Brevet;domaine;0;1
+1374;BTP;domaine;0;1
+785;Cahier spécial;domaine;2;1
+657;Calendrier;domaine;3;1
+3863;Centres de recherche d'excellence;domaine;2;1
+324;Cerveau;domaine;3;1
+4334;Cinquantenaire du CEA;domaine;0;1
+1899;Climat et Environnement;domaine;6;1
+763;Climatologie;domaine;0;1
+1274;Cluster;domaine;2;1
+1144;Communication & Innovation;domaine;2;1
+656;Communication scientifique;domaine;2;1
+2387;Communication-Innovation;domaine;2;1
+4556;Communications aériennes;domaine;0;1
+2338;Compétitivité;domaine;2;1
+1636;Conférences, Evénements;domaine;2;1
+2173;Consommation;domaine;2;1
+2333;Contrôle industriel ;domaine;2;1
+1175;Coopérations internationales;domaine;2;1
+861;Découverte;domaine;2;1
+457;Développement durable;domaine;2;1
+816;Développement urbain durable;domaine;3;1
+1619;Domotique;domaine;0;1
+3698;Dossier sectoriel : Le système universitaire singapourien;domaine;2;1
+3773;DOSSIER SECTORIEL : Les Systèmes d'Information Géographique en Norvège;domaine;2;1
+466;Dossier spécial;domaine;2;1
+4595;Droit;domaine;0;1
+448;Du côté des pôles;domaine;2;1
+1167;Du côté des Polonium;domaine;2;1
+900;Eau;domaine;0;1
+1221;Eclairage;domaine;2;1
+4526;Edition;domaine;0;1
+4097;Education - Recherche;domaine;2;1
+2236;Electrotechnique;domaine;2;1
+857;élevage;domaine;0;1
+608;Energies;domaine;2;1
+936;Energies & environnement;domaine;3;1
+3125;Environnement - Agriculture;domaine;2;1
+2154;Environnement, sciences de la terre;domaine;2;1
+3112;Epigénétique;domaine;2;1
+4118;Espace - Télédétection;domaine;2;1
+1865;Espace et aéronautique;domaine;2;1
+401;Ethologie;domaine;2;1
+1327;Evénement en Suède;domaine;2;1
+1463;Evènements - Conférences;domaine;2;1
+2734;Evénements - Infos - Publications;domaine;2;1
+3929;Fiche web;domaine;2;1
+2091;Franco-allemand;domaine;2;1
+3086;Général;domaine;2;1
+3679;Généralités - Sciences;domaine;2;1
+2181;Génétique animale;domaine;2;1
+1871;Génie Civil, STIC;domaine;2;1
+3213;Génie logiciel ;domaine;2;1
+1534;Géographie - urbanisme;domaine;2;1
+371;Géosciences;domaine;4;1
+2111;Géotextiles;domaine;2;1
+3350;Histoire des sciences;domaine;0;1
+4150;Histoire des techniques;domaine;2;1
+795;Horizons Enseignement;domaine;2;1
+2397;Humanités, Sciences sociales;domaine;2;1
+4122;Imagerie satellitaire;domaine;2;1
+4484;Industrie alimentaire;domaine;0;1
+4549;Industrie graphique;domaine;0;1
+3067;Informations - Communication;domaine;2;1
+3925;Informatique - Electronique - Télécoms;domaine;2;1
+2169;Informatique - Télécommunication;domaine;2;1
+3572;Informatique - Télécommunications - Transport;domaine;2;1
+3619;Informatique - Télécommunications - Transports;domaine;2;1
+2487;Informatique & télécommunications;domaine;2;1
+2341;Informatique et communication;domaine;2;1
+499;Ingénierie;domaine;3;1
+1114;Innovation et communication;domaine;2;1
+1661;Innovation urbaine;domaine;2;1
+1240;Innovations technologiques;domaine;2;1
+765;International;domaine;2;1
+836;La place des TIC dans l'économie de Singapour;domaine;2;1
+4189;La téléchirurgie;domaine;2;1
+743;Le point sur;domaine;0;1
+2052;Le Programme de mobilité Hubert Curien Amadeus;domaine;2;1
+4645;LHC;domaine;0;1
+4630;Maintenance;domaine;0;1
+2307;Manifestation;domaine;0;1
+1655;Manifestation scientifique;domaine;2;1
+3634;Matériaux avancés;domaine;2;1
+1203;Matériaux Environnement Energie;domaine;2;1
+2068;Mathématiques - Informatique;domaine;2;1
+380;Matières premières;domaine;3;1
+1937;Médecine - Biologie;domaine;2;1
+1312;Médecine - Pharmacie;domaine;2;1
+4030;Médecine - Pharmacologie;domaine;2;1
+2083;Medecine - TIC;domaine;2;1
+1079;Médecine-Biotechnologies;domaine;2;1
+1105;Médecine-Pharmacie;domaine;2;1
+1552;Medical;domaine;0;1
+2016;Métrologie;domaine;0;1
+588;Micro-nanotechnologie;domaine;0;1
+1859;Microsystèmes;domaine;2;1
+3006;Monétique;domaine;0;1
+960;nanoélectronique;domaine;3;1
+1958;Nanotechnologies, matériaux à haute valeur ajoutée;domaine;2;1
+1142;Navigation;domaine;2;1
+433;Neurologie;domaine;3;1
+1053;Nomination;domaine;0;1
+1424;Normalisation;domaine;2;1
+2901;Notes et Rapports;domaine;2;1
+1465;Nouveautés technologiques;domaine;2;1
+1792;Nouvelles technologies de l'information et de la télécommunication;domaine;2;1
+3431;NTIC - Politique;domaine;2;1
+3383;NTIC - Télécommunications appliquées;domaine;2;1
+2076;Nutrition;domaine;2;1
+4651;Océanogaphie;domaine;0;1
+1007;Océanologie;domaine;2;1
+3983;Opportunités;domaine;3;1
+3794;Optique - photonique - optoélectronique;domaine;2;1
+3300;Optique et électronique;domaine;0;1
+4575;Organisation;domaine;0;1
+1891;Parcs technologiques;domaine;6;1
+1812;Partenariat;domaine;6;1
+1878;partenariat public privé;domaine;6;1
+2702;Pharmacologie, médecine et biotechnologies;domaine;2;1
+822;Photovoltaïque;domaine;2;1
+1981;Physique & Chimie;domaine;2;1
+801;Physique Chimie;domaine;2;1
+1942;Physique fondamentale;domaine;2;1
+720;Physique quantique;domaine;3;1
+749;Planification urbaine;domaine;3;1
+4482;Pôle de compétitivité;domaine;0;1
+1726;Politique agricole;domaine;3;1
+1861;Politique de l'enseignement et de la recherche;domaine;2;1
+2736;Politique de la recherche - coopération internationale;domaine;2;1
+2377;Politique de la recherche - Télécommunications;domaine;2;1
+3806;Politique de la ville;domaine;2;1
+434;Politique de recherche et d'innovation;domaine;3;1
+1690;Politique des clusters;domaine;2;1
+2657;Politique en matière de recherche;domaine;2;1
+1589;Politique R&D;domaine;2;1
+2811;Politique scientifique - Coopération internationale;domaine;2;1
+753;Politique Universitaire;domaine;2;1
+340;Politiques Technologiques;domaine;3;1
+630;Potilique technologique;domaine;3;1
+1346;Présidence de l'Israël au programme européens de recherhce EUREKA;domaine;2;1
+2014;Prix scientifique;domaine;0;1
+413;Production;domaine;2;1
+3798;Production offshore;domaine;2;1
+3429;Programme de coopération franco coréen STAR;domaine;2;1
+1209;Prospective;domaine;2;1
+893;Psychiatrie;domaine;0;1
+1088;R&D;domaine;2;1
+421;Rapports d'Ambassade;domaine;3;1
+1804;Recherche - Enseignement - TIC;domaine;2;1
+1615;Recherche - Nanotechnologies;domaine;2;1
+572;Recherche & développement;domaine;2;1
+511;Recherche et Innovation;domaine;3;1
+820;Recherche marine;domaine;2;1
+4466;Récompence;domaine;0;1
+1601;Récompense internationale;domaine;2;1
+2088;Réglementations et politique scientifique;domaine;2;1
+3467;Relations internationales - Politique scientifique;domaine;2;1
+1265;Remise de prix;domaine;2;1
+4573;Renseignement;domaine;0;1
+1187;Réseau;domaine;2;1
+1779;Réseaux;domaine;2;1
+2132;Réseaux de compétences;domaine;2;1
+707;Réseaux sociaux;domaine;3;1
+3011;Restructuration;domaine;2;1
+1004;Résultats de recherches;domaine;3;1
+2431;Salon;domaine;0;1
+1459;Santé - Médecine - Pharmacie;domaine;2;1
+3934;Santé - Pharmacie - Biotechnologies;domaine;2;1
+503;Santé publique;domaine;2;1
+3752;Science et vulgarisation;domaine;2;1
+3566;Science physiques et de l'ingénieur;domaine;2;1
+687;Sciences cognitives;domaine;0;1
+1288;Sciences de l'environnement;domaine;2;1
+500;Sciences de l'Espace;domaine;3;1
+464;Sciences de l'ingénieur & transports;domaine;3;1
+1051;Sciences de l'ingénieur et TIC;domaine;3;1
+3018;Sciences de l'ingénieur, innovations technologiques;domaine;2;1
+3256;Sciences de la Vie et Biotechnologies;domaine;2;1
+3536;Sciences de la vie, médecine;domaine;2;1
+1849;Sciences du globe;domaine;0;1
+973;Sciences Economiques;domaine;2;1
+530;Sciences et éducation;domaine;3;1
+1838;Sciences et Innovation;domaine;2;1
+856;Sciences et patrimoine;domaine;3;1
+3064;Sciences et Recherche;domaine;2;1
+2269;Sciences et technologies;domaine;2;1
+1790;Sciences physique et de la matière;domaine;2;1
+638;Sciences physiques & de la matière;domaine;3;1
+468;Sciences sociales;domaine;0;1
+1333;Sécurité civile;domaine;2;1
+1951;Simulation;domaine;2;1
+3425;Simulation numérique;domaine;0;1
+807;Sismologie;domaine;2;1
+422;Smart cities;domaine;3;1
+728;Sociologie;domaine;2;1
+4110;Spécial budget;domaine;2;1
+4007;Spécial ESB;domaine;2;1
+3993;Spécial Société;domaine;2;1
+1824;Statistiques;domaine;2;1
+2167;Stratégie & politique de recherche;domaine;2;1
+1676;Stratégie et politiques scientifiques;domaine;2;1
+3544;Stratégie R&D en Corée du Sud;domaine;2;1
+811;Stratégie régionale;domaine;3;1
+3002;Stratégie technologique;domaine;2;1
+3268;Stratégies politiques;domaine;2;1
+867;Supercalculateurs;domaine;2;1
+674;Systèmes d'information;domaine;2;1
+1920;Technologie - Robotique - Informatique;domaine;2;1
+804;Technologie médicale;domaine;3;1
+1787;Technologies de la communication;domaine;2;1
+2050;Technologies de la production;domaine;2;1
+3359;Technologies et innovation;domaine;2;1
+2285;Technologies médicales;domaine;2;1
+494;Technologies, coopération;domaine;3;1
+4310;Télédétection spatiale;domaine;2;1
+2031;Télémédecine;domaine;0;1
+2203;Temps universel;domaine;2;1
+4676;Terre;domaine;0;1
+4394;TIC - spécial CeBIT;domaine;3;1
+2526;Transferts technologiques;domaine;2;1
+4343;Transports urbains;domaine;2;1
+402;Universitaire;domaine;2;1
+1469;Visualisation en relief;domaine;2;1
+3068;Vulgarisation scientifique;domaine;0;1
+397;"Objectif \""Horizon 2020\"";""domaine";3;1;

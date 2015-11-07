@@ -1,0 +1,23 @@
+Semestre,Intitulés des UE,Coeff UE,ECTS UE,Code Apogée,Code EC,Intitulés des EC,Coeff EC,ECTS EC,%CM,%TD,%TP,Volume  EC,code jour,code couleur
+1,UE 1  Apports théoriques,1,12,UJ7VRMCA,UE1-EC1,Rencontres Médias : Théoriciens et chercheurs ,1,6,50,50,,40,0,100
+,,,,UJ7VRMPA,UE1-EC2,Rencontres Médias : Professionnels et Actualités ,1,6,50,50,,40,0,101
+1,UE 2  Apports méthodologiques,1,18,UJ7VTCDA,UE2-EC1,Techniques de conception et design ,1,6,50,30,20,40,1,102
+,,,,UJ7VTDEA,UE2-EC2,Technologies du Développement ,1,6,50,30,20,40,1,103
+,,,,UJ7VANGA,UE2-EC3,Anglais : techniques et pratiques ,1,6,,80,20,40,1,104
+2,UE 3 Projet de création tutoré ,1,22,UJ7VAWVA,UE3-EC1,Atelier de réalisation Web et Vidéo  ,1,5,,50,50,40,2,105
+,,,,UJ7VPOLA,UE3-EC2,Perfectionnement outils et langages de base ,1,5,,50,50,40,2,106
+,,,,UJ7VPCTA,UE3-EC3,Atelier de projets collaboratifs ,1,12,,50,50,90,2,107
+2,UE 4 Stage en entreprise (10 à 16 semaines),1,4,,UE4-EC1,Participation aux projets de l'entreprise,1,2,,,100,0,3,108
+,,,,,UE4-EC2,Communication en entreprise,1,2,,,100,0,3,109
+2,UE 5.1 Parcours Développement ,1,4,UJ7VSTPA,UE5_1-EC1,Suivi technique de projet     ,1,1,,50,50,30,4,110
+,,,,UJ7VADVA,UE5_1-EC2,Approfondissement des technologies de développement ,1,1,,80,20,30,4,111
+,,,,UJ7VAODA,UE5_1-EC3,Approfondissement outils de développement ,1,1,,50,50,30,4,112
+,,,,UJ7VRDVA,UE5_1-EC4,Réalisation avancée en développement ,1,1,,50,50,30,4,113
+2,UE 5.2 Parcours Design,1,4,UJ7VSAPA,UE5_2-EC1,Suivi artistique de projet ,1,1,,50,50,30,5,114
+,,,,UJ7VATDA,UE5_2-EC2,Approfondissement technique du design ,1,1,,80,20,30,5,115
+,,,,UJ7VAIVA,UE5_2-EC3,Approfondissement outils infographie et vidéo ,1,1,,50,50,30,5,116
+,,,,UJ7VRADA,UE5_2-EC4,Réalisation avancée en design ,1,1,,50,50,30,5,117
+,,,,vacances,VACANCES,Vacances étudiant,1,1,,,100,0,6,118
+,,,,stage,STAGE,Stage en entreprise,1,1,,,100,0,3,119
+,,,,jury,JURY,Présentation publique des productions,1,1,,,100,0,7,120
+,,,,tutorat,TUTORAT,Tutorat – Recherches – Veille,1,1,,,100,0,8,121

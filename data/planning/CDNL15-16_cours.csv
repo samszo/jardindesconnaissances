@@ -1,0 +1,31 @@
+Semestre,Intitulés des UE,Coeff UE,ECTS UE,Code Apogée,Code EC,Intitulés des EC,Coeff EC,ECTS EC,%CM,%TD,%TP,Volume  EC,code jour,code couleur
+1,UE 1  Apports théoriques,1,5,UJ7VRMCA,UE1-EC1,Rencontres Médias - Théoriciens et chercheurs ,1,5,50,50,,30,0,100
+1,,,5,UJ7VRMPA,UE1-EC2,Rencontres Médias - Professionnels et Actualités ,1,5,50,50,,30,0,101
+1,UE 2  Apports méthodologiques,1,5,UJ7VTCDA,UE2-EC1,Techniques de conception et design ,1,5,50,30,20,30,1,102
+1,,,5,UJ7VTDEA,UE2-EC2,Technologies du Développement ,1,5,50,30,20,30,1,103
+1,,,4,UJ7VANGA,UE2-EC3,Anglais - techniques et pratiques ,1,4,,80,20,30,1,104
+2,UE 3 Projet de création tutoré ,1,4,UJ7VAWVA,UE3-EC1,Atelier de réalisation Web et Vidéo  ,1,4,,50,50,30,2,105
+2,,,4,UJ7VPOLA,UE3-EC2,Perfectionnement outils et langages de base ,1,4,,50,50,30,2,106
+2,,,12,UJ7VPCTA,UE3-EC3,Atelier de projets collaboratifs ,1,12,,50,50,90,2,107
+2,UE 4 Stage en entreprise (10 à 16 semaines),1,2,,UE4-EC1,Participation aux projets de l'entreprise,1,2,,,100,0,3,108
+2,,,2,,UE4-EC2,Communication en entreprise,1,2,,,100,0,3,109
+2,UE 5 Parcours Développement ,1,3,UJ7VSTPA,UE5-EC1,Suivi technique de projet     ,1,3,,50,50,30,4,110
+1,,,3,UJ7VADVA,UE5-EC2,Approfondissement des technologies de développement ,1,3,,80,20,30,4,111
+1,,,3,UJ7VAODA,UE5-EC3,Approfondissement outils de développement ,1,3,,50,50,30,4,112
+2,,,3,UJ7VRDVA,UE5-EC4,Réalisation avancée en développement ,1,3,,50,50,30,4,113
+2,UE 6 Parcours Design,1,3,UJ7VSAPA,UE6-EC1,Suivi artistique de projet ,1,3,,50,50,30,5,114
+1,,,3,UJ7VATDA,UE6-EC2,Approfondissement technique du design ,1,3,,80,20,30,5,115
+1,,,3,UJ7VAIVA,UE6-EC3,Approfondissement outils infographie et vidéo ,1,3,,50,50,30,5,116
+2,,,3,UJ7VRADA,UE6-EC4,Réalisation avancée en design ,1,3,,50,50,30,5,117
+,,,,vacances,VACANCES,Vacances étudiant,0,0,,,100,0,6,118
+,,,,stage,STAGE,Stage en entreprise,0,0,,,100,0,3,119
+,,,,jury,JURY,Présentation publique des productions,0,0,,,100,0,7,120
+,,,,tutorat,TUTORAT,Tutorat – Recherches – Veille,0,0,,,100,0,8,121
+2,UE 5.1 Parcours Développement ,1,4,UJ7VSTPA,UE5_1-EC1,Suivi technique de projet     ,1,1,,50,50,30,4,110
+,,,,UJ7VADVA,UE5_1-EC2,Approfondissement des technologies de développement ,1,1,,80,20,30,4,111
+,,,,UJ7VAODA,UE5_1-EC3,Approfondissement outils de développement ,1,1,,50,50,30,4,112
+,,,,UJ7VRDVA,UE5_1-EC4,Réalisation avancée en développement ,1,1,,50,50,30,4,113
+2,UE 5.2 Parcours Design,1,4,UJ7VSAPA,UE5_2-EC1,Suivi artistique de projet ,1,1,,50,50,30,5,114
+,,,,UJ7VATDA,UE5_2-EC2,Approfondissement technique du design ,1,1,,80,20,30,5,115
+,,,,UJ7VAIVA,UE5_2-EC3,Approfondissement outils infographie et vidéo ,1,1,,50,50,30,5,116
+,,,,UJ7VRADA,UE5_2-EC4,Réalisation avancée en design ,1,1,,50,50,30,5,117

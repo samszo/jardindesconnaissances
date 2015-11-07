@@ -1,0 +1,1930 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:bio="http://vocab.org/bio/0.1/"
+   xmlns:bnf-onto="http://data.bnf.fr/ontology/bnf-onto/"
+   xmlns:bnfroles="http://data.bnf.fr/vocabulary/roles/"
+   xmlns:dcterms="http://purl.org/dc/terms/"
+   xmlns:foaf="http://xmlns.com/foaf/0.1/"
+   xmlns:isni="http://isni.org/ontology#"
+   xmlns:marcrel="http://id.loc.gov/vocabulary/relators/"
+   xmlns:owl="http://www.w3.org/2002/07/owl#"
+   xmlns:rdagroup2elements="http://rdvocab.info/ElementsGr2/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478391h#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb36705181q#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35196439p#frbr:Expression">
+    <marcrel:edt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r360 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37430081g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb353721792#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb16185368g#frbr:Work">
+    <dcterms:creator rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385030827#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478388m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476630n#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478617x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37157537z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35434581j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb329777488#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb349535656#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb371695009#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466751p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385080933#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384784192#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384666146#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34683439g#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385030858#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34578089r#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384666026#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb16584159d#frbr:Work">
+    <dcterms:creator rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34600386b#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb39070336w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507005r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385070528#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb412629543#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478604k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38508313f#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34875610x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38508293n#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb320294637#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34708506h#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37061295w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384786006#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478611v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb411480832#frbr:Expression">
+    <marcrel:ant rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r72 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35234937t#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384666533#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38475198n#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb16260784c#frbr:Work">
+    <dcterms:creator rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37637244v#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35301775n#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38508098t#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34295804x#frbr:Expression">
+    <marcrel:edt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r360 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503096x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37422278d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb351866647#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38510622h#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb42321323d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38475305c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385581953#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503153x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34592134q#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558209z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385081027#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32977750t#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb36185043h#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384667839#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37238422n#frbr:Expression">
+    <bnfroles:r540 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aft rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385072415#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385072299#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb374341106#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38559623v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb342976861#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385067074#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35925401p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34704841w#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466781m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34710896d#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34683430c#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384785943#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466643s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/11899332/gilles_deleuze/studies">
+    <dcterms:subject rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466784n#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34598996x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb353721761#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384764156#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb42404900w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478685d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476494b#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503140k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb374609629#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478712g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558206x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb42307645k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385105912#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb349536524#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb42361731z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385070857#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cc57414g/ca59936064031319#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r110 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384691434#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558253f#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb346480461#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476371d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37366204g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503148b#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32977753v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38506702d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478415p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb347342039#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35372178q#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32977747x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476633p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384763733#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38812637j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb352262700#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35588984v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38475181x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476624q#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38475302b#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37411389w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385582078#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507083j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385031517#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38547943m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb39213745s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385582612#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34619503r#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385105974#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478608z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb373692762#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb15998146s#frbr:Work">
+    <dcterms:creator rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb373662421#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384766221#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384786811#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384667792#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478679g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466609m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37366150c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558214j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.univ-paris8.fr/deleuze/">
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Document"/>
+    <dcterms:subject rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb372563031#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38469142s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb400812060#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb42440978p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37459233r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385596246#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385070570#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384667719#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32411390d#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384763675#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb389555281#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478662r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384667521#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb354638436#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb400009499#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb370183171#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558244g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb33162517s#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385072237#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb361647088#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38508295b#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person">
+    <rdagroup2elements:placeOfBirth>Paris</rdagroup2elements:placeOfBirth>
+    <foaf:page rdf:resource="http://data.bnf.fr/11899332/gilles_deleuze/"/>
+    <rdagroup2elements:biographicalInformation>Philosophe, professeur à l'université de Paris VIII</rdagroup2elements:biographicalInformation>
+    <foaf:givenName>Gilles</foaf:givenName>
+    <bnf-onto:firstYear rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1925</bnf-onto:firstYear>
+    <bnf-onto:lastYear rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1995</bnf-onto:lastYear>
+    <rdagroup2elements:languageOfThePerson rdf:resource="http://id.loc.gov/vocabulary/iso639-2/fre"/>
+    <foaf:gender>male</foaf:gender>
+    <rdagroup2elements:fieldOfActivityOfThePerson rdf:resource="http://dewey.info/class/100/"/>
+    <rdagroup2elements:fieldOfActivityOfThePerson>Philosophie</rdagroup2elements:fieldOfActivityOfThePerson>
+    <foaf:birthday>01-18</foaf:birthday>
+    <rdagroup2elements:dateOfBirth rdf:resource="http://data.bnf.fr/date/1925/"/>
+    <foaf:familyName>Deleuze</foaf:familyName>
+    <owl:sameAs rdf:resource="http://dbpedia.org/resource/Gilles_Deleuze"/>
+    <owl:sameAs rdf:resource="http://viaf.org/viaf/22140703"/>
+    <owl:sameAs rdf:resource="http://www.idref.fr/026820552"/>
+    <rdagroup2elements:dateOfDeath rdf:resource="http://data.bnf.fr/date/1995/"/>
+    <foaf:document rdf:resource="http://ark.bnf.fr/ark:/12148/mm31200412"/>
+    <foaf:document rdf:resource="http://ark.bnf.fr/ark:/12148/mm31200145"/>
+    <foaf:depiction rdf:resource="http://commons.wikimedia.org/wiki/Special:FilePath/Gilles_Deleuze_in_1987.png?width=300"/>
+    <foaf:depiction rdf:resource="http://gallica.bnf.fr/ark:/12148/bpt6k1282676.thumbnail"/>
+    <rdagroup2elements:countryAssociatedWithThePerson rdf:resource="http://id.loc.gov/vocabulary/countries/fr#"/>
+    <foaf:name>Gilles Deleuze</foaf:name>
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+    <bio:death>1995-11-04</bio:death>
+    <bio:birth>1925-01-18</bio:birth>
+    <rdagroup2elements:placeOfDeath>Paris 17e</rdagroup2elements:placeOfDeath>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38475207s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb371565022#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385031579#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503144z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb42297220t#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38510629x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385031459#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476629f#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38474692q#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb355258311#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb42139926w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384666355#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb39056257m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32264731d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37156434d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37278090v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466748s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34552011z#frbr:Expression">
+    <marcrel:edt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r360 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38469145t#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb41262971p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38475201q#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb426370750#frbr:Expression">
+    <bnfroles:r170 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:clb rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb118993325">
+    <owl:sameAs rdf:resource="http://isni-url.oclc.nl/isni/000000012277323X"/>
+    <foaf:focus rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnf-onto:FRBNF rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">11899332</bnf-onto:FRBNF>
+    <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <skos:exactMatch rdf:resource="http://dbpedia.org/resource/Gilles_Deleuze"/>
+    <skos:exactMatch rdf:resource="http://www.idref.fr/026820552"/>
+    <skos:exactMatch rdf:resource="http://fr.wikipedia.org/wiki/Gilles_Deleuze"/>
+    <skos:exactMatch rdf:resource="http://viaf.org/viaf/22140703"/>
+    <skos:exactMatch rdf:resource="http://isni-url.oclc.nl/isni/000000012277323X"/>
+    <skos:note xml:lang="fr">Philosophe, professeur à l'université de Paris VIII</skos:note>
+    <skos:editorialNote xml:lang="fr">Le bergsonisme / Gilles Deleuze, 1989. - . - Les théories du cinéma aujourd'hui, 1988. - . -</skos:editorialNote>
+    <skos:editorialNote xml:lang="fr">Universalia 1992, p. 496-498. - . - Monde, 1995-11-08. - . - Qui était qui, XXe siècle, 2005. - . -</skos:editorialNote>
+    <isni:identifierValid>000000012277323X</isni:identifierValid>
+    <rdfs:seeAlso rdf:resource="http://catalogue.bnf.fr/ark:/12148/cb118993325"/>
+    <rdfs:seeAlso rdf:resource="http://fr.wikipedia.org/wiki/Gilles_Deleuze"/>
+    <skos:prefLabel xml:lang="fr">Gilles Deleuze (1925-1995)</skos:prefLabel>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb345598246#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476369v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507013c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384751979#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476365g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37169948d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37366217t#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37407670j#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503095k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38853421p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478680p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503124b#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558199g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb329777515#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb16724981w#frbr:Work">
+    <dcterms:creator rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://ark.bnf.fr/ark:/12148/mm31200412">
+    <rdf:type rdf:resource="http://data.bnf.fr/ontology/bnf-onto/expositionVirtuelle"/>
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Document"/>
+    <dcterms:title>Deleuze : L'univers d'un philosophe</dcterms:title>
+    <dcterms:subject rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325"/>
+    <foaf:depiction rdf:resource="http://www.bnf.fr/images/c_080624_korichi.jpg"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb437278639#frbr:Expression">
+    <marcrel:nrt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r1119 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38510593r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35455807m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb352149451#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503146n#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb376667767#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37674406z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35850583c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb342936893#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384691403#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34616207k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb411695357#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb135437912#frbr:Work">
+    <dcterms:creator rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32977752h#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476635c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38971307z#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38469144g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384766419#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38469136v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558203w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32010708j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385581922#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384666444#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://deleuze.tausendplateaus.de/">
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Document"/>
+    <dcterms:subject rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384764005#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38508104x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478599t#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb423058627#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385070559#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35103897c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558271c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb39098712b#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384787087#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb346378087#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38475291h#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466561f#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38469139w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34878412s#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38510568j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38510607m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385031548#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb39779923k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558187g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38475297k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38510602w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385031428#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb347047439#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503143m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466639j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34837710v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38506708g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385066969#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb374901601#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb43763997r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34559988q#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34580088p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503149p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb372734468#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb329777546#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34556025m#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384691465#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34703893w#frbr:Expression">
+    <marcrel:edt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r360 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb350176687#frbr:Expression">
+    <bnfroles:r540 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aft rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384667285#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://ark.bnf.fr/ark:/12148/mm31200145">
+    <rdf:type rdf:resource="http://data.bnf.fr/ontology/bnf-onto/expositionVirtuelle"/>
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Document"/>
+    <dcterms:title>Une politique libertaire : Les grandes conférences de la BnF - Fondation del Duca -Institut de France</dcterms:title>
+    <dcterms:subject rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325"/>
+    <foaf:depiction rdf:resource="http://www.bnf.fr/images/c_050211_onfray.jpg"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37273574s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb39094684z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37366213f#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38475303p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385083096#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37180662c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384787114#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507056n#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466778q#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507237x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558064j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb41353580r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35224363h#frbr:Expression">
+    <bnfroles:r540 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aft rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476615r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384751990#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503141x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38508097g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35925404q#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503152k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38953808r#frbr:Expression">
+    <marcrel:nrt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r1119 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37366214s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb36181239v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb345921352#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476395d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37159319z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385106037#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38469141f#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37265880t#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35433067c#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32919467z#frbr:Expression">
+    <marcrel:edt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r360 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb347360006#frbr:Expression">
+    <bnfroles:r9990 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503156z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503093w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34569008z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476393q#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb41464520h#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r1110 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:nrt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34726498n#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb165841582#frbr:Work">
+    <dcterms:creator rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384691345#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38508103k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35188866z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466618k#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503125p#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476639r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507080h#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb42419535v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38506711c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32010709w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35372177c#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478710s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb358067197#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478417c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478394j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb167614223#frbr:Work">
+    <dcterms:creator rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb33117047h#frbr:Expression">
+    <marcrel:edt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r360 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cc588828/ca505#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r110 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34555696j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507240t#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb32977749m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384784161#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507029r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384787145#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38474698s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476398f#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb43758592x#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb37365969r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35235062s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb391665674#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38506714d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34306174q#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385080964#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb43609882g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb35865577v#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38476399s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38839880b#frbr:Expression">
+    <marcrel:edt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r360 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38474680q#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.webdeleuze.com/">
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Document"/>
+    <dcterms:subject rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503081w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb375552647#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb34679882z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cc96518w/ca59870742886109#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r110 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb42168644c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507234w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb12357054m#frbr:Work">
+    <dcterms:creator rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb358102455#frbr:Expression">
+    <bnfroles:r540 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aft rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385070241#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384752727#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb426771633#frbr:Expression">
+    <bnfroles:r540 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aft rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558665j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384764245#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385031381#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385031470#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38279418m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb409282049#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb361452557#frbr:Expression">
+    <bnfroles:r170 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:clb rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38510634h#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503139c#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb41335718z#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385586615#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb376745187#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385030947#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb437585740#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38508100j#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384753010#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb385031230#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb353718501#frbr:Expression">
+    <bnfroles:r550 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <marcrel:aui rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384785974#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb39213741d#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466642f#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38506703r#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503150w#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466772n#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38466598s#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38503155m#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384766372#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38478610h#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38507046b#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb38558256g#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb343300002#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb374113934#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb384666386#frbr:Expression">
+    <marcrel:aut rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r70 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.bnf.fr/ark:/12148/cb317993179#frbr:Expression">
+    <marcrel:edt rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <dcterms:contributor rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+    <bnfroles:r360 rdf:resource="http://data.bnf.fr/ark:/12148/cb118993325#foaf:Person"/>
+  </rdf:Description>
+</rdf:RDF>

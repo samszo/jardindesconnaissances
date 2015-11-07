@@ -1,0 +1,15 @@
+{"equipe":"CITU","membres":[
+	{"nom":"ZREIK Khaldoun","login":"khaldoun.zreik", "statut":"Permanent"
+		,"roles":[{"nom":"permanent","deb":"01/01/2011","fin":"now"},{"nom":"directeur","deb":"01/01/2011","fin":"now"}]
+		,"rubriques":["nom":"01. Profil"
+]}
+SADI Hocine	hocine.sadi	sadi_1	Doctorant
+BALPE Jean-Pierre	jean-pierre.balpe	balpe_1	Professeur
+BALTZ Claude	claude.baltz	baltz_1	Professeur
+BOUHAI Nasreddine	nasreddine.bouhai	bouhai_1	Maître de conférence
+HUDRISIER Henri	henri.hudrisier	hudrisier_1	Maître de conférence
+MKADMI Abderrazek	abderrazek.mkadmi	mkadmi_1	Doctorant
+REGOTTAZ Jean-Frédéric	jean-frédéric.regottaz	regottaz_1	Doctorant
+REYES Everardo	everardo.reyes	reyes_1	Maître de conférence
+SZONIECKY samuel	samuel.szoniecky	szoniecky_1	Maître de conférence
+SALEH Imad	imad.saleh	saleh_1	

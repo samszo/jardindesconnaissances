@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Folder>
+	<name>HyperUrbain 5 : Temporalités florentines</name>
+	<open>1</open>
+	<description>Carte pour la conférence HyperUrbain 5 : http://hyperurbain.org/hu5/fr/</description>
+	<LookAt>
+		<gx:TimeSpan>
+			<begin>1800-12-31T23:59:59Z</begin>
+			<end>2016</end>
+		</gx:TimeSpan>
+		<longitude>11.22666142555583</longitude>
+		<latitude>43.76776756651687</latitude>
+		<altitude>0</altitude>
+		<heading>6.392755626936261</heading>
+		<tilt>3.927639543548755</tilt>
+		<range>8956.081048023041</range>
+		<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+	</LookAt>
+	<GroundOverlay>
+		<name>btv1b530209113</name>
+		<LookAt>
+			<longitude>11.2266614543146</longitude>
+			<latitude>43.76776756678052</latitude>
+			<altitude>0</altitude>
+			<heading>6.392755947007746</heading>
+			<tilt>3.928070057506178</tilt>
+			<range>8956.081689957238</range>
+			<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+		</LookAt>
+		<color>d9ffffff</color>
+		<Icon>
+			<href>http://localhost/jdc/data/carte/PlanFlorence/btv1b530209113.jpeg</href>
+			<viewBoundScale>0.75</viewBoundScale>
+		</Icon>
+		<altitude>1332</altitude>
+		<altitudeMode>absolute</altitudeMode>
+		<LatLonBox>
+			<north>43.79540077331149</north>
+			<south>43.75166418637464</south>
+			<east>11.28156961901198</east>
+			<west>11.22935613442244</west>
+			<rotation>0.3820353187238504</rotation>
+		</LatLonBox>
+	</GroundOverlay>
+</Folder>
+</kml>

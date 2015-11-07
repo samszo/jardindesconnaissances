@@ -1,0 +1,89 @@
+idFait,fait,tags,acteur,description,start,end,nature
+1,Mémoire pour servir à l'histoire des insectes, ,Réaumur, ,1734,,événement scientifique
+2,Controverse des générations spontanées ,génération spontanée,Spallanzani Needham,,1745,,événement scientifique
+3,Histoire naturelle générale et particulière,épigénèse,Buffon,Buffon relance la théorie de l'épigenèse contre le préformationnisme dominant. ,1749,1767,événement scientifique
+4,Système de la nature,,Maupertuis,,1751,,événement scientifique
+5,Theoria generationis,,Wolff,,1759,,événement scientifique
+6,"Vorläufige Nachricht von einigen, das Geschlecht der Pflanzen betreffenden Versuchen und Beobachtungen",hybridation,Koelreuter,"Travaille sur l'hybridation de deux plants de tabac, et inaugure une lignée d'hybrideurs jusqu'au XIXeme siècle",1761,,événement scientifique
+7,Novi Commentarii Academiae Scientiarum Imperialis Petropolitanae,hybridation,Koelreuter,,1760,1761,
+8,Les époque de la Nature,,Buffon,,1778,,événement scientifique
+9,Eléments de physiologie,,Diderot,Associe génération spontanée des molécules organiques et épigénèse.,1778,1780,événement scientifique
+10,Histoire naturelle des quadrupèdes ,,Lacépède,Histoire naturelle des quadrupèdes ovipares et des serpens (1788-1789).,1788,1789,événement scientifique
+11,Premier cours de zoologie en France,,Geoffroy Saint-Hilaire ,Geoffroy Saint-Hilaire au Museum d'histoire naturelle,1794,,événement scientifique
+12,Histoire naturelle des poissons,,Lacépède,,1798,1803,événement scientifique
+13,Traité des membranes,,Bichat,,1800,,événement scientifique
+14,The Origin of the Vaccine Inoculation,innoculation vaccin,Jenner,,1801,,événement scientifique
+15,Histoire naturelle des cétacés,,Lacépède,,1804,,événement scientifique
+16,Recherches sur les ossemens fossiles de quadrupèdes,anatomie comparée,Cuvier,,1812,1825,événement scientifique
+17,le règne animal,anatomie comparée,Cuvier,,1817,,événement scientifique
+18,Recherches anatomiques et physiologiques sur la structure intime des animaux et des végétaux et sur leur motilité,théorie cellulaire cellule,  Dutrochet (Henri),,1824,,
+19,Recherches sur l'accroissement et la reproduction des végétaux,embryologie,  Dutrochet (Henri)," Henri Dutrochet, Prix de l'Académie en physiologie expérimentale",1821,,événement scientifique
+20,Synthèse de l'urée,mécanisme chimie organique synthèse,Friedrich Wöller,"en réalisant la synthèse de l'urée, composant organique, il initie le déclin du vitalisme",1827,,événement scientifique
+21,découverte de l'osmose,osmose ,  Dutrochet (Henri),"L'agent immédiat du mouvement vital dévoilé dans la nature et dans son mode d'action chez les végétaux et les animaux, 1826",1827,,événement scientifique
+22,Découverte de l'ovule ,embryologie embryogenèse ovule,Von Baer, ,1827,,événement scientifique
+23,Le voyage du Beagle,,Darwin,,1831,1836,événement scientifique
+24,Traité de tératologie,embryogénèse embryologie,Geoffroy Saint-Hilaire ,,1832,1836,événement scientifique
+25,Voyage en Amérique méridionale, ,Alcide d'Orbigny,Darwin y verra un monument de la science du XIXe siècle,1835,1849,événement scientifique
+26,Théorie cellulaire: Beiträge zur Phytogenesis,théorie cellulaire cellule,Schleiden,"Première formulation de la théorie cellulaire en botanique, par Matthias Jakob Schleiden: la cellule est l'unité élémentaire du vivant",1838,,événement scientifique
+27,Beiträge zur Phytogenesis. Archiv für Anatomie,théorie cellulaire plante noyau phytogenèse,,découvre importance du noyau cellulaire dans la genèse de la plante,1837,,événement scientifique
+28,Recherches sur l'organisation des animaux infusoires,microbes fossiles amibes paléontologie,Ehrenberg, ,1838,,événement scientifique
+29,Mikroskopische Untersuchungen über die Übereinstimmung in der Struktur und dem Wachstum der Thiere und Pflanze,théorie cellulaire cellule ,Schwann," Recherches sur la cellule animale, dont il découvre la similarité avec les cellules des plantes.",1842,,
+30,Invention du mot Microbe,microbe microbiologie,Sédillot,"De l'inflence des découvertes de M. Pasteur sur les progrès de la Chirurgie », dans Comptes rendus hebdomadaires des séances de l'Académie des sciences, t. 86, (1878), p. 634. Le terme a été proposé après consultation de Littré",1839, ,événement scientifique
+31,Paléontologie française,,Alcide d'Orbigny,"Alcide d’Orbigny, somme de ses travaux sur les mollusques et autres rayonnés fossiles",1840,1860,événement scientifique
+32,Débuts de la biochimie: Liebig,bichimie,Liebig,Nouvelles lettres sur la chimie (traduites en français chez Masson en 1852),1840,,événement scientifique
+33,Théorie cellulaire: Grundzüge der wissenschaftlichen Botanik (Schleiden),théorie cellulaire,Schleiden,"Mathias Jakob Schleiden fait émerger une botanique scientifique contre la pratique naturaliste de son époque, réduite à un empirisme classificateur, mais aussi contre une philosophie de la nature verbeuse démarquée de Schelling. ",1842,1843,événement scientifique
+34,Traité philosophique et physiologique de l'hérédité naturelle ,hérédité,Lucas (prosper),Le premier traité concernant l'hérédité au sens biologique.,1847,1850,événement scientifique
+35,Lehrbuch der physiologischen Chemie (Masson 55) ,chimie,Lehmann (Karl Gotthelf 1812-1863),débuts de la biochimie,1855,,
+36,Die vegetabilische Zelle,théorie cellulaire  ,Von Mohl,Abrégé de la théorie cellulaire de l'inventeur du cytoplasme.,1851,,événement scientifique
+37, On the Mode of Communication of Cholera,choléra,,"Réfutation de la théorie des miasmes, par John Snow",1855,,événement scientifique
+38,Mémoire sur la fermentation lactique,fermentation,Pasteur,Présenté à la société des sciences de Lille : naissance de la microbiologie. ,1857,,événement scientifique
+39, Pathologie cellulaire,théorie cellulaire cellule,Virschow,,1858,,événement scientifique
+40,L'Origine des espèces (France 1862),espèces évolutionnisme,Darwin,,1859,,événement scientifique
+41,Théorie de la génération spontanée,génération spontanée,Pouchet,"Félix-Archimède Pouchet, Hétérogénie, ou traité de la génération spontanée",1859,,événement scientifique
+42,Mémoire sur les hybrides du règne végétal Ch. Naudin,hybridation,Charles Naudin,Précurseur de Mendel. Entre à l'académie des sciences l'année suivante,1862,,événement scientifique
+43,Introduction à la médecine expérimentale,,Claude Bernard,,1865,,événement scientifique
+44, Generelle Morphologie,,Haeckel,,1866,,événement scientifique
+45,La Mer,biologie marine,Schleiden, Schleiden ,1867,,événement scientifique
+46,A mechanico-physiological theory of organic evolution,évolutionnisme, Nägeli (Carl),"Ouvrage du botaniste suisse Carl Nägeli, correspondant de Mendel (quoi qu'il ne le cite pas): il avance l'idée  ",1868,,événement scientifique
+47,De la variation des animaux et des plantes à l'état domestique Darwin,espèces,Darwin,"Théorie de la pangenèse par laquelle Darwin tente d'expliquer l'hérédité, en faisant intervenir des gemmules, bourgons de cellules - pour erronée qu'elle soit elle avait le mérite d'une alternative au préformationnisme.  Rostand Jean. Esquisse d'une histoire de l'atomisme en biologie. In: Revue d'histoire des sciences et de leurs applications. 1949, Tome 2 n°3",1868,,événement scientifique
+48,Nouvelle traduction des Origines de l'homme,,Darwin,"Nouvelle traduction par Moulinié et Barbier, à la demande de Darwin peu satisfait des libertés prises par Clémence Royer (notamment ses préfaces), mais retardée par la guerre franco-prussienne. ",1873,,événement scientifique
+49,Découverte bacille anthrax,microbiologie bacille,Koch,due à Koch,1876,,événement scientifique
+50,La science expérimentale,,Claude Bernard,,1878,,événement scientifique
+51,la lutte des parties dans l'organisme  ,embryologie,Wilhelm Roux,,1881,,événement scientifique
+52,Découverte bacille tuberculose,microbiologie tuberculose bacille,Koch,Robert Koch,1882,,événement scientifique
+53,Découverte de la méiose,théorie cellulaire cellule,Van Beneden (Edouard),Edouard Van Beneden,1883,,événement scientifique
+54,Découverte du bacille du choléra,microbiologie vibrion,Koch,"Robert Koch, en Egypte,  avec l'aide de Gaffky et de Bernhard Fischer",1883,,événement scientifique
+55,Postulats  de Koch,microbiologie,Koch,"Outil important de la microbiologie de l'époque, les critères permettent de relier une maladie à un germe pathogène. ",1884,,événement scientifique
+56,Théorie de la mutation ,mutation, de Vries (Hugo),,1900,1903,événement scientifique
+57,Mechanism of Mendelian Heredity ,hérédité ,Morgan,le chromosome est le support physique de l'hérédité,1915,,événement scientifique
+58,On Growth and Form,,D'Arcy Thompson,,1917,,événement scientifique
+59,Réflexion sur le système de la génération de M. Buffon ,,Von Haller,,1751,,Réception médiatique  
+60,Querelle des analogues,,"Cuvier,Geoffroy Saint-Hilaire ","Cuvier /Geoffroy Saint-Hilaire sur l'unité de composition et de plan, à l'occasion de la présentation d'un mémoire sur les mollusques qui contredisait Cuvier.",1830,,Réception médiatique  
+61,Nouveaux coups de fouet scientifiques,satire,,Pamphlet anti-Cuvier,1831,,Réception médiatique  
+62,Histoire naturelle drôlatique et philosophique des professeurs du Jardin des Plantes  ,satire,Salles (isidore),"Pamphlet d'Isidore Salles, dans le Corsaire-Satan puis en volume",1845,1847,Réception médiatique  
+63,Die Pflanze und ihr Leben. Populäre Vorträge,vulgarisation botanique,Schleiden,Vulgarisation par Schleiden,1848,,Réception médiatique  
+64,Controverse infectionnistes/contagionnistes,contagion ,Farr (William),"William Farr, médecin, et membre du Scientific Committee for Scientific Enquiries in Relation to the Cholera Epidemic reformule la théorie des miasmes contre les hypothèses microbiennes de John Snow. ph.ucla.edu/epi/snow/reactionandcommitteeaction.html",1855,,Réception médiatique  
+65,Controverse de l'hétérogénie,génération spontanée microbiologie,,"Opposant Pasteur et Pouchet, à l'Académie des sciences",1859,1865,Réception médiatique  
+66,Histoire naturelle des règnes organiques,évolutionnisme,Geoffroy Saint-Hilaire ,"ouvrage posthume dans lequel GSH discute la théorie de Darwin, qu'il a lue dans sa version anglaise.",1862,,Réception médiatique  
+67,Die Darwin’sche Theorie in sechs Vorlesungen,évolutionnisme,Büchner,"Série de conférences du naturaliste Ludwig Büchner (également traducteur de Lyell) sur les théories de Darwin, traduites en français sous le titre  Conférences sur la théorie darwinienne de la transmutation des espèces et de l'apparition du monde organique. Application de cette théorie à l'homme. Ses rapports avec la doctrine du progrès et avec la philosophie matérialiste du passé et du présent, Paris, C. Reinwald, 1869, 281 pages",1868,,Réception médiatique  
+68,Scandale de la tuberculine,Koch tuberculose,Koch,Autour du prétendu traitement commercialisé par Koch,1890,,Réception médiatique  
+69,L’évolution et l’origine des espèces,évolutionnisme,Huxley,,1892,,Réception médiatique  
+70,Bibliotheca Botanica,biologie,Linné,"Parmi les auteurs de travaux botaniques, les biologi apparaissent dans la bibliographie au chapitre Anomali des Botanophili, au même titre que poètes et théologiens:Anomali Poetae Theologi bibliothecarii biologi miscellani",1735,,
+71,Système de la nature ,hérédité,Maupertuis,"Première analyse d'hérédité (Maupertuis utilise le terme, de façon isolée en son temps) avec étude de générations. Cf cas du noir albinos.",1756,,Histoire de la discipline
+72,Apparition du terme biologie,biologie,Burdach,"En 1800 Burdach (1776-1846), dans des écrits non scientifiques  influencés par Schelling, propose le terme biologie pour désigner l'étude des êtres humains d'un point de vue morphologique (terme dont il partage la paternité  avec Goethe) et physiologique. ",1800,,Histoire de la discipline
+73,1er usage savant allemand du terme Biologie,biologie,Treviranus,"En Allemagne, Biologie oder Philosophie der lebenden Natur für Naturforscher und Artze, 1802, de Georg Reinhold Treviranus (1776-1837) ",1802,,Histoire de la discipline
+74,1er usage savant français du terme Biologie,biologie,Lamarck,"Recherches sur l’organisation des corps vivants (« Tout ce qui est généralement commun aux végétaux et aux animaux comme toutes les facultés qui sont propres à chacun de ces êtres sans exception  doit constituer l'unique et vaste objet d'une science particulière qui n'est pas encore fondée et qui n'a pas encore de nom, et à laquelle je donnerai le nom de biologie. » (le terme apparaît dans un manuscrit de 1800) ",1802,,Histoire de la discipline
+75,Philosophie zoologique,biologie,Lamarck,"L'ouvrage regroupe les matériaux destinés à un ouvrage projeté sur les corps vivants, sous le titre de Biologie, ouvrage qui de ma part restera sans exécution (PZ, I, xviii). ",1809,,Histoire de la discipline
+76,Tableau méthodique de la classe des Céphalopodes,,Alcide d'Orbigny,Première publication d'ampleur de d'Orbigny,1826,,Histoire de la discipline
+77,Discours sur la biologie ou science de la vie,biologie,Fodera,Fodera y défend l'autonomie de la biologie sur la base retenue par Lamarck,1826,,Histoire de la discipline
+78,Evidence as to Man's Place in Nature ,,Huxley,L'ouvrage affirme l'existence d'un ancêtre commun aux hommes et aux grands singes,1863,,Histoire de la discipline
+79,introduction du terme Chromosome ,génétique chromosome ,HV Von Waldeyer,,1888,,Histoire de la discipline
+80,Le Darwinisme social ,darwinisme social critique Haeckel,Gautier (Emile),"se présente comme travaux d'un cercle d'études sociales du Panthéon (ouvriers surtout mais aussi artistes) dénonçant le darwinisme social, attribvué aux exploiteurs. Le socialisme ets présenté comme l'adversaire du darwinisme (Haeckel)",1877,,
+81,Natural inheritance  ,darwinisme social,Galton,,1889,,
+82, Hereditary Genius ,darwinisme social,Galton,,1869,,darwinimse social
+83, Les sélections sociales,darwinisme social,Vacher de Lapouges,"Dans  Les sélections sociales, l'anthropologue se réclame de Darwin et de la préface de Clémence Royer pour fonder la supériorité des races aryennes, dans la lignée des biométriciens anglais.",1869,,
+84,Essai sur l'hérédité,hérédité plasma  germinatif,Weismann (Auguste),,1883,,
+85,Le Germoplasme. Une théorie de l'hérédité,hérédité soma germen,Weismann (Auguste),,1892,,
+86,The Natural History of European Seas ,biologie marine,edward Forbes,,1859,,
+87, On the distinctions of a plant and an animal and on a fourth kingdom of Nature,protoctistes  protozoaires quatrième règne,Hogg (John),"afirme l'existence d'un règne ni minéral ni végétal ni animal,  mais des êtres vivants qui les ont précédés, protozoaires et protoctistes.",1860,,
+88,Über Zellbildung und Zellteilung,Mitose cytologie embryologie végétale,Strasburger,,1875,,
