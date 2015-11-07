@@ -1,0 +1,182 @@
+html,body,#wrapper {
+	width: 100%;
+	height: 100%;
+	margin: 10px;
+}
+path {
+  fill: steelblue;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+.chart {
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+}
+
+.axis path,.axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+
+.bar {
+	fill: #33b5e5;
+}
+
+.bar-failed {
+	fill: #CC0000;
+}
+
+.bar-running {
+	fill: #669900;
+}
+
+.bar-succeeded {
+	fill: #33b5e5;
+}
+
+.bar-killed {
+	fill: #ffbb33;
+}
+
+
+.UE1-EC1 {
+	fill: #6baed6;
+	background-color:#6baed6;
+	padding:6px;
+}
+.UE1-EC2 {
+	fill: #9ecae1;
+	background-color:#9ecae1;
+	padding:6px;
+}
+.UE2-EC1 {
+	fill: #fd8d3c;
+	background-color:#fd8d3c;
+	padding:6px;
+}
+.UE2-EC2 {
+	fill: #fdae6b;
+	background-color:#fdae6b;
+	padding:6px;
+}
+.UE2-EC3 {
+	fill: #fdd0a2;
+	background-color:#fdd0a2;
+	padding:6px;
+}
+.UE3-EC1 {
+	fill: #31a354;
+	background-color:#31a354;
+	padding:6px;
+}
+.UE3-EC2 {
+	fill: #74c476;
+	background-color:#74c476;
+	padding:6px;
+}
+.UE3-EC3 {
+	fill: #a1d99b;
+	background-color:#a1d99b;
+	padding:6px;
+}
+.UE4-EC1 {
+	fill: #bdbdbd;
+	background-color:#bdbdbd;
+	padding:6px;
+}
+.UE4-EC2 {
+	fill: #d9d9d9;
+	background-color:#d9d9d9;
+	padding:6px;
+}
+.UE5_2-EC1 {
+	fill:  #756bb1;
+	background-color:#756bb1;
+	padding:6px;
+}
+.UE5_2-EC2 {
+	fill: #9e9ac8;
+	background-color:#9e9ac8;
+	padding:6px;
+}
+.UE5_2-EC3 {
+	fill: #bcbddc;
+	background-color:#bcbddc;
+	padding:6px;
+}
+.UE5_2-EC4 {
+	fill: #dadaeb;
+	background-color:#dadaeb;
+	padding:6px;
+}
+.VACANCES {
+	fill: white;
+	background-color:white;
+	padding:6px;
+}
+.STAGE {
+	fill: #969696;
+	background-color:#969696;
+	padding:6px;
+}
+.JURY {
+	fill: red;
+	background-color:red;
+	padding:6px;
+	color:white;
+}
+.TUTORAT {
+	fill: #d9d9d9;
+	background-color:#d9d9d9;
+	padding:6px;
+}
+
+
+table {
+	border:3px solid #6495ed;
+	border-collapse:collapse;
+}
+thead, tfoot {
+	background-color:#D0E3FA;
+	border:1px solid #6495ed;
+}
+tbody {
+	background-color:#FFFFFF;
+	border:1px solid #6495ed;
+}
+th {
+	font-family:monospace;
+	border:1px dotted #6495ed;
+	padding:5px;
+	background-color:#EFF6FF;
+}
+.tdH {
+	vertical-align:middle;
+	font-family:sans-serif;
+	border:2px solid #6495ed;
+	padding:3px;
+	text-align:left;
+	width:60px;
+}
+.tdC {
+	vertical-align:top;
+	font-family:sans-serif;
+	text-align:left;
+	width:176px;
+	border:2px solid #6495ed;
+}
+caption {
+	font-family:sans-serif;
+}

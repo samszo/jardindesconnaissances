@@ -106,12 +106,12 @@ class Flux_Gapaii extends Flux_Site{
 		$idDoc = $this->dbD->ajouter(array("tronc"=>$data["idOeu"]."_".$data["idCpt"],"titre"=>$data["titre"]
 			,"data"=>$data["txt"], "maj"=>$date->get("c")));
 		foreach ($data["sems"] as $sem) {
-        	if($sem["lib"]){
-	        	//sauvegarde la sémantique du tag pour le clic document et l'utilisateur
+	        	if($sem["lib"]){
+	        		//sauvegarde la sémantique du tag pour le clic document et l'utilisateur
 				$idT = $this->saveTag($sem["lib"], $idDoc, 1, $date->get("c"), $idUti);
 				//sauvegarde la sémantique du tag
 				$this->saveIEML($sem["ieml"], $idUti, $idT);
-        	}
+	        	}
         }
         return $idDoc;
 	}	

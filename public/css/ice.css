@@ -1,0 +1,95 @@
+      html, body {
+        width: 100%;
+        height: 100%;
+        background-color: black;
+      }
+	div#viz {
+	    width: 1280px;
+        height: 720px;
+	    margin: 0 auto;
+	    background-color: white;
+	}
+	div.tooltip {
+	  position: absolute;
+	  text-align: center;
+      height: 16px;
+	  padding: 8px;
+	  font: 10px sans-serif;
+	  background: #ddd;
+	  border: solid 1px #aaa;
+	  border-radius: 8px;
+	  pointer-events: none;
+	}	      	      
+	
+	#promptCompat{ 
+			display: none; 
+	} 
+	#promptCompat.no_dialog{ 
+		box-shadow: 0 0 5px 2px red; 
+		padding: 10px; 
+		display: block; 
+		text-align: center; 
+		font-weight: bold; 
+	} 
+	.boutons{ 
+		padding: 10px; 
+	} 
+	dialog{ 
+		border-radius: 10px; 
+		box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); 
+	} 
+	dialog::backdrop{ 
+		background-color: rgba(0, 0, 0, 0.6); 
+	} 
+
+	ul li {list-style: none; cursor: pointer;}
+	li.smart_autocomplete_highlight {background-color: #8d8bc4;}
+	ul { margin: 10px 0; padding: 5px; background-color: #269bc9; }
+
+	.area {
+	  fill: grey;
+	  clip-path: url(#clip);
+	}
+	.axis path,
+	.axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+	
+	.brush .extent {
+	  stroke: #fff;
+	  fill-opacity: .125;
+	  shape-rendering: crispEdges;
+	}			
+   
+
+	.doc {
+	  fill: none;
+	  stroke: #fff;
+	  font: 10px sans-serif;
+	}
+    
+    
+        .parent .label {
+            font-size: 12px;
+            stroke: #FFFFFF;
+            fill: #FFFFFF;
+        }
+
+        .child .label {
+            font-size: 11px;
+        }
+
+        .cellDoc {
+            font-size: 18px;
+            cursor: pointer
+        }    
+		.labelDoc {
+            stroke: #FFFFFF;
+            fill: #FFFFFF;
+            stroke-width: 0;
+            margin: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }  

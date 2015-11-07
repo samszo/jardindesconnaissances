@@ -17,7 +17,7 @@ function selectsontexte(config) {
 	this.sst = function() {
 	  
 	  var sbparams;
-	  this.allTexte = this.data['text'];
+	  this.allTexte = this.data['texte'];
 	  var nbCarDeb = 0, nbCarFin = 0, nbCarTot = this.allTexte.length, arrMots = this.allTexte.split(" ")
 	  , phrases = this.data['phrases'], posis = this.data['posis'], arrSon = []
 	  , audioSource = this.data['urlSonLocal']
@@ -125,7 +125,7 @@ function selectsontexte(config) {
 	    	this.arrSbSon.push(new selectbar({id:'son_'+idDoc+'_'+i, wBar:10, wSel:10, d:[{x: getSecByCar(phrases[i]['deb']), y: 0}], width:this.width
 	    		, hSel:this.hCntxSon, left:this.mrgCntxSon.left, top:this.mrgCntxSon.top+this.hCntxSon
 		  		, xCntx:this.xCntxSon ,xCntxInv:this.xCntxSonInv, svg:this.svg, fncDragEnd:this.playSonSelect, xUnit:1000, sst:this}));
-	    	var sb =new selectbar({id:'txt_'+idDoc+'_'+i, wBar:10, wSel:10, d:[{x: getMotByTerm(phrases[i]['deb']), y: 0}], width:this.width
+	    	var sb =new selectbar({id:'txt_'+idDoc+'_'+i, wBar:10, wSel:10, d:[{x: getMotByTerm(phrases[i]['deb'], phrases[i]['pHTML']), y: 0}], width:this.width
 	    		, hSel:this.hCntxText, left:this.mrgCntxText.left, top:this.mrgCntxText.top
 		  		, xCntx:this.xCntxTxt ,xCntxInv:this.xCntxTxtInv , svg:this.svg, fncDragEnd:this.showTextSelect, xUnit:1, sst:this});
 		  	this.arrSbTxt.push(sb);
@@ -181,14 +181,16 @@ function selectsontexte(config) {
 	  	txtAuto.innerHTML = txt;	
 	  }
 	  
-	  function getMotByTerm(txt){
+	  function getMotByTerm(txt, p){
 		  //calcule le mot par rapport à un term
 		  var posi = self.allTexte.indexOf(txt);
+		  if(posi==-1)posi=p;
 		  return self.getMotByCar(posi);
 	  }
 	  
 	  function getSecByCar(term){
-		  var posi = self.allTexte.indexOf(term);		  
+		  var posi = self.allTexte.indexOf(term);
+		  if(posi==-1)posi=0;
 		  var numSec = Math.round(nbSecTot/nbCarTot*posi);
 		  var d = new Date(numSec*1000);
 		  return self.xCntxSon(d);		  
@@ -243,8 +245,8 @@ function selectsontexte(config) {
 	  	//calcule l'intervale en seconde
 	  	var d0 = new Date(arrExt[0]);
 	  	var d1 = new Date(arrExt[1]);
-	  	sst.nbSecDeb = (d0.getMinutes()*60) + d0.getSeconds();//arrExt[0] / 1000;
-	  	sst.nbSecFin = (d1.getMinutes()*60) + d1.getSeconds();//arrExt[1] / 1000;
+	  	sst.nbSecDeb = ((d0.getHours()-1)*3660) + (d0.getMinutes()*60) + d0.getSeconds();//arrExt[0] / 1000;
+	  	sst.nbSecFin = ((d1.getHours()-1)*3660) + (d1.getMinutes()*60) + d1.getSeconds();//arrExt[1] / 1000;
 	  	var queryTime = sst.formatDate(d0)+" - "+sst.formatDate(d1);//+" = "+nbSecDeb+" - "+nbSecFin;
 	  	//console.log(queryTime);
 

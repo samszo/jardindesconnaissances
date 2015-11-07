@@ -69,14 +69,14 @@
 						var toto = data;
 					 }, "json");
 			d3.select('#Select_exi_'+idDoc).remove();
-			d3.select('#showSelect_'+idDoc).remove();
+			d3.select('#showSelect_'+idElem).remove();
 
 
 		}
 		function saveTag(tag, poids, idDoc){
 			cursor_wait();
 			var arr = idDoc.split("_");
-			var p = {"tag":tag, "idDoc":arr[3], "poids":poids, "db":db};
+			var p = {"tag":tag, "idDoc":arr[3], "poids":poids, "db":idBase};
 			$.post("../flux/ajoututitag", p,
 					 function(data){
 						cursor_clear();
@@ -201,7 +201,7 @@
 				cursor_wait();
 				d3.select('#gPosi').html("");
 				d3.select('#vis_gTC').html("");
-				var p = {"idUti":c.options[c.selectedIndex].value, "db":db};
+				var p = {"idUti":c.options[c.selectedIndex].value, "db":idBase};
 				$.post("../flux/gettutitags", p,
 						 function(data){
 							//console.log(data);

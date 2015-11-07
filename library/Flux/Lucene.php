@@ -83,7 +83,7 @@ bsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
 	
 	function find($query) {
 		$c = str_replace("::", "_", __METHOD__)."_".md5($query); 
-	   	$hits = $this->cache->load($c);
+	   	$hits = false;//$this->cache->load($c);
         if(!$hits){
 			$hits = $this->index->find($query);
 			$this->cache->save($hits, $c);
@@ -93,31 +93,31 @@ bsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
 	
 	function getTermPositions($term, $fields=array("title", "url"), $find=false) {
 
-	    $c1 = str_replace("::", "_", __METHOD__).$term['field']."_".md5($term['text'])."_".$find; 
+	    $c1 = str_replace("::", "_", __METHOD__).$term['field']."_".md5($term['texte'])."_".$find; 
 		foreach ($fields as $f) {
-	    	$c1 .= "_".$f;
+	    		$c1 .= "_".$f;
 	    }
 	   	$result = $this->cache->load($c1);
         if($result){
-        	return $result;
+        		return $result;
         }
 	    
         if($find){
 			//recherche la requête
-			$c = str_replace("::", "_", __METHOD__)."_find_".$term['field']."_".md5($term['text']); 
+			$c = str_replace("::", "_", __METHOD__)."_find_".$term['field']."_".md5($term['texte']); 
 		   	$posis = $this->cache->load($c);
 	        if(!$posis){
-				$posis = $this->find($term['field'].":".$term['text']);
-	        	$this->cache->save($posis, $c);			
+	        		$posis = $this->find($term['field'].":".$term['texte']);
+	        		$this->cache->save($posis, $c);			
 	        }        	
         }else{
 			$objTerm = new Zend_Search_Lucene_Index_Term(strtolower($term['text']), $term['field']);
 			//récupère les positions du term
-			$c = str_replace("::", "_", __METHOD__)."_getPosis_".$term['field']."_".md5($term['text']); 
+			$c = str_replace("::", "_", __METHOD__)."_getPosis_".$term['field']."_".md5($term['texte']); 
 		   	$posis = $this->cache->load($c);
 	        if(!$posis){
 				$posis = $this->index->termPositions($objTerm);
-	        	$this->cache->save($posis, $c);			
+	        		$this->cache->save($posis, $c);			
 	        }        	
         }
 		
@@ -126,27 +126,27 @@ bsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
 		foreach ($posis as $kD => $ps) {
 			//on récupère le document lucene
 	        if($find)			
-		    	$doc = $this->index->getDocument($ps->id);
+		    		$doc = $this->index->getDocument($ps->id);
 		    else
-		    	$doc = $this->index->getDocument($kD);
+		    		$doc = $this->index->getDocument($kD);
 		    $url = urldecode($doc->getFieldValue('url'));
-	    	//récupère le contenu du document
-	    	if($term['field']=="cours"){
-		    	$html = $doc->getFieldValue('cours');		    		
-	    	}else{
-		    	$html = $this->getUrlBodyContent($url);		    		
-	    	}
-
-	    	//récupère les segments de phrase
-	    	$segs = $this->getSegments($html, $term['text']);
+		    	//récupère le contenu du document
+		    	if($term['field']=="cours"){
+			    	$html = $doc->getFieldValue('cours');		    		
+		    	}else{
+			    	$html = $this->getUrlBodyContent($url);		    		
+		    	}
+	
+		    	//récupère les segments de phrase
+		    	$segs = $this->getSegments($html, $term['texte']);
 
 			/**
 			 * TODO:
 			 * régler le problème de case sensitive qui fait que Lucène renvoit des valeurs et pas $this->getSegments
 			 */
-	    	if(count($segs)>1){
-	    	
-	    		$phrases = $this->getPhrases($segs, $find, $ps);
+		    	if(count($segs)>1){
+		    	
+		    		$phrases = $this->getPhrases($segs, $find, $ps);
 			    $r = "";
 			    foreach ($fields as $f) {
 			    	if($f=="url")
@@ -157,7 +157,7 @@ bsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
 			    $r["taille"]=strlen($html);
 			    $r["phrases"]=$phrases;
 			    $result[] = $r;
-	    	}		    
+		    	}		    
 		}
         $this->cache->save($result, $c1);			
 		
@@ -207,21 +207,23 @@ bsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
 	
 	function getSegments($html, $texte){
 		
-    	//vérification des requêtes complexes and
-    	$arrQ = split(" and ", $texte);
-    	
-    	//vérification des requêtes complexes or
-    	if(count($arrQ)==1) $arrQ = split(" or ", $texte);
-    	
-    	$result = array();
-    	
+	    	//vérification des requêtes complexes and
+	    	$arrQ = split(" and ", $texte);
+	    	
+	    	//vérification des requêtes complexes or
+	    	if(count($arrQ)==1) $arrQ = split(" or ", $texte);
+	    	
+	    	$result = array();
+	    	
 		//tag les mots de la requête
-    	for ($i = 0; $i < count($arrQ); $i++) {
-    		$html = preg_replace("[(".$arrQ[$i].")]", '<find>$1</find>', $html);    		
-    	}
-    	//création du tableau des résultats
-    	$pattern = "[<find>]";
-    	$result = preg_split($pattern, $html);
+	    	for ($i = 0; $i < count($arrQ); $i++) {
+	    		//$html = preg_replace("[(".$arrQ[$i].")]", '<find>$1</find>', $html);
+	    		$html = preg_replace("/".$arrQ[$i]."/i", '<find>'.$arrQ[$i].'</find>', $html);
+	    		    		
+	    	}
+	    	//création du tableau des résultats
+	    	$pattern = "[<find>]";
+	    	$result = preg_split($pattern, $html);
     	
 		return $result;
 	}

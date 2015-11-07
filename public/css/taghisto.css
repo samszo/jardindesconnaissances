@@ -128,12 +128,12 @@ body {
       stroke-width: 0.3px; }
     #content svg g.axis path.domain {
       fill: none; }
-    #content svg #prenoms #lines > g path {
+    #content svg #tags #lines > g path {
       stroke-width: 3px;
       fill: none; }
-    #content svg #prenoms #lines > g circle {
+    #content svg #tags #lines > g circle {
       stroke: none; }
-    #content svg #prenoms #labels > g text {
+    #content svg #tags #labels > g text {
       fill: white; }
     #content svg g.year_zoomers {
       cursor: pointer; }
@@ -154,10 +154,10 @@ body {
         stroke-dasharray: 2, 3;
         stroke-width: 0.3px;
         stroke: black; }
-      #content svg g#popup .prenom_summary text {
+      #content svg g#popup .tag_summary text {
         font-size: 14px;
         fill: #666666; }
-      #content svg g#popup .prenom_summary .bg {
+      #content svg g#popup .tag_summary .bg {
         fill: white; }
     #content svg #playground_bg {
       fill: #edf4f8; }

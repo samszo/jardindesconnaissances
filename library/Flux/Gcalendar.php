@@ -13,10 +13,10 @@ class Flux_Gcalendar extends Flux_Site{
 	var $idsEvent;		
 	var $events;		
 	var $token;		
-	var $client_id = '77330937798-6h0j3fcu56mi3vt54mal0j5sg37ijkug.apps.googleusercontent.com';
- 	var $client_secret = 'FlimbY2obkI3p6zUYtsMyfdx';
- 	var $redirect_uri = 'http://localhost/exemples/php/google-api/examples/user-example.php';
-	
+	var $client_id = KEY_GOOGLE_CLIENT_ID;
+ 	var $client_secret = KEY_GOOGLE_CLIENT_SECRET;
+	var $redirect_uri = 'http://localhost/exemples/php/google-api/examples/user-example.php';
+	 	
 	public function __construct($token)
     {
     	parent::__construct($idBase);
@@ -24,32 +24,32 @@ class Flux_Gcalendar extends Flux_Site{
 		$client = new Google_Client();				
 		$client->setAccessToken($token);
 		$this->service = new Google_Service_Calendar($client);
-    	$this->token = $token;	    
+    		$this->token = $token;	    
     }
 	
     public function getListeCalendar()
     {
-    	$this->trace("DEBUT ".__METHOD__);
+    		$this->trace("DEBUT ".__METHOD__);
 		$c = str_replace("::", "_", __METHOD__)."_".md5($this->token); 
 		$calendars = $this->cache->load($c);
     	
-    	if(!$calendars){
-			$calendarList = $this->service->calendarList->listCalendarList();    	
-		    while(true) {
-			  foreach ($calendarList->getItems() as $calendarListEntry) {
-			    $calendars[] = $this->getCalendarInfo($calendarListEntry);
-			  }
-			  $pageToken = $calendarList->getNextPageToken();
-			  if ($pageToken) {
-			    $optParams = array('pageToken' => $pageToken);
-			    $calendarList = $this->service->calendarList->listCalendarList($optParams);
-			  } else {
-			    break;
-			  }
-			}		    		
-        	$this->cache->save($calendars, $c);
-    	}
-    	$this->trace("FIN ".__METHOD__);
+	    	if(!$calendars){
+				$calendarList = $this->service->calendarList->listCalendarList();    	
+			    while(true) {
+				  foreach ($calendarList->getItems() as $calendarListEntry) {
+				    $calendars[] = $this->getCalendarInfo($calendarListEntry);
+				  }
+				  $pageToken = $calendarList->getNextPageToken();
+				  if ($pageToken) {
+				    $optParams = array('pageToken' => $pageToken);
+				    $calendarList = $this->service->calendarList->listCalendarList($optParams);
+				  } else {
+				    break;
+				  }
+				}		    		
+	        	$this->cache->save($calendars, $c);
+	    	}
+	    	$this->trace("FIN ".__METHOD__);
 		return $calendars;
     }
 

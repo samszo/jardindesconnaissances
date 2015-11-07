@@ -32,20 +32,21 @@ class Flux_Site{
 	var $kwe = array("autokeyword","zemanta", "alchemy", "opencalais", "yahoo", "textalytics","aylien");
     //pour l'optimisation
     var $bTrace = false;
+    var $bTraceFlush = false;//mettre false pour les traces de debuggage
     var $echoTrace = false;
-    var $temps_debut;
+	var $temps_debut;
     var $temps_inter;
     var $temps_nb=0;
-	
-    function __construct($idBase=false){    	
+    var $idDoc;
+    
+    function __construct($idBase=false, $bTrace=false){    	
     	
-    	/*
-    	$this->bTrace = $trace; // pour afficher les traces   	
-    	$this->temps_debut = microtime(true);
-		$this->trace("DEBUT ".__METHOD__);
-    	*/
-    	
-    	$this->getDb($idBase);
+    		if($bTrace){
+			$this->bTrace = true;		
+			$this->temps_debut = microtime(true);
+    		}
+    		
+    		$this->getDb($idBase);
     	
         $frontendOptions = array(
             'lifetime' => 30000000, // temps de vie du cache en seconde
@@ -61,16 +62,20 @@ class Flux_Site{
                                      'File',
                                      $frontendOptions,
                                      $backendOptions); 
+    
     }
 
 	/**
 	* fonction pour tracer l'éxécution du code
 	*
-    * @param string $message
+    * @param string 	$message
+    * @param array 	$data
     * 
     */
-	public function trace($message){
+	public function trace($message, $data=false){
 		if($this->bTrace){
+			if(!$this->temps_debut)$this->temps_debut = microtime(true);
+			
 			$temps_fin = microtime(true);
 			$tG = str_replace(".",",",round($temps_fin - $this->temps_debut, 4));
 			$tI = str_replace(".",",",round($temps_fin - $this->temps_inter, 4));
@@ -79,8 +84,12 @@ class Flux_Site{
 				$this->echoTrace .= $mess;
 			else{
 				echo $mess;
-				ob_flush();
-		        flush();				
+				if($data){print_r($data); echo "<br/>";}
+				if($this->bTraceFlush){
+					ob_flush();
+			        flush();				
+				}
+		        //
 			}
 			$this->temps_inter = $temps_fin;
 			$this->temps_nb ++;
@@ -210,17 +219,17 @@ class Flux_Site{
 		   	$html = $this->cache->load($c);
 		}
         if(!$html){
-	    	$client = new Zend_Http_Client($url,array('timeout' => 30));
-	    	if($param && !$method)$client->setParameterGet($param);
-	    	if($param && $method==Zend_Http_Client::POST)$client->setParameterPost($param);
-	    	try {
-				$response = $client->request($method);
-				$html = $response->getBody();
-			}catch (Zend_Exception $e) {
-				echo "Récupère exception: " . get_class($e) . "\n";
-			    echo "Message: " . $e->getMessage() . "\n";
-			}				
-        	if($cache)$this->cache->save($html, $c);
+		    	$client = new Zend_Http_Client($url,array('timeout' => 30));
+		    	if($param && !$method)$client->setParameterGet($param);
+		    	if($param && $method==Zend_Http_Client::POST)$client->setParameterPost($param);
+		    	try {
+					$response = $client->request($method);
+					$html = $response->getBody();
+				}catch (Zend_Exception $e) {
+					echo "Récupère exception: " . get_class($e) . "\n";
+				    echo "Message: " . $e->getMessage() . "\n";
+				}				
+	        	if($cache)$this->cache->save($html, $c);
         }
 		return $html;
 	}
@@ -410,6 +419,7 @@ class Flux_Site{
 		//initialise les gestionnaires de base de données
 		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
 		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc($this->db);
+		$this->idDoc = $idDoc;
 		
 		if($class=="all"){
 			foreach ($this->kwe as $c) {
@@ -476,16 +486,70 @@ class Flux_Site{
 					}
 					break;
 				case "aylien":
-					foreach ($arrKW as $lbl=>$kw){
+					//problème avec l'extraction des sentiments
+					$arrC = $arrKW['concepts']->concepts;
+					foreach ($arrC as $url=>$kw){
+						//récupère le nom de la ressource
+						$pu = parse_url($url);
+						//enregistre le document dppedia
+						$idDocDBP = $this->dbD->ajouter(array("titre"=>$pu["path"],"tronc"=>"dbpedia","maj"=>$d->get("c"), "type"=>33, "url"=>$url));
+						//récupères les formes du concept
+						foreach ($kw->surfaceForms as $w){
+							$idT = $this->saveTag($w->string, $idDoc, $w->score, $d->get("c"), $idUdst);
+						}
+						/*récupères les types du concept
+						foreach ($kw->types as $w){
+							$idT = $this->saveTag($w->string, $idDoc, $w->score, $d->get("c"), $idUdst);
+						}
+						*/
+					}
+					$arrC = $arrKW['entities']->entities;
+				   	foreach ($arrC as $lbl=>$kw){
 						foreach ($kw as $w){
 							$this->saveTagTag($lbl, $w, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);							
-						}
+						}				   			
 				   	}
-					break;
+				   	break;
 				case "textalytics":
 					foreach ($arrKW as $lbl=>$kw){
 						foreach ($kw as $w){
-							$this->saveTagTag($lbl, $w, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);							
+							switch ($lbl) {
+								case "entity_list":
+									$sem = $w->sementity;
+									$this->saveTagTag($lbl, $w->form, $w->relevance, $d->get("c"), $idDoc, -1, -1, $idUdst);
+									foreach ($w->variant_list as $v) {
+										$this->saveTagTag("variant_list", $v->form, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);
+										$idDocVar = $this->dbD->ajouter(array("titre"=>$v->form,"parent"=>$idDoc,"maj"=>$d->get("c"), "type"=>39, "url"=>"inip=".$v->inip."&endp=".$v->endp, "note"=>json_encode($v)));										
+									}							
+									break;								
+								case "concept_list":
+									$sem = $w->sementity;
+									$this->saveTagTag($lbl, $w->form, $w->relevance, $d->get("c"), $idDoc, -1, -1, $idUdst);
+									foreach ($w->variant_list as $v) {
+										$this->saveTagTag("variant_list", $v->form, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);
+										$idDocVar = $this->dbD->ajouter(array("titre"=>$v->form,"parent"=>$idDoc,"maj"=>$d->get("c"), "type"=>39, "url"=>"inip=".$v->inip."&endp=".$v->endp, "note"=>json_encode($v)));										
+									}							
+									break;								
+								case "money_expression_list":
+									$this->saveTagTag($lbl, $w->form, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);
+									$idDocUri = $this->dbD->ajouter(array("titre"=>$w->type,"parent"=>$idDoc,"maj"=>$d->get("c"), "type"=>39, "url"=>"", "note"=>json_encode($w)));										
+									break;								
+								case "time_expression_list":
+									$this->saveTagTag($lbl, $w->form, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);
+									$idDocUri = $this->dbD->ajouter(array("titre"=>$w->form,"parent"=>$idDoc,"maj"=>$d->get("c"), "type"=>39, "url"=>"inip=".$w->inip."&endp=".$w->endp, "note"=>json_encode($w)));										
+									break;								
+								case "uri_list":
+									$idDocUri = $this->dbD->ajouter(array("titre"=>$lbl,"parent"=>$idDoc,"maj"=>$d->get("c"), "type"=>33, "url"=>$w->form, "note"=>json_encode($w)));										
+									break;								
+								case "relation_list":
+									$sem = $w->verb;
+									$this->saveTagTag($lbl, $w->form, $w->degree, $d->get("c"), $idDoc, -1, -1, $idUdst);
+									$idDocRela = $this->dbD->ajouter(array("titre"=>$w->form,"parent"=>$idDoc,"maj"=>$d->get("c"), "type"=>33, "url"=>"inip=".$w->inip."&endp=".$w->endp, "note"=>json_encode($w)));										
+									foreach ($w->complement_list as $v) {
+										$this->saveTagTag($v->type, $v->form, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);
+									}							
+									break;								
+							}
 						}
 				   	}
 					break;
@@ -551,6 +615,41 @@ class Flux_Site{
 	}
 
     /**
+     * enregistre les mots clefs d'un utilisateur à partir d'un fichier csv
+     *
+     * @param string $login
+     * @param string $fic
+     *   
+     * @return array
+     */
+	function saveKWUti($login, $fic){
+	    	//
+	    	$this->bTrace = true; // pour afficher les traces   	
+	    	$this->temps_debut = microtime(true);
+		$this->trace("DEBUT ".__METHOD__);
+
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc($this->db);
+		
+		//récupère les données csv
+		$arrKW = $this->csvToArray($fic,0,",");
+
+		//récupère la date courante
+		$d = new Zend_Date();
+		
+		//récupère l'utilisateur
+		$idUti = $this->getUser(array("login"=>$login),true);
+		
+		//enregistre l'extraction de mots clefs
+		$idDoc = $this->dbD->ajouter(array("titre"=>"Mots clefs de ".$login,"maj"=>$d->get("c"), "type"=>78, "note"=>json_encode($arrKW)));
+		
+		foreach ($arrKW as $kw) {
+			$this->saveTag($kw[0], $idDoc, 1, $d->get("c"),$idUti);
+		}
+		
+	}
+	
+    /**
      * enregistre les mots clefs des fichiers d'un répertoire
      *
      * @param string $rep
@@ -572,9 +671,9 @@ class Flux_Site{
 		$globOut = glob($rep);
 		foreach ($globOut as $filename) {
 			$path_parts = pathinfo($filename);
-	        $this->trace($filename);
 			switch ($path_parts['extension']) {
 				case "pdf":
+					//problème avec l'extraction des données du pdf
 					$type = 35;
 					$pdf = Zend_Pdf::load($filename);
 					$contents = false;//$pdfParse->pdf2txt($pdf->render());
@@ -586,12 +685,13 @@ class Flux_Site{
 					break;
 			}
 			if($contents){
-	        	$this->trace($contents);
+	        		$this->trace($filename);
+				//$this->trace($contents);
 				//enregistre le document
-	        	$idDoc = $this->dbD->ajouter(array("titre"=>$path_parts['filename'],"url"=>$filename, "type"=>$type, "note"=>$contents));
-	        	//enregistre les mots clefs
+		        	$idDoc = $this->dbD->ajouter(array("titre"=>$path_parts['filename'],"url"=>$filename, "type"=>$type, "note"=>$contents));
+		        	//enregistre les mots clefs
 				//var $kwe = array("autokeyword","zemanta", "alchemy", "opencalais", "yahoo", "textalytics","aylien");
-	        	$this->saveKW($idDoc, $contents,"","aylien");	        
+		        	$this->saveKW($idDoc, $contents,"","all");	        
 			}
 	    }
 		
@@ -625,10 +725,13 @@ class Flux_Site{
 				break;
 			case "opencalais":
 				$rs = $this->getKWOpencalais($texte, $html);
+				break;
 			case "textalytics":
 				$rs = $this->getKWTextalytics($texte, $html);
+				break;
 			case "aylien":
 				$rs = $this->getKWAylien($texte, $html);
+				break;
 		}
 		return $rs;		
 	}	
@@ -911,7 +1014,8 @@ class Flux_Site{
 		
 		$aylien = new Flux_Aylien();
 		
-		$result = $aylien->getAnalyses($texte, $url);
+		$result = $aylien->getAnalyses($texte, $url, $this->idBase."_".$this->idDoc);
+		//$result = $aylien->getAnalyses($texte, $url);
 		
 		return $result;
 						
@@ -933,7 +1037,7 @@ class Flux_Site{
 		$oc = new OpenCalais(KEY_OPENCALAIS);
 		//$oc->outputFormat = "Application/JSON";
 				
-		$result = $oc->getEntities($chaine);
+		$result = $oc->getEntities(substr($chaine, 0, 99000));
 		
 		return $result;
 				
@@ -1194,5 +1298,84 @@ class Flux_Site{
     	return $dc;
     }    
     
-	
+    /** 
+     * Copy file or folder from source to destination, it can do 
+     * recursive copy as well and is very smart 
+     * It recursively creates the dest file or directory path if there weren't exists 
+     * Situtaions : 
+     * - Src:/home/test/file.txt ,Dst:/home/test/b ,Result:/home/test/b -> If source was file copy file.txt name with b as name to destination 
+     * - Src:/home/test/file.txt ,Dst:/home/test/b/ ,Result:/home/test/b/file.txt -> If source was file Creates b directory if does not exsits and copy file.txt into it 
+     * - Src:/home/test ,Dst:/home/ ,Result:/home/test/** -> If source was directory copy test directory and all of its content into dest      
+     * - Src:/home/test/ ,Dst:/home/ ,Result:/home/**-> if source was direcotry copy its content to dest 
+     * - Src:/home/test ,Dst:/home/test2 ,Result:/home/test2/** -> if source was directoy copy it and its content to dest with test2 as name 
+     * - Src:/home/test/ ,Dst:/home/test2 ,Result:->/home/test2/** if source was directoy copy it and its content to dest with test2 as name 
+     * @todo 
+     *     - Should have rollback technique so it can undo the copy when it wasn't successful 
+     *  - Auto destination technique should be possible to turn off 
+     *  - Supporting callback function 
+     *  - May prevent some issues on shared enviroments : http://us3.php.net/umask 
+     * @param $source //file or folder 
+     * @param $dest ///file or folder 
+     * @param $options //folderPermission,filePermission 
+     * @return boolean 
+     */ 
+    function smartCopy($source, $dest, $options=array('folderPermission'=>0755,'filePermission'=>0755)) 
+    { 
+        $result=false; 
+        
+        if (is_file($source)) { 
+            if ($dest[strlen($dest)-1]=='/') { 
+                if (!file_exists($dest)) { 
+                    cmfcDirectory::makeAll($dest,$options['folderPermission'],true); 
+                } 
+                $__dest=$dest."/".basename($source); 
+            } else { 
+                $__dest=$dest; 
+            } 
+            $result=copy($source, $__dest); 
+            chmod($__dest,$options['filePermission']); 
+            
+        } elseif(is_dir($source)) { 
+            if ($dest[strlen($dest)-1]=='/') { 
+                if ($source[strlen($source)-1]=='/') { 
+                    //Copy only contents 
+                } else { 
+                    //Change parent itself and its contents 
+                    $dest=$dest.basename($source); 
+                    @mkdir($dest); 
+                    chmod($dest,$options['filePermission']); 
+                } 
+            } else { 
+                if ($source[strlen($source)-1]=='/') { 
+                    //Copy parent directory with new name and all its content 
+                    @mkdir($dest,$options['folderPermission']); 
+                    chmod($dest,$options['filePermission']); 
+                } else { 
+                    //Copy parent directory with new name and all its content 
+                    @mkdir($dest,$options['folderPermission']); 
+                    chmod($dest,$options['filePermission']); 
+                } 
+            } 
+
+            $dirHandle=opendir($source); 
+            while($file=readdir($dirHandle)) 
+            { 
+                if($file!="." && $file!="..") 
+                { 
+                     if(!is_dir($source."/".$file)) { 
+                        $__dest=$dest."/".$file; 
+                    } else { 
+                        $__dest=$dest."/".$file; 
+                    } 
+                    //echo "$source/$file ||| $__dest<br />"; 
+                    $result=$this->smartCopy($source."/".$file, $__dest, $options); 
+                } 
+            } 
+            closedir($dirHandle); 
+            
+        } else { 
+            $result=false; 
+        } 
+        return $result; 
+    } 	
 }

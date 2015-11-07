@@ -46,8 +46,8 @@ function treeBranche(config) {
 		    //on regroupe le tree dans un g pour pouvoir le positionner
 		    groupTree = self.svgGroup
 		    	.append("svg:g")
-		    	.attr("id", "groupTree"+self.id)
-		    	.attr("transform", "translate("+self.x+", "+self.y+")");
+		    	.attr("id", "groupTree"+self.id);
+		    	//.attr("transform", "translate("+self.x+", "+self.y+")");
 
 		    
 		    // A recursive helper function for performing some setup by walking through all nodes		
@@ -303,16 +303,21 @@ function treeBranche(config) {
 		    // Function to center node when clicked/dropped so node doesn't get lost when collapsing/moving with large amount of children.
 		
 		    function centerNode(source) {
+		        //
 		        scale = zoomListener.scale();
 		        x = -source.y0;
 		        y = -source.x0;
+		        y = -source.x0+self.y;
+	            x = -source.y0+self.x;		        
 		        x = x * scale + viewerWidth / 2;
 		        y = y * scale + viewerHeight / 2;
-		        d3.select('g').transition()
+		        groupTree.select('g').transition()
 		            .duration(duration)
 		            .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");
+		        /*
 		        zoomListener.scale(scale);
 		        zoomListener.translate([x, y]);
+		        */
 		    }
 		
 		    // Toggle children function
@@ -363,8 +368,8 @@ function treeBranche(config) {
 		
 		        // Set widths between levels based on maxLabelLength.
 		        nodes.forEach(function(d) {
-		            d.y = -d.x;
-		            d.x = -(d.depth * (maxLabelLength * 10));
+		            d.y = -d.x+self.x;
+		            d.x = -(d.depth * (maxLabelLength * 10))+self.y;
 		        	//d.y = (d.depth * (maxLabelLength * 10)); //maxLabelLength * 10px
 		            // alternatively to keep a fixed scale one can set a fixed depth per level
 		            // Normalize for fixed-depth by commenting out below line

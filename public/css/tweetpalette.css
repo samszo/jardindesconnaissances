@@ -64,7 +64,9 @@ body, html {
 .tofsActeur{
 	cursor: pointer;
     width:100px;
+    /*
     height:100px;
+    */
 }
 .acteur{
 	float:left;

@@ -11,7 +11,8 @@ class Flux_Diigo extends Flux_Site{
 	const API_URI = "https://secure.diigo.com";
     const API_URL = '/api/v2/bookmarks';
     const RSS_GROUP_URL = 'http://groups.diigo.com/group/';
-    const LUCENE_INDEX = '../data/diigo-index';
+    var $LUCENE_INDEX;
+    var $setLucene = false;
 	
     /**
      * Zend_Service_Rest instance
@@ -20,12 +21,14 @@ class Flux_Diigo extends Flux_Site{
      */
     protected $rest;
 	
-	public function __construct($login="", $pwd="", $idBase=false)
+	public function __construct($login="", $pwd="", $idBase=false, $bTrace=false)
     {
-    	parent::__construct($idBase);
-		
+    	parent::__construct($idBase,$bTrace);
+
+    	$this->LUCENE_INDEX = ROOT_PATH.'/data/diigo-index';
+    	
+	$this->login = $login;
     	if($login && $pwd){
-	    	$this->login = $login;
 	    	$this->pwd = $pwd;
     		$this->rest = new Zend_Rest_Client();
 	        $this->rest->getHttpClient()->setAuth($login, $pwd);
@@ -38,13 +41,14 @@ class Flux_Diigo extends Flux_Site{
 		$c = str_replace("::", "_", __METHOD__)."_".$this->getParamString($params); 
 	   	$arr = $this->cache->load($c);
         if(!$arr){
-	    	$params['key'] = KEY_DIIGO_API;
-	    	$response = $this->rest->restGet(self::API_URL, $params);
-	
+		    	$params['key'] = KEY_DIIGO_API;
+		    	$response = $this->rest->restGet(self::API_URL, $params);
+			//$this->trace($response);	
 	        if (!$response->isSuccessful()) {
-	            throw new Zend_Service_Exception("Http client reported an error: '{$response->getMessage()}'");
-	        }
-	
+				$this->trace("ERREUR : ".$response->getMessage());	
+	        		//throw new Zend_Service_Exception("Http client reported an error: '{$response->getMessage()}'");
+	        		return false;
+	        }	        
 	        $json = $response->getBody();
 		    $arr = json_decode($json);
 	        //le decode de zend est beaucoup trop long
@@ -56,32 +60,56 @@ class Flux_Diigo extends Flux_Site{
     	
     }
     
-    function saveAll(){
-
-    	$this->getUser(array("login"=>$this->login,"flux"=>"diigo"));
+	/**
+	 * enegistre le bookmark d'un compte
+	 *
+	 * @param string 	$login
+	 *
+	 * @return array
+	 */
+    function saveAll($login=false){
+    	
+		$this->trace("DEBUT ".__METHOD__);				
+    		if(!$login)$login=$this->login;
+    		$this->getUser(array("login"=>$login,"flux"=>"diigo"));
+    		
+		$this->trace("LOGIN ".$login." : ".$this->user);				
+    		
 		//initialise les gestionnaires de base de données
-    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+	    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
 		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
 		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc($this->db);
 		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
 		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
-    	//initialise le moteur d'indexation
-		if(!$this->lucene){
-			$this->lucene = new Flux_Lucene($this->login, $this->pwd, $this->idBase, false, self::LUCENE_INDEX);
+    		
+		//initialise le moteur d'indexation
+		if($this->setLucene && !$this->lucene){
+			$this->lucene = new Flux_Lucene($this->login, $this->pwd, $this->idBase, false, $this->LUCENE_INDEX);
 			$this->lucene->classUrl = $this;
 			$this->lucene->index->optimize();	
 		}
 		
-    	$i = 1;
+    		$i = 1;
 		while ($i>0) {
-    		$arr = $this->getRequest(array("user"=>$this->login,"count"=>100, "start"=>$i));
-    		foreach ($arr as $item){
-    			$this->saveItem($item);
-    		}
-    		$i = $i+count($arr);
-    	}
-    	$this->lucene->index->optimize();
-    }
+	    		$arr = $this->getRequest(array("user"=>$login,"count"=>100, "start"=>$i));
+	    		if(!$arr){
+		    		$i=-1;	
+	    		}else{				
+	    			$j = 0;
+		    		foreach ($arr as $item){
+					$this->trace("   ".$j." : ".$item->url);				
+		    			$this->saveItem($item);
+		    			$j++;
+		    		}
+				$this->trace("   ".$i." : ".count($arr));
+				if(count($arr)==0 || $j<100)$i=-1;
+				else $i = $i+count($arr);
+	    		}
+	    	}
+	    	if($this->setLucenee)$this->lucene->index->optimize();
+	    	
+		$this->trace("FIN ".__METHOD__);				
+    }    
 
     function saveItem($i){
 
@@ -90,19 +118,20 @@ class Flux_Diigo extends Flux_Site{
 		//$this->getGraine(array("titre"=>"Diigo","class"=>"Flux_Diigo","url"=>"http://www.diigo.com/"));
 		//TODO ajouter la utigraine 
 
-    	//transforme l'objet en tableau dans le cas ou on n'utilise pas le json decode de Zen
-    	$item['url'] = $i->url;
-    	$item['title'] = $i->title;
-    	$item['created_at'] = $i->created_at;
-    	$item['annotations'] = $i->annotations;
-    	$item['tags'] = $i->tags;
-    	//sinon 
-    	//$item = $i;
+	    	//transforme l'objet en tableau dans le cas ou on n'utilise pas le json decode de Zen
+	    	$item['url'] = $i->url;
+	    	$item['title'] = $i->title;
+	    	$item['created_at'] = $i->created_at;
+	    	$item['annotations'] = $i->annotations;
+	    	$item['tags'] = $i->tags;
+	    	//sinon 
+	    	//$item = $i;
     	
 		//ajouter un document correspondant au lien
 		$idD = $this->dbD->ajouter(array("url"=>$item['url'],"titre"=>$item['title'],"tronc"=>0,"pubDate"=>$item['created_at']));
+
 		//index le document
-		//$this->lucene->addDoc($item['url']);
+		if($this->setLucene) $this->lucene->addDoc($item['url']);
 		
 		//TODO ajouter la grainedoc 
 		$i = 0;
@@ -255,7 +284,7 @@ class Flux_Diigo extends Flux_Site{
 		//enregistre ou récupère Diigo comme existence
 		$idEDii = $dbM->ajoutExi($idMon, array("nom"=>"Diigo", "niveau"=>1));
 		
-    	//enregistre ou récupère le groupe dans l'url comme existence
+    		//enregistre ou récupère le groupe dans l'url comme existence
 		$arrUrl = explode('/', $data['url']);
 		$idEG = $dbM->ajoutExi($idMon, array("nom"=>$arrUrl[4], "parent"=>$idEDii));
 				
@@ -334,29 +363,68 @@ class Flux_Diigo extends Flux_Site{
 		foreach ($results as $result) {
 			$s = simplexml_import_dom($result);
 		    //récupère le fragment du document
-	    	$anno = $s->div[0]->div;
-	    	//on enregistre le fragment
+		    	$anno = $s->div[0]->div;
+		    	//on enregistre le fragment
 			$idDocFrag = $dbM->ajoutDoc($idMon, array("parent"=>$idDoc,"titre"=>"fragment ".$numFrag, "note"=>$anno, "poids"=>strlen($anno), "pubDate"=>$datePost->format('Y-m-d H:i:s')),$idE);
 			$numFrag ++;
-	    	//récupère les commentaires
-	    	foreach ($s->div[1]->ul->li as $c){
-	    		$exiC = (string) $c->a->img['alt'];
-	    		$exiTof = (string) $c->a->img['src'];
-	    		$exiUrl =  (string) $c->a->img['href'];
-	    		$dateC = $c->div->div[0]->span[0]."";
-			    $dateC = substr($dateC, -9);
-			    $dateC = DateTime::createFromFormat('j M y', $dateC);
-	    		$cmt = $c->div->div[1]->div[1]."";
+		    	//récupère les commentaires
+		    	foreach ($s->div[1]->ul->li as $c){
+		    		$exiC = (string) $c->a->img['alt'];
+		    		$exiTof = (string) $c->a->img['src'];
+		    		$exiUrl =  (string) $c->a->img['href'];
+		    		$dateC = $c->div->div[0]->span[0]."";
+				$dateC = substr($dateC, -9);
+				$dateC = DateTime::createFromFormat('j M y', $dateC);
+		    		$cmt = $c->div->div[1]->div[1]."";
 				//ajoute l'existence
 				$idECmt = $dbM->ajoutExi($idMon, array("nom"=>$exiC, "parent"=>$idEG, "data"=>'{"icon":"'.$exiTof.'", "url":"'.$exiUrl.'"}'));
-	    		//ajoute le commentaire
+		    		//ajoute le commentaire
 				$idDocCmt = $dbM->ajoutDoc($idMon, array("parent"=>$idDocFrag,"titre"=>"commentaire ".$numCmt, "note"=>$cmt, "poids"=>strlen($cmt), "pubDate"=>$dateC->format('Y-m-d H:i:s')),$idECmt);
 				$numCmt ++;
-	    	}
+		    	}
 		}		
 		
     	
     }
-    
+
+    /** enregistre les mots clefs d'un compte 
+     * 
+     * @login 	string	$login = login du compte
+     * @return 	array	liste des tag du compte
+     * 
+     */
+    function saveUserTag($login){
+		$this->login = $login;    	
+    		$url = "https://www.diigo.com/cloud/".$this->login."?sort=4";
+		//enregistre ou récupère le comme existence
+    		$this->getUser(array("login"=>$this->login,"flux"=>"diigo"));
+		//initialise les gestionnaires de base de données
+	    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc($this->db);
+		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
+		if(!$this->dbUT)$this->dbUT = new Model_DbTable_Flux_UtiTag($this->db);
+		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
+				
+	    	//récupère le contenu de l'url
+		$html = $this->getUrlBodyContent($url);    	
+		$idDoc = $this->dbD->ajouter(array("url"=>$url, "data"=>$html, "poids"=>strlen($html)));			
+		
+		//extraction de la liste des tags
+		$dom = new Zend_Dom_Query($html);
+		$results = $dom->query('//*[@id="innerCloud"]/ul/li/a');
+		$nbTag = 0;
+		foreach ($results as $result) {
+		    $val = $result->nodeValue;
+		    $tag = substr($val, 0, strrpos($val, " "));
+		    $poids = substr($val, strrpos($val, "(")+1, -1);
+		    //enregistre le tag
+			$this->saveTag($tag, $idDoc, $poids);
+		    
+		    $nbTag ++;
+		}
+		
+		return $this->dbUT->findTagByUtiId($this->user);
+    }
     
 }

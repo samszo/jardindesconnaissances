@@ -1,0 +1,50 @@
+@CHARSET "UTF-8";
+.btn {
+	cursor:pointer; 
+}
+.tof {
+	width:200px; 
+}
+.good {
+	color:green;
+}
+.bad {
+	color:red;
+}
+
+div.conteneur { 
+  	text-align:left; /* centrage horizontal */
+  	clear:both;
+	border-style:solid;
+	border-width:2px;	
+}
+
+div.bloc {
+	float:left;
+	margin:3px 3px 3px 3px; 	 
+}
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.x.axis line {
+  stroke: #fff;
+}
+
+.x.axis .minor {
+  stroke-opacity: .5;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.y.axis line, .y.axis path {
+  fill: none;
+  stroke: #000;
+}
+.note{
+ font: 48px sans-serif;				
+ text-align:center;
+}

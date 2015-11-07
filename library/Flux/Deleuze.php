@@ -26,7 +26,7 @@ class Flux_Deleuze extends Flux_Site{
      */
     function cherche($txt) {
 
-    	$luc = new Flux_Lucene();
+    	$luc = new Flux_Lucene(null, null, 	$this->idBase, false, '../data/deleuze-index');
     	$dbD = new Model_DbTable_Spip_Articles($this->db);
 		$arr = $dbD->findFullText($txt);
     	
@@ -223,10 +223,10 @@ class Flux_Deleuze extends Flux_Site{
      */
     function getTermPositions($term, $json=false, $bdd=false, $order = "score DESC", $idDoc=false) {
 
-    	$c = str_replace("::", "_", __METHOD__).md5($term); 
+    		$c = str_replace("::", "_", __METHOD__).md5($term); 
 	   	$posis = false;//$this->cache->load($c);
 	   	if(!$posis){
-	        $lu = new Flux_Lucene();
+	        $lu = new Flux_Lucene(null, null, 	$this->idBase, false, ROOT_PATH.'/data/deleuze-index');
 	   		$dbD = new Model_DbTable_Flux_Doc($this->db);
 
 			if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
@@ -247,7 +247,7 @@ class Flux_Deleuze extends Flux_Site{
 				}
 			}else{
 				//$lu->index->optimize();
-	        	$lu->db = $this->db;
+	        		$lu->db = $this->db;
 				$passToIndexer = $lu->normalize($term);
 				$posis = $lu->getTermPositions(array('field'=>'cours', 'texte'=>$passToIndexer),array("titre", "url", "mp3", "doc_id"),true);					
 			}				
@@ -256,7 +256,7 @@ class Flux_Deleuze extends Flux_Site{
 			for ($i = 0; $i < count($posis); $i++) {
 	    		//récupère le document et son contenu
 				$arr = $dbD->findByTronc($posis[$i]['doc_id']);
-	    		foreach ($arr as $doc){
+		    		foreach ($arr as $doc){
 					//vérifie si on traite le mp3
 					if(substr($doc['url'],-3)=="mp3"){
 						$posis[$i] = $this->getInfosSon($posis[$i], $doc);
@@ -276,7 +276,6 @@ class Flux_Deleuze extends Flux_Site{
 			}
 
 			$this->cache->save($result, $c);			
-
         }
 	    
 		return $result;

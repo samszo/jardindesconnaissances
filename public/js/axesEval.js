@@ -9,6 +9,8 @@ window.onload = function(){
   
 	//initialise la heatmap
 	setHeatMap();
+	//récupère les données de la carte
+	//getEvals();
 
 };
 
@@ -110,7 +112,7 @@ function getSem(idE, axe){
 		degre = yClic - yOri;
 		//ieml = "E:U:.M:M:.-E:U:.s.-',"+ieml+vide+"_";
 	}
-	if(axe=="E"){
+	if(axe=="W"){
 		degre = xOri - xClic;
 		//ieml = "E:A:.M:M:.-E:U:.s.-',"+ieml+vide+"_";
 	}

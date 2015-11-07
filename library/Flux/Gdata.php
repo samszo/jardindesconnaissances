@@ -32,6 +32,20 @@ class Flux_Gdata extends Flux_Site{
         }	
 	}
 
+	function getSpreadsheetsByNum($num){
+		$this->feed = $this->getSpreadsheets();
+		$c = str_replace("::", "_", __METHOD__)."_".$num; 
+	   	$this->ws = $this->cache->load($c);
+		if(!$this->ws){
+			$query = new Zend_Gdata_Spreadsheets_DocumentQuery();
+			$query->setSpreadsheetKey($num);
+			$this->ws = $this->feed->getWorksheetFeed($query);
+			$this->cache->save($this->ws, $c);
+        }	
+	}
+	
+	
+	
 	function getSpreadsheetsContents(){
 		$c = str_replace("::", "_", __METHOD__)."_".md5($this->login); 
 	   	$arr = $this->cache->load($c);

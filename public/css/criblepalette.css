@@ -1,0 +1,102 @@
+body, html {
+	margin:4px;
+	font-family:Arial;
+	background-color:black;
+	color:white; 
+}
+#main {
+	position:relative;
+	padding:6px;
+	margin:auto;
+}
+#configArea {
+	position:relative;
+	float:left;
+	width:180px;
+	padding:6px;
+}
+#svgArea {
+	position:relative;
+	float:left;
+	border:2px dashed black;
+}
+#SVG {
+	position:absolute;
+	padding:10px;
+	width:940px;
+	height:710px;
+	top:-60px;
+	left:-80px;
+}
+#heatmapArea {
+	position:absolute;
+	width:876px;
+	height:618px;
+	top:60px;
+	left:80px;
+}
+#gen {
+	padding:10px 20px 10px 20px;
+	-moz-border-radius:15px;
+	-o-border-radius:15px;
+	-webkit-border-radius:15px;
+	border-radius:15px;
+	border:2px solid black;
+	cursor:pointer;
+	color:white;
+	background-color:black;
+	text-align:center;
+}
+#gen:hover{
+	background-color:grey;
+	color:black;
+}
+#tweet_text{
+	width:180px;
+	height:200px;
+}
+.infoEvent{
+	width:180px;
+}
+#tofsActeurs{
+	position:relative;
+	float:left;
+	width:600px;
+	height:800px;
+	/*
+	width:100px;
+    height:100px;
+    */
+}
+.tofsActeur{
+	cursor: pointer;
+    width:120px;
+}
+.acteur{
+	float:left;
+	width:120px;
+	text-align:center;
+}
+
+.btn {
+	cursor:pointer; 
+    width:20px;
+}
+
+
+ul li {list-style: none; cursor: pointer;}
+li.smart_autocomplete_highlight {background-color: #8d8bc4;}
+ul { margin: 10px 0; padding: 5px; background-color: #269bc9; }
+
+a:link {color:white;}    /* unvisited link */
+a:visited {color:orange;} /* visited link */
+a:hover {color:green;}   /* mouse over link */
+a:active {color:red;}  /* selected link */
+
+#docArea {
+	position:relative;
+	float:left;
+	height:800px;
+	border:2px dashed white;
+}
+

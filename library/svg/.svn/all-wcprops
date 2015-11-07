@@ -1,0 +1,155 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/svn/!svn/ver/239/trunk/library/svg
+END
+SvgPolygon.php
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/207/trunk/library/svg/SvgPolygon.php
+END
+SvgLine.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/207/trunk/library/svg/SvgLine.php
+END
+SvgElement.php
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/207/trunk/library/svg/SvgElement.php
+END
+SvgLinearGradient.php
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/207/trunk/library/svg/SvgLinearGradient.php
+END
+SvgTspan.php
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/207/trunk/library/svg/SvgTspan.php
+END
+SvgEllipse.php
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/207/trunk/library/svg/SvgEllipse.php
+END
+SvgGroup.php
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/207/trunk/library/svg/SvgGroup.php
+END
+SvgAnimate.php
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/207/trunk/library/svg/SvgAnimate.php
+END
+SvgMarker.php
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/207/trunk/library/svg/SvgMarker.php
+END
+SvgDocument.php
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/239/trunk/library/svg/SvgDocument.php
+END
+SvgUse.php
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/207/trunk/library/svg/SvgUse.php
+END
+Svg.php
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/207/trunk/library/svg/Svg.php
+END
+SvgPolyline.php
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/207/trunk/library/svg/SvgPolyline.php
+END
+SvgAnimateColor.php
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/207/trunk/library/svg/SvgAnimateColor.php
+END
+SvgRect.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/207/trunk/library/svg/SvgRect.php
+END
+SvgPath.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/207/trunk/library/svg/SvgPath.php
+END
+SvgAnimateTransform.php
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/207/trunk/library/svg/SvgAnimateTransform.php
+END
+SvgScript.php
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/207/trunk/library/svg/SvgScript.php
+END
+SvgText.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/207/trunk/library/svg/SvgText.php
+END
+SvgDefs.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/207/trunk/library/svg/SvgDefs.php
+END
+SvgRadialGradient.php
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/207/trunk/library/svg/SvgRadialGradient.php
+END
+SvgTitle.php
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/207/trunk/library/svg/SvgTitle.php
+END
+SvgCircle.php
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/207/trunk/library/svg/SvgCircle.php
+END
+SvgFragment.php
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/207/trunk/library/svg/SvgFragment.php
+END
+SvgDesc.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/207/trunk/library/svg/SvgDesc.php
+END
