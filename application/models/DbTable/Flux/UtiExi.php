@@ -24,7 +24,7 @@ class Model_DbTable_Flux_UtiExi extends Zend_Db_Table_Abstract
     /*
      * Clef primaire de la table.
      */
-    protected $_primary = 'uti_id_src';
+    protected $_primary = 'utiexi_id';
 
     
     /**
@@ -37,13 +37,13 @@ class Model_DbTable_Flux_UtiExi extends Zend_Db_Table_Abstract
     public function existe($data)
     {
 		$select = $this->select();
-		$select->from($this, array('uti_id_src'));
+		$select->from($this, array('uti_id'));
 		foreach($data as $k=>$v){
 			if($k!='eval')
 				$select->where($k.' = ?', $v);
 		}
 	    $rows = $this->fetchAll($select);        
-	    if($rows->count()>0)$id=$rows[0]->uti_id_src; else $id=false;
+	    if($rows->count()>0)$id=$rows[0]->uti_id; else $id=false;
         return $id;
     } 
         

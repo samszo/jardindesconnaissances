@@ -90,15 +90,14 @@ class Model_DbTable_Spip_articles extends Zend_Db_Table_Abstract
      * @return integer
      */
     public function ajouter($data, $existe=true)
-    {
-    	
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
-    		if(!isset($data["date"])) $data["date"] = new Zend_Db_Expr('NOW()');
-    		$id = $this->insert($data);
-    	}
-    	return $id;
+    {    	
+	    	$id=false;
+	    	if($existe)$id = $this->existe($data);
+	    	if(!$id){
+	    		if(!isset($data["date"])) $data["date"] = new Zend_Db_Expr('NOW()');
+	    		$id = $this->insert($data);
+	    	}
+	    	return $id;
     } 
            
     /**

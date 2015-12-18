@@ -38,7 +38,7 @@
 	$db_server   = "localhost";
 	$db_name     = "flux_ieml";
 	$db_username = "root";
-	$db_password = "root";
+	$db_password = "";
 
 // Other settings (optional)
 

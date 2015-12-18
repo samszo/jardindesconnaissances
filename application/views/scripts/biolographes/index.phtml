@@ -2,363 +2,132 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<link rel="stylesheet" type="text/css" href="css/gestedit.css" />
-    <link rel="stylesheet" type="text/css" href="css/w2ui.css" />
     <link rel="stylesheet" type="text/css" href="css/biolographes.css">
-    <link rel="stylesheet" type="text/css" href="fonts/font-awesome/font-awesome.css" />
-	<script type="text/javascript" src="js/d3.v3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/w2ui-dark.css" />
+    <link rel="stylesheet" type="text/css" href="font/font-awesome/font-awesome.css" />
+    <script type="text/javascript">
+    var prefUrl = "";
+    var setAutoComplet = false;
+	var idBase = '<?php echo $this->idBase;?>';
+	var uti = <?php echo $this->uti;?>;
+    </script>
+	<script type="text/javascript" src="js/d3.js"></script>
 	<script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/w2ui.js"></script>
 	<script type="text/javascript" src="js/biolographes/reseau.js"></script>
 	<script type="text/javascript" src="js/biolographes/modeles.js"></script>
 	<script type="text/javascript" src="js/biolographes/flux.js"></script>
-    <script type="text/javascript" src="js/w2ui.js"></script>
-	<script type="text/javascript">
-		function init() {
-		};		
-	</script>		
+	<script type="text/javascript" src="js/biolographes/dialogues.js"></script>
 </head>
 <body onload="init()">
 	<div id="layout" style="width: 100%; height: 1050px;"></div>
 
-<script type="text/javascript">
+	<script type="text/javascript">
 
-var rsAlerteLivre = <?php echo $this->rsAlerteLivre; ?>;
-var alerteSelect, alerteLayout;
-
-$(function () {
+	var rsCribles = <?php echo $this->rsCrible; ?>;
+	var rsGraphs = <?php echo $this->rsGraph; ?>;
 	
-    var pstyle = 'border: 1px solid #dfdfdf; padding: 5px;';
-    $('#layout').w2layout({
-        name: 'layout',
-        padding: 2,
-        panels: [
-            { type: 'top', size: 50, resizable: false, style: pstyle, content: '<div style="float:left;width:176px;">'
-	            +'<img src="img/logo-iste.png" alt="ISTE Editions - ouvrages scientifiques et techniques en langue française">'
-	            +'</div>'
-	            +'<div id="toolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>' },
-            { type: 'left', size: 180, resizable: true, style: pstyle},
-            { type: 'main', style: pstyle, resizable: true, content: '', size:"100%"  },
-            //{ type: 'bottom', size: 50, resizable: false, style: pstyle, content: 'mettre ici la date' }
-       	],
-    });
+	var sltCrible, sltGraph;
 
-    $().w2layout({
-        name: 'layout2',
-        panels: [
-            { type: 'top', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les alertes' },
-            { type: 'bottom', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les éditions' }
-        ]
-    });
+	function init(){
+		
+	    $('#layout').w2layout({
+	        name: 'layout',
+	        padding: 2,
+	        panels: [
+	            { type: 'top', size: 50, resizable: false, style: pstyle, content: '<div style="float:left;width:176px;">'
+		            +'<img src="img/logoEditInflu.png" alt="logo" style="height:40px;">'
+		            +'</div>'
+		            +'<div id="toolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>' },
+	            { type: 'left', size: 260, resizable: true, style: pstyle},
+	            { type: 'main', style: pstyle, resizable: true, content: '', size:"100%"  },
+	       	],
+	    });
 
-	var gridAlerte = { 
-        name: 'grid_alerte', 
-		header: 'Alertes livre',		
-		show: {toolbar		: false,
-			toolbarReload   : false,
-			toolbarColumns  : false,
-            	toolbarSearch   : false,
-            	toolbarAdd      : false,
-            	toolbarDelete   : false,
-            	toolbarSave		: false,
-            	header			: true, 
-            	columnHeaders	: true},
-        columns: [      		  		           
-            { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
-            { field: 'processus', caption: 'Process', hidden:true, size: '100px', sortable: true, resizable: true},
-            { field: 'tache', caption: 'Tâche', size: '175px', sortable: true, resizable: true},
-            { field: 'prevision', caption: 'Prévision', editable: { type: 'date'}, size: '80px', sortable: true, resizable: true},
-            { field: 'nbJour', caption: 'Nb. jour', hidden:true, size: '80px', sortable: true, resizable: true},
-            { field: 'titre', caption: 'Titre', size: '200px', sortable: true, resizable: true},
-            { field: 'commentaire', caption: 'Commentaires', size: '200px', sortable: true, resizable: true},
-        ],
-        records: rsAlerteLivre,
-        onClick: function (event) {
-	        alerteSelect = this.get(event.recid);
-			//si aucun layout n'est chargé on charge suivant le role
-	        if(!alerteLayout){
-		        if(uti.role == "admin") alerteLayout = 'Livre';
-		        if(uti.role == "production") alerteLayout = 'ProdLivre';     
-		        	if(uti.role == "traduction") alerteLayout = 'Traduction';     
-	        }
-	        if(w2ui['layout_'+alerteLayout]){
-		        if(alerteLayout == 'Livre')
-		        		selectRowInGrid(alerteSelect.id_livre,'grid_'+alerteLayout);
-		        else
-		        		selectRowInGrid(alerteSelect.isbns.split(","),'grid_'+alerteLayout);
-			        
-		        eval("showData"+alerteLayout+"()");
-	        }else{
-		        	chargeLayout('tb'+alerteLayout);		        	
-	        }
-        },        				        
-    }
+	    $().w2layout({
+	        name: 'layoutGauche',
+	        panels: [
+	            { type: 'top', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les cribles' },
+	            { type: 'bottom', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les graphs' }
+	        ]
+	    });
+	    $().w2layout({
+	        name: 'layoutMain',
+	        panels: [
+	            { type: 'top', size: "30", resizable: true, style: pstyle, content: '<h4 id="titreGraph"></h4>' },
+	            { type: 'main', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les graphs' }
+	        ]
+	    });
 
-
-	var treeEdition = {
-        name       : 'sidebar',
-        topHTML    : '<div style="background-color: #eee; padding: 10px 5px; border-bottom: 1px solid silver">Choisissez une édition</div>',
-        bottomHTML : '<div style="background-color: #eee; padding: 10px 5px; border-top: 1px solid silver"></div>',
-        nodes : [ 
-            { id: 'etatSerie', text: 'Etat des séries', img: 'fa-list-ul'},
-            { id: 'etatWiley', text: 'Etat Wiley', img: 'fa-list-alt'},
-            { id: 'etatElsevier', text: 'Etat Elsevier', img: 'fa-list-alt'},
-        ],
-	    onClick: function (event) {
-		    if(event.target=="etatSerie"){
-		        if(w2ui['layout_Param']){
-			        //récupère la sélection
-			        	var items = w2ui['grid_Param_serie'].getSelection();	
-		            if(items.length == 0){
-		                w2alert("Veuillez sélectionner au moins une série.");
-		                return false;
-		            }else{
-			        		$.get('calculer/rapport',
-		        				{"type":"etatSerie","ids":items},
-		        		    		function(js){
-		                			finsession(js);
-		        					w2alert(js.message);	    		
-		                			window.open(js.rs.url);
-		        		    },"json");           		           	
-		            }
-		        }else{
-			        	chargeLayout('tbParam');		        	
-		            w2alert("Veuillez sélectionner le(s) série(s).");
-		        }			    
-		    }
-		    if(event.target=="etatWiley"){
-	        		open(urlP+'export?obj=etatEditeur&idEditeur='+5,"_blank");
-		    }
-		    if(event.target=="etatElsevier"){
-	        		open(urlP+'export?obj=etatEditeur&idEditeur='+5,"_blank");
-		    }
-	    },        	    
-    };    
-    w2ui['layout'].content('left', w2ui['layout2']);
-    w2ui['layout2'].content('top', $().w2grid(gridAlerte));
-    w2ui['layout2'].content('bottom', $().w2sidebar(treeEdition));
+		   
+	    w2ui['layout'].content('left', w2ui['layoutGauche']);
+	    w2ui['layout'].content('main', w2ui['layoutMain']);
+	    w2ui['layoutGauche'].content('top', $().w2grid(gridCrible));
+	    w2ui['layoutGauche'].content('bottom', $().w2grid(gridGraph));
 
     
-    $('#toolbar').w2toolbar({
-	    name: 'mainTB',
-	    items: [
-	        { type: 'button',  id: 'tbAuteur', caption: 'Auteurs', icon:'fa-group', hidden:uti.role=="admin" ? false : true},
-	        { type: 'break',  id: 'break0' },
-	        { type: 'button',  id: 'tbLivre', caption: 'Livres', icon:'fa-book', hidden:uti.role=="admin" ? false : true},
-	        { type: 'break',  id: 'break0' },
-	        { type: 'button',  id: 'tbProdLivre', caption: 'Productions', icon:'fa-tasks'},
-	        { type: 'break',  id: 'break0' },
-	        { type: 'button',  id: 'tbTraduction', caption: 'Traductions', icon:'fa-language', hidden:uti.role=="admin" ? false : true},
-	        { type: 'break',  id: 'break0' },
-	        { type: 'button',  id: 'tbContrat', caption: 'Contrats', icon:'fa-leanpub', hidden:uti.role=="admin" ? false : true},
-	        { type: 'break',  id: 'break0' },
-	        { type: 'button',  id: 'tbVentes', caption: 'Ventes', icon:'fa-shopping-cart', hidden:uti.role=="admin" ? false : true},
-	        { type: 'break',  id: 'break0' },
-	        //{ type: 'button',  id: 'tbRoyalties', caption: 'Royalties', icon:'fa-money'},
-	        //{ type: 'break',  id: 'break0' },
-	        { type: 'button',  id: 'tbParam', caption: 'Paramètres', icon:'fa-cog', hidden:uti.role=="admin" ? false : true},
-	        { type: 'break',  id: 'break0' },
-	        { type: 'spacer' },
-	        { type: 'button',  id: 'utiLog',  caption: uti.login, icon: 'fa-user' },            
-	        { type: 'button',  id: 'utiSignOut',  caption: 'déconnexion', icon: 'fa-sign-out' }
-	    ]
-	});
+	    $('#toolbar').w2toolbar({
+		    name: 'mainTB',
+		    items: [
+		        { type: 'button',  id: 'tbGraph', caption: 'Graphs', icon:'fa-object-group'},
+		        { type: 'break',  id: 'break0' },
+		        { type: 'button',  id: 'tbCrible', caption: 'Cribles', icon:'fa-filter'},
+		        { type: 'break',  id: 'break1' },
+		        { type: 'button',  id: 'tbAuteur', caption: 'Auteurs', icon:'fa-group'},
+		        { type: 'break',  id: 'break2' },
+		        { type: 'button',  id: 'tbParam', caption: 'Paramètres', icon:'fa-cog', hidden:uti.role=="admin" ? false : true},
+		        { type: 'break',  id: 'break3' },
+		        { type: 'spacer' },
+		        { type: 'button',  id: 'utiLog',  caption: uti.login, icon: 'fa-user' },            
+		        { type: 'button',  id: 'utiSignOut',  caption: 'déconnexion', icon: 'fa-sign-out' }
+		    ]
+		});
 	
-	w2ui.mainTB.on('click', function (event) { 
-		alerteSelect = false;
-		w2ui.layout.lock('main', "Veuillez patienter...", true);	    
-    		chargeLayout(event.target);      		 	       
-	});    
-});
+		w2ui.mainTB.on('click', function (event) { 
+			w2ui.layout.lock('main', "Veuillez patienter...", true);	    
+		});  
 
-function chargeLayout(idLayout){
-	
-        //supprime les objets si déjà présent
-        if(w2ui['layout_Auteur']){
-            w2ui['layout_Auteur'].destroy();
-            w2ui['grid_Auteur'].destroy();
-            w2ui['grid_Auteur_Livre'].destroy();	            
-            w2ui['form_Auteur'].destroy();
-            w2ui['form_Auteur_commentaire'].destroy();
-            w2ui['layoutDetail_Auteur'].destroy();
-            if(w2ui['layout_Auteur_Detail1'])w2ui['layout_Auteur_Detail1'].destroy();
-            if(w2ui['grid_Auteur_detail1'])w2ui['grid_Auteur_detail1'].destroy();
-            
-            w2ui['grid_Auteur_Coordination'].destroy();
-            w2ui['grid_Auteur_Comite'].destroy();
-            w2ui['form_Auteur_coordination'].destroy();
-            w2ui['form_Auteur_comite'].destroy();
-        }
-    	if(idLayout=="tbAuteur"){
-        	w2ui['layout'].load('main', 'Index/auteur?ajax=1',null,function () {
-        		w2ui.layout.unlock('main');
-        	});        	
-    }
-
-        //supprime les objets si déjà présent
-        if(w2ui['layout_Livre']){
-            w2ui['layout_Livre'].destroy();
-            w2ui['grid_Livre'].destroy();
-            w2ui['form_Livre'].destroy();
-            w2ui['layoutDetail_Livre'].destroy();
-            w2ui['layoutDetail1_Livre'].destroy();
-            w2ui['layoutThemes_Livre'].destroy();
-            w2ui['layoutPropo_Livre'].destroy();
-            w2ui['layoutPropo1_Livre'].destroy();
-            w2ui['form_Livre_propo'].destroy();
-            w2ui['form_Livre_commentaire'].destroy();
-            if(w2ui['grid_Livre_collection'])w2ui['grid_Livre_collection'].destroy();
-            if(w2ui['form_Livre_collection'])w2ui['form_Livre_collection'].destroy();
-            w2ui['grid_Livre_comite'].destroy();
-            if(w2ui['form_Livre_comite'])w2ui['form_Livre_comite'].destroy();
-            w2ui['grid_Livre_serie'].destroy();
-            if(w2ui['form_Livre_serie'])w2ui['form_Livre_serie'].destroy();
-            w2ui['grid_Livre_isbn'].destroy();
-            if(w2ui['form_Livre_isbn'])w2ui['form_Livre_isbn'].destroy();
-            w2ui['grid_Livre_auteur'].destroy();
-            if(w2ui['form_Livre_auteur'])w2ui['form_Livre_auteur'].destroy();
-            w2ui['grid_Livre_process_livre'].destroy();
-            w2ui['grid_Livre_page'].destroy();
-            w2ui['grid_Livre_prix'].destroy();
-            if(w2ui['form_Livre_contrat'])w2ui['form_Livre_contrat'].destroy();
-        }
-    	if(idLayout=="tbLivre"){
-		alerteLayout = 'Livre';        
-        	w2ui['layout'].load('main', 'Index/livre?ajax=1',null,function () {
-        		w2ui.layout.unlock('main');
-        	});
-        	
-    }
-	    //supprime les objets si déjà présent
-        if(w2ui['layout_Traduction']){            	
-            w2ui['layout_Traduction'].destroy();
-            if(w2ui['layout_Traduction_top'])w2ui['layout_Traduction_top'].destroy();
-            w2ui['layout_Traducteur'].destroy();
-            w2ui['grid_Traduction'].destroy();
-            if(w2ui['layout_Traduction_Traducteur'])w2ui['layout_Traduction_Traducteur'].destroy();
-            if(w2ui['grid_Traduction_Traducteur'])w2ui['grid_Traduction_Traducteur'].destroy();
-            w2ui['layout_Traduction_trad_livre'].destroy();
-            w2ui['grid_Traduction_trad_livre_resp'].destroy();
-            w2ui['grid_Traduction_trad_livre'].destroy();
-            w2ui['grid_Traduction_trad_chapitre'].destroy();
-            w2ui['form_Traduction_trad_chapitre'].destroy();
-            w2ui['layout_Traduction_Top'].destroy();
-            w2ui['grid_Traduction_traducteur'].destroy();
-            w2ui['form_Traduction_traducteur'].destroy();
-        }
-    if(idLayout=="tbTraduction"){
-    		alerteLayout = 'Traduction';
-        	w2ui['layout'].load('main', 'Index/traduction?ajax=1',null,function () {
-        		w2ui.layout.unlock('main');
-        	});
-    }    
-    //supprime les objets si déjà présent
-    if(w2ui['layout_Contrat']){          		          	
-        w2ui['layout_Contrat'].destroy();
-        if(w2ui['grid_Contrat_auteur'])w2ui['grid_Contrat_auteur'].destroy();
-        if(w2ui['grid_Contrat_coor'])w2ui['grid_Contrat_coor'].destroy();
-        if(w2ui['grid_Contrat_dir'])w2ui['grid_Contrat_dir'].destroy();
-        if(w2ui['grid_Contrat_trad'])w2ui['grid_Contrat_trad'].destroy();	            
-        if(w2ui['form_Contrat_traducteur'])w2ui['form_Contrat_traducteur'].destroy();
-        if(w2ui['form_Contrat_auteur'])w2ui['form_Contrat_auteur'].destroy();
-        
-    }
-    if(idLayout=="tbContrat"){
-        	w2ui['layout'].load('main', 'Index/contrat?ajax=1',null,function () {
-        		w2ui.layout.unlock('main');
-        	});
-    }    
-    //supprime les objets si déjà présent
-    if(w2ui['layout_Vente']){
-        w2ui['layout_Vente'].destroy();
-        w2ui['layout_Vente_top'].destroy();
-        w2ui['grid_Vente'].destroy();
-        w2ui['grid_Vente_detail'].destroy();
-        if(w2ui['grid_Vente_royalties'])w2ui['grid_Vente_royalties'].destroy();
-        if(w2ui['grid_Vente_prix'])w2ui['grid_Vente_prix'].destroy();
-        if(w2ui['form_Vente_prix'])w2ui['form_Vente_prix'].destroy();
-        if(w2ui['grid_Vente_rapport'])w2ui['grid_Vente_rapport'].destroy();
-        if(w2ui['grid_Vente_devise'])w2ui['grid_Vente_devise'].destroy();
-        if(w2ui['form_Vente_devise'])w2ui['form_Vente_devise'].destroy();
-    }
-    if(idLayout=="tbVentes"){
-        	w2ui['layout'].load('main', 'Index/vente?ajax=1',null,function () {
-        		w2ui.layout.unlock('main');
-        	});
-    }    
-    if(idLayout=="tbRoyalties"){
-        	w2ui['layout'].content('main', 'ROYALTIES');
-        	w2ui.layout.unlock('main');
-    }    
-    //supprime les objets si déjà présent
-    if(w2ui['layout_ProdLivre']){
-        	w2ui['layout_ProdLivre'].destroy();
-        	if(w2ui['form_Prod_commentaire'])w2ui['form_Prod_commentaire'].destroy();
-    		if(w2ui['form_Prod_contexte'])w2ui['form_Prod_contexte'].destroy();
-        if(w2ui['form_Prod_tdm'])w2ui['form_Prod_tdm'].destroy();
-        if(w2ui['form_Prod_bio'])w2ui['form_Prod_bio'].destroy();
-        if(w2ui['layout_Prod_fic'])w2ui['layout_Prod_fic'].destroy();
-        if(w2ui['form_Prod'])w2ui['form_Prod'].destroy();
-        if(w2ui['grid_ProdLivre'])w2ui['grid_ProdLivre'].destroy();
-        if(w2ui['layout_ProdLivre_process_livre'])w2ui['layout_ProdLivre_process_livre'].destroy();
-        if(w2ui['form_ProdLivre_commentaire'])w2ui['form_ProdLivre_commentaire'].destroy();
-        if(w2ui['grid_ProdLivre_process_livre_resp'])w2ui['grid_ProdLivre_process_livre_resp'].destroy();
-        if(w2ui['grid_ProdLivre_process_livreFR'])w2ui['grid_ProdLivre_process_livreFR'].destroy();
-        if(w2ui['grid_ProdLivre_process_livreGB'])w2ui['grid_ProdLivre_process_livreGB'].destroy();
-        if(w2ui['grid_ProdLivre_web'])w2ui['grid_ProdLivre_web'].destroy();
-        if(w2ui['layout_Prod_web'])w2ui['layout_Prod_web'].destroy();
-    }
-    if(idLayout=="tbProdLivre"){
-	    	alerteLayout = 'ProdLivre';
-        	w2ui['layout'].load('main', 'Index/production?ajax=1',null,function () {
-        		w2ui.layout.unlock('main');
-        	});
-    }    
-    
-    if(w2ui['layout_Param']){
-	    	w2ui['layout_Param'].destroy();
-	    	w2ui['layout_Param_Auteur'].destroy();
-	    	w2ui['layout_Param_Livre'].destroy();
-	    	w2ui['layout_Param_Livre1'].destroy();
-	    	w2ui['layout_Param_Livre2'].destroy();
-	    	w2ui['layout_Param_Livre3'].destroy();
-	    	w2ui['layout_Param_LivreCol'].destroy();
-	    	if(w2ui['layout_Param_UserCol'])w2ui['layout_Param_UserCol'].destroy();	        
-	    	w2ui['grid_Param_civilites'].destroy();
-	    	w2ui['grid_Param_roles'].destroy();
-	    	w2ui['grid_Param_uti'].destroy();
-	    	w2ui['grid_Param_type1'].destroy();
-	    	w2ui['grid_Param_type2'].destroy();
-	    	w2ui['grid_Param_licence'].destroy();
-        if(w2ui['form_Param_licence'])	w2ui['form_Param_licence'].destroy();
-	    	w2ui['grid_Param_prix'].destroy();
-	    	w2ui['grid_Param_langues'].destroy();
-	    	w2ui['grid_Param_traduction'].destroy();
-	    	w2ui['grid_Param_page'].destroy();
-	    	w2ui['grid_Param_serie'].destroy();
-	    	w2ui['grid_Param_comite'].destroy();
-	    if(w2ui['grid_Param_usercol'])	w2ui['grid_Param_usercol'].destroy();
-	    if(w2ui['form_Param_usercol'])	w2ui['form_Param_usercol'].destroy();
-	    	w2ui['grid_Param_tache'].destroy();
-	    if(w2ui['form_Param_tache'])	w2ui['form_Param_tache'].destroy();
-		w2ui['grid_Param_boutique'].destroy();
-        if(w2ui['form_Param_boutique'])	w2ui['form_Param_boutique'].destroy();    	
-	}     
-    if(idLayout=="tbParam"){	    
-        	w2ui['layout'].load('main', 'Index/param?ajax=1',null,function () {
-        		w2ui.layout.unlock('main');
-        	});
-        	w2ui.layout.unlock('main');
-    } 	
-
-    if(idLayout=="utiSignOut"){
-	    	deconnexion();
+		chargeLayout("tbGraph");		  
 	}
 
+	function chargeLayout(idLayout){
+		
+        //supprime les objets si déjà présent
+        if(w2ui['layout_graph']){
 
-    
-}
+        }
+	    	if(idLayout=="tbGraph"){
+	        	w2ui['layoutMain'].load('main', 'Biolographes/editeur?ajax=1',null,function () {
+	        		w2ui.layout.unlock('main');
+	        	});        	
+	    }
+        if(w2ui['layout_crible']){
 
+        }
+	    	if(idLayout=="tbCrible"){
+	        	w2ui['layout'].load('main', 'Index/crible?ajax=1',null,function () {
+	        		w2ui.layout.unlock('main');
+	        	});        	
+	    }
+
+	    
+	    if(w2ui['layout_Param']){
+
+		}     
+	    if(idLayout=="tbParam"){	    
+	        	w2ui['layout'].load('main', 'Index/param?ajax=1',null,function () {
+	        		w2ui.layout.unlock('main');
+	        	});
+	        	w2ui.layout.unlock('main');
+	    } 	
+	
+	    if(idLayout=="utiSignOut"){
+		    	deconnexion();
+		}	    
+	}
+	
 </script>
+<script type="text/javascript" src="js/biolographes/view.js"></script>
 
 </body>
 </html>

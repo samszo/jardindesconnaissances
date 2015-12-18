@@ -205,7 +205,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
 			$tEnfs = new $t($this->_db);
 			$tEnfs->removeDoc($id);
 		}
-    	$this->delete('flux_doc.doc_id = ' . $id);
+    		$this->delete('flux_doc.doc_id = ' . $id);
     }
     
     /**
@@ -276,8 +276,10 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     public function findBydoc_id($doc_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_doc") )                           
-                    ->where( "f.doc_id = ?", $doc_id );
+			->from( array("f" => "flux_doc") )                           
+            ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('d' => 'flux_doc'),'d.doc_id = f.doc_id',array('recid'=>'doc_id'))			
+            ->where( "f.doc_id = ?", $doc_id );
 		$arr = $this->fetchAll($query)->toArray();
         return count($arr) ? $arr[0] : false; 
     }
@@ -293,7 +295,8 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
                     ->from( array("f" => "flux_doc") )                           
                     ->where( "f.url = ?", $url );
 
-        return $this->fetchAll($query)->toArray(); 
+		$arr = $this->fetchAll($query)->toArray();
+        return $arr[0]; 
     }
     /**
      * Recherche une entrée flux_doc avec la valeur spécifiée
@@ -338,7 +341,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     		if($rows){
     			$query = $this->select()
             		->from( array("f" => "flux_doc"), $rows)                           
-                ->where( "f.tronc = ?", $tronc );
+            		->where( "f.tronc = ?", $tronc );
     		}else{
     			$query = $this->select()
             		->from( array("f" => "flux_doc"))                           

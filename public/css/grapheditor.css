@@ -10,18 +10,20 @@ div#tools {
 }
 
 div#viz {
-    width: 1280px;
-    height: 720px;
+    width: 98%;
+    height: 98%;
     margin: 0 auto;
-    background-color: white;
+    background-color: #434d64;
 }
 
 .imgButton {
-    height: 32px;
+    height: 52px;
 }
 
 
 svg {
+  width: 100%;
+  height: 100%;
   background-color: #FFF;
   cursor: default;
   -webkit-user-select: none;
@@ -166,7 +168,7 @@ input.typeahead {
   width: 300px;
 }
 
-td {
+#tdC {
   vertical-align:top;
   padding:6px
 }
@@ -179,3 +181,18 @@ td {
 	color: green;	
 	font-size: 18px;
 }
+.w2ui-popup .w2ui-msg-buttons {
+  padding: 2px;
+  border-radius: 0px 0px 6px 6px;
+  border-top: 1px solid #d5d8d8;
+  background-color: #f1f1f1;
+  text-align: center;
+  position: absolute;
+  overflow: hidden;
+  height: 58px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  z-index: 200;
+}
+

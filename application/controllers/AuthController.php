@@ -64,7 +64,7 @@ class AuthController extends Zend_Controller_Action
 			$dbUti = new Model_DbTable_Flux_Uti($s->db);
 			$rs = $dbUti->findByLogin($login);
     			$ssExi->uti = $rs;
-			$ssUti->idUti = $rs["uti_id"];		            	
+			$ssExi->idUti = $rs["uti_id"];		            	
 	        	
 			if($this->view->ajax){
 				$this->view->rs = $ssExi->uti;
@@ -255,5 +255,10 @@ class AuthController extends Zend_Controller_Action
 		    $this->_redirect('/auth/google');
 		}
 	}    
-    
+
+    public function finsessionAction()
+    {
+		
+    }
+	
 }

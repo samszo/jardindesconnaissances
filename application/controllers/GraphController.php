@@ -120,6 +120,13 @@ class GraphController extends Zend_Controller_Action {
 		*/	    
     }	
     
+    public function sankeyAction()
+    {
+    		$this->view->urlStats = $this->_getParam('urlStats');
+    }	
+        
+    
+    
     public function iemlAction()
     {
     	try {

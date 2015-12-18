@@ -1,12 +1,23 @@
 var dtOrigine, datas, dtDoublons;
 var dtCrible = [];
 var dtGraph = [];
-var dtAuteurFind;
-
+var dtAuteurFind, dtTagFind;
 var catLieux= {"Académies":1,"Sociétés savantes":1,"Universités françaises":1
                ,"Sociétés savantes françaises":1,"Universités allemandes":1,"Sociétés savantes allemandes":1
                ,"Espaces de sociabilité: cercles et salons mondains ou littéraires":1
                ,"Autres lieux de savoirs":1,"Villégiatures":1};
+var dtTypeNoeud = ["Références","Acteurs","Concepts","Lieux"];
+
+var rsActeurs, rsTags;
+$.get(prefUrl+"ice/getacteurs",{'db':idBase},function(js){
+	rsActeurs = js;
+},"json");                        				
+/*
+$.get(prefUrl+"flux/tags",{'idBase':idBase,'parent':20},function(js){
+	rsTags = js;
+},"json");                        				
+*/
+var itemSelect, idUpdate;
 
 initDataCat();
 
@@ -99,7 +110,7 @@ var clusters =  d3.scale.ordinal()
 	.range([100,200,300,500]);
 
 //chargement des csv
-d3.csv("../../data/country.csv", function(error, data) {
+d3.csv(prefUrl+"../data/country.csv", function(error, data) {
 	var dataPays = data;
 	//ajoute la propriété value pour l'autocomplete
 	dataPays.forEach(function(d){
@@ -107,7 +118,7 @@ d3.csv("../../data/country.csv", function(error, data) {
 	});
 	if(setAutoComplet)setAutocompletePays(dataPays);
 });
-d3.csv("../../data/biolographes/appartenances_savants.csv", function(error, data) {
+d3.csv(prefUrl+"../data/biolographes/appartenances_savants.csv", function(error, data) {
 	var dataAuteurs = data;
 	dataAuteurs.forEach(function(d){
 		//ajoute la propriété value pour l'autocomplete
@@ -118,6 +129,7 @@ d3.csv("../../data/biolographes/appartenances_savants.csv", function(error, data
 	//initialise l'autocompletion
 	if(setAutoComplet)setAutocompleteNoeud("Acteurs");
 });
+
 function compareValue(a, b) { 
 	if (a.value < b.value) {
 		return -1;

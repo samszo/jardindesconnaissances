@@ -66,6 +66,12 @@ class GapaiiController extends Zend_Controller_Action {
 		$this->view->data = $g->getEval($this->_getParam('idDoc'), $this->_getParam('idUti'), $this->_getParam('idTag'));
 	}
 
+	public function importAction() {
+		//importation des données
+		
+	}
+	
+	
 	/**TODO: utiliser ce type de requête pour proposer des images plutôt que des mots
 	 * http://thenounproject.com/search/?q=animal
 	 */

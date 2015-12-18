@@ -1,7 +1,6 @@
 
 .project
 
-
 application/configs/applicationGapaii.ini
 
 application/configs/applicationP8-Paragraphe.ini
@@ -16,6 +15,8 @@ application/configs/configGapaii.php
 
 application/configs/configP8-Paragraphe.php
 
+tmp/
+
 data/audios
 
 data/CIDE17
@@ -29,3 +30,66 @@ data/diigo-index
 data/flux-index
 
 data/google/img
+
+data/gapaii
+
+bdd/bigdumpGapaii.php
+
+bdd/deleuze.sql
+
+bdd/deleuze.sql
+
+bdd/deleuze.sql.zip
+
+bdd/flux_sic
+
+bdd/deleuzeSpipMin.sql
+
+bdd/deleuzeSpipMin.sql.zip
+
+bdd/flux.sql
+
+bdd/flux_100notions.sql.zip
+
+bdd/flux_DeleuzeSpinoza.sql
+
+bdd/flux_DeleuzeSpinoza3…sql
+
+bdd/flux_biolographes.sql
+
+bdd/flux_biolographes.sql.zip
+
+bdd/flux_etuCDNL1314.sql
+
+bdd/flux_frontieres.sql
+
+bdd/flux_gapaii.sql
+
+bdd/flux_ieml.sql
+
+bdd/flux_plisages.sql
+
+bdd/flux_sic.sql
+
+bdd/flux_sic_new.sql
+
+bdd/flux_sic_vide.sql
+
+bdd/flux_tweetpalette.sql
+
+bdd/flux_vide.sql
+
+bdd/flux_zotero.sql
+
+bdd/flux_zotero 2.sql
+
+bdd/fluxsicDoc.sql
+
+bdd/monadeRapports.sql
+
+bdd/spip_e-educ_proverbes…sql
+bdd/flux_DeleuzeSpinoza3.sql
+
+bdd/spip_e-educ_proverbes.sql
+
+data/biolographes/.~lock.appartenances_savants.csv#

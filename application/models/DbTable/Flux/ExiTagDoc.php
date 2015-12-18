@@ -63,17 +63,17 @@ class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
      */
     public function ajouter($data, $existe=true)
     {
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
-    		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
-    		$id = $this->insert($data);
-    	}else{
-    		//met à jour le poids
-    		$data['exitagdoc_id'] = $id;
-    		$this->ajoutPoids($data);    		
-    	}
-    	return $id;
+	    	$id=false;
+	    	if($existe)$id = $this->existe($data);
+	    	if(!$id){
+	    		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
+	    		$id = $this->insert($data);
+	    	}else{
+	    		//met à jour le poids
+	    		$data['exitagdoc_id'] = $id;
+	    		$this->ajoutPoids($data);    		
+	    	}
+	    	return $id;
     } 
            
     /**
@@ -325,7 +325,7 @@ class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
     }
     
     /*
-     * Recherche les documents pour des utilisateurs et des tags
+     * Recherche les documents pour des existences et des tags
      * et retourne ces entrées.
      *
      * @param string $users
@@ -368,52 +368,71 @@ class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
 	/**
      * Récupère les tags associés à un document et leur poids
      *
-     * @param integer $idUti
-     * @param integer $idDoc
-     * @param string $where
+     * @param integer 	$idEti
+     * @param integer 	$idDoc
+     * @param string 	$where
+     * @param int 		$niveau
      * 
      * @return array
      */
-	function GetExiTagDoc($idUti=false, $idDoc=false, $where="") {
+	function GetExiTagDoc($idExi=false, $idDoc=false, $where="", $niveau=0) {
 
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_exitagdoc"), array("tag_id","doc_id","uti_id"))                           
-            ->joinInner(array('t' => 'flux_tag'),
-            	't.tag_id = utd.tag_id',array('code'))
-        	->joinInner(array('td' => 'flux_tagdoc'),
-            	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
-        	->group("utd.tag_id")
-        	->order("value DESC");
-        	if($idUti)$query->where( "utd.uti_id = ?", $idUti);
-        	if($idDoc)$query->where( "utd.doc_id = ?", $idDoc);
-        	if($where)$query->where($where);
+        	->from( array("etd" => "flux_exitagdoc"), array("recid"=>"tag_id","tag_id","doc_id","exi_id",'value'=>'SUM(etd.poids)'))                           
+        ->joinInner(array('t0' => 'flux_tag'),
+            	't0.tag_id = etd.tag_id',array('code'))
+        	->joinInner(array('d' => 'flux_doc'),
+            	'd.doc_id = etd.doc_id',array("tronc"))
+		->group("etd.tag_id");
+        	/*
+        	SELECT `etd`.`tag_id`, `etd`.`doc_id`, `etd`.`exi_id`, `t`.`code`, SUM(etd.poids) AS `value` 
+FROM `flux_exitagdoc` AS `etd`
+ INNER JOIN `flux_tag` AS `t` ON t.tag_id = etd.tag_id
+ INNER JOIN `flux_doc` AS `d` ON d.doc_id = etd.doc_id 
+ WHERE (etd.exi_id = 1) AND (etd.doc_id = 2) 
+ GROUP BY `etd`.`tag_id` 
+ ORDER BY `value` DESC
+        	 */
+        	//ajoute les niveaux de tag
+        $arrOrder = array();
+        if($niveau){
+	        	for ($i = 1; $i <= $niveau; $i++) {
+	        		$arrOrder[] = "parent".$i;
+	        		$query->joinInner(array('t'.$i => 'flux_tag'),'t'.$i.'.tag_id = t'.($i-1).'.parent'
+	        			,array("parent".$i=>"code","tId".$i=>"tag_id"));
+	        		
+	        	}
+	    }
+        	$arrOrder[]="code";
+        	$query->order($arrOrder);
         	
-        return $this->fetchAll($query)->toArray(); 		
+        	if($idExi)$query->where( "etd.exi_id = ?", $idExi);
+        	if($idDoc)$query->where( "etd.doc_id = ?", $idDoc);
+        	if($where)$query->where($where);
+
+        	return $this->fetchAll($query)->toArray(); 		
 	}
 
 	/**
      * Récupère les tags associés à un utilisateur
      *
-     * @param integer $idUti
+     * @param integer $idExi
      * @param string $w
      * @param string $h
      * 
      * @return array
      */
-	function GetUtiTags($idUti, $w="", $h="", $order=null, $limit=null, $from=null) {
-
+	function GetExiTags($idExi, $w="", $h="", $order=null, $limit=null, $from=null) {
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_exitagdoc"), array("tag_id"))                           
+        	->from( array("etd" => "flux_exitagdoc"), array("tag_id"))                           
             ->joinInner(array('t' => 'flux_tag'),
-            	't.tag_id = utd.tag_id',array('code'))
-        	->joinInner(array('td' => 'flux_tagdoc'),
-            	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
-        	->where( "utd.uti_id = ?", $idUti)
-        	->group("utd.tag_id");
+        	    		't.tag_id = etd.tag_id',array('code','parent','value'=>'SUM(etd.poids)'))
+        	->group("etd.tag_id");
+        if($idUti)$query->where( "etd.exi_id = ?", $idEti);
 		if($w!="")$query->where($w);
 		if($h!="")$query->having($h);
 		
@@ -421,7 +440,7 @@ class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
         {
             $query->order($order);
         }else{
-        	$query->order("value DESC");
+	        	$query->order("code");
         }
         if($limit != 0)
         {
@@ -445,15 +464,15 @@ class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_exitagdoc"), array("tag_id"))                           
+        	->from( array("etd" => "flux_exitagdoc"), array("tag_id"))                           
             ->joinInner(array('t' => 'flux_tag'),
-            	't.tag_id = utd.tag_id',array('code'))
+            	't.tag_id = etd.tag_id',array('code'))
         	->joinInner(array('td' => 'flux_tagdoc'),
-            	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
+            	'td.doc_id = etd.doc_id AND td.tag_id = etd.tag_id',array('value'=>'SUM(td.poids)'))
         	->joinInner(array('d' => 'flux_doc'),
-            	'd.doc_id = utd.doc_id',array('doc_id', 'titre'))
-        	->where("utd.doc_id IN (".$idsDoc.")")
-        	->group("utd.tag_id")
+            	'd.doc_id = etd.doc_id',array('doc_id', 'titre'))
+        	->where("etd.doc_id IN (".$idsDoc.")")
+        	->group("etd.tag_id")
         	->order("value DESC");
 
         if($order != null)
@@ -478,29 +497,23 @@ class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
 	}
 	
 	/**
-     * Récupère la liste des utilisateurs avec le nombre de tags et le nombre de document
+     * Récupère la liste des existences avec le nombre de tags et le nombre de document
      * 
      * @param string $w
      * @param string $h
      * 
      * @return array
      */
-	function GetUtisNbTagNbDoc($w="", $h="") {
+	function GetExisNbTagNbDoc($w="", $h="") {
 
 		//définition de la requête
         $query = $this->select()
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("utd" => "flux_exitagdoc")
-        		, array("nbTag"=>"COUNT(DISTINCT utd.tag_id)", "nbDoc"=>"COUNT(DISTINCT utd.doc_id)"))                           
-            ->joinInner(array('u' => 'flux_uti'),
-            	'u.uti_id = utd.uti_id',array('login','utd.uti_id'))
-            /*
-        	->joinInner(array('td' => 'flux_tagdoc'),
-            	'td.doc_id = utd.doc_id AND td.tag_id = utd.tag_id',array('value'=>'SUM(td.poids)'))
-            ->joinInner(array('t' => 'flux_tag'),
-            	't.tag_id = utd.tag_id',array('code'))
-            */
-        	->group("utd.uti_id")
+        	->from( array("etd" => "flux_exitagdoc")
+        		, array("nbTag"=>"COUNT(DISTINCT etd.tag_id)", "nbDoc"=>"COUNT(DISTINCT etd.doc_id)"))                           
+            ->joinInner(array('e' => 'flux_exi'),
+            	'e.exi_id = etd.exi_id',array('login','etd.exi_id'))
+        	->group("etd.exi_id")
         	->order("login");
 		if($w!="")$query->where($w);
 		if($h!="")$query->having($h);
@@ -508,7 +521,31 @@ class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 		
 	}
 
+	/**
+     * Récupère la liste des existences avec le nombre de tags et le nombre de document
+     * 
+     * @param string $w
+     * @param string $h
+     * 
+     * @return array
+     */
+	function GetExisByDocTronc($tronc) {
 
+		//définition de la requête
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("etd" => "flux_exitagdoc")
+        		, array("nbTag"=>"COUNT(DISTINCT etd.tag_id)", "nbDoc"=>"COUNT(DISTINCT etd.doc_id)"))                           
+		->joinInner(array('e' => 'flux_exi'),
+            	'e.exi_id = etd.exi_id',array('nom','prenom','recid'=>'etd.exi_id','etd.exi_id'))
+		->joinInner(array('d' => 'flux_doc'),
+            	'd.doc_id = etd.doc_id',array('doc_id'))
+		->where("d.tronc = ?",$tronc)
+		->group("etd.exi_id")
+        	->order("nom");
+		
+        return $this->fetchAll($query)->toArray(); 		
+	}
    
         
 }

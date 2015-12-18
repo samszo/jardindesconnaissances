@@ -61,24 +61,13 @@ class ICEController extends Zend_Controller_Action {
 	}    
 
 	public function ajoutdocAction() {
-			$auth = Zend_Auth::getInstance();
-			if ($auth->hasIdentity()) {
-				// l'identité existe ; on la récupère
-				$ssUti = new Zend_Session_Namespace('uti');
-				$o = new Flux_Site($this->_getParam('db', 0));
-				//echo "ssUti->idUti ".$ssUti->idUti;
-				//on ajoute un nouveau document pour la monade
-				$dbM = new Model_DbTable_Flux_Monade($o->db);
-				$dbM->ajoutDoc($this->_getParam('idMon'), $this->_getParam('data'));				
-    				$r["ICE"] = $dbM->getICE($this->_getParam('idMon'));    			
-    				$this->view->data = $r;
-    			//
-			}else{
-				if(isset($ssUti->redir))
-				    $this->_redirect($ssUti->redir);
-				else
-				    $this->_redirect('/auth/login');
-			}
+		$this->initInstance();
+		$o = new Flux_Site($this->idBase);
+		//on ajoute un nouveau document pour la monade
+		$dbM = new Model_DbTable_Flux_Monade($o->db);
+		$dbM->ajoutDoc($this->_getParam('idMon'), $this->_getParam('data'));				
+    		$r["ICE"] = $dbM->getICE($this->_getParam('idMon'));    			
+    		$this->view->data = $r;
 	}    
 
 	public function editmonadeAction() {
@@ -116,6 +105,15 @@ class ICEController extends Zend_Controller_Action {
 			    $this->_redirect('/auth/login');
 		}
 	}    
+
+	public function getacteursAction() {
+		// l'identité existe ; on la récupère
+		$s = new Flux_Site($this->_getParam('db', 0));
+		$db = new Model_DbTable_Flux_Exi($s->db);
+		$r = $db->getExiByTag('Acteur');
+		$this->view->data = $r;
+			
+	}    
 	
 	public function removemonadeAction() {
 		$auth = Zend_Auth::getInstance();
@@ -132,4 +130,25 @@ class ICEController extends Zend_Controller_Action {
 			    $this->_redirect('/auth/login');
 		}
 	} 	
+	
+    function initInstance(){
+		$this->view->ajax = $this->_getParam('ajax');
+    		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
+		
+		$auth = Zend_Auth::getInstance();
+		$ssUti = new Zend_Session_Namespace('uti');
+		if ($auth->hasIdentity()) {						
+			// l'identité existe ; on la récupère
+		    $this->view->identite = $auth->getIdentity();
+		    $this->view->uti = json_encode($ssUti->uti);
+		}else{			
+		    //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
+		    $ssUti->redir = "/biolographes";
+		    $ssUti->dbNom = $this->idBase;
+		    if($this->view->ajax)$this->_redirect('/auth/finsession');		    
+		    else $this->_redirect('/auth/login');
+		}
+		    	
+    }
+	
 }

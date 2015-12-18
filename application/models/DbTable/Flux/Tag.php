@@ -88,33 +88,31 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     	
     		if(isset($data["parent"])){
 	    		//récupère les information du parent
-	    		$arrP = $this->findByTag_id($data["parent"]);
+	    		$arr = $this->findByTag_id($data["parent"]);
 	    		//gestion des hiérarchies gauche droite
 	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
 	    		//vérifie si le parent à des enfants
-	    		$arr = $this->findByParent($data["parent"]);
-	    		if(count($arr)>0){
+	    		$arrP = $this->findByParent($data["parent"]);
+	    		if(count($arrP)){
 	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
+	    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arr['rgt'];
 	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
+	    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arr['rgt'];
 	    			$stmt = $this->_db->query($sql);
 	    			//
-	    			$data['lft'] = $arr[0]['rgt']+1;
-	    			$data['rgt'] = $arr[0]['rgt']+2;
+	    			$data['lft'] = $arr['rgt']+1;
+	    			$data['rgt'] = $arr['rgt']+2;
 	    		}else{
-	    			//récupère les informations du parent
-	    			$arr = $this->findByTag_id($data["parent"]);
 	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['lft'];
+	    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arr['lft'];
 	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arr[0]['lft'];
+	    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arr['lft'];
 	    			$stmt = $this->_db->query($sql);
 	    			//
-	    			$data['lft'] = $arr[0]['lft']+1;
-	    			$data['rgt'] = $arr[0]['lft']+2;
+	    			$data['lft'] = $arr['lft']+1;
+	    			$data['rgt'] = $arr['lft']+2;
 	    		}    		
-	    		$data['niveau'] = $arrP[0]['niveau']+1;
+	    		$data['niveau'] = $arr['niveau']+1;
     		}
     		if(!isset($data['lft']))$data['lft']=0;    		
     		if(!isset($data['rgt']))$data['rgt']=1;    		
@@ -157,9 +155,9 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     {
         $query = $this->select()
             ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-            ->from(array('node' => 'flux_tag'),array('libO'=>'code', 'idTag0'=>'tag_id'))
+            ->from(array('node' => 'flux_tag'),array('libO'=>'code', 'idTag0'=>'tag_id', "lft", "rgt"))
             ->joinInner(array('enfants' => 'flux_tag'),
-                'enfants.lft BETWEEN node.lft AND node.rgt',array('code', 'desc', 'tag_id', 'parent', 'niveau'))
+                'enfants.lft BETWEEN node.lft AND node.rgt',array("recid"=>"tag_id",'text'=>'code','code', 'desc', 'tag_id', 'parent', 'niveau'))
             ->where( "node.tag_id = ?", $idTag)
            	->order("enfants.".$order);        
 		$result = $this->fetchAll($query);
@@ -311,8 +309,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         $query = $this->select()
                     ->from( array("f" => "flux_tag") )                           
                     ->where( "f.parent = ?", $parent );
-
-        return $this->fetchAll($query)->toArray(); 
+        return $this->fetchAll($query)->toArray();
     }
     
 	/**

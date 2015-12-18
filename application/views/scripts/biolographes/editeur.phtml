@@ -1,40 +1,46 @@
-<!DOCTYPE html>
+<?php
+if(!$this->ajax){
+	$prefUrl = "../";
+	echo '<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Editeur de réseaux d'influences</title>
-    <link rel="stylesheet" href="../css/grapheditor.css">
-	<link rel="stylesheet" href="../css/jquery/ui-lightness/jquery-ui-1.10.4.min.css">
-	  <script type="text/javascript" src="../js/d3.js"></script>
-	  <script type="text/javascript" src="../js/jquery.min.js"></script>
-	  <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
-	  <script type="text/javascript" src="../js/biolographes/reseau.js"></script>
-	  <script type="text/javascript" src="../js/biolographes/modeles.js"></script>
-	  <script type="text/javascript" src="../js/biolographes/flux.js"></script>
+    <title>Editeur de réseaux d&#130;influences</title>
+	<script type="text/javascript">
+	    var prefUrl = "../";
+	  	var setAutoComplet = true;
+		var idBase = "'.$this->idBase.'";
+		var uti = '.$this->uti.';
+		var rsCribles = [];
+		var rsGraphs = [];		
+	</script>
+    <link rel="stylesheet" type="text/css" href="../css/w2ui.css" />
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+	<script type="text/javascript" src="../js/d3.js"></script>
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/w2ui.js"></script>
+	<script type="text/javascript" src="../js/biolographes/reseau.js"></script>
+	<script type="text/javascript" src="../js/biolographes/modeles.js"></script>
+	<script type="text/javascript" src="../js/biolographes/flux.js"></script>
+	<script type="text/javascript" src="../js/biolographes/view.js"></script>
+	<script type="text/javascript" src="../js/biolographes/dialogues.js"></script>
+	
   </head>
   
   <body >
-  	<div id="tools">
-  		<p>Utilisateur : <span id="utiConnect">anonyme</span></p>
-  		<hr/>
-		<label>Crible(s) :</label>
-		<br/>	
-		<select id="lstCrible" onchange="" >
-		</select>  		
-  		<hr/>
-		<label >Graph(s) enregistré(s) :</label>
-		<br/>	
-		<select id="lstGraph" onchange="" >
-		</select>  		
-  		<hr/>
-		<div class="boutons" id="btnGraph">
-	  		<img class="imgButton" alt="synchroniser" onclick="synchroniser()" src="../img/cloud182.png">
-	  		<img class="imgButton" alt="ajouter" src="../img/add83.png">
-	  		<img class="imgButton" alt="supprimer" src="../img/trash34.png">
-		</div>
-  	</div>
+';
+}else{
+	$prefUrl = "";
+	echo '<script type="text/javascript">
+	</script>';	
+}
+?>
+	<link rel="stylesheet" href="<?php echo $prefUrl;?>css/jquery/ui-lightness/jquery-ui-1.10.4.min.css">
+    <link rel="stylesheet" href="<?php echo $prefUrl;?>css/grapheditor.css">
+	<script type="text/javascript" src="<?php echo $prefUrl;?>js/jquery-ui.min.js"></script>
 	<div id="viz"></div>
-  
+
+	
 		<dialog id="dlgNoeud" close>
 			<h3>Ajout d'un noeud</h3>
 			<p>
@@ -96,7 +102,7 @@
 			<h3>Ajout d'un acteur</h3>
 			<div style="vertical-align:middle;">
 				<label for="nomActeur">Nom :</label><input id="nomActeur" />
-		  		<img class="imgButton" alt="chercher un auteur" onclick="findAuteur($('#nomActeur')[0].value)" src="../img/search26.png">
+		  		<img class="imgButton" alt="chercher un auteur" onclick="findAuteur($('#nomActeur')[0].value)" src="<?php echo $prefUrl;?>img/search26.png">
 			</div>
 			<div id="resultActeur" class="ui-widget" style="display:none;">
 				<p id="resultActeurNb" />
@@ -280,17 +286,7 @@
 				<button onclick="inscrit()">Inscription</button> 
 			</div> 
 		</dialog> 
-		<dialog id="dlgSauveDoc" close> 
-			<script type="text/javascript" >	
-				function getDocParams(){
-					var titre = $("#docTitre")[0].value;
-					var tronc = "graph";
-					var data = {"nodes":nodes,"links":links};
-					var p = {"idUti":uti.uti_id, "idBase":idBase, "titre":titre, "tronc":tronc, "data":data};
-					return p;
-				}		
-			</script>		
-		
+		<dialog id="dlgSauveDoc" close> 		
 			<label for="docTitre">Titre du graph : </label>
             <input type="text" name="docTitre" id="docTitre" required="required">
             <br/>
@@ -309,18 +305,11 @@
 				
 	</body>
 
-	<script type="text/javascript" src="../js/biolographes/dialogues.js"></script>
   	<script type="text/javascript">
-  	var idBase = '<?php echo $this->idBase; ?>';
   	var connect = <?php echo $this->connect; ?>;
-  	var arrGraphs, setAutoComplet = true;
+  	var arrGraphs;
   	var viz = document.getElementById("viz");  	
-  	var uti;
-  	if(connect){
-  	  	dialogues.login.showModal();
-  		d3.selectAll(".imgButton").style("display","none");
-  	}	  	
-	
+	var ajax = <?php echo $this->ajax ? 1 : 0; ?>;
 	var lstGraph = document.getElementById('lstGraph');
 
 	/*
@@ -334,18 +323,32 @@
              {source: nodes[1], target: nodes[2], left: false, right: true }
            ];
     */	
-	var nodes = [],links = [];	             
-	// app starts here
-	var rs = new reseau({"idCont":"viz", "w":1280, "h":720,"nodes":nodes
-		,"links":links,"colors":colors,"clusters":clusters, "dialogues":dialogues});
+	var nodes = [],links = [], rs;	             
+    dialogues = {
+    		"noeud":document.getElementById('dlgNoeud')
+    		,"lieu":document.getElementById('dlgLieu')
+    		,"event":document.getElementById('dlgEvent')
+    		,"acteur":document.getElementById('dlgActeur')
+    		,"sauveDoc":document.getElementById('dlgSauveDoc')
+    		,"message":document.getElementById('dlgMess')
+    		
+    		};
+
+    // app starts here
+	if(!ajax)showReseau(nodes, links);
+	
 	//chargement des datas
-	d3.csv("../../data/biolographes/CatRapportsBiolLitt.csv", function(error, data) {			
+	d3.csv("<?php echo $prefUrl;?>../data/biolographes/CatRapportsBiolLitt.csv", function(error, data) {			
 			//construction des données
 			dtOrigine = data;
 			setDataByCrible("oui");	
 			setListeCribles();
 	});	
 
-	
   </script>
-</html>
+<?php 
+if(!$this->ajax){
+	echo '</body>
+</html>';
+}
+?>

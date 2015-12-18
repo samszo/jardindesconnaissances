@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdafrbr1="http://rdvocab.info/RDARelationshipsWEMI/"
+	xmlns:marcrel="http://id.loc.gov/vocabulary/relators/" xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:gr="http://purl.org/goodrelations/v1#" xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:isbd="http://iflastandards.info/ns/isbd/elements/" xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:rdafrbr2="http://RDVocab.info/uri/schema/FRBRentitiesRDA/"
+	xmlns:rdaelements="http://rdvocab.info/Elements/" xmlns:rdac="http://rdaregistry.info/Elements/c/"
+	xmlns:rdau="http://rdaregistry.info/Elements/u/" xmlns:rdaw="http://rdaregistry.info/Elements/w/"
+	xmlns:rdae="http://rdaregistry.info/Elements/e/" xmlns:rdam="http://rdaregistry.info/Elements/m/"
+	xmlns:rdai="http://rdaregistry.info/Elements/i/" xmlns:sudoc="http://www.sudoc.fr/ns/"
+	xmlns:bnf-onto="http://data.bnf.fr/ontology/bnf-onto/">
+	<bibo:Document rdf:about="http://www.sudoc.fr/008884943">
+		<foaf:primaryTopic rdf:resource="http://www.sudoc.fr/008884943/id" />
+		<dcterms:creator rdf:resource="http://www.idref.fr/033702462/id" />
+		<dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1991-09-12
+		</dcterms:created>
+		<dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-02-10T11:15:58
+		</dcterms:modified>
+	</bibo:Document>
+	<bibo:Book rdf:about="http://www.sudoc.fr/008884943/id">
+		<dc:title>Mille plateaux [Texte imprimé] / Gilles Deleuze, Félix
+			Guattari</dc:title>
+		<dc:date>2002</dc:date>
+		<dc:publisher>Paris : les Ed. de minuit , impr.2002</dc:publisher>
+		<dc:format /><!--rda elements obsolète : voir rdam:P30003 -->
+		<rdaelements:modeOfIssuance>
+			<skos:Concept rdf:about="http://RDVocab.info/termLIst/ModeIssue/1001">
+				<skos:prefLabel xml:lang="en">Single unit</skos:prefLabel>
+			</skos:Concept>
+		</rdaelements:modeOfIssuance><!--mode of issuance -->
+		<rdam:P30003>
+			<skos:Concept rdf:about="http://RDVocab.info/termLIst/ModeIssue/1001">
+				<skos:prefLabel xml:lang="en">Single unit</skos:prefLabel>
+			</skos:Concept>
+		</rdam:P30003>
+		<isbd:P1001>
+			<skos:Concept
+				rdf:about="http://iflastandards.info/ns/isbd/terms/contentform/T1009">
+				<skos:prefLabel xml:lang="en">text</skos:prefLabel>
+			</skos:Concept>
+		</isbd:P1001>
+		<dc:type>Text</dc:type>
+		<isbd:P1003>
+			<skos:Concept
+				rdf:about="http://iflastandards.info/ns/isbd/terms/mediatype/T1010">
+				<skos:prefLabel xml:lang="en">unmediated</skos:prefLabel>
+			</skos:Concept>
+		</isbd:P1003>
+		<dcterms:language rdf:resource="http://lexvo.org/id/iso639-3/fra" />
+		<bibo:isbn10>2707303070</bibo:isbn10>
+		<bibo:oclcnum>489750052</bibo:oclcnum>
+		<dc:subject>Psychanalyse et sociologie</dc:subject>
+		<dcterms:subject rdf:resource="http://www.idref.fr/027291685/id" />
+		<dc:subject>Schizo-analyse</dc:subject>
+		<dcterms:subject rdf:resource="http://www.idref.fr/029570964/id" />
+		<dc:subject>Psychanalyse et capitalisme</dc:subject>
+		<dcterms:subject rdf:resource="http://www.idref.fr/028142098/id" />
+		<marcrel:aut>
+			<foaf:Person rdf:about="http://www.idref.fr/026820552/id">
+				<foaf:name>Deleuze, Gilles (1925-1995)</foaf:name>
+			</foaf:Person>
+		</marcrel:aut>
+		<marcrel:aut>
+			<foaf:Person rdf:about="http://www.idref.fr/02690554X/id">
+				<foaf:name>Guattari, Félix (1930-1992)</foaf:name>
+			</foaf:Person>
+		</marcrel:aut><!--UNM 410 : fait partie de la collection -->
+		<dcterms:isPartOf>
+			<bibo:Series rdf:about="http://www.sudoc.fr/001031546/id">
+				<dcterms:bibliographicCitation>Critique [Texte imprimé] / dir. par
+					Jean Piel / Paris : Éd. de Minuit , 1967-
+				</dcterms:bibliographicCitation>
+			</bibo:Series>
+		</dcterms:isPartOf>
+		<rdau:P60193>
+			<bibo:Series rdf:about="http://www.sudoc.fr/001031546/id">
+				<dcterms:bibliographicCitation>Critique [Texte imprimé] / dir. par
+					Jean Piel / Paris : Éd. de Minuit , 1967-
+				</dcterms:bibliographicCitation>
+			</bibo:Series>
+		</rdau:P60193>
+	</bibo:Book>
+</rdf:RDF>

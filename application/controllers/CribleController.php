@@ -52,22 +52,17 @@ class CribleController extends Zend_Controller_Action {
 	 * The default action - show the home page
 	 */
 	public function litAction() {
-		try {
-			//récupère les informations de la palette
-			if($this->_getParam('idBase', 0) && $this->_getParam('url', 0) && $this->_getParam('exi', 0) 
-			&& $this->_getParam('urlFond', 0) && $this->_getParam('filtrer', 0) && $this->_getParam('event', 0)){
-				$tp = new Flux_Tweetpalette($this->_getParam('idBase', 0));
-				$this->view->json = $tp->getPaletteClics($this->_getParam('exi', 0), $this->_getParam('url', 0)
-				, $this->_getParam('urlFond', 0), $this->_getParam('event', 0), $this->_getParam('filtrer', 0));
-				//$s = new Flux_Stats($this->_getParam('idBase', 0));
-				//$this->view->stats = $s->GetUtiTagDoc($this->_getParam('uti', 0), $this->_getParam('url', 0));
-			}else{
-				$this->view->json = "vide";
-			}
-		}catch (Zend_Exception $e) {
-	          echo "Récupère exception: " . get_class($e) . "\n";
-	          echo "Message: " . $e->getMessage() . "\n";
-		}
+		$this->initInstance();
+		//récupère les informations de la palette
+		if($this->_getParam('idBase', 0) && $this->_getParam('url', 0) && $this->_getParam('exi', 0) 
+		&& $this->_getParam('urlFond', 0) && $this->_getParam('filtrer', 0) && $this->_getParam('event', 0)){
+			$tp = new Flux_Tweetpalette($this->_getParam('idBase', 0));
+			$this->view->json = $tp->getPaletteClics($this->_getParam('exi', 0), $this->_getParam('url', 0)
+			, $this->_getParam('urlFond', 0), $this->_getParam('event', 0), $this->_getParam('filtrer', 0));
+			//$s = new Flux_Stats($this->_getParam('idBase', 0));
+			//$this->view->stats = $s->GetUtiTagDoc($this->_getParam('uti', 0), $this->_getParam('url', 0));
+		}else $this->view->json = "vide";
+		
 	}
 	
 	public function ajoutAction() {
@@ -132,5 +127,24 @@ class CribleController extends Zend_Controller_Action {
 		}
     	
     }
-	
+
+	function initInstance(){
+		$this->view->ajax = $this->_getParam('ajax');
+    		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
+		
+		$auth = Zend_Auth::getInstance();
+		$ssUti = new Zend_Session_Namespace('uti');
+		if ($auth->hasIdentity()) {						
+			// l'identité existe ; on la récupère
+		    $this->view->identite = $auth->getIdentity();
+		    $this->view->uti = json_encode($ssUti->uti);
+		}else{			
+		    //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
+		    $ssUti->redir = "/biolographes";
+		    $ssUti->dbNom = $this->idBase;
+		    if($this->view->ajax)$this->_redirect('/auth/finsession');		    
+		    else $this->_redirect('/auth/login');
+		}
+		    	
+    }    
 }

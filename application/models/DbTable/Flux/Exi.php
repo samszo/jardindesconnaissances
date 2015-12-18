@@ -41,9 +41,11 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     {
 		$select = $this->select();
 		$select->from($this, array('exi_id'));
-		//seul le nom est obligatoire et discriminant
+		//vérifie les champs obligatoires et discriminants
 		$select->where('nom = ?', $data['nom']);
-	    $rows = $this->fetchAll($select);        
+		if(isset($data['prenom']))$select->where('prenom = ?', $data['prenom']);
+		if(isset($data['isni']))$select->where('isni = ?', $data['isni']);
+		$rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->exi_id; else $id=false;
         return $id;
     } 
@@ -59,20 +61,20 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
      */
     public function ajouter($data, $existe=true, $rs=false)
     {
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
-    		$data = $this->updateHierarchie($data);
-    		if(!isset($data["maj"]))$data["maj"]= new Zend_Db_Expr('NOW()');
-    	 	$id = $this->insert($data);
-    	}
-    	if($rs)
-    		return $this->findByExiId($id);
+	    	$id=false;
+	    	if($existe)$id = $this->existe($data);	    		
+	    	if(!$id){
+	    		$data = $this->updateHierarchie($data);
+	    		if(!isset($data["maj"]))$data["maj"]= new Zend_Db_Expr('NOW()');
+	    	 	$id = $this->insert($data);
+	    	}
+	    	if($rs)
+	    		return $this->findByExiId($id);
 	    else
-	    	return $id;
+		    	return $id;
     } 
     
-/**
+	/**
      * Modifie la hiérarchie d'une entrée.
      *
      * @param array $data
@@ -83,31 +85,31 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     	
     		if(isset($data["parent"])){
 	    		//récupère les information du parent
-	    		$arrP = $this->findByExiId($data["parent"]);
+	    		$arr = $this->findByExiId($data["parent"]);
 	    		//gestion des hiérarchies gauche droite
 	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
 	    		//vérifie si le parent à des enfants
-	    		$arr = $this->findByParent($data["parent"]);
-	    		if(count($arr)>0){
+	    		$arrP = $this->findByParent($data["parent"]);
+	    		if(count($arrP)){
 	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
+	    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arr['rgt'];
 	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
+	    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arr['rgt'];
 	    			$stmt = $this->_db->query($sql);
 	    			//
-	    			$data['lft'] = $arr[0]['rgt']+1;
-	    			$data['rgt'] = $arr[0]['rgt']+2;
+	    			$data['lft'] = $arr['rgt']+1;
+	    			$data['rgt'] = $arr['rgt']+2;
 	    		}else{
 	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arrP[0]['lft'];
+	    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arr['lft'];
 	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arrP[0]['lft'];
+	    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arr['lft'];
 	    			$stmt = $this->_db->query($sql);
 	    			//
-	    			$data['lft'] = $arr[0]['lft']+1;
-	    			$data['rgt'] = $arr[0]['lft']+2;
+	    			$data['lft'] = $arr['lft']+1;
+	    			$data['rgt'] = $arr['lft']+2;
 	    		}    		
-	    		$data['niveau'] = $arrP[0]['niveau']+1;
+	    		$data['niveau'] = $arr['niveau']+1;
     		}
     		if(!isset($data['lft']))$data['lft']=0;    		
     		if(!isset($data['rgt']))$data['rgt']=1;    		
@@ -128,6 +130,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     public function edit($id, $data)
     {        
         $this->update($data, 'flux_exi.exi_id = ' . $id);
+        return $this->findByExiId($id);
     }
     
     /**
@@ -146,7 +149,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
         	$dbT = new $t($this->_db);
 	        $dbT->delete('uti_id = '.$id);
         }            	
-    	$this->delete('flux_exi.exi_id = '.$id);
+	    	$this->delete('flux_exi.exi_id = '.$id);
     }
     
     /**
@@ -155,10 +158,10 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
      */
     public function getAll($cols=false, $order=null, $limit=0, $from=0)
     {
-    	if($cols)
-        	$query = $this->select()->from( array("flux_exi" => "flux_exi"), $cols);
-    	else 
-    		$query = $this->select()->from( array("flux_exi" => "flux_exi") );
+	    	if($cols)
+	        	$query = $this->select()->from( array("flux_exi" => "flux_exi"), $cols);
+	    	else 
+	    		$query = $this->select()->from( array("flux_exi" => "flux_exi") );
                     
         if($order != null)
         {
@@ -182,7 +185,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     public function findByExiId($exi_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_exi") )                           
+                    ->from( array("f" => "flux_exi"),array('nom', 'prenom', 'exi_id', 'recid'=>'exi_id','data','nait','mort','isni','data'))                           
                     ->where( "f.exi_id = ?", $exi_id );
 		$rs = $this->fetchAll($query)->toArray();
         return  count($rs) ? $rs[0] : false;
@@ -199,12 +202,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
         $query = $this->select()
                     ->from( array("f" => "flux_exi") )                           
                     ->where( "f.parent = ?", $id );
-        $result = $this->fetchAll($query);
-        
-        if($result)
-	        return $result->toArray(); 
-	    else 
-	    	return false;                    
+        return $this->fetchAll($query)->toArray(); 
     }
     
     
@@ -271,6 +269,29 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
                 'enf.lft BETWEEN par.lft AND par.rgt',array('nom', 'exi_id', 'niveau'))
             ->where( "par.exi_id = ?", $idExi)
            	->order("enf.".$order);        
+        $result = $this->fetchAll($query);
+        return $result->toArray(); 
+    }      
+    
+     /**
+     * Recherche les entrées avec la valeur spécifiée
+     * et retourne ces entrées
+     *
+     * @param string $tag
+     * 
+     * @return array
+     */
+    public function getExiByTag($tag)
+    {
+        $query = $this->select()
+                ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->from(array('e' => 'flux_exi'),array('nom', 'prenom', 'exi_id', 'recid'=>'exi_id','data','nait','mort','isni','data'))
+            ->joinInner(array('etd' => 'flux_exitagdoc'),
+                'etd.exi_id = e.exi_id',array())
+            ->joinInner(array('t' => 'flux_tag'),
+                't.tag_id = etd.tag_id',array('tag_id', 'code'))
+            ->where( "t.code = ?", $tag)
+            ->order("e.nom");        
         $result = $this->fetchAll($query);
         return $result->toArray(); 
     }      

@@ -1,12 +1,17 @@
 /**
 fonctions pour la gestion des flux en lecture/ecriture
+
 **/
+function finsession(js){
+	if(js.finsession) window.location = prefUrl+'auth/login';	
+}
+
 function getAuth(type, login, mdp){
 	var login = $("#iptLogin")[0].value;
 	var mdp = $("#iptMdp")[0].value;
 	if (login != "" || mdp != "") {
 		var p = {"idBase":idBase, "login":login, "mdp":mdp, "ajax":1};
-		$.post("../auth/"+type, p,
+		$.post(prefUrl+"auth/"+type, p,
 				 function(data){
 			 		if(data.erreur){
 			 			showMessage(data.erreur);
@@ -29,7 +34,7 @@ function getAuth(type, login, mdp){
 }
 function getDocs(){
 	var p = {"idBase":idBase, "tronc":"graph"};
-	$.post("../flux/getdocs", p,
+	$.post(prefUrl+"flux/getdocs", p,
 		 function(data){
 	 		if(data.erreur){
 	 			showMessage(data.erreur);
@@ -76,7 +81,7 @@ function castJSON(n){
 function saveDoc(){
 	var p = getDocParams();
 	if (p.titre) {
-		$.post("../flux/sauvedoc", p,
+		$.post(prefUrl+"flux/sauvedoc", p,
 				 function(data){
 			 		if(data.erreur){
 			 			showMessage(data.erreur);
@@ -93,7 +98,7 @@ function saveDoc(){
 function editDoc(){
 	var p = getDocParams();
 	p.idDoc = arrGraphs[lstGraph.selectedIndex].doc_id;
-	$.post("../flux/sauvedoc", p,
+	$.post(prefUrl+"flux/sauvedoc", p,
 			 function(data){
 		 		if(data.erreur){
 		 			showMessage(data.erreur);
@@ -106,23 +111,79 @@ function editDoc(){
 }			
 function findAuteur(nom){
 	//supprime les résultats
-	initFormAuteur()
-	$.post("../flux/databnfterm?term="+nom, null,
+	//initFormAuteur()
+	w2popup.lock("Veuillez patienter", true);
+	$.post(prefUrl+"flux/databnf?obj=term&term="+nom, null,
 			 function(data){
 		 		//ne récupère que les personnes
 		 		dtAuteurFind = data.filter(function(d){
 			 		return d.raw_category=="Person";
 		 			});
 		 		setFindAuteur();
+		 	    w2popup.unlock();		 		
 			 }, "json");
 }
+
 function selectAuteur(i){
 	//récupère la bio de l'auteur
 	//"http://data.bnf.fr/10945257"
 	var idBNF = dtAuteurFind[i].value.substring(19);
-	$.post("../flux/databnfbio?idBNF="+idBNF, null,
+	$.post(prefUrl+"flux/databnf?obj=bio&idBNF="+idBNF, null,
 			 function(data){
 				setSelectAuteur(data);
 			 }, "json");	
 }
 
+function findTag(code){
+	//supprime les résultats
+	//initFormAuteur()
+	w2popup.lock("Veuillez patienter", true);
+	$.post(prefUrl+"flux/databnf?obj=term&term="+code, null,
+			 function(data){
+		 		//ne récupère que les notions
+		 		dtTagFind = data.filter(function(d){
+			 		return d.raw_category=="Rameau";
+		 			});
+		 		setFindTag();
+		 	    w2popup.unlock();		 		
+			 }, "json");
+}
+
+function selectTag(i){
+	//récupère le détail de la notion
+	//"http://data.bnf.fr/10945257"
+	var idBNF = dtTagFind[i].value.substring(19);
+	//charge les détails de la notion
+	$('#ifTag').attr("src","graph/sankey?urlStats=..%2Fflux%2Fdatabnf%3Fobj%3Drameau%26idBNF%3D"+idBNF);
+}
+
+
+function chargeCrible(crible){
+	//récupère les données du crible
+	var data = {"obj":"crible","idExi":crible.exi_id,"idDoc":crible.doc_id};	
+	$.get(prefUrl+"biolographes/get",
+			data,
+        		function(js){
+    				finsession(js);
+    				datas = {}, rsTags = [];
+    				js.rs.forEach(function(d){
+    					/*hiérarchie 3 niveaux
+    					var p1 = d.parent1, p2 = d.parent2;
+        				if(!datas[p2])datas[p2]=[];
+        				if(!datas[p2][p1]){
+        					datas[p2][p1]=[];
+        				}
+        				datas[p2][p1].push(d);    					
+        				*/
+    					//hiérarchie 2 niveaux
+    					var p1 = d.parent1;
+        				if(!datas[p1])datas[p1]=[];
+        				datas[p1].push(d);
+        				//cumul les notions
+        				if(d.parent2=="Catégories de notion")rsTags.push(d);
+    				});
+    				datas["Acteurs"] = rsActeurs;
+    				w2alert(js.message);
+       		},"json");		
+	
+}

@@ -37,6 +37,9 @@ class FluxController extends Zend_Controller_Action {
 			$this->view->tags = $dbTags->findTagByUti($this->_getParam('uti', 0),$this->_getParam('flux', ""));
     		}elseif($this->_getParam('idUti', 0)){	    	
 			$this->view->tags = $dbTags->findTagByUtiId($this->_getParam('idUti', 0),$this->_getParam('flux', ""));
+    		}elseif($this->_getParam('parent', 0)){	    	
+    			$dbTags = new Model_DbTable_Flux_Tag($s->db);
+    			$this->view->tags = $dbTags->getFullChild($this->_getParam('parent'),"code");			
     		}else{
 		    $this->view->tags = $dbTags->findTagUti();	    	
 	    }
@@ -106,9 +109,15 @@ class FluxController extends Zend_Controller_Action {
 		if ($auth->hasIdentity()) {
 		    // l'identité existe ; on la récupère
 			$o = new Flux_Site($this->_getParam('db', 0));
-			$dbUTD = new Model_DbTable_Flux_UtiTagDoc($o->db);		
-			$this->view->data = $dbUTD->GetUtiTags($this->_getParam('idUti', 0),"LENGTH(t.code) > 3", "SUM(td.poids) >= 1");
-			
+			if($this->_getParam('exi', 0)){
+				$dbETD = new Model_DbTable_Flux_ExiTagDoc($o->db);
+				$where = "";
+				if($this->_getParam('parent', 0))$where = "t.parent=".$this->_getParam('parent');		
+				$this->view->data = $dbETD->GetUtiTags($this->_getParam('idUti', 0),$where);
+			}else{
+				$dbUTD = new Model_DbTable_Flux_UtiTagDoc($o->db);		
+				$this->view->data = $dbUTD->GetUtiTags($this->_getParam('idUti', 0),"LENGTH(t.code) > 3", "SUM(td.poids) >= 1");
+			}			
 		}else{
 		    $this->_redirect('/auth/login');
 		}
@@ -206,61 +215,33 @@ class FluxController extends Zend_Controller_Action {
 		    $this->view->erreur = "aucun utilisateur connecté";
 		}   	        
     }    
-	public function databnftermAction()
+    
+	public function sudocAction()
     {
-    		$s = new Flux_Site();
-		$this->view->reponse = $s->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
+    		$s = new Flux_Databnf();
+    		if($this->_getParam('isbn')){
+			$this->view->reponse = json_encode($s->getSudocAutoriteByISBN($this->_getParam('isbn')));    			
+    		} 
     }
+    
 
-	public function databnfbioAction()
+	public function databnfAction()
     {
-    		$s = new Flux_Site();
-	   	$format = 'json';	 
+    		$bnf = new Flux_Databnf();
 	   	
-	   	//récupère les infos de data bnf
-	   	$query =
-		'SELECT DISTINCT ?idArk ?nom ?prenom ?nait ?mort  WHERE
-		{
-		?idArk bnf-onto:FRBNF "'.$this->_getParam('idBNF').'"^^xsd:integer;
-		foaf:focus ?identity.
-		?identity foaf:familyName ?nom;
-		foaf:givenName ?prenom.
-		OPTIONAL {?identity bio:birth ?nait.}
-		OPTIONAL {?identity bio:death ?mort.} 
-		}';	   			   	
-	   	$searchUrl = 'http://data.bnf.fr/sparql?'
-	    	.'query='.urlencode($query)
-	      	.'&format='.$format;
-		$result = $s->getUrlBodyContent($searchUrl,false,false);
-		$obj1 = json_decode($result);
-		//construction de la réponse
-		$objResult->idArk = $obj1->results->bindings[0]->idArk->value;				
-		$objResult->nom = $obj1->results->bindings[0]->nom->value;				
-		$objResult->prenom = $obj1->results->bindings[0]->prenom->value;				
-		$objResult->nait = $obj1->results->bindings[0]->nait->value;				
-		$objResult->mort = $obj1->results->bindings[0]->mort->value;				
-		
-		//récupère les données liées
-		$query =
-		'SELECT DISTINCT ?p ?o WHERE {
-		<'.$obj1->results->bindings[0]->idArk->value.'> ?p ?o.
-		}';	   	
-	   	$searchUrl = 'http://data.bnf.fr/sparql?'
-	    	.'query='.urlencode($query)
-	      	.'&format='.$format;
-		$result = $s->getUrlBodyContent($searchUrl,false,false);
-		$obj2 = json_decode($result);		
-		//construction de la réponse
-		$objResult->liens = array();
-		foreach ($obj2->results->bindings as $val) {
-			//ajoute les liens direct
-			if($val->p->value=="http://www.w3.org/2004/02/skos/core#exactMatch")
-				array_push($objResult->liens, $val->o->value);
-			//ajout l'isni
-			if($val->p->value=="http://isni.org/ontology#identifierValid")
-				$objResult->isni = $val->o->value;				
-		}
-		$this->view->reponse = json_encode($objResult);
+	   	switch ($this->_getParam('obj')) {
+	   		case 'term':
+				$this->view->reponse = $bnf->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
+	   			break;	   		
+	   		case 'bio':
+				$this->view->reponse = $bnf->getBio($this->_getParam('idBNF'));
+	   			break;	   		
+	   		case 'rameau':
+				$this->view->reponse = $bnf->getRameauByIdBnf($this->_getParam('idBNF'));
+	   			break;	   		
+	   		default:
+	   			break;
+	   	}
     }
     
 	public function googleAction()

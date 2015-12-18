@@ -228,6 +228,7 @@ try {
 	//$s->update("simple");
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
+	/*
     $diigo = new Flux_Diigo("luckysemiosis","samszo","flux_evaletu",true);
     $diigo->bTraceFlush = true;
     $arrCompte = array("ernestovi","Arso972","milounis","crazyyoshi","Ghislainguy","noelno","wumiolabisi","BCottereau","carolinemourer","DjamelMeziane","elographicdesigner","nazadounet","Sissiwiki","arzouz");
@@ -235,7 +236,6 @@ try {
     foreach ($arrCompte as $c) {
     		$diigo->saveAll($c);
 	}
-	/*
     $diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
     $diigo->getGroupeRss("bulles");
 	$diigo->getRequest(array("user"=>$user,"count"=>100));
@@ -318,17 +318,29 @@ try {
 	*/
 	
 	/*
-	
 	$server = new Zend_Amf_Server();
-
 	// *ZAMFBROWSER IMPLEMENTATION*
 	$server->setClass( "ZendAmfServiceBrowser" );
 	ZendAmfServiceBrowser::$ZEND_AMF_SERVER = $server;
-	
 	$server->setClass('Flux_delicious');
 	*/
 	//$response = $server->handle();
 
+	/*
+	$bnf = new Flux_Databnf();
+	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
+	$rs = $bnf->getRameauByIdBnf("11958000");
+	*/
+	
+	/*
+	$s->getDb("flux_biolographes");
+	$s->dbD = new Model_DbTable_Flux_ExiTagDoc($s->db);
+	$rs = $s->dbD->GetExiTagDoc(1,2);
+	*/
+	
+	$cairn = new Flux_Cairn("spip_e-educ_proverbes",true);
+	$dt = $cairn->sauve100Citations("http://localhost/jdc/data/gapaii/Les%20100%20citations%20de%20la%20philosophie%20-%20Cairn.info.html",15);
+	
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {
