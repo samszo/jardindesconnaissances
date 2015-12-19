@@ -13,6 +13,8 @@ class Flux_Databnf extends Flux_Site{
 
 	var $formatResponse = "json";
 	var $searchUrl = 'http://data.bnf.fr/sparql?';
+	var $rs;
+	var $doublons;
 	
     /**
      * Constructeur de la classe
@@ -236,45 +238,66 @@ ORDER BY ASC (?label_a)
 				$objResult->isni = $val->o->value;				
 		}
 		return json_encode($objResult);
-    }   
+    }  
 
 	/**
-     * Recherche un mot-clef rameau à partir d'un IDBNF
+     * Compte le nombre de document avec un mot-clef rameau
      *
      * @param  string $idBnf
      *
-     * @return string
+     * @return integer
      */
-    public function getRameauByIdBnf($idBnf){	   	
+    public function countDocByRameau($idBnf){	   	
 	   	//récupère les infos de data bnf
 		$query =
-			'SELECT DISTINCT ?sujet ?lSujet ?uLarge ?lLarge ?uLien ?lLien ?uPrecis ?lPrecis ?lLargeLien ?uLargeLien ?lPrecisLien ?uPrecisLien
+			'SELECT ?uSujet ?lSujet (COUNT(DISTINCT ?dSujet) as ?cDS) 
+			WHERE { 
+				?uSujet bnf-onto:FRBNF "'.$idBnf.'"^^xsd:integer;
+			    skos:prefLabel ?lSujet;
+			    dcterms:isPartOf ?scheme.	
+			  	?dSujet dcterms:subject ?uSujet.
+			} 
+			GROUP BY ?uSujet ?lSujet ';	   	
+		$result = $this->query($query);
+		
+		//construction de la réponse
+		$obj = json_decode($result);		
+		return json_encode($objResult);
+    }      
+    
+	/**
+     * Recherche un mot-clef rameau à partir d'un IDBNF
+     *
+     * @param  string 	$idBnf
+     * @param  int 		$niv
+     * @param  int 		$nivMax
+     *
+     * @return string
+     */
+    public function getRameauByIdBnf($idBnf, $niv=0, $nivMax=1){	   	
+	   	//récupère les infos de data bnf
+		$query =
+			'SELECT DISTINCT ?uSujet ?lSujet ?uLarge ?iLarge ?lLarge ?uLien ?iLien ?lLien ?uPrecis ?iPrecis ?lPrecis 
 			WHERE {
-				?sujet bnf-onto:FRBNF "'.$idBnf.'"^^xsd:integer;
+				?uSujet bnf-onto:FRBNF "'.$idBnf.'"^^xsd:integer;
 			    skos:prefLabel ?lSujet;
 			    dcterms:isPartOf ?scheme.
 			  OPTIONAL {
-			    ?uLarge skos:narrower ?sujet;
+			    ?uLarge skos:narrower ?uSujet;
+			    bnf-onto:FRBNF ?iLarge;
 			    skos:prefLabel ?lLarge.
 			  }
 			  OPTIONAL {
-			    ?uLien skos:related ?sujet;
+			    ?uLien skos:related ?uSujet;
+			    bnf-onto:FRBNF ?iLien;
 			    skos:prefLabel ?lLien.
 			  }
 			  OPTIONAL {
-			    ?uPrecis skos:broader ?sujet;
+			    ?uPrecis skos:broader ?uSujet;
+			    bnf-onto:FRBNF ?iPrecis;
 			    skos:prefLabel ?lPrecis.
 			  }
-			  OPTIONAL {
-			    ?uLargeLien skos:narrower ?uLien;
-			    skos:prefLabel ?lLargeLien.
-			  }  
-			  OPTIONAL {
-			    ?uPrecisLien skos:broader ?uLien;
-			    skos:prefLabel ?lPrecisLien.
-			  }    			  
-			} 
-			ORDER BY ASC (?lLien)';	   	
+			} ';	   	
 		$result = $this->query($query);
 		
 		//construction de la réponse
@@ -285,90 +308,82 @@ ORDER BY ASC (?label_a)
 		 * }
 		 */
 		//ajoute les noeuds "plus large" et "plus précis" 
-		$objResult = (object) array("nodes" => array(
+		if(!$this->rs)$this->rs = (object) array("nodes" => array(
 									array("name"=>"Plus large","uri"=>"","recid"=>0)
 									,array("name"=>"Plus précis","uri"=>"","recid"=>1)
 									), 
 									"links" => array());
-		$doublons = array();
-		$taille = 64;	
+		if(!$this->doublons)$this->doublons = array();
 		foreach ($obj->results->bindings as $val) {
-			if(!isset($doublons[$val->lSujet->value])){
-				$objResult->nodes[] = array("name"=>$val->lSujet->value,"uri"=>$val->sujet->value,"recid"=>count($objResult->nodes),"type"=>"sujet");
-				$doublons[$val->lSujet->value] = count($objResult->nodes)-1;
-				$ss = $doublons[$val->lSujet->value];
-			}
-			if(isset($val->lLien)){
-				if(!isset($doublons[$val->lLien->value])){
-					$objResult->nodes[] = array("name"=>$val->lLien->value,"uri"=>$val->uLien->value,"recid"=>count($objResult->nodes),"type"=>"lien");
-					$doublons[$val->lLien->value] = count($objResult->nodes)-1;
+			$s = $this->ajoutNoeud(array("name"=>$val->lSujet->value,"uri"=>$val->uSujet->value,"recid"=>$idBnf,"type"=>"sujet"));
+			if(isset($val->lLien) && $niv < $nivMax){
+				$l = $this->ajoutNoeud(array("name"=>$val->lLien->value,"uri"=>$val->uLien->value,"recid"=>$val->iLien->value,"type"=>"lien"));
+				if($niv < $nivMax){
+					//récupère la définition du lien
+					$this->getRameauByIdBnf($val->iLien->value,$niv+1,$nivMax);
 				}
-				$t = $doublons[$val->lLien->value];
-				if(isset($val->lLargeLien)){
-					if(!isset($doublons[$val->lLargeLien->value])){
-						$objResult->nodes[] = array("name"=>$val->lLargeLien->value,"uri"=>$val->uLargeLien->value,"recid"=>count($objResult->nodes),"type"=>"lien_large");
-						$doublons[$val->lLargeLien->value] = count($objResult->nodes)-1;
-					}
-					$s = $doublons[$val->lLargeLien->value];
-					if(!isset($doublons[$s."_".$t])){						
-						$objResult->links[] = array("source"=>$s,"target"=>$t,"value"=>$taille);
-						$objResult->links[] = array("source"=>0,"target"=>$s,"value"=>$taille);
-						$doublons[$s."_".$t] = true;
-					}
-				}elseif(!isset($doublons["0_".$t])){
-						$objResult->links[] = array("source"=>0,"target"=>$t,"value"=>$taille);						
-						$doublons["0_".$t] = true;
-					}
-				$s = $t;
-				if(isset($val->lPrecisLien)){
-					if(!isset($doublons[$val->lPrecisLien->value])){
-						$objResult->nodes[] = array("name"=>$val->lPrecisLien->value,"uri"=>$val->uPrecisLien->value,"recid"=>count($objResult->nodes),"type"=>"lien_precis");
-						$doublons[$val->lPrecisLien->value] = count($objResult->nodes)-1;
-					}
-					$t = $doublons[$val->lPrecisLien->value];			
-					if(!isset($doublons[$s."_".$t])){
-						$objResult->links[] = array("source"=>$s,"target"=>$t,"value"=>$taille);
-						$objResult->links[] = array("source"=>$t,"target"=>1,"value"=>$taille);
-						$doublons[$s."_".$t] = true;
-					}
-				}elseif(!isset($doublons[$s."_1"])){
-					$objResult->links[] = array("source"=>$s,"target"=>1,"value"=>$taille);
-					$doublons[$s."_1"] = 1;						
-				}					
 			}
 			if(isset($val->lPrecis)){
-				if(!isset($doublons[$val->lPrecis->value])){
-					$objResult->nodes[] = array("name"=>$val->lPrecis->value,"uri"=>$val->uPrecis->value,"recid"=>count($objResult->nodes),"type"=>"precis");
-					$doublons[$val->lPrecis->value] = count($objResult->nodes)-1;
-				}
-				$t = $doublons[$val->lPrecis->value];
-				if(!isset($doublons[$ss."_".$t])){										
-					$objResult->links[] = array("source"=>$ss,"target"=>$t,"value"=>$taille);
-					$objResult->links[] = array("source"=>$t,"target"=>1,"value"=>$taille);
-					$doublons[$ss."_".$t] = true;
-				}
-			}elseif(!isset($doublons[$ss."_1"])){
-				$objResult->links[] = array("source"=>$ss,"target"=>1,"value"=>$taille);
-				$doublons[$ss."_1"] = true;					
+				$p = $this->ajoutNoeud(array("name"=>$val->lPrecis->value,"uri"=>$val->uPrecis->value,"recid"=>$val->iPrecis->value,"type"=>"precis"));
+				if($niv+1 < $nivMax){
+					//récupère la définition du lien
+					$this->getRameauByIdBnf($val->iPrecis->value,$niv+1,$nivMax);
+				}				
+				$this->ajoutLien($s, $p);			
+				$this->ajoutLien($p, 1);			
+			}else{
+				$this->ajoutLien($s, 1);			
 			}	
 			if(isset($val->lLarge)){
-				if(!isset($doublons[$val->lLarge->value])){
-					$objResult->nodes[] = array("name"=>$val->lLarge->value,"uri"=>$val->uLarge->value,"recid"=>count($objResult->nodes),"type"=>"large");
-					$doublons[$val->lLarge->value] = count($objResult->nodes)-1;
-				}
-				$s = $doublons[$val->lLarge->value];
-				if(!isset($doublons[$s."_".$ss])){										
-					$objResult->links[] = array("source"=>$s,"target"=>$ss,"value"=>$taille);
-					$objResult->links[] = array("source"=>0,"target"=>$s,"value"=>$taille);
-					$doublons[$s."_".$ss]=true;
-				}
-			}elseif(!isset($doublons["0_".$ss])){
-				$objResult->links[] = array("source"=>0,"target"=>$ss,"value"=>$taille*2);					
-				$doublons["0_".$ss] = true;
+				$l = $this->ajoutNoeud(array("name"=>$val->lLarge->value,"uri"=>$val->uLarge->value,"recid"=>$val->iLarge->value,"type"=>"large"));
+				if($niv+1 < $nivMax){
+					//récupère la définition du lien
+					$this->getRameauByIdBnf($val->iLarge->value,$niv+1,$nivMax);
+				}				
+				$this->ajoutLien($l, $s);			
+				$this->ajoutLien(0, $l);			
+			}else{
+				$this->ajoutLien(0, $s);			
 			}		
 		}
-		return json_encode($objResult);
-    }     
+		return $this->rs;
+    }    
+
+	/**
+     * Ajout un noeud au résultat
+     *
+     * @param  array $arr
+     *
+     * @return int
+     */
+    function ajoutNoeud($arr){
+		if(!isset($this->doublons[$arr["name"]])){
+			$arr["num"]=	count($this->rs->nodes);				
+			$this->rs->nodes[] = $arr;
+			$this->doublons[$arr["name"]] = $arr["num"];
+		}
+		return $this->doublons[$arr["name"]];		
+    }
+
+	/**
+     * Ajout un lien au résultat
+     *
+     * @param  int $s
+     * @param  int $t
+     * @param  int $v
+     *
+     * @return int
+     */
+    function ajoutLien($s, $t, $v=1){
+		if(!isset($this->doublons[$s."_".$t])){					
+			$this->rs->links[] = array("source"=>$s,"target"=>$t,"value"=>$v);
+			$this->doublons[$s."_".$t] = count($this->rs->links)-1;						
+		}else{
+			//$this->rs->links[$this->doublons[$s."_".$t]]["value"]++;
+		} 
+		return $this->doublons[$s."_".$t];		
+    }
+    
     /*arboressence rameau par id
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 SELECT DISTINCT ?original_rameau ?prefLabel ?uri_1 ?label_1 ?uri_a ?label_a ?uri_b ?label_b

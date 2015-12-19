@@ -326,21 +326,22 @@ try {
 	*/
 	//$response = $server->handle();
 
-	/*
+	//
 	$bnf = new Flux_Databnf();
 	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
 	$rs = $bnf->getRameauByIdBnf("11958000");
-	*/
+	$s->trace(json_encode($rs));
+	//
 	
 	/*
 	$s->getDb("flux_biolographes");
 	$s->dbD = new Model_DbTable_Flux_ExiTagDoc($s->db);
 	$rs = $s->dbD->GetExiTagDoc(1,2);
 	*/
-	
+	/*
 	$cairn = new Flux_Cairn("spip_e-educ_proverbes",true);
 	$dt = $cairn->sauve100Citations("http://localhost/jdc/data/gapaii/Les%20100%20citations%20de%20la%20philosophie%20-%20Cairn.info.html",15);
-	
+	*/
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {
