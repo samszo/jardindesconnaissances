@@ -154,7 +154,9 @@ function selectTag(i){
 	//"http://data.bnf.fr/10945257"
 	var idBNF = dtTagFind[i].value.substring(19);
 	//charge les détails de la notion
-	$('#ifTag').attr("src","graph/sankey?urlStats=..%2Fflux%2Fdatabnf%3Fobj%3Drameau%26idBNF%3D"+idBNF);
+	$('#ifTag').attr("src","biolographes/navigrameau?idBNF="+idBNF);
+		
+	
 }
 
 
@@ -179,6 +181,9 @@ function chargeCrible(crible){
     					var p1 = d.parent1;
         				if(!datas[p1])datas[p1]=[];
         				datas[p1].push(d);
+        				//enregistre les tag références
+        				if(d.parent1=="Matière Rameau")idTagRameau=d.tId1;
+        				if(d.parent1=="Notions")idTagNotion=d.tId1;
         				//cumul les notions
         				if(d.parent2=="Catégories de notion")rsTags.push(d);
     				});

@@ -10,6 +10,8 @@
     var setAutoComplet = false;
 	var idBase = '<?php echo $this->idBase;?>';
 	var uti = <?php echo $this->uti;?>;
+	var defCribleExiId = 1;
+	var defCribleDocId = 2;
     </script>
 	<script type="text/javascript" src="js/d3.js"></script>
 	<script type="text/javascript" src="js/jquery.min.js"></script>
@@ -88,6 +90,8 @@
 		});  
 
 		chargeLayout("tbGraph");		  
+		//charge le crible par défaut
+		chargeCrible({"obj":"crible","idExi":defCribleExiId,"idDoc":defCribleDocId});
 	}
 
 	function chargeLayout(idLayout){
@@ -97,7 +101,7 @@
 
         }
 	    	if(idLayout=="tbGraph"){
-	        	w2ui['layoutMain'].load('main', 'Biolographes/editeur?ajax=1',null,function () {
+	        	w2ui['layoutMain'].load('main', 'Biolographes/editeur?ajax=1',null,function () {		        	
 	        		w2ui.layout.unlock('main');
 	        	});        	
 	    }

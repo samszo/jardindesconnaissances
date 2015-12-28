@@ -7,7 +7,7 @@ var catLieux= {"Académies":1,"Sociétés savantes":1,"Universités françaises"
                ,"Espaces de sociabilité: cercles et salons mondains ou littéraires":1
                ,"Autres lieux de savoirs":1,"Villégiatures":1};
 var dtTypeNoeud = ["Références","Acteurs","Concepts","Lieux"];
-
+var idTagRameau, idTagNotion;
 var rsActeurs, rsTags;
 $.get(prefUrl+"ice/getacteurs",{'db':idBase},function(js){
 	rsActeurs = js;

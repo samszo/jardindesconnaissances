@@ -56,24 +56,24 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
      *
      * @param array $data
      * @param boolean $existe
-     * @param boolean $rData
+     * @param boolean $rs
      *  
      * @return integer
      */
-    public function ajouter($data, $existe=true, $rData=false)
+    public function ajouter($data, $existe=true, $rs=false)
     {
-    	$id=false;
-    	
-        if($existe)$id = $this->existe($data);
-    	if(!$id){
-    		$data = $this->updateHierarchie($data);
-    		$id = $this->insert($data);
-    	}
-    	    	
-    	if($rs)
-    		return $this->findByTag_id($id);
-	    else
-	    	return $id;
+	    	$id=false;
+	    	
+	        if($existe)$id = $this->existe($data);
+	    	if(!$id){
+	    		$data = $this->updateHierarchie($data);
+	    		$id = $this->insert($data);
+	    	}
+	    	    	
+	    	if($rs)
+	    		return $this->findByTag_id($id);
+		else
+		    	return $id;
     	
     } 
 
@@ -235,8 +235,11 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     public function findByTag_id($tag_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_tag") )                           
-                    ->where( "f.tag_id = ?", $tag_id );
+			->from( array("f" => "flux_tag") )                           
+        		->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('t' => 'flux_tag'),
+                'f.tag_id = t.tag_id',array("recid"=>"tag_id"))
+			->where( "f.tag_id = ?", $tag_id );
 		$arr = $this->fetchAll($query)->toArray();
         return count($arr) ? $arr[0] : false; 
     }

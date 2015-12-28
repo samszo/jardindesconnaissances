@@ -927,7 +927,7 @@ button.w2ui-btn-small:focus:before {
   text-overflow: ellipsis;
   text-align: right;
   min-height: 20px;
-  color: #666;
+  /* color: #666; */
 }
 .w2ui-field > div {
   /* do not include width */

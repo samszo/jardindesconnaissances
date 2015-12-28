@@ -1,5 +1,6 @@
 var dialogues;
-var pstyle = 'border: 1px solid #dfdfdf; padding: 5px;';
+//var pstyle = 'border: 1px solid #dfdfdf; padding: 5px;';
+var pstyle = 'padding:3px;';
 
 function showReseau(data){
 	//change les valeurs null en array vide pour éviter les plantage de D3
@@ -364,6 +365,7 @@ var formTag = {
     fields: [
         { name: 'code', type: 'text', html: { caption: 'Libellé' } },
         { name: 'desc', type: 'text', html: { caption: 'Description' } },
+        { name: 'uri', type: 'text', html: { caption: 'URI' } },
         { name: 'parent', type: 'list', options: { items: rsTags }
 			, html: { caption: 'Parent', attr: 'size="20"' } 
 		},
@@ -380,8 +382,16 @@ var formTag = {
 	        	$.get(prefUrl+'biolographes/ajout',
 				data,
 	        		function(js){
-	    				finsession(js);
-	        			w2alert(js.message);
+    				if(idUpdate){
+    					//mise à jour de la data
+    					rsTags.forEach(function(d, i){
+    						if(d.recid==js.rs.recid)rsTags[i]=js.rs;
+    					});
+    				}else{
+    					rsTags.push(js.rs);
+    				}
+        			w2alert(js.message);
+        			openPopupAjoutTag();
 	       		},"json");
 	    }
     }
@@ -413,8 +423,8 @@ var lyTag = {
         name: 'layout_tag',
         panels: [
             { type: 'top', size: 50, style: pstyle, content: '',resizable: true },
-            { type: 'left', size:"400px", style: pstyle, content: '',resizable: true },
-            { type: 'main', size:"60%", style: pstyle, content: '',resizable: true },
+            { type: 'left', size:"30%", style: pstyle, content: '',resizable: true },
+            { type: 'main', size:"220px", style: pstyle, content: '',resizable: true },
             { type: 'bottom', size:"40%", style: pstyle, content: '<iframe id="ifTag" src="'+prefUrl+'vide.html" height="100%" width="100%" />',resizable: true }
         ],
     };
@@ -433,7 +443,11 @@ var gridResultBNF = {
         onClick: function (event) {
 			if(itemSelect && itemSelect.recid == event.recid) return;
 			itemSelect = this.get(event.recid);
-			if(itemSelect.raw_category=="Rameau")selectTag(event.recid);
+			if(itemSelect.raw_category=="Rameau"){
+				itemSelect.parent = idTagRameau;
+				selectTag(event.recid);				
+				setSelectTag(itemSelect);
+			}
 			if(itemSelect.raw_category=="Person")selectAuteur(event.recid);
         }	    
 	};
@@ -527,7 +541,7 @@ function openPopupAjoutTag(){
 	        	 	if(w2ui['grid_tag'])w2ui['grid_tag'].destroy();
 	        		$('#w2ui-popup #main').w2grid(gridTag);
 	            	w2popup.max();
-	        		w2popup.resize(1000, 500);
+	        		//w2popup.resize(1000, 500);
             };
         },
     });
@@ -545,4 +559,59 @@ function showRefTag(cherche){
 	if(cherche){
 		findTag(cherche.trim());
 	}
+}
+function setFindAuteur(){
+	if(dtAuteurFind.length==0)w2alert("Aucun acteur trouvé.");
+	//ajoute un recid
+	dtAuteurFind.forEach(function(d,i){
+		d.recid = i;
+	});
+	//affiche les résultats
+	gridResultBNF.records = dtAuteurFind;
+ 	if(w2ui['grid_result_bnf'])w2ui['grid_result_bnf'].destroy();	
+	w2ui['layout_acteur'].content('main', $().w2grid(gridResultBNF));
+ 	if(w2ui['layout_acteur_bottom'])w2ui['layout_acteur_bottom'].destroy();	
+	w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurBottom));            		
+	
+}
+
+
+function setSelectAuteur(dt){
+	if(dt.length==0 || dt.idArk==null)
+		w2alert("Aucunne référence dans data.bnf.fr");
+	else{
+        var g = w2ui['form_acteur'];
+        g.clear();
+		g.record = dt;
+		g.refresh();
+		$('#ifActeur').attr("src",dt.idArk);            		
+		
+		gridResultBNFliens.records = dt.liens;
+	 	if(w2ui['grid_result_bnf_liens'])w2ui['grid_result_bnf_liens'].destroy();	
+		w2ui['layout_acteur_bottom'].content('left', $().w2grid(gridResultBNFliens));
+		
+	}
+}
+
+function setFindTag(){
+	if(dtTagFind.length==0)w2alert("Aucune notion trouvée.");
+	//ajoute un recid
+	dtTagFind.forEach(function(d,i){
+		d.recid = i;
+	});
+	//affiche les résultats
+	gridResultBNF.records = dtTagFind;
+ 	if(w2ui['grid_result_bnf'])w2ui['grid_result_bnf'].destroy();	
+	w2ui['layout_tag'].content('main', $().w2grid(gridResultBNF));
+ 	//if(w2ui['layout_acteur_bottom'])w2ui['layout_acteur_bottom'].destroy();	
+	//w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurBottom));            		
+	
+}
+
+
+function setSelectTag(dt){
+    var g = w2ui['form_tag'];
+    g.clear();
+	g.record = {"code":dt.label,"desc":"","uri":dt.value,"parent":dt.parent};
+	g.refresh();
 }

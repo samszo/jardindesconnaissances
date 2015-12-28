@@ -4,7 +4,8 @@ class AuthController extends Zend_Controller_Action
     public function loginAction()
     {    	
 		$this->view->erreur = false;    		
-    		
+		$this->view->code = 1;
+		
 		$ssExi = new Zend_Session_Namespace('uti');
 		if($this->_getParam('idBase'))$ssExi->dbNom = $this->_getParam('idBase');	
 		$s = new Flux_Site($ssExi->dbNom);
@@ -29,36 +30,24 @@ class AuthController extends Zend_Controller_Action
             $adapter->setCredential($this->_getParam('mdp'));
             $login = $this->_getParam('login');
             // Tentative d'authentification et stockage du résultat
-			if($login)$result = $auth->authenticate($adapter);			
-    		}else{    		
-			$loginForm = new Form_Auth_Login();
-			if ($this->getRequest()->isPost()) {
-		        $formData = $this->getRequest()->getPost();
-		        
-		        if(isset($formData["crea"])) $this->_redirect('auth/inscription');
-		        if(isset($formData["ajax"])) $this->view->ajax = true;
-		        else $this->view->ajax = false;
-		        
-		        if ($loginForm->isValid($formData)) {
-		            $adapter = new Zend_Auth_Adapter_DbTable(
-		                $s->db,
-		                'flux_uti',
-		                'login',
-		                'mdp'
-		                );		                
-		            $adapter->setIdentity($loginForm->getValue('login'));
-		            $adapter->setCredential($loginForm->getValue('password'));
-		            $login = $loginForm->getValue('login');
-		            
-		            // Tentative d'authentification et stockage du résultat
-					$result = $auth->authenticate($adapter);
-	        		}	        
-    			}else{
-	        		$this->view->form = $loginForm;    			
-    				return;
-    			}
-		}    		
-    			
+			if($login)$result = $auth->authenticate($adapter);
+    		}elseif ($this->_getParam('login')) {
+	    		$adapter = new Zend_Auth_Adapter_DbTable(
+	                $s->db,
+	                'flux_uti',
+	                'login',
+	                'mdp'
+	                );		                
+	        $login = $this->_getParam('login');
+	        $adapter->setIdentity($login);
+	        $adapter->setCredential($this->_getParam('mdp'));
+	        // Tentative d'authentification et stockage du résultat
+			$result = $auth->authenticate($adapter);			
+			$this->view->erreur = "login calculé";			
+    		}else{
+    			return;
+    		}     		
+    		
     		if ($result->isValid()) {		            	
 			//met en sessions les informations de l'existence
 			$dbUti = new Model_DbTable_Flux_Uti($s->db);
@@ -73,6 +62,7 @@ class AuthController extends Zend_Controller_Action
 		    		return;
 	        }
 	    }else{
+		    	$this->view->code = $result->getCode();
 	    		switch ($result->getCode()) {
             		case 0:
 						$this->view->erreur = "Problème d'identification. Veuillez contacter le webmaster.";		            	
@@ -83,7 +73,7 @@ class AuthController extends Zend_Controller_Action
             		case -2:
 						$this->view->erreur = "Le login est ambigue.";		            	
 	            		break;		            		
-            		case -2:
+            		case -3:
 						$this->view->erreur = "Le login et/ou le mot de passe ne sont pas bons.";		            	
 	            		break;		            		
             	}
@@ -97,12 +87,18 @@ class AuthController extends Zend_Controller_Action
 			$formData['date_inscription'] = date('Y-m-d H:i:s');
 			$formData['login'] = $this->_getParam('login');
 			$formData['mdp'] = $this->_getParam('mdp');
+			$formData['email'] = $this->_getParam('email');
 			$ssExi = new Zend_Session_Namespace('uti');
+			if($this->_getParam('idBase'))$ssExi->dbNom = $this->_getParam('idBase');				
 			//echo "ssExi->dbNom = ".$ssExi->dbNom;
-			$s = new Flux_Site($this->_getParam('idBase'));
+			$s = new Flux_Site($ssExi->dbNom);
 			$dbUti = new Model_DbTable_Flux_Uti($s->db);
 			$this->view->rs = $dbUti->ajouter($formData, true, true);
-			$this->view->ajax=true;    			
+			$this->view->message = "Votre compte est créer.";
+			$this->view->redir = $ssExi->redir;			
+			$this->view->ajax=true;
+    			$ssExi->uti = $this->view->rs;
+			$ssExi->idUti = $this->view->rs["uti_id"];		            				
     		}else{    		
 	    		$this->view->form = $form = new Form_Auth_Inscription();
 	   	    	if($this->getRequest()->isPost()){

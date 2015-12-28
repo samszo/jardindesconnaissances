@@ -64,71 +64,7 @@ function setSelectAuteur(dt){
 }
 
 */
-function setFindAuteur(){
-	if(dtAuteurFind.length==0)w2alert("Aucun acteur trouvé.");
-	//ajoute un recid
-	dtAuteurFind.forEach(function(d,i){
-		d.recid = i;
-	});
-	//affiche les résultats
-	gridResultBNF.records = dtAuteurFind;
- 	if(w2ui['grid_result_bnf'])w2ui['grid_result_bnf'].destroy();	
-	w2ui['layout_acteur'].content('main', $().w2grid(gridResultBNF));
- 	if(w2ui['layout_acteur_bottom'])w2ui['layout_acteur_bottom'].destroy();	
-	w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurBottom));            		
-	
-}
 
-
-function setSelectAuteur(dt){
-	if(dt.length==0 || dt.idArk==null)
-		w2alert("Aucunne référence dans data.bnf.fr");
-	else{
-        var g = w2ui['form_acteur'];
-        g.clear();
-		g.record = dt;
-		g.refresh();
-		$('#ifActeur').attr("src",dt.idArk);            		
-		
-		gridResultBNFliens.records = dt.liens;
-	 	if(w2ui['grid_result_bnf_liens'])w2ui['grid_result_bnf_liens'].destroy();	
-		w2ui['layout_acteur_bottom'].content('left', $().w2grid(gridResultBNFliens));
-		
-	}
-}
-
-function setFindTag(){
-	if(dtTagFind.length==0)w2alert("Aucune notion trouvée.");
-	//ajoute un recid
-	dtTagFind.forEach(function(d,i){
-		d.recid = i;
-	});
-	//affiche les résultats
-	gridResultBNF.records = dtTagFind;
- 	if(w2ui['grid_result_bnf'])w2ui['grid_result_bnf'].destroy();	
-	w2ui['layout_tag'].content('main', $().w2grid(gridResultBNF));
- 	//if(w2ui['layout_acteur_bottom'])w2ui['layout_acteur_bottom'].destroy();	
-	//w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurBottom));            		
-	
-}
-
-
-function setSelectTag(dt){
-	if(dt.length==0 || dt.idArk==null)
-		w2alert("Aucunne référence dans data.bnf.fr");
-	else{
-        var g = w2ui['form_acteur'];
-        g.clear();
-		g.record = dt;
-		g.refresh();
-		$('#ifActeur').attr("src",dt.idArk);            		
-		
-		gridResultBNFliens.records = dt.liens;
-	 	if(w2ui['grid_result_bnf_liens'])w2ui['grid_result_bnf_liens'].destroy();	
-		w2ui['layout_acteur_bottom'].content('left', $().w2grid(gridResultBNFliens));
-		
-	}
-}
 
 
 //gestion de la boite lieu

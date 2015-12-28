@@ -1,20 +1,85 @@
 <?php
 	if($this->ajax){
-		echo $this->idUti;
-		echo $this->erreur;
+		echo json_encode(array("uti"=>$this->rs,"erreur"=>$this->erreur));
 	}else{
-		$this->form->setAction($this->url());
 		echo '<!DOCTYPE html>
 		<html>
 		<head>
 			<meta charset="utf-8" />
 			<title>Jardin des connaissances : login</title>
-			<link rel="stylesheet" href="../css/site.css" />
+		    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+    			<script src="../js/jquery.min.js"></script>
+    			<script type="text/javascript" src="../js/w2ui.js"></script>
+    			<style>
+			#main {
+				width:400px;
+				height:500px;
+				position:absolute;
+				left:50%;
+				top:50%;
+				margin:-250px 0 0 -200px;
+			}    			
+			</style>
 		</head>
-		<body>
-			<h1>Le jardin des connaissances</h1>
-			<h4>'.$this->erreur.'</h4>
-			'.$this->form.'
+		<body style="background-color:black;" >
+			<div id="main"></div>
+			<script type="text/javascript">
+			var codeErreur = '.	$this->code.';
+			$(function () {
+			    var pstyle = "border: 1px solid #dfdfdf; padding: 5px;";
+			    $("#main").w2layout({
+			        name: "layout",
+			        panels: [
+			            { type: "top", size: 50, style: pstyle, content: "'.$this->erreur.'" },
+			            { type: "main", size: "50%", style: pstyle},
+			            { type: "bottom", size: "50%", style: pstyle}
+			            ]
+			    });
+			    	w2ui["layout"].content("main",$().w2form({ 
+			        name     : "formLog",
+			        url      : "login",
+			        header   : "Jardin des connaissances : login",
+			        fields: [
+			            { field: "login", type: "text", required: true },
+			            { field: "mdp", type: "password", required: true }
+			        ],
+			        actions: {
+			            save: function () {
+			                var errors = this.validate();
+			                if (errors.length > 0) return;
+			                window.location.assign("login?login="+this.record.login+"&mdp="+this.record.mdp);
+			            }
+					},
+			    		})
+			    	);
+			    	if(codeErreur==-1){
+				    	w2ui["layout"].content("bottom",$().w2form({ 
+				        name     : "formIns",
+				        header   : "Jardin des connaissances : inscription",
+				        fields: [
+				            { field: "login", type: "text", required: true },
+				            { field: "mdp", type: "password", required: true },
+				            { field: "email", type: "email", required: true }
+				            ],
+				        actions: {
+				            save: function () {
+				                var errors = this.validate();
+				                if (errors.length > 0) return;
+				                var data = this.record;
+				                data.ajax = 1;
+								$.get("inscription",
+									data,
+						        		function(js){
+						        			w2alert(js.message);
+						        			window.location.assign("../"+js.redir);
+						       		},"json");				                				                
+				            }
+						},
+				    		})
+				    	); 
+				}
+			});
+			</script>
 		  </body>
 		</html>	';	
 	}

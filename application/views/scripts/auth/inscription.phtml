@@ -1,6 +1,6 @@
 <?php
 	if($this->ajax){
-		echo $this->idUti;
+		echo json_encode(array("message"=>$this->message, "redir"=>$this->redir, "rs"=>$this->rs));
 	}else{
 		$this->form->setAction($this->url());
 		echo '<!DOCTYPE html>

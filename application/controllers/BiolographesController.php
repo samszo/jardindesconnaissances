@@ -44,6 +44,11 @@ class BiolographesController extends Zend_Controller_Action {
     {
     }	    
 
+    public function navigrameauAction()
+    {
+    		$this->view->idBNF = $this->_getParam('idBNF');
+    }	    
+    
     public function editeurAction()
     {
 		$this->initInstance();
@@ -129,7 +134,28 @@ class BiolographesController extends Zend_Controller_Action {
     				$this->view->rs = $rsDoc;
     				$this->view->message = "La graph est ajouté"; 
     				break;
-    		}
+    			case "tag":
+    				//initialise les objets
+		    		$s->dbT = new Model_DbTable_Flux_Tag($s->db);
+		    		$s->dbUT = new Model_DbTable_flux_utitag($s->db);
+		    		$s->dbUTD = new Model_DbTable_Flux_UtiTagDoc($s->db);
+		    		$s->dbD = new Model_DbTable_Flux_Doc($s->db);
+		    		//récupère les références
+    				$docBio = $s->dbD->findByUrl('jdc/public/biolographes');
+    				if(!$params["parent"]){
+	    				$arrTagParent=$s->dbT->findByCode("Catégories de notion");	
+	    				$params["parent"] = $arrTagParent["tag_id"];
+    				}
+    				//ajoute le tag
+    				$rs=$s->dbT->ajouter($params,true,true);
+	    			//le mot clef acteur
+	    			$arrUTD = array("uti_id"=>$this->ssUti->uti["uti_id"],"tag_id"=>$rs["tag_id"],"doc_id"=>$docBio["doc_id"]);
+    				$s->trace("arrUTD",$arrUTD);
+	    			$s->dbUTD->ajouter($arrUTD);
+    				$this->view->rs = $rs;
+    				$this->view->message = "Le tag est ajouté"; 
+    				break;
+    		    		}
     }
     
 	public function editAction()
@@ -260,6 +286,16 @@ class BiolographesController extends Zend_Controller_Action {
 		
     		//on ajoute le tag global
     		$idTagG = $s->dbT->ajouter(array("code"=>"Cribles biolographes"));
+    		
+    		//on ajoute les tags génériques
+    		$idTagCatNotion = $s->dbT->ajouter(array("code"=>"Catégories de notion","parent"=>$idTagG)); 	    				    		
+    		$idTagRameau = $s->dbT->ajouter(array("code"=>"Matière Rameau","parent"=>$idTagCatNotion)); 	    				
+    		$idTagNotion = $s->dbT->ajouter(array("code"=>"Notions","parent"=>$idTagCatNotion));
+    		//on ajoute un enfant pour récupérer les tags génériques
+    		$idT = $s->dbT->ajouter(array("code"=>"Vide (physique)","uri"=>"http://data.bnf.fr/ark:/12148/cb12573072b","parent"=>$idTagRameau));  	    				
+	    	$s->dbETD->ajouter(array("exi_id"=>$idERacine,"tag_id"=>$idT,"doc_id"=>$idDoc));
+    		$idT = $s->dbT->ajouter(array("code"=>"Vide","parent"=>$idTagNotion));  	    				
+	    	$s->dbETD->ajouter(array("exi_id"=>$idERacine,"tag_id"=>$idT,"doc_id"=>$idDoc));
     		
 		//problème ssl sur mac
 		$this->urlGoogleCVS = WEB_ROOT."/data/biolographes/CategorisationRapports.csv";

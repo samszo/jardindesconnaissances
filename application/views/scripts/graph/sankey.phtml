@@ -66,17 +66,17 @@ var sankey = d3.sankey()
 
 var path = sankey.link();
 
-//d3.json("../../../exemples/data/energy.json", function(energy) {
-//d3.json("../flux/databnf?obj=rameau&idBNF=11931063", function(energy) {
-d3.json("<?php echo $this->urlStats;?>", function(energy) {
+//d3.json("../../../exemples/data/energy.json", function(stats) {
+//d3.json("../flux/databnf?obj=rameau&idBNF=11931063", function(stats) {
+d3.json("<?php echo $this->urlStats;?>", function(stats) {
 		
   sankey
-      .nodes(energy.nodes)
-      .links(energy.links)
+      .nodes(stats.nodes)
+      .links(stats.links)
       .layout(32);
 
   var link = svg.append("g").selectAll(".link")
-      .data(energy.links)
+      .data(stats.links)
     .enter().append("path")
       .attr("class", "link")
       .attr("d", path)
@@ -93,7 +93,7 @@ d3.json("<?php echo $this->urlStats;?>", function(energy) {
           });
 
   var node = svg.append("g").selectAll(".node")
-      .data(energy.nodes)
+      .data(stats.nodes)
     .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })

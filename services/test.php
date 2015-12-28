@@ -329,7 +329,7 @@ try {
 	//
 	$bnf = new Flux_Databnf();
 	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
-	$rs = $bnf->getRameauByIdBnf("11958000");
+	$rs = $bnf->getRameauByIdBnf("11983292");
 	$s->trace(json_encode($rs));
 	//
 	
