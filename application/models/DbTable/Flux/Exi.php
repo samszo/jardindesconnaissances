@@ -223,7 +223,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
     }
     
-    /*
+    /**
      * Recherche une entrée Flux_exi avec la valeur spécifiée
      * et retourne cette entrée.
      *
@@ -237,6 +237,21 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
 		$arr = $this->fetchAll($query)->toArray();
         return $arr[0]; 
     }
+    /**
+     * Recherche une entrée Flux_exi avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param int $idUti
+     */
+    public function findByUtiId($idUti)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_exi") )                           
+                    ->where( "f.uti_id = ?", $idUti);
+		$arr = $this->fetchAll($query)->toArray();
+        return $arr[0]; 
+    }
+    
     /**
      * Recherche une entrée Flux_exi avec la valeur spécifiée
      * et retourne cette entrée.

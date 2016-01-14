@@ -1,1 +1,44 @@
-YOOOOO ! carto....	
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="css/leaflet/leaflet.css" />
+	<link rel="stylesheet" href="css/leaflet/Control.Geocoder.css" />
+    <script src="js/leaflet/leaflet.js"></script>
+	<script src="js/leaflet/Control.Geocoder.js"></script>
+ 	<script src="//cdn.jsdelivr.net/leaflet.esri/2.0.0-beta.7/esri-leaflet.js"></script>
+ 
+    <style type="text/css">
+      html, body { margin: 0; padding: 0; height: 100%; }
+      #carte { min-height: 100%; }
+    </style>
+  </head>
+  <body>
+	<div id='carte' ></div>
+    <script type="text/javascript">
+		var geocoder, geocodeService;
+		var setFunction;
+      (function () {
+          var max, scale,
+              classes = 9,
+              container = L.DomUtil.get('carte'),
+              map = L.map(container).setView([0, 0], 2);
+
+          L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+
+          var optGeocoder = {position:"topleft"};
+          geocoder = L.Control.geocoder(optGeocoder).addTo(map);
+          
+          geocodeService = L.esri.Geocoding.geocodeService();                    
+      }());
+
+      function findPlace(place){
+          geocoder._input.value = place;
+          //geocoder._form.submit();          
+          geocoder._geocode(this.Event);          
+      }
+
+    </script>
+  </body>
+</html>

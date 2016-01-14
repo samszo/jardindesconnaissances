@@ -25,6 +25,7 @@ class Flux_Site{
 	var $dbE;
 	var $dbED;
 	var $dbET;
+	var $dbETD;
 	var $dbG;
 	var $dbGUD;
 	var $db;

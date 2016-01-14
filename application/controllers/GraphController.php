@@ -125,7 +125,10 @@ class GraphController extends Zend_Controller_Action {
     		$this->view->urlStats = $this->_getParam('urlStats');
     }	
         
-    
+    public function conceptmapAction()
+    {
+    		$this->view->urlStats = $this->_getParam('urlStats');
+    	}
     
     public function iemlAction()
     {

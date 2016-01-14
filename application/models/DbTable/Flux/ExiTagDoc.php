@@ -382,7 +382,7 @@ class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         	->from( array("etd" => "flux_exitagdoc"), array("recid"=>"tag_id","tag_id","doc_id","exi_id",'value'=>'SUM(etd.poids)'))                           
         ->joinInner(array('t0' => 'flux_tag'),
-            	't0.tag_id = etd.tag_id',array('code'))
+            	't0.tag_id = etd.tag_id',array('code', "uri"))
         	->joinInner(array('d' => 'flux_doc'),
             	'd.doc_id = etd.doc_id',array("tronc"))
 		->group("etd.tag_id");
@@ -441,6 +441,41 @@ FROM `flux_exitagdoc` AS `etd`
             $query->order($order);
         }else{
 	        	$query->order("code");
+        }
+        if($limit != 0)
+        {
+            $query->limit($limit, $from);
+        }
+		
+		return $this->fetchAll($query)->toArray(); 		
+	}
+
+	/**
+     * Récupère les docs associés à un utilisateur
+     *
+     * @param integer $idExi
+     * @param string $w
+     * @param string $h
+     * 
+     * @return array
+     */
+	function GetExiDocs($idExi, $w="", $h="", $order=null, $limit=null, $from=null) {
+		//définition de la requête
+        $query = $this->select()
+        	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        	->from( array("etd" => "flux_exitagdoc"), array("doc_id", "recid"=>"doc_id"))                           
+            ->joinInner(array('d' => 'flux_doc'),
+        	    		'd.doc_id = etd.doc_id',array('titre','url','tronc','pubDate','data','parent'))
+        	->group("etd.doc_id");
+        if($idUti)$query->where( "etd.exi_id = ?", $idEti);
+		if($w!="")$query->where($w);
+		if($h!="")$query->having($h);
+		
+        if($order != null)
+        {
+            $query->order($order);
+        }else{
+	        	$query->order("titre");
         }
         if($limit != 0)
         {

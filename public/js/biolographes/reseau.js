@@ -263,7 +263,7 @@ function reseau(config) {
   };
   
   this.showInfos=function (d){
-		if(d.type=="Acteurs"){
+		if(d.type=="Acteur"){
 			initFormAuteur();
 			if(d.dt){
 				setSelectAuteur(d.dt)
@@ -318,16 +318,27 @@ function reseau(config) {
 	    .classed('selected', function(d) { return d === selected_link; })
 	    .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
 	    .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
+	    .style('stroke-width', function(d) { 
+	    		return d.spatiotempo ? (d.spatiotempo.length+1)*3 : 3; 
+	    		})
 	    .on('mousedown', function(d) {
 	    		self.mousedownPath(d);
 	    	})
+	    .on('mouseover', function(d) {
+	    		if(d.spatiotempo.length){
+	    			openOverlaySpatioTempo(d);
+	    		}	    	
+	    })	    	
+	    .on('mouseout', function(d) {
+	    		w2popup.close();
+	    })
 	    .on("click",function(d){
-	    		showSpatioTempo(d);
+	    		//showSpatioTempo(d);
+			openPopupSpatioTempo(d);
 	     });
 
 	  // remove old links
 	  path.exit().remove();
-
 
 	  // circle (node) group
 	  // NB: the function arg is crucial here! nodes are known by id, not by index!
@@ -637,87 +648,7 @@ function reseau(config) {
 
 
 	this.createLien = function(l, g){
-
-		//vérifie le type de lien
-		if(l.source.type=="Acteurs" && l.target.type=="Acteurs"){
-			setTypeLien("Rapports Acteur → Acteur");
-			showSpatioTempo(l);
-			document.querySelector('#addEvent').onclick = function() {
-				 //ajoute une précision spatio-temporelle au noeud
-				if(!l.spatiotempo)l.spatiotempo=[];
-				l.spatiotempo.push({
-					 'debut':document.querySelector('#dtDeb').value
-					 ,'fin':document.querySelector('#dtFin').value
-					 ,'lieu':document.querySelector('#dtLieu').value
-					 ,'pays':document.querySelector('#dtPays').value
-					 ,'ville':document.querySelector('#dtVille').value
-					 ,'adresse':document.querySelector('#dtAdresse').value
-					 ,'rapport':document.querySelector('#dtRapport').value
-				 });
-				$( "#events-ajout tbody" ).append( "<tr id='eventST_"+l.spatiotempo.length+"'>" +
-						"<td>" + $("#dtDeb").val() + "</td>" +
-						"<td>" + $("#dtFin").val() + "</td>" +
-						"<td>" + $("#dtLieu").val() + "</td>" +
-						"<td>" + $("#dtPays").val() + "</td>" +
-						"<td>" + $("#dtVille").val() + "</td>" +
-						"<td>" + $("#dtAdresse").val() + "</td>" +
-						"<td>" + $("#dtRapport").val() + "</td>" +
-						"<td><span onclick='suppSpatioTempo("+(l.spatiotempo.length)+")' class='ui-icon ui-icon-trash'></span></td>" +					
-					"</tr>" );			 
-			};				
-			
-		}
-		if(l.source.type=="Acteurs" && l.target.type=="Lieux"){
-			setTypeLien("Rapports Acteur → Lieu");
-			showSpatioTempo(l);
-			document.querySelector('#addEvent').onclick = function() {
-				 //ajoute une précision spatio-temporelle au noeud
-				if(!l.spatiotempo)l.spatiotempo=[];
-				l.spatiotempo.push({
-					 'debut':document.querySelector('#dtDeb').value
-					 ,'fin':document.querySelector('#dtFin').value
-					 ,'lieu':document.querySelector('#dtLieu').value
-					 ,'pays':document.querySelector('#dtPays').value
-					 ,'ville':document.querySelector('#dtVille').value
-					 ,'adresse':document.querySelector('#dtAdresse').value
-					 ,'rapport':document.querySelector('#dtRapport').value
-				 });
-				$( "#events-ajout tbody" ).append( "<tr id='eventST_"+l.spatiotempo.length+"'>" +
-						"<td>" + $("#dtDeb").val() + "</td>" +
-						"<td>" + $("#dtFin").val() + "</td>" +
-						"<td>" + $("#dtLieu").val() + "</td>" +
-						"<td>" + $("#dtPays").val() + "</td>" +
-						"<td>" + $("#dtVille").val() + "</td>" +
-						"<td>" + $("#dtAdresse").val() + "</td>" +
-						"<td>" + $("#dtRapport").val() + "</td>" +
-						"<td><span onclick='suppSpatioTempo("+(l.spatiotempo.length)+")' class='ui-icon ui-icon-trash'></span></td>" +					
-					"</tr>" );			 
-			};				
-			
-		}			
-		/*
-		document.querySelector('#addLien').onclick = function() {
-			 // because :active only works in WebKit?
-			 svg.classed('active', true);
-			 // Get dialog
-			 var type = document.querySelector('#typeLien').value;
-
-			 //ajoute le texte au lien
-			// Add a text label.
-			 var text = svg.append("text")
-			     .attr("x", 5)
-			     .attr("dy", 15);
-
-			 text.append("textPath")
-			     .attr("stroke","black")
-			     .attr("xlink:href","#"+l.id)
-			     .text(type);
-			 
-			 self.dialogues.lien.close();
-			 draw();
-
-			};			
-		*/
+		openPopupSpatioTempo(l);
 	}	
 	this.params = function() {			
 		return {"deb":this.deb, "fin":this.fin, "id":this.id};

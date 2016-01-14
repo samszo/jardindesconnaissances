@@ -1,0 +1,354 @@
+<srw:searchRetrieveResponse xmlns="http://gallica.bnf.fr/namespaces/gallica/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:onix="http://www.editeur.org/onix/2.1/reference/" xmlns:srw="http://www.loc.gov/zing/srw/" xmlns:onix_dc="http://bibnum.bnf.fr/NS/onix_dc/">
+    <srw:version>1.2</srw:version>
+    <srw:echoedSearchRetrieveRequest>
+        <srw:query>gallica all "La Ligne brisée"</srw:query>
+        <srw:version>1.2</srw:version>
+    </srw:echoedSearchRetrieveRequest>
+    <srw:numberOfRecords>69635</srw:numberOfRecords>
+    <srw:records>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1799</dc:date>
+                    <dc:description>Appartient à l’ensemble documentaire : PaPeint18</dc:description>
+                    <dc:format>1 est. : impression à la planche, fond lissé</dc:format>
+                    <dc:format>image/jpeg</dc:format>
+                    <dc:identifier>http://gallica.bnf.fr/ark:/12148/btv1b69004430</dc:identifier>
+                    <dc:identifier>Numéro commercial : Jacquemart et Bénard 1371</dc:identifier>
+                    <dc:publisher>Jacquemart et Bénard (Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb40483996w</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France</dc:source>
+                    <dc:subject>Frises</dc:subject>
+                    <dc:subject>Acanthes</dc:subject>
+                    <dc:subject>Rosettes (ornement)</dc:subject>
+                    <dc:subject>Fleurons (ornement)</dc:subject>
+                    <dc:title>[Manufacture Jacquemart et Bénard. Bordure. Deux bandes de frise principale de fleurons de feuilles d'acanthe de part et d'autre d'une ligne brisée] : [papier peint]</dc:title>
+                    <dc:type>Décoration et ornement architecturaux -- 1789-1799</dc:type>
+                    <dc:type>Motifs décoratifs -- 1789-1799</dc:type>
+                    <dc:type>image fixe</dc:type>
+                    <dc:type>image</dc:type>
+                    <dc:type>still image</dc:type>
+                    <dc:type>estampe</dc:type>
+                    <dc:type>engraving</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>0</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://gallica.bnf.fr/ark:/12148/btv1b69004430 </link>
+                <nqamoyen>0.0</nqamoyen>
+                <thumbnail>http://gallica.bnf.fr/ark:/12148/btv1b69004430.thumbnail</thumbnail>
+                <typedoc>images</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1801</dc:date>
+                    <dc:description>Appartient à l’ensemble documentaire : PaPeint18</dc:description>
+                    <dc:format>1 est. sur papier rabouté : impression à la planche, 7 coul. sur fond bleu/violet, fond lissé ; 27,5 x 44,5 cm (f.) et env. 22,5 cm (largeur bande)</dc:format>
+                    <dc:format>image/jpeg</dc:format>
+                    <dc:identifier>http://gallica.bnf.fr/ark:/12148/btv1b69002150</dc:identifier>
+                    <dc:identifier>Numéro commercial : Chauveau et Cie 135</dc:identifier>
+                    <dc:publisher>Chauveau et Cie (Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb404837683</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Estampes et photographie, EST LI-23</dc:source>
+                    <dc:subject>Ornements géométriques</dc:subject>
+                    <dc:subject>Frises</dc:subject>
+                    <dc:subject>Végétaux de fantaisie</dc:subject>
+                    <dc:title>[Manufacture Chauveau et Cie. Bordure. Une bande de frise à motifs géométriques et fleurons de fantaisie sous une ligne brisée] : [papier peint]</dc:title>
+                    <dc:type>Motifs décoratifs -- 1800-1869</dc:type>
+                    <dc:type>image fixe</dc:type>
+                    <dc:type>image</dc:type>
+                    <dc:type>still image</dc:type>
+                    <dc:type>estampe</dc:type>
+                    <dc:type>engraving</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>1</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://gallica.bnf.fr/ark:/12148/btv1b69002150 </link>
+                <nqamoyen>0.0</nqamoyen>
+                <thumbnail>http://gallica.bnf.fr/ark:/12148/btv1b69002150.thumbnail</thumbnail>
+                <typedoc>images</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Baretta, Jules (Mouleur)</dc:creator>
+                    <dc:date>1877</dc:date>
+                    <dc:date>19e siècle</dc:date>
+                    <dc:description>Référence de l'image dans la banque d'images : STLCPE00221. - Nombre d'images dans le lot : 1</dc:description>
+                    <dc:description>Sculpture - Moulage</dc:description>
+                    <dc:description>cire</dc:description>
+                    <dc:description>[anc. 340 1877]. - Collection Péan n° 221, vitrine 149 (Tumeurs des os)</dc:description>
+                    <dc:format>image/jpeg</dc:format>
+                    <dc:identifier>http://www.biusante.parisdescartes.fr/histmed/image?STLCPE00221</dc:identifier>
+                    <dc:relation>vignette : http://www.biusante.parisdescartes.fr/images/banque/pt/STLCPE00221.jpg</dc:relation>
+                    <dc:relation>thumbnail : http://www.biusante.parisdescartes.fr/images/banque/pt/STLCPE00221.jpg</dc:relation>
+                    <dc:relation>http://www.biusante.parisdescartes.fr/images/banque/pt/STLCPE00221.jpg</dc:relation>
+                    <dc:rights>Musée des moulages de l'Hôpital Saint-Louis (AP-HP)</dc:rights>
+                    <dc:title>Sarcome fasciculé de la jambe droite. Sur la première pièce : tumeur fongueuse à sillon médian, et dont le lobe inférieur a le volume du poing. Sur la seconde pièce, on voit la coupe de l'os ; une ligne brisée à l'union du tiers supérieur et du tiers moyen indique une solution de continuité de l'os au niveau de la dépression de la tumeur. Toute la portion d'os sous-jacente est volumineuse et hyperhémiée</dc:title>
+                    <dc:type>image</dc:type>
+                    <dc:type>image fixe</dc:type>
+                    <dc:type>image</dc:type>
+                    <dc:type>still image</dc:type>
+                    <dc:type>moulage</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>2</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://www.biusante.parisdescartes.fr/histmed/image?STLCPE00221 </link>
+                <nqamoyen>0.0</nqamoyen>
+                <thumbnail> http://www.biusante.parisdescartes.fr/images/banque/pt/STLCPE00221.jpg </thumbnail>
+                <typedoc>images</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Ligne, Charles Joseph (1735-1814 ; prince de)</dc:creator>
+                    <dc:date>1795-1811</dc:date>
+                    <dc:format>34 vol. : pl., tableaux ; in-12</dc:format>
+                    <dc:format>application/pdf</dc:format>
+                    <dc:identifier>http://gallica.bnf.fr/ark:/12148/bpt6k5540566s</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>chez les frères Walter (A mon refuge sur le Léopolberg près de Vienne)</dc:publisher>
+                    <dc:relation>Notice d'ensemble : http://catalogue.bnf.fr/ark:/12148/cb30819004h</dc:relation>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb30819004h</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, Z-22033</dc:source>
+                    <dc:title>Mélanges militaires, littéraires et sentimentaires. Tome 9</dc:title>
+                    <dc:type>text</dc:type>
+                    <dc:type>monographie imprimée</dc:type>
+                    <dc:type>printed monograph</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>3</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://gallica.bnf.fr/ark:/12148/bpt6k5540566s</link>
+                <nqamoyen>82.78</nqamoyen>
+                <thumbnail>http://gallica.bnf.fr/ark:/12148/bpt6k5540566s.thumbnail</thumbnail>
+                <typedoc>monographies</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Guyon, Louis (lieutenant au 59e de ligne)</dc:creator>
+                    <dc:date>1829</dc:date>
+                    <dc:format>In-16, 239 p., planche</dc:format>
+                    <dc:format>application/pdf</dc:format>
+                    <dc:identifier>http://gallica.bnf.fr/ark:/12148/bpt6k6319433r</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>Chassaignon (Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb30564839p</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Philosophie, histoire, sciences de l'homme, 8-LN27-20396</dc:source>
+                    <dc:title>Histoire de Vidocq, chef de la brigade de sûreté... depuis 1812 jusqu'en 1827... [Par L. Guyon.]</dc:title>
+                    <dc:type>text</dc:type>
+                    <dc:type>monographie imprimée</dc:type>
+                    <dc:type>printed monograph</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>4</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://gallica.bnf.fr/ark:/12148/bpt6k6319433r </link>
+                <nqamoyen>99.96</nqamoyen>
+                <thumbnail>http://gallica.bnf.fr/ark:/12148/bpt6k6319433r.thumbnail</thumbnail>
+                <typedoc>monographies</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Delpit, Édouard (1844-1900)</dc:creator>
+                    <dc:date>1890</dc:date>
+                    <dc:format>313 p. ; in-18</dc:format>
+                    <dc:format>application/pdf</dc:format>
+                    <dc:identifier>http://gallica.bnf.fr/ark:/12148/bpt6k69050x</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>C. Lévy (Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb303202314</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, 8-Y2-43563</dc:source>
+                    <dc:title>Chaîne brisée / par Édouard Delpit</dc:title>
+                    <dc:type>text</dc:type>
+                    <dc:type>monographie imprimée</dc:type>
+                    <dc:type>printed monograph</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>5</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://gallica.bnf.fr/ark:/12148/bpt6k69050x </link>
+                <nqamoyen>93.94</nqamoyen>
+                <thumbnail>http://gallica.bnf.fr/ark:/12148/bpt6k69050x.thumbnail</thumbnail>
+                <typedoc>monographies</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:contributor>Marteau, Georges (1858-1916). Ancien possesseur</dc:contributor>
+                    <dc:contributor>Farhād Mīrza b. ʿAbbās Mīrza. Ancien possesseur</dc:contributor>
+                    <dc:contributor>Yakout al-Mostaʿsimi. Copiste</dc:contributor>
+                    <dc:contributor>ʿ Abbās Mirza b. Fatḥ ʿAlī ?āh Qāğār. Ancien possesseur</dc:contributor>
+                    <dc:contributor>Marteau (G.). Ancien possesseur</dc:contributor>
+                    <dc:contributor>Iḥti?ām al-Mulk b. Farhād Mīrza. Ancien possesseur</dc:contributor>
+                    <dc:contributor>Yāqūt al-Mustaʿṣimī. Copiste</dc:contributor>
+                    <dc:date>1289</dc:date>
+                    <dc:description>Marques de possession de divers princes qāğār (f° 1 r°) : 1) note datée de ramaḍān 1245/mars 1830 et signée Farhād commémorant le don de ce volume par ʿ Abbās Mīrza b. Fatḥ ʿAlī ?āh Qāğār à son fils Farhād Mīrza Qāğār ; 2) note datée du 7 ramaḍān 1302/20 juin 1885 commémorant le don de ce volume par Farhād Mīrza à son fils ʿ Abd alʿAlī Iḥti?ām al-Mulk ; 3) note de la même date par laquelle Iḥti?ām al-Mulk enregistre ce don. Provient de la collection Marteau.</dc:description>
+                    <dc:description>Al-Qur'ān</dc:description>
+                    <dc:description>ʿIraq ? Bibl . : E. Blochet, in Notices et extraits , t. 41, pp. 352-368 ; Les enluminures des manuscrits orientaux de la Bibliothèque Nationale , p. 60-62 et pl. XVI ; R. Ettinghausen, Manuscript illumination, in A. U. Pope et P. Ackerman, A survey of persian art , p. 1954, n. 1 ; Les arts de l'Iran, l'ancienne Perse et Bagdad , [exposition, Bibliothèque Nationale, Paris, 1938], Paris, 1938, p. 171, n° 104 ; M. Lings et Y. H. Safadi, Qur'an , p. 46, n° 59 ; G. Vajda, Album , pl. 24 ; Trésors d'Orient [exposition, Bibliothèque Nationale, Paris, 1972], Paris, 1972, p. 64, n° 171. Copie achevée en muḥarram 688/février 1289 par Yāqūt al-Mustaʿṣimī (f° 211 r°).</dc:description>
+                    <dc:format>Pl. XXVI, A. - Texte avec vocalisation et signes orthoépiques. Des rosettes dorées, avec un point doré en leur centre, séparent les versets. Des cercles dorés cernés d'un filet bleu, avec le mot ʿ. - ašr. - en caractères « coufiques », signalent les groupes de dix versets ; d'autres, plus petits et achevés par une pointe en leur partie supérieure, avec le mot. - ẖams. - ou un décor végétal marquent les groupes de cinq (ces décors sont légèrement différents aux ff° 10 à 29). En tête de chaque sourate figurent son titre et le nombre de ses versets en caractères. - ṯuluṯ. - dorés dont le contour a été dessiné à l'encre ; ceux des S. III et IV font exception et, comme la S. CXIV, sont dans des bandeaux, sur un fond d'ondes rouges ou brunes. Sur la première double page, un décor occupe la page ; dans un cadre délimité par une tige ondulée dorée sur fond noir, des filets blancs en ligne brisée dessinent des octogones de deux dimensions : les plus grands portent des motifs végétaux sur fond bleu ou doré - disposés en quinconce - et les plus petits reçoivent une rosette dorée (ff° 1 v°-2 r° ; ce double décor a été restauré ; il peut s'agir d'un ajout au manuscrit original). La première double page de texte est disposée dans un cadre dont les verticales sont formées de deux bandes identiques à celles du décor des ff° 1 v° et 2 r° ; des bandeaux achèvent ce cadre ; celui du haut du f° 2 v° porte le titre et le nombre des versets de la S. I à l'intérieur de deux ovales séparés par un cercle, en caractères « coufiques » blancs sur fond bleu ; sur les trois autres, en caractères « coufiques » blancs sur un fond d'arabesques dorées, est inscrit. - Coran. - LXXXV, 21-22 (bandeau inférieur du f° 2 v° ; le début de la citation n'est pas exactement fidèle au texte coranique) puis LXVIII, 52 (bandeau supérieur du f° 3 r°) et enfin LVI, 79 (bandeau inférieur) ; une vignette médiane accompagne chacun de ces cadres (ff° 2 v°-3 r°). Le titre de la S. CXIV et le début de la formule précédant le colophon sont placés dans un bandeau accompagné par une vignette ; un cartouche ovale a reçu la fin du texte du colophon, en caractères « coufiques » bleus cernés d'un filet doré, sur un fond d'ondes sépia (f° 211 r°). Les indications de division en. - ğuz. - ʾ et en. - ḥizb. - , de même que celles de. - sağda. - , sont portées en marge en caractères. - ṯuluṯ. - dorés dont les contours ont été tracés à l'encre ; jusqu'au f° 30, on trouve d'autres types de division dans des rectangles où, parfois, est inscrit un ovale : certaines correspondent à une division en septièmes qui n'apparaît plus par la suite. - Papier oriental. 211 fol. 191 × 155 mm. 16 lignes à la page (sauf aux ff° 1 v° : 8 l. ; et 2 r° : 10 l.). Réglure au. - misṭara. - . Surface d'écriture : 119 × 97 mm. Encre noire. Quinions. Reliure orientale dont le rabat a disparu ; le dos a été restauré. Aux deux plats, plaque centrale constituée par une figure à huit branches : celles qui sont placées sur les axes vertical et horizontal s'achèvent en palmette lancéolée tandis que celles des diagonales ont une forme de fleuron ; l'intérieur de cette plaque, estampée à froid et dorée de même que les pendentifs et les écoinçons (pour ces derniers, cf. M. Weisweiler. - IB. - , fig. 39 a), est décorée d'arabesques. L'encadrement est constitué de deux bandes, l'une de S enchaînés, l'autre d'un motif de tresse, prises entre des filets. - Nasẖ</dc:format>
+                    <dc:identifier>http://gallica.bnf.fr/ark:/12148/btv1b8433294k</dc:identifier>
+                    <dc:language>ara</dc:language>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, Département des manuscrits, Arabe 6716</dc:source>
+                    <dc:title>Coran</dc:title>
+                    <dc:title>القرآن</dc:title>
+                    <dc:type>manuscrit</dc:type>
+                    <dc:type>manuscript</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>6</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://gallica.bnf.fr/ark:/12148/btv1b8433294k </link>
+                <nqamoyen>0.0</nqamoyen>
+                <thumbnail>http://gallica.bnf.fr/ark:/12148/btv1b8433294k.thumbnail</thumbnail>
+                <typedoc>manuscrits</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:description>F. 1r-2v : Extrait de la parachah Toldot Yishaq (Genèse XXVII,2-XXVIII,15), copié sur deux colonnes, hébreu et araméen face à face. Il s'agit très probablement des défets de reliure conservés et montés en tête de manuscrit lors de la restauration.F. 4r-12v : traité sur la massore, Maḥberet Tiynǧaʾn, מחברת התיג'אן provenant d'un autre manuscrit, d'origine yéménite ou caraïte.F. 13v-273r : Pentateuque : Genèse f. 13r-78r, Exode f. 78r-135r, 135v et 136r vierge, Lévitique f. 136v-173v, Nombres f. 174r-228v, Deutéronome f. 229v-276r. Yémen fin du XIV début du XVe siècles.</dc:description>
+                    <dc:description>Eulogies. F. 78r , entre deux rosaces, à la fin de la Genèse, Psaume CXIX, 10 : בכל לבי דרשתיך אל תשגני ממצותיך. F. 98v, entre les versets XV, 19 et 20, à la fin du cantique de la Mer rouge, dans un cartouche, حسبنل الله وكفا ولعم . F. 135r, à la fin du livre de l’Exode : .ברוך יהוה לעולם אמן ואמן . Au dessous, après le compte des versets, אלהים יעזרנו להשלים שלשה הספרים וישיענו כן יאמרו רחום. F. 173v, pour la fin du livre de Lévitique, en hébreu et en arabe au dessus d’un cadre dans lequel les deux derniers mots en arabes sont inscrits : ברוך יהוה לעולם אמן ואמן, تبراك اللة الة العالمين. F. 228v, pour la fin du livre des Nombres en hébreu : אלהים יזכינו להשלים משנה תורה אמן ואמן. En dessous, dans un cartouche, en caractères arabes et arabe en caractères hébreux : علمت بان يدي بلا و عد كتابها يا بنيني شعري ما يكون جوابها هل في الجنيزان يكون محلرتن و في الجحيم يكون عذابها . עלמת באן ידי או כתאבהא אליה שערי מא יכון גואבהא אל פי אלגנאן</dc:description>
+                    <dc:description>Marque de possession en arabe en caractères hébreux (f. 13v) :"הדא אלתאג רהן מעא סעיד בן סלימאן אלפריג’ מן סאלם בן אלרנה פי חרפין צרף אלחרף מ בקשה לחק לא גהתאמץ מעוצר חרף וזכרי נמף דלה ונצף שעיר יצח קימת אלזכרי אר וש בקשה" Voici le livre du Tadj qu'a engagé pour une somme d'argent Saïd ibn Slimân El-Fredji auprès de Sâlim ibn Saïd El-Rana</dc:description>
+                    <dc:format>Papier oriental de teinte brune entoilé avec comblement de lacunes au papier. - 276 f. Trois feuillets de garde de papier mécanique (Arches) vierge au début et à la fin de l’œuvre. Feuillets endommagés, texte lacunaire aux ff. 46v et 47r. Feuillet 135v blanc. Sur le feuillet 136r un cadre à l’encre rouge partiellement effacé (décor inachevé ?). - 275 x 209 mm (f. 13v). Papier aux contours irréguliers. - Ternions et quinions. Les cahiers sont numérotés en lettres hébraïques et en arabe, dans les coins supérieurs droit et gauche au recto du premier feuillet du cahier (exemple au f. 27r), ainsi que dans le coin inférieur gauche du verso du dernier feuillet (exemple au f. 26r). En arabe la numérotation des cahiers se fait au moyen de l’ordinal écrit en toutes lettres, et en hébreu, au moyen de la lettre hébraïque surmontée de trois points. L’usure de certains feuillets ne permet pas de suivre la numérotation des cahiers en hébreu. La numérotation des cahiers au verso du cahier n’est pas continue. Les cahiers sont numérotés à partir du f. 6v (א) et 7r (الثنية) puis à partir du f. 17r en arabe en toutes lettres ( f. 27r, 36r, f. 47, f. 57, f. 67, f. 77, f. 87, f. 97, f. 107, f. 117, f. 127, 136r, 145r, f. 155r, 165r, f. 174r, f. 184r, f. 194r, f. 204r, f. 214r, f. 224r, f. 234r, f. 244r, f. 251r, f. 264r). - La technique de réglure est difficilement discernable après entoilage des feuillets de papier, mais il est permis de penser qu'il s'agit d'une réglure à la mistara (voir f. 230r). - Ecriture carrée de style oriental (yéménite). Encre noire pour l'écriture. Encre rouge et verte pour les décors. Jusqu'au f. 135, texte copié sur deux colonnes, environ 18 lignes écrites à la page, dimensions de la surface écrite : 53.189.33 x 22.145.54 mm (f. 130v). A partir du f. 136r jusqu'au 228v, une colonne, linéation longue, 18 lignes environs écrites à la page, dimensions de la surface écrite : 50.190.34 x 15.145.46 mm. A partir du feuillet 229v jusqu'au f. 275v, texte copié sur deux colonnes, 18 lignes écrites à la page, dimensions de la surface écrite : 44.190.35 x 11.145.49 mm. Le texte est copié sur une colonne au dernier f. 276. - Les lectures hebdomadaires sont indiquées par la lettre hébraïque פ surmontée d ‘un élément décoratif en forme de palmier, imitant les tagim, de couleur (exemple au f. 45r. ou au f. 58r). La division de la péricope hebdomadaire en sept passages est indiquée par une lettre hébraïque de couleur de grand module située dans la marge et surmontée d’un point. Les espaces de lecture fermés et ouverts sont signalés au moyen de motifs géométriques en forme de petites rosaces de couleur, de deux ou trois rosaces plus petites à quatre pointes de couleur en forme de lys, de motifs en forme de nœud ou de torsades de couleur (exemple au f. 75v et 76r). Entre chaque hémistiche du passage dit « Cantique de la Mer Rouge », le scribe à intercalé des médaillons ou des rosaces en forme d’étoile à six branches encerclées (voir au ff. 97v et 98r). La fin des livres est signalée par des motifs géométriques en forme de rosace de diamètre plus grand (exemple au f. 78r). La massore est disposée de façon ornementale dans la marge inférieure, soit en forme de ligne brisée remontant le long de la colonne d’écriture parfois jusqu’en haut, soit en disposant les mots composant la ligne intermédiaire de la massore dans la marge inférieure, en épis (exemple aux ff. 98v et 99r). F. 104v : deux tables de la lois sont insérées dans le texte du Décalogue, les premiers mots de chacun des dix commandements est écrit dans l’espace laissé vide au centre. f. 229, rosace formée de la massore, à la fin du sefer bamidbar. F. 237v, le copiste a inséré entre les versets 16 et suivants du chapitre V du Deutéronome, un graphique de couleur représentant de façon schématique l’arche d’alliance et le propitiatoire au centre duquel il a dessiné dans un cercle une rosace à six pointes. - Reliure de plein cuir refaite à neuf, avec décor</dc:format>
+                    <dc:identifier>http://gallica.bnf.fr/ark:/12148/btv1b10510181g</dc:identifier>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, Département des manuscrits, Hébreu 1327</dc:source>
+                    <dc:title>Bible. A.T. Pentateuque (hébreu)</dc:title>
+                    <dc:type>manuscript</dc:type>
+                    <dc:type>manuscrit</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>7</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://gallica.bnf.fr/ark:/12148/btv1b10510181g </link>
+                <nqamoyen>0.0</nqamoyen>
+                <thumbnail>http://gallica.bnf.fr/ark:/12148/btv1b10510181g.thumbnail</thumbnail>
+                <typedoc>manuscrits</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:description>תאג</dc:description>
+                    <dc:description>Pentateuque ou תאג accompagné des voyelles, des signes de cantilation et de la massore (f. 1-236r), le tableau de la grande massore (f. 236v) introduite par Psaume XIX, 8 : תּוֹרַת יְהוָה תְּמִימָה, מְשִׁיבַת נָפֶשׁ. F. 237, commentaire et traduction en arabe de la péricope hebdomadaire vayeshev (Genèse XXXVIII, 26-IL, 10), incomplet attribué à Saadia benYoseph. Début du texte : אלכ'אתם אלמפתילה. Les f. 232r-236v sont des insertions du XIXe siècle destinées à combler la lacune du texte qui se termine au f. 231v par Deutéronome, XXXI, 28.</dc:description>
+                    <dc:description>Le manuscrit porte la date de la restauration : janvier 1956</dc:description>
+                    <dc:format>Papier teinté et parchemin (f. 237). Restauration et consolidation contemporaines de l'ensemble des feuillets par pose de mousseline. Sur quelques feuillets, les galeries ont été restaurées par ajout de pièces de papier avec réecriture du texte lacunaire sur les feuillets restaurés (exemple ff. 118r et 122 r). - 237 f. - 150 x 188 mm (f. 104r). - La restauration a rendu impossible l'observation de la technique de réglure. 19 lignes écrites à la page (exemple f. 104 r). La massore est écrite sur deux lignes dans les marges supérieure et inférieure en remontant le long du texte en une ligne droite ou brisée. - Ecriture carrée orientale. Encre noire. Les voyelles, signes de cantilation et la massore sont de la même encre. Les divisions du Pentateuque sont indiquées au moyen d'une lettre ס dans la marge, stylisée. La subdivision de chacun de ces passages est indiquée par des lettres hébraïques surmontées de trois points. Dimension de la surface écrite : 19.14.188.14.21 x 27.126.53 mm (f. 104v). - Reliure orientale remontée lors de la restauration (dos refait à neuf), estampée à froid, décor à fleuron et au centre des plats supérieurs et inférieurs, trois mandorles.Traces de lanières</dc:format>
+                    <dc:identifier>http://gallica.bnf.fr/ark:/12148/btv1b107203618</dc:identifier>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, Département des manuscrits, Hébreu 1326</dc:source>
+                    <dc:title>Bible. A.T. (hébreu)</dc:title>
+                    <dc:type>manuscript</dc:type>
+                    <dc:type>manuscrit</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>8</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://gallica.bnf.fr/ark:/12148/btv1b107203618 </link>
+                <nqamoyen>0.0</nqamoyen>
+                <thumbnail>http://gallica.bnf.fr/ark:/12148/btv1b107203618.thumbnail</thumbnail>
+                <typedoc>manuscrits</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:description>תאג</dc:description>
+                    <dc:description>Pentateuque ou תאג accompagné des voyelles, des signes de cantilation et de la massore (f. 1-236r), le tableau de la grande massore (f. 236v) introduite par Psaume XIX, 8 : תּוֹרַת יְהוָה תְּמִימָה, מְשִׁיבַת נָפֶשׁ. F. 237, commentaire et traduction en arabe de la péricope hebdomadaire vayeshev (Genèse XXXVIII, 26-IL, 10), incomplet attribué à Saadia benYoseph. Début du texte : אלכ'אתם אלמפתילה. Les f. 232r-236v sont des insertions du XIXe siècle destinées à combler la lacune du texte qui se termine au f. 231v par Deutéronome, XXXI, 28.</dc:description>
+                    <dc:description>Le manuscrit porte la date de la restauration : janvier 1956</dc:description>
+                    <dc:format>Papier teinté et parchemin (f. 237). Restauration et consolidation contemporaines de l'ensemble des feuillets par pose de mousseline. Sur quelques feuillets, les galeries ont été restaurées par ajout de pièces de papier avec réecriture du texte lacunaire sur les feuillets restaurés (exemple ff. 118r et 122 r). - 237 f. - 150 x 188 mm (f. 104r). - La restauration a rendu impossible l'observation de la technique de réglure. 19 lignes écrites à la page (exemple f. 104 r). La massore est écrite sur deux lignes dans les marges supérieure et inférieure en remontant le long du texte en une ligne droite ou brisée. - Ecriture carrée orientale. Encre noire. Les voyelles, signes de cantilation et la massore sont de la même encre. Les divisions du Pentateuque sont indiquées au moyen d'une lettre ס dans la marge, stylisée. La subdivision de chacun de ces passages est indiquée par des lettres hébraïques surmontées de trois points. Dimension de la surface écrite : 19.14.188.14.21 x 27.126.53 mm (f. 104v). - Reliure orientale remontée lors de la restauration (dos refait à neuf), estampée à froid, décor à fleuron et au centre des plats supérieurs et inférieurs, trois mandorles.Traces de lanières</dc:format>
+                    <dc:identifier>http://gallica.bnf.fr/ark:/12148/btv1b10510175v</dc:identifier>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, Département des manuscrits, Hébreu 1326</dc:source>
+                    <dc:title>Bible. A.T. (hébreu)</dc:title>
+                    <dc:type>manuscript</dc:type>
+                    <dc:type>manuscrit</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>9</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <infoSupModifiable></infoSupModifiable>
+                <link>http://gallica.bnf.fr/ark:/12148/btv1b10510175v </link>
+                <nqamoyen>0.0</nqamoyen>
+                <thumbnail>http://gallica.bnf.fr/ark:/12148/btv1b10510175v.thumbnail</thumbnail>
+                <typedoc>manuscrits</typedoc>
+            </srw:extraRecordData>
+        </srw:record>
+    </srw:records>
+    <srw:nextRecordPosition>11</srw:nextRecordPosition>
+</srw:searchRetrieveResponse>

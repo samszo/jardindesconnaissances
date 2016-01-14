@@ -5,6 +5,15 @@
     <link rel="stylesheet" type="text/css" href="css/biolographes.css">
     <link rel="stylesheet" type="text/css" href="css/w2ui-dark.css" />
     <link rel="stylesheet" type="text/css" href="font/font-awesome/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="css/leaflet/leaflet.css" />
+	<link rel="stylesheet" type="text/css" href="css/leaflet/Control.Geocoder.css" />
+	<link rel="stylesheet" type="text/css" href="css/leaflet/leaflet.awesome-markers.css">
+    <style type="text/css">
+    h2{
+    		text-align: center;
+    		width: 100%;    		
+    }
+    </style>
     <script type="text/javascript">
     var prefUrl = "";
     var setAutoComplet = false;
@@ -17,9 +26,15 @@
 	<script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/w2ui.js"></script>
 	<script type="text/javascript" src="js/biolographes/reseau.js"></script>
-	<script type="text/javascript" src="js/biolographes/modeles.js"></script>
 	<script type="text/javascript" src="js/biolographes/flux.js"></script>
+	<!--  
+	<script type="text/javascript" src="js/biolographes/modeles.js"></script>
 	<script type="text/javascript" src="js/biolographes/dialogues.js"></script>
+	-->
+    <script src="js/leaflet/leaflet.js"></script>
+	<script src="js/leaflet/Control.Geocoder.js"></script>
+	<script src="js/leaflet/leaflet.awesome-markers.js"></script>	
+
 </head>
 <body onload="init()">
 	<div id="layout" style="width: 100%; height: 1050px;"></div>
@@ -30,7 +45,7 @@
 	var rsGraphs = <?php echo $this->rsGraph; ?>;
 	
 	var sltCrible, sltGraph;
-
+	
 	function init(){
 		
 	    $('#layout').w2layout({
@@ -56,7 +71,7 @@
 	    $().w2layout({
 	        name: 'layoutMain',
 	        panels: [
-	            { type: 'top', size: "30", resizable: true, style: pstyle, content: '<h4 id="titreGraph"></h4>' },
+	            { type: 'top', size: "60", resizable: true, style: pstyle, content: '<h2 id="titreGraph"></h2>' },
 	            { type: 'main', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les graphs' }
 	        ]
 	    });
@@ -91,7 +106,7 @@
 
 		chargeLayout("tbGraph");		  
 		//charge le crible par défaut
-		chargeCrible({"obj":"crible","idExi":defCribleExiId,"idDoc":defCribleDocId});
+		chargeCrible({"obj":"crible","exi_id":defCribleExiId,"doc_id":defCribleDocId});
 	}
 
 	function chargeLayout(idLayout){

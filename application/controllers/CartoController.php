@@ -23,4 +23,12 @@ class CartoController extends Zend_Controller_Action {
     {
     }	
     
+    public function tempoAction()
+    {
+    	
+    }
+    
+    public function hexagoneAction(){
+    	
+    }
 }

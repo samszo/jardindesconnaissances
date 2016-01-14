@@ -2,6 +2,17 @@
 fonctions pour la gestion des flux en lecture/ecriture
 
 **/
+
+var datas={"Tags":[],"Lieux":[],"Rapports":[],"Docs":[]};
+
+var idTagRameau, idTagNotion;
+var itemSelect, idUpdate, linkSelect, stSelect, docSelect, docFragSelect;
+var dtOrigine, dtDoublons;
+var dtCrible = [];
+var dtGraph = [];
+var dtAuteurFind, dtTagFind, dtDocFind;
+
+
 function finsession(js){
 	if(js.finsession) window.location = prefUrl+'auth/login';	
 }
@@ -159,6 +170,30 @@ function selectTag(i){
 	
 }
 
+function findDoc(code){
+	//supprime les résultats
+	//initFormAuteur()
+	w2popup.lock("Veuillez patienter", true);
+	$.post(prefUrl+"flux/databnf?obj=term&term="+code, null,
+			 function(data){
+		 		//ne récupère que les documents
+		 		dtDocFind = data.filter(function(d){
+			 		return d.raw_category=="Work" || d.raw_category=="Periodic";
+		 			});
+		 		setFindDoc();
+		 	    w2popup.unlock();		 		
+			 }, "json");
+}
+
+function selectDoc(i){
+	//récupère le détail de la notion
+	//"http://data.bnf.fr/10945257"
+	var idBNF = dtDocFind[i].value.substring(19);
+	//charge les détails de la notion
+	$('#ifDoc').attr("src","biolographes/navigrameau?idBNF="+idBNF);
+		
+	
+}
 
 function chargeCrible(crible){
 	//récupère les données du crible
@@ -167,8 +202,9 @@ function chargeCrible(crible){
 			data,
         		function(js){
     				finsession(js);
-    				datas = {}, rsTags = [];
-    				js.rs.forEach(function(d){
+    				datas["Docs"]=js.rs["docs"];
+    				datas["Acteurs"] = js.rs["acteurs"];   				
+    				js.rs["notions"].forEach(function(d){
     					/*hiérarchie 3 niveaux
     					var p1 = d.parent1, p2 = d.parent2;
         				if(!datas[p2])datas[p2]=[];
@@ -177,17 +213,31 @@ function chargeCrible(crible){
         				}
         				datas[p2][p1].push(d);    					
         				*/
-    					//hiérarchie 2 niveaux
+    					/*hiérarchie 2 niveaux
     					var p1 = d.parent1;
         				if(!datas[p1])datas[p1]=[];
         				datas[p1].push(d);
+        				*/
         				//enregistre les tag références
         				if(d.parent1=="Matière Rameau")idTagRameau=d.tId1;
         				if(d.parent1=="Notions")idTagNotion=d.tId1;
         				//cumul les notions
-        				if(d.parent2=="Catégories de notion")rsTags.push(d);
+        				if(d.parent2=="Catégories de rapport"){
+        					d.id = d.recid;
+        					d.text = d.code;
+        					datas["Rapports"][d.recid]=d;        				        				
+        				}
+        				if(d.parent2=="Catégories de notion"){
+        					d.id = d.recid;
+        					d.text = d.code+" - "+d.parent1;
+        					datas["Tags"].push(d);
+        				}
+        				if(d.parent2=="Catégories de lieu"){
+        					d.id = d.recid;
+        					d.text = d.code;//+" - "+d.parent1;
+        					datas["Lieux"].push(d);
+        				}
     				});
-    				datas["Acteurs"] = rsActeurs;
     				w2alert(js.message);
        		},"json");		
 	

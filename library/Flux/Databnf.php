@@ -158,6 +158,42 @@ ORDER BY ASC (?label_a)
     }
 
      /**
+     * Recherche des données dans Gallica
+     *
+     * @param  string $term
+     *
+     * @return string
+     */
+    public function getGallicaByTerm($term){
+    		$arrMC = array();
+    		//execute la recherche
+		$searchUrl = "http://gallica.bnf.fr/SRU";
+		$html = $this->getUrlBodyContent($searchUrl
+			,array("operation"=>"searchRetrieve","version"=>1.2,"maximumRecords"=>10,"startRecord"=>1
+				,"query"=>'gallica%20all%20"'.$term.'"'),false);
+    		echo $html;
+    		/*
+		$dom = new Zend_Dom_Query($html);	    
+		//récupère la liste
+		$xPath = '//table[@summary="short title presentation"]/tr/td[3]/input';
+		$results = $dom->queryXpath($xPath);
+		foreach ($results as $result) {
+			//récupère l'identifiant du livre
+		    $idBook = $result->getAttribute("value");
+		    $rdf = $this->getUrlBodyContent($rdfUrl.$idBook.".rdf",false);
+		  	$domRdf = new Zend_Dom_Query($rdf);
+			//récupère la liste des thèmes
+			$rsTheme = $domRdf->queryXpath("//dc:subject");
+			foreach ($rsTheme as $theme) {
+				$arrMC[]=$theme->nodeValue;
+			}
+		}	    
+    		return $arrMC;
+    		*/
+    }
+    
+    
+     /**
      * Recherche un livre dans databnf à partir d'un isbn
      *
      * @param  string $isbn

@@ -123,38 +123,39 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     public function updateHierarchie($data){
     	
     		if(isset($data["parent"])){
-	    		//récupère les information du parent
-	    		$arr = $this->findBydoc_id($data["parent"]);
+	    		$arrP = $this->findBydoc_id($data["parent"]);
+    			//récupère les information du parent
+	    		$arr = $this->findByParent($data["parent"]);
 	    		//gestion des hiérarchies gauche droite
 	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
-	    		//vérifie si le parent à des enfants
-	    		$arrP = $this->findByParent($data["parent"]);
-	    		if(count($arrP)>0){
+    			if(count($arr)>0){
 	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arr['rgt'];
+	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
 	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arr['rgt'];
+	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
 	    			$stmt = $this->_db->query($sql);
 	    			//
-	    			$data['lft'] = $arr['rgt']+1;
-	    			$data['rgt'] = $arr['rgt']+2;
+	    			$data['lft'] = $arr[0]['rgt']+1;
+	    			$data['rgt'] = $arr[0]['rgt']+2;
 	    		}else{
+	    			//vérifie si la base n'est pas vide
 	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arr['lft'];
+	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arrP['lft'];
 	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arr['lft'];
+	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arrP['lft'];
 	    			$stmt = $this->_db->query($sql);
 	    			//
-	    			$data['lft'] = $arr['lft']+1;
-	    			$data['rgt'] = $arr['lft']+2;
+	    			$data['lft'] = $arrP['lft']+1;
+	    			$data['rgt'] = $arrP['lft']+2;
 	    		}    		
-	    		$data['niveau'] = $arr['niveau']+1;
+	    		$data['niveau'] = $arrP['niveau']+1;
     		}
     		if(!isset($data['lft']))$data['lft']=0;    		
     		if(!isset($data['rgt']))$data['rgt']=1;    		
     		if(!isset($data['niveau']))$data['niveau']=1;    		
-    		
+    		    		
     		return $data;
+    	
     }    
     
     /**
@@ -166,10 +167,11 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     public function findByParent($parent)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_doc") )                           
-                    ->where( "f.parent = ?", $parent );
-
-        return $this->fetchAll($query)->toArray(); 
+			->from( array("f" => "flux_doc") )                           
+            ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('d' => 'flux_doc'),'d.doc_id = f.doc_id',array('recid'=>'doc_id'))			
+            ->where( "f.parent = ?", $parent );
+        return $this->fetchAll($query)->toArray();
     }
         
     /**
