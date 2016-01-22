@@ -11,7 +11,7 @@ require_once 'Zend/Controller/Action.php';
 
 class GapaiiController extends Zend_Controller_Action {
 	
-	var $dbNom = "flux_gapaii";
+	var $idBase = "flux_gapaii";
 	var $idOeu = 6;//37;//
 	var $idUti = 2;
 	var $idDoc = 1;
@@ -21,7 +21,7 @@ class GapaiiController extends Zend_Controller_Action {
 	 * The default action - show the home page
 	 */
 	public function indexAction() {
-		if($this->_getParam('idBase')) $this->dbNom = $this->_getParam('idBase');
+		if($this->_getParam('idBase')) $this->idBase = $this->_getParam('idBase');
 		if($this->_getParam('idOeu')) $this->idOeu = $this->_getParam('idOeu');
 		if($this->_getParam('idDoc')) $this->idDoc = $this->_getParam('idDoc');
 		if($this->_getParam('idCpt')) $this->idCpt = $this->_getParam('idCpt');
@@ -34,7 +34,7 @@ class GapaiiController extends Zend_Controller_Action {
 		}else{
 			$this->view->idUti = $this->idUti;
 		}
-		$this->view->idBase = $this->dbNom;
+		$this->view->idBase = $this->idBase;
 		$this->view->idOeu = $this->idOeu;
 		$this->view->idDoc = $this->idDoc;
 		$this->view->idCpt = $this->idCpt;
@@ -62,7 +62,7 @@ class GapaiiController extends Zend_Controller_Action {
 	public function getevalAction() {
 		//récupère les critère de l'évaluation
 		//print_r($this->getRequest()->getParams());
-		$g = new Flux_Gapaii($this->_getParam('idBase', $this->dbNom));
+		$g = new Flux_Gapaii($this->_getParam('idBase', $this->idBase));
 		$this->view->data = $g->getEval($this->_getParam('idDoc'), $this->_getParam('idUti'), $this->_getParam('idTag'));
 	}
 
@@ -71,8 +71,42 @@ class GapaiiController extends Zend_Controller_Action {
 		
 	}
 	
+	public function evalAction() {
+		$this->initInstance();
+		//vue pour l'évaluation des fragments
+		
+	}
 	
 	/**TODO: utiliser ce type de requête pour proposer des images plutôt que des mots
 	 * http://thenounproject.com/search/?q=animal
 	 */
+	
+    function initInstance(){
+		if($this->_getParam('idBase')) $this->idBase = $this->_getParam('idBase');
+		if($this->_getParam('idOeu')) $this->idOeu = $this->_getParam('idOeu');
+		if($this->_getParam('idDoc')) $this->idDoc = $this->_getParam('idDoc');
+		if($this->_getParam('idCpt')) $this->idCpt = $this->_getParam('idCpt');
+		$this->view->idBase = $this->idBase;
+		$this->view->idOeu = $this->idOeu;
+		$this->view->idDoc = $this->idDoc;
+		$this->view->idCpt = $this->idCpt;
+    			
+		$auth = Zend_Auth::getInstance();
+		$this->ssUti = new Zend_Session_Namespace('uti');
+		if ($auth->hasIdentity()) {						
+			// l'identité existe ; on la récupère
+		    $this->view->identite = $auth->getIdentity();
+		    $this->view->uti = json_encode($this->ssUti->uti);
+		    $this->view->idUti = $ssUti->idUti;
+		}else{			
+		    //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
+		    //$this->ssUti->redir = "/gapaii";
+		    	$this->view->idUti = $this->idUti;
+			$this->ssUti->dbNom = $this->idBase;
+		    if($this->view->ajax)$this->_redirect('/auth/finsession');		    
+		    else $this->_redirect('/auth/login');
+		}
+		
+    }
+	
 }

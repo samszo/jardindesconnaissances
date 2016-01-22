@@ -1,5 +1,7 @@
+var spans, sTxt = [], dtGen;
 
 $(document).ready(function() {
+		
     $('#inscription').on('submit', function() {
  
         var login = $('#login').val();
@@ -62,12 +64,72 @@ $(document).ready(function() {
 function load(idDiv, idCpt) {
 	cursor_wait();
     d3.text(urlGen+"&cpt="+idCpt, function(fragment) {
-    	cursor_clear();
-    	d3.select("#"+idDiv).html(fragment);
-    	paroleGen(idDiv, fragment);
+	    	cursor_clear();
+    		d3.select("#"+idDiv).html(fragment);
+	    paroleGen(idDiv, fragment);
         saveGen(idDiv, fragment, idCpt);
     });
 }
+function loadEval(idDiv, idCpt) {
+	cursor_wait();
+	$.get(urlGen+"&cpt="+idCpt, null,
+		 function(data){
+		    	cursor_clear();
+		    	dtGen = data;
+			var div = d3.select("#"+idDiv).html(dtGen.txt);
+			//décompose le texte
+			//$("#"+idDiv).blast({ delimiter:"character",customClass:"c",generateIndexID:true });			
+			$("#"+idDiv).blast({ delimiter:"word",customClass:"w",generateIndexID:true });			
+			caracts = d3.selectAll("span")
+				.on("mouseover",function(d){
+					var s = d3.select("#"+this.id);
+					s.style("color","red");
+					showOverlay(this);					
+				})
+				.on("mouseout",function(d){
+					var s = d3.select("#"+this.id);
+					s.style("color","black");
+				});
+			
+			/*
+		    	sTxt = [];
+			arrMot = dtGen.txt.split(" ");
+			arrMot.forEach(function(m){
+				sTxt.push({"m":m,"c":m.split('')}); 
+			});
+			div.selectAll('span').remove();
+			spans = div.selectAll('span').data(sTxt);
+			spans.enter()
+				.append("span")
+				.attr("id", function(d,i){ return "sMot_"+i;})
+			.html(function(d){
+				return d.m;
+			})
+			.on("mouseover",function(d){
+				var s = d3.select("#"+this.id);
+				s.style("color","red");
+			})
+			.on("mouseout",function(d){
+				var s = d3.select("#"+this.id);
+				s.style("color","black");
+			});
+			var caracts = spans.selectAll('span').data(function(row, i) {
+			       // evaluate column objects against the current row
+			       return sTxt.map(function(c) {
+			           var cell = {};
+			           d3.keys(c).forEach(function(k) {
+			               cell[k] = typeof c[k] == 'function' ? c[k](row,i) : c[k];
+			           });
+			           return cell;
+			       });
+			   });
+			  */
+		    //	paroleGen(idDiv, fragment);
+		    //saveGen(idDiv, fragment, idCpt);
+		}, "json");	
+	
+}
+
 function saveGen(titre, txt, idCpt) {
 	var p = {"idBase":idBase, "idUti":idUti, "data":{"titre":"gapaii_"+titre, "idOeu":idOeu, "idCpt":idCpt,"txt":txt}};
     

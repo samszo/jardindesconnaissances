@@ -28,6 +28,8 @@ class Flux_Site{
 	var $dbETD;
 	var $dbG;
 	var $dbGUD;
+	var $dbM;
+	var $dbGM;		
 	var $db;
 	var $lucene;
 	var $kwe = array("autokeyword","zemanta", "alchemy", "opencalais", "yahoo", "textalytics","aylien");
@@ -39,6 +41,7 @@ class Flux_Site{
     var $temps_inter;
     var $temps_nb=0;
     var $idDoc;
+    var $type;
     
     function __construct($idBase=false, $bTrace=false){    	
     	

@@ -63,6 +63,7 @@ class BiolographesController extends Zend_Controller_Action {
     			case "init":
 	    			$this->importCrible();
 	    			$this->importActeur();
+	    			$this->importOpenAnnotation();
 	    			break;
     			case "crible":
 	    			$this->importCrible();
@@ -70,7 +71,10 @@ class BiolographesController extends Zend_Controller_Action {
     			case "acteur":
 	    			$this->importActeur();
 	    			break;
-    			case "rien":
+    			case "oa":
+	    			$this->importOpenAnnotation();
+	    			break;
+	    		case "rien":
 	    			echo "aucun type";
 	    			break;
     		}
@@ -447,6 +451,79 @@ class BiolographesController extends Zend_Controller_Action {
     		}
     }	    
 
+    /**
+     * 
+     * Fonction pour importer Open Annotation data model
+     * http://www.openannotation.org/spec/core/index.html
+     * 
+     */
+    function importOpenAnnotation()
+    {
+		$this->initInstance();
+    	
+		//création des objets
+    		$s = new Flux_Site($this->idBase);
+    		$s->bTrace = true;
+    		$s->bTraceFlush = true;
+    		$s->dbT = new Model_DbTable_Flux_Tag($s->db);
+    		$s->dbTT = new Model_DbTable_Flux_TagTag($s->db);
+    		$s->dbE = new Model_DbTable_Flux_Exi($s->db);
+    		$s->dbETD = new Model_DbTable_Flux_ExiTagDoc($s->db);
+    		$s->dbD = new Model_DbTable_Flux_Doc($s->db);
+
+    		//on récupère le document racine
+		$idDocRacine = $s->dbD->ajouter(array("titre"=>"Editeur de réseaux d'influences","url"=>"jdc/public/biolographes","tronc"=>"application"));    		    		    		
+    		//on récupère l'existence racine
+    		$idERacine = $s->dbE->ajouter(array("nom"=>"Biolographes"));
+		
+    		//on ajoute le document csv
+    		$urlCSV = WEB_ROOT."/data/w3c/annotation/importTagAnnotation.csv";
+		$idDoc = $s->dbD->ajouter(array("titre"=>"Open Annotation Data Model"
+			,"url"=>$urlCSV, "parent"=>$idDocRacine, "tronc"=>"crible"));    		
+		
+    		//on ajoute le tag global
+    		$idTagG = $s->dbT->ajouter(array("code"=>"Cribles biolographes"));
+    		
+    		//on ajoute les tags génériques
+    		$idTagOA = $s->dbT->ajouter(array("code"=>"Open Annotation Data Model","parent"=>$idTagG)); 	    				    		
+		
+    		//chargement des csv
+    		$csv = $s->csvToArray($urlCSV,0,",");
+    		$arrNs = array();
+    		$arrTags = array();
+    		$nbLigne = count($csv);
+    		for ($i = 1; $i < $nbLigne; $i++) {
+    			$l = $csv[$i];
+    			//calcule le parent
+    			$target = 0;
+    			switch ($l[5]) {
+    				case 0:
+	    				$idTagP = $idTagOA;
+	    				break;
+    				case "ns":
+	    				$idTagP = $arrNs[$l[1]];
+	    				break;
+    				default:
+    					$arrP = explode("-",$l[5]);
+    					if($arrP[1])$target = $arrTags[$arrP[1]];
+    					$idTagP = $arrTags[$arrP[0]];
+    				break;
+    			}
+    			//ajoute le tag
+			$idT = $s->dbT->ajouter(array("ns"=>$l[1],"code"=>$l[2],"type"=>$l[3],"desc"=>$l[4],"uri"=>$l[6],"parent"=>$idTagP)); 
+			$arrTags[$i]=$idT;
+			if($target){
+				//enregistre la relation
+				$s->dbTT->ajouter(array("tag_id_src"=>$idTagP,"tag_id_dst"=>$target,"tag_id_rel"=>$idT));
+    				$s->trace($i." enregistre la relation : ".$idTagP." = ".$idT." =>".$target);	    						
+			}
+    			//enregistre le lien avec l'existence racine
+    			$s->dbETD->ajouter(array("exi_id"=>$idERacine,"tag_id"=>$idT,"doc_id"=>$idDoc));
+    			$s->trace($i." référence enregistrée : ".$l[2]." = ".$idT);	    						
+    			
+    		}
+    }	   
+        
 	function importActeur()
     {
 		$this->initInstance();

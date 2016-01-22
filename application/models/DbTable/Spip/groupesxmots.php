@@ -14,8 +14,7 @@
  * @copyright  2014 Samuel Szoniecky
  * @license    "New" BSD License
  */
-//ATTENTION le "s" de Models est nécessaire pour une compatibilité entre application et serveur
-class Models_DbTable_Spip_groupes_mots extends Zend_Db_Table_Abstract
+class Model_DbTable_Spip_groupesxmots extends Zend_Db_Table_Abstract
 {
     
     /*
@@ -133,7 +132,8 @@ class Models_DbTable_Spip_groupes_mots extends Zend_Db_Table_Abstract
                     ->from( array("s" => "spip_groupes_mots") )                           
                     ->where( "s.id_groupe = ?", $id_groupe );
 
-        return $this->fetchAll($query)->toArray(); 
+		$arr = $this->fetchAll($query)->toArray();
+        return count($arr) ? $arr[0] : false; 
     }
     	/**
      * Recherche une entrée Spip_groupes_mots avec la valeur spécifiée

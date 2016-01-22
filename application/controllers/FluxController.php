@@ -263,6 +263,26 @@ class FluxController extends Zend_Controller_Action {
 		}
     }
 
+	public function googlekgAction()
+    {
+		$g = new Flux_Gknowledgegraph();
+		if($this->_getParam('q'))$this->view->reponse = $g->getQuery($this->_getParam('q'));
+		else $this->view->reponse = "Il manque un paramètre.";
+    }    
+    
+	public function dbpediaAction()
+    {
+    		$dbp = new Flux_Dbpedia();
+	   	
+	   	switch ($this->_getParam('obj')) {
+	   		case 'bio':
+				$this->view->reponse = $dbp->getBio($this->_getParam('res'));
+	   			break;	   		
+	   		default:
+	   			break;
+	   	}
+    }
+    
 	private function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);
 		if ($ss->client->isAccessTokenExpired()) {

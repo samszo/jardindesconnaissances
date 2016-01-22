@@ -295,17 +295,18 @@ try {
 	/* pour importer les rdf de Zotero
 	//$zot = new Flux_Zotero();
 	//$zot->SaveRdf($_REQUEST);
-	
-	// pour importer les flux Wikipedia
-	//$f = new Flux_Dbpedia();
+	*/
+	/* pour importer les flux Wikipedia
+	$f = new Flux_Dbpedia();
 	//$f->SaveUserTagsLinks($user);
+	$rep = $f->getBio("Adam_Smith");
+	*/
 	
 	//$d = new Model_DbTable_Flux_Doc();
 	//$d->remove(7641);
 	
-	//
-	$f = new Flux_Delicious();
 	/*
+	$f = new Flux_Delicious();
 	$f->forceCalcul = true;
 	$f->SaveUserFan($user, $pwd);
 	$f->SaveUserNetwork($user, $pwd);
@@ -326,13 +327,13 @@ try {
 	*/
 	//$response = $server->handle();
 
-	//
+	/*
 	$bnf = new Flux_Databnf();
 	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
 	//$rs = $bnf->getRameauByIdBnf("11983292");
 	$rs = $bnf->getGallicaByTerm($_GET["term"]);
 	//$s->trace(json_encode($rs));
-	//
+	*/
 	
 	/*
 	$s->getDb("flux_biolographes");
@@ -342,7 +343,18 @@ try {
 	/*
 	$cairn = new Flux_Cairn("spip_e-educ_proverbes",true);
 	$dt = $cairn->sauve100Citations("http://localhost/jdc/data/gapaii/Les%20100%20citations%20de%20la%20philosophie%20-%20Cairn.info.html",15);
+	*/	
+	
+	/*
+	$g = new Flux_Gknowledgegraph();
+	$rep = $g->getQuery('zappa');	
 	*/
+	
+	
+	$s = new Flux_Skos('spip_e-educ_proverbes',true);
+	$s->sauveToSpip("http://skos.um.es/unescothes/CS000/json",5);		
+	
+	
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

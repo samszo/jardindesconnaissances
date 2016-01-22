@@ -115,7 +115,7 @@ ORDER BY ASC (?label_a)
 		foreach ($obj2->results->bindings as $val) {
 			//ajoute les liens direct
 			if($val->p->value=="http://www.w3.org/2004/02/skos/core#exactMatch"){
-				array_push($objResult->liens, array("value"=>$val->o->value,"recid"=>$i));
+				array_push($objResult->liens, array("value"=>$val->o->value,"recid"=>$i,"type"=>"ref"));
 				$i++;
 			}
 			//ajout l'isni

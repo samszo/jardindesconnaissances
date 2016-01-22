@@ -58,6 +58,7 @@ var gridGraph = {
     columns: [      		  		           
         { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
         { field: 'titre', caption: 'Titre', editable: { type: 'text' }, size: '10%', sortable: true, resizable: true},
+        { field: 'note', caption: 'Type', editable: { type: 'text' }, size: '10%', sortable: true, resizable: true},
         //{ field: 'auteur', caption: 'Process', hidden:true, size: '100px', sortable: true, resizable: true},
         //{ field: 'crible', caption: 'Process', hidden:true, size: '100px', sortable: true, resizable: true},
     ],
@@ -144,7 +145,8 @@ var gridActeur = {
     toolbar: {
         items: [
             { id: 'ajout_reseau', type: 'button', caption: 'Ajouter au réseau', icon: 'fa-file' },
-            { id: 'find_bnf', type: 'button', caption: 'Trouver dans DataBNF', icon: 'fa-file-excel-o' }
+            { id: 'find_bnf', type: 'button', caption: 'Trouver dans DataBNF', icon: 'fa-file-excel-o' },
+            { id: 'find_google', type: 'button', caption: 'Trouver dans Google Knowledge Graph', icon: 'fa-google' }
         ],
         onClick: function (event) {
         		if(!w2ui.grid_acteur.getSelection())	w2alert("Veuillez sélectionner un acteur");
@@ -157,6 +159,11 @@ var gridActeur = {
             		idUpdate = acteur.recid;
             		showRefActeur(acteur.prenom+' '+acteur.nom);
             }
+            if (event.target == 'find_google') {
+	        		idUpdate = acteur.recid;
+	        		showGoogleActeur(acteur.prenom+' '+acteur.nom);
+	        }
+            
         }
     },	
 }; 
@@ -217,10 +224,14 @@ var tbActeur = {
                   '</div>' 
         },
         { type: 'button',  id: 'btnGetBio',  caption: 'DataBNF', icon: 'fa-search' },
+        { type: 'button',  id: 'btnGetGoogle',  caption: 'Google KG', icon: 'fa-google' },
     ],
     onClick: function (event) {
 		if(event.target=="btnGetBio"){
 			findAuteur($('#tb_acteur_ip')[0].value);			
+		}
+		if(event.target=="btnGetGoogle"){
+			findAuteurGoogle($('#tb_acteur_ip')[0].value);			
 		}
     },
 	onRender: function(event) {
@@ -568,7 +579,7 @@ var gridResultBNF = {
         },		
         columns: [                
             { field: 'label', caption: 'Nom', size: '60%' },
-            { field: 'value', caption: 'Lien', size: '200px',editable: { type: 'text' } },
+            { field: 'value', caption: 'Lien', size: '200px'},
         ],
         onClick: function (event) {
 			if(itemSelect && itemSelect.recid == event.recid) return;
@@ -598,6 +609,31 @@ var gridResultBNFliens = {
         onClick: function (event) {
         		var item = this.get(event.recid);
 			$('#ifActeur').attr("src",item.value);            		
+        }	    
+	};
+
+var gridResultGoogleKG = {
+        name: 'grid_result_googlekg', 
+        recordHeight : 200,
+		header: 'Resultat de la recherche',		
+        show: { 
+			header	: true,		
+            	footer	: true,
+        },		
+        columns: [                
+            { field: 'id', caption: 'ID', size: '100px' },
+            { field: 'name', caption: 'Nom', size: '200px'},
+            { field: 'desc', caption: 'Description', size: '200px'},
+            { field: 'img', caption: 'Image', size: '200px',
+                render: function (record) {
+                    return '<img height="200px" src="' + record.img + '" />';
+                }},
+            { field: 'detail', caption: 'Détail', size: '20%'},
+        ],
+        onClick: function (event) {
+			if(itemSelect && itemSelect.recid == event.recid) return;
+			itemSelect = this.get(event.recid);
+			if(itemSelect.type=="Person")selectAuteurGoogle(itemSelect);
         }	    
 	};
 
@@ -818,6 +854,21 @@ function showRefActeur(cherche){
 	}
 }
 
+function showGoogleActeur(cherche){
+	
+ 	if(w2ui['layout_acteur'])w2ui['layout_acteur'].destroy();
+ 	if(w2ui['form_acteur'])w2ui['form_acteur'].destroy();
+ 	if(w2ui['tb_acteur'])w2ui['tb_acteur'].destroy();
+    	$('#w2ui-popup #main').w2layout(lyActeur);            		
+    	w2ui['layout_acteur'].content('left', $().w2form(formActeur));            		            		
+    	w2ui['layout_acteur'].content('top', $().w2toolbar(tbActeur));
+    	w2popup.max();
+	if(cherche){
+		findAuteurGoogle(cherche);
+	}
+}
+
+
 function openPopupAjoutDoc(){
 	
 	w2popup.open({
@@ -951,9 +1002,29 @@ function setFindAuteur(){
  	if(w2ui['grid_result_bnf'])w2ui['grid_result_bnf'].destroy();	
 	w2ui['layout_acteur'].content('main', $().w2grid(gridResultBNF));
  	if(w2ui['layout_acteur_bottom'])w2ui['layout_acteur_bottom'].destroy();	
+	w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurBottom));            			
+}
+
+function setFindAuteurGoogle(){
+	if(dtAuteurFind.length==0)w2alert("Aucun acteur trouvé.");
+	//création du tableau des résultats
+	var dtGKG = [];
+	dtAuteurFind.forEach(function(d,i){
+		var r = {type:"Person",recid:i,id:d.result["@id"],name:d.result.name,desc:d.result.description,data:d.result,img:"",detail:""};
+		if(d.result.image)r.img=d.result.image.contentUrl;
+		if(d.result.detailedDescription)r.detail=d.result.detailedDescription.articleBody;
+		dtGKG.push(r);
+	});
+	
+	//affiche les résultats
+	gridResultGoogleKG.records = dtGKG;
+ 	if(w2ui['grid_result_googlekg'])w2ui['grid_result_googlekg'].destroy();	
+	w2ui['layout_acteur'].content('main', $().w2grid(gridResultGoogleKG));
+ 	if(w2ui['layout_acteur_bottom'])w2ui['layout_acteur_bottom'].destroy();	
 	w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurBottom));            		
 	
 }
+
 
 
 function setSelectAuteur(dt){
@@ -972,6 +1043,19 @@ function setSelectAuteur(dt){
 		
 	}
 }
+
+function setSelectAuteurGoogle(dt){
+    var g = w2ui['form_acteur'];
+    g.clear();
+	g.record = dt;
+	g.refresh();
+	$('#ifActeur').attr("src",dt.idArk);            		
+	
+	gridResultBNFliens.records = dt.liens;
+ 	if(w2ui['grid_result_bnf_liens'])w2ui['grid_result_bnf_liens'].destroy();	
+	w2ui['layout_acteur_bottom'].content('left', $().w2grid(gridResultBNFliens));
+}
+
 
 function showRefTag(cherche){
 	

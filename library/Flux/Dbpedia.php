@@ -10,24 +10,83 @@
  * Website: http://johnwright.me/blog
  * http://johnwright.me/code-examples/sparql-query-in-code-rest-php-and-json-tutorial.php
  */
-class Flux_Dbpedia{
+class Flux_Dbpedia extends Flux_Site{
 
-	var $cache;
 	var $forceCalcul = false;
-	var $user;
 	var $idUser;
 	var $del;
-	var $dbUT;
-	var $dbD;
-	var $dbT;
-	var $dbUD;
-	var $dbTD;
-	var $dbED;
-	var $dbET;
-	var $dbTT;
+	var $lang = "fr";
+	var $formatResponse = "json";
+	var $searchUrl = 'http://fr.dbpedia.org/sparql?';
 	
     const IDEXI = 1;
-	
+    
+    /**
+     * Constructeur de la classe
+     *
+     * @param  string $idBase
+     * 
+     */
+	public function __construct($idBase=false, $bTrace=false)
+    {
+    		parent::__construct($idBase, $bTrace);    	
+    }
+
+    /**
+     * Execute une requète sur dbpedia
+     *
+     * @param  string $query
+     *
+     * @return string
+     */
+    public function query($query)
+    {
+	    $url = $this->searchUrl.'query='.urlencode($query)
+	      	.'&format='.$this->formatResponse;
+		return $this->getUrlBodyContent($url,false);
+    }
+    
+	/**
+     * Recherche une biographie à partir d'une ressource databnf
+     *
+     * @param  string $ressource
+     *
+     * @return string
+     */
+    public function getBio($ressource)
+    {	   	
+	   	//récupère les infos de data bnf
+	   	$query = "select * where {<http://fr.dbpedia.org/resource/".$ressource."> ?r ?p}";	   			   	
+		$result = $this->query($query);
+		$obj = json_decode($result);
+		
+		//construction de la réponse
+		$objResult = new stdClass();
+		foreach ($obj->results->bindings as $key => $v) {
+			switch ($v->r->value) {
+				case "http://fr.dbpedia.org/property/bnf":
+					$objResult->bnf = $v->p->value."";				
+					break;
+				case "http://fr.dbpedia.org/property/naissance":
+					$objResult->nait = $v->p->value;				
+					break;
+				case "http://fr.dbpedia.org/property/décès":
+					$objResult->mort = $v->p->value;				
+					break;
+				case "http://fr.dbpedia.org/property/sudoc":
+					$objResult->sudoc = $v->p->value;				
+					break;
+				case "http://fr.dbpedia.org/property/viaf":
+					$objResult->viaf = $v->p->value;				
+					break;
+				case "http://xmlns.com/foaf/0.1/depiction":
+					$objResult->img = $v->p->value;				
+					break;							
+			}
+		}	
+		return json_encode($objResult);
+    }    
+    	
 	function SaveUserTagsLinks($user) {
 		
 		//récupère les tags d'un utilisateur
@@ -46,7 +105,7 @@ class Flux_Dbpedia{
         if(!$flux = $this->cache->load($c)) {
 			$searchUrl = $this->getUrlKeyword($tag);
 		    $flux = $this->request($searchUrl);
-	    	$this->cache->save($flux,$c);
+	    		$this->cache->save($flux,$c);
 		}
 		
 		return simplexml_load_string($flux);      

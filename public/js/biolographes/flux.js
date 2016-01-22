@@ -135,6 +135,27 @@ function findAuteur(nom){
 			 }, "json");
 }
 
+function findAuteurGoogle(nom){
+	//supprime les résultats
+	//initFormAuteur()
+	w2popup.lock("Veuillez patienter", true);
+	$.post(prefUrl+"flux/googlekg?q="+nom, null,
+		 function(data){
+	 		//ne récupère que les personnes
+			dtAuteurFind = false;
+			if(data){
+		 		dtAuteurFind = data.itemListElement.filter(function(d){
+			 		var types = d.result["@type"].filter(function(t){
+			 			return t=="Person";
+			 			});
+			 		return types.length;
+			 		});
+			}
+	 		setFindAuteurGoogle();
+	 	    w2popup.unlock();		 		
+		 }, "json");
+}
+
 function selectAuteur(i){
 	//récupère la bio de l'auteur
 	//"http://data.bnf.fr/10945257"
@@ -144,6 +165,33 @@ function selectAuteur(i){
 				setSelectAuteur(data);
 			 }, "json");	
 }
+
+function selectAuteurGoogle(i){
+	//récupère la bio de l'auteur
+	//via dbpedia
+	//var urlDbpedia = i.data.detailedDescription.url.replace("wikipedia.org/wiki", "dbpedia.org/data/")+".json";	
+	var res = i.data.detailedDescription.url.split("/");
+	res = res[res.length-1]; 
+	$.post(prefUrl+"flux/dbpedia?obj=bio&res="+res, null,
+			 function(data){
+				i.nait = data.nait;
+				i.mort = data.mort;
+				i.nom = i.name;
+				i.liens = [];
+				i.liens.push({"value":i.data.detailedDescription.url,"recid":i.liens.length+1,type:"ref"});
+				if(i.data.image)i.liens.push({"value":i.data.image.url,"recid":i.liens.length+1,type:"image"});
+				if(data.img)i.liens.push({"value":data.img,"recid":i.liens.length+1,type:"image"});
+				if(data.bnf)i.liens.push({"value":"http://data.bnf.fr/"+data.bnf,"recid":i.liens.length+1,type:"ref"});
+				if(data.viaf)i.liens.push({"value":"http://viaf.org/viaf/"+data.viaf,"recid":i.liens.length+1,type:"ref"});
+				//supprime les données superflux
+				delete i.name;
+				delete i.type;
+				delete i.id;
+				delete i.desc;
+				setSelectAuteurGoogle(i);
+			 }, "json");	
+}
+
 
 function findTag(code){
 	//supprime les résultats

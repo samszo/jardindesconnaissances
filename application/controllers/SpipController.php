@@ -12,9 +12,80 @@ class SpipController extends Zend_Controller_Action
 	}
 
 	/**
-	 * controle pour l'importation d'un fichier csv
+	 * controle pour l'importation des données
 	 */
 	public function importAction() {
+		
+		
+		//initialisation des objets
+		$sSpip = new Flux_Site($this->_getParam('idBaseSpip'));
+    		$sSpip->bTrace = true;
+    		$sSpip->bTraceFlush = true;
+		
+		switch ($this->_getParam('type')) {
+			case "fluxSKOs":
+				$dbA = new Models_DbTable_Spip_mots($sSpip->db);
+				$json = $sSpip->getUrlBodyContent("http://skos.um.es/unescothes/CS000/json");
+				
+				$arr = json_encode($json);
+				
+				foreach ($arr as $key => $value) {
+					;
+				}
+		    		
+				//ajouter un mot clef dans spip
+				$dbA->ajouter(array("titre"=>"","descriptif"=>"","id_groupe"=>"","type"=>""
+				,"profondeur"=>"", "id_mot_racine"=>"", "id_parent"=>""));
+
+		}
+		$this->view->data = "OK"; 				
+		
+	}
+	
+	
+	/**
+	 * controle pour l'exportation des données
+	 */
+	public function exportAction() {
+		
+		//initialisation des objets
+		$sSpip = new Flux_Site($this->_getParam('idBaseSpip'));
+		$sFlux = new Flux_Site($this->_getParam('idBaseFlux'));
+    		$sSpip->bTrace = true;
+    		$sSpip->bTraceFlush = true;
+		
+		switch ($this->_getParam('type')) {
+			case "fluxExi":
+				$dbA = new Model_DbTable_Spip_auteurs($sSpip->db);
+				$dbE = new Model_DbTable_Flux_Exi($sFlux->db);
+				$dbFS = new Model_DbTable_Flux_Spip($sFlux->db);
+				$dbD = new Model_DbTable_Flux_Doc($sFlux->db);
+				$dbT = new Model_DbTable_Flux_Tag($sFlux->db);
+		    		$dbETD = new Model_DbTable_Flux_ExiTagDoc($sFlux->db);
+		    		$dbUE = new Model_DbTable_Flux_UtiExi($sFlux->db);
+		    		
+				//récupère les auteurs;
+				$arrAuteurs = $dbA->getAll();
+				//récupère les références
+				$idDocRacine = $dbD->ajouter(array("titre"=>"Editeur de réseaux d'influences","url"=>"jdc/public/biolographes"));    		    		    		
+				//on ajoute le document spip
+				$idDoc = $dbD->ajouter(array("titre"=>"SPIP proverbes","url"=>"http://gapai.univ-paris8.fr/CreaTIC/E-education/Proverbes/","parent"=>$idDocRacine, ));    		
+		    		$TagGlobal = $dbT->findByCode("Cribles biolographes");
+		    		$idTagAct = $dbT->ajouter(array("code"=>"Acteur","parent"=>$TagGlobal["tag_id"]));
+		    		
+				//création des existences
+				foreach ($arrAuteurs as $a) {
+					$idE = $dbE->ajouter(array("nom"=>$a["nom"]));
+					$dbFS->ajouter(array("id_flux"=>$idE,"id_spip"=>$a["id_auteur"],"obj_flux"=>"exi","obj_spip"=>"auteurs"));
+					$sSpip->trace("existence ajoutée : ".$a["nom"]." = ".$a["id_auteur"]." => ".$idE);
+					
+					$dbETD->ajouter(array("exi_id"=>$idE,"tag_id"=>$idTagAct,"doc_id"=>$idDoc));
+		    			//lie l'existence à l'utilisateur admin pour gérer les droits CRUD
+					$dbUE->ajouter(array("uti_id"=>1, "exi_id"=>$idE)); 
+					
+				}
+				break;
+		}
 		$this->view->data = "OK"; 					
 			
 	}

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="../css/leaflet/leaflet.css" />
+	<link rel="stylesheet" type="text/css" href="../css/leaflet/Control.Geocoder.css" />
+	<link rel="stylesheet" type="text/css" href="../css/leaflet/leaflet.awesome-markers.css">
+    <style type="text/css">
+    h2{
+    		text-align: center;
+    		width: 100%;    		
+    }
+    </style>
+    <script type="text/javascript">
+	var idBase="<?php echo $this->idBase; ?>";
+	var uti = <?php echo $this->uti;?>;	
+	var idUti = uti.uti_id;	
+	var idOeu = <?php echo $this->idOeu; ?>;				
+	var idDoc = <?php echo $this->idDoc; ?>;				
+	var urlGen = "http://localhost/generateur/services/api.php?frt=json&oeu="+idOeu;
+
+	</script>
+	<script type="text/javascript" src="../js/d3.js"></script>
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/w2ui.js"></script>
+	<script type="text/javascript" src="../js/jquery.blast.min.js"></script>
+	<script type="text/javascript" src="../js/gapaii/gapaii.js"></script>
+	<script type="text/javascript" src="../js/leaflet/leaflet.js"></script>
+	<script type="text/javascript" src="../js/leaflet/Control.Geocoder.js"></script>
+	<script type="text/javascript" src="../js/leaflet/leaflet.awesome-markers.js"></script>	
+
+</head>
+<body onload="init()">
+	<div id="layout" style="width: 100%; height:640px;"></div>
+
+	<script type="text/javascript">
+	var pstyle = 'padding:3px;';
+	
+	function init(){
+		
+	    $('#layout').w2layout({
+	        name: 'layout',
+	        padding: 2,
+	        panels: [
+	            { type: 'top', size: 50, resizable: false, style: pstyle, content: '<div style="float:left;width:176px;">'
+		            +'<img src="http://localhost/CreaTIC/E-education/Proverbes/IMG/siteon0.png" alt="logo" style="height:40px;">'
+		            +'<img src="../img/logoJDC.png" alt="logo" style="margin:0 0 0 10px;height:40px;">'
+		            +'</div>'
+		            +'<div id="toolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>' },
+	            { type: 'main', style: pstyle, resizable: true, content: '', size:"100%"  },
+	       	],
+	    });
+
+	    $().w2layout({
+	        name: 'layoutMain',
+	        panels: [
+	            { type: 'top', size: "60", resizable: true, style: pstyle, content: '<h2 id="txtGen"></h2>' },
+	            { type: 'main', size: "50%", resizable: true, style: pstyle, content: '' }
+	        ]
+	    });
+
+		   
+	    w2ui['layout'].content('main', w2ui['layoutMain']);
+    
+	    $('#toolbar').w2toolbar({
+		    name: 'mainTB',
+		    items: [
+				{ type: 'html',  id: 'item6',
+				    html: '<h1>Cartographier les sagesses</h1>' 
+				},				    
+		        { type: 'break',  id: 'break0'},
+		        { type: 'button',  id: 'tbNewTxt', caption: '', icon:'fa-file'},
+		        { type: 'break',  id: 'break1'},
+		        { type: 'button',  id: 'tbNewImg', caption: '', icon:'fa-file'},
+		        { type: 'break',  id: 'break2'},
+		        { type: 'button',  id: 'tbNewFilm', caption: '', icon:'fa-film'},	        
+		        { type: 'break',  id: 'break3'},
+		        { type: 'button',  id: 'tbNewSound', caption: '', icon:'fa-film'},	        
+		        { type: 'break',  id: 'break4', hidden:uti.role=="admin" ? false : true },
+		        { type: 'button',  id: 'tbParam', caption: 'Paramètres', icon:'fa-cog', hidden:uti.role=="admin" ? false : true},
+		        { type: 'spacer' },
+		        { type: 'button',  id: 'utiLog',  caption: uti.login, icon: 'fa-user' },            
+		        { type: 'button',  id: 'utiSignOut',  caption: 'déconnexion', icon: 'fa-sign-out' }
+		    ]
+		});
+	
+		w2ui.mainTB.on('click', function (event) { 
+			w2ui.layout.lock('main', "Veuillez patienter...", true);	
+			if(event.target=="tbNewTxt"){
+				loadEval('txtGen', <?php echo $this->idCpt; ?>);
+			}
+		});  
+
+		//charge le processus d'évaluation
+		//chargeProcessEval({"obj":"crible","exi_id":defCribleExiId,"doc_id":defCribleDocId});
+	}
+
+	function chargeLayout(idLayout){
+		
+        //supprime les objets si déjà présent
+        if(w2ui['layout_graph']){
+
+        }
+	    	if(idLayout=="tbGraph"){
+	        	w2ui['layoutMain'].load('main', 'Biolographes/editeur?ajax=1',null,function () {		        	
+	        		w2ui.layout.unlock('main');
+	        	});        	
+	    }
+        if(w2ui['layout_crible']){
+
+        }
+	    	if(idLayout=="tbCrible"){
+	        	w2ui['layout'].load('main', 'Index/crible?ajax=1',null,function () {
+	        		w2ui.layout.unlock('main');
+	        	});        	
+	    }
+
+	    
+	    if(w2ui['layout_Param']){
+
+		}     
+	    if(idLayout=="tbParam"){	    
+	        	w2ui['layout'].load('main', 'Index/param?ajax=1',null,function () {
+	        		w2ui.layout.unlock('main');
+	        	});
+	        	w2ui.layout.unlock('main');
+	    } 	
+	
+	    if(idLayout=="utiSignOut"){
+		    	deconnexion();
+		}	    
+	}
+	function chargeProcessEval(){
+	}
+</script>
+
+</body>
+</html>
+<!--  
+<script src="../js/d3.v3.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/w2ui.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+<link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+
+<script type="text/javascript">
+
+</script>
+<style>
+span{
+	# margin: 0 0.3em 0 0;
+	font-family: 'Source Sans Pro', sans-serif;
+	font-size: 18pt;
+	line-height: 1.75em;	
+}
+</style>
+	<h2>Evaluation des textes</h2>
+	<div class="row">
+		<div id="genPro"><br/></div>
+		<div id="genProAudio" ></div>
+	</div>
+	<div class="12u">
+		<ul class="actions">
+			<li><a class="btn btn-lg btn-primary" onclick="loadEval('genPro', <?php echo $this->idCpt; ?>,true)" >Génèrer</a>
+			<a class="btn btn-lg btn-primary" onclick="evaluer()" >Evaluer</a>
+			</li>
+		</ul>
+	</div>
+-->

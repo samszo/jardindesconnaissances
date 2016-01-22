@@ -14,8 +14,7 @@
  * @copyright  2014 Samuel Szoniecky
  * @license    "New" BSD License
  */
-//ATTENTION le "s" de Models est nécessaire pour une compatibilité entre application et serveur
-class Models_DbTable_Spip_mots extends Zend_Db_Table_Abstract
+class Model_DbTable_Spip_mots extends Zend_Db_Table_Abstract
 {
     
     /*
@@ -41,7 +40,8 @@ class Models_DbTable_Spip_mots extends Zend_Db_Table_Abstract
 		$select = $this->select();
 		$select->from($this, array('id_mot'));
 		foreach($data as $k=>$v){
-			$select->where($k.' = ?', $v);
+			if($k!="texte")
+				$select->where($k.' = ?', $v);
 		}
 	    $rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->id_mot; else $id=false;
@@ -59,12 +59,12 @@ class Models_DbTable_Spip_mots extends Zend_Db_Table_Abstract
     public function ajouter($data, $existe=true)
     {
     	
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
-    	 	$id = $this->insert($data);
-    	}
-    	return $id;
+	    	$id=false;
+	    	if($existe)$id = $this->existe($data);
+	    	if(!$id){
+	    	 	$id = $this->insert($data);
+	    	}
+	    	return $id;
     } 
            
     /**

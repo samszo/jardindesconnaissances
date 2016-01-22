@@ -1,0 +1,142 @@
+id,ns,code,type,desc,TextPositionSelector,uri,ieml
+1,oa,oa,Namespace,The Open Annotation ontology,0,http://www.w3.org/ns/oa#,
+2,cnt,cnt,Namespace,Representing Content in RDF,0,http://www.w3.org/2011/content#,
+3,dc,dc,Namespace,Dublin Core Elements,0,http://purl.org/dc/elements/1.1/,
+4,dcterms,dcterms,Namespace,Dublin Core Terms,0,http://purl.org/dc/terms/,
+5,dctypes,dctypes,Namespace,Dublin Core Type Vocabulary,0,http://purl.org/dc/dcmitype/,
+6,foaf,foaf,Namespace,Friend-of-a-Friend Vocabulary,0,http://xmlns.com/foaf/0.1/,
+7,prov,prov,Namespace,Provenance Ontology,0,http://www.w3.org/ns/prov#,
+8,rdf,rdf,Namespace,RDF,0,http://www.w3.org/1999/02/22-rdf-syntax-ns#,
+9,rdfs,rdfs,Namespace,RDF Schema,0,http://www.w3.org/2000/01/rdf-schema#,
+10,skos,skos,Namespace,Simple Knowledge Organization System,0,http://www.w3.org/2004/02/skos/core#,
+11,trig,trig,Namespace,TriG Named Graphs,0,http://www.w3.org/2004/03/trix/rdfg-1/,
+12,oa,Annotation,Class,"The class for Annotations 
+The oa:Annotation class MUST be associated with an Annotation.",ns,,
+13,oa,hasBody,Relationship,"The relationship between an Annotation and the Body of the Annotation 
+There SHOULD be 1 or more oa:hasBody relationships associated with an Annotation but there MAY be 0.",12,,
+14,oa,hasTarget,Relationship,"The relationship between an Annotation and the Target of the Annotation 
+There MUST be 1 or more oa:hasTarget relationships associated with an Annotation.",12,,
+15,dctypes,Dataset,Class,The class for a resource which encodes data in a defined structure,ns,,
+16,dctypes,Image,Class,"The class for image resources, primarily intended to be seen",ns,,
+17,dctypes,MovingImage,Class,"The class for video resources, with or without audio",ns,,
+18,dctypes,Sound,Class,The class for a resource primarily intended to be heard,ns,,
+19,dctypes,Text,Class,The class for a resource primarily intended to be read,ns,,
+20,cnt,ContentAsText,Class,"A class assigned to the Body for embedding textual resources within the Annotation.
+This class SHOULD be assigned to the Body, however it can be inferred from the presence of the mandatory cnt:chars property.",ns,,
+21,cnt,chars,Property,"The character sequence of the content.
+There MUST be exactly 1 cnt:chars property associated with the ContentAsText resource.",ns,,
+22,dc,format,Property,"The media type of the content. 
+There SHOULD be exactly 1 dc:format property associated with the resource.",ns,,
+23,dc,language,Property,"The language of the content, if known.
+There MAY be 0 or more dc:language properties. Each language SHOULD be expressed as a language tag, as defined by RFC 3066.",ns,,
+24,oa,Tag,Class,"A class assigned to the Body when it is a tag, such as a embedded text string",ns,,
+25,oa,SemanticTag,Class,"[subClass of oa:Tag] A class assigned to the Body when it is a semantic tagging resource; a URI that identifies a concept, rather than an embedded string, frequently a term from a controlled vocabulary",24,,
+26,foaf,page,Relationship,The foaf:page relationship expresses the link between a Semantic Tag and the document that describes or somehow embodies the tagging concept.,25,,
+27,oa,annotatedBy,Relationship,"[subProperty of prov:wasAttributedTo] The object of the relationship is a resource that identifies the agent responsible for creating the Annotation. This may be either a human or software agent. 
+There SHOULD be exactly 1 oa:annotatedBy relationship per Annotation, but MAY be 0 or more than 1, as the Annotation may be anonymous, or multiple agents may have worked together on it.",12,,
+28,oa,annotatedAt,Property,"The time at which the Annotation was created. 
+There SHOULD be exactly 1 oa:annotatedAt property per Annotation, and MUST NOT be more than 1. The datetime MUST be expressed in the xsd:dateTime format, and SHOULD have a timezone specified.",12,,
+29,oa,serializedBy,Relationship,"[subProperty of prov:wasAttributedTo] The object of the relationship is the agent, likely software, responsible for generating the Annotation's serialization. 
+There MAY be 0 or more oa:serializedBy relationships per Annotation.",12,,
+30,oa,serializedAt,Property,"The time at which the agent referenced by oa:serializedBy generated the first serialization of the Annotation, and any subsequent substantially different one. The annotation graph MUST have changed for this property to be updated, and as such represents the last modified datestamp for the Annotation. This might be used to determine if it should be re-imported into a triplestore when discovered. 
+There MAY be exactly 1 oa:serializedAt property per Annotation, and MUST NOT be more than 1. The datetime MUST be expressed in the xsd:dateTime format, and SHOULD have a timezone specified.",12,,
+31,foaf,Person,Class,"The class for a human agent, typically used as the class of the object of the oa:annotatedBy relationship",ns,,
+32,prov,SoftwareAgent,Class,"The class for a software agent, typically used as the class of the object of the oa:serializedBy relationship. It might also be used for the object of the oa:annotatedBy for machine generated annotations.",ns,,
+33,foaf,Organization,Class,"The class for an organization, as opposed to an individual. This might be used as the class of the object of the oa:annotatedBy relationship, for example.",ns,,
+34,foaf,name,Property,"The name of the agent. 
+Each agent SHOULD have exactly 1 name property.",ns,,
+35,foaf,mbox,Relationship,"The email address associated with the agent, using the mailto: URI scheme. 
+Each agent MAY have 1 or more mailboxes",ns,,
+36,foaf,openid,Relationship,"The openId URI associated with the agent. 
+Each agent MAY have 1 or more openIds.",ns,,
+37,foaf,homepage,Relationship,"The home page for the agent.
+Each agent MAY have 1 or more home pages.",ns,,
+38,oa,Motivation,Class,"[subClass of skos:Concept] The Motivation for an Annotation is a reason for its creation, and might include things like Replying to another annotation, Commenting on a resource, or Linking to a related resource.",12,,
+39,oa,motivatedBy,Relationship,"The relationship between an Annotation and a Motivation. 
+There SHOULD be at least 1 Motivation for each Annotation, and MAY be more than 1.",12-38,,
+40,oa,bookmarking,Instance,"The motivation that represents the creation of a bookmark to the target resources or recorded point or points within one or more resources. For example, an Annotation that bookmarks the point in a text where the reader finished reading. Bookmark Annotations may or may not have a Body resource.",39,,
+41,oa,classifying,Instance,"The motivation that represents the assignment of a classification type, typically from a controlled vocabulary, to the target resource(s). For example to classify an Image resource as a Portrait.",39,,
+42,oa,commenting,Instance,The motivation that represents a commentary about or review of the target resource(s). For example to provide a commentary about a particular PDF.,39,,
+43,oa,describing,Instance,"The motivation that represents a description of the target resource(s), as opposed to a comment about them. For example describing the above PDF's contents, rather than commenting on their accuracy.",39,,
+44,oa,editing,Instance,"The motivation that represents a request for a modification or edit to the target resource. For example, an Annotation that requests a typo to be corrected.",39,,
+45,oa,highlighting,Instance,The motivation that represents a highlighted section of the target resource or segment. For example to draw attention to the selected text that the annotator disagrees with. A Highlight may or may not have a Body resource,39,,
+46,oa,identifying,Instance,"The motivation that represents the assignment of an identity to the target resource(s). For example, annotating the name of a city in a string of text with the URI that identifies it.",39,,
+47,oa,linking,Instance,The motivation that represents an untyped link to a resource related to the target.,39,,
+48,oa,moderating,Instance,The motivation that represents an assignment of value or quality to the target resource(s). For example annotating an Annotation to moderate it up in a trust network or threaded discussion.,39,,
+49,oa,questioning,Instance,"The motivation that represents asking a question about the target resource(s). For example to ask for assistance with a particular section of text, or question its veracity.",39,,
+50,oa,replying,Instance,"The motivation that represents a reply to a previous statement, either an Annotation or another resource. For example providing the assistance requested in the above.",39,,
+51,oa,tagging,Instance,The motivation that represents adding a Tag on the target resource(s). Please see the section on Tagging and Semantic Tags for more information.,39,,
+52,oa,SpecificResource,Class,"The class for Specific Resources 
+The oa:SpecificResource class SHOULD be associated with a Specific Resource to be clear as to its role as a more specific region or state of another resource.",ns,,
+53,oa,hasSource,Relationship,"The relationship between a Specific Resource and the resource that it is a more specific representation of. 
+There MUST be exactly 1 oa:hasSource relationship associated with a Specific Resource.",39,,
+54,oa,Selector,Class,"The super class for individual Selectors. This class is not used directly in Annotations, only its subclasses are.",ns,,
+55,oa,hasSelector,Relationship,"The relationship between a Specific Resource and a Selector. 
+There MUST be exactly 0 or 1 oa:hasSelector relationship associated with a Specific Resource.",39,,
+56,oa,FragmentSelector,Class,"[subClass of oa:Selector] A resource which describes the segment of interest in a representation, through the use of the fragment identifier component of a URI.",54,,
+57,rdf,value,Property,"The contents of the fragment identifier component of a URI that describes the segment of interest in the resource.
+The oa:FragmentSelector MUST have exactly 1 rdf:value property.",56,,
+58,dcterms,conformsTo,Relationship,The Fragment Selector SHOULD have a dcterms:conformsTo relationship with the object being the specification that defines the syntax of the fragment.,56,,
+59,oa,TextPositionSelector,Class,[subClass of oa:Selector] The class for a Selector which describes a range of text based on its start and end positions.,54,,
+60,oa,start,Property,"The starting position of the segment of text. The first character in the full text is character position 0, and the character is included within the segment. 
+Each TextPositionSelector MUST have exactly 1 oa:start property.",59,,
+61,oa,end,Property,"The end position of the segment of text. The last character is not included within the segment. 
+Each TextPositionSelector MUST have exactly 1 oa:end property.",59,,
+62,oa,TextQuoteSelector,Class,"[subClass of oa:Selector] The class for a Selector that describes a textual segment by means of quoting it, plus passages before or after it.",54,,
+63,oa,exact,Property,"A copy of the text which is being selected, after normalization. 
+Each TextQuoteSelector MUST have exactly 1 oa:exact property.",62,,
+64,oa,prefix,Property,"A snippet of text that occurs immediately before the text which is being selected. 
+Each TextQuoteSelector SHOULD have exactly 1 oa:prefix property, and MUST NOT have more than 1.",62,,
+65,oa,suffix,Property,"The snippet of text that occurs immediately after the text which is being selected. 
+Each TextQuoteSelector SHOULD have exactly 1 oa:suffix property, and MUST NOT have more than 1.",62,,
+66,oa,DataPositionSelector,Class,[subClass of oa:Selector] The class for a Selector which describes a range of data based on its start and end positions within the byte stream.,54,,
+67,oa,start,Property,"The starting position of the segment of data. The first byte is character position 0. 
+Each DataPositionSelector MUST have exactly 1 oa:start property.",66,,
+68,oa,end,Property,"The end position of the segment of data. The last character is not included within the segment. 
+Each DataPositionSelector MUST have exactly 1 oa:end property.",66,,
+69,oa,SvgSelector,Class,[subClass of oa:Selector] The class for a Selector which defines a shape using the SVG standard.,54,,
+70,oa,State,Class,"A resource which describes how to retrieve a representation of the Source resource that is appropriate for the Annotation. This class is not used directly in Annotations, only its subclasses are.",ns,,
+71,oa,hasState,Relationship,"The relationship between a oa:SpecificResource and an oa:State resource. 
+There MAY be 0 or 1 oa:hasState relationship for each SpecificResource.",52-70,,
+72,oa,TimeState,Class,A resource which describes how to retrieve a representation of the Source resource that is temporally appropriate for the Annotation.,ns,,
+73,oa,when,Property,"The timestamp at which the Source resource should be interpreted for the Annotation. The timestamp MUST be expressed in the xsd:dateTime format, and SHOULD have a timezone specified. 
+There MAY be 0 or more oa:when properties per TimeState, but there MUST be at least one of oa:when and oa:cachedSource. If there is more than 1, each gives an alternative timestamp at which the Source may be interpreted.",72,,
+74,oa,cachedSource,Relationship,"A link to a copy of the Source resource's representation, appropriate for the Annotation. 
+There MAY be 0 or more oa:cachedSource relationships per TimeState, but there MUST be at least one of oa:cachedSource and oa:when. If there is more than 1, each gives an alternative copy of the representation.",ns,,
+75,oa,HttpRequestState,Class,"A resource which describes how to retrieve an appropriate representation of the Source resource for the Annotation, based on the HTTP Request headers to send to the server.",ns,,
+76,rdf,value,Property,"The HTTP request headers as a single, complete string, exactly as they would appear in an HTTP request. 
+There MUST be exactly 1 rdf:value property per HTTPRequestState.",75,,
+77,oa,Style,Class,"A resource which describes the style in which the selection or resource should be rendered. This class is not used directly in Annotations, only its subclasses are.",ns,,
+78,oa,styledBy,Relationship,"The relationship between an Annotation and the oa:Style. 
+There MAY be 0 or 1 styledBy relationships for each Annotation.",12-77,,
+79,oa,CssStyle,Class,[subClass of oa:Style] A resource which describes styles for resources participating in the Annotation using CSS.,77,,
+80,oa,styleClass,Property,"The string name of the class used in the CSS description that should be applied to the Specific Resource.
+There MAY be 0 or more styleClass properties on a Specific Resource.",79,,
+81,oa,hasScope,Relationship,"The relationship between a Specific Resource and the resource that provides the scope or context for it in this Annotation.
+There MAY be 0 or more hasScope relationships for each Specific Resource.",ns,,
+82,oa,item,Relationship,"[subProperty of rdfs:member] The relationship between a multiplicity construct node and its constituent resources.
+There MUST be 1 or more item relationships for each multiplicity construct.",ns,,
+83,oa,Choice,Class,"[subClass of rdf:Alt] A multiplicity construct that conveys to a consuming application that it should select one of the constituent resources to display to the user, and not render all of them. This construct is equivalent to the rdf:Alt container class.",ns,,
+84,oa,default,Relationship,"[subProperty of oa:item] The constituent resource to use as a default option, if there is no other means to determine which would be most appropriate.
+There SHOULD be exactly 1 default relationship for each Choice.",82,,
+85,oa,Composite,Class,[subClass of rdf:Bag] A multiplicity construct that conveys to a consuming application that all of the constituent resources are required for the Annotation to be correctly interpreted. This construct is equivalent to the RDF container class rdf:Bag.,ns,,
+86,oa,List,Class,"[subClass of oa:Composite] A multiplicity construct that conveys to a consuming application that all of the constituent resources are required for the Annotation to be correctly interpreted, and in a particular order.",85,,
+87,rdf,List,Class,An rdf:List is a resource that can be used to build descriptions of ordered lists and other list-like structures.,ns,,
+88,rdf,first,Relationship,"The first resource in a particular list, the remainder being referenced by rdf:rest.",87,,
+89,rdf,rest,Relationship,"Either an instance of rdf:List, or rdf:nil if there are no further items in the list.",87,,
+90,rdf,nil,Resource,A particular instance of rdf:List that represents the empty list.,87,,
+91,cnt,ContentAsText,Class,"The representation of a resource, expressed as plain text.",ns,,
+92,cnt,ContentAsBase64,Class,"The representation of a resource, expressed as Base 64 encoded text.",ns,,
+93,cnt,chars,Property,"The property of a ContextAsText that contains the representation.
+There MUST be exactly 1 cnt:chars property for a ContentAsText resource.",91,,
+94,cnt,bytes,Property,"The property of a ContentAsBase64 that contains the representation.
+There MUST be exactly 1 cnt:bytes property for a ContentAsBase64 resource.",92,,
+95,cnt,characterEncoding,Property,"The character encoding of the content string in either cnt:chars or cnt:bytes.
+There SHOULD be exactly 1 cnt:characterEncoding for a ContentAsText or ContentAsBase64 resource.",91-92,,
+96,dc,format,Property,"The media type of the representation.
+There SHOULD be exactly 1 dc:format per embedded resource.",ns,,
+97,trig,Graph,Class,The class of Named Graphs,ns,,
+98,oa,equivalentTo,Relationship,"[subProperty of prov:alternateOf] The subject and object resources of the oa:equivalentTo relationship represent the same resource, but potentially have different metadata such as oa:serializedBy, oa:serializedAt and serialization format. oa:equivalentTo is a symmetrical and transitive relationship; if A oa:equivalentTo B, then it is also true that B oa:equivalent A; and that if B oa:equivalentTo C, then it is also true that A oa:equivalentTo C. 
+The Annotation MAY include 0 or more instances of the oa:equivalentTo relationship between copies of the Annotation or other resources, and SHOULD include as many as are available.",ns,,
+99,prov,wasAttributedTo,Property,,ns,,
+100,prov,alternateOf,Property,,ns,,
