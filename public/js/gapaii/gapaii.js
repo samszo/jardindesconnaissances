@@ -70,16 +70,46 @@ function load(idDiv, idCpt) {
         saveGen(idDiv, fragment, idCpt);
     });
 }
-function loadEval(idDiv, idCpt) {
+function loadEval(idDiv, idCpt, callBack) {
 	cursor_wait();
-	$.get(urlGen+"&cpt="+idCpt, null,
-		 function(data){
+	$.ajax({
+		dataType: "json",
+		url: urlGen+"&cpt="+idCpt,
+	    	error: function(error){
+		    	cursor_clear();
+        		try {
+        			var js = JSON.parse(error.responseText);
+        		}catch (e){
+        			console.log(error.responseText)            		  	
+        			w2alert("Erreur : "+e);
+        		}
+	    	},            	
+	    	success: function(data) {
 		    	cursor_clear();
 		    	dtGen = data;
-			var div = d3.select("#"+idDiv).html(dtGen.txt);
-			//décompose le texte
-			//$("#"+idDiv).blast({ delimiter:"character",customClass:"c",generateIndexID:true });			
-			$("#"+idDiv).blast({ delimiter:"word",customClass:"w",generateIndexID:true });			
+			//affiche le texte
+		    	var div = d3.select("#"+idDiv).html(dtGen.txt);
+		    	//enregistre la génération
+		    	var p = {"idBase":idBase, "idUti":idUti
+		    			, "data":{"titre":dtGen.txt, "idOeu":idOeu, "idCpt":idCpt,"txt":dtGen.txt
+		    				,"data":JSON.stringify(dtGen)}};
+		    	$.ajax({
+	        		url: "../gapaii/savegen",
+	        		data: p,
+	            	type: 'post',
+	            	error: function(error){
+	          		w2alert("Erreur : "+error);
+	            	},            	
+	            	success: function(rep) {
+	    				dtGen.idDoc = rep;
+	    				//execute la fonction callBack		    				
+	    				callBack();
+	            }
+			});		    	
+		}
+	});		    	
+	
+			/*
 			caracts = d3.selectAll("span")
 				.on("mouseover",function(d){
 					var s = d3.select("#"+this.id);
@@ -91,7 +121,6 @@ function loadEval(idDiv, idCpt) {
 					s.style("color","black");
 				});
 			
-			/*
 		    	sTxt = [];
 			arrMot = dtGen.txt.split(" ");
 			arrMot.forEach(function(m){
@@ -126,11 +155,21 @@ function loadEval(idDiv, idCpt) {
 			  */
 		    //	paroleGen(idDiv, fragment);
 		    //saveGen(idDiv, fragment, idCpt);
-		}, "json");	
 	
 }
 
 function saveGen(titre, txt, idCpt) {
+	var p = {"idBase":idBase, "idUti":idUti, "data":{"titre":"gapaii_"+titre, "idOeu":idOeu, "idCpt":idCpt,"txt":txt}};
+    
+	$.post("gapaii/savegen"
+		, p,
+		 function(data){
+			console.log(data);
+			idDoc = data;
+		 });
+}
+
+function saveRepQuest(titre, txt, idCpt) {
 	var p = {"idBase":idBase, "idUti":idUti, "data":{"titre":"gapaii_"+titre, "idOeu":idOeu, "idCpt":idCpt,"txt":txt}};
     
 	$.post("gapaii/savegen"

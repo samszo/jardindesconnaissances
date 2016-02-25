@@ -8,18 +8,32 @@
 	<link rel="stylesheet" type="text/css" href="../css/leaflet/Control.Geocoder.css" />
 	<link rel="stylesheet" type="text/css" href="../css/leaflet/leaflet.awesome-markers.css">
     <style type="text/css">
+	html, body {
+	   width: 100%;
+	   height: 100%;
+	   background-color: black;
+	}
     h2{
     		text-align: center;
     		width: 100%;    		
     }
+    #layout{
+        margin-left: auto;
+    		margin-right: auto;
+		width: 1024px; 
+		height:100%;    
+    }
     </style>
     <script type="text/javascript">
 	var idBase="<?php echo $this->idBase; ?>";
+	var idBaseSpip="<?php echo $this->idBaseSpip; ?>";
 	var uti = <?php echo $this->uti;?>;	
 	var idUti = uti.uti_id;	
-	var idOeu = <?php echo $this->idOeu; ?>;				
+	var idOeu = <?php echo $this->idOeu; ?>;		
+	var idCpt = <?php echo $this->idCpt; ?>;		
 	var idDoc = <?php echo $this->idDoc; ?>;				
-	var urlGen = "http://localhost/generateur/services/api.php?frt=json&oeu="+idOeu;
+	var urlGen = "http://<?php echo $_SERVER['SERVER_NAME'];?>/generateur/services/api.php?frt=json&oeu="+idOeu;	
+	var urlSpip = "http://<?php echo $_SERVER['SERVER_NAME'];?>/CreaTIC/E-education/Proverbes/";
 
 	</script>
 	<script type="text/javascript" src="../js/d3.js"></script>
@@ -33,10 +47,10 @@
 
 </head>
 <body onload="init()">
-	<div id="layout" style="width: 100%; height:640px;"></div>
+	<div id="layout"></div>
 
 	<script type="text/javascript">
-	var pstyle = 'padding:3px;';
+	var pstyle = 'padding:3px;', evals, idEval, idQuest, q, idDivGen='txtGen';
 	
 	function init(){
 		
@@ -57,7 +71,7 @@
 	        name: 'layoutMain',
 	        panels: [
 	            { type: 'top', size: "60", resizable: true, style: pstyle, content: '<h2 id="txtGen"></h2>' },
-	            { type: 'main', size: "50%", resizable: true, style: pstyle, content: '' }
+	            { type: 'main', size: "50%", resizable: true, style: pstyle, content: '' },
 	        ]
 	    });
 
@@ -71,101 +85,248 @@
 				    html: '<h1>Cartographier les sagesses</h1>' 
 				},				    
 		        { type: 'break',  id: 'break0'},
-		        { type: 'button',  id: 'tbNewTxt', caption: '', icon:'fa-file'},
+		        { type: 'button',  id: 'tbNewTxt', caption: '', icon:'fa-font'},
 		        { type: 'break',  id: 'break1'},
-		        { type: 'button',  id: 'tbNewImg', caption: '', icon:'fa-file'},
+		        { type: 'button',  id: 'tbNewImg', caption: '', icon:'fa-image'},
 		        { type: 'break',  id: 'break2'},
 		        { type: 'button',  id: 'tbNewFilm', caption: '', icon:'fa-film'},	        
 		        { type: 'break',  id: 'break3'},
-		        { type: 'button',  id: 'tbNewSound', caption: '', icon:'fa-film'},	        
+		        { type: 'button',  id: 'tbNewSound', caption: '', icon:'fa-volume-up'},	        
 		        { type: 'break',  id: 'break4', hidden:uti.role=="admin" ? false : true },
 		        { type: 'button',  id: 'tbParam', caption: 'Paramètres', icon:'fa-cog', hidden:uti.role=="admin" ? false : true},
 		        { type: 'spacer' },
-		        { type: 'button',  id: 'utiLog',  caption: uti.login, icon: 'fa-user' },            
-		        { type: 'button',  id: 'utiSignOut',  caption: 'déconnexion', icon: 'fa-sign-out' }
+		        { type: 'break',  id: 'break5'},
+		        { type: 'menu',   id: 'utiLog', caption: uti.login, icon: 'fa-user', items: [
+					{ id: 'utiSignOut', caption: 'déconnexion', icon: 'fa-sign-out'}, 
+					{ id: 'utiParam', caption: 'informations', icon: 'fa-newspaper-o'}
+					]},
+		        { type: 'break',  id: 'break6'},
+	            { type: 'check',  id: 'lang_fr', caption: 'Français', icon: 'fa-check', checked: true },
+	            { type: 'check',  id: 'lang_en', caption: 'English', icon: 'fa-square-o', checked: false },
+	            { type: 'check',  id: 'lang_ar', caption: 'عربي', icon: 'fa-square-o', checked: false },
 		    ]
 		});
 	
 		w2ui.mainTB.on('click', function (event) { 
 			w2ui.layout.lock('main', "Veuillez patienter...", true);	
-			if(event.target=="tbNewTxt"){
-				loadEval('txtGen', <?php echo $this->idCpt; ?>);
-			}
+			chargeLayout(event.target)				
 		});  
 
-		//charge le processus d'évaluation
-		//chargeProcessEval({"obj":"crible","exi_id":defCribleExiId,"doc_id":defCribleDocId});
 	}
 
 	function chargeLayout(idLayout){
 		
-        //supprime les objets si déjà présent
-        if(w2ui['layout_graph']){
-
-        }
-	    	if(idLayout=="tbGraph"){
-	        	w2ui['layoutMain'].load('main', 'Biolographes/editeur?ajax=1',null,function () {		        	
-	        		w2ui.layout.unlock('main');
-	        	});        	
+		if(idLayout=='tbNewTxt'){
+			idEval = 0;
+	        	w2ui['layoutMain'].content('main', '<h1>Bientôt disponible</h1>');        	
+	        	/*
+			$('#tabs').w2tabs({
+		        name: 'tabs',
+		        active: 'first',
+		        tabs: [
+		            { id: 'first', caption: 'First Tab' }
+		        ]
+		    });
+			*/
+			loadEval(idDivGen, idCpt, getNextQuest);	
+		}
+		if(idLayout=='tbNewImg'){
+	        	w2ui['layoutMain'].content('main', '<h1>Bientôt disponible</h1>');        	
 	    }
-        if(w2ui['layout_crible']){
-
-        }
-	    	if(idLayout=="tbCrible"){
-	        	w2ui['layout'].load('main', 'Index/crible?ajax=1',null,function () {
-	        		w2ui.layout.unlock('main');
-	        	});        	
+	    	if(idLayout=='tbNewFilm'){
+	        	w2ui['layoutMain'].content('main', '<h1>Bientôt disponible</h1>');        	
 	    }
-
-	    
-	    if(w2ui['layout_Param']){
-
-		}     
-	    if(idLayout=="tbParam"){	    
-	        	w2ui['layout'].load('main', 'Index/param?ajax=1',null,function () {
-	        		w2ui.layout.unlock('main');
-	        	});
-	        	w2ui.layout.unlock('main');
+	    if(idLayout=='tbNewSound'){	    
+	        	w2ui['layoutMain'].content('main', '<h1>Bientôt disponible</h1>');        	
 	    } 	
-	
+
+	    if(idLayout=="lang_fr"){	    	
+		    	w2ui['mainTB'].items[15].icon='fa-check';
+		    	w2ui['mainTB'].items[15].checked=true;
+		    	w2ui['mainTB'].items[16].icon='fa-square-o';
+		    	w2ui['mainTB'].items[16].checked=false;
+		    	w2ui['mainTB'].items[17].icon='fa-square-o';
+		    	w2ui['mainTB'].items[17].checked=false;
+		    	w2ui['mainTB'].refresh();
+			chargeProcessEval(idLayout);		    	
+		}	    
+	    if(idLayout=="lang_en"){
+		    	w2ui['mainTB'].items[15].icon='fa-square-o';
+		    	w2ui['mainTB'].items[15].checked=false;
+		    	w2ui['mainTB'].items[16].icon='fa-check';
+		    	w2ui['mainTB'].items[16].checked=true;
+		    	w2ui['mainTB'].items[17].icon='fa-square-o';
+		    	w2ui['mainTB'].items[17].checked=false;
+		    	w2ui['mainTB'].refresh();
+			chargeProcessEval(idLayout);		    	
+		}	    
+	    if(idLayout=="lang_ar"){
+		    	w2ui['mainTB'].items[15].icon='fa-square-o';
+		    	w2ui['mainTB'].items[15].checked=false;
+		    	w2ui['mainTB'].items[16].icon='fa-square-o';
+		    	w2ui['mainTB'].items[16].checked=false;
+		    	w2ui['mainTB'].items[17].icon='fa-check';
+		    	w2ui['mainTB'].items[17].checked=true;
+		    	w2ui['mainTB'].refresh();
+			chargeProcessEval(idLayout);		    	
+		}	    
+		
 	    if(idLayout=="utiSignOut"){
 		    	deconnexion();
 		}	    
+
+	    	w2ui.layout.unlock('main');
+		
 	}
-	function chargeProcessEval(){
+	
+	function chargeProcessEval(idLayout){
+		var url = urlSpip+'?page=evaluations&var_mode=recalcul&'+idLayout.replace('_','=');
+		$.ajax({
+        		url: url,
+            	error: function(error){
+            		try {
+            			var js = JSON.parse(error.responseText);
+            		} catch (e) {
+            			console.log(error.responseText)            		  	
+          			w2alert("Erreur : "+e);
+            		}
+            	},            	
+            	success: function(result) {
+                	//gestion des messages SPIP CRON                	
+            		result = result.replace("<!-- SPIP-CRON --><div style=\"background-image: url('http://localhost/CreaTIC/E-education/Proverbes/spip.php?action=cron');\"></div>","");
+            		evals = JSON.parse(result);
+            		w2ui['mainTB'].items[0].html='<h1>'+evals.expeTitre+'</h1>';
+            		w2ui['mainTB'].items[13].items[0].caption=evals.deconnexion;
+            		w2ui['mainTB'].items[13].items[1].caption=evals.information;
+	    		    	w2ui['mainTB'].refresh();
+            }
+		});
 	}
+
+	function getNextQuest(num){
+
+		if(!num){
+			q = evals.evals[idEval].quests[0];
+		}else{
+			evals.evals[idEval].quests.forEach(function(r){if(r.questId==num)q=r;});			
+		}
+		idQuest=q.questId;		
+
+		var formId = 'form_'+dtGen.idDoc+'q_'+q.questId;
+		if(w2ui[formId])w2ui[formId].destroy();
+
+
+	 	if(q.formTitre=='radar'){
+		 	//on calcule les data 
+		 	var dt = [];
+		 	q.reps.forEach(function(r){
+		 		dt.push({axis:r.repTitre,idSpip:r.repId,value:0});
+			 	});		 	
+			//on charge l'url
+			w2ui['layoutMain'].load('main', '../graph/radar?titre='+q.questTitre, null, function () {
+				radarChartOptions.fctDragEnd = saveEvalRadar;
+				fctSave = function(){
+					saveRepQuest();
+					if(q.process && q.process[data['q_'+q.questId]]){
+						getNextQuest(q.process[data['q_'+q.questId]].questId);
+					}
+				};
+				fctClear = function(){d3.selectAll('.legend').style('fill','white');};
+				radarData = [dt];			
+				RadarChart('.radarChart', [dt], radarChartOptions);
+				d3.selectAll('.legend').style('fill','white');
+			});
+			return;
+	 	}
+		
+	 	//construction des champs
+	 	var champs = [], opts = [];
+	 	if(q.formTitre=='select'){
+		 	//on calcule les options 
+		 	q.reps.forEach(function(r){
+		 		if(r.repId){
+			 		opts.push({id:r.repId,text:r.repTitre});
+		 		}
+		 	});
+		 	//on ajoute le champ
+		 	champs.push({field:'q_'+q.questId, html:{caption:q.gmDesc}, type:'radio', required:true, options:{items:opts}});
+	 	}
+	 	if(q.formTitre=='select mot'){
+		 	//on calcule les options 		 	
+		 	q.reps.forEach(function(r){
+		 		if(r.repId){
+			 		opts.push({id:r.repId,text:r.repTitre});
+		 		}
+		 	});
+			//décompose le texte
+			var arrMot = $("#"+idDivGen).blast({ delimiter:"word",customClass:"w",generateIndexID:true,returnGenerated: true });	
+		 	//on ajoute les champs pour chaque mot
+			for (i = 0; i < arrMot.length; i++) { 
+			 	champs.push({field:'q_'+q.questId+'_'+i, html:{caption:arrMot[i].innerHTML}, type:'radio', required:true, options:{items:opts}});
+			}
+	 	}
+
+		var f = { 
+		    header: q.questTitre,
+		    name: formId,
+		    fields: champs,
+		    actions: {
+                reset: {
+                    caption : q.boutons[0].btnTitre,
+                    style   : '',
+                    "class" : '',
+                    onClick : function () {
+                        this.clear();
+                    }
+                },
+                save: {
+                    caption : q.boutons[1].btnTitre,
+                    style   : '',
+                    "class" : '',
+                    onClick : function () {
+	    			        var errors = this.validate();
+	    			        if (errors.length > 0) return;
+	    			        var data = this.record;
+	    			        if(q.process && q.process[data['q_'+q.questId]]){
+		    			        	getNextQuest(q.process[data['q_'+q.questId]].questId);
+	    			        }
+	                	},
+                }
+		    }
+		};	
+				
+		//w2ui['layoutMain'].content('main', '');
+		w2ui['layoutMain'].content('main', $().w2form(f));
+			
+	}
+
+
+	function saveEvalRadar(d){
+		var dt = {'axe':d,"quest":q,'gen':dtGen.idDoc,'acti':'saveEvalRadar'};
+		console.log(dt);
+		$.ajax({
+        		url: "saverepquest",
+        		data: dt,
+        		type: 'post',
+            	dataType: 'json',
+            	error: function(error){
+            		try {
+            			var js = JSON.parse(error.responseText);
+            		} catch (e) {
+            			console.log(error.responseText)            		  	
+          			w2alert("Erreur : "+e);
+            		}
+            	},            	
+            	success: function(result) {
+            		evals = result;
+            }
+		});
+	}
+	
+	chargeProcessEval('lang_fr');
+
+	
 </script>
 
 </body>
 </html>
-<!--  
-<script src="../js/d3.v3.js"></script>
-<script src="../js/jquery.min.js"></script>
-<script src="../js/w2ui.js"></script>
-<link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
-<link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
-
-<script type="text/javascript">
-
-</script>
-<style>
-span{
-	# margin: 0 0.3em 0 0;
-	font-family: 'Source Sans Pro', sans-serif;
-	font-size: 18pt;
-	line-height: 1.75em;	
-}
-</style>
-	<h2>Evaluation des textes</h2>
-	<div class="row">
-		<div id="genPro"><br/></div>
-		<div id="genProAudio" ></div>
-	</div>
-	<div class="12u">
-		<ul class="actions">
-			<li><a class="btn btn-lg btn-primary" onclick="loadEval('genPro', <?php echo $this->idCpt; ?>,true)" >Génèrer</a>
-			<a class="btn btn-lg btn-primary" onclick="evaluer()" >Evaluer</a>
-			</li>
-		</ul>
-	</div>
--->

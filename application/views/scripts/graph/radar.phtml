@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- merci à https://gist.github.com/nbremer/21746a9668ffdf6d8242#file-radarchart-js -->
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+		<title><?php echo $this->titre;?></title>
+
+		<!-- Google fonts 
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+		-->
+	    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+	    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+
+		<!-- D3.js -->
+		<script type="text/javascript" src="../js/d3.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/jquery.min.js" charset="utf-8"></script>
+	    <script type="text/javascript" src="../js/w2ui.js" charset="utf-8"></script>
+		
+		<style>
+			body {
+				cursor: default;
+				text-align: center;
+			}
+			.legend {
+				font-family: 'Raleway', sans-serif;
+				fill: #333333;
+				font-size: 11px;
+				font-weight: 300;
+				text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+								
+			}
+			
+			.tooltip {
+				fill: white;
+				text-anchor:middle;
+				text-align:center;
+			}
+		</style>
+	
+	</head>
+	<body>
+		<div id="formRadar"></div>
+
+		<script src="../js/radarChart.js"></script>	
+		<script>
+		var fctClear, fctSave;
+
+		if(w2ui['formRadar'])w2ui['formRadar'].destroy();		
+		$('#formRadar').w2form({
+		    name: 'formRadar',
+		    header: '<?php echo $this->titre;?>',		    
+		    style: 'border: 0px; background-color: transparent;',
+		    formHTML: 
+		        '<div class="w2ui-page page-0">'+
+		        '	<div class="radarChart"></div>'+
+		        '</div>'+
+		        '<div class="w2ui-buttons">'+
+		        '   <button class="w2ui-btn" name="reset">Reset</button>'+
+		        '    <button class="w2ui-btn w2ui-btn-green" name="save">Save</button>'+
+		        '</div>',
+		    fields: [],
+		    record: {},
+		    actions: {
+		        "save": function () { 
+			        if(fctSave)fctSave(); 
+			    },
+		        "reset": function () { 
+					if(radarData.length){
+						//mise à zéro des axes
+						radarData.forEach(function(c){
+							c.forEach(function(d){
+								d.value = 0;
+							});
+						});
+						//
+						RadarChart(".radarChart", radarData, radarChartOptions);
+					}
+			        if(fctClear)fctClear(); 					
+			    },
+		    }
+		});
+		
+			////////////////////////////////////////////////////////////// 
+			//////////////////////// Set-Up ////////////////////////////// 
+			////////////////////////////////////////////////////////////// 
+			var margin = {top: 40, right: 40, bottom: 40, left: 40},
+				width = Math.min(400, window.innerWidth - 10) - margin.left - margin.right,
+				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
+					
+			////////////////////////////////////////////////////////////// 
+			////////////////////////// Data ////////////////////////////// 
+			////////////////////////////////////////////////////////////// 
+			var radarData = <?php echo $this->data; ?>;
+			////////////////////////////////////////////////////////////// 
+			//////////////////// Draw the Chart ////////////////////////// 
+			////////////////////////////////////////////////////////////// 
+			var color = d3.scale.ordinal()
+				.range(["#EDC951","#CC333F","#00A0B0"]);
+				
+			var radarChartOptions = {
+			  w: width,
+			  h: height,
+			  margin: margin,
+			  maxValue: 100,
+			  minValue: -100,
+			  levels: 8,
+			  roundStrokes: true,
+			  color: color
+			};
+			//Call function to draw the Radar chart
+			if(radarData.length)RadarChart(".radarChart", radarData, radarChartOptions);
+		</script>
+	</body>
+</html>

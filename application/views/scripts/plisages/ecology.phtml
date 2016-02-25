@@ -1,0 +1,439 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Palette Ecology of Mind</title>
+	    <script type="text/javascript" src="../js/d3.js"></script>
+	    <script type="text/javascript" src="../js/jquery-2.1.1.min.js"></script>
+	    <script type="text/javascript" src="../js/queue.v1.min.js" ></script>
+		<script type="text/javascript">
+
+		var ficSVG = "../svg/paletteecologyofmind.svg";
+
+		var dataProfil;
+
+		var hauteurs = [];
+		var colors = [];
+		
+		var arrIds = [
+		      			{"idEle":"circle-haut","fonction":changerTemperature,"params":[{"mes":"coucou"}]}
+		      		];
+		
+		function load(){
+		 	//charge l'IHM SVG
+		    //merci Ã  http://bl.ocks.org/KoGor/8162640
+		    	queue()
+		    		.defer(d3.xml, ficSVG, "image/svg+xml")
+		    		.await(IHMcharge);
+		    //	chargeData(ficCSV);
+		}
+		
+	    function IHMcharge(error, xml){
+	    		//Adding our svg file to HTML document
+			var importedNode = document.importNode(xml.documentElement, true);
+    	  		d3.select("#viz").node().appendChild(importedNode);	    	    	  	
+    	  		ajouteEvent();
+	    }		
+	    
+		// fonction pour ajouter un Ã©couteur Ã  UN Ã‰LÃ‰MENT
+		//merci Ã  https://developer.mozilla.org/fr/docs/DOM/element.addEventListener
+		function ajouteEvent() { 
+		
+			for (var i = 0; i < arrIds.length; i++) {
+			     d3.select("#"+arrIds[i].idEle)
+			     		 .on("click", changerTemperature)
+			     		 .on("mousemove", montrerMeteo)
+			     		 .on("mouseout", cacherMeteo);
+			}
+		}
+
+		function chargeData(){
+			alert("toto");	
+		}
+
+		function sauveSVG(){
+			var svg = document.getElementById("viz").firstChild;
+			svg = svg.outerHTML;
+			var p = {"svg":svg,"titre":"mon beau svg","url":ficSVG};
+			$.post("explo/sauvesvg", p,
+					 function(data){
+						alert(data);
+					 });
+			
+		}
+
+
+		/*
+		* Source: https://gist.github.com/lrvick/2080648
+		* convert 0..255 R,G,B values to a hexidecimal color string
+		*/
+		RGBToHex = function(r,g,b){
+		    var bin = r << 16 | g << 8 | b;
+		    return (function(h){
+		        return new Array(7-h.length).join("0")+h;
+		    })(bin.toString(16).toUpperCase());
+		}
+
+		function montrerMeteo(){
+
+			//suppression du texte existant
+			cacherMeteo();
+
+			//décalage du conteneur par rapport au clic
+			var x_decalage = this.getBBox().x;
+			var y_decalage = this.getBBox().y;
+
+			//coordonnées du centre du cercle
+			var x_centre = this.getBBox().width / 2;
+			var y_centre = this.getBBox().height / 2;
+
+			//coordonnées du clic de la souris par rapport au cercle
+			var x_click = d3.mouse(this)[0] - x_decalage;
+			var y_click = d3.mouse(this)[1] - y_decalage;
+
+			//distance de chaque coordonnée du clic par rapport au centre du cercle
+			var dist_x_centre = x_click - x_centre;
+			var dist_y_centre = y_click - y_centre;
+
+			//distance entre le point cliqué et le centre du cercle
+			var dist_centre = Math.sqrt(Math.pow(dist_x_centre, 2) + Math.pow(dist_y_centre, 2));
+
+			//cosinus et sinus de l'angle formé entre le clic et le centre du cercle
+			var cos = dist_x_centre / dist_centre;
+			var sin = -dist_y_centre / dist_centre;
+			
+			if(sin > 0){
+				if(cos > 0){
+					//C'est l'été, affiche un texte au dessus de l'élément adapté
+					d3.select("#g19495")
+		    		    .append("text")
+		    		    .attr("id", "textMeteo")
+		    		    .attr("x", this.getBBox().x + 300)
+		    		    .attr("y", this.getBBox().y + 50)
+		    		    .style("font-style", "italic")
+		    		    .text("Ensoleille");
+				}
+				else{
+					//C'est le printemps affiche un texte au dessus de l'élément adapté
+					d3.select("#g17519")
+		    		    .append("text")
+		    		    .attr("id", "textMeteo")
+		    		    .attr("x", this.getBBox().x - 10)
+		    		    .attr("y", this.getBBox().y + 65)
+		    		    .style("font-style", "italic")
+		    		    .text("Nuageux");
+				}
+			}
+			else{
+				if(cos > -0.2){
+					//C'est l'automne, affiche un texte au dessus de l'élément adapté
+					d3.select("#g18721")
+		    		    .append("text")
+		    		    .attr("id", "textMeteo")
+		    		    .attr("x", this.getBBox().x + 280)
+		    		    .attr("y", this.getBBox().y + 300)
+		    		    .style("font-style", "italic")
+		    		    .text("Pluvieux");
+				}
+				else{
+					//C'est l'hiver, affiche un texte au dessus de l'élément adapté
+					d3.select("#g18962")
+		    		    .append("text")
+		    		    .attr("id", "textMeteo")
+		    		    .attr("x", this.getBBox().x - 10)
+		    		    .attr("y", this.getBBox().y + 300)
+		    		    .style("font-style", "italic")
+		    		    .text("Glacial");
+				}
+			}
+		}
+
+		function cacherMeteo(){
+			d3.select("#textMeteo")
+		    .remove();
+		}
+
+
+		function montrerGraphValeur(){
+			//affiche la température au dessus de la barre du graphe
+			d3.select("svg")
+		  	    .append("text")
+		  	    .attr("id", "textGraphValeur")
+		  	    .attr("x", this.getBBox().x)
+		  	    .attr("y", this.getBBox().y - 5)
+		  	    .text(Math.round(this.getBBox().height*0.9 - 20));
+		}
+		
+		function cacherGraphValeur(){
+			d3.select("#textGraphValeur")
+		    	.remove();
+		}
+		
+		function changerTemperature(){
+			//décalage du conteneur par rapport au clic
+			var x_decalage = this.getBBox().x;
+			var y_decalage = this.getBBox().y;
+
+			//coordonnées du centre du cercle
+			var x_centre = this.getBBox().width / 2;
+			var y_centre = this.getBBox().height / 2;
+
+			//coordonnées du clic de la souris par rapport au cercle
+			var x_click = d3.mouse(this)[0] - x_decalage;
+			var y_click = d3.mouse(this)[1] - y_decalage;
+
+			//distance de chaque coordonnée du clic par rapport au centre du cercle
+			var dist_x_centre = x_click - x_centre;
+			var dist_y_centre = y_click - y_centre;
+
+			//distance entre le point cliqué et le centre du cercle
+			var dist_centre = Math.sqrt(Math.pow(dist_x_centre, 2) + Math.pow(dist_y_centre, 2));
+
+			//cosinus et sinus de l'angle formé entre le clic et le centre du cercle
+			var cos = dist_x_centre / dist_centre;
+			var sin = -dist_y_centre / dist_centre;
+
+			//variable de composante de la couleur du thermomètre
+			var r_color;
+			var g_color;
+			var b_color;	
+
+			//varuation de la hauteur du thermomètre
+			var h_variation;
+
+			//calcul de la hauteur du thermomètre et de la couleur
+			if(sin > 0){
+				g_color = 255;
+
+				h_variation = 45 + cos * 45; 
+
+				if(cos > 0){
+					//C'est l'été, adapte la couleur
+					r_color = 0 + cos * 50;
+					b_color = 0 + cos * 100;
+				}
+				else{
+					//C'est le printemps, adapte la couleur
+					r_color = 0 - cos * 200;
+					b_color = 0 - cos * 100;
+				}
+			}
+			else{
+				if(cos > -0.2){
+					//C'est l'automne, adapte la couleur
+					r_color = 255;
+
+					if(cos > 0){
+						g_color = 150 + cos * 50;
+						b_color = 0 + cos * 30;
+					}
+					else{
+						g_color = 150 - cos * 50;
+						b_color = 0 - cos * 30;
+					}
+					
+					//adapte la hauteur
+					h_variation = - 45 + cos * 25;
+				}
+				else{
+					//C'est l'hiver, adapte la couleur
+					r_color = 170 - cos * 35;
+					g_color = 190 - cos * 35;
+					b_color = 200 - cos * 20;
+					
+					//adapte la hauteur
+					h_variation = -45 + cos * 35;
+				}
+			}
+
+			//Crée une couleur hexadécimal à partir des trois composantes RGB
+			var color = RGBToHex(r_color, g_color, b_color);
+
+			//Définit la hauteur à partir de sa variation
+			var hauteur = 95.62735 + h_variation;
+
+			//Change la couleur du cercle du thermomètre
+			d3.select("#circle21092")
+				.transition()
+				.duration(1500)
+				.style("fill", "#"+color);
+
+			//Change la taille du rectangle de température du cercle
+			d3.select("#rect21094")
+				.transition()
+				.duration(1500)
+				.attr("height", hauteur)
+				.attr("y", 318.54865 - h_variation)
+				.style("fill", "#"+color);
+
+			//Change la taille de l'ombre du rectangle de température du cercle
+			d3.select("#rect21050")
+				.transition()
+				.duration(1500)
+				.attr("height", hauteur)
+				.attr("y", 328.54865 - h_variation);
+
+			//affiche un label en fonction de la hauteur
+			if(hauteur < 45){
+				d3.select("#t1")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t2")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t3")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t4")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t5")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 1);
+			}
+
+			else if(hauteur < 90){
+				d3.select("#t1")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t2")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t3")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t4")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 1);
+				d3.select("#t5")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+			}
+
+			else if(hauteur < 120){
+				d3.select("#t1")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t2")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t3")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 1);
+				d3.select("#t4")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t5")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+			}
+
+			else if(hauteur < 165){
+				d3.select("#t1")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t2")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 1);
+				d3.select("#t3")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t4")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t5")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+			}
+
+			else{
+				d3.select("#t1")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 1);
+				d3.select("#t2")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t3")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t4")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+				d3.select("#t5")
+				.transition()
+				.duration(1500)
+				.style("fill-opacity", 0);
+			}
+
+			hauteurs[hauteurs.length] = hauteur;
+			colors[colors.length] = color;
+			updateGraphBar();
+		}
+	    
+		function getElementArr(arr, prop, val){
+			for (var i = 0; i < arr.length; i++) {
+				if(arr[i][prop]==val)return arr[i];
+			}
+			return false;
+		}
+		
+		function updateGraphBar(){
+
+			//définit une marge à gauche
+			var margeGauche = 200;
+
+			//définit la largeur des barres du graphe
+			var largeur = (800 - margeGauche) / hauteurs.length;
+
+			//crée une barre pour la nouvelle température
+			d3.select("svg")
+				.append("rect")
+				.attr("id", "bar" + hauteurs.length)
+				.attr("y", 600 - hauteurs[hauteurs.length-1]/3 - 10)
+				.attr("x", 800)
+				.attr("height", hauteurs[hauteurs.length-1]/3 + 10)
+				.attr("width", 0)
+				.style("fill", "#"+colors[colors.length-1])
+				.on("mouseover", montrerGraphValeur)
+			    .on("mouseout", cacherGraphValeur);
+
+			//modifie la largeur et la position de chaque barre du graphe
+			for(var i = 0; i <= hauteurs.length; i++){
+				d3.select("#bar"+i)
+					.transition()
+					.duration(1500)
+					.attr("width", largeur)
+					.attr("x", margeGauche + 1 + largeur * (i-1));
+			}
+		}
+		
+		</script>
+	</head>
+	<body onload="load();">
+		<div id="viz" ></div>
+		<div onclick="sauveSVG();" >Sauve SVG</div>		
+	</body>
+</html>

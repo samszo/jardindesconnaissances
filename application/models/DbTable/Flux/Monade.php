@@ -224,20 +224,22 @@ class Model_DbTable_Flux_Monade extends Zend_Db_Table_Abstract
      *
      * @param array $data
      * @param boolean $existe
+     * @param boolean $rs
      *  
      * @return integer
      */
-    public function ajouter($data, $existe=true)
-    {
-    	
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
-    		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
-    		$id = $this->insert($data);
-    	}
-    	$r = $this->findById($id);
-    	return $r;
+    public function ajouter($data, $existe=true, $rs=true)
+    {    	
+	    	$id=false;
+	    	if($existe)$id = $this->existe($data);
+	    	if(!$id){
+	    		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
+	    		$id = $this->insert($data);
+	    	}
+	    	if($rs)
+	    		return $this->findById($id);
+	    	else 
+	    		return $id;
     } 
            
     /**

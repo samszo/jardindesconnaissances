@@ -95,3 +95,5 @@ bdd/spip_e-educ_proverbes.sql
 data/biolographes/.~lock.appartenances_savants.csv#
 
 application/views/scripts/auth/loginO.phtml
+
+.settings/org.eclipse.php.core.prefs

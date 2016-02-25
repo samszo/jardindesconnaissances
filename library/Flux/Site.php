@@ -335,7 +335,7 @@ class Flux_Site{
 		
 		if(!$date){
 			$d = new Zend_Date();
-	    	$date= $d->get("c");			
+	    		$date= $d->get("c");			
 		}
 		
 		if(!$idUser)$idUser=$this->user;

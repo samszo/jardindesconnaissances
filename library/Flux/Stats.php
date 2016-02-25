@@ -16,7 +16,8 @@ class Flux_Stats  extends Flux_Site{
 	
 	/**
      * Mise à jour des calculs statistiques 
-     *
+     * 
+     * @param varchar $code
      * 
      */
     function update($code) {

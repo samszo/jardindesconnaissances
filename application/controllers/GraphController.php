@@ -262,5 +262,32 @@ class GraphController extends Zend_Controller_Action {
     public function barsmatrixAction(){
     	
     }
+
+    public function radarAction(){
+
+    		$dt = '[]';
+    		$dt = '[[//iPhone
+						{axis:"Battery Life",value:22},
+						{axis:"Brand",value:28},
+						{axis:"Contract Cost",value:29},
+						{axis:"Design And Quality",value:17},
+						{axis:"Have Internet Connectivity",value:22},
+						{axis:"Large Screen",value:02},
+						{axis:"Price Of Device",value:21},
+						{axis:"To Be A Smartphone",value:-50}			
+					  ],[//Samsung
+						{axis:"Battery Life",value:27},
+						{axis:"Brand",value:16},
+						{axis:"Contract Cost",value:35},
+						{axis:"Design And Quality",value:-13},
+						{axis:"Have Internet Connectivity",value:20},
+						{axis:"Large Screen",value:13},
+						{axis:"Price Of Device",value:35},
+						{axis:"To Be A Smartphone",value:38}
+    			]]';
+		$this->view->data =  $this->_getParam('data', $dt);    	
+		$this->view->titre =  $this->_getParam('titre', "Radar sans titre");    	
+		
+    }
     
 }

@@ -18,7 +18,7 @@ class Flux_Gapaii extends Flux_Site{
      */
 	public function __construct($idBase=false)
     {
-    	parent::__construct($idBase);
+	    	parent::__construct($idBase);
     	    	
     }
 	
@@ -104,7 +104,7 @@ class Flux_Gapaii extends Flux_Site{
 		
 		//ajoute ou récupère le clic sur le fond
 		$idDoc = $this->dbD->ajouter(array("tronc"=>$data["idOeu"]."_".$data["idCpt"],"titre"=>$data["titre"]
-			,"data"=>$data["txt"], "maj"=>$date->get("c")));
+			,"data"=>$data["txt"], "maj"=>$date->get("c"), "data"=>$data["data"]),true,true);
 		foreach ($data["sems"] as $sem) {
 	        	if($sem["lib"]){
 	        		//sauvegarde la sémantique du tag pour le clic document et l'utilisateur

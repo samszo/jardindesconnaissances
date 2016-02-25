@@ -27,6 +27,7 @@
     <script type="text/javascript" src="js/w2ui.js"></script>
 	<script type="text/javascript" src="js/biolographes/reseau.js"></script>
 	<script type="text/javascript" src="js/biolographes/flux.js"></script>
+	<script type="text/javascript" src="js/biolographes/log.js"></script>
 	<!--  
 	<script type="text/javascript" src="js/biolographes/modeles.js"></script>
 	<script type="text/javascript" src="js/biolographes/dialogues.js"></script>
@@ -101,7 +102,8 @@
 		});
 	
 		w2ui.mainTB.on('click', function (event) { 
-			w2ui.layout.lock('main', "Veuillez patienter...", true);	    
+			w2ui.layout.lock('main', "Veuillez patienter...", true);	
+			chargeLayout(event.item.id);    
 		});  
 
 		chargeLayout("tbGraph");		  
@@ -142,6 +144,7 @@
 	
 	    if(idLayout=="utiSignOut"){
 		    	deconnexion();
+	        	w2ui.layout.unlock('main');
 		}	    
 	}
 	

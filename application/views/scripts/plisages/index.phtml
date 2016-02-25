@@ -1,0 +1,790 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Explorateur de palette</title>
+	    <script type="text/javascript" src="js/d3.js"></script>
+	    <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+	    <script type="text/javascript" src="js/queue.v1.min.js" ></script>
+		<script type="text/javascript">
+
+		var ficIHM = "svg/plis-ages.svg";
+		//var ficSVG = "svg/tagcloudAccueil.svg";
+		var chaineDate = d3.time.format("%x");
+		var chaineDateHeure = d3.time.format("Le %x à %X");
+		
+		//tableau des inclanations
+		var arrInclinations =  <?php echo json_encode($this->arrInclinations); ?>;	
+
+		//tableau des inclanaisons
+		var arrInclinaisons =  <?php echo json_encode($this->arrInclinaisons); ?>;		
+		arrInclinaisons.forEach(function(d){
+			//récupère les notes de l'inclanations
+			if(d.note)d.oNote = JSON.parse(d.note);
+			if(d.data)d.data = JSON.parse(d.data);
+		  });
+		var selectIclnation, selectIclnaison;
+		
+		//variables serveur
+		var uti = <?php 
+			if($this->identite){
+				echo json_encode($this->uti);
+			}else{
+				echo "false";
+			}
+		?>;		
+		var idBase = '<?php echo $this->idBase; ?>';
+
+		//tableau des graphiques intéractifs
+		var arrIds = [
+			{"idEle":"g16196","fonction":setTitreInclination,"role":"ecrit"}
+			,{"idEle":"g16470","fonction":sauveInclination,"role":"ecrit"}
+			,{"idEle":"g16416","fonction":suppInclination,"role":"ecrit"}
+			,{"idEle":"g16374","fonction":imprimeInclination,"role":"ecrit"}
+			//,{"idEle":"g16470","fonction":sauveInclinaison,"role":"ecrit"}
+			//,{"idEle":"g16476","fonction":suppInclinaison,"role":"ecrit"}
+			,{"idEle":"image7844","fonction":deconexion,"role":"lecture"}
+						
+		];
+
+	 	var diagMess, diagLogin, diagTitre;
+	 			
+		function load(){
+		    //	chargeData(ficCSV);
+		    chargeSVG(ficIHM, chargeIHM);
+		    //création des boites de dialogues
+		 	diagMess = document.getElementById('diagMess'); 
+		 	diagLogin = document.getElementById('diagLogin'); 
+		 	diagTitre = document.getElementById('diagTitre'); 
+			if(!('show' in diagMess)){ 
+				document.getElementById('promptCompat').className = 'no_dialog'; 
+			} 
+		    //création de la cartographie
+		    getLocation();
+		}
+
+	    function chargeSVG(url, fct){
+		 	//charge un SVG
+		    //merci à http://bl.ocks.org/KoGor/8162640
+		    	queue()
+		    		.defer(d3.xml, url, "image/svg+xml")
+		    		.await(fct);
+	    }		
+		
+	    function chargeIHM(error, xml){
+	    		//Adding our svg file to HTML document
+			var importedNode = document.importNode(xml.documentElement, true);
+    	  		d3.select("#viz").node().appendChild(importedNode);	    	    	  	
+    	  		ajoutEvent();
+    	  		creaClock();
+    	  		//masque les inclinaisons
+    	  		//document.getElementById("g7995").setAttribute("visibility","hidden");			    	  		
+    	  		//masque les boutons d'écriture
+    	  		arrIds.forEach(function(d){
+    				if(d.role=="ecrit")document.getElementById(d.idEle).setAttribute("visibility","hidden");
+    			  });
+  			if(uti)
+				utiIsConnect();
+  			else
+	    	  		diagLogin.showModal();
+		    //creation de la liste des inclinaisons
+	   	  	creaListeInclinaison();	  		
+ 	    }		
+	    
+		// fonction pour ajouter un écouteur à UN ÉLÉMENT
+		//merci à https://developer.mozilla.org/fr/docs/DOM/element.addEventListener
+		function ajoutEvent() { 
+		
+			for (var i = 0; i < arrIds.length; i++) {
+				//length = taille du tableau
+			     var el = document.getElementById(arrIds[i].idEle); 
+			     el.addEventListener("click", arrIds[i].fonction,false); 			    	
+			} 		
+		}
+		
+		function changeFillPath(evt){
+			var idEleEvt = evt.currentTarget.id;
+			/*
+			var eleChild = evt.currentTarget.children;
+			for (var i = 0; i < eleChild.length; i++) {
+				var el = eleChild[i];
+				if(el.localName=="path"){
+					el.setAttribute("style","fill:red");
+				}
+			}
+			*/
+			d3.select("#"+idEleEvt)
+				.selectAll("path")
+				.style("fill","red");
+		}
+	    
+		function getElementArr(arr, prop, val){
+			for (var i = 0; i < arr.length; i++) {
+				if(arr[i][prop]==val)return arr[i];
+			}
+			return false;
+		}
+		
+		/*code pour la montre 
+		merci beaucoup à http://bl.ocks.org/mbostock/1096355
+		*/
+		var width = 200,
+		    height = 153,
+		    radius = Math.min(width, height) / 1.9,
+		    spacing = .09;
+
+		var formatSecond = d3.time.format("%S s"),
+		    formatMinute = d3.time.format("%M m"),
+		    formatHour = d3.time.format("%H h"),
+		    formatDay = d3.time.format("%a"),
+		    formatDate = d3.time.format("%d d"),
+		    formatMonth = d3.time.format("%b");
+
+		var color = d3.scale.linear()
+		    .range(["hsl(0,0%,24%)", "hsl(0,0%,100%)"])
+		    .interpolate(interpolateHsl);
+
+		var arc = d3.svg.arc()
+		    .startAngle(0)
+		    .endAngle(function(d) { return d.value * 2 * Math.PI; })
+		    .innerRadius(function(d) { return d.index * radius; })
+		    .outerRadius(function(d) { return (d.index + spacing) * radius; });
+		var svgClock, field;
+		
+		function creaClock(){
+			svgClock = d3.select("#g5735").append("svg")
+		    .attr("id", "polarClock")
+		    .attr("width", width)
+		    .attr("height", height)
+		    .attr("x", 818)
+		    .attr("y", 0)
+			.append("g")
+				.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+			field = svgClock.selectAll("g")
+			    .data(fields)
+			  .enter().append("g");
+	
+			field.append("path");
+	
+			field.append("text");
+	
+			d3.transition().duration(0).each(tick);
+	
+			d3.select(self.frameElement).style("height", height + "px");
+			
+		}
+		
+		function tick() {
+		  field = field
+		      .each(function(d) { this._value = d.value; })
+		      .data(fields)
+		      .each(function(d) { d.previousValue = this._value; });
+
+		  field.select("path")
+		    .transition()
+		      .ease("elastic")
+		      .attrTween("d", arcTween)
+		      .style("fill", function(d) { return color(d.value); });
+
+		/*on n'affiche pas le texte
+		  field.select("text")
+		      .attr("dy", function(d) { return d.value < .5 ? "-.5em" : "1em"; })
+		      .style("fill", "white")
+		      .text(function(d) { return d.text; })
+		    .transition()
+		      .ease("elastic")
+		      .attr("transform", function(d) {
+		        return "rotate(" + 360 * d.value + ")"
+		            + "translate(0," + -(d.index + spacing / 2) * radius + ")"
+		            + "rotate(" + (d.value < .5 ? -90 : 90) + ")"
+		      });
+		*/
+		  setTimeout(tick, 1000 - Date.now() % 1000);
+		}
+
+		function arcTween(d) {
+		  var i = d3.interpolateNumber(d.previousValue, d.value);
+		  return function(t) { d.value = i(t); return arc(d); };
+		}
+
+		function fields() {
+		  var now = new Date;
+		  return [
+		    {index: .7, text: formatSecond(now), value: now.getSeconds() / 60},
+		    {index: .6, text: formatMinute(now), value: now.getMinutes() / 60},
+		    {index: .5, text: formatHour(now),   value: now.getHours() / 24},
+		    {index: .3, text: formatDay(now),    value: now.getDay() / 7},
+		    {index: .2, text: formatDate(now),   value: (now.getDate() - 1) / (32 - new Date(now.getYear(), now.getMonth(), 32).getDate())},
+		    {index: .1, text: formatMonth(now),  value: now.getMonth() / 12}
+		  ];
+		}
+
+		// Avoid shortest-path interpolation.
+		function interpolateHsl(a, b) {
+		  var i = d3.interpolateString(a, b);
+		  return function(t) {
+		    return d3.hsl(i(t));
+		  };
+		}
+		//fin horloge
+		
+		//gestion cartographique
+		var geoPosi;
+		var userGeoname = "<?php echo $this->userGeoname; ?>";
+		function getLocation() {
+		    if (navigator.geolocation) {
+		        navigator.geolocation.getCurrentPosition(showPosition, showError);
+		    } else {
+			    	showMessage("La géolocation n'est pas supportée par votre navigateur.");
+		    }
+		}
+		
+		function showPosition(position) {
+			geoPosi = position;
+			//récupère le geoname
+			var p = {"lat":position.coords.latitude, "lng":position.coords.longitude, "username":userGeoname};
+			$.post("http://api.geonames.org/findNearbyJSON", p,
+					 function(data){
+						geoPosi.geoname = data.geonames[0];
+					 }, "json");	
+			//récupère l'image de la carte		
+		    var latlon = position.coords.latitude + "," + position.coords.longitude;
+		    //pour faire les styles = http://gmaps-samples-v3.googlecode.com/svn/trunk/styledmaps/wizard/index.html
+		    var img_url = "http://maps.googleapis.com/maps/api/staticmap?center="
+		    +latlon+"&zoom=12&size=485x134&markers=color:black%7Clabel:0%7C"+latlon+"&sensor=false&format=png&maptype=roadmap&style=invert_lightness:true|weight:0.1|saturation:-100|gamma:1.13|lightness:4";
+		    document.getElementById("image5934").setAttribute("xlink:href",img_url);
+		}		
+
+		function showError(error) {
+		    switch(error.code) {
+		        case error.PERMISSION_DENIED:
+		        		showMessage("User denied the request for Geolocation.");
+		            break;
+		        case error.POSITION_UNAVAILABLE:
+		        		showMessage("Location information is unavailable.");
+		            break;
+		        case error.TIMEOUT:
+		        	showMessage("The request to get user location timed out.");
+		            break;
+		        case error.UNKNOWN_ERROR:
+		        		showMessage("An unknown error occurred.");
+		            break;
+		    }
+		}		
+		//fin cartographie
+		
+		//gestion des boites de dialogue
+		function showMessage(mess) {
+			document.getElementById('mess').innerHTML = mess; 			
+			diagMess.showModal();
+		}
+		
+		function connecte(){
+			getAuth("login");
+		}		
+		function inscrit(){
+			getAuth("inscription");
+		}		
+		function deconexion(){
+			window.location.assign('../public/auth/login?redir=explo&ajax=true');
+		}
+		function getAuth(type){
+			var login = $("#iptLogin")[0].value;
+			var mdp = $("#iptMdp")[0].value;
+			if (login != "" || mdp != "") {
+				var p = {"idBase":idBase, "login":login, "mdp":mdp, "ajax":1};
+				$.post("auth/"+type, p,
+						 function(data){
+					 		if(data.erreur){
+					 			showMessage(data.erreur);
+					 		}else{
+						 		//enregistre les infos de l'uti
+						 		uti = data;
+						 		utiIsConnect();
+								diagLogin.close();						 		
+					 		}					 		
+						 }, "json");
+			}else{
+				showMessage("Veillez remplir tous les champs.");
+			}
+		}
+		function utiIsConnect(){
+			//affichage des bouton d'écriture
+	  		arrIds.forEach(function(d){
+				if(d.role=="ecrit")document.getElementById(d.idEle).setAttribute("visibility","inherit");
+			  });
+			//affichage des infos de l'utilisateur
+			document.getElementById("tspan6160-2").innerHTML = uti.login;
+			document.getElementById("tspan7728").innerHTML = uti.role;
+		}
+		//fin boite de dialogue
+		
+		//gestion des inclinations et des inclinaisons
+		function setTitreInclination(){
+			//récupère le titre
+			diagTitre.showModal();
+			
+		}
+		function sauveInclination(titre){
+
+			if(!selectIclnation){
+				copieInclinaison(titre);
+				return;
+			}
+			/*			
+			if(titre.currentTarget)
+				titre = document.getElementById("sltIclnaison").value;
+			else
+				titre = $("#iptTitre")[0].value;
+			*/
+			
+			//récupère le recto
+			var svgR = document.getElementById("g6558").getElementsByTagName('svg')[0].outerHTML;
+			//récupère le verso
+			var svgV = document.getElementById("g6561").getElementsByTagName('svg')[0].outerHTML;
+			var p = {"idUti":uti.uti_id
+					, "idDoc":selectIclnation.doc_id, "idParent":selectIclnation.parent
+					,"data":{"recto":svgR,"verso":svgV}};
+			$.post("explo/sauvesvg", p,
+					 function(data){
+				 		if(data.erreur){
+				 			showMessage(data.erreur);
+				 		}else{
+							//met à jour le tableau des inclinations
+							data.recto.login = uti.login;
+							data.verso.login = uti.login;
+							arrInclinations.push(data.recto);
+							arrInclinations.push(data.verso);
+							//met à jour la liste				
+							creaListeInclinations();
+							diagTitre.close();
+				 		}
+					 },"json");			
+		}
+		
+		function copieInclinaison(titre){
+
+			var p = {"titre":titre,"idDoc":selectIclnaison.doc_id,"idUti":uti.uti_id,"idBase":idBase};
+			$.post("explo/copieinclinaison", p,
+					 function(data){
+				 		if(data.erreur){
+				 			showMessage(data.erreur);
+				 		}else{
+							//met à jour le tableau des inclainsons
+							data.oNote = JSON.parse(data.note);
+							data.login = uti.login;
+							arrInclinaisons.push(data);
+							//met à jour la liste				
+							creaListeInclinations();
+							diagTitre.close();
+				 		}
+					 }, "json");
+		}
+		function suppInclination(){	
+			var p = {"idDoc":selectIclnation.doc_id,"idBase":idBase};
+			$.post("explo/suppinclination", p,
+					 function(data){
+				 		if(data.erreur){
+				 			showMessage(data.erreur);
+				 		}else{
+							//met à jour le tableau des inclinations
+							arrInclinations.forEach(function(d, i){
+								if(d.doc_id==selectIclnation.doc_id)arrInclinations.splice(i, 1);
+							});
+							//met à jour la liste				
+							creaListeInclinations();
+							//affiche le message de suppression
+				 			showMessage(data.message);					 		
+				 		}
+					 }, "json");
+
+		}		
+		function sauveInclinaison(){
+		}
+		function imprimeInclination(){			
+		}
+	    function addHtmlInSvg(svg, HTML, h, w, x, y){
+			var divStyle = "line-height:"+h+"px;height:"+h+"px;width:"+w;
+			divStyle = "display: table-cell;vertical-align: middle;"+divStyle;
+			svg.append('foreignObject')
+	            .attr('x', x)
+	            .attr('y', y)
+	            .attr('width', w)
+	            .attr('height', h)
+	            .append("xhtml:body")
+	            		.attr("xmlns","http://www.w3.org/1999/xhtml")
+		            .attr('class', "foreignBody")
+					.html('<div style="'+divStyle+'" >'+HTML+'</div>');						    
+	    }
+		
+		function creaListeInclinaison(){
+			var bb = document.getElementById("g7723").getBBox();
+		    addHtmlInSvg(d3.select("#g7723")
+				    , '<select id="sltIclnaison"></select>'
+				    , bb.height, bb.width, bb.x, bb.y);
+		    //filtre les inclinaisons de la personne connectée
+		    var arrIclnaison = arrInclinaisons.filter(function(e){
+			    		return e.login == "CreaTIC";
+		    		});		    
+			var select  = d3.select("#sltIclnaison")
+				.on("change", 
+					function (){
+						if(this.selectedIndex != arrIclnaison.length){
+							selectIclnaison = arrIclnaison[this.selectedIndex];
+							selectIclnation = false;
+					     	creaListeInclinations();
+						}					
+					}					
+				);
+		    var options = select.selectAll('option').data(arrIclnaison); // Data join
+			//ajoute les options
+			options.enter().append("option").text(function(d) { 
+				//var dt = new Date(d.maj);
+				//return d.titre+" - "+d.login+" - "+chaineDate(dt); 
+				return d.titre+" ("+d.login+")"; 
+				});
+			//ajout de l'option de sélection
+			select.append("option")
+				.text("Choisissez un modèle")
+				.attr("selected",true); 
+				
+		}
+
+		function creaListeInclinations(){
+			//vérifie s'il fut créer la liste
+			var lst = document.getElementById("sltIclnation");
+			if(!lst){				
+				var bb = document.getElementById("g77232").getBBox();
+			    addHtmlInSvg(d3.select("#g77232")
+					    , '<select id="sltIclnation"></select>'
+					    , bb.height, bb.width, bb.x, bb.y);
+			}else{
+	    		    //supprime les options
+				while (lst.firstChild) {
+				    lst.removeChild(lst.firstChild);
+				}				
+			}
+		    //filtre les inclinaisons de l'utilisateur
+		    var arrIclnation = arrInclinations.filter(function(e){
+			    		return e.login == uti.login && e.parent == selectIclnaison.doc_id;
+		    		});
+    			//ajoute une copie de l'inclinaison si aucun instanse du modèle pour l'utilisateur
+			if(arrIclnation.length==0){
+				setTitreInclination();
+    			}else{
+        			//création au mise à jour de la liste
+    				var select  = d3.select("#sltIclnation")
+    				.on("change", 
+    					function (){
+						if(this.value == "Ajouter une inclination"){
+							setTitreInclination();
+						}else if(this.selectedIndex != arrIclnation.length){
+							selectIclnation = arrIclnation[this.selectedIndex];
+							showInclination();
+    						}
+    					}					
+    				);
+    				
+				//sélectionne les options
+	    		    var options = select.selectAll('option').data(arrIclnation); // Data join
+	    			//ajoute les options
+	    			options.enter().append("option")
+	    				.text(function(d) { 
+						var dt = new Date(d.maj);
+	    					return d.titre+" ("+chaineDate(dt)+")"; 
+	    					});
+	    			//ajout de l'option d'ajout
+    				select.append("option")
+	    				.text("Ajouter une inclination"); 
+    				//ajout de l'option de sélection
+	    			if(arrIclnation.length > 1){		    			
+		    			select.append("option")
+		    				.text("Choisissez une inclination")
+		    				.attr("selected","true"); 
+	    			}else{
+	    				selectIclnation = arrIclnation[0];
+	    				showInclination();
+	    			}
+	    			
+    			}
+				
+		}		
+		function showInclination(){
+			//affiche le titre
+			//d3.select("#tspan6160-2-6").text(selectIclnaison.titre);
+			//affiche les inclinaisons
+			//document.getElementById("g7995").setAttribute("visibility","visible");			
+			//affiche le nombre d'inclinaisons
+			d3.select("#tspan4354").text("0 / "+(selectIclnation.oNote.recto.nbInc+selectIclnation.oNote.verso.nbInc));
+			//affiche les plans
+			if(selectIclnation.data){
+				chargeInclinaisonSauve(selectIclnation.oNote.recto, "g6558", selectIclnation.data.recto);
+				chargeInclinaisonSauve(selectIclnation.oNote.verso, "g6561", selectIclnation.data.verso);						
+			}else{				
+				chargeInclinaisonUrl(selectIclnation.oNote.recto, "g6558");
+				chargeInclinaisonUrl(selectIclnation.oNote.verso, "g6561");						
+			}
+		}
+
+		function chargeInclinaisonSauve(oNote, dst, txtSvg){
+	    		var xmlSvg = ( new window.DOMParser() ).parseFromString(txtSvg, "text/xml");
+		    var importedNode = document.importNode(xmlSvg.documentElement, true);
+		    //supprime les bindings
+		    oNote.binding = false;
+	    		chargeInclinaison(oNote, dst, importedNode);
+    		}			
+    		function chargeInclinaisonUrl(oNote, dst){
+	    		d3.xml(oNote.url, "application/xml", function(xml) {
+		    		var importedNode = document.importNode(xml.documentElement, true);
+		    		chargeInclinaison(oNote, dst, importedNode);
+	    		});    			
+    		}
+    		function chargeInclinaison(oNote, dst, importedNode){
+			//récupère la destination
+			var gDst = document.getElementById(dst);
+			//supprime le contenu sauf le rectangle
+	    		if(gDst.childNodes){
+	    			var childs=gDst.childNodes;
+	    			for(var i=0;i<childs.length;i++){
+	    				if(childs[i].id != "rect4380" && childs[i].id != "rect16999")gDst.removeChild(childs[i]);
+	    			}
+	    		}
+	    		//redimensionne le svg
+	    		var bbDst = gDst.getBBox();
+	    		var wSrc = importedNode.getAttribute("width");
+	    		//supprime les px
+	    		var px = wSrc.substr(wSrc.length-2);
+	    		if(px=="px")wSrc=wSrc.substr(0, wSrc.length-2);
+	    		var hSrc = importedNode.getAttribute("height");
+	    		px = hSrc.substr(hSrc.length-2);
+	    		if(px=="px")hSrc=hSrc.substr(0, hSrc.length-2);
+	    		var id = importedNode.getAttribute("id");
+	    		importedNode.setAttribute("width",bbDst.width);
+	    		importedNode.setAttribute("height",bbDst.height);
+	    		importedNode.setAttribute("x",bbDst.x);
+	    		importedNode.setAttribute("y",bbDst.y);		    		
+	    		importedNode.setAttribute("viewBox","0 0 "+wSrc+" "+hSrc);
+	    		//ajoute le svg à la destination
+   			gDst.appendChild(importedNode);	
+    			//ajoute l'interactivité aux plans
+	    		var plans = d3.select("#"+dst+" svg").selectAll("g")
+	    			.on("click",function(){
+		    			if(this.id.substr(0,4)=="plan"){
+						var idPlan = this.id;
+			    			console.log("click plan ="+idPlan);
+			    			//mets à jour la couleur du cadre
+			    			d3.select("#"+dst+" svg").selectAll("rect")
+			    				.style("stroke",function(){
+				    				if(d3.select(this).attr("stroke")=="red") return "black";
+				    				})
+			    				.style("stroke-width",function(d){
+				    				if(d3.select(this).attr("stroke-width")==6) return 1;
+			    				});
+				   		//affiche l'inclinaisons avec l'url
+			   			var arrId = this.id.split("_");
+		    				var incUrl = false;
+						oNote.inclinations.forEach(function(inc){
+			    				if(inc.plan==arrId[1]){
+				    				chargeInclination(inc.url, "g9800");
+				    				incUrl = true;
+			    				}								
+						});
+						//affiche l'inclaisons suivant le g
+						if(!incUrl){
+							chargeInclination(false, "g9800", idPlan);
+						}								    			
+		    			}else console.log(this.id.substr(0,4));
+		    			
+	    			})
+   			//ajoute les inclinaisons définies
+			oNote.inclinations.forEach(function(d){
+				//retrouve le plan
+				plans[0].forEach(function(p){
+					var idP = p.id.substr(0,5+d.plan.length);
+	    				if(idP=="plan_"+d.plan){
+	    					chargeInclination(d.url, p.id);
+	    				}
+				});
+    			  });				
+   			//ajoute les binding
+   			if(oNote.binding){
+				oNote.binding.forEach(function(d){
+					if(d.fct=="setSrcToDst"){
+						document.getElementById(d.idDst).innerHTML = document.getElementById(d.idSrc).innerHTML;
+					}
+					if(d.fct=="getDate"){
+						var now=new Date();
+						var dt = chaineDateHeure(now)
+						document.getElementById(d.idDst).innerHTML = dt;
+					}
+					if(d.fct=="getLieu"){
+						var strLieu = "Sur Terre...";
+						if(geoPosi && geoPosi.geoname)							
+							strLieu = geoPosi.geoname.name+", "+geoPosi.geoname.countryName;
+						document.getElementById(d.idDst).innerHTML = strLieu;
+					}						
+	    			  });				
+   			}
+    		}		
+
+		function chargeInclination(url, dst, src){
+			//récupère la destination
+			var gDst = document.getElementById(dst);
+	    		var bbDst = gDst.getBBox();
+			//supprime le contenu sauf le rectangle
+	    		if(gDst.childNodes){
+	    			var childs=gDst.childNodes;
+	    			for(var i=0;i<childs.length;i++){
+	    				if(childs[i].id != "rect6156")gDst.removeChild(childs[i]);
+	    			}
+	    		}
+	    		    		
+			if(url){				
+		    		queue()
+		    		.defer(d3.xml, url, "image/svg+xml")
+		    		.await(function(error, xml) {
+			    		var importedNode = document.importNode(xml.documentElement, true);
+			    		//redimensionne le svg
+			    		var wSrc = importedNode.getAttribute("width");
+			    		var hSrc = importedNode.getAttribute("height");
+			    		importedNode.setAttribute("width",bbDst.width);
+			    		importedNode.setAttribute("height",bbDst.height);
+			    		importedNode.setAttribute("x",bbDst.x);
+			    		importedNode.setAttribute("y",bbDst.y);		    		
+			    		importedNode.setAttribute("viewBox","0 0 "+wSrc+" "+hSrc);
+		   			gDst.appendChild(importedNode);	    	    	  	
+			    });
+			}else{
+				//récupère la source
+				var gSrc = document.getElementById(src);
+				var gSrcCopie = gSrc.cloneNode(true);
+		    		var bbSrc = gSrc.getBBox();
+
+		    		//vérifie la rotation du plan
+		    		var arrId = gSrc.getAttribute("id").split("_");
+		    		var idCopie = arrId.join("_")+"_c";
+		    		gSrcCopie.setAttribute("id", idCopie);
+		    		
+		    		var xRot = (bbSrc.width/2)+bbSrc.x;
+		    		var yRot = (bbSrc.height/2)+bbSrc.y;
+		    		if(arrId[2]!="0") gSrcCopie.setAttribute("transform","rotate(" +arrId[2]+" "+xRot+" "+yRot+")");
+				
+				//ajoute un svg à la source
+				var svg = d3.select("#"+dst).append("svg")
+					.attr("id","svgZoom")
+					.attr("width",bbDst.width)
+					.attr("height",bbDst.height)
+					.attr("x",bbDst.x)
+					.attr("y",bbDst.y)
+			    		.attr("viewBox",bbSrc.x+" "+bbSrc.y+" "+bbSrc.width+" "+bbSrc.height);
+				svg.node().appendChild(gSrcCopie);
+	    			var f = d3.select("#"+src).select("rect");
+	    			f.style("stroke","red").style("stroke-width","6");
+				
+			}
+		}		
+		</script>
+		
+		<style>
+		
+			.mainBody {
+			  background: #222;
+			  font: 10px sans-serif;
+			  margin: auto;
+			  position: relative;
+			  width: 1024px;
+			}
+			
+			text {
+			  text-anchor: middle;
+			}
+			
+			#credit {
+			  position: absolute;
+			  right: 4px;
+			  bottom: 4px;
+			  color: #ddd;
+			}
+			
+			#credit a {
+			  color: #fff;
+			  font-weight: bold;
+			}
+		    @font-face {
+		        font-family: Origami;
+		        src: url('fonts/origami/ORIGAMI_.TTF');
+		    }
+		
+			#promptCompat{ 
+					display: none; 
+			} 
+			#promptCompat.no_dialog{ 
+				box-shadow: 0 0 5px 2px red; 
+				padding: 10px; 
+				display: block; 
+				text-align: center; 
+				font-weight: bold; 
+			} 
+			.boutons{ 
+				padding: 10px; 
+			} 
+			dialog{ 
+				border-radius: 10px; 
+				box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); 
+			} 
+			dialog::backdrop{ 
+				background-color: rgba(0, 0, 0, 0.6); 
+			} 
+			@font-face {
+				font-family: 'TodaySHOP-Light';
+				src: url('fonts/TodaySHOP/TodaySHOP-Light.otf') format('truetype');
+			}
+			@font-face {
+				font-family: 'TodaySHOP-Medium';
+				src: url('fonts/TodaySHOP/TodaySHOP-Medium.otf') format('truetype');
+			}
+			@font-face {
+				font-family: 'Swift-Light';
+				src: url('fonts/Swift/Swift-03-Light.otf') format('truetype');
+			}
+			@font-face {
+				font-family: 'Impact';
+				src: url('fonts/Impact.ttf') format('truetype');
+			}
+			.foreignBody {
+				background-color:white;margin:3px;
+			}
+			
+		</style>	
+	</head>
+	<body class="mainBody" onload="load();">
+		<p id="promptCompat">Votre navigateur ne pend pas en charge les balises <code><dialog></code></p> 
+		<div id="viz" ></div>
+		<dialog id="diagMess" close> 
+			<div id="mess" ></div>
+	        <div class="boutons">
+				<button onclick="diagMess.close()">Fermer</button> 
+			</div> 
+		</dialog> 
+		<dialog id="diagLogin" close> 
+			<label for="iptLogin">Login : </label>
+            <input type="text" name="iptLogin" id="iptLogin" required="required">
+            <label for="iptlogin">Mot de passe : </label>
+            <input type="password" name="iptMdp" id="iptMdp" required="required">
+	        <div class="boutons">
+				<button onclick="diagLogin.close()">Fermer</button> 
+				<button onclick="connecte()">Connexion</button> 
+				<button onclick="inscrit()">Inscription</button> 
+			</div> 
+		</dialog> 
+		<dialog id="diagTitre" close> 
+			<label for="iptTitre">Titre : </label>
+            <input type="text" name="iptTitre" id="iptTitre" required="required">
+	        <div class="boutons">
+				<button onclick="diagTitre.close()">Fermer</button> 
+				<button onclick="sauveInclination($('#iptTitre')[0].value)">Enregistrer</button> 
+			</div> 
+		</dialog> 
+		
+	</body>
+</html>

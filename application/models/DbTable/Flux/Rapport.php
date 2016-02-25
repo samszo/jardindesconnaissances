@@ -48,15 +48,13 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
      */
     public function ajouter($data, $existe=true)
     {
-    	
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
-    		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
-    		
-    	 	$id = $this->insert($data);
-    	}
-    	return $id;
+	    	$id=false;
+	    	if($existe)$id = $this->existe($data);
+	    	if(!$id){
+	    		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');    		
+	    	 	$id = $this->insert($data);
+	    	}
+	    	return $id;
     } 
 
     

@@ -56,12 +56,12 @@ class Model_DbTable_flux_acti extends Zend_Db_Table_Abstract
      */
     public function ajouter($data, $existe=true)
     {
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
-    	 	$id = $this->insert($data);
-    	}
-    	return $id;
+	    	$id=false;
+	    	if($existe)$id = $this->existe($data);
+	    	if(!$id){
+	    	 	$id = $this->insert($data);
+	    	}
+	    	return $id;
     } 
            
     /**

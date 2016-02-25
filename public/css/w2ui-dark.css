@@ -492,7 +492,7 @@ input[type=checkbox].w2ui-toggle:focus {
 }
 .w2ui-overlay table.w2ui-drop-menu .w2ui-icon {
   font-size: 14px;
-  color: #516173;
+  /*color: #516173;*/
   display: inline-block;
   padding-top: 4px;
 }
