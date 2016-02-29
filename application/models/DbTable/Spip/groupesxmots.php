@@ -50,20 +50,21 @@ class Model_DbTable_Spip_groupesxmots extends Zend_Db_Table_Abstract
     /**
      * Ajoute une entrée Spip_groupes_mots.
      *
-     * @param array $data
-     * @param boolean $existe
+     * @param array 		$data
+     * @param boolean 	$existe
+     * @param boolean 	$rs
      *  
      * @return integer
      */
-    public function ajouter($data, $existe=true)
+    public function ajouter($data, $existe=true, $rs=false)
     {
-    	
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
-    	 	$id = $this->insert($data);
-    	}
-    	return $id;
+	    	$id=false;
+	    	if($existe)$id = $this->existe($data);
+	    	if(!$id){
+	    	 	$id = $this->insert($data);
+	    	}
+	    	if($rs) return $this->findById_groupe($id);
+	    else return $id;
     } 
            
     /**

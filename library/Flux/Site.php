@@ -856,12 +856,13 @@ class Flux_Site{
 
 	/**
      * Récupère le contenu d'une page html avec des argument POST
-     * @param string $url
-     * @param array $args
+     * @param string 	$url
+     * @param array 		$args
+     * @param string 	$contentType
      * 
      * @return string
      */
-	function getUrlPostContent($url, $args){
+	function getUrlPostContent($url, $args, $contentType='application/x-www-form-urlencoded'){
 
 		/* Here we build the data we want to POST */
 		$data = "";
@@ -874,7 +875,7 @@ class Flux_Site{
 		/* Here we build the POST request */
 		$params = array('http' => array(
 			'method' => 'POST',
-			'Content-type'=> 'application/x-www-form-urlencoded',
+			'Content-type'=> $contentType,
 			'Content-length' =>strlen($data),
 			'content' => $data
 		));

@@ -38,8 +38,8 @@ class Flux_Rmngp extends Flux_Site{
      */
     public function query($query)
     {
-	    $url = $this->apiUrl.$query
-	      	.'&api_key='.$this->key;
+	    $url = $this->apiUrl.$query.'&api_key='.$this->key;
+	    //echo $url;
 		return $this->getUrlBodyContent($url,false);
     }
     
@@ -58,4 +58,22 @@ class Flux_Rmngp extends Flux_Site{
 		return $this->query("autocomplete?q=".$q."&types=".urlencode($types)."&lang=".$lang."&per=".$per);
     }
         
+    /**
+     * Recherche une suggestion d'oeuvre
+     *
+     * @param  	string 	$id
+     * @param	boolean	$slug 
+     * @param  	int 		$page
+     * @param  	int	 	$per_page
+     *
+     * @return string
+     */
+    public function getSuggestion($id, $slug=false, $page=1, $per_page=10)
+    {    	
+		$query = "works/suggested?iq=".$id."&page=".$page."&per_page=".$per_page;
+		if($slug)$query .= "slug=".$slug;
+		return $this->query($query);
+    }
+    
+    
 }

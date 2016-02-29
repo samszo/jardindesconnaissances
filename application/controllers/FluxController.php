@@ -243,6 +243,22 @@ class FluxController extends Zend_Controller_Action {
 	   			break;
 	   	}
     }
+
+	public function rmnAction()
+    {
+    		$rmn = new Flux_Rmngp();
+	   	
+	   	switch ($this->_getParam('obj')) {
+	   		case 'autocomplete':
+				$this->view->reponse = $rmn->getAutocomplete($this->_getParam('q'));
+	   			break;
+	   		case 'suggestion':
+				$this->view->reponse = $rmn->getSuggestion($this->_getParam('id'));
+	   			break;
+	   		default:
+	   			break;
+	   	}
+    }
     
 	public function googleAction()
     {
@@ -277,6 +293,37 @@ class FluxController extends Zend_Controller_Action {
 	   	switch ($this->_getParam('obj')) {
 	   		case 'bio':
 				$this->view->reponse = $dbp->getBio($this->_getParam('res'));
+	   			break;	   		
+	   		default:
+	   			break;
+	   	}
+    }
+
+	public function skosAction()
+    {
+	   	
+	   	switch ($this->_getParam('obj')) {
+	   		case 'saveToSpip':
+	   			if($this->_getParam('idBase')){
+			    		$s = new Flux_Skos($this->_getParam('idBase'),true);
+    					$s->dbGM = new Model_DbTable_Spip_groupesxmots($s->db);
+			    		if($this->_getParam('csv')){
+	   					$arrMC = $s->csvToArray($this->_getParam('csv'));
+	   					for ($i = 1; $i < count($arrMC); $i++) {
+	   						//foreach ($arrMC as $mc) {
+	   						$mc = $arrMC[$i];
+	   						$s->trace("mot-clef csv",$mc);
+	   						//recherche le groupe de mot
+	   						$gm = $s->dbGM->ajouter(array('titre'=>$mc[1]),true,true);
+	   						//récupère l'uri du concept
+	   						$uri = $s->getUriByLabel($mc[0]);
+	   						if($uri){
+		   						//enregistre le mot clef
+		   						$s->sauveToSpip($uri."/json", $gm);
+	   						}else $s->trace("PAS DANS SKOS",$mc[0]);
+	   					}
+	   				}
+	   			}else $this->view->reponse = 'Il manque des paramètres';
 	   			break;	   		
 	   		default:
 	   			break;

@@ -349,12 +349,41 @@ try {
 	$g = new Flux_Gknowledgegraph();
 	$rep = $g->getQuery('zappa');	
 	*/
-	
-	
+
+	//
 	$s = new Flux_Skos('spip_e-educ_proverbes',true);
+	$id = $s->getUriByLabel('Droits humains');
 	$s->sauveToSpip("http://skos.um.es/unescothes/CS000/json",5);		
+	//
 	
+	/*
+	$rmn = new Flux_Rmngp();
+	$json = $rmn->getAutocomplete('troy');
+	$s->trace($json);			
+	*/
 	
+	$im = file_get_contents('1404571653141.jpg');
+    $imdata = base64_encode($im); 
+    
+    $json = '{
+	  "requests":[
+	    {
+	      "image":{
+	        "content":'.$imdata.'
+	      },
+	      "features":[
+	        {
+	          "type":"LABEL_DETECTION",
+	          "maxResults":1
+	        }
+	      ]
+	    }
+	  ]
+	}';
+	$url = "https://vision.googleapis.com/v1/images:annotate?key=".KEY_GOOGLE_BROWSER;
+    $response = $s->getUrlBodyContent($url,array("requests"=>$json),false,Zend_Http_Client::POST);//"Content-Type: application/json"
+	//$ curl -v -k -s -H "Content-Type: application/json" https://vision.googleapis.com/v1/images:annotate?key=browser_key --data-binary @request_filename
+    
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

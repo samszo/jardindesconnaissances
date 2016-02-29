@@ -169,16 +169,7 @@ function saveGen(titre, txt, idCpt) {
 		 });
 }
 
-function saveRepQuest(titre, txt, idCpt) {
-	var p = {"idBase":idBase, "idUti":idUti, "data":{"titre":"gapaii_"+titre, "idOeu":idOeu, "idCpt":idCpt,"txt":txt}};
-    
-	$.post("gapaii/savegen"
-		, p,
-		 function(data){
-			console.log(data);
-			idDoc = data;
-		 });
-}
+
 
 function paroleGen(idDiv, txt) {
 	var p = {"txt":txt};

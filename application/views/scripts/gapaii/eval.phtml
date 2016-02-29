@@ -226,7 +226,7 @@
 			w2ui['layoutMain'].load('main', '../graph/radar?titre='+q.questTitre, null, function () {
 				radarChartOptions.fctDragEnd = saveEvalRadar;
 				fctSave = function(){
-					saveRepQuest();
+					saveEvalRadarAll();
 					if(q.process && q.process[data['q_'+q.questId]]){
 						getNextQuest(q.process[data['q_'+q.questId]].questId);
 					}
@@ -303,23 +303,32 @@
 
 	function saveEvalRadar(d){
 		var dt = {'axe':d,"quest":q,'gen':dtGen.idDoc,'acti':'saveEvalRadar'};
-		console.log(dt);
+		saveRepQuest(dt);
+	}
+
+	function saveEvalRadarAll(){
+		var dt = {'radarData':radarData,"quest":q,'gen':dtGen.idDoc,'acti':'saveEvalRadarAll'};
+		saveRepQuest(dt);
+	}
+	
+
+	function saveRepQuest(dt) {
 		$.ajax({
-        		url: "saverepquest",
-        		data: dt,
-        		type: 'post',
-            	dataType: 'json',
-            	error: function(error){
-            		try {
-            			var js = JSON.parse(error.responseText);
-            		} catch (e) {
-            			console.log(error.responseText)            		  	
-          			w2alert("Erreur : "+e);
-            		}
-            	},            	
-            	success: function(result) {
-            		evals = result;
-            }
+	    		url: "saverepquest",
+	    		data: dt,
+	    		type: 'post',
+	        	dataType: 'json',
+	        	error: function(error){
+	        		try {
+	        			var js = JSON.parse(error.responseText);
+	        		} catch (e) {
+	        			console.log(error.responseText)            		  	
+	      			w2alert("Erreur : "+e);
+	        		}
+	        	},            	
+	        	success: function(result) {
+	        		evals = result;
+	        }
 		});
 	}
 	

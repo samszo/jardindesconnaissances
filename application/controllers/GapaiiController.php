@@ -13,7 +13,7 @@ class GapaiiController extends Zend_Controller_Action {
 	
 	//var $idBase = "flux_gapaii";
 	var $idBase = "flux_proverbes";
-	var $idBaseSpip = "spip_e-educ_proverbes";
+	var $idBaseSpip = "spip_proverbe";
 	var $idOeu = 57;//37;//
 	var $idUti = 2;
 	var $idDoc = 1;
@@ -71,11 +71,11 @@ class GapaiiController extends Zend_Controller_Action {
 		
 		//enregistre les paramètres
 		$quest = $this->_getParam('quest');
-		$axe = $this->_getParam('axe');
 		$gen = $this->_getParam('gen');
 		$acti = $this->_getParam('acti');
 		
-		$idM = $g->dbM->ajouter(array("titre"=>"gapaï"),true,false);
+		$this->idMonade = $g->dbM->ajouter(array("titre"=>"gapaï"),true,false);
+		$this->idDocEvalRoot = $g->dbD->ajouter(array("titre"=>"évaluations"));
 		
 		//enregistre la question
 		if($quest){
@@ -83,7 +83,7 @@ class GapaiiController extends Zend_Controller_Action {
 			$idDocQ = $g->dbD->ajouter(array("titre"=>$quest["questTitre"],"parent"=>$idDocQRoot,"data"=>json_encode($quest)));
 			//enregistre le rapport avec le doc évalué
 			$idTagPre = $g->dbT->ajouter(array("code"=>"question -> document"));
-			$idRapQ = $g->dbR->ajouter(array("monade_id"=>$idM,"geo_id"=>$this->idGeo
+			$idRapQ = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 				,"src_id"=>$idDocQ,"src_obj"=>"doc"
 				,"pre_id"=>$idTagPre,"pre_obj"=>"tag"
 				,"dst_id"=>$gen,"dst_obj"=>"doc"
@@ -91,27 +91,57 @@ class GapaiiController extends Zend_Controller_Action {
 		}
 		
 		//enregistre l'axe évalué
-		if($axe){
-			$idTag = $g->dbT->ajouter(array("code"=>$axe["axis"]));
-			$idAct = $g->dbA->ajouter(array("code"=>$acti));
-			$g->dbS->ajouter(array("id_flux"=>$idTag,"id_spip"=>$axe["idSpip"],"obj_flux"=>"tag","obj_spip"=>"mots"));	
+		if($this->_getParam('axe')){
+			//$this->saveRepAxe($this->_getParam('axe'));	
+		}
+		
+		//enregistre tous les axes du radar
+		if($this->_getParam('radarData')){
+			$data = $this->_getParam('radarData');
+			$idDocRadar = $g->dbD->ajouter(array("titre"=>"Evaluation radar","parent"=>$this->idDocEvalRoot,"data"=>json_encode($data)));
+			//enregistre chaque axe
+			foreach ($data as $axe) {
+				$this->saveRepAxe($axe);	
+			}
 			//enregistre le rapport entre la question, l'utilisateur et l'action
-			$idRap = $g->dbR->ajouter(array("monade_id"=>$idM,"geo_id"=>$this->idGeo
+			$idRap = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 				,"src_id"=>$idRapQ,"src_obj"=>"rapport"
 				,"pre_id"=>$this->idUti,"pre_obj"=>"uti"
 				,"dst_id"=>$idAct,"dst_obj"=>"acti"
 				));
-			//enregistre la réponse
-			$idDocEval = $g->dbD->ajouter(array("titre"=>"Evaluations Radar"));
-			$idDocRep = $g->dbD->ajouter(array("titre"=>"rapport=".$idRap,"data"=>json_encode($axe),"parent"=>$idDocEval),false);
 			//enregistre la réponse à la question par l'utilistaeur
-			$idRapRep = $g->dbR->ajouter(array("monade_id"=>$idM,"geo_id"=>$this->idGeo
-				,"pre_id"=>$idRap,"src_obj"=>"rapport"
-				,"src_id"=>$idTag,"pre_obj"=>"tag"
-				,"dst_id"=>$idDocRep,"dst_obj"=>"doc"
-				,"niveau"=>$axe["value"]
+			$idRapRep = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+				,"src_id"=>$idRap,"src_obj"=>"rapport"
+				,"pre_id"=>$this->idUti,"pre_obj"=>"uti"
+				,"dst_id"=>$idDocRadar,"dst_obj"=>"doc"
 				));				
 		}
+		
+		
+	}
+	
+	function saveRepAxe($axe){
+
+		$idTag = $g->dbT->ajouter(array("code"=>$axe["axis"]));
+		$idAct = $g->dbA->ajouter(array("code"=>$acti));
+		$g->dbS->ajouter(array("id_flux"=>$idTag,"id_spip"=>$axe["idSpip"],"obj_flux"=>"tag","obj_spip"=>"mots"));	
+		//enregistre le rapport entre la question, l'utilisateur et l'action
+		$idRap = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+			,"src_id"=>$this->idRapQ,"src_obj"=>"rapport"
+			,"pre_id"=>$this->idUti,"pre_obj"=>"uti"
+			,"dst_id"=>$idAct,"dst_obj"=>"acti"
+			));
+		//enregistre la réponse
+		$idDocEval = $g->dbD->ajouter(array("titre"=>"Evaluations axe","parent"=>$this->idDocEvalRoot));
+		$idDocRep = $g->dbD->ajouter(array("titre"=>"rapport=".$idRap,"data"=>json_encode($axe),"parent"=>$idDocEval),false);
+		//enregistre la réponse à la question par l'utilistaeur
+		$idRapRep = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+			,"src_id"=>$idTag,"src_obj"=>"tag"
+			,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+			,"dst_id"=>$idDocRep,"dst_obj"=>"doc"
+			,"niveau"=>$axe["value"]
+			));				
+		
 	}
 	
 	public function savesemevalAction() {

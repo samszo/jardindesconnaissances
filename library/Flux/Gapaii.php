@@ -9,6 +9,9 @@
  */
 class Flux_Gapaii extends Flux_Site{
 	
+	var $idDocRoot;
+	
+	
     /**
      * Construction du gestionnaire de flux.
      *
@@ -20,6 +23,9 @@ class Flux_Gapaii extends Flux_Site{
     {
 	    	parent::__construct($idBase);
     	    	
+	    	//on récupère la racine
+	    	$idDocRoot
+	    	
     }
 	
     /**
@@ -101,7 +107,7 @@ class Flux_Gapaii extends Flux_Site{
 		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
 		
 		$date = new Zend_Date();
-		
+				
 		//ajoute ou récupère le clic sur le fond
 		$idDoc = $this->dbD->ajouter(array("tronc"=>$data["idOeu"]."_".$data["idCpt"],"titre"=>$data["titre"]
 			,"data"=>$data["txt"], "maj"=>$date->get("c"), "data"=>$data["data"]),true,true);
