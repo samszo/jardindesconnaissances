@@ -350,11 +350,11 @@ try {
 	$rep = $g->getQuery('zappa');	
 	*/
 
-	//
+	/*
 	$s = new Flux_Skos('spip_e-educ_proverbes',true);
 	$id = $s->getUriByLabel('Droits humains');
 	$s->sauveToSpip("http://skos.um.es/unescothes/CS000/json",5);		
-	//
+	*/
 	
 	/*
 	$rmn = new Flux_Rmngp();

@@ -337,3 +337,4 @@ class FluxController extends Zend_Controller_Action {
 		}
 	}    
 }
+
