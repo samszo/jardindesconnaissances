@@ -362,28 +362,58 @@ try {
 	$s->trace($json);			
 	*/
 	
-	$im = file_get_contents('1404571653141.jpg');
+	/*
+	$url = '1404571653141.jpg';
+	$url = 'http://gallica.bnf.fr/iiif/ark:/12148/bpt6k63191b/f508/806.7551430159441,842.9350218708103,1044.2048577376822,201.16030534351148/571,110/0/native.jpg';
+	$url = 'http://www.samszo.univ-paris8.fr/LaMuseMent/tofs/20150625_180417.jpg';
+	$s->trace("url de l'image = ".$url);			
+	$s->trace("<img src='".$url."'>");			
+	
+	$im = file_get_contents($url);	
     $imdata = base64_encode($im); 
-    
     $json = '{
-	  "requests":[
-	    {
-	      "image":{
-	        "content":'.$imdata.'
-	      },
-	      "features":[
-	        {
-	          "type":"LABEL_DETECTION",
-	          "maxResults":1
-	        }
-	      ]
-	    }
-	  ]
-	}';
-	$url = "https://vision.googleapis.com/v1/images:annotate?key=".KEY_GOOGLE_BROWSER;
-    $response = $s->getUrlBodyContent($url,array("requests"=>$json),false,Zend_Http_Client::POST);//"Content-Type: application/json"
-	//$ curl -v -k -s -H "Content-Type: application/json" https://vision.googleapis.com/v1/images:annotate?key=browser_key --data-binary @request_filename
+		 "requests": [
+		  {
+		      "image":{
+		        "content":"'.$imdata.'"
+		      },
+			  "features": [
+				{
+				  "type": "LANDMARK_DETECTION"
+				}
+			  ]		   
+		  }
+		 ]
+		}';
+	$s->trace("requête envoyée = ".$json);			
     
+    $url = "https://vision.googleapis.com/v1/images:annotate?key=".KEY_GOOGLE_SERVER."&fields=responses";
+    $response = $s->getUrlBodyContent($url,false,false,Zend_Http_Client::POST,array("value"=>$json, "type"=>'application/json'));//"Content-Type: application/json"
+	//$ curl -v -k -s -H "Content-Type: application/json" https://vision.googleapis.com/v1/images:annotate?key=browser_key --data-binary @request_filename
+	$s->trace("reponse de google = ".$response);			
+	*/
+	
+	/*
+	$bt = new BibTeX_Parser("../../cdnl-2015-prod/excode/bdd/shelf.bibtex");
+	$bt->parse();
+	//
+	/*
+	$ris = new RISReader();
+	$ris->parseFile("../../cdnl-2015-prod/excode/bdd/shelf.ris");
+	*/
+	/*
+	$bup8 = new Flux_Bup8("cdnl_excode");
+	$bup8->bCache = true;
+	$bup8->setListe(3713);
+    */
+
+	$mp = new Flux_MistralProverbe("flux_proverbes",true);
+	//on initialise les tables du générateur
+	$mp->dbG = new Model_DbTable_Gen_generateurs($mp->getDb("generateur"));	
+	//on réinitialise la connexion par défaut
+	$mp->getDb("flux_proverbes");	
+	$rs = $mp->saveResultSearch("chat",1,200,array("id_concept"=>169977,"id_dico"=>153));
+	
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

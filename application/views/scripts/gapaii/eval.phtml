@@ -50,7 +50,7 @@
 	<div id="layout"></div>
 
 	<script type="text/javascript">
-	var pstyle = 'padding:3px;', evals, idEval, idQuest, q, idDivGen='txtGen';
+	var pstyle = 'padding:3px;', evals, idEval, idQuest, q, idDivGen='txtGen', saveResult;
 	
 	function init(){
 		
@@ -208,7 +208,9 @@
 		if(!num){
 			q = evals.evals[idEval].quests[0];
 		}else{
-			evals.evals[idEval].quests.forEach(function(r){if(r.questId==num)q=r;});			
+			evals.evals[idEval].quests.forEach(function(r){
+				if(r.questId==num)q=r;
+				});			
 		}
 		idQuest=q.questId;		
 
@@ -227,8 +229,8 @@
 				radarChartOptions.fctDragEnd = saveEvalRadar;
 				fctSave = function(){
 					saveEvalRadarAll();
-					if(q.process && q.process[data['q_'+q.questId]]){
-						getNextQuest(q.process[data['q_'+q.questId]].questId);
+					if(q.process && q.process[q.questId]){
+						getNextQuest(q.process[q.questId].questId);
 					}
 				};
 				fctClear = function(){d3.selectAll('.legend').style('fill','white');};
@@ -287,8 +289,8 @@
 	    			        var errors = this.validate();
 	    			        if (errors.length > 0) return;
 	    			        var data = this.record;
-	    			        if(q.process && q.process[data['q_'+q.questId]]){
-		    			        	getNextQuest(q.process[data['q_'+q.questId]].questId);
+	    			        if(q.process && q.process[q.questId]){
+		    			        	getNextQuest(q.process[q.questId].questId);
 	    			        }
 	                	},
                 }
@@ -327,7 +329,7 @@
 	        		}
 	        	},            	
 	        	success: function(result) {
-	        		evals = result;
+	        		saveResult = result;
 	        }
 		});
 	}

@@ -84,6 +84,11 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     			$this->edit($id[0]["doc_id"], $dt);
     		}
     		*/    		
+    		//met à jour les data
+    		if(isset($data["data"])){
+    			$dt["data"] = $data["data"];
+    			$this->edit($id[0]["doc_id"], $dt);
+    		}
     		$id = $id[0]["doc_id"];
     	}
     	if($rs)

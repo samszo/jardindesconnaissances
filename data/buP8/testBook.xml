@@ -1,0 +1,2077 @@
+
+           <!DOCTYPE html>
+<!-- TEMPLATE FILE: opac-detail.tt -->
+<html lang="fr-FR" class="no-js">
+<head>
+<title>
+univ-paris8 catalogue &rsaquo; Détail de : Mille plateaux </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Koha 3.1813000" /> <!-- leave this for stats -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="/opac-tmpl/bootstrap/images/favicon.ico" type="image/x-icon" />
+
+ <link rel="stylesheet" type="text/css" href="/opac-tmpl/bootstrap/lib/bootstrap/css/bootstrap.min.css" />
+
+
+
+ <link rel="stylesheet" type="text/css" href="/opac-tmpl/bootstrap/lib/jquery/jquery-ui.css" />
+
+
+
+
+ <link rel="stylesheet" type="text/css" href="/opac-tmpl/bootstrap/css/opac.css" />
+
+
+
+<link rel="stylesheet" type="text/css" media="print" href="/opac-tmpl/bootstrap/css/print.css" />
+
+
+<style type="text/css">@import url("/public/css/opacusercss.css");
+/* Change color of buttons - to match Paris8 colors */
+.btn-primary {
+
+background-image: linear-gradient(to bottom, #9D0612, #9D0612);
+}
+
+.btn-primary[disabled] {
+    color: #9D0612;
+    background-color: #9D0612;
+}
+
+/* Change color of buttons - to match Paris8 colors -when focus */
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .btn-primary.disabled, .btn-primary[disabled] {
+    color: #FFF;
+    background-color: #9D0612;
+}
+
+/* Change color of buttons - to match Paris8 colors */
+button.btn, input.btn[type="submit"] {
+}
+.btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success.active, .btn-success.disabled, .btn-success[disabled] {
+    color: #FFF;
+    background-color: #9D0612;
+}
+
+/* Change color of buttons - to match Paris8 colors */
+.btn-success {
+    color: #FFF;
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.25);
+    background-color: #9D0612;
+    background-image: linear-gradient(to bottom, #9D0612, #9D0612);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+/* Resize theheadband image */
+.mastheadsearch {
+    border-radius: 7px;
+    padding: 3em;
+    margin: 0.5em 0px;
+    background: url("http://catalogue.bu.univ-paris8.fr/public/images/bandeau3.jpg") repeat scroll 0% 0% #ECEDE6;
+}
+
+/* Hide the no image found image */
+.no-image { display: none !important; }</style>
+<link rel="unapi-server" type="application/xml" title="unAPI" href="http://http://catalogue.bu.univ-paris8.fr/cgi-bin/koha/unapi" />
+<link rel="stylesheet" type="text/css" href="/opac-tmpl/bootstrap/css/jquery.rating.css" />
+<!-- Respond.js brings responsive layout behavior to IE < v.9 -->
+<!--[if lt IE 9]>
+ <script src="/opac-tmpl/bootstrap/lib/respond.min.js"></script>
+<![endif]-->
+<script type="text/javascript">
+    function _(s) { return s } // dummy function for gettext
+</script>
+<script type="text/javascript" src="/opac-tmpl/bootstrap/lib/modernizr.min.js"></script>
+ 
+
+</head>
+
+
+ 
+
+
+ 
+
+
+
+
+ 
+
+<body ID="opac-detail" class="branch-BUP8 scrollto" >
+
+
+<div id="wrap">
+ <div id="header-region" class="noprint">
+ <div class="navbar navbar-inverse navbar-static-top">
+ <div class="navbar-inner">
+ <div class="container-fluid">
+ <h1 id="logo">
+ <a class="brand" href="/cgi-bin/koha/opac-main.pl">
+  univ-paris8 </a>
+ </h1>
+ 
+ <div id="cartDetails" class="cart-message">Votre panier est vide.</div>
+ 
+ <ul class="nav">
+ 
+ <li class="dropdown">
+ <a href="#" class="dropdown-toggle" id="cartmenulink" data-toggle="dropdown" role="button">
+ <i id="carticon" class="icon-shopping-cart icon-white"></i> <span class="cartlabel">Panier</span> <span id="basketcount"></span> <b class="caret"></b>
+ </a>
+ <ul aria-labelledby="cartmenulink" role="menu" class="dropdown-menu">
+ <li role="presentation">
+ <a href="#" id="cartmenuitem" class="cart-message" tabindex="-1" role="menuitem">Votre panier est vide.</a>
+ </li>
+ </ul>
+ </li>
+ 
+ 
+ <li class="divider-vertical"></li>
+ 
+ 
+ <li class="dropdown">
+ <a href="#" class="dropdown-toggle" id="listsmenu" data-toggle="dropdown" role="button"><i class="icon-list icon-white"></i> <span class="listslabel">Listes</span> <b class="caret"></b></a>
+ <ul aria-labelledby="listsmenu" role="menu" class="dropdown-menu">
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves" tabindex="-1" role="menuitem"><strong>Mes listes publiques</strong></a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3713&amp;sortfield=" tabindex="-1" role="menuitem">iks ray</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3710&amp;sortfield=" tabindex="-1" role="menuitem">Un travail sans limites ?</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3709&amp;sortfield=" tabindex="-1" role="menuitem">Colloque Apocalyspse</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3035&amp;sortfield=" tabindex="-1" role="menuitem">Artistes contemporains - sélection écrits académiques</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3646&amp;sortfield=" tabindex="-1" role="menuitem">Psychanalyse et arts/création - Sélection de livres, salle rouge, 22 février 2016</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3664&amp;sortfield=" tabindex="-1" role="menuitem">La Corée du sud invitée du Salon du livre de Paris (17-20 mars 2016) - Auteurs invités : sélection de livres, salle orange, 29 février 2016</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3501&amp;sortfield=" tabindex="-1" role="menuitem">Autrui</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3645&amp;sortfield=" tabindex="-1" role="menuitem">Désherbés en ethnologie - Sélection de livres, salle rouge, 22 février 2016</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3431&amp;sortfield=" tabindex="-1" role="menuitem">Littérature allemande contemporaine : ces nouveaux auteurs issus de l'immigration - Sélection de livres, salle orange, février 2016</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3002&amp;sortfield=" tabindex="-1" role="menuitem">La révolution culturelle dans la littérature chinoise - Sélection de livres, salle orange, octobre 2015</a></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves" tabindex="-1" role="menuitem" class="listmenulink">Voir tout</a></li>
+ 
+ <li class="divider" role="presentation"></li>
+ 
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves" tabindex="-1" role="menuitem"><strong>Mes listes</strong></a></li>
+ 
+ 
+ <li role="presentation"><a href="#" tabindex="-1" class="menu-inactive" role="menuitem">Pas de liste privée</a></li>
+ <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves" tabindex="-1" role="menuitem" class="listmenulink">Ajouter une liste</a></li>
+ 
+ 
+ 
+ </ul> <!-- / .dropdown-menu -->
+ </li> <!-- / .dropdown -->
+ 
+ </ul> <!-- / .nav -->
+ <div id="listsDetails"></div>
+ 
+ <a id="user-menu-trigger" class="pull-right" href="#"><i class="icon-user"></i> <span class="caret"></span></a>
+ <div id="members">
+ <ul class="nav pull-right">
+ 
+ 
+ 
+ <li><p class="members navbar-text">Bienvenue, <a href="/cgi-bin/koha/opac-user.pl"><span class="loggedinusername"> Samuel SZONIECKY</span></a></p></li>
+ <li class="divider-vertical"></li>
+ 
+ 
+ 
+ <li><p class="navbar-text"><a href="/cgi-bin/koha/opac-search-history.pl" title="Voir mon historique de recherche">Historique de recherche</a> [<a href="/cgi-bin/koha/opac-search-history.pl?action=delete" class="logout" title="Supprimer votre historique de recherche" onclick="return confirm(MSG_DELETE_SEARCH_HISTORY);">x</a>]</p></li>
+ <li class="divider-vertical"></li>
+ 
+ 
+ 
+ <li><p class="navbar-text">
+ 
+ <a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1">
+  Déconnexion</a></p></li>
+ 
+ 
+ </ul>
+ </div> <!-- /members -->
+ 
+ </div> <!-- /container-fluid -->
+ </div> <!-- /navbar-inner -->
+ </div> <!-- /navbar -->
+
+ 
+ </div> <!-- / header-region -->
+
+ <div class="container-fluid">
+ <div class="row-fluid">
+ <div id="opac-main-search">
+ <!-- <div class="span2">
+ 
+ <h1 id="libraryname">
+ 
+ <a href="/cgi-bin/koha/opac-main.pl">univ-paris8</a></h1>
+ </div> /.span2 -->
+ <div class="span12">
+ 
+ 
+ 
+ <div class="mastheadsearch librarypulldown">
+ 
+ 
+ <form name="searchform" method="get" action="/cgi-bin/koha/opac-search.pl" id="searchform" class="form-inline">
+ <label for="masthead_search"> Chercher  </label>
+
+ <select name="idx" id="masthead_search">
+ 
+ <option value="">Catalogue</option>
+ 
+ 
+ <option value="ti">Titre</option>
+ 
+ 
+ <option value="au">Auteur</option>
+ 
+ 
+ <option value="su">Sujet</option>
+ 
+ 
+ <option value="nb">ISBN</option>
+ 
+ 
+ <option value="se">Collection</option>
+ 
+ 
+ 
+ <option value="callnum">Cote</option>
+ 
+ 
+ </select>
+
+ 
+ 
+ <input name="q" type="text" title="Saisissez votre recherche" class="transl1" id="translControl1" /><span id="translControl"></span>
+ 
+
+ 
+
+ 
+ <div class="input-append">
+ <select name="branch_group_limit" id="select_library">
+ <option value="">Tous sites</option>
+ 
+ 
+ <option value="branch:IUTM">Bibliothèque de l'IUT de Montreuil</option>
+ 
+ <option value="branch:IUTT">Bibliothèque de l'IUT de Tremblay</option>
+ 
+ <option selected="selected" value="branch:BUP8">BU – Saint-Denis</option>
+ 
+ 
+ <option value="branch:CAR">Cartothèque</option>
+ 
+ <option value="branch:INC">INCONNUE</option>
+ 
+ 
+ </select>
+ <button type="submit" id="searchsubmit" class="btn btn-primary">Valider</button>
+ </div>
+ 
+
+ </form>
+ 
+ </div> <!-- / .mastheadsearch -->
+ 
+
+ <div class="row-fluid">
+ <div id="moresearches">
+ <ul>
+ <li><a href="/cgi-bin/koha/opac-search.pl">Recherche avancée</a></li>
+ 
+ 
+ <li><a href="/cgi-bin/koha/opac-authorities-home.pl">Recherche d'autorités</a></li>
+ 
+ <li><a href="/cgi-bin/koha/opac-tags.pl">Nuage de Tags</a></li>
+ 
+ 
+ 
+ 
+ 
+ </ul>
+ </div> <!-- /#moresearches -->
+ </div> <!-- /.row-fluid -->
+
+ 
+ </div> <!-- /.span10 -->
+ </div> <!-- /.opac-main-search -->
+ </div> <!-- / .row-fluid -->
+ </div> <!-- /.container-fluid -->
+
+ <!-- Login form hidden by default, used for modal window -->
+ <div id="loginModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="modalLoginLabel" aria-hidden="true">
+ <div class="modal-header">
+ <button type="button" class="closebtn" data-dismiss="modal" aria-hidden="true">×</button>
+ <h3 id="modalLoginLabel">Connexion à votre compte</h3>
+ </div>
+ <form action="/cgi-bin/koha/opac-user.pl" method="post" name="auth" id="modalAuth">
+ <div class="modal-body">
+ 
+ <input type="hidden" name="koha_login_context" value="opac" />
+ <fieldset class="brief">
+ <label for="muserid">Identifiant&nbsp;:</label><input type="text" id="muserid" name="userid" />
+ <label for="mpassword">Mot de passe&nbsp;:</label><input type="password" id="mpassword" name="password" />
+ 
+ <div id="nologininstructions-modal">
+ <h5>CAS = pour &eacutetudiants ou personnel de Paris 8   |   Identifiant local, Login et mot de passe = pour lecteurs ext&eacuterieurs</h5>
+Login : votre pr&eacutenom.nom (sans accent)<br>mot de passe : votre date de naissance (JJMMAAAA)
+
+ </div>
+ 
+ 
+ </fieldset>
+ </div>
+ <div class="modal-footer">
+ <input value="Connexion" type="submit" class="btn btn-primary" />
+ <a href="#" data-dismiss="modal" aria-hidden="true" class="cancel">Annuler</a>
+ </div>
+ </form> <!-- /#auth -->
+ </div> <!-- /#modalAuth -->
+
+
+<div class="main">
+ <ul class="breadcrumb">
+ <li><a href="/cgi-bin/koha/opac-main.pl">Accueil</a> <span class="divider">&rsaquo;</span></li>
+ <li><a href="#">Détails pour&nbsp;: Mille plateaux</a></li>
+ </ul>
+
+ <div class="container-fluid">
+ <div class="row-fluid">
+ <div class="span9">
+ <div id="catalogue_detail_biblio" class="maincontent">
+
+ <div id="bookcover">
+ 
+ 
+ 
+ <a href="http://www.amazon.com/dp/2707303070">
+ 
+ 
+ <img alt="Image de couverture" src="http://images.amazon.com/images/P/2707303070.01.MZZZZZZZ.jpg" border="0" /></a>
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+ </div><!-- / #bookcover -->
+
+ <abbr class="unapi-id" title="koha:biblionumber:97756"><!-- unAPI --></abbr>
+ 
+ <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=book&amp;rft.title=Mille+plateaux&amp;rft.btitle=Mille+plateaux&amp;rft.isbn=2-7073-0307-0&amp;rft.issn=&amp;rft.aulast=Deleuze&amp;rft.aufirst=Gilles&amp;rft.au=Gilles+Deleuze&amp;rft.pub=les+Ed.+de+Minuit&amp;rft.date=impr.+1980&amp;rft.pages="></span>
+ 
+
+ <div id="views">
+ <span class="view"><span id="Normalview">Vue normale</span></span>
+ <span class="view"><a id="MARCview" href="/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=97756">Vue MARC</a></span>
+ <span class="view"><a id="ISBDview" href="/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber=97756">vue ISBD</a></span>
+ </div>
+ 
+ 
+
+<h1>Mille plateaux [Texte imprimé] / Gilles Deleuze, Félix Guattari</h1><span class="results_summary"><span class="label">Contenu dans: </span><a href="/cgi-bin/koha/opac-search.pl?q=ti:Capitalisme%20et%20schizophr%C3%A9nie">Capitalisme et schizophrénie</a>2. </span><span class="results_summary"><span class="label">Auteur principal: </span><span><a href="/cgi-bin/koha/opac-search.pl?q=an:579644">Deleuze, Gilles<span dir="ltr"> (1925-1995)</span></a>  </span></span><span class="results_summary"><span class="label">Co-auteur: </span><span><a href="/cgi-bin/koha/opac-search.pl?q=an:610624">Guattari, Félix<span dir="ltr"> (1930-1992)</span></a>  </span></span><span class="results_summary"><span class="label">Langue: </span>français ; de la table des matières, fre ; de la page de titre, fre ; du titre propre, français.</span><span class="results_summary"><span class="label">Pays: </span>France.</span><span xmlns:marc="http://www.loc.gov/MARC21/slim" class="results_summary"><span class="label">Editeur: </span>Paris : <a href="/cgi-bin/koha/opac-search.pl?q=pb:les%20Ed.%20de%20Minuit">les Ed. de Minuit</a>, impr. 1980 — 61-Alençon : impr. Corbière et Jugain</span><span class="results_summary"><span class="label">Description: </span>1 vol. (645 p.) :
+          ill. ;
+          22 cm</span><abbr class="unapi-id" title="koha:biblionumber:"></abbr><span class="results_summary"><span class="label">ISBN: </span>2-7073-0307-0 ; 978-2-7073-0307-3.<a href="http://www.sudoc.abes.fr/DB=2.1/SET=14/TTL=1/CMD?ACT=SRCHA&amp;IKT=7&amp;SRT=RLV&amp;TRM=2-7073-0307-0"> Localiser ce document dans le SUDOC </a></span><span class="results_summary"><span class="label">Collection: </span><a href="/cgi-bin/koha/opac-search.pl?q=se:Capitalisme%20et%20schizophr%C3%A9nie">Capitalisme et schizophrénie</a>, 2<a href="/cgi-bin/koha/opac-search.pl?q=se:Critique">Critique</a></span><span class="results_summary"><span class="label">Bibliographie: </span>Notes bibliogr..</span><span class="results_summary"><span class="label">Sujet - Nom commun: </span><a href="/cgi-bin/koha/opac-search.pl?q=an:734938">Schizophrénie </a> | <a href="/cgi-bin/koha/opac-search.pl?q=su:Capitalism">Capitalism </a> | <a href="/cgi-bin/koha/opac-search.pl?q=su:Philosophy">Philosophy </a> | <a href="/cgi-bin/koha/opac-search.pl?q=su:Social%20psychiatry">Social psychiatry </a> | <a href="/cgi-bin/koha/opac-search.pl?q=an:645981">Psychanalyse et capitalisme </a> | <a href="/cgi-bin/koha/opac-search.pl?q=an:632785">Psychiatrie sociale </a> | <a href="/cgi-bin/koha/opac-search.pl?q=su:Schizophrenia">Schizophrenia </a> | <a href="/cgi-bin/koha/opac-search.pl?q=an:766459">Capitalisme </a> | <a href="/cgi-bin/koha/opac-search.pl?q=an:625835">Psychanalyse et sociologie </a> | <a href="/cgi-bin/koha/opac-search.pl?q=an:623074">Inconscient </a></span><p></p><p></p><br>
+
+
+
+ 
+
+ 
+
+ <!-- This puts the LTFL reviews in, and if TabbedView is not set, puts the remaining content above the Tabs instead of in them -->
+ 
+
+ <!--This grabs all of the lists a bib record appears in -->
+ 
+ <span class="results_summary lists"><span class="label">Ce document apparaît dans la/les liste(s)&nbsp;: </span>
+ 
+ <a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=3713">iks ray</a>
+ 
+ 
+ </span>
+ 
+
+ 
+ <div class="results_summary tags">
+ 
+ <span class="label">Tags de cette bibliothèque :</span> <span class="notags">Pas de tags pour ce titre.</span>
+ 
+  <a class="tag_add" id="tag_add97756" href="#">Ajouter un/des tag(s)</a> 
+ </div>
+ 
+
+ 
+ <div class="results_summary tagsinput">
+ 
+ <form id="tagform97756" method="post" action="/cgi-bin/koha/opac-tags.pl" style="display:none;">
+ <label for="newtag97756">Nouveau(s) tag(s), séparés par une virgule :</label>
+ <input name="newtag97756" id="newtag97756" maxlength="100" type="text"/>
+ <input value="Ajouter" name="tagbutton" class="btn btn-small tagbutton" title="97756" type="submit" />
+ <a class="cancel_tag_add" id="cancel97756" href="#">(fait)</a>
+ </form>
+ <span id="newtag97756_status" class="tagstatus" style="display:none;">
+ Statut du tag. </span>
+ 
+ </div>
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ </div> <!-- / #catalogue_detail_biblio -->
+
+ <div id="bibliodescriptions" class="toptabs">
+
+ <ul>
+ 
+ <li id="tab_holdings">
+ 
+ <a href="#holdings">Exemplaires  ( 8 )</a>
+ </li>
+ 
+ 
+ <li id="tab_descriptions"> <a href="#descriptions">Notes</a></li>
+ 
+ 
+ 
+
+ 
+
+ 
+
+ 
+ <li id="tab_comments"><a href="#comments">Commentaires ( 0 )</a></li>
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ </ul>
+
+ 
+
+
+ <div id="holdings">
+  
+ <table class="holdingst table table-bordered table-striped">
+ <thead>
+ <tr>
+ <th id="item_itemtype" class="itype">Type de document</th>
+ 
+ <th id="item_current_location" class="item_location">Emplacement actuel</th>
+ 
+ 
+ 
+ 
+ <th id="item_ccode" class="collection">Collection</th>
+ <th id="item_callnumber" class="call_no">Cote</th>
+ 
+ 
+ 
+ <th id="item_status" class="status">Situation</th>
+ 
+ <th id="item_datedue" class="date_due">Date de retour</th>
+ 
+ 
+ 
+ </tr>
+ </thead>
+ <tbody>
+ 
+ 
+ <tr vocab="http://schema.org/" typeof="Offer">
+ 
+ 
+ <td class="itype">
+ 
+ 
+ 
+ Livre empruntable
+ </td>
+ 
+ 
+ 
+ <td class="location" property="seller">
+ <link property="itemOffered" href="#record" />
+ <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut">
+ <span class="" title="">
+ 
+ <span>BU – Saint-Denis</span>
+ 
+ </span>
+ <div class="branch-info-tooltip"></div>
+
+ 
+ <span class="shelvingloc">Salle bleue</span>
+ 
+
+ </td>
+ 
+
+ 
+
+ 
+
+ 
+ <td class="collection">Philosophie - B</td>
+ 
+ <td class="call_no" property="sku">
+ 
+ 1"19" DEL 7 Mil
+ 
+ 
+ (<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=97756&amp;shelfbrowse_itemnumber=406731#holdings">Parcourir l'étagère</a>)
+ 
+ 
+ 
+ </td>
+ 
+ 
+ 
+ <td class="status">
+ <link property="availability" href="http://schema.org/OutOfStock" />
+
+   
+
+
+ 
+ 
+ 
+ <span class="item-status checkedout">En prêt</span>
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</td>
+ 
+ <td class="date_due"><span title="2016-04-26 23:59:00">26/04/2016</span></td>
+ 
+ 
+ 
+ </tr>
+ 
+ 
+ <tr vocab="http://schema.org/" typeof="Offer">
+ 
+ 
+ <td class="itype">
+ 
+ 
+ 
+ Livre empruntable
+ </td>
+ 
+ 
+ 
+ <td class="location" property="seller">
+ <link property="itemOffered" href="#record" />
+ <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut">
+ <span class="" title="">
+ 
+ <span>BU – Saint-Denis</span>
+ 
+ </span>
+ <div class="branch-info-tooltip"></div>
+
+ 
+ <span class="shelvingloc">Salle bleue</span>
+ 
+
+ </td>
+ 
+
+ 
+
+ 
+
+ 
+ <td class="collection">Philosophie - B</td>
+ 
+ <td class="call_no" property="sku">
+ 
+ 1"19" DEL 7 Mil
+ 
+ 
+ (<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=97756&amp;shelfbrowse_itemnumber=131350#holdings">Parcourir l'étagère</a>)
+ 
+ 
+ 
+ </td>
+ 
+ 
+ 
+ <td class="status">
+ <link property="availability" href="http://schema.org/OutOfStock" />
+
+   
+
+
+ 
+ 
+ 
+ <span class="item-status checkedout">En prêt</span>
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</td>
+ 
+ <td class="date_due"><span title="2016-03-15 23:59:00">15/03/2016</span></td>
+ 
+ 
+ 
+ </tr>
+ 
+ 
+ <tr vocab="http://schema.org/" typeof="Offer">
+ 
+ 
+ <td class="itype">
+ 
+ 
+ 
+ Livre empruntable
+ </td>
+ 
+ 
+ 
+ <td class="location" property="seller">
+ <link property="itemOffered" href="#record" />
+ <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut">
+ <span class="" title="">
+ 
+ <span>BU – Saint-Denis</span>
+ 
+ </span>
+ <div class="branch-info-tooltip"></div>
+
+ 
+ <span class="shelvingloc">Salle bleue</span>
+ 
+
+ </td>
+ 
+
+ 
+
+ 
+
+ 
+ <td class="collection">Philosophie - B</td>
+ 
+ <td class="call_no" property="sku">
+ 
+ 1"19" DEL 7 Mil
+ 
+ 
+ (<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=97756&amp;shelfbrowse_itemnumber=131351#holdings">Parcourir l'étagère</a>)
+ 
+ 
+ 
+ </td>
+ 
+ 
+ 
+ <td class="status">
+ <link property="availability" href="http://schema.org/InStock" />
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <span class="item-status available">Disponible </span>
+
+</td>
+ 
+ <td class="date_due"><span title=""></span></td>
+ 
+ 
+ 
+ </tr>
+ 
+ 
+ <tr vocab="http://schema.org/" typeof="Offer">
+ 
+ 
+ <td class="itype">
+ 
+ 
+ 
+ Livre empruntable
+ </td>
+ 
+ 
+ 
+ <td class="location" property="seller">
+ <link property="itemOffered" href="#record" />
+ <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut">
+ <span class="" title="">
+ 
+ <span>BU – Saint-Denis</span>
+ 
+ </span>
+ <div class="branch-info-tooltip"></div>
+
+ 
+ <span class="shelvingloc">Magasin 1</span>
+ 
+
+ </td>
+ 
+
+ 
+
+ 
+
+ 
+ <td class="collection">Philosophie - B</td>
+ 
+ <td class="call_no" property="sku">
+ 
+ 482155
+ 
+ 
+ (<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=97756&amp;shelfbrowse_itemnumber=131352#holdings">Parcourir l'étagère</a>)
+ 
+ 
+ 
+ </td>
+ 
+ 
+ 
+ <td class="status">
+ <link property="availability" href="http://schema.org/OutOfStock" />
+
+   
+
+
+ 
+ 
+ 
+ <span class="item-status checkedout">En prêt</span>
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</td>
+ 
+ <td class="date_due"><span title="2016-03-09 23:59:00">09/03/2016</span></td>
+ 
+ 
+ 
+ </tr>
+ 
+ 
+ <tr vocab="http://schema.org/" typeof="Offer">
+ 
+ 
+ <td class="itype">
+ 
+ 
+ 
+ Livre empruntable
+ </td>
+ 
+ 
+ 
+ <td class="location" property="seller">
+ <link property="itemOffered" href="#record" />
+ <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut">
+ <span class="" title="">
+ 
+ <span>BU – Saint-Denis</span>
+ 
+ </span>
+ <div class="branch-info-tooltip"></div>
+
+ 
+ <span class="shelvingloc">Salle bleue</span>
+ 
+
+ </td>
+ 
+
+ 
+
+ 
+
+ 
+ <td class="collection">Philosophie - B</td>
+ 
+ <td class="call_no" property="sku">
+ 
+ 1"19" DEL 7
+ 
+ 
+ (<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=97756&amp;shelfbrowse_itemnumber=131354#holdings">Parcourir l'étagère</a>)
+ 
+ 
+ 
+ </td>
+ 
+ 
+ 
+ <td class="status">
+ <link property="availability" href="http://schema.org/OutOfStock" />
+
+   
+
+
+ 
+ 
+ 
+ <span class="item-status checkedout">En prêt</span>
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</td>
+ 
+ <td class="date_due"><span title="2016-03-10 23:59:00">10/03/2016</span></td>
+ 
+ 
+ 
+ </tr>
+ 
+ 
+ <tr vocab="http://schema.org/" typeof="Offer">
+ 
+ 
+ <td class="itype">
+ 
+ 
+ 
+ Livre empruntable
+ </td>
+ 
+ 
+ 
+ <td class="location" property="seller">
+ <link property="itemOffered" href="#record" />
+ <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut">
+ <span class="" title="">
+ 
+ <span>BU – Saint-Denis</span>
+ 
+ </span>
+ <div class="branch-info-tooltip"></div>
+
+ 
+ <span class="shelvingloc">Magasin 1</span>
+ 
+
+ </td>
+ 
+
+ 
+
+ 
+
+ 
+ <td class="collection">Philosophie - B</td>
+ 
+ <td class="call_no" property="sku">
+ 
+ 215976
+ 
+ 
+ (<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=97756&amp;shelfbrowse_itemnumber=131355#holdings">Parcourir l'étagère</a>)
+ 
+ 
+ 
+ </td>
+ 
+ 
+ 
+ <td class="status">
+ <link property="availability" href="http://schema.org/InStock" />
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <span class="item-status available">Disponible </span>
+
+</td>
+ 
+ <td class="date_due"><span title=""></span></td>
+ 
+ 
+ 
+ </tr>
+ 
+ 
+ <tr vocab="http://schema.org/" typeof="Offer">
+ 
+ 
+ <td class="itype">
+ 
+ 
+ 
+ Livre empruntable
+ </td>
+ 
+ 
+ 
+ <td class="location" property="seller">
+ <link property="itemOffered" href="#record" />
+ <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut">
+ <span class="" title="">
+ 
+ <span>BU – Saint-Denis</span>
+ 
+ </span>
+ <div class="branch-info-tooltip"></div>
+
+ 
+ <span class="shelvingloc">Magasin 1</span>
+ 
+
+ </td>
+ 
+
+ 
+
+ 
+
+ 
+ <td class="collection">Philosophie - B</td>
+ 
+ <td class="call_no" property="sku">
+ 
+ 215974
+ 
+ 
+ (<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=97756&amp;shelfbrowse_itemnumber=131356#holdings">Parcourir l'étagère</a>)
+ 
+ 
+ 
+ </td>
+ 
+ 
+ 
+ <td class="status">
+ <link property="availability" href="http://schema.org/InStock" />
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <span class="item-status available">Disponible </span>
+
+</td>
+ 
+ <td class="date_due"><span title=""></span></td>
+ 
+ 
+ 
+ </tr>
+ 
+ 
+ <tr vocab="http://schema.org/" typeof="Offer">
+ 
+ 
+ <td class="itype">
+ 
+ 
+ 
+ Livre empruntable
+ </td>
+ 
+ 
+ 
+ <td class="location" property="seller">
+ <link property="itemOffered" href="#record" />
+ <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut">
+ <span class="" title="">
+ 
+ <span>BU – Saint-Denis</span>
+ 
+ </span>
+ <div class="branch-info-tooltip"></div>
+
+ 
+ <span class="shelvingloc">Salle bleue</span>
+ 
+
+ </td>
+ 
+
+ 
+
+ 
+
+ 
+ <td class="collection">Philosophie - B</td>
+ 
+ <td class="call_no" property="sku">
+ 
+ 1"19" DEL 7 Mil
+ 
+ 
+ (<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=97756&amp;shelfbrowse_itemnumber=131358#holdings">Parcourir l'étagère</a>)
+ 
+ 
+ 
+ </td>
+ 
+ 
+ 
+ <td class="status">
+ <link property="availability" href="http://schema.org/InStock" />
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <span class="item-status available">Disponible </span>
+
+</td>
+ 
+ <td class="date_due"><span title=""></span></td>
+ 
+ 
+ 
+ </tr>
+ 
+ </tbody>
+ </table>
+  
+ 
+ 
+ 
+ 
+
+ <br style="clear:both;" />
+ </div> <!-- / #holdings -->
+
+ 
+
+ 
+ <div id="descriptions">
+ <div class="content_set">
+
+ 
+
+ 
+ <div id="marcnotes">
+ 
+ <p> Réimpressions : 1989, 1994, 1997, 2001, 2004, 2006</p>
+ 
+ <p>Notes bibliogr.</p>
+ 
+ </div>
+ 
+
+ </div>
+ </div> <!-- / #descriptions -->
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ <div id="comments">
+ <div id="newcomment"></div>
+ 
+ <p>Il n'y a pas de commentaire pour ce document.</p>
+ 
+
+ 
+ 
+ <div id="addcomment"> <a href="#" onclick="Dopop('/cgi-bin/koha/opac-review.pl?biblionumber=97756'); return false;">
+ Ecrivez ou modifiez votre commentaire sur cet ouvrage. </a></div>
+ 
+ 
+ </div> <!-- / #comments -->
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ </div> <!-- / #bibliodescriptions -->
+
+ 
+
+ 
+ </div> <!-- /.span8 -->
+
+ <div class="span3">
+ <div id="ulactioncontainer">
+
+ 
+ <div class="nav_results">
+ <div class="l_Results">
+ 
+ <a href="#" id="a_listResults" title="Montrer la liste (1-10 / 10)">Parcourir le résultat</a>
+ 
+ </div>
+ <ul class="pg_menu clearfix">
+ <li class="left_results">
+ 
+ <span>Précédent</span>
+ 
+ </li>
+ 
+ <li class="back_results"><a href="opac-search.pl?idx=&amp;q=mille%20plateaux&amp;branch_group_limit=branch%3ABUP8&amp;limit=branch%3ABUP8" title="Retour au résultat de recherche">Résultat</a></li>
+ <li class="right_results">
+ 
+ <a href="opac-detail.pl?biblionumber=166736" title="Voir&nbsp;: Du corps sans organes au Post-Rock">Suivant &raquo;</a>
+ 
+ </li>
+ </ul>
+ 
+ <div class="results-pagination">
+ <div class="nav_pages">
+ <span class="close_pagination"><a href="#" id="close_pagination">Fermer</a></span>
+ <ul id="listResults"></ul>
+ </div>
+ <div class="pagination_list">
+ <ul id="ul_pagination_list"></ul>
+ </div>
+ </div>
+ 
+ </div>
+ 
+
+ <ul id="action">
+ 
+ 
+ 
+ 
+ 
+ <li><a class="reserve" href="/cgi-bin/koha/opac-reserve.pl?biblionumber=97756">Réserver</a></li>
+ 
+ 
+ 
+ 
+ 
+ <li><a class="print-large" href="#" onclick="window.print();">Impression</a></li>
+ 
+ 
+ <li><a class="addtoshelf" href="/cgi-bin/koha/opac-addbybiblionumber.pl?biblionumber=97756" onclick="Dopop('opac-addbybiblionumber.pl?biblionumber=97756'); return false;">
+ Enregistrer dans mes listes </a></li>
+ 
+ 
+ 
+ 
+ <li><a class="addtocart cart97756" href="#" onclick="addRecord('97756'); return false;">Ajouter à mon panier</a> <a style="display:none;" class="cartRemove cartR97756" href="#" onclick="delSingleRecord('97756'); return false;">(Supprimer)</a></li>
+ 
+ 
+ 
+
+ 
+ <li>
+ <div id="export">
+ <div class="dropdown">
+ <a id="format" class="dropdown-toggle" data-toggle="dropdown" href="#">Enregistrer la notice <b class="caret"></b></a>
+ <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="format">
+ 
+ <li>
+ <a role="menuitem" href="/cgi-bin/koha/opac-export.pl?op=export&amp;bib=97756&amp;format=bibtex">
+ BIBTEX  </a>
+ </li>
+ 
+ <li>
+ <a role="menuitem" href="/cgi-bin/koha/opac-export.pl?op=export&amp;bib=97756&amp;format=dc">
+ Dublin Core (XML)  </a>
+ </li>
+ 
+ <li>
+ <a role="menuitem" href="/cgi-bin/koha/opac-export.pl?op=export&amp;bib=97756&amp;format=marcxml">
+ MARCXML  </a>
+ </li>
+ 
+ <li>
+ <a role="menuitem" href="/cgi-bin/koha/opac-export.pl?op=export&amp;bib=97756&amp;format=marc8">
+ MARC (non-Unicode/MARC-8)  </a>
+ </li>
+ 
+ <li>
+ <a role="menuitem" href="/cgi-bin/koha/opac-export.pl?op=export&amp;bib=97756&amp;format=utf8">
+ MARC (Unicode/UTF-8)  </a>
+ </li>
+ 
+ <li>
+ <a role="menuitem" href="/cgi-bin/koha/opac-export.pl?op=export&amp;bib=97756&amp;format=marcstd">
+ MARC (Unicode/UTF-8, Standard)  </a>
+ </li>
+ 
+ <li>
+ <a role="menuitem" href="/cgi-bin/koha/opac-export.pl?op=export&amp;bib=97756&amp;format=mods">
+ MODS (XML)  </a>
+ </li>
+ 
+ <li>
+ <a role="menuitem" href="/cgi-bin/koha/opac-export.pl?op=export&amp;bib=97756&amp;format=ris">
+ RIS  </a>
+ </li>
+ 
+ </ul>
+ </div>
+ </div>
+ </li>
+ 
+
+ 
+ <li>
+ <div id="moresearches_menu">
+ <div class="dropdown">
+ <a id="furthersearches" class="dropdown-toggle" data-toggle="dropdown" href="#">Plus de recherches <b class="caret"></b></a>
+ <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="furthersearches">
+ <li><a href="#" class="menu-inactive">Chercher ce titre dans&nbsp;:</a></li>
+ <li><a  href="http://worldcat.org/search?q=Mille%20plateaux" target="_blank">Other Libraries (WorldCat)</a></li>
+<li><a href="http://www.scholar.google.com/scholar?q=Mille%20plateaux" target="_blank">Other Databases (Google Scholar)</a></li>
+<li><a href="http://www.bookfinder.com/search/?author=Gilles%20Deleuze%2C%20F%C3%A9lix%20Guattari&amp;title=Mille%20plateaux&amp;st=xl&amp;ac=qr" target="_blank">Online Stores (Bookfinder.com)</a></li>
+<li><a href="http://openlibrary.org/search/?author=(Gilles%20Deleuze%2C%20F%C3%A9lix%20Guattari)&title=(Mille%20plateaux)" target="_blank">Open Library (openlibrary.org)</a></li>
+ </ul>
+ </div>
+ </div>
+ </li>
+ 
+</ul>
+
+
+ 
+
+ 
+
+ 
+ <div id="social_networks" class="clearfix">
+ <span>Partager</span>
+ <div><a href="http://www.facebook.com/sharer.php?u=http://http://catalogue.bu.univ-paris8.fr/cgi-bin/koha/opac-detail.pl?biblionumber=97756&t=Mille%20plateaux" id="facebook" title="Partager sur Facebook">Facebook</a></div>
+ <div><a href="http://www.linkedin.com/shareArticle?mini=true&url=http://http://catalogue.bu.univ-paris8.fr/cgi-bin/koha/opac-detail.pl?biblionumber=97756&title=Mille%20plateaux" id="linkedin" title="Partager sur LinkedIn">LinkedIn</a></div>
+ <div><a href="http://www.delicious.com/save?url=http://http://catalogue.bu.univ-paris8.fr/cgi-bin/koha/opac-detail.pl?biblionumber=97756&title=Mille%20plateaux" id="delicious" title="Partager sur Delicious">Delicious</a></div>
+ <div><a href="mailto:?subject=Mille%20plateaux&body=Mille%20plateaux%20(http://http://catalogue.bu.univ-paris8.fr/cgi-bin/koha/opac-detail.pl?biblionumber=97756)" id="email" title="Partager par courriel">Courriel</a></div>
+ <div><div class="g-plusone" data-size="small" data-count="false"></div></div>
+ <div><a id="twitter" href="https://twitter.com/share" class="twitter-share-button" data-count="none" data-text="Mille plateaux" data-lang="fr-FR">Tweet</a></div>
+ </div>
+ 
+ </div> <!-- / .ulactioncontainer -->
+ </div> <!-- / .span4 -->
+ </div> <!-- / .row-fluid -->
+ <div class="row-fluid">
+ 
+
+ 
+
+ 
+ </div> <!-- / .row-fluid -->
+</div> <!-- / .container-fluid -->
+</div> <!-- / .main -->
+
+
+ 
+
+ 
+
+</div> <!-- / #wrap in masthead.inc -->
+
+ 
+
+
+
+<!-- JavaScript includes -->
+<script type="text/javascript" src="/opac-tmpl/bootstrap/lib/jquery/jquery.js"></script>
+<script type="text/javascript" src="/opac-tmpl/bootstrap/lib/jquery/jquery-ui.js"></script>
+<script type="text/javascript">
+// Resolve name collision between jQuery UI and Twitter Bootstrap
+$.widget.bridge('uitooltip', $.ui.tooltip);
+</script>
+<script type="text/javascript" src="/opac-tmpl/bootstrap/lib/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/opac-tmpl/bootstrap/js/global.js"></script>
+<script type="text/javascript">
+    Modernizr.load([
+        // Test need for polyfill
+        {
+            test: window.matchMedia,
+            nope: "/opac-tmpl/bootstrap/lib/media.match.min.js"
+        },
+        // and then load enquire
+        "/opac-tmpl/bootstrap/lib/enquire.min.js",
+        "/opac-tmpl/bootstrap/js/script.js"
+    ]);
+</script>
+
+<script type="text/javascript">//<![CDATA[
+        var NO_AMAZON_IMAGE = _("Pas d'image disponible");
+    //]]>
+</script>
+<script type="text/javascript" src="/opac-tmpl/bootstrap/js/amazonimages.js"></script>
+
+
+<script type="text/javascript">
+    //<![CDATA[
+    var MSG_CONFIRM_AGAIN = _("Attention: annulation impossible. Merci de confirmer à nouveau.")
+    var MSG_DELETE_SEARCH_HISTORY = _("Êtes-vous sûr de vouloir supprimer votre historique de recherche ?");
+    var MSG_NO_SUGGESTION_SELECTED = _("Aucun suggestion sélectionnée");
+    
+        var MSG_BASKET_EMPTY = _("Votre panier est actuellement vide");
+        var MSG_RECORD_IN_BASKET = _("Ce document est déjà dans votre panier");
+        var MSG_RECORD_ADDED = _("Ce document a été ajouté à votre panier");
+        var MSG_RECORD_REMOVED = _("Ce document a été enlevé de votre panier");
+        var MSG_NRECORDS_ADDED = _(" document(s) ajouté(s) à votre panier");
+        var MSG_NRECORDS_IN_BASKET = _("Déjà dans votre panier");
+        var MSG_NO_RECORD_SELECTED = _("Aucun document sélectionné");
+        var MSG_NO_RECORD_ADDED = _("Aucun document ajouté dans votre panier");
+        var MSG_CONFIRM_DEL_BASKET = _("Êtes-vous sûr de vouloir vider votre panier ?");
+        var MSG_CONFIRM_DEL_RECORDS = _("Êtes-vous sûr de vouloir enlever les documents sélectionnés ?");
+        var MSG_ITEM_IN_CART = _("Dans mon panier");
+        var MSG_IN_YOUR_CART = _("Dans votre panier&nbsp;: ");
+        var MSG_ITEM_NOT_IN_CART = _("Ajouter à mon panier");
+        var MSG_NO_RECORD_SELECTED = _("Aucun document sélectionné");
+    
+    
+        var MSG_TAGS_DISABLED = _("Désolé, les tags ne sont pas disponibles sur ce système.");
+        var MSG_TAG_ALL_BAD = _("Erreur! Votre tag était composé de code informatique interdit. Il n'a donc pas été ajouté. Merci de réessayer avec du texte brut.");
+        var MSG_ILLEGAL_PARAMETER = _("Erreur ! paramètre illégal");
+        var MSG_TAG_SCRUBBED = _("Remarque : Votre tag contenait un code informatique interdit, qui a été supprimé. Le tag a été ajouté sous la forme ");
+        var MSG_ADD_TAG_FAILED = _("Erreur ! Impossible d'ajouter le tag");
+        var MSG_ADD_TAG_FAILED_NOTE = _("Remarque : Vous ne pouvez ajouter qu'un seul tag donné au même exemplaire. Allez dans 'Mes tags' afin de voir vos tags.");
+        var MSG_DELETE_TAG_FAILED = _("Erreur ! Vous ne pouvez pas supprimer le tag");
+        var MSG_DELETE_TAG_FAILED_NOTE = _("Remarque : Vous ne pouvez supprimer que vos propres tags.")
+        var MSG_LOGIN_REQUIRED = _("Vous devez être connecté pour ajouter des tags.");
+        var MSG_TAGS_ADDED = _("Tags ajoutés&nbsp;: ");
+        var MSG_TAGS_DELETED = _("Tags ajoutés&nbsp;: ");
+        var MSG_TAGS_ERRORS = _("Erreurs&nbsp;: ");
+        var MSG_MULTI_ADD_TAG_FAILED = _("Impossible d'ajouter des tags.");
+        var MSG_NO_TAG_SPECIFIED = _("Aucun tag déclaré.");
+    
+    
+        $(window).load(function() {
+            verify_images();
+         });
+    
+    //]]>
+</script>
+
+
+ <script type="text/javascript" src="/opac-tmpl/bootstrap/js/basket.js"></script>
+
+
+<script type="text/javascript" src="/opac-tmpl/bootstrap/js/tags.js"></script>
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="/opac-tmpl/lib/jquery/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+    var MSG_DT_FIRST = _("Premier");
+    var MSG_DT_LAST = _("Dernier");
+    var MSG_DT_NEXT = _("Suivant");
+    var MSG_DT_PREVIOUS = _("Précédent");
+    var MSG_DT_EMPTY_TABLE = _("Aucune donnée disponible");
+    var MSG_DT_INFO = _("Afficher de _START_ à _END_ sur _TOTAL_");
+    var MSG_DT_INFO_EMPTY = _("Pas d'entrées à afficher");
+    var MSG_DT_INFO_FILTERED = _("(filtré sur _MAX_ total entrées)");
+    var MSG_DT_LENGTH_MENU = _("Affiche _MENU_ entrées");
+    var MSG_DT_LOADING_RECORDS = _("Chargement...");
+    var MSG_DT_PROCESSING = _("En cours...");
+    var MSG_DT_SEARCH = _("Rechercher&nbsp;:");
+    var MSG_DT_ZERO_RECORDS = _("Aucune notice correspondante");
+    var CONFIG_EXCLUDE_ARTICLES_FROM_SORT = _("un une l' le la les d' du de des");
+//]]>
+</script>
+<script type="text/javascript" src="/opac-tmpl/bootstrap/js/datatables.js"></script>
+
+ <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+    //<![CDATA[
+      {lang: 'fr-FR'}
+    //]]>
+    </script>
+ <script type="text/javascript">!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+
+<script type="text/javascript" src="/opac-tmpl/bootstrap/lib/jquery/plugins/jquery.highlight-3.js"></script>
+
+<script type="text/javascript">
+//<![CDATA[
+
+    
+        var arrPagination = new Array();
+        var pag_index_ini = 1;
+        
+            
+                arrPagination[1] = {
+                    url:"",
+                    title:"",
+                    author:"",
+                    biblionumber:97756
+                };
+           
+                arrPagination[2] = {
+                    url:"opac-detail.pl?biblionumber=166736",
+                    title:"Du corps sans organes au Post-Rock",
+                    author:"Laszlo Elekes",
+                    biblionumber:166736
+                };
+           
+                arrPagination[3] = {
+                    url:"opac-detail.pl?biblionumber=286984",
+                    title:"A thousand plateaus",
+                    author:"Gilles Deleuze, Félix Guattari",
+                    biblionumber:286984
+                };
+           
+                arrPagination[4] = {
+                    url:"opac-detail.pl?biblionumber=239533",
+                    title:"Philippe Cognée, &quot;Carcasses&quot;",
+                    author:"[textes de Philippe Cognée et Christian Bernard]",
+                    biblionumber:239533
+                };
+           
+                arrPagination[5] = {
+                    url:"opac-detail.pl?biblionumber=180494",
+                    title:"La trilogie de la vie",
+                    author:"Pier Paolo Pasolini, réal.",
+                    biblionumber:180494
+                };
+           
+                arrPagination[6] = {
+                    url:"opac-detail.pl?biblionumber=17269",
+                    title:"Exposition sacrificielle",
+                    author:"thèse pour le doctorat présentée et soutenue publiquement par Melih Basaran ; sous la dir. de René Scherer",
+                    biblionumber:17269
+                };
+           
+                arrPagination[7] = {
+                    url:"opac-detail.pl?biblionumber=384554",
+                    title:"Territoires entre-deux",
+                    author:"Alice Finichiu",
+                    biblionumber:384554
+                };
+           
+                arrPagination[8] = {
+                    url:"opac-detail.pl?biblionumber=112582",
+                    title:"Géographie champenoise",
+                    author:"Ernest Millet",
+                    biblionumber:112582
+                };
+           
+                arrPagination[9] = {
+                    url:"opac-detail.pl?biblionumber=360291",
+                    title:"Autonomie locale et developpement de pays de quatre plateaux dans le massif central",
+                    author:"Agnès Bonnaud",
+                    biblionumber:360291
+                };
+           
+                arrPagination[10] = {
+                    url:"opac-detail.pl?biblionumber=361039",
+                    title:"Ernest Pignon Ernest",
+                    author:"André Velter",
+                    biblionumber:361039
+                };
+           
+        
+    
+
+    
+        var q_array = new Array();  // holds search terms if available
+
+        function highlightOff() {
+            $("#catalogue_detail_biblio").removeHighlight();
+            $(".highlight_toggle").toggle();
+        }
+        function highlightOn() {
+            var x;
+            for (x in q_array) {
+                if ( q_array[x].length > 0 ) {
+                    q_array[x] = q_array[x].replace(/\w*:([\w])/, "$1");
+                    q_array[x] = q_array[x].toLowerCase();
+                    var myStopwords = "and|or|not".toLowerCase().split('|');
+                    if( $.inArray(q_array[x], myStopwords) == -1 ) {
+                        $(".title").highlight(q_array[x]);
+                        $(".author").highlight(q_array[x]);
+                        $(".results_summary").highlight(q_array[x]);
+                    }
+                }
+            }
+            $(".highlight_toggle").toggle();
+        }
+    
+
+     $(document).ready(function() {
+        $('#bibliodescriptions').tabs();
+        $(".branch-info-tooltip-trigger").uitooltip({
+            position: { my: "left+15 center", at: "right center" },
+            show: 50,
+            hide: 50,
+            content: function(){
+                var element = $(this).next("div");
+                return element.html();
+            }
+        });
+
+        $(".tag_add").click(function(){
+            var thisid = $(this).attr("id");
+            thisid = thisid.replace("tag_add","");
+            $(this).hide();
+            $("#tagform"+thisid).show();
+            $("#newtag"+thisid).focus();
+            $("#newtag"+thisid+"_status").empty().hide();
+            return false;
+        });
+        $(".cancel_tag_add").click(function(){
+            var thisid = $(this).attr("id");
+            thisid = thisid.replace("cancel","");
+            $("#tagform"+thisid).hide();
+            $("#tag_add"+thisid).show();
+            $("#newtag"+thisid).val("");
+            $("#newtag"+thisid+"_status").empty().hide();
+            return false;
+        });
+        $(".tagbutton").click(function(){
+            var thisid = $(this).attr("title");
+            var tag = $("#newtag"+thisid).val();
+            if (!tag || (tag == "")) {
+                alert(MSG_NO_TAG_SPECIFIED);
+                return false;
+            }
+            KOHA.Tags.add_tag_button(thisid, tag);
+            return false;
+        });
+
+
+        $(".holdingst").dataTable($.extend(true, {}, dataTablesDefaults, {
+            "aoColumns": [
+                null,
+                null,
+                
+                null,
+                null,
+                
+                
+                
+                null,
+                
+                { "sType": "title-string" },
+                
+                
+                
+            ]
+        }));
+
+        
+    
+    
+    
+    
+
+    
+        if (arrPagination.length > 0) {
+            renderPagIndexList(pag_index_ini, $("#listResults"));
+        }
+        $("#a_listResults").click(function(e) {
+            if (arrPagination.length > 0) {
+                e.preventDefault();
+                var navigation = $(".results-pagination");
+                if (navigation.css("display") == 'none') {
+                    navigation.show();
+                    var newtitle = $(this).attr('title').replace('Show', 'Hide')
+                    $(this).attr('title',newtitle);
+                    renderPagination(pag_index_ini, arrPagination.length - 1, $("#ul_pagination_list"), false);
+                } else {
+                    navigation.hide();
+                    var newtitle = $(this).attr('title').replace('Hide', 'Show')
+                    $(this).attr('title',newtitle);
+                }
+            }
+        });
+        $("#close_pagination").click(function(e) {
+            e.preventDefault();
+            var navigation = $(".results-pagination");
+            navigation.hide();
+        });
+    
+
+
+    (function prepareShelfBrowser(){
+
+        $(".main").on("click",".close_shelf",function(e){
+            e.preventDefault();
+            $("#shelfbrowser").toggle();
+        });
+        $(".main").on("click", "#browser_previous a", function(e){
+            e.preventDefault();
+            $.ajax({
+                url: "/cgi-bin/koha/svc/shelfbrowser.pl",
+                type: "POST",
+                data: {
+                    "shelfbrowse_itemnumber": $("#browser_previous a").data( "prev-itemnumber" )
+                },
+                success: function(data){
+                    $("#shelfbrowser").replaceWith(data);
+                    
+                    
+                    
+                }
+            });
+        });
+
+        $(".main").on("click", "#browser_next a", function(e){
+            e.preventDefault();
+            $.ajax({
+                  url: "/cgi-bin/koha/svc/shelfbrowser.pl",
+                  type: "POST",
+                  data: {
+                    "shelfbrowse_itemnumber": $("#browser_next a").data( "next-itemnumber" )
+                },
+                success: function(data){
+                    $("#shelfbrowser").replaceWith(data);
+                    
+                    
+                    
+                }
+            });
+        });
+    }());
+
+
+
+
+
+});
+    
+
+    
+        var timeoutRFW;
+        var totalPagItemList = 10;
+
+        function rewindList()
+        {
+            var ul = $("#listResults");
+            var li_ini = ul.children(':first').next();
+            var index_ini = pag_index_ini;
+            if (li_ini) {
+                index_ini = parseInt(li_ini.attr("class").substring(7), 10);
+            }
+            var li_end = ul.children(':last').prev();
+            var index_end = arrPagination.length - 1;
+            if (li_end) {
+                index_end = parseInt(li_end.attr("class").substring(7), 10);
+            }
+            if (index_ini > pag_index_ini) {
+                renderPagIndexList(index_ini - 1, ul, false);
+                renderPagination(index_ini - 1, arrPagination.length - 1, $("#ul_pagination_list"), true);
+            }
+        }//rewindList
+
+        function forwardList()
+        {
+            var ul = $("#listResults");
+            var li_ini = ul.children(':first').next();
+            var index_ini = pag_index_ini;
+            if (li_ini) {
+                index_ini = parseInt(li_ini.attr("class").substring(7), 10);
+            }
+            var li_end = ul.children(':last').prev();
+            var index_end = arrPagination.length - 1;
+            if (li_end) {
+                index_end = parseInt(li_end.attr("class").substring(7), 10);
+            }
+            if (index_end < arrPagination.length - 1) {
+                renderPagIndexList(index_ini + 1, ul, false);
+                renderPagination(index_ini + 1, arrPagination.length - 1, $("#ul_pagination_list"), true);
+            }
+        }//forwardList
+
+        function renderPagIndexList(index, ul)
+        {
+            var $kids = ul.children("li");
+            if ($kids.length > 0) {
+                $kids.each(function() {
+                    $(this).remove();
+                });
+            }
+            var li;
+            var html = "";
+            var ini = index - 1;
+            var end = ini + totalPagItemList - 1;
+            li = $("<li />");
+            html = (index > pag_index_ini)?"<a href='#' id='rew_list_index' onclick='rewindList()' title='" + _("Cliquez pour revenir aux documents") + " " + ini + " - " + end + "'>&laquo;</a>":"&laquo;";
+            li.html(html);
+            ul.append(li);
+            var title = "";
+            for (var i=index; i < arrPagination.length && i < index + totalPagItemList; i++) {
+                if (arrPagination[i] == undefined) continue;
+                var li = $("<li />");
+                if (arrPagination[i].url != "") {
+                    title = _("Voir la notice") + " &quot;" + arrPagination[i].title + "&quot; ";
+                    if (arrPagination[i].author != "") title += " " + _("par") + "&quot;" + arrPagination[i].author + "&quot;";
+                    title += " " + _("avec le biblionumber") + " " + arrPagination[i].biblionumber;
+                    html = "<a href='" + arrPagination[i].url + "' title='" + title + "' class='a_pag' id='a_pag_" + i + "'";
+                    html += " onmouseover='renderPagination(" + i + ", " + (arrPagination.length - 1) + ", $(\"#ul_pagination_list\"), true)'";
+                    html += ">" + i + "</a>";
+                } else html = i;
+                li.html(html);
+                li.attr("class", "li_pag_" + i);
+                ul.append(li);
+            }
+            li = $("<li />");
+            ini = index + 1;
+            end = (arrPagination.length > index + totalPagItemList)?index + totalPagItemList:arrPagination.length - 1;
+            html = (end <= arrPagination.length - 1 && (end - index) >= totalPagItemList)?"<a href='#' id='fw_list_index' onclick='forwardList()' title='" + _("Cliquer pour avancer la liste à") + " " + ini + " - " + end + "'>&raquo;</a>":"&raquo;";
+            li.html(html);
+            ul.append(li);
+        }//renderPagIndexList
+
+
+        function renderPagination(index, total, ul, highlIndex)
+        {
+            for (var i = pag_index_ini; i <= total; i++) {
+                if (arrPagination[i] == undefined || arrPagination[i].url == "") continue;
+                $("#li_pag_" + i).remove();
+            }
+            var j = 0;
+            for (var i = index; i <= total && j < totalPagItemList; i++) {
+                if (arrPagination[i] == undefined || arrPagination[i].url == "") continue;
+                var li = $("<li id='li_pag_" + i + "' " + ((j % 2 == 0)?"class='highlight'":"")  + " title='" + _("Voir le détail") + "' />");
+                var html = "<span class='li_pag_index'>" + i + "</span><a href='" + arrPagination[i].url + "'>" + arrPagination[i].title + "</a>";
+                if (arrPagination[i].author) html += "<br /> " + _("par") + " " + arrPagination[i].author;
+                li.html(html);
+                if (highlIndex && i == index) li.css("backgroundColor", "#DDDDDD");
+                ul.append(li);
+                j++;
+            }
+            for (i = pag_index_ini; i < index && j < totalPagItemList; i++) {
+                if (arrPagination[i] == undefined || arrPagination[i].url == "") continue;
+                $("#li_pag_" + i).remove();
+                var li = $("<li id='li_pag_" + i + "' " + ((j % 2 == 0)?"class='highlight'":"")  + " title='" + _("Voir le détail") + "' />");
+                var html = "<span class='li_pag_index'>" + i + "</span><a href='" + arrPagination[i].url + "'>" + arrPagination[i].title + "</a>";
+                if (arrPagination[i].author) html += "<br /> " + _("par") + " " + arrPagination[i].author;
+                li.html(html);
+                ul.append(li);
+                j++;
+            }
+        }//renderPagination
+    
+//]]>
+</script>
+
+
+
+
+
+ <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function(){
+
+/* modification page connexion CAS*/
+$("#opac-auth h3").text("Se connecter à son compte lecteur");
+
+$("#opac-auth acronym[title='Central Authentication Service']").text("Pour consulter ou renouveler vos prêts, faire des suggestions d'achat ou créer vos propres listes bibliographiques, vous devez vous authentifier au au moyen de vos identifiants e-P8");
+
+
+$("#opac-auth label[for='userid']").text("Identifiant : votre prénom.nom (sans accent)");
+$("#opac-auth label[for='password']").text("Mot de passe (votre date de naissance JJMMAAAA):");
+
+$("h4:contains('Identification par CAS')").text("Vous êtes étudiant ou personnel de Paris 8");
+$("h4:contains('Identifiant local')").text("Vous êtes lecteur extérieur");
+
+$("p:contains('pas de compte CAS')").text("Pour accéder à votre compte, vous pouvez vous identifier ci-dessous :");
+
+$("h5:contains('Pas encore de mot de passe ?')").text("Pas encore de mot de passe ? Pas de carte de bibliothèque ?");
+$("p:contains('Si vous n'avez pas encore de mot de passe, passez par la banque de prêt la prochaine fois que vous viendrez à la bibliothèque. Nous serons ravis de vous en attribuer un.')").text("Passez à l'accueil la prochaine fois que vous viendrez à la bibliothèque !");
+
+$("h5:contains('Pas de carte de la bibliothèque ?')").hide();
+$("p:contains('Si vous n'êtes pas inscrit, passez à la bibliothèque la plus proche pour le faire.')").hide();
+
+//pour les périodiques
+if ($('table').hasClass('periodique')) 
+{$("#holdings").html('<p>Pour connaître les numéros disponibles et leur localisation, reportez-vous aux informations ci-dessus sous le titre "Etat de collection".</p>');}
+
+//Masquer la vue MARC dans les résultats
+$(".view a:contains('MARC view')").hide();
+
+//Recherche simple - ajout recherche issn
+
+$("#masthead_search option[value='nb']").after("<option value=\'ns\'>ISSN</option>");
+});
+//Piwik : toute personnalisation doit être effectuée avant le code de piwik, donc avant cette ligne
+//Piwik : customizations must be done before piwik, so before this line
+//]]>
+//##########
+//Piwik : 
+//##########
+var piwikid = "26";
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.biblibre.com/" : "http://piwik.biblibre.com/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker( pkBaseURL + "piwik.php", piwikid ) ;
+var url = window.location.href ;
+var uri = url ;
+var total = "zero" ;
+var numresults = document.getElementById('numresults');
+if (numresults) {
+    //total = numresults.innerHTML;
+    var numresultsstrong=numresults.getElementsByTagName('strong');
+    if (numresultsstrong[0]) {
+        //total = numresultsstrong[0].innerHTML;
+        var numresultspattern = /(\d+)/;
+        if (numresultspattern.test(numresultsstrong[0].innerHTML))
+        {
+            total = numresultsstrong[0].innerHTML.replace(/\D*(\d+)\D*/, "$1");
+        }
+    }
+}
+var title = document.title ;
+// translate url encoding ("%2C" to "," ; %3A" to ":" ...) except for & and = (which are used in functions)
+var regexurif26 = /%26/g ;
+uri = uri.replace ( regexurif26 , '#26#' ) ;
+var regexurif3D = /%3D/g ;
+uri = uri.replace ( regexurif3D , '#3D#' ) ;
+uri = decodeURIComponent ( uri ) ;
+var regexurit26 = /#26#/g ;
+uri = uri.replace ( regexurit26 , '%26' ) ;
+var regexurit3D = /#3D#/g ;
+uri = uri.replace ( regexurit3D , '%3D' ) ;
+// setDocumentTitle
+var regextitle = /^(.+) › (.+)$/ ;
+title = title.replace( regextitle , '$2' ) ;//to keep only what is after " › "
+piwikTracker.setDocumentTitle(title) ;
+if ( uri.match ( new RegExp ( "/cgi-bin/koha/opac-search.pl." ) ) ) {
+    // to ensure that the first parameter is properly treated
+    uri = uri.replace ( 'opac-search.pl?' , 'opac-search.pl?&' ) ;
+    // preprocessing for "idx" : remove from url idx parameters wich are not befor a "q" parameter ; remove ",wrdl"
+    var regexidxok = /&idx=([^&]+)&q=/g ;
+    uri = uri.replace ( regexidxok , '&#idx#=$1&q=' ) ;
+    var regexidxbad = /&idx=[^&]+/g ;
+    uri = uri.replace ( regexidxbad , '' ) ;
+    var regexidxfin = /&#idx#=/g ;
+    uri = uri.replace ( regexidxfin , '&idx=' ) ;
+    var regexidxwrdl = /&idx=([^&]+),wrdl/g ;
+    uri = uri.replace ( regexidxwrdl , '&idx=$1' ) ;
+    // preprocessing for "limit" : limit-yr becomes a "limit=yr:value" parameter ; replace ",????:" with ":"
+    var regexlimityr = /&limit-yr=/g ;
+    uri = uri.replace ( regexlimityr , '&limit=yr:' ) ;
+    var regexlimit = /&limit=([^,]+),[^:]+:/g ;
+    uri = uri.replace ( regexlimit , '&limit=$1:' ) ;
+    // setCustomVariable
+    // initialization of piwik custom variable names
+    var customvartitle_dosortby = "type de recherche et tri" ;
+    var customvartitle_q = "termes recherchés" ;
+    var customvartitle_idx = "indexes de recherche" ;
+    var customvartitle_limit = "limites de recherche" ;
+    var customvartitle_total = "nombre de résultats" ;
+    var customvartitle_offset = "décalage" ;
+    // offset
+    if ( geturiparam ( uri , "offset" ) ) { var customvarvalue_offset = geturiparam ( uri , "offset" , "" , "" , 1 ) ; }
+    else {
+        // total
+        var customvarvalue_total = total ;
+        // dosortby
+        var customvarvalue_dosortby = "simple" ;
+        if ( geturiparam ( uri , "do" ) ) { customvarvalue_dosortby = "advanced" ; }
+        if ( geturiparam ( uri , "sort_by" ) ) { customvarvalue_dosortby = customvarvalue_dosortby + "," + geturiparam ( uri , "sort_by" ) ; }
+        // q
+        if ( geturiparam ( uri , "q" ) ) { var customvarvalue_q = geturiparam ( uri , "q" , ", " , " " , 1 ) ; }
+        // idx
+        if ( geturiparam ( uri , "idx" ) ) { var customvarvalue_idx = geturiparam ( uri , "idx" , "," , "" , 1 ) ; }
+        else { var customvarvalue_idx = "kw" ; }
+        // limit
+        if ( geturiparam ( uri , "limit" ) ) { var customvarvalue_limit = geturiparam ( uri , "limit" , "," , "" , 1 ) ; }
+    }
+    //if offset, only the 2nd CustomVariable is set
+    if ( customvarvalue_offset && customvarvalue_offset != 0 ) {
+        piwikTracker.setCustomVariable ( 2 , customvartitle_offset , customvarvalue_offset , "page" ) ;
+    } else {
+    if ( customvarvalue_total ) { piwikTracker.setCustomVariable ( 1 , customvartitle_total , customvarvalue_total , "page" ) ; }
+    if ( customvarvalue_dosortby ) { piwikTracker.setCustomVariable ( 2 , customvartitle_dosortby , customvarvalue_dosortby , "page" ) ; }
+    if ( customvarvalue_q ) { piwikTracker.setCustomVariable ( 3 , customvartitle_q , customvarvalue_q , "page" ) ; }
+    if ( customvarvalue_idx ) { piwikTracker.setCustomVariable ( 4 , customvartitle_idx , customvarvalue_idx , "page" ) ; }
+    if ( customvarvalue_limit ) { piwikTracker.setCustomVariable ( 5 , customvartitle_limit , customvarvalue_limit , "page" ) ; } }
+    uri = uri.replace( 'opac-search.pl?&' , 'opac-search.pl?' ) ;
+}
+var regexegal = /=/g;
+url = url.replace ( regexegal , '[]=' ) ;// to replace = with []= into url, without this, multiple sames parameters aren't process by piwik
+var regexcgibin = /\/cgi-bin\/koha\/([^\?]*)?/ ;
+url = url.replace ( regexcgibin , '/$1' ) ;// to remove /cgi-bin/koha/ from url
+piwikTracker.setCustomUrl ( url ) ; piwikTracker.trackPageView () ; piwikTracker.enableLinkTracking () ;
+} catch ( err ) {}
+// returns a string containing the list of values corresponding to one url's parameter
+// uri = the url to parse , param = parameter to process , sep = separator between each value , rep = which replaces the sep, sorting = 1 to sort results
+function geturiparam ( uri, param, sep, rep, sorting ) {
+    // split on &, to have each argument in a row of an array
+	var tab = uri.substring ( 1 ).split ( '&' ) ; var tabparam = [];
+    // then parse each argument, split on = to separate key and value
+	for ( var i = 0 ; i < tab.length ; i++ ) {
+		var x = tab [ i ].split ( '=' ) ;
+        if ( x [ 0 ] == param ) {
+            var xvalue = "" ;
+            // warning = there's probably something wrong in Koha, because the value sometimes contains a =
+            // so the split sometimes don't result in a size 2 array
+            // so rebuild everything after the [0] -the key- as the value
+            for ( var ix = 1 ; ix < x.length ; ix++ ) { if ( ix == 1 ) { xvalue = x [ ix ] } else { xvalue = xvalue + "=" + x [ ix ] } }
+            if ( sep && rep ) { var regexrep = new RegExp ( trim ( sep ) , 'g' ) ; xvalue = xvalue.replace ( regexrep , rep ) ; }
+            tabparam.push ( xvalue ) ; } }
+    if ( sorting == 1 ) { tabparam.sort () ; }
+    if ( sep ) { var out = tabparam.join ( sep ) ; } else { var out = tabparam.join ( "" ) ; }
+	return out ;
+}
+function trim ( myString ) { return myString.replace ( /^\s+/g , '' ).replace (/\s+$/g , '' ) }
+//NE RIEN AJOUTER APRES CES LIGNES (sauf la ligne de réouverture de CDATA), les personnalisations doivent être faites avant le code Piwik
+//DON'T ADD ANYTHING AFTER THIS LINE (except cthe reopen CDATA line), customizations must be done before the Piwik code
+//<![CDATA[
+
+        //]]>
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
+

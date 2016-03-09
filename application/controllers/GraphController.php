@@ -290,4 +290,11 @@ class GraphController extends Zend_Controller_Action {
 		
     }
     
+    public function roueemotionAction(){
+
+    		$dt = '[]';
+		$this->view->data =  $this->_getParam('data', $dt);    	
+		$this->view->titre =  $this->_getParam('titre', "Roue des émotions");    	
+		
+    }    
 }

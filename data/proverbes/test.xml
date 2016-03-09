@@ -1,0 +1,264 @@
+<!doctype html public "-//sq//dtd html 2.0 hotmetal + extensions//en">
+<html lang="fr">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<link rel="icon" href="/documentation/icones/logo.png" type="image/png">
+
+<script language="javascript" type="text/javascript" src="/documentation/js/mistral.js">
+</script>
+
+<script language="javascript">
+
+function retour(){
+    window.location='/public/mistral/proverbe_fr?action=retour&usrname=nobody&usrpwd=4%24%2534p&field_1=prov&value_1=ville'
+}
+
+</script>
+
+</head>
+<body text=#000000 link=#0690cc bgcolor="#ffffff">
+<style type="text/css">
+<!--
+a:active {  font-weight: normal; text-decoration: none; color: #ca0d24}
+a:link {  font-weight: normal; color: #ca0d24; text-decoration: none}
+a:visited {  font-weight: normal; color: #ca0d24; text-decoration: none}
+a:hover {  font-weight: normal; color: #ff0000; text-decoration: none}
+td {font-family: lucida calligraphy; color: #000000; font-size: 16px}
+.titre {font-family: lucida calligraphy; color: #ca0d24; font-size: 18px}
+-->
+</style>
+
+
+
+<center>
+<table width="800">
+<tr>
+<td valign=top width="100">
+<img src="http://www.culture.gouv.fr/icons/logo.gif">
+</td>
+<td width="300" class="titre"><b>*** proverbes ***</b> </td>
+<td width="100" class="titre" valign="bottom"><a href=/public/mistral/proverbe_fr?action=nouveau&usrname=nobody&usrpwd=4%24%2534p>nouvelle recherche</a></td>
+<td align="right" valign="bottom"><b>50</b> / <b>63</b>
+</td>
+</tr>
+</table>
+<hr width=800 align=center color="#ff6600">
+
+
+<table valign=top width=800 border=0 background="/documentation/proverbe/prov-4.gif">
+<tr valign=top>
+<tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>1</small></td>
+<td width=700><font color="#000000"><b>a l'entr�e de la <font color=#ff0000>ville</font> est le commencement des maisons</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>1</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>2</small></td>
+<td width=700><font color="#000000"><b>a l'entr�e de la <font color=#ff0000>ville</font>, sont les premi�res maisons</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>2</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>3</small></td>
+<td width=700><font color="#000000"><b>ce n'est pas tout �vangile, ce qu'on dit parmi la <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>3</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>4</small></td>
+<td width=700><font color="#000000"><b>ce n'est pas une <font color=#ff0000>ville</font> ou le vachier corne</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>4</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>5</small></td>
+<td width=700><font color="#000000"><b>chacune <font color=#ff0000>ville</font> a sa croix</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>5</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>6</small></td>
+<td width=700><font color="#000000"><b>chacune <font color=#ff0000>ville</font> a son tour, plaint son deuil et dolour</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>6</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>7</small></td>
+<td width=700><font color="#000000"><b>cit� que paris, <font color=#ff0000>ville</font> que dijon bordeaux d'avignon</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>7</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>8</small></td>
+<td width=700><font color="#000000"><b>de petite scintille, s'enflamme une <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>8</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>9</small></td>
+<td width=700><font color="#000000"><b>enfant de bonne <font color=#ff0000>ville</font> est demi �crivain</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>9</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>10</small></td>
+<td width=700><font color="#000000"><b>faire le qui va la en <font color=#ff0000>ville</font> et s'ensuit aux bois</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>10</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>11</small></td>
+<td width=700><font color="#000000"><b>femme qui ecoute et <font color=#ff0000>ville</font> qui parlemente sont bient�t prises</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>11</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>12</small></td>
+<td width=700><font color="#000000"><b>fille qui ecoute <font color=#ff0000>ville</font> qui parlemente sont bient�t prises</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>12</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>13</small></td>
+<td width=700><font color="#000000"><b>fille qui escoute et <font color=#ff0000>ville</font> qui parlemente, c'est signe qu'elle se veut rendre</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>13</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>14</small></td>
+<td width=700><font color="#000000"><b>grande <font color=#ff0000>ville</font>, rien dedans</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>14</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>15</small></td>
+<td width=700><font color="#000000"><b>il faut que la <font color=#ff0000>ville</font> soit fournie qu'il en y ait des fols et des sages</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>15</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>16</small></td>
+<td width=700><font color="#000000"><b>il ha ung oeil au bois, l'autre a la <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>16</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>17</small></td>
+<td width=700><font color="#000000"><b>il n'est pas moins n�cessaire qu'une <font color=#ff0000>ville</font> soit bien regie, que le propre seigneur proveu de bon m�decin</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>17</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>18</small></td>
+<td width=700><font color="#000000"><b>il n'y a en <font color=#ff0000>ville</font> ne village arts ne mestiers, ou n'y ait plus de meschants que de bons ouvriers</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>18</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>19</small></td>
+<td width=700><font color="#000000"><b>il ne le craint n'y aux champs n'y a la <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>19</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>20</small></td>
+<td width=700><font color="#000000"><b>il ne scait rien qui ne va par <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>20</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>21</small></td>
+<td width=700><font color="#000000"><b>incogneue est la <font color=#ff0000>ville</font> metropolitaine de tous maux</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>21</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>22</small></td>
+<td width=700><font color="#000000"><b>je ne le dy pas pour moy, mais les bergiers demeurent trop a la <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>22</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>23</small></td>
+<td width=700><font color="#000000"><b>jeune coeur est souvent volage, tant en <font color=#ff0000>ville</font> comme en village</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>23</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>24</small></td>
+<td width=700><font color="#000000"><b>l'advocaserie est un cancer universel en une <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>24</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>25</small></td>
+<td width=700><font color="#000000"><b>la boutique du m�decin est aux champs et la <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>25</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>26</small></td>
+<td width=700><font color="#000000"><b>la guerre intestine et civile, <font color=#ff0000>ville</font> et pays a mis en friche</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>26</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>27</small></td>
+<td width=700><font color="#000000"><b>la musique est un chant de <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>27</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>28</small></td>
+<td width=700><font color="#000000"><b>le dimanche est aux champs comme a la <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>28</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>29</small></td>
+<td width=700><font color="#000000"><b>le m�decin aux champs doit en la <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>29</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>30</small></td>
+<td width=700><font color="#000000"><b>le noel est plus beau aux champs qu'a la <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>30</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>31</small></td>
+<td width=700><font color="#000000"><b>le sainct de la <font color=#ff0000>ville</font> n'est point aoeure</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>31</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>32</small></td>
+<td width=700><font color="#000000"><b>le sainct de la <font color=#ff0000>ville</font> n'est point ore</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>32</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>33</small></td>
+<td width=700><font color="#000000"><b>le sainct en sa <font color=#ff0000>ville</font> ou cite, est rarement honnore</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>33</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>34</small></td>
+<td width=700><font color="#000000"><b>les noces hors de la <font color=#ff0000>ville</font> ne se terminent pas en un jour</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>34</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>35</small></td>
+<td width=700><font color="#000000"><b>loin de la <font color=#ff0000>ville</font>, loin de la sant�</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>35</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>36</small></td>
+<td width=700><font color="#000000"><b>monte aux champs comme sainct george et a la <font color=#ff0000>ville</font> comme sainct michel</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>36</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>37</small></td>
+<td width=700><font color="#000000"><b>ne sont pas tous sur les arbres les coucous, il y en a bien dans cette <font color=#ff0000>ville</font> des v�tus</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>37</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>38</small></td>
+<td width=700><font color="#000000"><b>ouir dire va par la <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>38</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>39</small></td>
+<td width=700><font color="#000000"><b>ouyr dire va par <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>39</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>40</small></td>
+<td width=700><font color="#000000"><b>porc en <font color=#ff0000>ville</font>, homme a cuisine, de quoi d'etonner</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>40</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>41</small></td>
+<td width=700><font color="#000000"><b>porcs a la <font color=#ff0000>ville</font> et l'homme ou f�re font a femme grand ennuy</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>41</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>42</small></td>
+<td width=700><font color="#000000"><b>prosp�re est la <font color=#ff0000>ville</font> et cite, ou vertu est en dignite</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>42</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>43</small></td>
+<td width=700><font color="#000000"><b>quand ils sont en <font color=#ff0000>ville</font>, les hommes ont leur mine du dimanche, quand ils sont a la maison, celle des jours ouvrables</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>43</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>44</small></td>
+<td width=700><font color="#000000"><b>quand les hommes vont en <font color=#ff0000>ville</font>, ils ont toujours leur mine du dimanche, mais � la maison, c'est toujours la mine de tous les jours</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>44</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>45</small></td>
+<td width=700><font color="#000000"><b>qui gu�re ne vaut en sa <font color=#ff0000>ville</font>, vaudra moins en seville</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>45</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>46</small></td>
+<td width=700><font color="#000000"><b>qui ne chevauche autant aux champs qu'a la <font color=#ff0000>ville</font> tombe malade</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>46</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>47</small></td>
+<td width=700><font color="#000000"><b>qui perd coeur et courage, n'a mestier en <font color=#ff0000>ville</font> ne village</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>47</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>48</small></td>
+<td width=700><font color="#000000"><b>qui plus despent qu'il ne gaigne n'a mestier en bonne <font color=#ff0000>ville</font></b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>48</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>49</small></td>
+<td width=700><font color="#000000"><b>qui va a la <font color=#ff0000>ville</font> il vient bourgeois, et au village villageois</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>49</small></td>
+</tr><tr valign=top>
+<td width=50 bgcolor="#fff1e3"><small>50</small></td>
+<td width=700><font color="#000000"><b>rarement est et peu souvent, le vieil usurier sans argent, <font color=#ff0000>ville</font> marchande sans fins larrons, vieil grenier sans rats ou rattons</b></font></td>
+<td width=50 bgcolor="#fff1e3" align="right"><small>50</small></td>
+</tr>
+</tr>
+</table>
+<hr width=800 align=center color="#ff6600">
+<table valign=top width=800 border=0 background="/documentation/proverbe/prov-4.gif">
+<tr><td width=150 align=right valign=top>lots de r&eacute;ponses : </td>
+<td valign=top><p align="justify"> <a href="/public/mistral/proverbe_fr?action=retrouver_title&field_1=prov&value_1=ville&grp=0&spec=9&syn=1&imly=&max1=1&max2=10&max3=50&req=%28%28ville%29%20%3aprov%20%29&dom=all&usrname=nobody&usrpwd=4%24%2534p"> <font size="-1">1-50</font></a>&nbsp;<a href="/public/mistral/proverbe_fr?action=retrouver_title&field_1=prov&value_1=ville&grp=1&spec=9&syn=1&imly=&max1=1&max2=10&max3=50&req=%28%28ville%29%20%3aprov%20%29&dom=all&usrname=nobody&usrpwd=4%24%2534p"> <font size="-1">51-63</font></a>&nbsp;</td>
+</tr></table>
+</center>
+<br>
+
+
+
+</body> 
+</html>

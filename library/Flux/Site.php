@@ -3,7 +3,8 @@
 class Flux_Site{
     
     var $cache;
-	var $idBase;
+    var $bCache=true;
+    var $idBase;
     var $idExi;
 	var $login;
 	var $pwd;
@@ -29,7 +30,9 @@ class Flux_Site{
 	var $dbG;
 	var $dbGUD;
 	var $dbM;
-	var $dbGM;		
+	var $dbGM;
+	var $dbR;		
+	var $dbCG;		
 	var $db;
 	var $lucene;
 	var $kwe = array("autokeyword","zemanta", "alchemy", "opencalais", "yahoo", "textalytics","aylien");
@@ -208,13 +211,14 @@ class Flux_Site{
     /**
      * Récupère le contenu body d'une url
      *
-     * @param string $url
-     * @param array $param
-     * @param boolean $cache
+     * @param string 	$url
+     * @param array 		$param
+     * @param boolean 	$cache
+     * @param array	 	$rawData
      *   
      * @return string
      */
-	function getUrlBodyContent($url, $param=false, $cache=true, $method=null) {
+	function getUrlBodyContent($url, $param=false, $cache=true, $method=null, $rawData=false) {
 		$html = false;
 		if(substr($url, 0, 7)!="http://")$url = urldecode($url);
 		if($cache){
@@ -226,6 +230,7 @@ class Flux_Site{
 		    	$client = new Zend_Http_Client($url,array('timeout' => 30));
 		    	if($param && !$method)$client->setParameterGet($param);
 		    	if($param && $method==Zend_Http_Client::POST)$client->setParameterPost($param);
+		    	if($rawData) $client->setRawData($rawData["value"], $rawData["type"]);
 		    	try {
 					$response = $client->request($method);
 					$html = $response->getBody();
@@ -246,7 +251,7 @@ class Flux_Site{
      */
     function csvToArray($file, $tailleCol="0", $sep=";"){
 		ini_set("memory_limit",'1024M');
-    	$this->trace("DEBUT ".__METHOD__);     	
+    		$this->trace("DEBUT ".__METHOD__);     	
 	    if (($handle = fopen($file, "rb")) !== FALSE) {
     		$this->trace("Traitement des lignes : ".ini_get("memory_limit"));     	
 	    	$i=0;
@@ -261,10 +266,42 @@ class Flux_Site{
 	        fclose($handle);
 	    }
     	
-    	$this->trace("FIN ".__METHOD__);     	
+    		$this->trace("FIN ".__METHOD__);     	
 		return $csvarray;		
 	}	
 	
+	/**
+     * création d'un tableau à partir d'une chaine csv
+     *
+     * @param string 	$csv = chaine de caractère csv
+     * @param string 	$sep = séparateur de valeur
+     * @param booblean 	$first = la première ligen contient le nom des champs
+     *
+     * @return array
+     */
+    function csvStringToArray($csv, $sep=";", $first=true){
+    		$arr = array();
+    		$cols = false;
+		$data = str_getcsv($csv, "\n"); //parse the rows 
+		foreach($data as $row){
+			if($first){
+				$cols = str_getcsv($row, $sep);
+				$first=false;
+			}else{
+				$r = str_getcsv($row, $sep); //parse the items in rows 
+				if($cols){
+					$arrR = array();
+					for ($i = 0; $i < count($cols); $i++) {
+						$arrR[$cols[$i]]=$r[$i];
+					}
+					$r = $arrR;	
+				}
+				$arr[] = $r;
+			}
+		} 
+		
+		return $arr;
+    }
     /**
      * récupère le contenu HTML d'un DOMElement
      *

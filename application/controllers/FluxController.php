@@ -244,7 +244,29 @@ class FluxController extends Zend_Controller_Action {
 	   	}
     }
 
-	public function rmnAction()
+	public function bup8Action()
+    {
+    		$buP8 = new Flux_Bup8($this->_getParam('idBase'));
+	   	
+	   	switch ($this->_getParam('obj')) {
+	   		case 'getListe':
+				$this->view->reponse = $bnf->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
+	   			break;	   		
+	   		case 'setListe':
+				$this->view->reponse = $buP8->setListe($this->_getParam('idListe'));
+	   			break;	   		
+	   		case 'getLivre':
+				$this->view->reponse = $bnf->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
+	   			break;	   		
+	   		case 'setLivre':
+				$this->view->reponse = $buP8->setInfoPageLivre($this->_getParam('idLivre'));
+	   			break;	   		
+	   		default:
+	   			break;
+	   	}
+    }
+
+    public function rmnAction()
     {
     		$rmn = new Flux_Rmngp();
 	   	
