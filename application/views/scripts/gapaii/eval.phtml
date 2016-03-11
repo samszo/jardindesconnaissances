@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
-    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css"> />
     <link rel="stylesheet" type="text/css" href="../css/leaflet/leaflet.css" />
 	<link rel="stylesheet" type="text/css" href="../css/leaflet/Control.Geocoder.css" />
 	<link rel="stylesheet" type="text/css" href="../css/leaflet/leaflet.awesome-markers.css">
@@ -48,7 +48,6 @@
 </head>
 <body onload="init()">
 	<div id="layout"></div>
-
 	<script type="text/javascript">
 	var pstyle = 'padding:3px;', evals, idEval, idQuest, q, idDivGen='txtGen', saveResult;
 	
@@ -217,6 +216,20 @@
 		var formId = 'form_'+dtGen.idDoc+'q_'+q.questId;
 		if(w2ui[formId])w2ui[formId].destroy();
 
+	 	if(q.formTitre=='Roue des émotions'){
+			//on charge l'url
+			w2ui['layoutMain'].load('main', '../graph/roueemotion?titre='+q.questTitre, null, function () {
+				fctSave = function(){
+				};
+				fctClickRoue = function(d){
+					console.log(d);
+				};
+				fctClickChoix = function(d){
+					console.log(d);
+				};
+			});
+			return;
+	 	}
 
 	 	if(q.formTitre=='radar'){
 		 	//on calcule les data 
