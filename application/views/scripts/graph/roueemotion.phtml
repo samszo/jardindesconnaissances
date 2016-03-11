@@ -13,6 +13,7 @@
 		<script type="text/javascript" src="../js/d3.js" charset="utf-8"></script>
 		<script type="text/javascript" src="../js/jquery.min.js" charset="utf-8"></script>
 	    <script type="text/javascript" src="../js/w2ui.js" charset="utf-8"></script>
+	    <script type="text/javascript" src="../js/queue.v1.min.js" ></script>
 		
 		<style>
 			body {
@@ -26,30 +27,58 @@
 				font-weight: 300;
 				text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
 								
+			}			
+			#svgChartChoix {
+				width: 100%;
+				height: 100%;
 			}
-			
 			.tooltip {
 				fill: white;
 				text-anchor:middle;
 				text-align:center;
 			}
+			path.slice{
+				stroke-width:2px;
+			}
+			
+			polyline{
+				opacity: .3;
+				stroke: black;
+				stroke-width: 2px;
+				fill: none;
+			}			
 		</style>
 	
 	</head>
 	<body>
-		<div id="formRoueEmotions"></div>
+		<div id="layoutRoueEmotions" style="width:100%;height:100px"></div>
 
 		<script>
 		var fctClear, fctSave;
+		var pstyle = 'border: 0px solid #dfdfdf; padding: 0px;';
+		var sizeTop = 40;
 
+		if(w2ui['layoutRoueEmotions'])w2ui['flayoutRoueEmotions'].destroy();		
+	    $('#layoutRoueEmotions').w2layout({
+	        name: 'layoutRoueEmotions',
+	        padding: 2,
+	        panels: [
+	            { type: 'top', size: sizeTop, resizable: false, style: pstyle, content: '<h3 style="color:#000000;" >'
+		            +'<?php echo $this->titre;?>'
+		            +'</h3>' },
+	            { type: 'left', size:'50%', resizable: false, style: pstyle, content: '<div id="chartRoueEmotions"></div>'},
+	            { type: 'main', size:'50%', resizable: false, style: pstyle, content: ''},
+	       	],
+	    });
+		
+		
 		if(w2ui['formRoueEmotions'])w2ui['formRoueEmotions'].destroy();		
-		$('#formRoueEmotions').w2form({
+		var formRoueEmo = {
 		    name: 'formRoueEmotions',
-		    header: '<?php echo $this->titre;?>',		    
-		    style: 'border: 0px; background-color: transparent;',
+		    style: 'border: 0px',
 		    formHTML: 
 		        '<div class="w2ui-page page-0">'+
-		        '	<div class="chartRoueEmotions"></div>'+
+		        '	<div id="chartChoixEmotions"></div>'+
 		        '</div>'+
 		        '<div class="w2ui-buttons">'+
 		        '   <button class="w2ui-btn" name="reset">Reset</button>'+
@@ -57,42 +86,262 @@
 		        '</div>',
 		    fields: [],
 		    record: {},
+		    onRender: function(event) {
+	        		event.onComplete = function () {
+		    	  		creaPieChoix();
+	        	    }		        
+	        },		    
 		    actions: {
 		        "save": function () { 
 			        if(fctSave)fctSave(); 
 			    },
 		        "reset": function () { 
 					if(roueData.length){
-						//mise à zéro des axes
+						//mise à zéro des valeurs
 						roueData.forEach(function(c){
-							c.forEach(function(d){
-								d.value = 0;
-							});
+							c.value = 0;
 						});
-						//
+						changeChoix(roueData);
 					}
 			        if(fctClear)fctClear(); 					
 			    },
 		    }
-		});
+		};
 		
-			////////////////////////////////////////////////////////////// 
-			//////////////////////// Set-Up ////////////////////////////// 
-			////////////////////////////////////////////////////////////// 
-			var margin = {top: 40, right: 40, bottom: 40, left: 40},
-				width = Math.min(400, window.innerWidth - 10) - margin.left - margin.right,
-				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
-					
-			////////////////////////////////////////////////////////////// 
-			////////////////////////// Data ////////////////////////////// 
-			////////////////////////////////////////////////////////////// 
+	    w2ui['layoutRoueEmotions'].content('main', $().w2form(formRoueEmo));
+		
 			var roueData = <?php echo $this->data; ?>;
-			////////////////////////////////////////////////////////////// 
-			//////////////////// Draw the Chart ////////////////////////// 
-			////////////////////////////////////////////////////////////// 
-			var color = d3.scale.ordinal()
-				.range(["#EDC951","#CC333F","#00A0B0"]);
-				
+			var langue = '<?php echo $this->langue;?>';
+			var txts;
+
+			//calcule la taille suivant la dimension de l'écran
+			var margin = {top: 10, right: 10, bottom: 10, left: 10},
+			    width = (window.innerWidth - margin.left - margin.right)/2,
+			    height = window.innerHeight - margin.top - margin.bottom;
+			var w="715.41962", h="724.66992", svg, idSvg="svg3360";
+
+			//met à jour le div principal
+			d3.select("#layoutRoueEmotions")
+				    .style("height", height+"px");				
+
+			/*
+			Pour la roue des émotions en SVG merci à https://fr.wikipedia.org/wiki/Robert_Plutchik
+			*/
+			chargeSVG("../img/Plutchik-wheel.svg",chargeIHM)
+			window.onresize = resize;
+			
+			function zoom() {
+				  svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+				}
+			function zoomEnd() {
+				  console.log(d3.event);
+				}
+						
+			function resize(){
+				width = (window.innerWidth - margin.left - margin.right) / 2,
+			    height = window.innerHeight - margin.top - margin.bottom;
+				d3.select("#"+idSvg).transition().duration(0)
+				    .attr("width", width)
+				    .attr("height", height - sizeTop)
+					.attr("viewBox","0 0 "+w+" "+h);	
+				if(document.getElementById(idSvgChoix) && onChange){
+					//var bb = document.getElementById(idSvgChoix).getBBox();
+					d3.select("#"+idSvgChoix).transition().duration(0)
+					    .attr("width", width)
+					    .attr("height", height-140) //enlève la taille de la barre de bouton
+						.attr("viewBox","0 0 "+(width+margin.left)+" "+(height+margin.top));	
+					onChange = false;
+				}
+	    	  		w2ui['layoutRoueEmotions'].resize();
+			}
+			
+			
+			function chargeSVG(url, fct){
+			 	//charge un SVG
+			    //merci à http://bl.ocks.org/KoGor/8162640
+			    	queue()
+			    		.defer(d3.xml, url, "image/svg+xml")
+			    		.await(fct);
+		    }		
+			
+		    function chargeIHM(error, xml){
+		    		//Adding our svg file to HTML document
+				var importedNode = document.importNode(xml.documentElement, true);
+	    	  		d3.select("#chartRoueEmotions").node().appendChild(importedNode);	    	    	  	
+	    	  		ajoutEvent();
+	    	  		changeLangue();
+	    	  		//met le graphique au format de l'écran
+				resize();	    	  		
+	 	    }	
+
+			function ajoutEvent() { 
+
+	    	  		//var txt =d3.selectAll("text");
+	    	  		txts = d3.selectAll('text')
+	    	  			.data(roueData)
+		    	  		.on('click',function(d, i){
+		    	  			console.log(i+" - "+d.id+" / "+d.en+" / "+d.fr+" / "+d.color);
+		    	  			d.value ++;
+		    	  			changeChoix(roueData);
+	    	  			});
+			}
+
+			function changeLangue() { 
+				roueData.forEach(function(d){
+					d3.select("#"+d.id).text(d[langue]);
+				});
+			}
+
+
+		/* ------- 
+		---------- DIAGRAMME D'AFFICHAGE DES CHOIX 		
+		-------*/
+		var svgChoix, radius, pie, arc, outerArc, key, idSvgChoix="svgChartChoix", onChange=false;
+		function creaPieChoix(){
+			svgChoix = d3.select("#chartChoixEmotions")
+				.append("svg")
+				.attr("id",idSvgChoix)
+				.append("g")
+	
+			svgChoix.append("g")
+				.attr("class", "slices");
+			svgChoix.append("g")
+				.attr("class", "labels");
+			svgChoix.append("g")
+				.attr("class", "lines");
+	
+			radius = Math.min(width, height) / 2;
+	
+			pie = d3.layout.pie()
+				.sort(null)
+				.value(function(d) {
+					return d.value;
+				});
+	
+			arc = d3.svg.arc()
+				.outerRadius(radius * 0.8)
+				.innerRadius(radius * 0.4);
+	
+			outerArc = d3.svg.arc()
+				.innerRadius(radius * 0.9)
+				.outerRadius(radius * 0.9);
+	
+			svgChoix.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+	
+			key = function(d){ 
+				return d.data.id; 
+				};
+
+			changeChoix(roueData);
+		}
+			
+		function changeChoix(data) {
+			onChange = true;
+
+			//flitre les objects sans valeur
+			var dt = data.filter(function(d){return d.value>0});
+			
+			/* ------- PIE SLICES -------*/
+			var slice = svgChoix.select(".slices").selectAll("path.slice")
+				.data(pie(dt), key);
+
+			slice.enter()
+				.insert("path")
+				.style("stroke", "#000000")
+				.style("stroke-width", 2)
+				.style("fill", function(d) { 
+					return d.data.color; 
+					})
+				.attr("class", "slice");
+
+			slice		
+				.transition().duration(1000)
+				.attrTween("d", function(d) {
+					this._current = this._current || d;
+					var interpolate = d3.interpolate(this._current, d);
+					this._current = interpolate(0);
+					return function(t) {
+						return arc(interpolate(t));
+					};
+				})
+
+			slice.exit()
+				.remove();
+
+			/* ------- TEXT LABELS -------*/
+
+			var text = svgChoix.select(".labels").selectAll("text")
+				.data(pie(dt), key);
+
+			text.enter()
+				.append("text")
+				.attr("dy", ".35em")
+				.style("font-size", "14px")
+				.style("text-align", "center")
+				.style("text-anchor", "middle")
+				.text(function(d) {
+					return d.data[langue];
+				});
+
+			function midAngle(d){
+				return d.startAngle + (d.endAngle - d.startAngle)/2;
+			}
+
+			text.transition().duration(1000)
+				.attrTween("transform", function(d) {
+					this._current = this._current || d;
+					var interpolate = d3.interpolate(this._current, d);
+					this._current = interpolate(0);
+					return function(t) {
+						var d2 = interpolate(t);
+						var pos = outerArc.centroid(d2);
+						pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+						return "translate("+ pos +")";
+					};
+				})
+				.styleTween("text-anchor", function(d){
+					this._current = this._current || d;
+					var interpolate = d3.interpolate(this._current, d);
+					this._current = interpolate(0);
+					return function(t) {
+						var d2 = interpolate(t);
+						return midAngle(d2) < Math.PI ? "start":"end";
+					};
+				});
+
+			text.exit()
+				.remove();
+
+			/* ------- SLICE TO TEXT POLYLINES -------*/
+
+			var polyline = svgChoix.select(".lines").selectAll("polyline")
+				.data(pie(dt), key);
+			
+			polyline.enter()
+				.append("polyline");
+
+			polyline.transition().duration(1000)
+				.attrTween("points", function(d){
+					this._current = this._current || d;
+					var interpolate = d3.interpolate(this._current, d);
+					this._current = interpolate(0);
+					return function(t) {
+						var d2 = interpolate(t);
+						var pos = outerArc.centroid(d2);
+						pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+						return [arc.centroid(d2), outerArc.centroid(d2), pos];
+					};			
+				})
+				.each("end", resize);
+			
+			polyline.exit()
+				.remove();
+
+			
+			
+		};
+
+		
 		</script>
 	</body>
 </html>
