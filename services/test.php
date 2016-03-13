@@ -3,7 +3,7 @@ require_once( "../application/configs/config.php" );
 
 try {
 	$application->bootstrap();
-	$s = new Flux_Site(false,true);
+	$s = new Flux_Site(false,false);
 	$s->trace("DEBUT TEST");		
 	
 	$user = "luckysemiosis";
@@ -356,6 +356,7 @@ try {
 	$s->sauveToSpip("http://skos.um.es/unescothes/CS000/json",5);		
 	*/
 	
+	/*
 	$s = new Flux_Site('spip_proverbe',true);
 	$dbM = new Model_DbTable_Spip_mots($s->db);
 	$js = '[{"id":"tspan4022","en":"disapproval","fr":"désapprobation","color":"#ffffff","value":0}
@@ -400,7 +401,7 @@ try {
 		$mc->id_mot = $dbM->ajouter($data);
 		$dbM->edit($mc->id_mot,array("descriptif"=>json_encode($mc)));
 	}
-	
+	*/
 	/*
 	$rmn = new Flux_Rmngp();
 	$json = $rmn->getAutocomplete('troy');
@@ -460,6 +461,20 @@ try {
 	$mp->getDb("flux_proverbes");	
 	$rs = $mp->saveResultSearch("chat",1,200,array("id_concept"=>169977,"id_dico"=>153));
 	*/
+	
+	/*ATTENTION
+	 * pas de trace pour éviter le plantage sur la création de session
+	 */
+	$scoop = new Flux_ScoopIt(new SessionTokenStore(), "http://localhost/jdc/services/test.php", KEY_SCOOPIT, SECRET_SCOOPIT);
+	$scoop->login();
+	$currentUser = $scoop->profile(null)->user;
+	// Display the current user name
+	echo "<h1>Hello ".$currentUser->name."</h1>";
+	//$arr = $scoop->prepareAPost("http://gapai.univ-paris8.fr/CreaTIC/E-education/Proverbes");	
+	$arr = $scoop->createAPost("", "http://gapai.univ-paris8.fr/CreaTIC/E-education/Proverbes", "", "", "984480","true");
+	$s->bTrace = true;		
+	$s->trace("Resultat post =",$arr);			
+	
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

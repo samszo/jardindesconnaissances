@@ -9,6 +9,7 @@
 class Flux_Hal extends Flux_Site{
 
 	var $urlRepo = "http://hal-univ-paris8.archives-ouvertes.fr/rss.php?dc=1";
+	var $urlStat = "https://hal-univ-paris8.archives-ouvertes.fr/stat/ajaxdata";
 	
 	public function __construct($idBase=false)
     {
@@ -86,4 +87,20 @@ class Flux_Hal extends Flux_Site{
         
         return $html;
     }    
+    
+    function getStatAuteur(){
+	    /* pour trouver les docs de paragraphe
+	     * https://api.archives-ouvertes.fr/search/?wt=xml&q=structId_i:39850
+	     */	
+	    /* pour trouver les docs de CITU
+	     * https://api.archives-ouvertes.fr/search/?wt=xml&q=rteamStructName_s:CITU
+	     * avec les champs pertinents
+	     * https://api.archives-ouvertes.fr/search/?wt=xml&q=rteamStructName_s:CITU&fl=authId_i,authFirstName_s,authLastName_s,*IdExt_id,docid,team_t,keyword_s,labStructName_s,structName_s,structType_s,thematique_s,title_s,*domainAllCodeLabel_fs,*_discipline_s,
+	     * uniquement les document et la liste des auteurs
+	     * https://api.archives-ouvertes.fr/search/?wt=xml&q=rteamStructName_s:CITU&fl=docid&facet=true&facet.field=authFullName_s&facet.mincount=1
+	     */	
+    	
+    	
+    }
+    
 }

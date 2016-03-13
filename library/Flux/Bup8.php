@@ -34,8 +34,8 @@ class Flux_Bup8 extends Flux_Site{
     		//on récupère la racine des documents
 		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);	    	
 		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);	    	
-		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>"BU Paris 8"));
-		$this->idMonade = $this->dbM->ajouter(array("titre"=>"BU Paris 8"),true,false);
+		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
 	    	
     }
 
