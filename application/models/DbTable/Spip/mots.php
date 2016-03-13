@@ -135,7 +135,26 @@ class Model_DbTable_Spip_mots extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+
+    
     	/**
+     * Recherche une entrée Spip_mots avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param bigint $id_mot
+     *
+     * @return array
+     */
+    public function findByIdMotParent($id_mot)
+    {
+        $query = $this->select()
+                    ->from( array("s" => "spip_mots") )                           
+                    ->where( "s.id_parent = ?", $id_mot );
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+
+    /**
      * Recherche une entrée Spip_mots avec la valeur spécifiée
      * et retourne cette entrée.
      *

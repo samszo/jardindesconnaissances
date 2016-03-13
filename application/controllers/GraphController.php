@@ -325,7 +325,24 @@ class GraphController extends Zend_Controller_Action {
 	      	,{id:'tspan3828',en:'sadness',fr:'tristesse',color:'#5151ff',value:0}
 	      	,{id:'tspan3832',en:'grief',fr:'chagrin',color:'#0000c8',value:0}
 	      	]";
+		//vérifie s'il faut récupérer les données dans spip
+		if($this->_getParam('idMotParent', false) && $this->_getParam('idBase', false)){
+			$s = new Flux_Site($this->_getParam('idBase'));
+			$dbM = new Model_DbTable_Spip_mots($s->db);
+			$arrM = $dbM->findByIdMotParent($this->_getParam('idMotParent'));
+			$dt = "[";
+			$deb = true;
+			foreach ($arrM as $m) {
+				if(!$deb)$dt .= ",";
+				$dt .= $m["descriptif"];
+				$deb = false;
+			}
+			$dt .= "]";			
+		}
+				
 		$this->view->data =  $this->_getParam('data', $dt);    	
+		$this->view->w =  $this->_getParam('w', 0);    	
+		$this->view->h =  $this->_getParam('h', 0);    	
 		$this->view->langue =  $this->_getParam('langue', "fr");    	
 		$this->view->titre =  $this->_getParam('titre', "Roue des émotions");    	
 		

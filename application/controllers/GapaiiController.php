@@ -90,6 +90,22 @@ class GapaiiController extends Zend_Controller_Action {
 				));
 		}
 		
+		//enregistre l'émotion évaluée
+		if($this->_getParam('emo')){
+			$this->saveRepEmo($this->_getParam('emo'),$acti,$g,$this->idDocEvalRoot);	
+		}
+		
+		//enregistre tous les axes du radar
+		if($this->_getParam('roueData')){
+			$data = $this->_getParam('roueData');
+			//enregistre chaque émotion
+			$idDocEval = $g->dbD->ajouter(array("titre"=>"Evaluation roue émotion","parent"=>$this->idDocEvalRoot,"data"=>json_encode($data)));
+			foreach ($data as $emo) {
+				$this->saveRepEmo($emo,$acti,$g,$idDocEval);	
+			}
+		}
+		
+		
 		//enregistre l'axe évalué
 		if($this->_getParam('axe')){
 			$this->saveRepAxe($this->_getParam('axe'),$acti,$g,$this->idDocEvalRoot);	
@@ -130,6 +146,28 @@ class GapaiiController extends Zend_Controller_Action {
 			,"pre_id"=>$idRap,"pre_obj"=>"rapport"
 			,"dst_id"=>$idDocRep,"dst_obj"=>"doc"
 			,"niveau"=>$axe["value"]
+			),false);				
+	}
+
+	function saveRepEmo($emo,$acti,$g,$idDocEval){
+		$idTag = $g->dbT->ajouter(array("code"=>$emo["fr"]));
+		$idAct = $g->dbA->ajouter(array("code"=>$acti));
+		$g->dbS->ajouter(array("id_flux"=>$idTag,"id_spip"=>$emo["id_mot"],"obj_flux"=>"tag","obj_spip"=>"mots"));	
+		//enregistre le rapport entre la question, l'utilisateur et l'action
+		$idRap = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+			,"src_id"=>$this->idRapQ,"src_obj"=>"rapport"
+			,"pre_id"=>$this->idUti,"pre_obj"=>"uti"
+			,"dst_id"=>$idAct,"dst_obj"=>"acti"
+			));
+		//enregistre la réponse
+		$idDocEval = $g->dbD->ajouter(array("titre"=>"Evaluations émotions","parent"=>$idDocEval));
+		$idDocRep = $g->dbD->ajouter(array("titre"=>"rapport=".$idRap,"data"=>json_encode($emo),"parent"=>$idDocEval),false);
+		//enregistre la réponse à la question par l'utilistaeur
+		$idRapRep = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+			,"src_id"=>$idTag,"src_obj"=>"tag"
+			,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+			,"dst_id"=>$idDocRep,"dst_obj"=>"doc"
+			,"niveau"=>$emo["value"]
 			),false);				
 	}
 	

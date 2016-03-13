@@ -161,18 +161,20 @@ class Flux_Spip extends Flux_Site{
 	 * 
 	 * @param	int		$id
 	 * @param	string	$type
+	 * @param	string	$obj
+	 * @param	int		$id
 	 * 
 	 * @return array
 	 */
-	public function creaMCFromFlux($mc, $type, $obj, $id) {
+	public function creaMCFromFlux($mc, $type, $obj=false, $id=false) {
 
 		if(!$mc[2] && !$mc[1]) return;
 		if(!$mc[1])$mc[1]=$mc[2];
 		if(!$mc[2])$mc[2]=$mc[1];
 		
 		$idMC = $this->dbM->ajouter(array("titre"=>"<multi>[fr]".$mc[2]."[en]".$mc[1]."</multi>","id_groupe"=>$this->arrMC[$type]));
-		$this->dbSpip->ajouter(array("id_spip"=>$idMC,"id_flux"=>$mc[0],"obj_spip"=>"mots","obj_flux"=>$type));
-		$this->dbML->ajouter(array("objet"=>$obj,"id_objet"=>$id,"id_mot"=>$idMC));
+		if($mc[0])$this->dbSpip->ajouter(array("id_spip"=>$idMC,"id_flux"=>$mc[0],"obj_spip"=>"mots","obj_flux"=>$type));
+		if($obj)$this->dbML->ajouter(array("objet"=>$obj,"id_objet"=>$id,"id_mot"=>$idMC));
 				
 	}
 	

@@ -82,7 +82,7 @@ function loadEval(idDiv, idCpt, callBack) {
         		}catch (e){
         			console.log(error.responseText)            		  	
         			w2alert("Erreur : "+e);
-        			loadEval(idDiv, idCpt, callBack) ;
+        			//loadEval(idDiv, idCpt, callBack) ;
         		}
 	    	},            	
 	    	success: function(data) {
@@ -100,7 +100,7 @@ function loadEval(idDiv, idCpt, callBack) {
 	            	type: 'post',
 	            	error: function(error){
 	          		w2alert("Erreur : "+error);
-	          		loadEval(idDiv, idCpt, callBack);
+	          		//loadEval(idDiv, idCpt, callBack);
 	            	},            	
 	            	success: function(rep) {
 	    				dtGen.idDoc = rep;

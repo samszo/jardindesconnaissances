@@ -356,6 +356,51 @@ try {
 	$s->sauveToSpip("http://skos.um.es/unescothes/CS000/json",5);		
 	*/
 	
+	$s = new Flux_Site('spip_proverbe',true);
+	$dbM = new Model_DbTable_Spip_mots($s->db);
+	$js = '[{"id":"tspan4022","en":"disapproval","fr":"désapprobation","color":"#ffffff","value":0}
+	      	,{"id":"tspan4026","en":"remorse","fr":"remord","color":"#ffffff","value":0}
+	      	,{"id":"tspan4030","en":"contempt","fr":"mépris","color":"#ffffff","value":0}
+	      	,{"id":"tspan4034","en":"awe","fr":"crainte","color":"#ffffff","value":0}
+	      	,{"id":"tspan4038","en":"submission","fr":"soumission","color":"#ffffff","value":0}
+	      	,{"id":"tspan4042","en":"love","fr":"amour","color":"#ffffff","value":0}
+	      	,{"id":"tspan4046","en":"optimism","fr":"optimisme","color":"#ffffff","value":0}
+	      	,{"id":"tspan4050","en":"aggressiveness","fr":"aggressivité","color":"#ffffff","value":0}
+	      	,{"id":"tspan3007","en":"pensiveness","fr":"songerie","color":"#8c8cff","value":0}
+	      	,{"id":"tspan3836","en":"annoyance","fr":"gêne","color":"#ff8c8c","value":0}
+	      	,{"id":"tspan3840","en":"anger","fr":"colère","color":"#ff0000","value":0}
+	      	,{"id":"tspan3844","en":"rage","fr":"rage","color":"#d40000","value":0}
+	      	,{"id":"tspan3891","en":"ecstasy","fr":"extase","color":"#ffe854","value":0}
+	      	,{"id":"tspan3895","en":"joy","fr":"joie","color":"#ffff54","value":0}
+	      	,{"id":"tspan3899","en":"serenity","fr":"sérénité","color":"#ffffb1","value":0}
+	      	,{"id":"tspan3903","en":"terror","fr":"terreur","color":"#008000","value":0}
+	      	,{"id":"tspan3907","en":"fear","fr":"peur","color":"#009600","value":0}
+	      	,{"id":"tspan3911","en":"apprehension","fr":"appréhension","color":"#8cc68c","value":0}
+	      	,{"id":"tspan3915","en":"admiration","fr":"adoration","color":"#00b400","value":0}
+	      	,{"id":"tspan3919","en":"trust","fr":"confiance","color":"#54ff54","value":0}
+	      	,{"id":"tspan3923","en":"acceptance","fr":"résignation","color":"#8cff8c","value":0}
+	      	,{"id":"tspan3927","en":"vigilance","fr":"vigilance","color":"#ff7d00","value":0}
+	      	,{"id":"tspan3931","en":"anticipation","fr":"excitation","color":"#ffa854","value":0}
+	      	,{"id":"tspan3935","en":"interest","fr":"intérêt","color":"#ffc48c","value":0}
+	      	,{"id":"tspan3939","en":"boredom","fr":"ennui","color":"#ffc6ff","value":0}
+	      	,{"id":"tspan3943","en":"disgust","fr":"dégoût","color":"#ff54ff","value":0}
+	      	,{"id":"tspan3947","en":"loathing","fr":"aversion","color":"#de00de","value":0}
+	      	,{"id":"tspan3951","en":"amazement","fr":"stupéfaction","color":"#0089e0","value":0}
+	      	,{"id":"tspan3955","en":"surprise","fr":"surprise","color":"#59bdff","value":0}
+	      	,{"id":"tspan3959","en":"distraction","fr":"distraction","color":"#a5dbff","value":0}
+	      	,{"id":"tspan3828","en":"sadness","fr":"tristesse","color":"#5151ff","value":0}
+	      	,{"id":"tspan3832","en":"grief","fr":"chagrin","color":"#0000c8","value":0}]';	
+	$dt = json_decode($js);
+	foreach ($dt as $mc) {
+		$mc->id_groupe = 8;
+		$mc->id_parent = 26;
+		$mc->type = "Concepts";
+		$data = array("titre"=>"<multi>[fr]".$mc->fr."[en]".$mc->en."</multi>","id_groupe"=>8,"type"=>"Concepts"
+			,"profondeur"=>1, "id_parent"=>26, "id_mot_racine"=>26);
+		$mc->id_mot = $dbM->ajouter($data);
+		$dbM->edit($mc->id_mot,array("descriptif"=>json_encode($mc)));
+	}
+	
 	/*
 	$rmn = new Flux_Rmngp();
 	$json = $rmn->getAutocomplete('troy');
@@ -406,14 +451,15 @@ try {
 	$bup8->bCache = true;
 	$bup8->setListe(3713);
     */
-
+	
+	/*
 	$mp = new Flux_MistralProverbe("flux_proverbes",true);
 	//on initialise les tables du générateur
 	$mp->dbG = new Model_DbTable_Gen_generateurs($mp->getDb("generateur"));	
 	//on réinitialise la connexion par défaut
 	$mp->getDb("flux_proverbes");	
 	$rs = $mp->saveResultSearch("chat",1,200,array("id_concept"=>169977,"id_dico"=>153));
-	
+	*/
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

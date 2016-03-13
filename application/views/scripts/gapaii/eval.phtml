@@ -218,14 +218,21 @@
 
 	 	if(q.formTitre=='Roue des émotions'){
 			//on charge l'url
-			w2ui['layoutMain'].load('main', '../graph/roueemotion?titre='+q.questTitre, null, function () {
+			var l = w2ui['layoutMain'].get('main');
+			w2ui['layoutMain'].load('main'
+					, '../graph/roueemotion?idBase=spip_proverbe&idMotParent=26&titre='+q.questTitre+'&w='+l.width+'&h='+l.height
+					, null, function () {
 				fctSave = function(){
+					saveEvalRoueEmoAll();
+					if(q.process && q.process[q.questId]){
+						getNextQuest(q.process[q.questId].questId);
+					}
 				};
 				fctClickRoue = function(d){
-					console.log(d);
+					saveEvalRoueEmo(d);
 				};
 				fctClickChoix = function(d){
-					console.log(d);
+					saveEvalRoueEmo(d.data);
 				};
 			});
 			return;
@@ -323,6 +330,16 @@
 
 	function saveEvalRadarAll(){
 		var dt = {'radarData':radarData,"quest":q,'gen':dtGen.idDoc,'acti':'saveEvalRadarAll'};
+		saveRepQuest(dt);
+	}
+
+	function saveEvalRoueEmo(d){
+		var dt = {'emo':d,"quest":q,'gen':dtGen.idDoc,'acti':'saveEvalRoueEmo'};
+		saveRepQuest(dt);
+	}
+
+	function saveEvalRoueEmoAll(){
+		var dt = {'roueData':roueData,"quest":q,'gen':dtGen.idDoc,'acti':'saveEvalRoueEmoAll'};
 		saveRepQuest(dt);
 	}
 	
