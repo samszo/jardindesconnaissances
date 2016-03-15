@@ -1,7 +1,7 @@
 <?php
 
 /**
- * BiolographesController
+ * EditinfluController
  * 
  * @author Samuel Szoniecky
  * @version 0.0
@@ -9,10 +9,9 @@
 
 require_once 'Zend/Controller/Action.php';
 
-class BiolographesController extends Zend_Controller_Action {
+class EditinfluController extends Zend_Controller_Action {
 	
-	var $idBase = "flux_biolographes";
-	var $urlGoogleCVS = "https://docs.google.com/spreadsheets/d/169QusRs3TyrqxzVb28hXX2E8FZsqWb01xIWpl5FDPns/pub?output=csv";
+	var $idBase = "flux_editinflu";
 	var $ssUti;
 	/**
 	 * The default action - show the home page
@@ -24,7 +23,7 @@ class BiolographesController extends Zend_Controller_Action {
 	    
 	    $s = new Flux_Site($this->view->idBase);
 	    
-	    /* récupère les cribles = les existences attachées à un document avec un tronc "crible"
+	    /* récupère les cribles = les rapports attachés à un document avec un tronc "crible"
 	     */
 	    $dbETD = new Model_DbTable_Flux_ExiTagDoc($s->db);
 	    $this->view->rsCrible = json_encode($dbETD->GetExisByDocTronc("crible"));
@@ -36,25 +35,12 @@ class BiolographesController extends Zend_Controller_Action {
 	    
 	}
 
-    public function comparecatAction()
-    {
-    }	    
-
-    public function keshifAction()
-    {
-    }	    
 
     public function navigrameauAction()
     {
     		$this->view->idBNF = $this->_getParam('idBNF');
     }	    
-    
-    public function editeurAction()
-    {
-		$this->initInstance();
-    		$this->view->connect =  $this->_getParam('connect', 0);
-    }	    
-    
+        
     	public function importAction()
     {
 		$this->initInstance();
@@ -332,10 +318,6 @@ class BiolographesController extends Zend_Controller_Action {
     				
     		}
     }    
-    public function formacteurAction()
-    {
-    		$this->initInstance();
-    }
     
     function importCrible()
     {
@@ -346,17 +328,17 @@ class BiolographesController extends Zend_Controller_Action {
     		$s->bTrace = true;
     		$s->bTraceFlush = true;
     		$bnf = new Flux_Databnf();
-    		$s->dbT = new Model_DbTable_Flux_Tag($s->db);
     		$s->dbE = new Model_DbTable_Flux_Exi($s->db);
     		$s->dbU = new Model_DbTable_Flux_Uti($s->db);
-    		$s->dbUE = new Model_DbTable_Flux_UtiExi($s->db);
-    		$s->dbETD = new Model_DbTable_Flux_ExiTagDoc($s->db);
+    		$s->dbT = new Model_DbTable_Flux_Tag($s->db);
     		$s->dbD = new Model_DbTable_Flux_Doc($s->db);
+    		$s->dbR = new Model_DbTable_Flux_Rapport($s->db);
+    		$s->dbM = new Model_DbTable_Flux_Monade($s->db);
 
     		//on récupère le document racine
-		$idDocRacine = $s->dbD->ajouter(array("titre"=>"Editeur de réseaux d'influences","url"=>"jdc/public/biolographes","tronc"=>"application"));    		    		    		
+		$idDocRacine = $s->dbD->ajouter(array("titre"=>"Editeur de réseaux d'influences","url"=>"jdc/public/editinflu","tronc"=>"application"));    		    		    		
     		//on récupère l'existence racine
-    		$idERacine = $s->dbE->ajouter(array("nom"=>"Biolographes"));
+    		$idERacine = $s->dbE->ajouter(array("nom"=>"EditInflu"));
 		
     		//on ajoute le document csv
 		$idDoc = $s->dbD->ajouter(array("titre"=>"Catégorisation des rapports entre biologie et littérature  (réponses)"
@@ -451,7 +433,12 @@ class BiolographesController extends Zend_Controller_Action {
     		}
     }	    
 
-    	   
+    public function editeurAction()
+    {
+		$this->initInstance();
+    		$this->view->connect =  $this->_getParam('connect', 0);
+    }	    
+    
         
 	function importActeur()
     {
@@ -523,7 +510,7 @@ class BiolographesController extends Zend_Controller_Action {
 		    $this->view->uti = json_encode($this->ssUti->uti);
 		}else{			
 		    //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
-		    $this->ssUti->redir = "/biolographes";
+		    $this->ssUti->redir = "/editinflu";
 		    $this->ssUti->dbNom = $this->idBase;
 		    if($this->view->ajax)$this->_redirect('/auth/finsession');		    
 		    else $this->_redirect('/auth/login');

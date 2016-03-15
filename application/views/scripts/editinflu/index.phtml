@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/editinflu.css">
+    <link rel="stylesheet" type="text/css" href="css/w2ui-dark.css" />
+    <link rel="stylesheet" type="text/css" href="font/font-awesome/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="css/leaflet/leaflet.css" />
+	<link rel="stylesheet" type="text/css" href="css/leaflet/Control.Geocoder.css" />
+	<link rel="stylesheet" type="text/css" href="css/leaflet/leaflet.awesome-markers.css">
+    <style type="text/css">
+    h2{
+    		text-align: center;
+    		width: 100%;    		
+    }
+    </style>
+    <script type="text/javascript">
+    var prefUrl = "";
+    var setAutoComplet = false;
+	var idBase = '<?php echo $this->idBase;?>';
+	var uti = <?php echo $this->uti;?>;
+	var defCribleExiId = 1;
+	var defCribleDocId = 2;
+    </script>
+	<script type="text/javascript" src="js/d3.js"></script>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/w2ui.js"></script>
+	<script type="text/javascript" src="js/editinflu/reseau.js"></script>
+	<script type="text/javascript" src="js/editinflu/flux.js"></script>
+	<script type="text/javascript" src="js/editinflu/log.js"></script>
+    <script src="js/leaflet/leaflet.js"></script>
+	<script src="js/leaflet/Control.Geocoder.js"></script>
+	<script src="js/leaflet/leaflet.awesome-markers.js"></script>	
+
+</head>
+<body onload="init()">
+	<div id="layout" style="width: 100%; height: 1050px;"></div>
+
+	<script type="text/javascript">
+
+	var rsCribles = <?php echo $this->rsCrible; ?>;
+	var rsGraphs = <?php echo $this->rsGraph; ?>;
+	
+	var sltCrible, sltGraph;
+	
+	function init(){
+		
+	    $('#layout').w2layout({
+	        name: 'layout',
+	        padding: 2,
+	        panels: [
+	            { type: 'top', size: 50, resizable: false, style: pstyle, content: '<div style="float:left;width:176px;">'
+		            +'<img src="img/logoEditInflu.png" alt="logo" style="height:40px;">'
+		            +'</div>'
+		            +'<div id="toolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>' },
+	            { type: 'left', size: 260, resizable: true, style: pstyle},
+	            { type: 'main', style: pstyle, resizable: true, content: '', size:"100%"  },
+	       	],
+	    });
+
+	    $().w2layout({
+	        name: 'layoutGauche',
+	        panels: [
+	            { type: 'top', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les cribles' },
+	            { type: 'bottom', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les graphs' }
+	        ]
+	    });
+	    $().w2layout({
+	        name: 'layoutMain',
+	        panels: [
+	            { type: 'top', size: "60", resizable: true, style: pstyle, content: '<h2 id="titreGraph"></h2>' },
+	            { type: 'main', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les graphs' }
+	        ]
+	    });
+
+		   
+	    w2ui['layout'].content('left', w2ui['layoutGauche']);
+	    w2ui['layout'].content('main', w2ui['layoutMain']);
+	    w2ui['layoutGauche'].content('top', $().w2grid(gridCrible));
+	    w2ui['layoutGauche'].content('bottom', $().w2grid(gridGraph));
+
+    
+	    $('#toolbar').w2toolbar({
+		    name: 'mainTB',
+		    items: [
+		        { type: 'button',  id: 'tbGraph', caption: 'Graphs', icon:'fa-object-group'},
+		        { type: 'break',  id: 'break0' },
+		        { type: 'button',  id: 'tbCrible', caption: 'Cribles', icon:'fa-filter'},
+		        { type: 'break',  id: 'break1' },
+		        { type: 'button',  id: 'tbAuteur', caption: 'Auteurs', icon:'fa-group'},
+		        { type: 'break',  id: 'break2' },
+		        { type: 'button',  id: 'tbParam', caption: 'Paramètres', icon:'fa-cog', hidden:uti.role=="admin" ? false : true},
+		        { type: 'break',  id: 'break3' },
+		        { type: 'spacer' },
+		        { type: 'button',  id: 'utiLog',  caption: uti.login, icon: 'fa-user' },            
+		        { type: 'button',  id: 'utiSignOut',  caption: 'déconnexion', icon: 'fa-sign-out' }
+		    ]
+		});
+	
+		w2ui.mainTB.on('click', function (event) { 
+			w2ui.layout.lock('main', "Veuillez patienter...", true);	
+			chargeLayout(event.item.id);    
+		});  
+
+		chargeLayout("tbGraph");		  
+		//charge le crible par défaut
+		chargeCrible({"obj":"crible","exi_id":defCribleExiId,"doc_id":defCribleDocId});
+	}
+
+	function chargeLayout(idLayout){
+		
+        //supprime les objets si déjà présent
+        if(w2ui['layout_graph']){
+
+        }
+	    	if(idLayout=="tbGraph"){
+	        	w2ui['layoutMain'].load('main', 'Editinflu/editeur?ajax=1',null,function () {		        	
+	        		w2ui.layout.unlock('main');
+	        	});        	
+	    }
+        if(w2ui['layout_crible']){
+
+        }
+	    	if(idLayout=="tbCrible"){
+	        	w2ui['layout'].load('main', 'Index/crible?ajax=1',null,function () {
+	        		w2ui.layout.unlock('main');
+	        	});        	
+	    }
+
+	    
+	    if(w2ui['layout_Param']){
+
+		}     
+	    if(idLayout=="tbParam"){	    
+	        	w2ui['layout'].load('main', 'Index/param?ajax=1',null,function () {
+	        		w2ui.layout.unlock('main');
+	        	});
+	        	w2ui.layout.unlock('main');
+	    } 	
+	
+	    if(idLayout=="utiSignOut"){
+		    	deconnexion();
+	        	w2ui.layout.unlock('main');
+		}	    
+	}
+	
+</script>
+<script type="text/javascript" src="js/Editinflu/view.js"></script>
+
+</body>
+</html>

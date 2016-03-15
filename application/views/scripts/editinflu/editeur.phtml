@@ -1,0 +1,354 @@
+<?php
+if(!$this->ajax){
+	$prefUrl = "../";
+	echo '<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Editeur de réseaux d&#130;influences</title>
+	<script type="text/javascript">
+	    var prefUrl = "../";
+	  	var setAutoComplet = true;
+		var idBase = "'.$this->idBase.'";
+		var uti = '.$this->uti.';
+		var rsCribles = [];
+		var rsGraphs = [];		
+	</script>
+    <link rel="stylesheet" type="text/css" href="../css/w2ui.css" />
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+	<script type="text/javascript" src="../js/d3.js"></script>
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/w2ui.js"></script>
+	<script type="text/javascript" src="../js/biolographes/reseau.js"></script>
+	<script type="text/javascript" src="../js/biolographes/modeles.js"></script>
+	<script type="text/javascript" src="../js/biolographes/flux.js"></script>
+	<script type="text/javascript" src="../js/biolographes/view.js"></script>
+	<script type="text/javascript" src="../js/biolographes/dialogues.js"></script>
+	
+  </head>
+  
+  <body >
+';
+}else{
+	$prefUrl = "";
+	echo '<script type="text/javascript">
+	</script>';	
+}
+?>
+	<link rel="stylesheet" href="<?php echo $prefUrl;?>css/jquery/ui-lightness/jquery-ui-1.10.4.min.css">
+    <link rel="stylesheet" href="<?php echo $prefUrl;?>css/grapheditor.css">
+	<script type="text/javascript" src="<?php echo $prefUrl;?>js/jquery-ui.min.js"></script>
+	<div id="viz"></div>
+
+	
+		<dialog id="dlgNoeud" close>
+			<h3>Ajout d'un noeud</h3>
+			<p>
+				<label for="typeNoeud">Type de noeud:</label>	
+				<select id="typeNoeud" name="type" onchange="setAutocompleteNoeud(this.value)" >
+				  <option value="Acteurs">Acteur</option>
+				  <!-- <option value="EVENEMENTS">Evènement</option> -->
+				  <option value="Lieux">Lieu</option>
+				  <option value="CONCEPTS">Notion</option>
+				  <option value="REFERENCES">Référence</option>
+				</select>
+				<br/><br/>
+				<label for="nameNoeud">Valeur:</label>	
+				<input id="autocomplete" title="type &quot;a&quot;">
+			</p>
+			<div class="boutons">
+				<button id="cancel" onclick="dialogues.noeud.close()">Annuler</button>
+				<button id="addNode" >Ajout du noeud</button>
+			</div>
+		</dialog>
+		<dialog id="dlgLieu" close>
+			<h3>Ajout d'un lieu</h3>
+			<label for="dtLieuAjout">Lieu :</label>	
+			<select id="typeNoeudAjout" name="typeLieu" onchange="setAutocompleteLieu(this.value)" >
+			<option value="Académies">Académies</option>
+			  <option value="Universités françaises">Universités françaises</option>
+			  <option value="Sociétés savantes françaises">Sociétés savantes françaises</option>
+			  <option value="Universités allemandes">Universités allemandes</option>
+			  <option value="Sociétés savantes allemandes">Sociétés savantes allemandes</option>
+			  <option value="Espaces de sociabilité">Espaces de sociabilité</option>
+			  <option value="Autres lieux de savoirs">Autres lieux de savoirs</option>
+			  <option value="Villégiatures">Villégiatures</option>
+			</select>							
+			<input id="dtLieuAjout" name="dtLieuAjout" style="width:100%;" />
+			<br/>
+			<label for="dtPaysAjout">Pays :</label>	
+			<input id="dtPaysAjout" name="dtPaysAjout" style="width:100%;" />
+			<br/>
+			<label for="dtVilleAjout">Ville :</label>	
+			<input id="dtVilleAjout" name="dtVilleAjout" style="width:100%;" />
+			<br/>
+			<label for="dtAdresseAjout">Adresse :</label>	
+			<input id="dtAdresseAjout" name="dtAdresseAjout" style="width:100%;" />
+			<br/>
+			<label for="dtLatAjout">Latitude :</label>	
+			<input id="dtLatAjout" name="dtLatAjout" style="width:100%;" />
+			<br/>
+			<label for="dtLngAjout">Longitude :</label>	
+			<input id="dtLngAjout" name="dtLngAjout" style="width:100%;" />
+			<br/>
+			<label for="dtZoomAjout">Zoom :</label>	
+			<input id="dtZoomAjout" name="dtZoomAjout" style="width:100%;" />
+			<div class="boutons">
+				<button onclick="dialogues.lieu.close()">Annuler</button>
+				<button id="addLieu" >Ajout du Lien</button>
+			</div>			
+		</dialog>
+		<dialog id="dlgActeur" close>
+			<h3>Ajout d'un acteur</h3>
+			<div style="vertical-align:middle;">
+				<label for="nomActeur">Nom :</label><input id="nomActeur" />
+		  		<img class="imgButton" alt="chercher un auteur" onclick="findAuteur($('#nomActeur')[0].value)" src="<?php echo $prefUrl;?>img/search26.png">
+			</div>
+			<div id="resultActeur" class="ui-widget" style="display:none;">
+				<p id="resultActeurNb" />
+				<div style="overflow: scroll;max-height:200px">
+					<table id="resultActeurAjout" style="width:100%;" class="ui-widget ui-widget-content">
+						<thead>
+							<tr class="ui-widget-header " >
+								<th>Auteur</th>
+								<th>Choisir</th>
+								<th>+ d'info</th>
+							</tr>
+						</thead>
+						<tbody >
+						</tbody>
+					</table>
+				</div>
+			</div>			
+			<table style="width:100%;">
+				<tbody>
+				<tr>
+					<td valign="top">
+						<p>
+							<label for="prenomActeur">Prénom :</label><input id="prenomActeur" />
+						</p>
+						<p>
+							<label for="isniActeur">ISNI :</label><input id="isniActeur" />
+						</p>
+						<p>
+							<label for="dtNait">Date de naissance :</label>	
+							<input type="date" id="dtNait" name="dtNait" />
+						<p>
+						<p>
+							<label for="dtMort">Date de mort :</label>	
+							<input type="date" id="dtMort" name="dtMort" />
+						<p>
+						<p>
+							<label for="professionActeur">Profession :</label><input id="professionActeur" />
+						</p>
+						<p>
+							<label for="specialiteActeur">Spécialité :</label><input id="specialiteActeur" />
+						</p>
+						<p>
+							<label for="fonctionActeur">Fonction :</label><input id="fonctionActeur" />
+						</p>
+					</td>
+					<td  valign="top">
+						<div style="overflow: scroll;height:200px">
+							<table id="resultActeurLiens" style="width:100%;" class="ui-widget ui-widget-content">
+								<thead>
+									<tr class="ui-widget-header " >
+										<th>Liens</th>
+									</tr>
+								</thead>
+								<tbody >
+								</tbody>
+							</table>
+						</div>			
+					</td>
+				</tr>
+				</tbody>
+			</table>
+			<div class="boutons">
+				<button id="cancel" onclick="dialogues.acteur.close()">Annuler</button>
+				<button id="addActeur" >Ajout de l'acteur</button>
+			</div>
+		</dialog>
+		<dialog id="dlgEvent" close>
+			<style>
+				.ui-autocomplete-category {
+					font-weight: bold;
+					padding: .2em .4em;
+					margin: .8em 0 .2em;
+					line-height: 1.5;
+				}
+				.ui-autocomplete {
+					max-height: 300px;
+					overflow-y: auto;
+					/* prevent horizontal scrollbar */
+					overflow-x: hidden;
+				}				
+			</style>
+			<h3 id="titreEvent">Précisions des rapports spatio-temporels</h3>
+			<h4>Entre <span id="titreEventSource"></span> et <span id="titreEventDest"></span></h4>
+			<div id="event-contain" class="ui-widget">
+				<table id="events-ajout" style="width:100%;" class="ui-widget ui-widget-content">
+					<thead>
+						<tr class="ui-widget-header ">
+							<th>Début</th>
+							<th>Fin</th>
+							<th>Lieu</th>
+							<th>Pays</th>
+							<th>Ville</th>
+							<th>Adresse</th>
+							<th>Rapport</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+			<h3 >Compléter le formulaire pour ajouter des précisions</h3>			
+			<table id="events" style="width:600px;">
+				<thead>
+					<tr class="ui-widget-header ">
+						<th>Quand ?</th>
+						<th>Où ?</th>
+						<th>Quoi ?</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr >
+						<td >
+							<label for="dtDeb">Date de début :</label>	
+							<input type="date" id="dtDeb" name="dtDeb" />
+							<br/> <br/>
+							<label for="dtFin">Date de fin :</label>	
+							<input type="date" id="dtFin" name="dtFin" />						
+						</td>
+						<td >
+							<label for="dtLieu">Lieu :</label>	
+							<select id="typeNoeud" name="typeLieu" onchange="setAutocompleteLieu(this.value)" >
+							<option value="Académies">Académies</option>
+							  <option value="Universités françaises">Universités françaises</option>
+							  <option value="Sociétés savantes françaises">Sociétés savantes françaises</option>
+							  <option value="Universités allemandes">Universités allemandes</option>
+							  <option value="Sociétés savantes allemandes">Sociétés savantes allemandes</option>
+							  <option value="Espaces de sociabilité">Espaces de sociabilité</option>
+							  <option value="Autres lieux de savoirs">Autres lieux de savoirs</option>
+							  <option value="Villégiatures">Villégiatures</option>
+							</select>							
+							<input id="dtLieu" name="dtLieu" style="width:100%;" />
+							<br/>
+							<label for="dtPays">Pays :</label>	
+							<input id="dtPays" name="dtPays" style="width:100%;" />
+							<br/>
+							<label for="dtVille">Ville :</label>	
+							<input id="dtVille" name="dtVille" style="width:100%;" />
+							<br/>
+							<label for="dtAdresse">Adresse :</label>	
+							<input id="dtAdresse" name="dtAdresse" style="width:100%;" />
+						</td>
+						<td >
+							<label id="dtTypeRapport" for="dtRapport">Type de rapport :</label>	
+							<select id="dtRapport" name="dtRapport" >
+							</select>
+						</td>
+					</tr>
+				</tbody>
+			</table>	
+			<br/>	
+			<div class="boutons">
+				<button id="addEvent" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+					<span class="ui-button-text">Ajouter</span>
+				</button>				
+				<button id="cancelEvent"  onclick="dialogues.event.close()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+					<span class="ui-button-text">Fermer</span>
+				</button>				
+			</div>			
+		</dialog>
+		<dialog id="dlgLogin" close> 
+			<script type="text/javascript" >
+				function connecte(){
+					getAuth("login", $("#iptLogin")[0].value, $("#iptMdp")[0].value);
+				}		
+				function inscrit(){
+					getAuth("inscription", $("#iptLogin")[0].value, $("#iptMdp")[0].value);
+				}		
+				function deconexion(){
+					window.location.assign('../public/auth/login?redir=graph/grapheditor&ajax=true');
+				}
+			</script>		
+		
+			<label for="iptLogin">Login : </label>
+            <input type="text" name="iptLogin" id="iptLogin" required="required">
+            <label for="iptlogin">Mot de passe : </label>
+            <input type="password" name="iptMdp" id="iptMdp" required="required">
+	        <div class="boutons">
+				<button onclick="diaglogues.login.close()">Fermer</button> 
+				<button onclick="connecte()">Connexion</button> 
+				<button onclick="inscrit()">Inscription</button> 
+			</div> 
+		</dialog> 
+		<dialog id="dlgSauveDoc" close> 		
+			<label for="docTitre">Titre du graph : </label>
+            <input type="text" name="docTitre" id="docTitre" required="required">
+            <br/>
+	        <div class="boutons">
+				<button onclick="dialogues.sauveDoc.close()">Annuler</button> 
+				<button onclick="saveDoc()">Ajouter</button> 
+				<button id="btnEdit" onclick="editDoc()">Modifier</button> 
+			</div> 
+		</dialog> 
+		<dialog id="dlgMess" close> 
+			<div id="mess" ></div>
+	        <div class="boutons">
+				<button onclick="dialogues.message.close()">Fermer</button> 
+			</div> 
+		</dialog> 
+				
+	</body>
+
+  	<script type="text/javascript">
+  	var connect = <?php echo $this->connect; ?>;
+  	var arrGraphs;
+  	var viz = document.getElementById("viz");  	
+	var ajax = <?php echo $this->ajax ? 1 : 0; ?>;
+	var lstGraph = document.getElementById('lstGraph');
+
+	/*
+	var nodes = [
+	             {id: 0, reflexive: false, desc:"Trop bien"},
+	             {id: 1, reflexive: true, desc:"oui oui" },
+	             {id: 2, reflexive: false, desc:"d'la bombe"}
+	           ],
+           links = [
+             {source: nodes[0], target: nodes[1], left: false, right: true },
+             {source: nodes[1], target: nodes[2], left: false, right: true }
+           ];
+    */	
+	var nodes = [],links = [], rs;	             
+    dialogues = {
+    		"noeud":document.getElementById('dlgNoeud')
+    		,"lieu":document.getElementById('dlgLieu')
+    		,"event":document.getElementById('dlgEvent')
+    		,"acteur":document.getElementById('dlgActeur')
+    		,"sauveDoc":document.getElementById('dlgSauveDoc')
+    		,"message":document.getElementById('dlgMess')
+    		
+    		};
+
+    // app starts here
+	if(!ajax)showReseau(nodes, links);
+	
+	//chargement des datas
+	d3.csv("<?php echo $prefUrl;?>../data/biolographes/CatRapportsBiolLitt.csv", function(error, data) {			
+			//construction des données
+			dtOrigine = data;
+			//setDataByCrible("oui");	
+			//setListeCribles();
+	});	
+
+  </script>
+<?php 
+if(!$this->ajax){
+	echo '</body>
+</html>';
+}
+?>

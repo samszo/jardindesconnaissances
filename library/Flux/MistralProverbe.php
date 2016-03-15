@@ -1,12 +1,12 @@
 <?php
 /**
- * Classe qui gère les flux de la BU de Paris 8
+ * Classe qui gère les flux de la base de donnée de proverbes Mistral
  *
  * @copyright  2016 Samuel Szoniecky
  * @license    "New" BSD License
  * 
  * REFERENCES
- * http://catalogue.bu.univ-paris8.fr/cgi-bin/koha/opac-main.pl
+ * http://www.culture.gouv.fr/public/mistral/proverbe_fr
  * 
  * THANKS
  */

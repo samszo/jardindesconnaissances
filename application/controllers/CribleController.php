@@ -128,6 +128,18 @@ class CribleController extends Zend_Controller_Action {
     	
     }
 
+	/**
+     * 
+     * Fonction pour importer Open Annotation data model
+     * 
+     */
+    function importOpenAnnotation()
+    {
+		$this->initInstance();
+    	
+		
+    }    
+    
 	function initInstance(){
 		$this->view->ajax = $this->_getParam('ajax');
     		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
