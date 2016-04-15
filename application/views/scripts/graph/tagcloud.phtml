@@ -41,9 +41,11 @@
 				vis = svg.append("g")
 					.attr("transform", "translate(" + [w >> 1, h >> 1] + ")"); 
 			
-			d3.json("<?php echo $this->urlStats; ?>", function(data) {
+			//d3.json("<?php echo $this->urlStats; ?>", function(data) {
+			d3.json("http://localhost/jdc/data/aliento/milestone.js", function(data) {
 				var ext = d3.extent(data.map(function(x) { return parseInt(x.value); }));
-				fontSize = d3.scale.linear().domain([ext[0],ext[1]]).range([8,128]);
+				fontSize = d3.scale.linear().domain([ext[0],ext[1]]).range([32,128]);
+				//fontSize = d3.scale.linear().domain([ext[0],ext[1]]).range([8,128]);
 				d3.layout.cloud().size([w, h])
 					.words(data)
 				    .rotate(0)
@@ -61,7 +63,7 @@
 				    .enter().append("text")
 			    	  	.style("fill", function(d) { return fill(d.text.toLowerCase()); })
 			        	.style("font-size", function(d) { return d.size + "px"; })
-				        .attr("text-anchor", "middle")
+				    .attr("text-anchor", "middle")
 			    	    .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
 			        	.text(function(d) { return d.text; })
 			        	.on("click", function(d) {alert(d.text);})

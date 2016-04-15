@@ -98,9 +98,7 @@ class Flux_Hal extends Flux_Site{
 	     * https://api.archives-ouvertes.fr/search/?wt=xml&q=rteamStructName_s:CITU&fl=authId_i,authFirstName_s,authLastName_s,*IdExt_id,docid,team_t,keyword_s,labStructName_s,structName_s,structType_s,thematique_s,title_s,*domainAllCodeLabel_fs,*_discipline_s,
 	     * uniquement les document et la liste des auteurs
 	     * https://api.archives-ouvertes.fr/search/?wt=xml&q=rteamStructName_s:CITU&fl=docid&facet=true&facet.field=authFullName_s&facet.mincount=1
-	     */	
-    	
-    	
+	     */	    	
     }
     
 }

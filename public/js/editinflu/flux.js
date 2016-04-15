@@ -218,19 +218,32 @@ function selectTag(i){
 	
 }
 
-function findDoc(code){
+function findDoc(code, type){
 	//supprime les résultats
 	//initFormAuteur()
+	itemSelect = null;
 	w2popup.lock("Veuillez patienter", true);
-	$.post(prefUrl+"flux/databnf?obj=term&term="+code, null,
-			 function(data){
-		 		//ne récupère que les documents
-		 		dtDocFind = data.filter(function(d){
-			 		return d.raw_category=="Work" || d.raw_category=="Periodic";
-		 			});
-		 		setFindDoc();
-		 	    w2popup.unlock();		 		
-			 }, "json");
+	if(type=='bnf'){
+		$.post(prefUrl+"flux/databnf?obj=term&term="+code, null,
+				 function(data){
+			 		//ne récupère que les documents
+			 		dtDocFind = data.filter(function(d){
+				 		return d.raw_category=="Work" || d.raw_category=="Periodic";
+			 			});
+			 		setFindDoc(type);
+			 	    w2popup.unlock();		 		
+				 }, "json");
+	}
+	if(type=='gBook'){
+		$.post(prefUrl+"flux/google?type=trouveLivre&q="+code, null,
+				 function(data){
+			 		//ne récupère que les documents
+			 		dtDocFind = data;
+			 		setFindDoc(type);
+			 	    w2popup.unlock();		 		
+				 }, "json");
+	}
+	
 }
 
 function selectDoc(i){
@@ -245,11 +258,16 @@ function selectDoc(i){
 
 function chargeCrible(crible){
 	//récupère les données du crible
-	var data = {"obj":"crible","idExi":crible.exi_id,"idDoc":crible.doc_id};	
+	var data = {"obj":"crible","idCrible":crible.doc_id};	
 	$.get(prefUrl+"Editinflu/get",
 			data,
         		function(js){
     				finsession(js);
+    		        d3.select("#titreCrible").text("Crible : "+sltCrible.titre);        
+    				//parse les data
+    				js.rs["docs"].forEach(function(d){
+    					if(d.data)d.data = JSON.parse(d.data);
+    				});
     				datas["Docs"]=js.rs["docs"];
     				datas["Acteurs"] = js.rs["acteurs"];   				
     				js.rs["notions"].forEach(function(d){

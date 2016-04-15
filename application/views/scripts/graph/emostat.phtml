@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- merci à https://gist.github.com/nbremer/21746a9668ffdf6d8242#file-radarchart-js -->
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+		<title><?php echo $this->titre;?></title>
+
+		<!-- CSS -->
+	    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+	    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+		<!-- D3.js -->
+		<script type="text/javascript" src="../js/d3.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/jquery.min.js" charset="utf-8"></script>
+	    <script type="text/javascript" src="../js/w2ui.js" charset="utf-8"></script>
+	    <script type="text/javascript" src="../js/queue.v1.min.js" ></script>
+		<script type="text/javascript" src="../js/jquery.awesome-cursor.min.js" ></script>
+		
+		<style>
+			body {
+				cursor: default;
+				text-align: center;
+			}
+			.legend {
+				font-family: 'Raleway', sans-serif;
+				fill: #333333;
+				font-size: 11px;
+				font-weight: 300;
+				text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+								
+			}			
+			#svgChartChoix {
+				width: 100%;
+				height: 100%;
+			}
+			.tooltip {
+				fill: white;
+				text-anchor:middle;
+				text-align:center;
+			}
+			path.slice{
+				stroke-width:2px;
+			}
+			
+			polyline{
+				opacity: .3;
+				stroke: black;
+				stroke-width: 2px;
+				fill: none;
+			}
+			/*.mercis {position: absolute; bottom: 0;}*/			
+		</style>
+	
+	</head>
+	<body>
+		<div id="layoutRoueEmotions" style="width:100%;height:100px;background-color:white;"></div>
+
+		<script>
+		
+		var idBase = "flux_acteurinterieur";
+		var fctClear, fctSave=saveEvalAll, fctClickRoue=saveEval, fctClickChoix;
+		var pstyle = 'border: 0px solid #dfdfdf; padding: 0px;';
+		var sizeTop = 40, wTot=<?php echo $this->w;?>, hTot=<?php echo $this->h;?>;
+		if(!wTot)wTot=window.innerWidth;
+		if(!hTot)hTot=window.innerHeight;
+
+		if(w2ui['layoutRoueEmotions'])w2ui['layoutRoueEmotions'].destroy();		
+	    $('#layoutRoueEmotions').w2layout({
+	        name: 'layoutRoueEmotions',
+	        padding: 2,
+	        panels: [
+	            { type: 'top', size: sizeTop, resizable: false, style: pstyle, content: 
+		            '<h3 style="color:#000000;" >'
+		            +'<?php echo $this->titre;?>'
+		            +'</h3>'
+		            },
+	            { type: 'left', size:'50%', resizable: false, style: pstyle, content: '<div id="chartRoueEmotions"></div>'},
+	            { type: 'main', size:'50%', resizable: false, style: pstyle, content: ''},
+	            { type: 'bottom', size:'10', resizable: false, style: pstyle, content: '<div class="mercis"><i class="fa fa-thumbs-up"></i> <a href="http://bl.ocks.org/dbuezas/9306799">David Buezas</a></div>'},
+	       	],
+	    });
+		
+		
+		if(w2ui['formRoueEmotions'])w2ui['formRoueEmotions'].destroy();		
+		var formRoueEmo = {
+		    name: 'formRoueEmotions',
+		    style: 'border: 0px',
+		    formHTML: 
+		        '<div class="w2ui-page page-0">'+
+		        '	<div id="chartChoixEmotions"></div>'+
+		        '</div>'+
+		        '<div class="w2ui-buttons">'+
+		        '   <button class="w2ui-btn" name="reset">Reset</button>'+
+		        '    <button class="w2ui-btn w2ui-btn-green" name="save">Save</button>'+
+		        '</div>',
+		    fields: [],
+		    record: {},
+		    onRender: function(event) {
+	        		event.onComplete = function () {
+		    	  		creaPieChoix();
+	        	    }		        
+	        },		    
+		    actions: {
+		        "save": function () { 
+			        if(fctSave)fctSave(); 
+			    },
+		        "reset": function () { 
+					if(roueData.length){
+						//mise à zéro des valeurs
+						roueData.forEach(function(c){
+							c.value = 0;
+						});
+						changeChoix(roueData);
+					}
+			        if(fctClear)fctClear(); 					
+			    },
+		    }
+		};
+		
+	    w2ui['layoutRoueEmotions'].content('main', $().w2form(formRoueEmo));
+		
+			var roueData = <?php echo $this->data; ?>;
+			var langue = '<?php echo $this->langue;?>';
+			var txts;
+
+			//calcule la taille suivant la dimension de l'écran
+			var margin = {top: 10, right: 10, bottom: 10, left: 10},
+			    width = (wTot - margin.left - margin.right)/2,
+			    height = hTot - margin.top - margin.bottom;
+			var w="600", h="600", svg, idSvg="svg2";
+
+			//met à jour le div principal
+			d3.select("#layoutRoueEmotions")
+				    .style("height", height+"px");				
+
+			/*
+			Pour la roue des émotions en SVG merci à https://fr.wikipedia.org/wiki/Robert_Plutchik
+			*/
+			chargeSVG("../img/EmoStates.svg",chargeIHM)
+			window.onresize = resize;
+			
+			function zoom() {
+				  svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+				}
+			function zoomEnd() {
+				  console.log(d3.event);
+				}
+						
+			function resize(){
+				width = (wTot - margin.left - margin.right) / 2,
+			    height = hTot - margin.top - margin.bottom;
+				d3.select("#"+idSvg).transition().duration(0)
+				    .attr("width", width)
+				    .attr("height", height - sizeTop)
+					.attr("viewBox","0 0 "+w+" "+h);	
+				if(document.getElementById(idSvgChoix) && onChange){
+					//var bb = document.getElementById(idSvgChoix).getBBox();
+					d3.select("#"+idSvgChoix).transition().duration(0)
+					    .attr("width", width)
+					    .attr("height", height-140) //enlève la taille de la barre de bouton
+						.attr("viewBox","0 0 "+(width+margin.left)+" "+(height+margin.top));	
+					onChange = false;
+				}
+	    	  		w2ui['layoutRoueEmotions'].resize();
+			}
+			
+			
+			function chargeSVG(url, fct){
+			 	//charge un SVG
+			    //merci à http://bl.ocks.org/KoGor/8162640
+			    	queue()
+			    		.defer(d3.xml, url, "image/svg+xml")
+			    		.await(fct);
+		    }		
+			
+		    function chargeIHM(error, xml){
+		    		//Adding our svg file to HTML document
+				var importedNode = document.importNode(xml.documentElement, true);
+	    	  		d3.select("#chartRoueEmotions").node().appendChild(importedNode);	    	    	  	
+	    	  		ajoutEvent();
+	    	  		changeLangue();
+	    	  		//met le graphique au format de l'écran
+				resize();	    	  		
+	 	    }	
+
+			function ajoutEvent() { 
+
+	    	  		//var txt =d3.selectAll("text");
+	    	  		txts = d3.selectAll('path')
+	    	  			.attr('class','pathEmo')
+		    	  		.on('click',function(d, i){
+		    	  			//console.log(i+" - "+d.id+" / "+d.en+" / "+d.fr+" / "+d.color);
+		    	  			var id = this.id;
+		    	  			roueData.forEach(function(d){
+			    	  			if(d.id == id){
+				    	  			d.value ++;
+				    	  			if(fctClickRoue)fctClickRoue(d);
+				    	  			changeChoix(roueData);
+			    	  			}
+		    	  			});
+	    	  			});
+
+	   			 //ajoute un curseur +
+	   			 $('.pathEmo').awesomeCursor('plus', {
+	   			   color: 'black',
+	   			   outline: 'red'
+	   			 });		 
+    	  			
+			}
+
+			function changeLangue() { 
+				roueData.forEach(function(d){
+					d3.select("#"+d.id).text(d[langue]);
+				});
+			}
+
+
+		/* ------- 
+		---------- DIAGRAMME D'AFFICHAGE DES CHOIX 		
+		-------*/
+		var svgChoix, radius, pie, arc, outerArc, key, idSvgChoix="svgChartChoix", onChange=false;
+		function creaPieChoix(){
+			svgChoix = d3.select("#chartChoixEmotions")
+				.append("svg")
+				.attr("id",idSvgChoix)
+				.append("g")
+	
+			svgChoix.append("g")
+				.attr("class", "slices");
+			svgChoix.append("g")
+				.attr("class", "labels");
+			svgChoix.append("g")
+				.attr("class", "lines");
+	
+			radius = Math.min(width, height) / 2;
+	
+			pie = d3.layout.pie()
+				.sort(null)
+				.value(function(d) {
+					return d.value;
+				});
+	
+			arc = d3.svg.arc()
+				.outerRadius(radius * 0.8)
+				.innerRadius(radius * 0.4);
+	
+			outerArc = d3.svg.arc()
+				.innerRadius(radius * 0.9)
+				.outerRadius(radius * 0.9);
+	
+			svgChoix.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+	
+			key = function(d){ 
+				return d.data.id; 
+				};
+
+			changeChoix(roueData);
+		}
+			
+		function changeChoix(data) {
+			onChange = true;
+
+			//flitre les objects sans valeur
+			var dt = data.filter(function(d){return d.value>0});
+			
+			/* ------- PIE SLICES -------*/
+			var slice = svgChoix.select(".slices").selectAll("path.slice")
+				.data(pie(dt), key);
+
+			slice.enter()
+				.insert("path")
+				.style("stroke", "#000000")
+				.style("stroke-width", 2)
+				.style("fill", function(d) { 
+					return d.data.color; 
+					})
+				.style("fill-opacity", function(d) { 
+					return d.data.alpha; 
+					})
+				.attr("class", "slice")
+				.on('click',function(d, i){
+		    	  			//console.log(i+" - "+d.id+" / "+d.en+" / "+d.fr+" / "+d.color);
+		    	  			roueData.forEach(function(rd){
+			    	  			if(rd.id==d.data.id)rd.value --;
+			    	  			});
+		    	  			if(fctClickChoix)fctClickChoix(d);
+		    	  			changeChoix(roueData);
+	    	  			});
+
+  			 //ajoute un curseur -
+  			 $('.slice').awesomeCursor('minus', {
+  			   color: 'black',
+  			   outline: 'red'
+  			 });		 
+
+			
+			slice		
+				.transition().duration(1000)
+				.attrTween("d", function(d) {
+					this._current = this._current || d;
+					var interpolate = d3.interpolate(this._current, d);
+					this._current = interpolate(0);
+					return function(t) {
+						return arc(interpolate(t));
+					};
+				})
+
+			slice.exit()
+				.remove();
+
+			/* ------- TEXT LABELS -------*/
+
+			var text = svgChoix.select(".labels").selectAll("text")
+				.data(pie(dt), key);
+
+			text.enter()
+				.append("text")
+				.attr("dy", ".35em")
+				.style("font-size", "14px")
+				.style("text-align", "center")
+				.style("text-anchor", "middle")
+				.text(function(d) {
+					return d.data[langue]+" "+d.data.alpha;
+				});
+
+			function midAngle(d){
+				return d.startAngle + (d.endAngle - d.startAngle)/2;
+			}
+
+			text.transition().duration(1000)
+				.attrTween("transform", function(d) {
+					this._current = this._current || d;
+					var interpolate = d3.interpolate(this._current, d);
+					this._current = interpolate(0);
+					return function(t) {
+						var d2 = interpolate(t);
+						var pos = outerArc.centroid(d2);
+						pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+						return "translate("+ pos +")";
+					};
+				})
+				.styleTween("text-anchor", function(d){
+					this._current = this._current || d;
+					var interpolate = d3.interpolate(this._current, d);
+					this._current = interpolate(0);
+					return function(t) {
+						var d2 = interpolate(t);
+						return midAngle(d2) < Math.PI ? "start":"end";
+					};
+				});
+
+			text.exit()
+				.remove();
+
+			/* ------- SLICE TO TEXT POLYLINES -------*/
+
+			var polyline = svgChoix.select(".lines").selectAll("polyline")
+				.data(pie(dt), key);
+			
+			polyline.enter()
+				.append("polyline");
+
+			polyline.transition().duration(1000)
+				.attrTween("points", function(d){
+					this._current = this._current || d;
+					var interpolate = d3.interpolate(this._current, d);
+					this._current = interpolate(0);
+					return function(t) {
+						var d2 = interpolate(t);
+						var pos = outerArc.centroid(d2);
+						pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+						return [arc.centroid(d2), outerArc.centroid(d2), pos];
+					};			
+				})
+				.each("end", resize);
+			
+			polyline.exit()
+				.remove();
+
+			
+			
+		};
+
+		function saveEval(d){
+			var dt = {'emo':d,'acti':'saveEvalEmoStat'};
+			saveRep(dt);
+		}
+
+		function saveEvalAll(){
+			var dt = {'roueData':roueData,'acti':'saveEvalEmoStatAll'};
+			saveRep(dt);
+		}
+		
+
+		function saveRep(dt) {
+			dt.idBase = idBase;
+			dt.idUti = 1;
+			$.ajax({
+		    		url: "../gapaii/saverepquest",
+		    		data: dt,
+		    		type: 'post',
+		        	dataType: 'json',
+		        	error: function(error){
+		        		try {
+		        			var js = JSON.parse(error.responseText);
+		        		} catch (e) {
+		        			console.log(error.responseText)            		  	
+		      			w2alert("Erreur : "+e);
+		        		}
+		        	},            	
+		        	success: function(result) {
+		        		saveResult = result;
+		        }
+			});
+		}
+		
+		</script>
+	</body>
+</html>

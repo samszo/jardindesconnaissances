@@ -26,13 +26,18 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     protected $_primary = 'doc_id';
 
+    /*version 0
 	protected $_dependentTables = array(
 		'Model_DbTable_Flux_UtiDoc'
 		,'Model_DbTable_Flux_TagDoc'
 		,'Model_DbTable_Flux_UtiTagDoc'
 		,'Model_DbTable_Flux_ExiTagDoc'
+		,'Model_DbTable_Flux_Rapport'
 		);
-        
+    */    
+	protected $_dependentTables = array(
+		'Model_DbTable_Flux_Rapport'
+		);
 		
     /**
      * Vérifie si une entrée flux_doc existe.
@@ -208,7 +213,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-    	foreach($this->_dependentTables as $t){
+    		foreach($this->_dependentTables as $t){
 			$tEnfs = new $t($this->_db);
 			$tEnfs->removeDoc($id);
 		}
@@ -360,7 +365,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
             		->joinInner(array('ud' => 'flux_utidoc'),'ud.doc_id = f.doc_id',array('maj', 'poids'))
             		->joinInner(array('u' => 'flux_uti'),'ud.uti_id = u.uti_id',array('uti_id',"login"));            
         }
-                    
+        
         return $this->fetchAll($query)->toArray(); 
     }
     /**

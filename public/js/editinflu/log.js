@@ -5,7 +5,7 @@ function inscrit(){
 	getAuth("inscription");
 }		
 function deconnexion(){
-	window.location.assign(prefUrl+'auth/deconnexion?redir=biolographes');
+	window.location.assign(prefUrl+'auth/deconnexion?redir=editinflu');
 }
 function getAuth(type){
 	var login = $("#iptLogin")[0].value;

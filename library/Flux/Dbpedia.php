@@ -70,9 +70,17 @@ class Flux_Dbpedia extends Flux_Site{
 				case "http://fr.dbpedia.org/property/naissance":
 					$objResult->nait = $v->p->value;				
 					break;
+				case "http://dbpedia.org/ontology/birthDate":
+					$date = new DateTime($v->p->value);
+					$objResult->nait = $date->format('Y-m-d');				
+					break;
 				case "http://fr.dbpedia.org/property/décès":
 					$objResult->mort = $v->p->value;				
 					break;
+				case "http://dbpedia.org/ontology/deathDate":
+					$date = new DateTime($v->p->value);
+					$objResult->mort = $date->format('Y-m-d');				
+					break;	
 				case "http://fr.dbpedia.org/property/sudoc":
 					$objResult->sudoc = $v->p->value;				
 					break;

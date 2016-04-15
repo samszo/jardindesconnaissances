@@ -9,9 +9,7 @@ function reseau(config) {
 	this.posis = config.posis;
 	this.colors = config.colors;
 	this.clusters = config.clusters;
-	this.dialogues = config.dialogues;
-	this.lastNodeId = 0;
-	this.selectNodeId;
+	this.sauve = config.sauve;
 	this.svg;
 	this.force;
 	var point, path, selected_link= null,node,node_drag,force,selected_node = null;
@@ -26,7 +24,7 @@ function reseau(config) {
 	this.rs = function() {
 
 		self=this;
-		self.lastNodeId = self.nodes.length-1;
+		//self.lastNodeId = self.nodes.length-1;
 
 		node_drag = d3.behavior.drag()
 			.on("dragstart", dragstart)
@@ -89,44 +87,6 @@ function reseau(config) {
 		d3.select('#'+self.id)
 		  .on('keydown', keydown)
 		  .on('keyup', keyup);
-		
-		//ajoute les écouteur sur les dialogues
-		document.querySelector('#addActeur').onclick = function() {
-			 dt= {"nom":document.querySelector('#nomActeur').value
-				, "prenom":document.querySelector('#prenomActeur').value 
-				, "profession":document.querySelector('#professionActeur').value 
-				, "specialite":document.querySelector('#specialiteActeur').value 
-				, "fonction":document.querySelector('#fonctionActeur').value 
-				, "nait":document.querySelector('#dtNait').value 
-				, "mort":document.querySelector('#dtMort').value 
-				, "isni":document.querySelector('#isniActeur').value 
-				, "liens":[]
-			 };	
-			 //ajoute les liens
-			 var tdLiens = document.querySelectorAll('#resultActeurLiens td');
-			 for (var i = 0; i < tdLiens.length; i++) {
-				 dt.liens.push(tdLiens[i].innerText);
-			 }
-			nodes[self.selectNodeId].dt = dt;
-			self.draw();
-			dialogues.acteur.close();
-			selectItem = "";
-		 }		
-		document.querySelector('#addLieu').onclick = function() {
-			 dt= {
-				"nom":document.querySelector('#dtLieuAjout').value
-				,"pays":document.querySelector('#dtPaysAjout').value
-				,"ville":document.querySelector('#dtVilleAjout').value
-				,"adresse":document.querySelector('#dtAdresseAjout').value
-				,"lat":document.querySelector('#dtAdresseAjout').value
-				,"lng":document.querySelector('#dtAdresseAjout').value
-				,"zoom":document.querySelector('#dtZoomAjout').value
-			 };			
-			nodes[self.selectNodeId].dt = dt;
-			draw();
-			dialogues.lieu.close();
-			selectItem = "";
-		 }
 		
 		//visualisation du réseau
 		self.draw();	
@@ -286,18 +246,48 @@ function reseau(config) {
 
   
   this.creaNode = function(type,desc,dt) { 
-		// prevent I-bar on drag
+		//vérifie si le noeud existe déjà
+	  	var doublons = nodes.filter(function(n){
+	  		return n.id == dt.recid && n.type == type;
+	  	})
+	  	
+	  	if(doublons.length > 0){
+			w2alert("Ce noeud existe déjà dans le graph");
+			return;
+	  	}
 				
 		 // because :active only works in WebKit?
 		 this.svg.classed('active', true);
 		 // Get dialog
-		 this.lastNodeId ++;
-		 this.selectNodeId = this.lastNodeId;
-		 var  node = {id: this.lastNodeId, reflexive: false, desc : desc, type : type, dt:dt};
+		 //this.lastNodeId ++;
+		 //this.selectNodeId = this.lastNodeId;
+		 //var  node = {id: this.lastNodeId, reflexive: false, desc : desc, type : type, dt:dt};
+		 var  node = {id: dt.recid, reflexive: false, desc : desc, type : type, dt:dt};
 		 node.x = point[0];
 		 node.y = point[1];
 		 nodes.push(node);
 		 this.draw();
+
+		  //enregistre le graph dans la base
+		  if(this.sauve)this.sauve();
+		 
+	} 
+
+  this.deleteNode = function(dt) { 
+				
+		 //supprime les liens
+		 this.links.forEach(function(l,i){
+		  		if(l.source.id == dt.id && l.source.type == dt.type) this.links.splice(i,1);
+		  		if(l.target.id == dt.id && l.target.type == dt.type) this.links.splice(i,1);
+		  	});
+		 nodes.forEach(function(n, i){
+		  		if(n.id == dt.id && n.type == dt.type)nodes.splice(i,1);
+		  	});
+		 this.draw();
+		 
+		  //enregistre le graph dans la base
+		  if(this.sauve)this.sauve();
+		 
 	} 
   
 	// update graph (called when needed)
@@ -325,7 +315,7 @@ function reseau(config) {
 	    		self.mousedownPath(d);
 	    	})
 	    .on('mouseover', function(d) {
-	    		if(d.spatiotempo.length){
+	    		if(d.spatiotempo && d.spatiotempo.length){
 	    			openOverlaySpatioTempo(d);
 	    		}	    	
 	    })	    	
@@ -457,6 +447,27 @@ function reseau(config) {
 	    .on("click",function(d){
 	    		self.showInfos(d);
 	    });
+	  //ajoute le bouton pour supprimer le noeud
+	  g.append('svg:image')
+	  	.attr('x', function(d){
+	  		return d.bb.x+d.bb.width-r;
+	  	})
+		.attr('y', function(d){
+	  		return d.bb.y+d.bb.height-r;
+	  	})
+		.attr('width', r)
+		.attr('height', r)
+		.style('cursor','pointer')
+		.attr('xlink:href',prefUrl+"img/DeleteRecord.png")
+		.on('mouseover', function(d) {
+	    		ajout=false;
+	    	})
+		.on('mouseleave', function(d) {
+	    		ajout=true;
+	    	})
+	    .on("click",function(d){
+	    		self.deleteNode(d);
+	    	});
 
 	  
 	  // remove old nodes
@@ -649,6 +660,10 @@ function reseau(config) {
 
 	this.createLien = function(l, g){
 		openPopupSpatioTempo(l);
+
+		  //enregistre le graph dans la base
+		  if(this.sauve)this.sauve();
+		
 	}	
 	this.params = function() {			
 		return {"deb":this.deb, "fin":this.fin, "id":this.id};

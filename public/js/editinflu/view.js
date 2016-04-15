@@ -1,15 +1,16 @@
-var dialogues;
 //var pstyle = 'border: 1px solid #dfdfdf; padding: 5px;';
 var pstyle = 'padding:3px;';
 var popMax = false; //pour gérer l'affichage plein écran de la carte
 var map, geocoder, markers = [];
+var objDetailId, objDetail; //pour gérer l'affichage des détails
+
 
 var colors =  d3.scale.ordinal()
-.domain(["Acteur","Notion","Document"])
-.range(["green","red","yellow"]);
+	.domain(["Acteur","Notion","Document"])
+	.range(["green","red","yellow"]);
 var clusters =  d3.scale.ordinal()
-.domain(["REFERENCES","EVENEMENTS","ACTEURS","CONCEPTS"])
-.range([100,200,300,500]);
+	.domain(["REFERENCES","EVENEMENTS","ACTEURS","CONCEPTS"])
+	.range([100,200,300,500]);
 
 
 function showReseau(data){
@@ -18,7 +19,7 @@ function showReseau(data){
 	data.links ? links = data.links : links = [];
 	data.posis ? posis = data.posis : posis = [];
 	rs = new reseau({"idCont":"viz", "w":1280, "h":720,"nodes":nodes
-		,"links":links,"posis":posis,"colors":colors,"clusters":clusters, "dialogues":dialogues});
+		,"links":links,"posis":posis,"colors":colors,"clusters":clusters,"sauve":editGraph});
 }
 
 var gridCrible = { 
@@ -30,14 +31,54 @@ var gridCrible = {
         	toolbarSearch   : false,
         	toolbarAdd      : true,
         	toolbarDelete   : true,
-        	toolbarSave		: false,
+        	toolbarSave		: true,
         	header			: true, 
         	columnHeaders	: true},
     columns: [      		  		           
         { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
-        { field: 'nom', caption: 'Nom', size: '100%', sortable: true, resizable: true},
-    ],
+        { field: 'titre', caption: 'titre', size: '100%', sortable: true, resizable: true,editable: { type: 'text'}},
+    ],    
     records: rsCribles,
+    onAdd: function(event) {
+		var data = {"titre":"nouveau crible","obj":"crible"};
+		$.get(prefUrl+"editinflu/ajout",
+		data,
+    		function(js){
+			finsession(js);
+			rsCribles.push(js.rs);
+			w2ui.grid_crible.add(js.rs);
+    			w2alert(js.message);
+   		},"json");		
+    },    
+    onDelete: function(event) {
+		//vérifie que l'utilisateur est propriétaire du crible
+		if(sltCrible.uti_id!=uti.uti_id){
+			w2alert("Vous ne pouvez pas supprimer un crible qui ne vous appartient pas.");
+			return;
+		}
+		var p = {id:sltCrible.recid, obj:'crible'};
+		if(event.force){						
+			var g = w2ui[event.target];
+            	$.get(prefUrl+'editinflu/delete',
+				p,
+            		function(js){
+            			finsession(js);
+            			w2alert(js.message);
+           		},"json");
+		}
+    },        
+    onSave: function(event) {
+        var changes = w2ui.grid_crible.getChanges();
+        changes.forEach(function(c, i){
+            c.obj = 'crible';
+	        	$.get(prefUrl+"editinflu/edit",
+        			c,
+        			function(js){
+            			finsession(js);
+        				if(changes.length==i+1)w2alert(js.message);
+        			},"json");                        
+        });
+    },    
     onClick: function (event) {
         sltCrible = this.get(event.recid);
         	chargeCrible(sltCrible);		        	
@@ -52,20 +93,20 @@ var gridGraph = {
         	toolbarSearch   : false,
         	toolbarAdd      : true,
         	toolbarDelete   : true,
-        	toolbarSave		: false,
+        	toolbarSave		: true,
         	header			: true, 
         	columnHeaders	: true},
     columns: [      		  		           
         { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
         { field: 'titre', caption: 'Titre', editable: { type: 'text' }, size: '10%', sortable: true, resizable: true},
-        { field: 'note', caption: 'Type', editable: { type: 'text' }, size: '10%', sortable: true, resizable: true},
+        //{ field: 'note', caption: 'Type', editable: { type: 'text' }, size: '10%', sortable: true, resizable: true},
         //{ field: 'auteur', caption: 'Process', hidden:true, size: '100px', sortable: true, resizable: true},
         //{ field: 'crible', caption: 'Process', hidden:true, size: '100px', sortable: true, resizable: true},
     ],
     records: rsGraphs,
     onAdd: function(event) {
     		var data = {"titre":"nouveau graph","tronc":"graphInfluence","obj":"graph"};
-    		$.get(prefUrl+"biolographes/ajout",
+    		$.get(prefUrl+"editinflu/ajout",
 			data,
         		function(js){
     				finsession(js);
@@ -74,6 +115,18 @@ var gridGraph = {
         			w2alert(js.message);
        		},"json");		
 	},    
+	onSave: function(event) {
+        var changes = w2ui.grid_graph.getChanges();
+        changes.forEach(function(c, i){
+            c.obj = 'graph';
+            $.post(prefUrl+'editinflu/edit',
+        			c,
+        			function(js){
+            			finsession(js);
+        				if(changes.length==i+1)w2alert(js.message);
+        			},"json");                        
+        });
+    },			    
 	onDelete: function(event) {      
 		//vérifie que l'utilisateur est propriétaire du graph
 		if(sltGraph.uti_id!=uti.uti_id){
@@ -83,7 +136,7 @@ var gridGraph = {
 		var p = {id:sltGraph.recid, obj:'graph'};
 		if(event.force){						
 			var g = w2ui[event.target];
-            	$.get(prefUrl+'biolographes/delete',
+            	$.get(prefUrl+'editinflu/delete',
 				p,
             		function(js){
             			finsession(js);
@@ -91,26 +144,16 @@ var gridGraph = {
            		},"json");
 		}
     },
-    toolbar: {
-        items: [
-            { id: 'edit_graph', type: 'button', caption: 'Sauver', icon: 'fa-file' },
-        ],
-        onClick: function (event) {
-        		if(!w2ui.grid_graph.getSelection())	w2alert("Veuillez sélectionner un graph");
-            if (event.target == 'edit_graph') {
-            		editGraph();
-            }
-        }
-    },	
     onClick: function (event) {
         sltGraph = this.get(event.recid);
         d3.select("#titreGraph").text(sltGraph.titre);
-		$.get(prefUrl+"biolographes/get",
+		$.get(prefUrl+"editinflu/get",
 				{"obj":"graph","id":sltGraph.recid},
 	        		function(js){
 	    				finsession(js);
-	    				var data = JSON.parse(js.rs["data"]);
-	    		        showReseau(data);	        	
+	    				var data = {nodes:[],links:[],posis:[]};
+	    				if(js.rs["data"]) data = JSON.parse(js.rs["data"]);
+		    		    showReseau(data);	        	    					
 	       		},"json");		
         
     },        				        
@@ -149,8 +192,12 @@ var gridActeur = {
             { id: 'find_google', type: 'button', caption: 'Trouver dans Google Knowledge Graph', icon: 'fa-google' }
         ],
         onClick: function (event) {
-        		if(!w2ui.grid_acteur.getSelection())	w2alert("Veuillez sélectionner un acteur");
+        		if(event.target == 'w2ui-add')return;
         		var acteur = w2ui.grid_acteur.get(w2ui.grid_acteur.getSelection());
+        		if(!acteur){
+        			w2alert("Veuillez sélectionner un acteur");
+        			return;
+        		}
             if (event.target == 'ajout_reseau') {
             		idUpdate = false;
             		rs.creaNode("Acteur",acteur.nom,acteur);
@@ -191,14 +238,22 @@ var formActeur = {
 	        if (errors.length > 0) return;
 	        var data = this.record;
 	        data.obj = "acteur";
-	        var url = 'biolographes/ajout'
+	        data.idCrible = sltCrible.recid;
+	        var url = 'editinflu/ajout'
 	        if(idUpdate){
-	        		url = 'biolographes/edit';
+	        		url = 'editinflu/edit';
 	        		data.recid = idUpdate;
 	        }	        
-	        	$.get(prefUrl+url,
-				data,
-	        		function(js){
+	        
+	        $.ajax({
+	        		url: prefUrl+url,
+	        		dataType: "json",
+	        		data: data,
+	        		method: 	"POST",
+	            	error: function(error){
+	            		w2alert("Erreur : "+error.responseText);
+	            	},            	
+	            	success: function(js) {
 	    				finsession(js);
 	    				if(idUpdate){
 	    					//mise à jour de la data
@@ -210,7 +265,8 @@ var formActeur = {
 	    				}
 	    			    editGraph();
 	        			openPopupAjoutActeur();
-	       		},"json");
+	            }
+			});	        
 	    }
     }
 };
@@ -279,9 +335,22 @@ var gridDoc = {
 	    ],
 	    onClick: function (event) {
 	    		docSelect = this.get(event.recid);
-	    		if(docSelect.url)$('#ifDocList').attr("src",docSelect.url);            		
+	    		//affiche le contenu Web de l'élément
+	    		if(docSelect.data.idGoogle){
+	    			w2ui['layout_doc_bottom'].content('left', '<div id="gBookCanvas" style="width: 100%; height: 100%"></div>');		
+	    			if(google){
+		    			viewerGoogleBook = new google.books.DefaultViewer(document.getElementById('gBookCanvas'));	    			
+		    	        viewerGoogleBook.load(docSelect.data.idGoogle);		    			
+	    			}
+	    		}else{
+		    		w2ui['layout_doc_bottom'].content('left', '<iframe id="ifDocList" src="'+prefUrl+'vide.html" onLoad="loadDoc(this);" height="100%" width="100%" />');		
+		    		$('#ifDocList').attr("src",docSelect.url);            		
+	    		}
+	    		//affiche le data de l'élément
+	    		objDetailId = docSelect.recid, objDetail = "doc";
+	    		showDetails(docSelect.data, 'layout_doc_bottom', 'main');
 	    		//sélectionne les fragment du document
-	        	$.get(prefUrl+'biolographes/get',
+	        	$.get(prefUrl+'editinflu/get',
 	    				{"obj":"fragment","idParent":docSelect.recid},
 	    	        		function(js){
 	    	    				finsession(js);
@@ -295,10 +364,28 @@ var gridDoc = {
 	    onAdd: function(event) {
 	    		showRefDoc();
 		},
+		onDelete: function(event) {      
+			//vérifie que l'utilisateur est propriétaire du graph
+			if(docSelect.uti_id!=uti.uti_id){
+				w2alert("Vous ne pouvez pas supprimer un document qui ne vous appartient pas.");
+				return;
+			}
+			var p = {id:docSelect.recid, obj:'doc'};
+			if(event.force){						
+				var g = w2ui[event.target];
+	            	$.get(prefUrl+'editinflu/delete',
+					p,
+	            		function(js){
+	            			finsession(js);
+	            			w2alert(js.message);
+	           		},"json");
+			}
+	    },		
 	    toolbar: {
 	        items: [
 	            { id: 'ajout_reseau', type: 'button', caption: 'Ajouter au réseau', icon: 'fa-file' },
-	            { id: 'find_bnf', type: 'button', caption: 'Trouver dans DataBNF', icon: 'fa-file-excel-o' }
+	            { id: 'find_bnf', type: 'button', caption: 'Trouver dans DataBNF', icon: 'fa-file-excel-o' },
+	            { id: 'find_gBook', type: 'button', caption: 'Trouver dans Google Book', icon: 'fa-google' }
 	        ],
 	        onClick: function (event) {
 	        		if(!w2ui.grid_doc.getSelection())	w2alert("Veuillez sélectionner un document");
@@ -308,12 +395,17 @@ var gridDoc = {
 	            		rs.creaNode("Document",doc.titre,doc);
 	            }
 	            if (event.target == 'find_bnf') {
-	            		idUpdate = tag.recid;
-	            		showRefDoc(tag.titre);
+	            		idUpdate = doc.recid;
+	            		showRefDoc(doc.titre, 'bnf');
+	            }
+	            if (event.target == 'find_gBook') {
+	            		idUpdate = doc.recid;
+	            		showRefDoc(doc.titre,'gBook');
 	            }
 	        }
 	    },	
 	}; 
+
 var formDoc = { 
     header: 'Information sur le document',
     msgSaving  : 'Merci de patienter...',
@@ -324,7 +416,7 @@ var formDoc = {
         { name: 'pubDate', type: 'date', options:{format: 'yyyy-mm-dd'}, html: { caption: 'Date de publication' } },
         { name: 'type', type: 'text', html: { caption: 'Type' } },
         { name: 'data', type: 'textarea'
-            , html: { caption: 'Données :', attr: 'style="width: 100%; height: 100px; resize: none"'} 
+            , html: { caption: 'Données :', attr: 'style="width:0px; height:0px; resize: none"'} 
        	}
     ],
     actions: {
@@ -332,15 +424,16 @@ var formDoc = {
             w2popup.close();
         },
 	    Save: function () {
-	        var errors = this.validate();
-	        if (errors.length > 0) return;
+	        //var errors = this.validate();
+	        //if (errors.length > 0)return;
 	        var data = this.record;
 	        data.obj = "doc";
-	        data.tronc = "ajoutDoc"
-	        	$.get(prefUrl+'biolographes/ajout',
+	        data.idCrible = sltCrible.recid;
+	        	$.get(prefUrl+'editinflu/ajout',
 				data,
 	        		function(js){
 	    				finsession(js);
+	    				if(js.rs.data)js.rs.data=JSON.parse(js.rs.data);
 	    				datas["Docs"].push(js.rs);
 	        			w2alert(js.message);
 	       		},"json");
@@ -374,7 +467,8 @@ var gridDocFrag = {
 	    onAdd: function(event) {
 		    	if(!docSelect)	w2alert("Veuillez sélectionner un document");
 	        var data = {"obj":"doc","tronc":"ajoutDocFrag","parent":docSelect.recid,"titre":"nouveau fragment"};
-	        	$.get(prefUrl+'biolographes/ajout',
+	        data.idCrible = sltCrible.recid;
+	        	$.get(prefUrl+'editinflu/ajout',
 				data,
 	        		function(js){
 	    				finsession(js);
@@ -386,7 +480,7 @@ var gridDocFrag = {
             var changes = w2ui.grid_doc_frag.getChanges();
             changes.forEach(function(c, i){
 	            c.obj = 'doc';
-	            $.post(prefUrl+'biolographes/edit',
+	            $.post(prefUrl+'editinflu/edit',
 	        			c,
 	        			function(js){
 	            			finsession(js);
@@ -397,7 +491,7 @@ var gridDocFrag = {
 		onDelete: function(event) {
 			var p = {id:docFragSelect.recid, obj:'doc'};
 			if(event.force){						
-	            	$.get(prefUrl+'biolographes/delete',
+	            	$.get(prefUrl+'editinflu/delete',
 					p,
 	            		function(js){
 	            			finsession(js);
@@ -415,11 +509,15 @@ var tbDoc = {
                   '    <input id="tb_doc_ip" size="100"  style="padding: 3px; border-radius: 2px; border: 1px solid silver"/>'+
                   '</div>' 
         },
-        { type: 'button',  id: 'btnGetDoc',  caption: 'DataBNF', icon: 'fa-search' }
+        { type: 'button',  id: 'btnGetDocBnf',  caption: 'DataBNF', icon: 'fa-search' },
+        { type: 'button',  id: 'btnGetDocGoogBook',  caption: 'Google Book', icon: 'fa-google' }
     ],
 	onClick: function (event) {
-		if(event.target=="btnGetDoc"){
-			findDoc($('#tb_doc_ip')[0].value);			
+		if(event.target=="btnGetDocBnf"){
+			findDoc($('#tb_doc_ip')[0].value, 'bnf');			
+		}
+		if(event.target=="btnGetDocGoogBook"){
+			findDoc($('#tb_doc_ip')[0].value, 'gBook');			
 		}
 	},
 	onRender: function(event) {
@@ -450,9 +548,12 @@ var lyDocBottom = {
         name: 'layout_doc_bottom',
         panels: [
 		    { type: 'left', size:"60%", style: pstyle, content: '<iframe id="ifDocList" onLoad="loadDoc(this);" src="'+prefUrl+'vide.html" height="100%" width="100%" />',resizable: true },
-		    { type: 'main', size:"20%", style: pstyle, content: '<iframe id="ifDocFragList" onLoad="loadDoc(this);" src="'+prefUrl+'vide.html" height="100%" width="100%" />',resizable: true },
-		    { type: 'right', size:"20%", style: pstyle, content: '',resizable: true }
+		    { type: 'main', size:"40%", style: pstyle, content: '',resizable: true },
 		],
+		onResizing: function(event) {
+	        console.log('panels of object '+ this.name + ' are being resized');
+			viewerGoogleBook.resize();
+	    } 		
     };
 
 
@@ -520,7 +621,8 @@ var formTag = {
 	        if (errors.length > 0) return;
 	        var data = this.record;
 	        data.obj = "tag";
-	        	$.get(prefUrl+'biolographes/ajout',
+	        data.idCrible = sltCrible.recid;
+	        	$.get(prefUrl+'editinflu/ajout',
 				data,
 	        		function(js){
     				if(idUpdate){
@@ -578,8 +680,8 @@ var gridResultBNF = {
             	footer	: true,
         },		
         columns: [                
-            { field: 'label', caption: 'Nom', size: '60%' },
-            { field: 'value', caption: 'Lien', size: '200px'},
+            { field: 'label', caption: 'Nom', size: '60%', sortable: true},
+            { field: 'value', caption: 'Lien', size: '200px', sortable: true},
         ],
         onClick: function (event) {
 			if(itemSelect && itemSelect.recid == event.recid) return;
@@ -637,6 +739,32 @@ var gridResultGoogleKG = {
         }	    
 	};
 
+var gridResultGoogleBook = {
+        name: 'grid_result_gBook', 
+        recordHeight : 200,
+		header: 'Resultat de la recherche',		
+        show: { 
+			header	: true,		
+            	footer	: true,
+        },		
+        columns: [                
+            { field: 'id', caption: 'ID', size: '100px' },
+            { field: 'titre', caption: 'Titre', size: '200px'},
+            { field: 'date', caption: 'Date', size: '200px'},
+            { field: 'auteurs', caption: 'Auteurs', size: '200px'},
+            { field: 'img', caption: 'Image', size: '200px',
+                render: function (record) {
+                    return '<img height="200px" src="' + record.img + '" />';
+                }},
+            { field: 'categories', caption: 'Catégories', size: '20%'},
+        ],
+        onClick: function (event) {
+			if(itemSelect && itemSelect.recid == event.recid) return;
+			itemSelect = this.get(event.recid);
+			setSelectDoc(itemSelect);
+        }	    
+	};
+
 var gridSpatioTempo = {
 	    name: 'grid_spatiotempo', 
 		header: "Influence spatio-temporelle",		
@@ -685,7 +813,7 @@ var gridSpatioTempo = {
 	    onClick: function (event) {
 	    		stSelect = this.get(event.recid);
 	        //vérifie s'il faut afficher la position
-	        if(stSelect.lat && stSelect.lng && !markers[stSelect.recid]){
+	        if(google && stSelect.lat && stSelect.lng && !markers[stSelect.recid]){
         			var redMarker = L.AwesomeMarkers.icon({
 		        	    icon: 'university', //book,
 		        	    markerColor: 'red',
@@ -735,7 +863,7 @@ var gridSpatioTempo = {
         },		
 	    onResize: function(event) {
 	    		event.onComplete = function () {
-	    			if(popMax && !map)initCarte("carte");		            			        			
+	    			if(google && popMax && !map)initCarte("carte");		            			        			
 	    	    }		        
 	    	},        		
 	    toolbar: {
@@ -817,7 +945,57 @@ var lySpatioTempo = {
         ],
     };
 
-
+var gridDetails = {
+	    header: 'Détails des données',
+	    show: {toolbar		: false,
+				toolbarReload   : false,
+				toolbarColumns  : false,
+				toolbarSearch   : false,
+				toolbarAdd      : false,
+				toolbarDelete   : false,
+	        		toolbarSave		: true,
+	        		header: true, 
+	        		columnHeaders: false},
+	    name: 'grid_details', 
+	    columns: [                
+	        { field: 'name', caption: 'Name', size: '100px', attr: "align=right" },
+	        { field: 'value', caption: 'Value', size: '100%', editable: { type: 'text' } }
+	    ],
+		onSave: function(event) {
+			var data = {'recid':objDetailId,'obj':objDetail};
+		    var changes = w2ui['grid_details'].getChanges();
+		    changes.forEach(function(d){
+			    if(d.recid!="url"){
+			    		data[arrDetail[d.recid].value] = d.value;
+			    		itemSelect[arrDetail[d.recid].value] = d.value;
+			    }
+		    });				
+	        $.post(prefUrl+'editinflu/edit',
+	    			c,
+	    			function(js){
+	        			finsession(js);
+	    				if(changes.length==i+1)w2alert(js.message);
+	    			},"json");                        
+	    }
+	};
+function showDetails(data, layout, place){
+	if(w2ui['grid_details'])w2ui['grid_details'].destroy();
+	w2ui[layout].content(place,$().w2grid(gridDetails));			            
+    var g = w2ui['grid_details'];
+    g.clear();
+	if(data){
+	    pushObjTypeValToGrid(data, g,"");
+	}	    			
+}
+function pushObjTypeValToGrid(data, g, prefix){
+    var name;
+    for (name in data) {
+    		if(typeof data[name]=="object")
+    			pushObjTypeValToGrid(data[name], g, name+" : ");
+    		else
+    			g.add({ recid:g.records.length+1, name:prefix+name, value:data[name]});               
+    }			
+}
 
 function openPopupAjoutActeur(){
 	
@@ -949,7 +1127,7 @@ function openPopupSpatioTempo(d){
         },
         onClose : function (event) {
             //supprime les objet pour éviter un bug leaflet
-        		map.remove();
+        		if(google)map.remove();
         		map = false;
         },
 	    onMax: function(event) {
@@ -1089,7 +1267,7 @@ function setFindTag(){
 }
 
 
-function showRefDoc(cherche){
+function showRefDoc(cherche, type){
 	
  	if(w2ui['layout_doc_ajout'])w2ui['layout_doc_ajout'].destroy();
  	if(w2ui['form_doc'])w2ui['form_doc'].destroy();
@@ -1099,20 +1277,30 @@ function showRefDoc(cherche){
     	w2ui['layout_doc_ajout'].content('top', $().w2toolbar(tbDoc));
     	w2popup.max();
 	if(cherche){
-		findDoc(cherche.trim());
+		findDoc(cherche.trim(), type);
 	}
 }
 
-function setFindDoc(){
+function setFindDoc(type){
 	if(dtDocFind.length==0)w2alert("Aucun document trouvé.");
 	//ajoute un recid
 	dtDocFind.forEach(function(d,i){
 		d.recid = i;
 	});
 	//affiche les résultats
-	gridResultBNF.records = dtDocFind;
- 	if(w2ui['grid_result_bnf'])w2ui['grid_result_bnf'].destroy();	
-	w2ui['layout_doc_ajout'].content('main', $().w2grid(gridResultBNF));
+	if(type=="bnf"){
+		gridResultBNF.records = dtDocFind;
+	 	if(w2ui['grid_result_bnf'])w2ui['grid_result_bnf'].destroy();	
+		w2ui['layout_doc_ajout'].content('main', $().w2grid(gridResultBNF));		
+		w2ui['layout_doc_ajout'].content('bottom', '<iframe id="ifDoc" src="'+prefUrl+'vide.html" height="100%" width="100%" />');		
+	}
+	if(type=="gBook"){
+		gridResultGoogleBook.records = dtDocFind;
+	 	if(w2ui['grid_result_gBook'])w2ui['grid_result_gBook'].destroy();	
+		w2ui['layout_doc_ajout'].content('main', $().w2grid(gridResultGoogleBook));		
+		w2ui['layout_doc_ajout'].content('bottom', '<div id="gBookCanvas" style="width: 100%; height: 100%"></div>');		
+		viewerGoogleBook = new google.books.DefaultViewer(document.getElementById('gBookCanvas'));
+	}
 	
 }
 
@@ -1120,10 +1308,20 @@ function setFindDoc(){
 function setSelectDoc(dt){
     var g = w2ui['form_doc'];
     g.clear();
-	g.record = {"titre":dt.label,"url":dt.value};
-	g.refresh();
-	$('#ifDoc').attr("src",dt.value);            		
-	
+    //cas bnf
+    if(dt.value){
+		g.record = {"titre":dt.label,"url":dt.value};
+		g.refresh();
+		$('#ifDoc').attr("src",dt.value);            		
+    }
+    //cas gBook
+    if(dt.date){
+		g.record = {'titre':dt.titre,'url':dt.liens.infos,'pubDate':dt.date,'data':JSON.stringify(dt)};
+		g.refresh();
+		viewerGoogleBook = new google.books.DefaultViewer(document.getElementById('gBookCanvas'));
+        viewerGoogleBook.load(dt.idGoogle);	
+    }
+    
 }
 
 function loadDoc(t){
@@ -1186,6 +1384,9 @@ function setCartoInfo(geo){
 	st.editField(recid, 4, arrAdd.join(", "));	
 }
 function editGraph(){
+
+	if(!rs)return;
+	
 	var changes = w2ui.grid_graph.getChanges();
 	var data={};
 	if(changes.length > 0) data = changes[0];
@@ -1203,11 +1404,11 @@ function editGraph(){
 	nodes ? data.nodes = nodes : data.nodes=[];
 	links ? data.links = links : data.links=[];
 	data.obj='graph';
-	$.post(prefUrl+'biolographes/edit',
+	$.post(prefUrl+'editinflu/edit',
 		data,
 		function(js){
 			finsession(js);
-			w2alert(js.message);
+			//w2alert(js.message);
 		},"json");
 }
 function initCarte(idElem){

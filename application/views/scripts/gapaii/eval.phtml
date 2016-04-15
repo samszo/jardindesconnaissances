@@ -219,6 +219,7 @@
 	 	if(q.formTitre=='Roue des émotions'){
 			//on charge l'url
 			var l = w2ui['layoutMain'].get('main');
+			l.height = l.height/1.5;
 			w2ui['layoutMain'].load('main'
 					, '../graph/roueemotion?idBase=spip_proverbe&idMotParent=26&titre='+q.questTitre+'&w='+l.width+'&h='+l.height
 					, null, function () {

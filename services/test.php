@@ -8,11 +8,27 @@ try {
 	
 	$user = "luckysemiosis";
 	$pwd = "samszo";
-
+		
 	/*
 	$client = new Google_Client();
 	$client->setClientId(KEY_GOOGLE_CLIENT_ID);
 	$client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
+	$service = new Google_Service_Books($client);
+	$searchTerm = "zappa";
+	$results = $service->volumes->listVolumes($searchTerm);
+	foreach ($results as $item) {
+	  $info = $item['volumeInfo'];
+	  $i = $item->getId();
+	  $isbn = $item['volumeInfo']['industryIdentifiers'];
+	  $thumbnail = $item['volumeInfo']['imageLinks']['smallThumbnail'];
+	  echo $item['volumeInfo']['title'], "<br /> \n";
+	  echo "<img src='$thumbnail' alt='hi'/>";
+	}
+	*/	
+    	$g = new Flux_Gbooks();
+	$arr = $g->findBooks('proverbe');
+	
+	/*
 	$client->setRedirectUri('http://localhost/jdc/public/auth/google');
 	$client->addScope("https://www.google.com/calendar/feeds/");
 	$url = $client->createAuthUrl();
@@ -453,18 +469,17 @@ try {
 	$bup8->setListe(3713);
     */
 	
-	/*
+	//
 	$mp = new Flux_MistralProverbe("flux_proverbes",true);
 	//on initialise les tables du générateur
 	$mp->dbG = new Model_DbTable_Gen_generateurs($mp->getDb("generateur"));	
 	//on réinitialise la connexion par défaut
 	$mp->getDb("flux_proverbes");	
-	$rs = $mp->saveResultSearch("chat",1,200,array("id_concept"=>169977,"id_dico"=>153));
-	*/
+	$rs = $mp->saveResultSearch("homme",1,200,array("id_concept"=>169977,"id_dico"=>153));
+	//
 	
 	/*ATTENTION
 	 * pas de trace pour éviter le plantage sur la création de session
-	 */
 	$scoop = new Flux_ScoopIt(new SessionTokenStore(), "http://localhost/jdc/services/test.php", KEY_SCOOPIT, SECRET_SCOOPIT);
 	$scoop->login();
 	$currentUser = $scoop->profile(null)->user;
@@ -474,6 +489,15 @@ try {
 	$arr = $scoop->createAPost("", "http://gapai.univ-paris8.fr/CreaTIC/E-education/Proverbes", "", "", "984480","true");
 	$s->bTrace = true;		
 	$s->trace("Resultat post =",$arr);			
+	 */
+	
+	/*
+	$ei = new Flux_EditInflu("flux_editinflu");
+	$ei->bTrace = false;
+	$ei->idGeo = 0;
+    //$rs = $ei->creaCrible(1, array("titre"=>"nouveau crible"));
+	$ei->importCrible("http://localhost/jdc/data/aliento/CategorisationRapports.csv");
+	*/
 	
 	$s->trace("FIN TEST");			
 	

@@ -346,5 +346,59 @@ class GraphController extends Zend_Controller_Action {
 		$this->view->langue =  $this->_getParam('langue', "fr");    	
 		$this->view->titre =  $this->_getParam('titre', "Roue des émotions");    	
 		
-    }    
+    }   
+
+    
+    public function emostatAction(){
+		$dt = "[
+	      	{id:'path292',en:'Exitation',fr:'Exitation',alpha:1,color:'#ffe956',value:0}
+	      	,{id:'path276',en:'Exitation',fr:'Exitation',alpha:0.9,color:'#ffe956',value:0}
+	      	,{id:'path248',en:'Exitation',fr:'Exitation',alpha:0.8,color:'#ffe956',value:0}
+	      	,{id:'path220',en:'Exitation',fr:'Exitation',alpha:0.7,color:'#ffe956',value:0}
+	      	,{id:'path192',en:'Exitation',fr:'Exitation',alpha:0.6,color:'#ffe956',value:0}
+	      	,{id:'path164',en:'Exitation',fr:'Exitation',alpha:0.5,color:'#ffe956',value:0}
+	      	,{id:'path136',en:'Exitation',fr:'Exitation',alpha:0.4,color:'#ffe956',value:0}
+	      	,{id:'path108',en:'Exitation',fr:'Exitation',alpha:0.3,color:'#ffe956',value:0}
+	      	,{id:'path80',en:'Exitation',fr:'Exitation',alpha:0.2,color:'#ffe956',value:0}
+	      	,{id:'path52',en:'Exitation',fr:'Exitation',alpha:0.1,color:'#ffe956',value:0}
+	      	,{id:'path300',en:'Frustration',fr:'Frustration',alpha:1,color:'rgb(13, 129, 54)',value:0}
+	      	,{id:'path284',en:'Frustration',fr:'Frustration',alpha:0.9,color:'rgb(13, 129, 54)',value:0}
+	      	,{id:'path256',en:'Frustration',fr:'Frustration',alpha:0.8,color:'rgb(13, 129, 54)',value:0}
+	      	,{id:'path228',en:'Frustration',fr:'Frustration',alpha:0.7,color:'rgb(13, 129, 54)',value:0}
+	      	,{id:'path200',en:'Frustration',fr:'Frustration',alpha:0.6,color:'rgb(13, 129, 54)',value:0}
+	      	,{id:'path172',en:'Frustration',fr:'Frustration',alpha:0.5,color:'rgb(13, 129, 54)',value:0}
+	      	,{id:'path144',en:'Frustration',fr:'Frustration',alpha:0.4,color:'rgb(13, 129, 54)',value:0}
+	      	,{id:'path116',en:'Frustration',fr:'Frustration',alpha:0.3,color:'rgb(13, 129, 54)',value:0}
+	      	,{id:'path88',en:'Frustration',fr:'Frustration',alpha:0.2,color:'rgb(13, 129, 54)',value:0}
+			,{id:'path60',en:'Frustration',fr:'Frustration',alpha:0.1,color:'rgb(13, 129, 54)',value:0}
+			,{id:'path296',en:'Meditation',fr:'Méditation',alpha:1,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path280',en:'Meditation',fr:'Méditation',alpha:0.9,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path252',en:'Meditation',fr:'Méditation',alpha:0.8,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path224',en:'Meditation',fr:'Méditation',alpha:0.7,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path196',en:'Meditation',fr:'Méditation',alpha:0.6,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path169',en:'Meditation',fr:'Méditation',alpha:0.5,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path140',en:'Meditation',fr:'Méditation',alpha:0.4,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path112',en:'Meditation',fr:'Méditation',alpha:0.3,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path84',en:'Meditation',fr:'Méditation',alpha:0.2,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path56',en:'Meditation',fr:'Méditation',alpha:0.1,color:'rgb(35, 63, 146)',value:0}
+			,{id:'path288',en:'Engagement',fr:'Engagement',alpha:1,color:'rgb(212, 20, 23)',value:0}
+			,{id:'path272',en:'Engagement',fr:'Engagement',alpha:0.9,color:'rgb(212, 20, 23)',value:0}
+			,{id:'path244',en:'Engagement',fr:'Engagement',alpha:0.8,color:'rgb(212, 20, 23)',value:0}
+			,{id:'path216',en:'Engagement',fr:'Engagement',alpha:0.7,color:'rgb(212, 20, 23)',value:0}
+			,{id:'path188',en:'Engagement',fr:'Engagement',alpha:0.6,color:'rgb(212, 20, 23)',value:0}
+			,{id:'path160',en:'Engagement',fr:'Engagement',alpha:0.5,color:'rgb(212, 20, 23)',value:0}
+			,{id:'path132',en:'Engagement',fr:'Engagement',alpha:0.4,color:'rgb(212, 20, 23)',value:0}
+			,{id:'path104',en:'Engagement',fr:'Engagement',alpha:0.3,color:'rgb(212, 20, 23)',value:0}
+			,{id:'path76',en:'Engagement',fr:'Engagement',alpha:0.2,color:'rgb(212, 20, 23)',value:0}
+			,{id:'path48',en:'Engagement',fr:'Engagement',alpha:0.1,color:'rgb(212, 20, 23)',value:0}
+			
+	      	]";
+				
+		$this->view->data =  $this->_getParam('data', $dt);    	
+		$this->view->w =  $this->_getParam('w', 0);    	
+		$this->view->h =  $this->_getParam('h', 0);    	
+		$this->view->langue =  $this->_getParam('langue', "fr");    	
+		$this->view->titre =  $this->_getParam('titre', "Emo Stat");    	
+		
+    }       
 }

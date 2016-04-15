@@ -63,11 +63,12 @@ class Flux_MistralProverbe extends Flux_Site{
 		
 		$params = array("FIELD_1"=>"PROV","VALUE_1"=>$query,"ACTION"=>"CHERCHER","USRNAME"=>"nobody","USRPWD"=>"4$%34P","DICO"=>"","x"=>0,"y"=>0,"MAX3"=>$max);
     		$html = $this->getUrlBodyContent($searchUrl,$params,false,Zend_Http_Client::POST);
-    		$html = strtolower($html);
 		$idDocFind = $this->dbD->ajouter(array("titre"=>"Resultat recherche = ".$query,"tronc"=>$page,"parent"=>$this->idDocRoot,"data"=>$html,"note"=>json_encode($params)));
 		    		
 		//echo $html;
 		$dom = new Zend_Dom_Query($html);	    		
+		
+		//récupère les citations de la page
 		$xPath = '//td[@width=700]';
 		$results = $dom->queryXpath($xPath);
 		$i = 0;
@@ -80,7 +81,43 @@ class Flux_MistralProverbe extends Flux_Site{
 			}
 			$this->trace($i."=".$pro); 
 			$i++;
-		}	    
+		}
+
+		/*récupère les autres pages
+		$xPath = '//a';
+		$results = $dom->queryXpath($xPath);
+		$i = 0;
+		foreach ($results as $result) {
+			$tag = $result->textContent;
+			$lien = "";
+			if($tag!="nouvelle recherche"){
+				$lien = "http://www.culture.gouv.fr".$result->getAttribute('href');
+				$html = $this->getUrlBodyContent($lien,false,false);
+				$idDocFind = $this->dbD->ajouter(array("titre"=>"Resultat recherche $i = ".$query,"url"=>$lien,"tronc"=>$page,"parent"=>$this->idDocRoot,"data"=>$html,"note"=>json_encode($params)));
+				    		
+				echo $html;
+				$dom = new Zend_Dom_Query($html);	    		
+				
+				//récupère les citations de la page
+				$xPath = '//td[@width=700]';
+				$results = $dom->queryXpath($xPath);
+				$i = 0;
+				foreach ($results as $result) {
+					$pro = $result->textContent;
+					$idDoc = $this->dbD->ajouter(array("titre"=>$pro,"parent"=>$this->idDocRoot));
+					if($arrGen){
+						//on crée le générateur				
+						$this->dbG->ajouter($arrGen["id_concept"],array("valeur"=>$pro,"id_dico"=>$arrGen["id_dico"]));
+					}
+					$this->trace($i."=".$pro); 
+					$i++;
+				}				
+				
+			}
+			$this->trace($tag."=".$lien); 				
+			$i++;				
+		}
+		*/
 		
 	}
      

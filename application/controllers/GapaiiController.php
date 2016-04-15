@@ -66,7 +66,7 @@ class GapaiiController extends Zend_Controller_Action {
 		$g->dbD = new Model_DbTable_Flux_Doc($g->db);
 		$g->dbR = new Model_DbTable_Flux_Rapport($g->db);
 		$g->dbM = new Model_DbTable_Flux_Monade($g->db);
-		$g->dbA = new Model_DbTable_flux_acti($g->db);
+		$g->dbA = new Model_DbTable_Flux_Acti($g->db);
 		$g->dbS = new Model_DbTable_Flux_Spip($g->db);
 		
 		//enregistre les paramètres
@@ -78,6 +78,7 @@ class GapaiiController extends Zend_Controller_Action {
 		$this->idDocEvalRoot = $g->dbD->ajouter(array("titre"=>"évaluations"));
 		
 		//enregistre la question
+		$this->idRapQ = 0;
 		if($quest){
 			$idDocQRoot = $g->dbD->ajouter(array("titre"=>"questions"));
 			$idDocQ = $g->dbD->ajouter(array("titre"=>$quest["questTitre"],"parent"=>$idDocQRoot,"data"=>json_encode($quest)));
@@ -95,6 +96,16 @@ class GapaiiController extends Zend_Controller_Action {
 			$this->saveRepEmo($this->_getParam('emo'),$acti,$g,$this->idDocEvalRoot);	
 		}
 		
+		//enregistre tous les axes du radar
+		if($this->_getParam('roueData')){
+			$data = $this->_getParam('roueData');
+			//enregistre chaque émotion
+			$idDocEval = $g->dbD->ajouter(array("titre"=>"Evaluation roue émotion","parent"=>$this->idDocEvalRoot,"data"=>json_encode($data)));
+			foreach ($data as $emo) {
+				$this->saveRepEmo($emo,$acti,$g,$idDocEval);	
+			}
+		}
+
 		//enregistre tous les axes du radar
 		if($this->_getParam('roueData')){
 			$data = $this->_getParam('roueData');
@@ -124,7 +135,6 @@ class GapaiiController extends Zend_Controller_Action {
 				$idCouche ++;
 			}		
 		}
-		
 	}
 	
 	function saveRepAxe($axe,$acti,$g,$idDocEval){
@@ -152,7 +162,7 @@ class GapaiiController extends Zend_Controller_Action {
 	function saveRepEmo($emo,$acti,$g,$idDocEval){
 		$idTag = $g->dbT->ajouter(array("code"=>$emo["fr"]));
 		$idAct = $g->dbA->ajouter(array("code"=>$acti));
-		$g->dbS->ajouter(array("id_flux"=>$idTag,"id_spip"=>$emo["id_mot"],"obj_flux"=>"tag","obj_spip"=>"mots"));	
+		if($emo["id_mot"])$g->dbS->ajouter(array("id_flux"=>$idTag,"id_spip"=>$emo["id_mot"],"obj_flux"=>"tag","obj_spip"=>"mots"));	
 		//enregistre le rapport entre la question, l'utilisateur et l'action
 		$idRap = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 			,"src_id"=>$this->idRapQ,"src_obj"=>"rapport"
@@ -209,6 +219,7 @@ class GapaiiController extends Zend_Controller_Action {
 		if($this->_getParam('idOeu')) $this->idOeu = $this->_getParam('idOeu');
 		if($this->_getParam('idDoc')) $this->idDoc = $this->_getParam('idDoc');
 		if($this->_getParam('idCpt')) $this->idCpt = $this->_getParam('idCpt');
+		if($this->_getParam('idUti')) $this->idUti = $this->_getParam('idUti');
 		$this->idGeo = $this->_getParam('idGeo',-1);
 		
 		$this->view->idBase = $this->idBase;
@@ -216,6 +227,12 @@ class GapaiiController extends Zend_Controller_Action {
 		$this->view->idDoc = $this->idDoc;
 		$this->view->idCpt = $this->idCpt;
 		$this->view->idGeo = $this->idGeo;
+		
+		//pas d'authentification si idUti
+		if($this->idUti){
+			$this->view->idUti = $this->idUti;
+			return;
+		}
 		
 		$auth = Zend_Auth::getInstance();
 		$this->ssUti = new Zend_Session_Namespace('uti');

@@ -284,21 +284,28 @@ class FluxController extends Zend_Controller_Action {
     
 	public function googleAction()
     {
-		$ssGoogle = new Zend_Session_Namespace('google');
-		$ssGoogle->type = $this->_getParam('type');
-		$ssGoogle->gDocId = $this->_getParam('gDocId');
-		if(!$ssGoogle->client || $this->verifExpireToken($ssGoogle)){
-			$this->_redirect('/auth/google?scope='.$this->_getParam('scope',"Drive"));
-		}elseif ($this->_getParam('logout')){
-			$this->_redirect('/auth/google?logout=1');			
-		}else{
-			if($ssGoogle->type == 'css' && $ssGoogle->gDocId){
-				$gDrive = new Flux_Gdrive($ssGoogle->token);
-				$this->view->content =  $gDrive->downloadFile($ssGoogle->gDocId,'text/csv');
+    		//service n'ayant pas besoin d'une authentification cliente
+    		if($this->_getParam('type')=="trouveLivre"){
+    			$g = new Flux_Gbooks();
+    			$arr = $g->findBooks($this->_getParam('q'));
+    			$this->view->content =  json_encode($arr);
+    		}else{    	
+			$ssGoogle = new Zend_Session_Namespace('google');
+			$ssGoogle->type = $this->_getParam('type');
+			$ssGoogle->gDocId = $this->_getParam('gDocId');
+			if(!$ssGoogle->client || $this->verifExpireToken($ssGoogle)){
+				$this->_redirect('/auth/google?scope='.$this->_getParam('scope',"Drive"));
+			}elseif ($this->_getParam('logout')){
+				$this->_redirect('/auth/google?logout=1');			
 			}else{
-				$this->view->google = $ssGoogle;
+				if($ssGoogle->type == 'css' && $ssGoogle->gDocId){
+					$gDrive = new Flux_Gdrive($ssGoogle->token);
+					$this->view->content =  $gDrive->downloadFile($ssGoogle->gDocId,'text/csv');
+				}else{
+					$this->view->google = $ssGoogle;
+				}
 			}
-		}
+    		}
     }
 
 	public function googlekgAction()

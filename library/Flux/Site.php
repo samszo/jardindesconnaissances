@@ -10,6 +10,7 @@ class Flux_Site{
 	var $pwd;
     var $user;
 	var $graine;
+	var $dbA;
 	var $dbU;
 	var $dbUU;
 	var $dbUT;
@@ -44,6 +45,7 @@ class Flux_Site{
     var $temps_inter;
     var $temps_nb=0;
     var $idDoc;
+    var $idGeo;
     var $type;
     
     function __construct($idBase=false, $bTrace=false){    	
@@ -255,10 +257,11 @@ class Flux_Site{
 	    if (($handle = fopen($file, "rb")) !== FALSE) {
     		$this->trace("Traitement des lignes : ".ini_get("memory_limit"));     	
 	    	$i=0;
+	    	$csvarray = array();
     		while (($data = fgetcsv($handle, $tailleCol, $sep)) !== FALSE) {
     			$num = count($data);
- 				$numTot = count($csvarray);
- 				//$this->trace("$numTot -> $num fields in line $i:");
+ 			$numTot = count($csvarray);
+ 			//$this->trace("$numTot -> $num fields in line $i:");
         		$csvarray[] = $data;
     			$i++;
 	    	}

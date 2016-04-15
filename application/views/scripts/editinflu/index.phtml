@@ -16,11 +16,8 @@
     </style>
     <script type="text/javascript">
     var prefUrl = "";
-    var setAutoComplet = false;
 	var idBase = '<?php echo $this->idBase;?>';
 	var uti = <?php echo $this->uti;?>;
-	var defCribleExiId = 1;
-	var defCribleDocId = 2;
     </script>
 	<script type="text/javascript" src="js/d3.js"></script>
 	<script type="text/javascript" src="js/jquery.min.js"></script>
@@ -31,7 +28,13 @@
     <script src="js/leaflet/leaflet.js"></script>
 	<script src="js/leaflet/Control.Geocoder.js"></script>
 	<script src="js/leaflet/leaflet.awesome-markers.js"></script>	
-
+	<script type="text/javascript" src="//www.google.com/jsapi"></script>	
+	<!--  
+	<script type="text/javascript" >
+	var google = false;
+	</script>	
+	-->
+	
 </head>
 <body onload="init()">
 	<div id="layout" style="width: 100%; height: 1050px;"></div>
@@ -40,8 +43,19 @@
 
 	var rsCribles = <?php echo $this->rsCrible; ?>;
 	var rsGraphs = <?php echo $this->rsGraph; ?>;
+	var defCribleDocId = 0, sltCrible, sltGraph;
 	
-	var sltCrible, sltGraph;
+	//par defaut le crible correspond à celui de l'utilisateur connecté
+	rsCribles.forEach(function(c){
+		if(c.uti_id == uti.uti_id){
+			defCribleDocId = c.recid;
+			sltCrible = c;
+		}
+	});
+	
+	//pour le viewer GoogleBook 
+	var viewerGoogleBook;
+	if(google)google.load("books", "0");
 	
 	function init(){
 		
@@ -68,7 +82,7 @@
 	    $().w2layout({
 	        name: 'layoutMain',
 	        panels: [
-	            { type: 'top', size: "60", resizable: true, style: pstyle, content: '<h2 id="titreGraph"></h2>' },
+	            { type: 'top', size: "60", resizable: true, style: pstyle, content: '<div id="titreCrible">Crible : '+sltCrible.titre+'</div><h2 id="titreGraph"></h2>' },
 	            { type: 'main', size: "50%", resizable: true, style: pstyle, content: 'mettre ici les graphs' }
 	        ]
 	    });
@@ -104,7 +118,7 @@
 
 		chargeLayout("tbGraph");		  
 		//charge le crible par défaut
-		chargeCrible({"obj":"crible","exi_id":defCribleExiId,"doc_id":defCribleDocId});
+		chargeCrible({"obj":"crible","doc_id":defCribleDocId});
 	}
 
 	function chargeLayout(idLayout){
@@ -145,7 +159,7 @@
 	}
 	
 </script>
-<script type="text/javascript" src="js/Editinflu/view.js"></script>
+<script type="text/javascript" src="js/editinflu/view.js"></script>
 
 </body>
 </html>
