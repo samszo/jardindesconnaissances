@@ -272,7 +272,9 @@ class Flux_EditInflu extends Flux_Site{
 	            	->joinInner(array('r' => 'flux_rapport'),'r.dst_id = d.doc_id AND dst_obj="doc"',array())
 	            	->joinInner(array('ru' => 'flux_rapport'),'ru.rapport_id = r.src_id',array())            
 	            	->joinInner(array('u' => 'flux_uti'),'u.uti_id = ru.src_id',array('uti_id',"login"));            
-        	if($idCrible)$query->where("d.parent = ?", $idCrible);
+        	if($idCrible){
+        		$query->joinInner(array('dC' => 'flux_doc'),'dC.doc_id = d.parent AND dC.parent = '.$idCrible,array("parent"=>"titre"));
+        	}
         return $this->dbD->fetchAll($query)->toArray(); 
     }    
 
@@ -284,14 +286,14 @@ class Flux_EditInflu extends Flux_Site{
      * 
      */
     function getExiByCrible($idCrible){
-		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-    	    $query = $this->dbD->select()
-			->from( array("d" => "flux_doc"), array("recid"=>"doc_id","url","titre"))                           
-            	->where( "d.tronc = ?", $tronc)
+		if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
+    	    $query = $this->dbE->select()
+			->from( array("e" => "flux_exi"), array("recid"=>"exi_id","nom","prenom","data","nait","mort"))                           
 	        		->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-	            	->joinInner(array('r' => 'flux_rapport'),'r.dst_id = d.doc_id AND dst_obj="doc"',array())
+	            	->joinInner(array('r' => 'flux_rapport'),'r.dst_id = e.exi_id AND r.dst_obj="exi" 
+	            		AND r.pre_obj = "doc" AND r.pre_id = '.$idCrible,array())
 	            	->joinInner(array('ru' => 'flux_rapport'),'ru.rapport_id = r.src_id',array())            
-	            	->joinInner(array('u' => 'flux_uti'),'u.uti_id = ru.src_id',array('uti_id',"login"));            
+	            	->joinInner(array('u' => 'flux_uti'),'u.uti_id = ru.src_id',array('uti_id',"login"));            	            	
 	            	
         return $this->dbD->fetchAll($query)->toArray(); 
     }    

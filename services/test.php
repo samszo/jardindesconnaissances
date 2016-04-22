@@ -3,7 +3,7 @@ require_once( "../application/configs/config.php" );
 
 try {
 	$application->bootstrap();
-	$s = new Flux_Site(false,false);
+	$s = new Flux_Site(false,true);
 	$s->trace("DEBUT TEST");		
 	
 	$user = "luckysemiosis";
@@ -24,9 +24,9 @@ try {
 	  echo $item['volumeInfo']['title'], "<br /> \n";
 	  echo "<img src='$thumbnail' alt='hi'/>";
 	}
-	*/	
     	$g = new Flux_Gbooks();
 	$arr = $g->findBooks('proverbe');
+	*/
 	
 	/*
 	$client->setRedirectUri('http://localhost/jdc/public/auth/google');
@@ -427,11 +427,18 @@ try {
 	/*
 	$url = '1404571653141.jpg';
 	$url = 'http://gallica.bnf.fr/iiif/ark:/12148/bpt6k63191b/f508/806.7551430159441,842.9350218708103,1044.2048577376822,201.16030534351148/571,110/0/native.jpg';
-	$url = 'http://www.samszo.univ-paris8.fr/LaMuseMent/tofs/20150625_180417.jpg';
-	$s->trace("url de l'image = ".$url);			
-	$s->trace("<img src='".$url."'>");			
+	$url = 'https://books.google.fr/books?id=VpNa9UckT24C&hl=fr&pg=PA22&img=1&zoom=3&sig=ACfU3U3WWrRLzXiX-8wX29Bl_d1LxQuLlw&w=1280';
+	$fichier = 'image_test.jpeg';
 	
-	$im = file_get_contents($url);	
+	$current = file_get_contents($url);
+	file_put_contents($fichier, $current);
+	
+    $response = $s->getUrlBodyContent($url,false,false);
+	copy($url, $fichier);	
+	$s->trace("url de l'image = ".$url);			
+	$s->trace("<img src='".$fichier."'>");			
+	
+	$im = file_get_contents($fichier);	
     $imdata = base64_encode($im); 
     $json = '{
 		 "requests": [
@@ -441,12 +448,14 @@ try {
 		      },
 			  "features": [
 				{
-				  "type": "LANDMARK_DETECTION"
+				  "type": "TEXT_DETECTION"
 				}
 			  ]		   
 		  }
 		 ]
 		}';
+    //"type": "LANDMARK_DETECTION"
+    
 	$s->trace("requête envoyée = ".$json);			
     
     $url = "https://vision.googleapis.com/v1/images:annotate?key=".KEY_GOOGLE_SERVER."&fields=responses";
@@ -470,12 +479,12 @@ try {
     */
 	
 	//
-	$mp = new Flux_MistralProverbe("flux_proverbes",true);
+	$mp = new Flux_Proverbe("flux_proverbes",true);
 	//on initialise les tables du générateur
 	$mp->dbG = new Model_DbTable_Gen_generateurs($mp->getDb("generateur"));	
 	//on réinitialise la connexion par défaut
 	$mp->getDb("flux_proverbes");	
-	$rs = $mp->saveResultSearch("homme",1,200,array("id_concept"=>169977,"id_dico"=>153));
+	$rs = $mp->saveResultSearchMistral("enfant",1,200,array("id_concept"=>169978,"id_dico"=>153));
 	//
 	
 	/*ATTENTION

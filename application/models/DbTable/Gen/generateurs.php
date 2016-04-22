@@ -86,18 +86,18 @@ class Model_DbTable_Gen_generateurs extends Zend_Db_Table_Abstract
     public function ajouter($idCpt, $data, $existe=true, $modif=false)
     {
     	
-    	$id=false;
-    	if($existe)$id = $this->existe($data);
-    	if(!$id){
-    	 	$id = $this->insert($data);
-    	}elseif ($modif){
-    		$this->edit($id, $data);
-    	}
-    	//création du lien entre le générateur et le concept
-    	$dbCptGen = new Model_DbTable_Gen_conceptsxgenerateurs($this->_db);
-    	$dbCptGen->ajouter(array("id_concept"=>$idCpt,"id_gen"=>$id));
-    	
-    	return $idCpt;
+	    	$id=false;
+	    	if($existe)$id = $this->existe($data);
+	    	if(!$id){
+	    	 	$id = $this->insert($data);
+	    	}elseif ($modif){
+	    		$this->edit($id, $data);
+	    	}
+	    	//création du lien entre le générateur et le concept
+	    	$dbCptGen = new Model_DbTable_Gen_conceptsxgenerateurs($this->_db);
+	    	$dbCptGen->ajouter(array("id_concept"=>$idCpt,"id_gen"=>$id));
+	    	
+	    	return $id;
     } 
            
     /**

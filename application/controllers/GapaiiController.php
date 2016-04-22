@@ -15,7 +15,7 @@ class GapaiiController extends Zend_Controller_Action {
 	var $idBase = "flux_proverbes";
 	var $idBaseSpip = "spip_proverbe";
 	var $idOeu = 57;//37;//
-	var $idUti = 2;
+	var $idUti;
 	var $idDoc = 1;
 	var $idCpt = 169964;// poeme stein 158393;//158278 - test poème;//;
 	var $idGeo;
@@ -204,7 +204,7 @@ class GapaiiController extends Zend_Controller_Action {
 	}
 	
 	public function evalAction() {
-		$this->initInstance();
+		$this->initInstance("eval");
 		//vue pour l'évaluation des fragments
 		
 	}
@@ -213,7 +213,7 @@ class GapaiiController extends Zend_Controller_Action {
 	 * http://thenounproject.com/search/?q=animal
 	 */
 	
-    function initInstance(){
+    function initInstance($action=""){
 		if($this->_getParam('idBase')) $this->idBase = $this->_getParam('idBase');
 		if($this->_getParam('idBaseSpip')) $this->idBaseSpip = $this->_getParam('idBaseSpip');
 		if($this->_getParam('idOeu')) $this->idOeu = $this->_getParam('idOeu');
@@ -233,7 +233,6 @@ class GapaiiController extends Zend_Controller_Action {
 			$this->view->idUti = $this->idUti;
 			return;
 		}
-		
 		$auth = Zend_Auth::getInstance();
 		$this->ssUti = new Zend_Session_Namespace('uti');
 		if ($auth->hasIdentity()) {						
@@ -243,8 +242,11 @@ class GapaiiController extends Zend_Controller_Action {
 		    $this->view->idUti = $ssUti->idUti;
 		}else{			
 		    //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
-		    //$this->ssUti->redir = "/gapaii";
-		    	$this->view->idUti = $this->idUti;
+		    if($action)
+			    $this->ssUti->redir = "/gapaii/".$action;
+			else
+			    $this->ssUti->redir = "/gapaii";
+			$this->view->idUti = $this->idUti;
 			$this->ssUti->dbNom = $this->idBase;
 		    if($this->view->ajax)$this->_redirect('/auth/finsession');		    
 		    else $this->_redirect('/auth/login');

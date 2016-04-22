@@ -31,6 +31,8 @@ data/flux-index
 
 data/google/img
 
+data/proverbes
+
 data/gapaii
 
 bdd/bigdumpGapaii.php
@@ -109,3 +111,13 @@ data/aliento/Adâb al-falâsifaExtrait.xml
 data/aliento/Mukhtâr al-HikamExtrait.xml
 
 data/w3c/annotation/.~lock.importTagAnnotation.ods#
+
+bdd/CreaDump.php
+
+data/proverbes/proverbes.json
+
+data/proverbes/internauteProverbes.csv
+
+services/books.jpeg
+
+services/image_test.jpeg
