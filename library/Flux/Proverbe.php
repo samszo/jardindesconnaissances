@@ -13,6 +13,7 @@
 class Flux_Proverbe extends Flux_Site{
 
 	var $mc;
+	var $dbGen;
 	
     /**
      * Constructeur de la classe
@@ -20,7 +21,7 @@ class Flux_Proverbe extends Flux_Site{
      * @param  string $idBase
      * 
      */
-	public function __construct($idBase=false, $bTrace=false)
+	public function __construct($idBase=false, $idBaseGen=false, $bTrace=false)
     {
     		parent::__construct($idBase, $bTrace);    	
 
@@ -32,6 +33,8 @@ class Flux_Proverbe extends Flux_Site{
 
 		//on crée les objets nécessaire
 	    	$this->mc = new Flux_MC($idBase);
+	    	$this->dbGen = $this->getDb($idBaseGen);
+	    	$this->getDb($idBase);
 	    	$this->initDbTables();
     }
 
@@ -48,7 +51,8 @@ class Flux_Proverbe extends Flux_Site{
 		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
 		if(!$this->dbA)$this->dbA = new Model_DbTable_flux_acti($this->db);
 		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
-		if(!$this->dbG)$this->dbG = new Model_DbTable_Gen_generateurs($this->db);		
+		if(!$this->dbG)$this->dbG = new Model_DbTable_Gen_generateurs($this->dbGen);		
+		if(!$this->dbC)$this->dbC = new Model_DbTable_Gen_concepts($this->dbGen);		
 		
     }
             

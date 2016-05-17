@@ -31,19 +31,10 @@ class MigreController extends Zend_Controller_Action {
 			//initialise les objets			
 			$sSrc = new Flux_Site($this->idBaseSrc, true);
 			$sSrc->bTraceFlush = true;
-			$sGen = new Flux_Site("generateur");
-			$pro = new Flux_Proverbe($this->idBaseDst);
-			$pro->dbG = new Model_DbTable_Gen_generateurs($sGen->db);	
+			$pro = new Flux_Proverbe($this->idBaseDst,"generateur");
 			$dbDoc = new Model_DbTable_Flux_Doc($pro->db);
 			$idAct = $pro->dbA->ajouter(array("code"=>"Migre -> proverbes"));
-			//récupère les données sources
-			$dbSrc = new Model_DbTable_Flux_Doc($sSrc->db);
-			$idDocSite = $pro->dbD->ajouter(array("titre"=>"Proverbes de l'internautes","url"=>"http://www.linternaute.com/proverbe","parent"=>$pro->idDocRoot));						
-			$arrSrc = $dbSrc->exeQuery("SELECT p.idPage, p.urlPage pa, pro.proverbeContent po
-				FROM pages p
-				INNER JOIN proverbes pro ON pro.idPage = p.idPage 
-				WHERE p.IdPage BETWEEN 0 AND 700
-				ORDER BY p.idPage");
+			$idDico = 153;
 			//enregistre le rapport de l'action
 			$idRapAct = $pro->dbR->ajouter(array("monade_id"=>$pro->idMonade,"geo_id"=>$pro->idGeo
 				,"src_id"=>$this->idBaseSrc,"src_obj"=>"base"
@@ -69,16 +60,33 @@ class MigreController extends Zend_Controller_Action {
 				array('n?',"n'"),
 				array('qu?',"qu'"),
 				array('C?',"C'"),
+				array('c ?',"c'"),
 				array('?'," ?"),
 				array('  '," ")
 				);										 
+
+			//récupère les données sources
+			$dbSrc = new Model_DbTable_Flux_Doc($sSrc->db);
+			$arrSrc = $dbSrc->exeQuery("SELECT p.idPage, p.urlPage pa, pro.proverbeContent po
+				FROM pages p
+				INNER JOIN proverbes pro ON pro.idPage = p.idPage 
+				WHERE p.IdPage BETWEEN 0 AND 10
+				ORDER BY p.idPage");
 				
 	    		//ajoute les sources à la base de destination
 	    		$oIdPage = 0;
 	    		foreach ($arrSrc as $p) {
 	    			if($p["idPage"]!=$oIdPage){
+	    				//récupère le domaine comme document parent
+					$domaine = $sSrc->getNomDeDomaine($p["pa"]);
+					$idDocSite = $pro->dbD->ajouter(array("titre"=>$domaine,"url"=>$domaine,"parent"=>$pro->idDocRoot));						
+	    				$sSrc->trace("Récupère le domaine = ".$domaine." : ".$idDocSite);
+					//récupère le domaine comme concept
+	    				$idCpt = $pro->dbC->ajouter(array("id_dico"=>$idDico,"lib"=>$domaine,"type"=>"page web"));
+	    				$sSrc->trace("Récupère le concept = ".$idCpt);
+	    				//enregistre l'url
 	    				$params  = explode("/", $p["pa"]);
-	    				$arr = array("titre"=>"Les proverbes de l'internaute - ".$params[5]."_".$params[6],"url"=>$p["pa"],"parent"=>$idDocSite);
+	    				$arr = array("titre"=>$domaine." - ".$params[5]."_".$params[6],"url"=>$p["pa"],"parent"=>$idDocSite);
 					$idDocPage = $pro->dbD->ajouter($arr);			
 	    				$sSrc->trace("nouvelle page = ".$idDocPage,$arr);
 	    			}
@@ -102,6 +110,7 @@ class MigreController extends Zend_Controller_Action {
 					UPDATE flux_doc SET titre = REPLACE(titre,'n?',"n'");
 					UPDATE flux_doc SET titre = REPLACE(titre,'qu?',"qu'");
 					UPDATE flux_doc SET titre = REPLACE(titre,'C?',"C'");
+					UPDATE flux_doc SET titre = REPLACE(titre,'c ?',"c'");
 					UPDATE flux_doc SET titre = REPLACE(titre,'?'," ?");
 					UPDATE flux_doc SET titre = REPLACE(titre,'  '," ");										 
 				 */		
@@ -109,7 +118,7 @@ class MigreController extends Zend_Controller_Action {
 				foreach ($corr as $c) {
 					$txt = str_replace($c[0],$c[1],$txt);
 				}			
-				$pro->ajouter($txt, $idDocPage, $idRapAct, array("id_concept"=>169977,"id_dico"=>153));
+				$pro->ajouter($txt, $idDocPage, $idRapAct, array("id_concept"=>$idCpt,"id_dico"=>$idDico));
 	    			$sSrc->trace($oIdPage." = ".$txt);
 	    		}
 	    		$sSrc->trace("FIN");

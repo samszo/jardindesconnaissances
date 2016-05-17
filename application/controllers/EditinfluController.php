@@ -78,36 +78,39 @@ class EditinfluController extends Zend_Controller_Action {
     		$params = $this->_request->getParams();
     		//$ei->trace("params",$params);
     		$oName = $params['obj'];
-
+    		$idUti = $this->_getParam('idUti', $this->ssUti->uti["uti_id"]);
+    		
     		//enlève les paramètres Zend
-    		unset($params['controller']);
-    		unset($params['action']);
-    		unset($params['module']);
-    		//et les paramètres de l'ajout
-    		unset($params['obj']);
+    		$params = $this->cleanParamZend($params);
     		
     		//ajout suivant les cas	    
     		switch ($oName) {
     			case "crible":    				
-    				$this->view->rs = $ei->creaCrible($this->ssUti->uti["uti_id"], $params);
+    				$this->view->rs = $ei->creaCrible($idUti, $params);
     				$this->view->message = "Le crible est ajouté"; 
     				break;
     			case "acteur":
-    				$this->view->rs = $ei->creaActeur($this->ssUti->uti["uti_id"], $params);    				
+    				$this->view->rs = $ei->creaActeur($idUti, $params);    				
     				$this->view->message = "L'acteur est ajouté"; 
     				break;
     			case "graph":
-    				$this->view->rs = $ei->creaGraph($this->ssUti->uti["uti_id"], $params);
+    				$this->view->rs = $ei->creaGraph($idUti, $params);
     				$this->view->message = "La graph est ajouté"; 
     				break;
     			case "tag":
+    				$this->view->rs = $ei->creaTag($idUti, $params);
     				$this->view->message = "Le tag est ajouté"; 
     				break;
+    			case "rapport":
+    				$this->view->rs = $ei->creaRapport($idUti, $params);
+    				$this->view->message = "Le rapport est ajouté"; 
+    				break;
     			case "doc":
-    				$this->view->rs = $ei->creaDoc($this->ssUti->uti["uti_id"], $params);
+    				$this->view->rs = $ei->creaDoc($idUti, $params);
     				$this->view->message = "Le document est ajouté"; 
     				break;
     	    		}
+    	    	$ei->trace("FIN");
     }
     
 	public function editAction()
@@ -121,12 +124,9 @@ class EditinfluController extends Zend_Controller_Action {
     		$s->trace("params",$params);
     		$oName = $params['obj'];
 
-    		//enlève les paramètres Zend
-    		unset($params['controller']);
-    		unset($params['action']);
-    		unset($params['module']);
+    		$params = $this->cleanParamZend($params);
+    		
     		//et les paramètres de l'ajout
-    		unset($params['obj']);
 		$id = $params['recid'];
     		unset($params['recid']);
     		
@@ -140,9 +140,6 @@ class EditinfluController extends Zend_Controller_Action {
     				$this->view->message = "Le crible est mis à jour"; 
     				break;
     			case "acteur":
-    				$params['data'] = json_encode(array("idArk"=>$params['idArk'],"liens"=>$params['liens'],"isni"=>$params['isni']));
-    				unset($params['idArk']);
-    				unset($params['liens']);
     				//initialise les objets
 		    		$s->dbE = new Model_DbTable_Flux_Exi($s->db);
 		    		//met à jour les données
@@ -266,5 +263,17 @@ class EditinfluController extends Zend_Controller_Action {
 		    	
     }
     
-    
+    function cleanParamZend($params){
+    		//enlève les paramètres Zend
+    		unset($params['controller']);
+    		unset($params['action']);
+    		unset($params['module']);
+    		unset($params['idBase']);
+    		unset($params['ajax']);
+    		unset($params['idUti']);
+		unset($params['obj']);
+		    		
+    		return $params;
+    	
+    }
 }

@@ -1,0 +1,37 @@
+<html>
+<head>
+
+<link href="js/conceptmap/concept-map.css" rel="stylesheet"></link>
+
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script src="js/d3.v3.min.js" type="text/javascript"></script>
+<script src="js/conceptmap/packages.js" type="text/javascript"></script>
+<script src="js/conceptmap/concept-map.js" type="text/javascript"></script>
+
+<script>
+$(function(){
+	plotConceptMap();
+});
+function plotConceptMap()
+{
+	//var url = "data/metadata.json";
+	var url = "../public/paragraphe/conceptmap";
+	d3.json(url, function(dataJson) {
+		//trie les acteurs
+		dataJson.ditems.sort(function(a,b){ 
+			return a.name.charCodeAt(0) - b.name.charCodeAt(0) 
+			} );
+		var plot = new ConceptMap("graph", "graph-info", dataJson);
+	});
+}
+</script>
+<style>
+body{
+}
+</style>
+</head>
+<body>
+				<div id="graph" class="conceptmap" ></div>
+				<div id="graph-info"></div>
+</body>
+</html>

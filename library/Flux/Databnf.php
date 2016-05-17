@@ -96,7 +96,7 @@ ORDER BY ASC (?label_a)
 		$result = $this->query($query);
 		$obj1 = json_decode($result);
 		//construction de la réponse
-		$objResult->idArk = $obj1->results->bindings[0]->idArk->value;				
+		$objResult->data=array("bnf"=>array("idArk"=>$obj1->results->bindings[0]->idArk->value,"liens"=>array(),"isni"=>""));
 		$objResult->nom = $obj1->results->bindings[0]->nom->value;				
 		$objResult->prenom = $obj1->results->bindings[0]->prenom->value;				
 		$objResult->nait = $obj1->results->bindings[0]->nait->value;				
@@ -110,18 +110,19 @@ ORDER BY ASC (?label_a)
 		$result = $this->query($query);
 		$obj2 = json_decode($result);		
 		//construction de la réponse
-		$objResult->liens = array();
+		$liens = array();
 		$i=0;
 		foreach ($obj2->results->bindings as $val) {
 			//ajoute les liens direct
 			if($val->p->value=="http://www.w3.org/2004/02/skos/core#exactMatch"){
-				array_push($objResult->liens, array("value"=>$val->o->value,"recid"=>$i,"type"=>"ref"));
+				array_push($liens, array("value"=>$val->o->value,"recid"=>$i,"type"=>"ref"));
 				$i++;
 			}
 			//ajout l'isni
 			if($val->p->value=="http://isni.org/ontology#identifierValid")
-				$objResult->isni = $val->o->value;				
+				$objResult->data["bnf"]["isni"] = $val->o->value;				
 		}
+		$objResult->data->liens=$liens;		
 		return json_encode($objResult);
     }	
     

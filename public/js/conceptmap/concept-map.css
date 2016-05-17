@@ -9,8 +9,8 @@
 /* ditem carousel */
 #ditem-container {
   position: relative;
-  width: 750px;
-  height: 600px;
+  width: 500px;
+  height: 500px;
   margin: 20px auto;
   /* vertical space = (total height - ditem height - height of bottom thing) / 2 */
   padding-top: 65px;
@@ -32,7 +32,7 @@
 #ditems li > a {
   position: relative;
   display: block;
-  width: 750px;
+  width: 500px;
 }
 #ditems li > a:hover {
   border: 0;
@@ -70,7 +70,7 @@
 #transport {
   position: absolute;
   top: 410px; /* 350 + top pad of container */
-  width: 750px;
+  width: 500px;
 }
 #transport a {
   position: absolute;
@@ -96,7 +96,7 @@
   top: 0;
   background-color: #fff;
   margin: 0;
-  width: 750px;
+  width: 500px;
   z-index: 100;
 }
 .conceptmap #ditem-thumbs li {
@@ -115,7 +115,7 @@
 
 .conceptmap #controls {
   margin-top: 20px;
-  width: 750px;
+  width: 500px;
 }
 .conceptmap #controls .btn {
   position: relative;

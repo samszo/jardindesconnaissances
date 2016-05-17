@@ -1,0 +1,168 @@
+<html>
+<head>
+
+<script src="../js/jquery.min.js" type="text/javascript"></script>
+<script src="../js/d3.v3.min.js" type="text/javascript"></script>
+
+<script>
+	var dataset = [], idBase = "flux_paragraphe", idCrible = <?php echo $this->idCrible; ?>;
+	var urlData = "../../data/paragraphe/AxesCiTu-Paragraphe-cor.csv"; 
+	d3.csv(urlData, function(data) {
+	   //console.log(data)
+	   /*construction des data suivant le modèle concept map
+	   http://czcodezone.blogspot.fr/2015/01/d3-simple-javascript-class-wrapper-for_25.html
+	   */	
+	   	var dtConcepMap = {"ditems": [],"themes": [],"perspectives": []};    
+	   	var tagColabo = 	ajoutInflu({'obj':'tag','code':'Collaborateur'});					
+	   	var arrActeur = 	[];					
+	   	
+		data.forEach(function(d){
+			//ajout de l'acteur	
+			var acteur = ajoutInflu({'obj':'acteur',"nom":d.Prénom+" "+d.Nom});
+			var oAct = {
+		            "type": "ditem",
+		            "name": d.Prénom+" "+d.Nom,
+		            "description": d["Bref descriptif de votre recherche"],
+		            "ditem": acteur.recid,
+		            "date": "2016-05-14 09:40:11",
+		            "role":d.Rôle,
+		            "slug": "ditem-one-"+acteur.recid,
+		            "links": []
+		        };		        					
+			//ajout des axes		
+			for (i = 1; i <= 6; i++) { 
+				if(d["Nom axe #"+i]){
+					//ajoute l'axe pour l'acteur
+					var axe = ajoutInflu({'obj':'tag','idUti':acteur.recid,"code":d["Nom axe #"+i],"desc":d["Descriptif rapide axe #"+i]});					
+					var oAxe = {
+			            "type": "theme",
+			            "name": d["Nom axe #"+i],
+			            "description": d["Descriptif rapide axe #"+i],
+			            "slug": "tag-"+axe.recid
+			        };
+					dtConcepMap.themes.push(oAxe);
+					oAct.links.push(d["Nom axe #"+i]);
+									
+					//récupère les collaborateurs
+					var colaboAxe = d["Collaborateurs axe #"+i+" (séparés par des virgules)"];
+					colaboAxe = colaboAxe.split(",");
+					colaboAxe.forEach(function(c){
+						//ajoute les collaborateurs
+						c = c.trim();
+						var colabo = ajoutInflu({'obj':'acteur',"nom":c});
+						ajoutInflu({'obj':'rapport','idUti':acteur.recid,"src_id":acteur.recid,"src_obj":"exi","dst_id":colabo.recid,"dst_obj":"exi","pre_id":tagColabo.recid,"pre_obj":"tag"});						
+						var oColabo;
+						if(arrActeur[colabo.recid]){
+							oColabo = arrActeur[colabo.recid].obj;
+						}else{	
+							oColabo = {
+					            "type": "ditem",
+					            "name": c,
+					            "description": "Collaborateur",
+					            "ditem": colabo.recid,
+					            "date": "2016-05-14 09:40:11",
+					            "role":"Collaborateur",
+					            "slug": "ditem-one-"+colabo.recid,
+					            "links": []
+					        };	
+							arrActeur[colabo.recid] = {recid:colabo.recid,obj:oColabo};
+						}	
+						//ajoute l'axe
+						oColabo.links.push(d["Nom axe #"+i]);				
+					});
+					
+					//ajoute les liens vers les documents
+					if(d["Liens vers vos articles liés à l'axe #"+i+" dans HAL (séparés par des virgules)"]){
+						var hals = d["Liens vers vos articles liés à l'axe #"+i+" dans HAL (séparés par des virgules)"].split(",");
+						hals.forEach(function(h){
+							//ajoute le document
+							var doc = ajoutInflu({'obj':'doc','idUti':acteur.recid,"url":h,"titre":d.Prénom+" "+d.Nom+" document de référence axe "+i});
+							var oDoc ={
+				                "type": "perspective",
+				                "name": h,
+				                "description": "<a href=\""+h+"\">Lien vers le document dans HAL</a>.",
+				                "slug": "doc-"+doc.recid,
+				                "count": "10",
+				                "group": "281"
+				            };	
+							dtConcepMap.perspectives.push(oDoc);
+							oAct.links.push(h);				            						
+						});
+					}					
+				}
+			}						        
+			dtConcepMap.ditems.push(oAct);
+			//enregistre l'objet acteur finalisé
+			editInflu({'obj':'acteur','recid':acteur.recid,"data":JSON.stringify(oAct)});
+			arrActeur[acteur.recid] = {recid:acteur.recid,obj:oAct};
+			
+		})
+		//ajoute tous les collaborateurs
+		arrActeur.forEach(function(c){
+			if(c.obj.role=="Collaborateur"){
+				dtConcepMap.ditems.push(c.obj);
+				editInflu({'obj':'acteur','recid':c.recid,"data":JSON.stringify(c.obj)});
+			}
+		});		   
+		//ajoute le document
+		var doc = ajoutInflu({'obj':'doc',"titre":"Définition des axes Paragraphe Citu","url":urlData});
+		//met à jour le json
+		editInflu({'obj':'doc','recid':doc.recid,"note":JSON.stringify(dtConcepMap)});
+		d3.select("body").text(JSON.stringify(dtConcepMap));
+	});
+
+
+	function editInflu(data){
+
+	    data.idBase = idBase;
+	    $.ajax({
+	    		url: '../editinflu/edit',
+	    		dataType: "json",
+	    		async: false, // Mode synchrone
+	    		data: data,
+	    		method: 	"POST",
+	        	error: function(error){
+	        		console.log("Erreur : "+error.responseText);
+	        	},            	
+	        	success: function(js) {
+		        	console.log(js);
+	        }
+		});	 	
+	}
+
+	function ajoutInflu(data){
+
+		var result;
+	    data.idCrible = idCrible;
+	    data.idBase = idBase;
+	    $.ajax({
+	    		url: '../editinflu/ajout',
+	    		async: false, // Mode synchrone
+	    		dataType: "json",
+	    		data: data,
+	    		method: 	"POST",
+	        	error: function(error){
+	        		console.log("Erreur : "+error.responseText);
+	        	},            	
+	        	success: function(js) {
+		        	console.log(js);
+		        	result = js.rs;
+	        }
+		});	 		    
+		return result;		
+	}
+	
+	
+	
+</script>
+<style>
+body{
+padding-top: 10px;
+}
+</style>
+</head>
+<body>
+
+</body>
+</html>
+

@@ -211,7 +211,8 @@ class Flux_Bup8 extends Flux_Site{
     		$csv = $this->getUrlBodyContent($searchUrl,array("format"=>"6","shelfid"=>$idListe,"save"=>"Valider"),$this->bCache,Zend_Http_Client::POST);
 		$this->livres=array();
     		$arrBook= $this->csvStringToArray($csv,",",true);
-
+		$this->trace($csv,$arrBook);
+		
     		//récupère la liste avec l'identifiant du livre
 		$searchUrl = "http://catalogue.bu.univ-paris8.fr/cgi-bin/koha/opac-downloadshelf.pl";
     		$bt = $this->getUrlBodyContent($searchUrl,array("format"=>"bibtex","shelfid"=>$idListe,"save"=>"Valider"),$this->bCache,Zend_Http_Client::POST);

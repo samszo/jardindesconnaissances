@@ -194,12 +194,12 @@ var gridActeur = {
         onClick: function (event) {
         		if(event.target == 'w2ui-add')return;
         		var acteur = w2ui.grid_acteur.get(w2ui.grid_acteur.getSelection());
+        		idUpdate = false;
         		if(!acteur){
         			w2alert("Veuillez sélectionner un acteur");
         			return;
         		}
             if (event.target == 'ajout_reseau') {
-            		idUpdate = false;
             		rs.creaNode("Acteur",acteur.nom,acteur);
             }
             if (event.target == 'find_bnf') {
@@ -243,6 +243,7 @@ var formActeur = {
 	        if(idUpdate){
 	        		url = 'editinflu/edit';
 	        		data.recid = idUpdate;
+	    			delete data.idCrible;			
 	        }	        
 	        
 	        $.ajax({
@@ -284,9 +285,11 @@ var tbActeur = {
     ],
     onClick: function (event) {
 		if(event.target=="btnGetBio"){
+			itemSelect = false;
 			findAuteur($('#tb_acteur_ip')[0].value);			
 		}
 		if(event.target=="btnGetGoogle"){
+			itemSelect = false;
 			findAuteurGoogle($('#tb_acteur_ip')[0].value);			
 		}
     },
@@ -706,7 +709,8 @@ var gridResultBNFliens = {
         },		
         columns: [                
             { field: 'recid', hidden:true},
-            { field: 'value', caption: 'Lien', size: '100%',editable: { type: 'text' } },
+            { field: 'value', caption: 'Lien', size: '80%',editable: { type: 'text' } },
+            { field: 'type', caption: 'Type', size: '20%',editable: { type: 'text' } },
         ],
         onClick: function (event) {
         		var item = this.get(event.recid);
@@ -1203,10 +1207,14 @@ function setFindAuteurGoogle(){
 	
 }
 
+function initFormAuteur(){
+	idUpdate = false;
+    w2ui['form_acteur'].clear();
+}
 
 
 function setSelectAuteur(dt){
-	if(dt.length==0 || dt.idArk==null)
+	if(dt==null)
 		w2alert("Aucunne référence dans data.bnf.fr");
 	else{
         var g = w2ui['form_acteur'];
@@ -1215,7 +1223,7 @@ function setSelectAuteur(dt){
 		g.refresh();
 		$('#ifActeur').attr("src",dt.idArk);            		
 		
-		gridResultBNFliens.records = dt.liens;
+		gridResultBNFliens.records = dt.data.liens;
 	 	if(w2ui['grid_result_bnf_liens'])w2ui['grid_result_bnf_liens'].destroy();	
 		w2ui['layout_acteur_bottom'].content('left', $().w2grid(gridResultBNFliens));
 		
@@ -1229,7 +1237,7 @@ function setSelectAuteurGoogle(dt){
 	g.refresh();
 	$('#ifActeur').attr("src",dt.idArk);            		
 	
-	gridResultBNFliens.records = dt.liens;
+	gridResultBNFliens.records = dt.data.liens;
  	if(w2ui['grid_result_bnf_liens'])w2ui['grid_result_bnf_liens'].destroy();	
 	w2ui['layout_acteur_bottom'].content('left', $().w2grid(gridResultBNFliens));
 }

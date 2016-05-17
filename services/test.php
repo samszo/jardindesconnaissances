@@ -478,14 +478,14 @@ try {
 	$bup8->setListe(3713);
     */
 	
-	//
+	/*
 	$mp = new Flux_Proverbe("flux_proverbes",true);
 	//on initialise les tables du générateur
 	$mp->dbG = new Model_DbTable_Gen_generateurs($mp->getDb("generateur"));	
 	//on réinitialise la connexion par défaut
 	$mp->getDb("flux_proverbes");	
 	$rs = $mp->saveResultSearchMistral("enfant",1,200,array("id_concept"=>169978,"id_dico"=>153));
-	//
+	*/
 	
 	/*ATTENTION
 	 * pas de trace pour éviter le plantage sur la création de session

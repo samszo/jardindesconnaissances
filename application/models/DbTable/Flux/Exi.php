@@ -129,6 +129,9 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
+    		if(isset($data["data"])){
+    			if(is_object($data["data"]) || is_array($data["data"]))$data["data"] = json_eoncode($data["data"]);
+    		}
         $this->update($data, 'flux_exi.exi_id = ' . $id);
         return $this->findByExiId($id);
     }

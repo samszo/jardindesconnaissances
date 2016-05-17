@@ -122,7 +122,8 @@ function editDoc(){
 }			
 function findAuteur(nom){
 	//supprime les résultats
-	//initFormAuteur()
+	initFormAuteur()
+	itemSelect = false;
 	w2popup.lock("Veuillez patienter", true);
 	$.post(prefUrl+"flux/databnf?obj=term&term="+nom, null,
 			 function(data){
@@ -137,7 +138,7 @@ function findAuteur(nom){
 
 function findAuteurGoogle(nom){
 	//supprime les résultats
-	//initFormAuteur()
+	initFormAuteur()
 	w2popup.lock("Veuillez patienter", true);
 	$.post(prefUrl+"flux/googlekg?q="+nom, null,
 		 function(data){
@@ -173,22 +174,13 @@ function selectAuteurGoogle(i){
 	var res = i.data.detailedDescription.url.split("/");
 	res = res[res.length-1]; 
 	$.post(prefUrl+"flux/dbpedia?obj=bio&res="+res, null,
-			 function(data){
-				i.nait = data.nait;
-				i.mort = data.mort;
-				i.nom = i.name;
-				i.liens = [];
-				i.liens.push({"value":i.data.detailedDescription.url,"recid":i.liens.length+1,type:"ref"});
-				if(i.data.image)i.liens.push({"value":i.data.image.url,"recid":i.liens.length+1,type:"image"});
-				if(data.img)i.liens.push({"value":data.img,"recid":i.liens.length+1,type:"image"});
-				if(data.bnf)i.liens.push({"value":"http://data.bnf.fr/"+data.bnf,"recid":i.liens.length+1,type:"ref"});
-				if(data.viaf)i.liens.push({"value":"http://viaf.org/viaf/"+data.viaf,"recid":i.liens.length+1,type:"ref"});
-				//supprime les données superflux
-				delete i.name;
-				delete i.type;
-				delete i.id;
-				delete i.desc;
-				setSelectAuteurGoogle(i);
+			 function(r){
+				//fusionne les données
+				if(!r.nom)r.nom = i.name;				
+				r.data.liens.push({"value":i.data.detailedDescription.url,"recid":r.data.liens.length+1,type:"kg"});
+				if(i.data.image)r.data.liens.push({"value":i.data.image.url,"recid":r.data.liens.length+1,type:"img"});
+			    r.data.kg = {"idKg":i.data['@id'],"data":i};
+				setSelectAuteurGoogle(r);
 			 }, "json");	
 }
 

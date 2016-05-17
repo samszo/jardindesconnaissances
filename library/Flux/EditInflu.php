@@ -153,6 +153,7 @@ class Flux_EditInflu extends Flux_Site{
      */
     function creaActeur($idUti, $data){
 
+		$this->trace(__METHOD__." : ".$idUti);
     		$this->initDbTables();
     	
 		//enregistre le rapport entre l'utilisateur et l'action
@@ -163,12 +164,12 @@ class Flux_EditInflu extends Flux_Site{
 			));
 			
 		//nettoyage des paramètres
-		$img = $data['img'];	
 		$idCrible = $data['idCrible'];		
 		$data = $this->cleanData($data);
 		//print_r($data);
 		
 		//enregistre l'acteur
+		$this->trace("data",$data);
 		$arr = $this->dbE->ajouter($data,true,true);
 		//ajoute le(s) champ(s) pour le grid
 		$arr["recid"] = $arr["exi_id"];
@@ -187,9 +188,87 @@ class Flux_EditInflu extends Flux_Site{
 				,"src_id"=>$arr["exi_id"],"dst_obj"=>"exi"
 				));
 		}
+		
 		return $arr;    	
     }
 
+ 	/**
+     * Fonction pour créer un tag
+     *
+     * @param  	int 		$idUti
+     * @param  	array 	$data
+     * 
+     * @return	array
+     * 
+     */
+    function creaTag($idUti, $data){
+
+		$this->trace(__METHOD__." : ".$idUti);
+    		$this->initDbTables();
+    	
+		//enregistre le rapport entre l'utilisateur et l'action
+		$idActi = $this->dbA->ajouter(array("code"=>__METHOD__));		
+    		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+			,"src_id"=>$idUti,"src_obj"=>"uti"
+			,"dst_id"=>$idActi,"dst_obj"=>"acti"
+			));
+			
+		//nettoyage des paramètres
+		$idCrible = $data['idCrible'];		
+		$data = $this->cleanData($data);
+		//print_r($data);
+		
+		//enregistre le tag
+		$this->trace("data",$data);
+		$arr = $this->dbT->ajouter($data,true,true);
+		//ajoute le(s) champ(s) pour le grid
+		$arr["recid"] = $arr["tag_id"];
+		//enregistre la création du tag
+		$idRapRep = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+			,"src_id"=>$idRap,"src_obj"=>"rapport"
+			,"pre_id"=>$idCrible,"pre_obj"=>"doc"
+			,"dst_id"=>$arr["tag_id"],"dst_obj"=>"tag"
+			));
+		
+		return $arr;    	
+    }   
+
+	/**
+     * Fonction pour créer un rapport
+     *
+     * @param  	int 		$idUti
+     * @param  	array 	$data
+     * 
+     * @return	array
+     * 
+     */
+    function creaRapport($idUti, $data){
+
+		$this->trace(__METHOD__." : ".$idUti);
+    		$this->initDbTables();
+    	
+		//enregistre le rapport entre l'utilisateur et l'action
+		$idActi = $this->dbA->ajouter(array("code"=>__METHOD__));		
+    		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+			,"src_id"=>$idUti,"src_obj"=>"uti"
+			,"dst_id"=>$idActi,"dst_obj"=>"acti"
+			));
+			
+		//nettoyage des paramètres
+		$data = $this->cleanData($data);
+		//print_r($data);
+		
+		//enregistre le rapport
+		$this->trace("data",$data);
+		$data["monade_id"]=$this->idMonade;
+		$data["geo_id"]=$this->idGeo;
+		$idRapRep = $this->dbR->ajouter($data);
+		//ajoute le(s) champ(s) pour le grid
+		$arr["recid"] = $arr["tag_id"];
+			
+		return $arr;    	
+    }       
+    
     /**
      * Fonction pour nettoyer les paramètres
      * @param	array	$data
@@ -198,6 +277,7 @@ class Flux_EditInflu extends Flux_Site{
      * 
      */
     function cleanData($data){
+    		/*fait en javascript
 		if($data['idArk'])	{
 			$data['data'] = json_encode(array("bnf"=>array("idArk"=>$data['idArk'],"liens"=>$data['liens'],"isni"=>$data['isni'])));
 			unset($data['idArk']);
@@ -214,8 +294,11 @@ class Flux_EditInflu extends Flux_Site{
     			unset($data['detail']);			
     			unset($data['expanded']);			
 		}
+		*/
+	    	if(isset($data['data']))	$data['data'] = json_encode($data['data']);
     		unset($data['idCrible']);			
-		
+    		unset($data['recid']);			
+    		
     		return $data;
     	}
     

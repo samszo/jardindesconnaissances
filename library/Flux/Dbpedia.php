@@ -18,7 +18,6 @@ class Flux_Dbpedia extends Flux_Site{
 	var $lang = "fr";
 	var $formatResponse = "json";
 	var $searchUrl = 'http://fr.dbpedia.org/sparql?';
-	
     const IDEXI = 1;
     
     /**
@@ -43,7 +42,7 @@ class Flux_Dbpedia extends Flux_Site{
     {
 	    $url = $this->searchUrl.'query='.urlencode($query)
 	      	.'&format='.$this->formatResponse;
-		return $this->getUrlBodyContent($url,false);
+		return $this->getUrlBodyContent($url,false,$this->forceCalcul);
     }
     
 	/**
@@ -55,17 +54,22 @@ class Flux_Dbpedia extends Flux_Site{
      */
     public function getBio($ressource)
     {	   	
-	   	//récupère les infos de data bnf
+	   	$this->trace(__METHOD__." ".$ressource);
+    		//récupère les infos de data bnf
 	   	$query = "select * where {<http://fr.dbpedia.org/resource/".$ressource."> ?r ?p}";	   			   	
+	   	$this->trace($query);
 		$result = $this->query($query);
+	   	$this->trace($result);
 		$obj = json_decode($result);
-		
+						
 		//construction de la réponse
 		$objResult = new stdClass();
+		$liens = array();
 		foreach ($obj->results->bindings as $key => $v) {
+	   		$this->trace($key,$v->r->value);
 			switch ($v->r->value) {
 				case "http://fr.dbpedia.org/property/bnf":
-					$objResult->bnf = $v->p->value."";				
+					$liens[] = array("value"=>"http://data.bnf.fr/"+$v->p->value,"recid"=>count($liens)+1,"type"=>"bnf");				
 					break;
 				case "http://fr.dbpedia.org/property/naissance":
 					$objResult->nait = $v->p->value;				
@@ -82,17 +86,26 @@ class Flux_Dbpedia extends Flux_Site{
 					$objResult->mort = $date->format('Y-m-d');				
 					break;	
 				case "http://fr.dbpedia.org/property/sudoc":
-					$objResult->sudoc = $v->p->value;				
+					$liens[] = array("value"=>"http://data.bnf.fr/"+$v->p->value,"recid"=>count($liens)+1,"type"=>"sudoc");														
 					break;
 				case "http://fr.dbpedia.org/property/viaf":
-					$objResult->viaf = $v->p->value;				
+					$liens[] = array("value"=>"http://viaf.org/viaf/"+$v->p->value,"recid"=>count($liens)+1,"type"=>"viaf");																								
 					break;
 				case "http://xmlns.com/foaf/0.1/depiction":
-					$objResult->img = $v->p->value;				
-					break;							
+					$liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"img");																								
+					break;
+				case "http://dbpedia.org/ontology/wikiPageWikiLink":	
+					$liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"wiki");																								
+					break;
 			}
 		}	
-		return json_encode($objResult);
+		$objResult->data->liens = $liens;
+		
+	   	$this->trace("result",$objResult);
+	   	$js = json_encode($objResult); 
+	   	$this->trace($js);
+	   	
+		return $js;
     }    
     	
 	function SaveUserTagsLinks($user) {

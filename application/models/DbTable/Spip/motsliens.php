@@ -140,14 +140,16 @@ class Model_DbTable_Spip_motsliens extends Zend_Db_Table_Abstract
      * Recherche une entrée Spip_mots_liens avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param bigint $id_objet
+     * @param varchar	$objet
+     * @param bigint		$id_objet
      *
      * @return array
      */
-    public function findById_objet($id_objet)
+    public function findByIdObj($objet, $id_objet)
     {
         $query = $this->select()
                     ->from( array("s" => "spip_mots_liens") )                           
+                    ->where( "s.objet = ?", $objet )
                     ->where( "s.id_objet = ?", $id_objet );
 
         return $this->fetchAll($query)->toArray(); 
@@ -168,7 +170,7 @@ class Model_DbTable_Spip_motsliens extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
-    	/**
+	/**
      * Recherche une entrée Spip_mots_liens avec la valeur spécifiée
      * et retourne cette entrée.
      *
@@ -185,5 +187,23 @@ class Model_DbTable_Spip_motsliens extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray(); 
     }
     
+    	/**
+     * Copier les mots-clef d'un objet à un autre
+     *
+     * @param string	 $objSrc
+     * @param int	 $idObjSrc
+     * @param string	 $objDst
+     * @param int	 $idObjDst
+     *
+     * @return array
+     */
+    public function copier($objSrc,$idObjSrc,$objDst,$idObjDst)
+    {
+        $arr = $this->findByIdObj($objSrc,$idObjSrc);
+        foreach ($arr as $l) {
+	        //ajoute le lien
+	        $this->ajouter(array("id_mot"=>$l["id_mot"],"objet"=>$objDst,"id_objet"=>$idObjDst));
+        }
+    }
     
 }

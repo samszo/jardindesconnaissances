@@ -11,29 +11,30 @@ class Flux_Site{
     var $user;
 	var $graine;
 	var $dbA;
-	var $dbU;
-	var $dbUU;
-	var $dbUT;
-	var $dbUD;
-	var $dbUTD;
-	var $dbT;
-	var $dbTT;
-	var $dbTD;		
+	var $dbC;		
+	var $dbCG;		
 	var $dbD;
 	var $dbDT;
-	var $dbIEML;
-	var $dbUIEML;
-	var $dbTrad;
 	var $dbE;
 	var $dbED;
 	var $dbET;
 	var $dbETD;
 	var $dbG;
-	var $dbGUD;
-	var $dbM;
 	var $dbGM;
+	var $dbGUD;
+	var $dbIEML;
+	var $dbM;
 	var $dbR;		
-	var $dbCG;		
+	var $dbT;
+	var $dbTrad;
+	var $dbTT;
+	var $dbTD;		
+	var $dbU;
+	var $dbUIEML;
+	var $dbUU;
+	var $dbUT;
+	var $dbUD;
+	var $dbUTD;
 	var $db;
 	var $lucene;
     //pour l'optimisation
@@ -781,4 +782,32 @@ class Flux_Site{
         } 
         return $result; 
     } 	
+    
+	/**
+	 * Retourne le nom de domaine d'une url
+	 *
+	 * @param string $url L'url dont il faut récupérer le NDD
+	 * @return string $domain Le nom de domaine
+	 * @phpversion : 5+
+	 * @see http://fr.php.net/parse-url
+	 * @author : Hugo HAMON <webmaster@apprendre-php.com>
+	 */
+	function getNomDeDomaine($url) {
+	    
+	    $hostname = parse_url($url, PHP_URL_HOST);
+	    $hostParts = explode('.', $hostname);
+	    $numberParts = sizeof($hostParts);
+	    $domain='';
+	    
+	    // Domaine sans tld (ex: http://server/page.php)
+	    if(1 === $numberParts) {
+	        $domain = current($hostParts);
+	    }
+	    // Domaine avec tld (ex: http://fr.php.net/parse-url)
+	    elseif($numberParts>=2) {
+	        $hostParts = array_reverse($hostParts);
+	        $domain = $hostParts[1] .'.'. $hostParts[0];
+	    }
+	    return $domain;
+	}    
 }
