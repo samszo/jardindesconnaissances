@@ -6,7 +6,8 @@
 	<meta name="Description" CONTENT="jardin connaissances planning cours"/>
 	<meta name="Keywords" CONTENT="jardin connaissances planning cours"/>
 	<meta name="Author" CONTENT="Samuel Szoniecky"/>
-	<script type="text/javascript" src="js/d3.js"></script>
+	<script src="js/d3.v3.min.js" type="text/javascript"></script>
+	
 	<script type="text/javascript" src="js/cal-heatmap.js"></script>
 	<script src="js/jquery.min.js"></script>
   	<script src="js/jquery-ui.min.js"></script>
@@ -85,8 +86,8 @@
 				<?php endforeach; ?>		
 			</select>		
 	    <?php endif ?>
-	    Date de début: <input type="text" id="datepickerMin" value="01/09/2015" />
-	    Date de fin: <input type="text" id="datepickerMax" value="30/09/2016" />
+	    Date de début: <input type="text" id="datepickerMin" value="01/09/2016" />
+	    Date de fin: <input type="text" id="datepickerMax" value="30/09/2017" />
 	  </div>
 	  <div>
 		<label for="cours">Cours :</label>
@@ -185,8 +186,8 @@
 						idxCour = [];
 						$cours.append('<option value="">Tous les cours</option>');											
 						dataCour.forEach(function(d) {
-							idxCour.push(d["Code Apogée"]);
-							$cours.append('<option value="'+ d["Code Apogée"] +'">'+d["Code Apogée"]+" "+d["Intitulés des EC"] +'</option>');					
+							idxCour.push(d["New Apogée"]);
+							$cours.append('<option value="'+ d["New Apogée"] +'">'+d["New Apogée"]+" "+d["Intitulés des EC"] +'</option>');					
 						});
 						
 						d3.csv(urlInt[sltPlan.label], function(data3) {
@@ -266,11 +267,11 @@
 				}
 				if(opt.value==1){
 					for(var i=0; i < nbCou; i++){
-						dataCour[i]["Nb d'heure"]=cumulCou[dataCour[i]["Code Apogée"]]["nbHeure"];
-						dataCour[i]["Nb d'heure TD"]=cumulCou[dataCour[i]["Code Apogée"]]["nbHeureTD"];
-						dataCour[i]["intervenants"]=cumulCou[dataCour[i]["Code Apogée"]]["intervenants"];
+						dataCour[i]["Nb d'heure"]=cumulCou[dataCour[i]["New Apogée"]]["nbHeure"];
+						dataCour[i]["Nb d'heure TD"]=cumulCou[dataCour[i]["New Apogée"]]["nbHeureTD"];
+						dataCour[i]["intervenants"]=cumulCou[dataCour[i]["New Apogée"]]["intervenants"];
 						//construction de la liste pour le planning général
-						if(cumulCou[dataCour[i]["Code Apogée"]]["nbHeure"]>0){
+						if(cumulCou[dataCour[i]["New Apogée"]]["nbHeure"]>0){
 							dataCour[i]["intervenants"].forEach(function(d) {
 								if(!dataCour[i]["liste des intervenants"]) dataCour[i]["liste des intervenants"]=d.Nom+" : "+d.nbSeance+" => "+d.nbHeure+" H";
 								else dataCour[i]["liste des intervenants"] += "; "+d.Nom+" : "+d.nbSeance+" => "+d.nbHeure+" H";
@@ -278,7 +279,7 @@
 						}
 					}
 					//création du tableau des cours
-				    creaTable("#tabStat1cont", dataCour, ["Intitulés des UE", "Code Apogée", "Intitulés des EC", "Code Apogée", "New Apogée","Nb d'heure", "Nb d'heure TD", "liste des intervenants"],[null, null, null, null, "Nb d'heure","Nb d'heure TD", null]);
+				    creaTable("#tabStat1cont", dataCour, ["Intitulés des UE", "New Apogée", "Intitulés des EC", "New Apogée", "New Apogée","Nb d'heure", "Nb d'heure TD", "liste des intervenants"],[null, null, null, null, "Nb d'heure","Nb d'heure TD", null]);
 				}				
 				if(opt.value==2){
 					var dataCol = ["Civilité", "Prénom", "Nom", "Mail", "Téléphone","Nb d'heure", "Nb d'heure TD", "Type"];
@@ -342,7 +343,7 @@
 					cumulInt[dataInt[i]["Nom"]]= {'nbHeure':0,'nbHeureTD':0,'cours':[]};
 				}
 				for(var i=0; i < nbCou; i++){
-					cumulCou[dataCour[i]["Code Apogée"]]= {'nbHeure':0,'nbHeureTD':0,'intervenants':[]};
+					cumulCou[dataCour[i]["New Apogée"]]= {'nbHeure':0,'nbHeureTD':0,'intervenants':[]};
 				}
 
 				//calcule les data pour le calendrier
@@ -401,8 +402,8 @@
 									nbTD =  Math.round(nbTD*100)/100;
 									//console.log(dateStart+' '+iC+' '+iI+' CM='+nbHCM.toFixed(2)+' TD='+nbHTD.toFixed(2)+' TP='+nbHTP.toFixed(2)+' ='+nbTD);
 									//incrémente le compteur de cours
-									cumulCou[dataCour[iC]["Code Apogée"]]["nbHeure"] += nbH;
-									cumulCou[dataCour[iC]["Code Apogée"]]["nbHeureTD"] += nbTD;
+									cumulCou[dataCour[iC]["New Apogée"]]["nbHeure"] += nbH;
+									cumulCou[dataCour[iC]["New Apogée"]]["nbHeureTD"] += nbTD;
 									//incrémente le compteur des intervenants
 									d['idxInt'].forEach(function(iI){
 										cumulInt[dataInt[iI]["Nom"]]["nbHeure"] += nbH;
@@ -426,7 +427,7 @@
 										if(dataCour[iC]["New Apogée"] != "?")
 											libCours = dataCour[iC]["New Apogée"];
 										else
-											libCours = dataCour[iC]["Code Apogée"];
+											libCours = dataCour[iC]["New Apogée"];
 										libCours += " - "+dataCour[iC]["Intitulés des EC"];
 										var itemFind = findArrayObjProp(cumulInt[dataInt[iI]["Nom"]]["cours"],"cours",libCours); 
 										if(itemFind==-1)
@@ -438,18 +439,18 @@
 										}
 
 										// ajoute les liens entre les cours et les intervenants
-										itemFind = findArrayObjProp(cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"],"Nom",dataInt[iI]["Nom"]); 
+										itemFind = findArrayObjProp(cumulCou[dataCour[iC]["New Apogée"]]["intervenants"],"Nom",dataInt[iI]["Nom"]); 
 										if(itemFind==-1)
-											cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"].push({"Nom":dataInt[iI]["Nom"],"nbSeance":1,"nbHeure":nbH,"nbHeureTD":nbTD});
+											cumulCou[dataCour[iC]["New Apogée"]]["intervenants"].push({"Nom":dataInt[iI]["Nom"],"nbSeance":1,"nbHeure":nbH,"nbHeureTD":nbTD});
 										else{
-											cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"][itemFind].nbSeance += 1;
-											cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"][itemFind].nbHeure += nbH;
-											cumulCou[dataCour[iC]["Code Apogée"]]["intervenants"][itemFind].nbHeureTD += nbTD;
+											cumulCou[dataCour[iC]["New Apogée"]]["intervenants"][itemFind].nbSeance += 1;
+											cumulCou[dataCour[iC]["New Apogée"]]["intervenants"][itemFind].nbHeure += nbH;
+											cumulCou[dataCour[iC]["New Apogée"]]["intervenants"][itemFind].nbHeureTD += nbTD;
 										}
 
 										//ajoute le détail du planning par intervenant
 										cumulPlanInt.push({'intervenant':dataInt[iI]["Prénom"]+" "+dataInt[iI]["Nom"],'dateTri':curDate,'date':planningFormat1(curDate)+planningFormat2(finDate)
-											,'cours':dataCour[iC]["Code Apogée"]+" - "+dataCour[iC]["Intitulés des EC"],'lieu':d.location});
+											,'cours':dataCour[iC]["New Apogée"]+" - "+dataCour[iC]["Intitulés des EC"],'lieu':d.location});
 										
 										idxDate = dateStart.getTime()/1000;
 										//la valeur correspond au code couleur correspondant à la journée

@@ -508,6 +508,10 @@ try {
 	$ei->importCrible("http://localhost/jdc/data/aliento/CategorisationRapports.csv");
 	*/
 	
+	$p2net = new Flux_P2Net(false,true);
+	$p2net->bTraceFlush = true;
+	$p2net->rassembleData("Ecosystems");	
+	
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

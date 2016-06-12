@@ -1,21 +1,26 @@
 <html>
 <head>
+	<meta charset="UTF-8">
+	<meta name="Description" CONTENT="Visualisation des intéractions entre chercheurs du laboratoire Paragraphe"/>
+	<meta name="Keywords" CONTENT="visualisation intéractions laboratoire paragraphe chercheurs"/>
+	<meta name="Author" CONTENT="Samuel Szoniecky"/>
 
-<link href="js/conceptmap/concept-map.css" rel="stylesheet"></link>
-
-<script src="js/jquery.min.js" type="text/javascript"></script>
-<script src="js/d3.v3.min.js" type="text/javascript"></script>
-<script src="js/conceptmap/packages.js" type="text/javascript"></script>
-<script src="js/conceptmap/concept-map.js" type="text/javascript"></script>
-
-<script>
+	<link href="js/conceptmap/concept-map.css" rel="stylesheet"></link>
+	
+	<script src="js/jquery.min.js" type="text/javascript"></script>
+	<script src="js/d3.v3.min.js" type="text/javascript"></script>
+	<script src="js/conceptmap/packages.js" type="text/javascript"></script>
+	<script src="js/conceptmap/concept-map.js" type="text/javascript"></script>
+	
+	<script>
 $(function(){
 	plotConceptMap();
 });
 function plotConceptMap()
 {
-	//var url = "data/metadata.json";
-	var url = "../public/paragraphe/conceptmap";
+	//vide le graph
+	$("#graph").empty();
+	var url = "../public/paragraphe/conceptmap?googleId="+$("#idGoogle")[0].value;
 	d3.json(url, function(dataJson) {
 		//trie les acteurs
 		dataJson.ditems.sort(function(a,b){ 
@@ -27,11 +32,48 @@ function plotConceptMap()
 </script>
 <style>
 body{
+	background-color:#263248;
 }
+/* unvisited link */
+a:link {
+    color: green;
+}
+
+/* visited link */
+a:visited {
+    color: green;
+}
+
+/* mouse over link */
+a:hover {
+    color: red;
+}
+
+/* selected link */
+a:active {
+    color: yellow;
+}
+
+.info{
+	color:white;
+}
+#graph-info{
+	witdh:30%;
+	float:left;
+}
+#graph{
+	witdh:70%;
+	float:left;
+}
+
 </style>
 </head>
 <body>
-				<div id="graph" class="conceptmap" ></div>
-				<div id="graph-info"></div>
+	<div style="display:none;" class="info">
+	Identifiant du CSV de google: <input type="text" id="idGoogle" name="idGoogle" value="<?php echo $this->googleId; ?>">
+	<button onclick="plotConceptMap()" >CHARGER</button>
+	</div>
+	<div class="info" id="graph-info"></div>
+	<div id="graph" class="conceptmap" ></div>
 </body>
 </html>

@@ -35,6 +35,8 @@ data/proverbes
 
 data/gapaii
 
+data/p2net
+
 bdd/bigdumpGapaii.php
 
 bdd/deleuze.sql
@@ -127,3 +129,5 @@ bdd/cdnl_excode.sql
 bdd/proverbdb.sql.zip
 
 data/paragraphe/.~lock.AxesCiTu-Paragraphe-cor.csv#
+
+bdd/flux_paragraphe.sql.zip
