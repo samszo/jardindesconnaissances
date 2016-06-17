@@ -131,3 +131,11 @@ bdd/proverbdb.sql.zip
 data/paragraphe/.~lock.AxesCiTu-Paragraphe-cor.csv#
 
 bdd/flux_paragraphe.sql.zip
+
+.buildpath
+
+.settings/.jsdtscope
+
+*.container
+
+.settings/org.eclipse.wst.jsdt.ui.superType.name

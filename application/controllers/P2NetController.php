@@ -9,5 +9,10 @@ class P2NetController extends Zend_Controller_Action
 		$this->view->data = "OK"; 					
 			
 	}	
+
+    public function keshifAction()
+    {
+    }	    
+
 	
 }
