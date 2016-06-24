@@ -92,7 +92,7 @@ function loadEval(idDiv, idCpt, callBack) {
 		    	var div = d3.select("#"+idDiv).html(dtGen.txt);
 		    	//enregistre la génération
 		    	var p = {"idBase":idBase, "idUti":idUti
-		    			, "data":{"titre":dtGen.txt, "idOeu":idOeu, "idCpt":idCpt,"txt":dtGen.txt
+		    			, "data":{"url":'vide',"titre":dtGen.txt, "idOeu":idOeu, "idCpt":idCpt,"txt":dtGen.txt
 		    				,"data":JSON.stringify(dtGen)}};
 		    	$.ajax({
 	        		url: "../gapaii/savegen",

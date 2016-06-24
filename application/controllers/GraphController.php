@@ -400,5 +400,12 @@ class GraphController extends Zend_Controller_Action {
 		$this->view->langue =  $this->_getParam('langue', "fr");    	
 		$this->view->titre =  $this->_getParam('titre', "Emo Stat");    	
 		
-    }       
+    }   
+
+    
+    public function streamAction(){
+    	
+    }
+    
+    
 }

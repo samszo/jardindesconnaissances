@@ -17,7 +17,7 @@ class GapaiiController extends Zend_Controller_Action {
 	var $idOeu = 57;//37;//
 	var $idUti;
 	var $idDoc = 1;
-	var $idCpt = 169964;// poeme stein 158393;//158278 - test poème;//;
+	var $idCpt = 169992;// poeme stein 158393;//158278 - test poème;//;
 	var $idGeo;
 	
 	/**
@@ -105,17 +105,6 @@ class GapaiiController extends Zend_Controller_Action {
 				$this->saveRepEmo($emo,$acti,$g,$idDocEval);	
 			}
 		}
-
-		//enregistre tous les axes du radar
-		if($this->_getParam('roueData')){
-			$data = $this->_getParam('roueData');
-			//enregistre chaque émotion
-			$idDocEval = $g->dbD->ajouter(array("titre"=>"Evaluation roue émotion","parent"=>$this->idDocEvalRoot,"data"=>json_encode($data)));
-			foreach ($data as $emo) {
-				$this->saveRepEmo($emo,$acti,$g,$idDocEval);	
-			}
-		}
-		
 		
 		//enregistre l'axe évalué
 		if($this->_getParam('axe')){
@@ -135,6 +124,7 @@ class GapaiiController extends Zend_Controller_Action {
 				$idCouche ++;
 			}		
 		}
+		//
 	}
 	
 	function saveRepAxe($axe,$acti,$g,$idDocEval){
@@ -191,6 +181,13 @@ class GapaiiController extends Zend_Controller_Action {
 		}else echo "pas de donnée !";
 	}
 
+	public function getrepquestAction() {
+		$this->initInstance();
+		
+		$g = new Flux_Gapaii($this->idBase);
+		
+	}
+	
 	public function getevalAction() {
 		//récupère les critère de l'évaluation
 		//print_r($this->getRequest()->getParams());
@@ -229,6 +226,7 @@ class GapaiiController extends Zend_Controller_Action {
 		$this->view->idGeo = $this->idGeo;
 		
 		//pas d'authentification si idUti
+		//echo "this->idUti=".$this->idUti."\n";
 		if($this->idUti){
 			$this->view->idUti = $this->idUti;
 			return;
@@ -239,7 +237,7 @@ class GapaiiController extends Zend_Controller_Action {
 			// l'identité existe ; on la récupère
 		    $this->view->identite = $auth->getIdentity();
 		    $this->view->uti = json_encode($this->ssUti->uti);
-		    $this->view->idUti = $ssUti->idUti;
+		    $this->view->idUti = $this->idUti = $this->ssUti->idUti;
 		}else{			
 		    //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
 		    if($action)

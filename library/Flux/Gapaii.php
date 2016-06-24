@@ -124,6 +124,28 @@ class Flux_Gapaii extends Flux_Site{
         return $idDoc;
 	}	
 	
-    
+ 	/**
+     * Récupère les réponses aux questions
+     *
+     * @param integer 	$idDoc
+     * @param integer 	$idUti
+     * @param integer 	$idTag
+     *
+     * @return array
+     */
+    function getRepQuest($idDoc, $idUti, $idTag){
+
+		//création des tables
+		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+				
+		//récupère les évaluations
+		$evals = $this->dbD->getHistoEval();
+		//calcul les données pour heatmap
+		$arrHM = $this->getHeatmapClic($evals, true);
+		$result["histo"] = $evals;
+		$result["hm"] = $arrHM;
+		
+		return $result;
+	}	    
     
 }

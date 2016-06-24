@@ -58,12 +58,12 @@
 	        padding: 2,
 	        panels: [
 	            { type: 'top', size: 50, resizable: false, style: pstyle, content: '<div style="float:left;width:176px;">'
-		            +'<img src="http://localhost/CreaTIC/E-education/Proverbes/IMG/siteon0.png" alt="logo" style="height:40px;">'
+		            +'<img src="'+urlSpip+'/IMG/siteon0.png" alt="logo" style="height:40px;">'
 		            +'<img src="../img/logoJDC.png" alt="logo" style="margin:0 0 0 10px;height:40px;">'
 		            +'</div>'
 		            +'<div id="toolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>' },
 	            { type: 'main', style: pstyle, resizable: true, content: '', size:"100%"  },
-	       	],
+	       	]
 	    });
 
 	    $().w2layout({
@@ -192,7 +192,7 @@
             	},            	
             	success: function(result) {
                 	//gestion des messages SPIP CRON                	
-            		result = result.replace("<!-- SPIP-CRON --><div style=\"background-image: url('http://localhost/CreaTIC/E-education/Proverbes/spip.php?action=cron');\"></div>","");
+            		result = result.replace("<!-- SPIP-CRON --><div style=\"background-image: url('"+urlSpip+"?action=cron');\"></div>","");
             		evals = JSON.parse(result);
             		w2ui['mainTB'].items[0].html='<h1>'+evals.expeTitre+'</h1>';
             		w2ui['mainTB'].items[13].items[0].caption=evals.deconnexion;
@@ -313,7 +313,7 @@
 	    			        if(q.process && q.process[q.questId]){
 		    			        	getNextQuest(q.process[q.questId].questId);
 	    			        }
-	                	},
+	                	}
                 }
 		    }
 		};	

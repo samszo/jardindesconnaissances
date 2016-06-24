@@ -75,7 +75,7 @@
 	            { type: 'left', size:'50%', resizable: false, style: pstyle, content: '<div id="chartRoueEmotions"></div>'},
 	            { type: 'main', size:'50%', resizable: false, style: pstyle, content: ''},
 	            { type: 'bottom', size:'10', resizable: false, style: pstyle, content: '<div class="mercis"><i class="fa fa-thumbs-up"></i> <a href="http://bl.ocks.org/dbuezas/9306799">David Buezas</a> <i class="fa fa-thumbs-up"></i> <a href="https://fr.wikipedia.org/wiki/Robert_Plutchik">Wikipédia : Robert Plutchik</a></div>'},
-	       	],
+	       	]
 	    });
 		
 		
@@ -111,7 +111,7 @@
 						changeChoix(roueData);
 					}
 			        if(fctClear)fctClear(); 					
-			    },
+			    }
 		    }
 		};
 		
@@ -184,11 +184,12 @@
 			function ajoutEvent() { 
 
 	    	  		//var txt =d3.selectAll("text");
+		    	  	console.log(roueData);
 	    	  		txts = d3.selectAll('text')
 	    	  			.data(roueData)
 	    	  			.attr('class','txtRoueEmo')
 		    	  		.on('click',function(d, i){
-		    	  			//console.log(i+" - "+d.id+" / "+d.en+" / "+d.fr+" / "+d.color);
+		    	  			console.log(i+" - "+d.id+" / "+d.en+" / "+d.fr+" / "+d.color);
 		    	  			d.value ++;
 		    	  			if(fctClickRoue)fctClickRoue(d);
 		    	  			changeChoix(roueData);
