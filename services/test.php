@@ -509,10 +509,15 @@ try {
 	*/
 	//$solr_version = solr_get_version();
 	
+	/*
 	$p2net = new Flux_P2Net(false,true);
 	$p2net->bTraceFlush = FALSE;
 	//$p2net->mergeData("Ecosystems");	
 	$p2net->mergeContent("Ecosystems");
+	*/
+
+	$gapaii = new Flux_Gapaii("flux_proverbes");
+	$gapaii->getRepQuest();
 	
 	$s->trace("FIN TEST");			
 	

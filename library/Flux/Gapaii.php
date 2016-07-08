@@ -133,19 +133,58 @@ class Flux_Gapaii extends Flux_Site{
      *
      * @return array
      */
-    function getRepQuest($idDoc, $idUti, $idTag){
+    function getRepQuest($idDoc=false, $idUti=false, $idTag=false){
 
 		//création des tables
-		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-				
-		//récupère les évaluations
-		$evals = $this->dbD->getHistoEval();
-		//calcul les données pour heatmap
-		$arrHM = $this->getHeatmapClic($evals, true);
-		$result["histo"] = $evals;
-		$result["hm"] = $arrHM;
+		$db = new Model_DbTable_Flux_Monade($this->db);
+		$sql ='SELECT m.monade_id, m.titre monade
+			, rq.rapport_id
+			, dq.doc_id dqid, dq.titre dqtitre
+			-- , tq.tag_id, tq.code
+			, dd.doc_id ddid, dd.titre ddtitre
+			 , ur.uti_id, ur.login
+			 , ar.acti_id, ar.code acti
+			 , re.niveau, re.valeur, re.maj
+			 , te.tag_id, te.code
+			FROM flux_monade m
+			-- donnée de la question
+			INNER JOIN flux_rapport rq ON rq.monade_id = m.monade_id AND rq.src_obj = "doc" AND rq.pre_obj = "tag" AND rq.dst_obj = "doc"
+			INNER JOIN flux_doc dq ON rq.src_id = dq.doc_id
+			INNER JOIN flux_doc dpq ON dq.parent = dpq.doc_id AND dpq.titre = "questions"
+			-- INNER JOIN flux_tag tq ON rq.pre_id = tq.tag_id 
+			INNER JOIN flux_doc dd ON rq.dst_id = dd.doc_id
+			-- donnée de la réponse
+			 INNER JOIN flux_rapport rr ON rr.src_id = rq.rapport_id AND rr.src_obj = "rapport" AND rr.pre_obj = "uti" AND rr.dst_obj = "acti"
+			 INNER JOIN flux_uti ur ON rr.pre_id = ur.uti_id
+			 INNER JOIN flux_acti ar ON rr.dst_id = ar.acti_id AND ar.code = "saveEvalRoueEmoAll"
+			 INNER JOIN flux_rapport re ON re.pre_id = rr.rapport_id AND re.src_obj = "tag" AND re.pre_obj = "rapport" AND re.dst_obj = "doc"
+			 INNER JOIN flux_tag te ON re.src_id = te.tag_id
+		ORDER BY re.maj';
+		$db = $db->getAdapter()->query($sql);
+        $rs = $db->fetchAll();
+        
+        //construction de la réponse
+    		$nbNiv = count($rs);
+		$this->rs = array("monade"=>array(),"question"=>array(),"event"=>array(),"uti"=>array(),"acti"=>array(),"tag"=>array(),"evals"=>array());
+		foreach ($rs as $r) {
+			$this->groupResult("monade", $r['monade_id'], $r['monade']);
+			$this->groupResult("question", $r['dqid'], $r['dqtitre']);
+			$this->groupResult("event", $r['ddid'], $r['ddtitre']);
+			$this->groupResult("uti", $r['uti_id'], $r['login']);
+			$this->groupResult("acti", $r['acti_id'], $r['acti']);
+			$this->groupResult("tag", $r['tag_id'], $r['code']);
+			
+			$this->rs["evals"][] = array("date"=>$r["maj"],"key"=>$r["code"],"value"=>$r["niveau"]
+				,"monade"=>$r['monade_id']
+				,"question"=>$r['dqid']
+				,"event"=>$r['ddid']
+				,"uti"=>$r['uti_id']
+				,"acti"=>$r['acti_id']
+				,"tag"=>$r['tag_id']
+				);			
+		}        
 		
-		return $result;
+		return $this->rs;
 	}	    
     
 }

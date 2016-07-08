@@ -1,0 +1,12 @@
+<?php
+	if($this->csv){
+		$first = true;
+		//echo "nb=".count($this->rs["evals"]);
+		header("content-type:application/csv;charset=UTF-8");
+		foreach ($this->rs["evals"] as $v) {
+			if($first)echo "date,key,value\r\n";
+			$first = false;
+			echo $v["date"].",".$v["key"].",".$v["value"]."\r\n";
+		}
+	}else
+		echo json_encode(array("rs"=>$this->rs,"message"=>$this->message));

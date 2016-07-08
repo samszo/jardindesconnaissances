@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script type="text/javascript" src="../js/d3.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/d3.v3.js" charset="utf-8"></script>
 		<meta charset="utf-8">
 		<style>
 		
@@ -41,12 +41,13 @@
 		</div>
 		
 		<script>
-		
-		chart("../data/dataStreamTest.csv", "orange");
-		
+
 		var datearray = [];
 		var colorrange = [];
+		var cribles = <?php echo $this->cribles;?>;
+		var mc = <?php echo $this->mc;?>;
 		
+		chart("<?php echo $this->urlData;?>", "<?php echo $this->color;?>");		
 		
 		function chart(csvpath, color) {
 		
@@ -60,8 +61,11 @@
 			  colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9"];
 			}
 			strokecolor = colorrange[0];
+			if (mc && mc.length) {
+				strokecolor = "black";
+			}
 			
-			var format = d3.time.format("%m/%d/%y");
+			var format = d3.time.format("<?php echo $this->timeFormat;?>");
 			
 			var margin = {top: 20, right: 40, bottom: 30, left: 30};
 			var width = document.body.clientWidth - margin.left - margin.right;
@@ -83,12 +87,12 @@
 			    .range([height-10, 0]);
 			
 			var z = d3.scale.ordinal()
-			    .range(colorrange);
+				    .range(colorrange);
 			
 			var xAxis = d3.svg.axis()
 			    .scale(x)
 			    .orient("bottom")
-			    .ticks(d3.time.weeks);
+			    .ticks(<?php echo $this->timeInterval;?>);
 			
 			var yAxis = d3.svg.axis()
 			    .scale(y);
@@ -98,15 +102,19 @@
 			
 			var stack = d3.layout.stack()
 			    .offset("silhouette")
-			    .values(function(d) { return d.values; })
+			    .values(function(d) { 
+				    return d.values; 
+				    })
 			    .x(function(d) { return d.date; })
 			    .y(function(d) { return d.value; });
 			
 			var nest = d3.nest()
-			    .key(function(d) { return d.key; });
+			    .key(function(d) { 
+				    	return d.key; 
+				    	});
 			
 			var area = d3.svg.area()
-			    .interpolate("cardinal")
+			    .interpolate("basis")
 			    .x(function(d) { return x(d.date); })
 			    .y0(function(d) { return y(d.y0); })
 			    .y1(function(d) { return y(d.y0 + d.y); });
@@ -120,20 +128,39 @@
 			var graph = d3.csv(csvpath, function(data) {
 			  data.forEach(function(d) {
 			    d.date = format.parse(d.date);
+			    //if(d.value==0)d.value=10;
 			    d.value = +d.value;
+			    //console.log(d);
+			    /*ATTENTION il doit y avoir le même nombre de valeur poru chaque date*/
 			  });
 			
 			  var layers = stack(nest.entries(data));
+				if (mc && mc.length) {
+					layers.forEach(function(l){
+						var mcFind = mc.find(function(c){
+							return c.fr === l.key;
+						});
+						l.color = mcFind.color;
+					});
+				}
 			
 			  x.domain(d3.extent(data, function(d) { return d.date; }));
-			  y.domain([0, d3.max(data, function(d) { return d.y0 + d.y; })]);
+			  y.domain([0, d3.max(data, function(d) { 
+				  return d.y0 + d.y; 
+				  })]);
 			
 			  svg.selectAll(".layer")
 			      .data(layers)
 			    .enter().append("path")
 			      .attr("class", "layer")
 			      .attr("d", function(d) { return area(d.values); })
-			      .style("fill", function(d, i) { return z(i); });
+			      .style("fill", function(d, i) {
+				      console.log(d); 
+				      if(mc.length) 
+					      return d.color;
+				      else 
+					      return z(i); 
+				      });
 			
 			
 			  svg.append("g")
@@ -172,12 +199,13 @@
 			
 			      mousedate = datearray.indexOf(invertedx);
 			      pro = d.values[mousedate].value;
+			      time = d.values[mousedate].date;
 			
 			      d3.select(this)
 			      .classed("hover", true)
 			      .attr("stroke", strokecolor)
 			      .attr("stroke-width", "0.5px"), 
-			      tooltip.html( "<p>" + d.key + "<br>" + pro + "</p>" ).style("visibility", "visible");
+			      tooltip.html( "<p>" + d.key + "<br>" + time + "<br>" + pro + "</p>" ).style("visibility", "visible");
 			      
 			    })
 			    .on("mouseout", function(d, i) {

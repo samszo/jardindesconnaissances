@@ -49,6 +49,9 @@ class Flux_Site{
     var $type;
 	var $idDocRoot;
 	var $idMonade;
+	var $rs;
+	var $rsVerifGroup = array();
+	
     
     function __construct($idBase=false, $bTrace=false){    	
     	
@@ -810,4 +813,19 @@ class Flux_Site{
 	    }
 	    return $domain;
 	}    
+	
+	/**
+     * regroupe les données par clefs et titre
+     *
+     * @param string 	$k
+     * @param integer 	$id
+     * @param string 	$titre
+     *
+     */
+	function groupResult($k,$id,$titre){
+		if(!isset($this->rsVerifGroup[$k.$id])){
+			$this->rs[$k][]=array("recid"=>$id,"lib"=>$titre);	
+			$this->rsVerifGroup[$k.$id]=1;
+		}		
+	}	
 }

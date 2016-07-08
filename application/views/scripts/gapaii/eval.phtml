@@ -186,14 +186,18 @@
             		try {
             			var js = JSON.parse(error.responseText);
             		} catch (e) {
-            			console.log(error.responseText)            		  	
+            			console.log(error.responseText);            		  	
           			w2alert("Erreur : "+e);
             		}
             	},            	
             	success: function(result) {
-                	//gestion des messages SPIP CRON                	
-            		result = result.replace("<!-- SPIP-CRON --><div style=\"background-image: url('"+urlSpip+"?action=cron');\"></div>","");
+                	/*gestion des messages SPIP CRON                	
+                	pas nécessaire si header application/json
+            		result = result.replace("<!-- SPIP-CRON --><div style=\"background-image: url('"+urlSpip+"?action=cron');\"></div>","").trim();
+        			console.log(result);            		  	
             		evals = JSON.parse(result);
+            		*/
+            		evals = result;
             		w2ui['mainTB'].items[0].html='<h1>'+evals.expeTitre+'</h1>';
             		w2ui['mainTB'].items[13].items[0].caption=evals.deconnexion;
             		w2ui['mainTB'].items[13].items[1].caption=evals.information;
@@ -281,9 +285,7 @@
 			 		opts.push({id:r.repId,text:r.repTitre});
 		 		}
 		 	});
-			//décompose le texte
-			var arrMot = $("#"+idDivGen).blast({ delimiter:"word",customClass:"w",generateIndexID:true,returnGenerated: true });	
-		 	//on ajoute les champs pour chaque mot
+		 	//on ajoute les champs pour chaque mot décomposé au chargement de la génération
 			for (i = 0; i < arrMot.length; i++) { 
 			 	champs.push({field:'q_'+q.questId+'_'+i, html:{caption:arrMot[i].innerHTML}, type:'radio', required:true, options:{items:opts}});
 			}

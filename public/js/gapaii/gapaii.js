@@ -1,4 +1,4 @@
-var spans, sTxt = [], dtGen;
+var spans, sTxt = [], dtGen, arrMot;
 
 $(document).ready(function() {
 		
@@ -90,6 +90,8 @@ function loadEval(idDiv, idCpt, callBack) {
 		    	dtGen = data;
 			//affiche le texte
 		    	var div = d3.select("#"+idDiv).html(dtGen.txt);
+		    arrMot = $("#"+idDiv).blast({ delimiter:"word",customClass:"w",generateIndexID:true,returnGenerated: true });	
+			 			    	
 		    	//enregistre la génération
 		    	var p = {"idBase":idBase, "idUti":idUti
 		    			, "data":{"url":'vide',"titre":dtGen.txt, "idOeu":idOeu, "idCpt":idCpt,"txt":dtGen.txt

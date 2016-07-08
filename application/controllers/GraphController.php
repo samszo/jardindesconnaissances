@@ -327,17 +327,7 @@ class GraphController extends Zend_Controller_Action {
 	      	]";
 		//vérifie s'il faut récupérer les données dans spip
 		if($this->_getParam('idMotParent', false) && $this->_getParam('idBase', false)){
-			$s = new Flux_Site($this->_getParam('idBase'));
-			$dbM = new Model_DbTable_Spip_mots($s->db);
-			$arrM = $dbM->findByIdMotParent($this->_getParam('idMotParent'));
-			$dt = "[";
-			$deb = true;
-			foreach ($arrM as $m) {
-				if(!$deb)$dt .= ",";
-				$dt .= $m["descriptif"];
-				$deb = false;
-			}
-			$dt .= "]";			
+			$dt = $this->getSpipMot();
 		}
 				
 		$this->view->data =  $this->_getParam('data', $dt);    	
@@ -404,8 +394,33 @@ class GraphController extends Zend_Controller_Action {
 
     
     public function streamAction(){
-    	
+		$this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fdata%2FdataStreamTest.csv"));   
+		//$this->view->urlData =  $this->_getParam('urlData', "../gapaii/getrepquest?csv=1");   
+		$this->view->color =  $this->_getParam('color', "blue");     	
+		$this->view->cribles =  $this->_getParam('cribles', "false");    
+		$this->view->timeFormat =  $this->_getParam('timeFormat', "%m/%d/%y"); 
+		//https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Intervals.md   
+		$this->view->timeInterval =  $this->_getParam('timeInterval', "d3.time.weeks");    
+		$this->view->mc = $this->getSpipMot();		
+		 	
     }
     
+    function getSpipMot(){
+	    	//vérifie s'il faut récupérer les données dans spip
+		$dt = "[";
+    		if($this->_getParam('idMotParent', false) && $this->_getParam('idBase', false)){
+			$s = new Flux_Site($this->_getParam('idBase'));
+			$dbM = new Model_DbTable_Spip_mots($s->db);
+			$arrM = $dbM->findByIdMotParent($this->_getParam('idMotParent'));
+			$deb = true;
+			foreach ($arrM as $m) {
+				if(!$deb)$dt .= ",";
+				$dt .= $m["descriptif"];
+				$deb = false;
+			}
+		}    	
+		$dt .= "]";			
+		return $dt;
+    }
     
 }

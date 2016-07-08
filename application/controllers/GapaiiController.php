@@ -96,7 +96,7 @@ class GapaiiController extends Zend_Controller_Action {
 			$this->saveRepEmo($this->_getParam('emo'),$acti,$g,$this->idDocEvalRoot);	
 		}
 		
-		//enregistre tous les axes du radar
+		//enregistre toutes les émotions du donuts
 		if($this->_getParam('roueData')){
 			$data = $this->_getParam('roueData');
 			//enregistre chaque émotion
@@ -185,6 +185,9 @@ class GapaiiController extends Zend_Controller_Action {
 		$this->initInstance();
 		
 		$g = new Flux_Gapaii($this->idBase);
+		$this->view->rs = $g->getRepQuest($this->_getParam('idDoc'),$this->_getParam('idUti'),$this->_getParam('idTag'));
+		$this->view->message = $this->_getParam('idDoc').",".$this->_getParam('idUti').",".$this->_getParam('idTag');
+		$this->view->csv = $this->_getParam('csv');
 		
 	}
 	

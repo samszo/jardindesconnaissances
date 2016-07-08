@@ -421,7 +421,7 @@ class Model_DbTable_Flux_Monade extends Zend_Db_Table_Abstract
 		WHERE r.monade_id = 2
 		GROUP BY r.niveau
 		*/
-    	$query = $this->select()
+    		$query = $this->select()
 			->from( array("r" => "flux_rapport"),array("niveau"))                           
         	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table        
 				->joinInner(array('etd' => 'flux_exitagdoc'), "etd.exitagdoc_id = r.exitagdoc_id",array('nbDoc'=>"count(DISTINCT etd.doc_id)"
@@ -481,5 +481,6 @@ class Model_DbTable_Flux_Monade extends Zend_Db_Table_Abstract
 		}
 		
         return $result; 
-    }    
+    }   
+    
 }
