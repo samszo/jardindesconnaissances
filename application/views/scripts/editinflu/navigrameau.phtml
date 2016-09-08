@@ -71,6 +71,7 @@ var margin = {top: 10, right: 10, bottom: 10, left: 10},
     width = window.innerWidth - margin.left - margin.right,
     height = window.innerHeight - margin.top - margin.bottom;
 var w, h;
+var fontSize = <?php echo $this->fontSize;?>;
 var formatNumber = d3.format(",.0f"),
     format = function(d) { return formatNumber(d) + " TWh"; },
     color = d3.scale.category20();
@@ -96,7 +97,7 @@ function resize(){
     }
 
 
-d3.json("../flux/databnf?obj=rameau&idBNF=<?php echo $this->idBNF;?>", function(stats) {
+d3.json("../flux/databnf?obj=rameau&idBNF=<?php echo $this->idBNF;?>&nivMax=<?php echo $this->nivMax;?>", function(stats) {
 
 	w = width*3;// * stats.nodes.length / 2;
 	h = height*3;// * stats.nodes.length / 2;
@@ -177,7 +178,8 @@ d3.json("../flux/databnf?obj=rameau&idBNF=<?php echo $this->idBNF;?>", function(
           return d.type == "sujet" ? "red" : "black"; 
           })
       .style("font-size", function(d) { 
-          return d.type == "sujet" ? 32 : 18; 
+        	  //return Math.min(10 * sankey.nodeWidth(), (10 * sankey.nodeWidth() - 8) / this.getComputedTextLength() * 24) + "px"; 
+          return d.type == "sujet" ? fontSize*2 : fontSize; 
           })
     .filter(function(d) { return d.x < w / 2; })
       .attr("x", 6 + sankey.nodeWidth())

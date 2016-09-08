@@ -237,7 +237,7 @@ class FluxController extends Zend_Controller_Action {
 				$this->view->reponse = $bnf->getBio($this->_getParam('idBNF'));
 	   			break;	   		
 	   		case 'rameau':
-				$this->view->reponse = json_encode($bnf->getRameauByIdBnf($this->_getParam('idBNF')));
+				$this->view->reponse = json_encode($bnf->getRameauByIdBnf($this->_getParam('idBNF'),$this->_getParam('niv',0),$this->_getParam('nivMax',1)));
 	   			break;	   		
 	   		default:
 	   			break;

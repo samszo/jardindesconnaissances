@@ -7,6 +7,8 @@
     <link rel="stylesheet" type="text/css" href="../css/leaflet/leaflet.css" />
 	<link rel="stylesheet" type="text/css" href="../css/leaflet/Control.Geocoder.css" />
 	<link rel="stylesheet" type="text/css" href="../css/leaflet/leaflet.awesome-markers.css">
+	<link rel="stylesheet" type="text/css" href="../css/flag-icon.min.css">
+	
     <style type="text/css">
 	html, body {
 	   width: 100%;
@@ -84,31 +86,37 @@
 				    html: '<h1>Cartographier les sagesses</h1>' 
 				},				    
 		        { type: 'break',  id: 'break0'},
-		        { type: 'button',  id: 'tbNewTxt', caption: '', icon:'fa-font'},
+		        { type: 'button',  id: 'tbNewTxt', caption: '', icon:'fa-font', hint: 'Nouveau texte'},
+		        { type: 'button',  id: 'tbNewImg', caption: '', icon:'fa-image', hint: 'Nouvelle image'},
+		        { type: 'button',  id: 'tbNewFilm', caption: '', icon:'fa-film', hint: 'Nouveau film'},	        
+		        { type: 'button',  id: 'tbNewSound', caption: '', icon:'fa-volume-up', hint: 'Nouveau son'},	        
 		        { type: 'break',  id: 'break1'},
-		        { type: 'button',  id: 'tbNewImg', caption: '', icon:'fa-image'},
-		        { type: 'break',  id: 'break2'},
-		        { type: 'button',  id: 'tbNewFilm', caption: '', icon:'fa-film'},	        
-		        { type: 'break',  id: 'break3'},
-		        { type: 'button',  id: 'tbNewSound', caption: '', icon:'fa-volume-up'},	        
+		        { type: 'menu',   id: 'evalMenu', caption: 'Résultats', icon: 'fa-balance-scale', items: [
+					{id: 'evalCarte', caption: 'Carte', icon: 'fa-globe'},
+                    {id: 'evalStream', caption: 'Flux', icon: 'fa-area-chart'},
+                    ]
+                },
 		        { type: 'break',  id: 'break4', hidden:uti.role=="admin" ? false : true },
 		        { type: 'button',  id: 'tbParam', caption: 'Paramètres', icon:'fa-cog', hidden:uti.role=="admin" ? false : true},
 		        { type: 'spacer' },
-		        { type: 'break',  id: 'break5'},
-		        { type: 'menu',   id: 'utiLog', caption: uti.login, icon: 'fa-user', items: [
-					{ id: 'utiSignOut', caption: 'déconnexion', icon: 'fa-sign-out'}, 
-					{ id: 'utiParam', caption: 'informations', icon: 'fa-newspaper-o'}
-					]},
 		        { type: 'break',  id: 'break6'},
-	            { type: 'check',  id: 'lang_fr', caption: 'Français', icon: 'fa-check', checked: true },
-	            { type: 'check',  id: 'lang_en', caption: 'English', icon: 'fa-square-o', checked: false },
-	            { type: 'check',  id: 'lang_ar', caption: 'عربي', icon: 'fa-square-o', checked: false },
+		        { type: 'menu',   id: 'lngMenu', caption: 'langues', icon: 'fa-language', items: [
+		            {id: 'lang_fr', caption: 'Français', icon: 'flag-icon flag-icon-fr'},
+		            {id: 'lang_en', caption: 'English', icon: 'flag-icon flag-icon-gb'},
+		            {id: 'lang_ar', caption: 'عربي', icon: 'flag-icon flag-icon-sa'},
+                    ]
+    				},
+    		        { type: 'break',  id: 'break5'},
+    		        { type: 'menu',   id: 'utiMenu', caption: uti.login, icon: 'fa-user', items: [
+    					{ id: 'utiSignOut', caption: 'déconnexion', icon: 'fa-sign-out'}, 
+    					{ id: 'utiParam', caption: 'informations', icon: 'fa-newspaper-o'}
+    					]},
 		    ]
 		});
 	
 		w2ui.mainTB.on('click', function (event) { 
 			w2ui.layout.lock('main', "Veuillez patienter...", true);	
-			chargeLayout(event.target)				
+			chargeLayout(event.target);				
 		});  
 
 	}
@@ -139,27 +147,14 @@
 	        	w2ui['layoutMain'].content('main', '<h1>Bientôt disponible</h1>');        	
 	    } 	
 
-	    if(idLayout=="lang_fr"){	    	
-		    	w2ui['mainTB'].items[15].icon='fa-check';
-		    	w2ui['mainTB'].items[15].checked=true;
-		    	w2ui['mainTB'].items[16].icon='fa-square-o';
-		    	w2ui['mainTB'].items[16].checked=false;
-		    	w2ui['mainTB'].items[17].icon='fa-square-o';
-		    	w2ui['mainTB'].items[17].checked=false;
-		    	w2ui['mainTB'].refresh();
-			chargeProcessEval(idLayout);		    	
+	    if(idLayout=="lngMenu:lang_fr"){
+			chargeProcessEval("lang_fr");		    	
 		}	    
-	    if(idLayout=="lang_en"){
-		    	w2ui['mainTB'].items[15].icon='fa-square-o';
-		    	w2ui['mainTB'].items[15].checked=false;
-		    	w2ui['mainTB'].items[16].icon='fa-check';
-		    	w2ui['mainTB'].items[16].checked=true;
-		    	w2ui['mainTB'].items[17].icon='fa-square-o';
-		    	w2ui['mainTB'].items[17].checked=false;
-		    	w2ui['mainTB'].refresh();
-			chargeProcessEval(idLayout);		    	
+	    if(idLayout=="lngMenu:lang_en"){
+			chargeProcessEval("lang_en");		    	
 		}	    
-	    if(idLayout=="lang_ar"){
+	    if(idLayout=="lngMenu:lang_ar"){
+		    /*
 		    	w2ui['mainTB'].items[15].icon='fa-square-o';
 		    	w2ui['mainTB'].items[15].checked=false;
 		    	w2ui['mainTB'].items[16].icon='fa-square-o';
@@ -167,7 +162,8 @@
 		    	w2ui['mainTB'].items[17].icon='fa-check';
 		    	w2ui['mainTB'].items[17].checked=true;
 		    	w2ui['mainTB'].refresh();
-			chargeProcessEval(idLayout);		    	
+		    	*/
+			chargeProcessEval("lang_ar");		    	
 		}	    
 		
 	    if(idLayout=="utiSignOut"){
@@ -198,9 +194,16 @@
             		evals = JSON.parse(result);
             		*/
             		evals = result;
+            		//chargment des propriétés de la barre d'outil
+            		evals.tb.forEach(function(tb){
+                		var i = w2ui['mainTB'].items[tb.num];
+            			if(tb.hint)i.tooltip=tb.hint;
+                		});
             		w2ui['mainTB'].items[0].html='<h1>'+evals.expeTitre+'</h1>';
-            		w2ui['mainTB'].items[13].items[0].caption=evals.deconnexion;
-            		w2ui['mainTB'].items[13].items[1].caption=evals.information;
+            		w2ui['mainTB'].items[14].items[0].caption=evals.deconnexion;
+            		w2ui['mainTB'].items[14].items[1].caption=evals.information;
+            		w2ui['mainTB'].items[12].caption=evals.langue;
+            		w2ui['mainTB'].items[12].text=evals.langue;
 	    		    	w2ui['mainTB'].refresh();
             }
 		});

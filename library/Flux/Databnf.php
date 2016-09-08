@@ -346,8 +346,8 @@ ORDER BY ASC (?label_a)
 		 */
 		//ajoute les noeuds "plus large" et "plus précis" 
 		if(!$this->rs)$this->rs = (object) array("nodes" => array(
-									array("name"=>"Plus large","uri"=>"","recid"=>0)
-									,array("name"=>"Plus précis","uri"=>"","recid"=>1)
+									array("name"=>"Plus générique","uri"=>"","recid"=>0)
+									,array("name"=>"Plus spécifique","uri"=>"","recid"=>1)
 									), 
 									"links" => array());
 		if(!$this->doublons)$this->doublons = array();

@@ -67,7 +67,7 @@ function load(idDiv, idCpt) {
 	    	cursor_clear();
     		d3.select("#"+idDiv).html(fragment);
 	    paroleGen(idDiv, fragment);
-        saveGen(idDiv, fragment, idCpt);
+        if(idUti)saveGen(idDiv, fragment, idCpt);
     });
 }
 function loadEval(idDiv, idCpt, callBack) {

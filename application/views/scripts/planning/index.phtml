@@ -145,7 +145,7 @@
 					"Master 2 THYP":urlIntTot
 					,"Master 2 PTN":urlIntTot
 					,"L3 PRO CDNL":urlIntTot
-					,"Master 2 NET":"flux/google?type=css&gDocId=1fvVB3bDR74KnYgBhKJgttzqqwygfpuD_OaCu9zOgZ7A"
+					,"Master 2 NET":urlIntTot
 					,"Master 1 CEN":urlIntTot
 					,"Master 1 GSI":urlIntTot
 					,"Master 2 GSI":urlIntTot
@@ -156,7 +156,7 @@
 					
 		
 			
-			var arrStat = ["Nb d'heure par type d'intervenant","Nb d'heure par cours","Nb d'heure par intervenants","Planning par intervenants"];
+			var arrStat = ["Nb d'heure par type d'intervenant","Nb d'heure par cours","Nb d'heure par intervenants","Planning par intervenants","Nb d'heure par jour"];
 			var calY;
 			var calD;
 			var jourFormat = d3.time.format("%x");
@@ -327,6 +327,59 @@
 					
 					//création du tableau des planning pour les intervenants
 				    creaTable("#tabStat3cont", cumulPlanInt, ['intervenant','date','cours','lieu'], [null, null, null, null]);
+				}
+				if(opt.value==4){
+					var dataCol = ["num1", "jour1", "nbHd1", "nbHc1"
+						,"num2", "jour2", "nbHd2", "nbHc2"
+						,"num3", "jour3", "nbHd3", "nbHc3"
+						,"num4", "jour4", "nbHd4", "nbHc4"
+						,"num5", "jour5", "nbHd5", "nbHc5"
+						,"num6", "jour6", "nbHd6", "nbHc6"
+						,"num7", "jour7", "nbHd7", "nbHc7"
+						,"num8", "jour8", "nbHd8", "nbHc8"
+						,"num9", "jour9", "nbHd9", "nbHc9"
+						,"num10", "jour10", "nbHd10", "nbHc10"
+						,"num11", "jour11", "nbHd11", "nbHc11"
+						,"num12", "jour12", "nbHd12", "nbHc12"
+						,"num13", "jour13", "nbHd13", "nbHc13"
+									];
+					var dataColLib = ["Septembre", null, null, null
+							,"Octobre", null, null, null
+							,"Novembre", null, null, null
+							,"Décembre", null, null, null
+							,"Janvier", null, null, null
+							,"Février", null, null, null
+							,"Mars", null, null, null
+							,"Avril", null, null, null
+							,"Mai", null, null, null
+							,"Juin", null, null, null
+							,"Juillet", null, null, null
+							,"Aout", null, null, null
+							,"Septembre", null, null, null
+							];
+					var dataJour = [];
+					var dtMin = $("#datepickerMin").datepicker("getDate");
+					var mMin = dtMin.getMonth();
+					var dtMax = $("#datepickerMax").datepicker("getDate");
+					var mMax = dtMin.getMonth();
+					for(var i=1; i <= 31; i++){
+						dataJour[i]= [i, "jour1", "nbHd1", "nbHc1"
+										,i, "jour2", "nbHd2", "nbHc2"
+										,i, "jour3", "nbHd3", "nbHc3"
+										,i, "jour4", "nbHd4", "nbHc4"
+										,i, "jour5", "nbHd5", "nbHc5"
+										,i, "jour6", "nbHd6", "nbHc6"
+										,i, "jour7", "nbHd7", "nbHc7"
+										,i, "jour8", "nbHd8", "nbHc8"
+										,i, "jour9", "nbHd9", "nbHc9"
+										,i, "jour10", "nbHd10", "nbHc10"
+										,i, "jour11", "nbHd11", "nbHc11"
+										,i, "jour12", "nbHd12", "nbHc12"
+										,i, "jour13", "nbHd13", "nbHc13"
+													];
+					}
+					//création du tableau des intervenants
+				    creaTable("#tabStat4cont", dataJour, dataCol, dataColLib);
 				}
 				closeWaitingDialog();
 			} 
@@ -562,7 +615,7 @@
 			}
 
 			function dateDiff(date1, date2){
-			    var diff = {}                           // Initialisation du retour
+			    var diff = {};                          // Initialisation du retour
 			    var tmp = date2 - date1;
 			 
 			    tmp = Math.floor(tmp/1000);             // Nombre de secondes entre les 2 dates

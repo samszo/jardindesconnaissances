@@ -14,7 +14,7 @@ try {
 	$client->setClientId(KEY_GOOGLE_CLIENT_ID);
 	$client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
 	$service = new Google_Service_Books($client);
-	$searchTerm = "zappa";
+	$searchTerm = "Ecosystem";
 	$results = $service->volumes->listVolumes($searchTerm);
 	foreach ($results as $item) {
 	  $info = $item['volumeInfo'];
@@ -24,8 +24,8 @@ try {
 	  echo $item['volumeInfo']['title'], "<br /> \n";
 	  echo "<img src='$thumbnail' alt='hi'/>";
 	}
-    	$g = new Flux_Gbooks();
-	$arr = $g->findBooks('proverbe');
+    	$g = new Flux_Gbooks(false,true);
+	$arr = $g->findBooks('Ecosystem');
 	*/
 	
 	/*
@@ -343,13 +343,13 @@ try {
 	*/
 	//$response = $server->handle();
 
-	/*
+	//
 	$bnf = new Flux_Databnf();
 	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
-	//$rs = $bnf->getRameauByIdBnf("11983292");
-	$rs = $bnf->getGallicaByTerm($_GET["term"]);
+	$rs = $bnf->getRameauByIdBnf("11947434");
+	//$rs = $bnf->getGallicaByTerm($_GET["term"]);
 	//$s->trace(json_encode($rs));
-	*/
+	//
 	
 	/*
 	$s->getDb("flux_biolographes");
@@ -428,6 +428,7 @@ try {
 	$url = '1404571653141.jpg';
 	$url = 'http://gallica.bnf.fr/iiif/ark:/12148/bpt6k63191b/f508/806.7551430159441,842.9350218708103,1044.2048577376822,201.16030534351148/571,110/0/native.jpg';
 	$url = 'https://books.google.fr/books?id=VpNa9UckT24C&hl=fr&pg=PA22&img=1&zoom=3&sig=ACfU3U3WWrRLzXiX-8wX29Bl_d1LxQuLlw&w=1280';
+	$url = 'http://localhost/jdc/data/ocr/800px-LNP_OCR_ex1.png';
 	$fichier = 'image_test.jpeg';
 	
 	$current = file_get_contents($url);

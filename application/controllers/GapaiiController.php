@@ -15,9 +15,9 @@ class GapaiiController extends Zend_Controller_Action {
 	var $idBase = "flux_proverbes";
 	var $idBaseSpip = "spip_proverbe";
 	var $idOeu = 57;//37;//
-	var $idUti;
+	var $idUti = 0;
 	var $idDoc = 1;
-	var $idCpt = 169992;// poeme stein 158393;//158278 - test poème;//;
+	var $idCpt = 169994;// poeme stein 158393;//158278 - test poème;//;
 	var $idGeo;
 	
 	/**

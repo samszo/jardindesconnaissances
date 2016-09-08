@@ -45,7 +45,11 @@ class Flux_Gbooks extends Flux_Site{
 
       		$results = $this->service->volumes->listVolumes($searchTerm,$options);
 			$arr = array();
+			$i = 0;
 			foreach ($results as $item) {
+				if($i==14){
+					$stop=true;
+				}
 			  $thumbnail = $item['volumeInfo']['imageLinks']['smallThumbnail'];
 			  $access = $item->getAccessInfo();
 			  $r = array('titre'=>$item['volumeInfo']['title'],'soustitre'=>$item['volumeInfo']['subtitle']
@@ -54,7 +58,6 @@ class Flux_Gbooks extends Flux_Site{
 			  	,"page"=>$item['volumeInfo']['pageCount']
 			  	,"langue"=>$item['volumeInfo']['language']
 			  	,"img"=>$thumbnail
-			  	,'auteurs'=>implode(";",$item['volumeInfo']['authors'])
 			  	,'categories'=>implode(";",$item['volumeInfo']['categories'])
 			  	,'visible'=>$access->viewability
 			  	,'access'=>$access->accessViewStatus
@@ -67,13 +70,17 @@ class Flux_Gbooks extends Flux_Site{
 			  		,"imgGrande"=>$item['volumeInfo']['imageLinks']['large']
 			  		)
 			  	);
+			  	if($item['volumeInfo']['authors'])$r['auteurs']=implode(";",$item['volumeInfo']['authors']);
+			  	
 				$isbns = $item['volumeInfo']['industryIdentifiers'];
 				if($isbns){
 					foreach ($isbns as $is){
 						$r[$is->type]=$is->identifier; 
 					}				  			
 				}
-			  	$arr[] = $r;			  	
+			  	$arr[] = $r;	
+			  	$this->trace($i." : ".$r["titre"]);	
+			  	$i++;	  	
 			}		
 		return $arr;
       	    	

@@ -38,6 +38,8 @@ class EditinfluController extends Zend_Controller_Action {
     public function navigrameauAction()
     {
     		$this->view->idBNF = $this->_getParam('idBNF');
+    		$this->view->fontSize = $this->_getParam('fontSize',18);
+    		$this->view->nivMax = $this->_getParam('nivMax',1);
     }	    
         
     	public function importAction()

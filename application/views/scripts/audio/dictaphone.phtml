@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <title>dictaphone</title>
+	<script type="text/javascript">
+		var idBase="<?php echo $this->idBase; ?>";
+		var uti = <?php echo $this->uti;?>;	
+     </script>
+
+    <script src="../js/webrtc/MediaStreamRecorder.js"></script>
+    <!-- for Edige/FF/Chrome/Opera/etc. getUserMedia support -->
+    <script src="../js/webrtc/gumadapter.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="../css/font-awesome.css" />
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<style type="text/css">
+		html {
+		    background: #eee;
+		}
+		
+		body {
+		    font-family: '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Open Sans', 'Myriad', 'Arial';
+		    font-size: 1.2em;
+		    line-height: 1.5em;
+		    margin: 0;
+		}
+		
+		article, footer {
+		    display: block;
+		    max-width: 900px;
+		    min-width: 360px;
+		    width: 80%;
+		}
+		
+		article {
+		    background: #fff;
+		    border: 1px solid;
+		    border-color: #ddd #aaa #aaa #ddd;
+		    margin: 2.5em auto 0 auto;
+		    padding: 2em;
+		}
+		
+		h1 {
+		    margin-top: 0;
+		}
+		
+		article p:first-of-type {
+		    margin-top: 1.6em;
+		}
+		
+		article p:last-child {
+		    margin-bottom: 0;
+		}
+		
+		footer {
+		    margin: 0 auto 2em auto;
+		    text-align: center;
+		}
+		
+		footer a {
+		    color: #666;
+		    font-size: inherit;
+		    padding: 1em;
+		    text-decoration: none;
+		    text-shadow: 0 1px 1px #fff;
+		}
+		
+		footer a:hover, footer a:focus {
+		    color: #111;
+		}
+		
+		h1, h2 {
+		    border-bottom: 1px solid rgb(189, 189, 189);
+		    display: inline;
+		    font-weight: normal;
+		    line-height: 36px;
+		    padding: 0 0 3px 0;
+		}
+		
+		a {
+		    color: #2844FA;
+		    text-decoration: none;
+		}
+		
+		a:hover, a:focus {
+		    color: #1B29A4;
+		}
+		
+		a:active {
+		    color: #000;
+		}
+		
+		:-moz-any-link:focus {
+		    border: 0;
+		    color: #000;
+		}
+		
+		::selection {
+		    background: #ccc;
+		}
+		
+		::-moz-selection {
+		    background: #ccc;
+		}
+		
+	
+		button {
+		    background-color: white;
+		    color: black;
+		    border: 2px solid #555555;
+		    text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    -webkit-transition-duration: 0.4s; /* Safari */
+		    transition-duration: 0.4s;
+		    cursor: pointer;
+		}
+		
+		button:hover {
+		    background-color: #555555;
+		    color: white;
+		}
+		button:active, input[type=button]:active {
+		    background: rgb(10, 118, 190);
+		}
+		
+		button[disabled], input[type=button][disabled] {
+		    background: none;
+		    border: 1px solid rgb(187, 181, 181);
+		    color: gray;
+		    text-shadow: none;
+		}
+		
+		.experiment {
+		    border: 1px solid rgb(189, 189, 189);
+		    margin: 1em 3em;
+		    border-radius: .2em;
+		    text-align: left;
+		}
+		
+		.experiment .header {
+		    padding: .2em .4em;
+		}
+		
+		.experiment .description {
+		    padding: .8em 1.4em;
+		}		
+	</style>
+</head>
+
+<body>
+    <article>
+        <header style="text-align: center;">
+            <h1>Dictaphone</h1>
+        </header>
+
+        <section class="experiment" style="padding: 5px;">
+            <button title="démarre l'enregistrement" class="fa fa-microphone fa-3x" id="start-recording" ></button>
+            <button title="stop l'enregistrement" class="fa fa-stop-circle fa-3x" id="stop-recording" disabled></button>
+            <button title="enregistre le fichier" class="fa fa-floppy-o fa-3x" id="save-recording" disabled></button>
+            <button title="sauvegarde dans la base de données" class="fa fa-database fa-3x" id="bdd-recording" disabled></button>
+            <div style="float:right">
+            		<i id="utiIcone" class="fa fa-user" aria-hidden="true" ></i>
+            		<span id="utiLogin" ></span>
+	            <button title="log in-out" class="fa fa-sign-in" id="login" ></button>
+            </div>
+            <div id="audios-container"></div>
+        </section>
+
+        <section class="experiment" style="padding: 5px;">
+            <label for="transcription">Transcription automatique</label>
+            <input id="transcription" type="checkbox" checked style="width:auto;">
+			<div id="div_language">
+			    <label for="select_language">Langue</label>
+			    <select id="select_language" onchange="updateCountry()"></select>
+			    <label id="lbl_select_dialect" for="select_dialect">Pays</label>
+			    <select id="select_dialect"></select>
+			</div>   
+			         
+			<div id="results">
+			  <span id="final_span" class="final"></span>
+			  <span id="interim_span" class="interim"></span>
+			  <p>
+			</div>
+        </section>
+
+        <script>
+			if(uti){
+				document.querySelector('#login').className = "fa fa-sign-out";
+				document.querySelector('#utiLogin').innerHTML = uti.login;
+			}else{
+				 document.querySelector('#login').className = "fa fa-sign-in";
+				 document.querySelector('#utiIcone').style.visibility = "hidden";
+				 
+			}
+        	
+            function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
+                navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
+            }
+
+            var mediaConstraints = {
+                audio: true
+            };
+
+            var mediaRecorder, blobRecord;
+            var startTime, elapsedTime;
+
+            document.querySelector('#start-recording').onclick = function(e) {
+                startTime = new Date().getTime();
+                elapsedTime = 0;
+            		startButton(e);
+            	    this.disabled = true;
+                if(mediaRecorder)mediaRecorder.resume();
+                captureUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
+                document.querySelector('#save-recording').disabled = true;
+                document.querySelector('#bdd-recording').disabled = true;                
+            };
+
+            document.querySelector('#stop-recording').onclick = function(e) {
+                elapsedTime = new Date().getTime() - startTime;            
+                this.disabled = true;
+                mediaRecorder.stop();
+                mediaRecorder.stream.stop();
+
+                startButton(e);
+
+                document.querySelector('#start-recording').disabled = false;
+                document.querySelector('#save-recording').disabled = false;
+                if(uti)document.querySelector('#bdd-recording').disabled = false;
+            };
+
+            document.querySelector('#save-recording').onclick = function() {
+                this.disabled = true;
+                mediaRecorder.save();
+                // alert('Drop WebM file on Chrome or Firefox. Both can play entire file. VLC player or other players may not work.');
+            };
+
+
+            document.querySelector('#bdd-recording').onclick = function() {
+                this.disabled = true;
+                var fileType = 'audio'; // or "video"
+                var fileName = 'dictaphone_'+Date.now()+'.wav';  // or "webm" or "ogg"
+
+                var formData = new FormData();
+                formData.append(fileType + '-filename', fileName);
+                formData.append(fileType + '-blob', blobRecord);
+                formData.append('bdd', 1);
+                formData.append('idBase', idBase);
+                
+
+                xhr('../fichier/charger', formData, function (fileURL) {
+                    window.open(fileURL);
+                });
+
+                function xhr(url, data, callback) {
+                    var request = new XMLHttpRequest();
+                    request.onreadystatechange = function () {
+                        if (request.readyState == 4 && request.status == 200) {
+                            console.log(location.href + request.responseText);
+                        }
+                    };
+                    request.open('POST', url);
+                    request.send(data);
+                }
+            };
+
+            document.querySelector('#login').onclick = function() {
+            		if(uti)window.location.href="../auth/deconnexion";
+            		else window.location.href="../auth/login?redir=audio/dictaphone&idBase="+idBase;
+            };
+            
+            function onMediaSuccess(stream) {
+                var audio = document.createElement('audio');
+
+                audio = mergeProps(audio, {
+                    controls: true,
+                    muted: true,
+                    src: URL.createObjectURL(stream)
+                });
+                audio.play();
+
+                audiosContainer.appendChild(audio);
+                audiosContainer.appendChild(document.createElement('hr'));
+
+                mediaRecorder = new MediaStreamRecorder(stream);
+                mediaRecorder.stream = stream;
+
+				mediaRecorder.recorderType = StereoAudioRecorder;
+                mediaRecorder.mimeType = 'audio/wav';
+ 
+                mediaRecorder.audioChannels = 2;
+                mediaRecorder.ondataavailable = function(blob) {
+                		blobRecord = blob;
+            			audiosContainer.innerHTML = "";
+                    var a = document.createElement('a');
+                    a.target = '_blank';
+                    a.innerHTML = 'Taille: ' + bytesToSize(blob.size) + ' Durée: ' + getTimeLength(elapsedTime);
+
+                    a.href = URL.createObjectURL(blob);
+
+                    audiosContainer.appendChild(a);
+                    audiosContainer.appendChild(document.createElement('hr'));
+                };
+
+                //get blob after specific time interval
+                var timeInterval = 60 * 1000;
+                mediaRecorder.start(timeInterval);
+                
+                document.querySelector('#stop-recording').disabled = false;
+                //document.querySelector('#save-recording').disabled = false;
+                //document.querySelector('#bdd-recording').disabled = false;
+                
+            }
+
+            function onMediaError(e) {
+                console.error('media error', e);
+            }
+
+            var audiosContainer = document.getElementById('audios-container');
+            var index = 1;
+
+            // below function via: http://goo.gl/B3ae8c
+            function bytesToSize(bytes) {
+                var k = 1000;
+                var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                if (bytes === 0) return '0 Bytes';
+                var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
+                return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+            }
+
+            // below function via: http://goo.gl/6QNDcI
+            function getTimeLength(milliseconds) {
+                var data = new Date(milliseconds);
+                return data.getUTCHours() + " heure(s) " + data.getUTCMinutes() + " minute(s) " + data.getUTCSeconds() + " seconde(s)";
+            }
+
+            window.onbeforeunload = function() {
+                document.querySelector('#start-recording').disabled = false;
+            };
+
+
+            var langs =
+            	[['Afrikaans',       ['af-ZA']],
+            	 ['Bahasa Indonesia',['id-ID']],
+            	 ['Bahasa Melayu',   ['ms-MY']],
+            	 ['Català',          ['ca-ES']],
+            	 ['Čeština',         ['cs-CZ']],
+            	 ['Deutsch',         ['de-DE']],
+            	 ['English',         ['en-AU', 'Australia'],
+            	                     ['en-CA', 'Canada'],
+            	                     ['en-IN', 'India'],
+            	                     ['en-NZ', 'New Zealand'],
+            	                     ['en-ZA', 'South Africa'],
+            	                     ['en-GB', 'United Kingdom'],
+            	                     ['en-US', 'United States']],
+            	 ['Español',         ['es-AR', 'Argentina'],
+            	                     ['es-BO', 'Bolivia'],
+            	                     ['es-CL', 'Chile'],
+            	                     ['es-CO', 'Colombia'],
+            	                     ['es-CR', 'Costa Rica'],
+            	                     ['es-EC', 'Ecuador'],
+            	                     ['es-SV', 'El Salvador'],
+            	                     ['es-ES', 'España'],
+            	                     ['es-US', 'Estados Unidos'],
+            	                     ['es-GT', 'Guatemala'],
+            	                     ['es-HN', 'Honduras'],
+            	                     ['es-MX', 'México'],
+            	                     ['es-NI', 'Nicaragua'],
+            	                     ['es-PA', 'Panamá'],
+            	                     ['es-PY', 'Paraguay'],
+            	                     ['es-PE', 'Perú'],
+            	                     ['es-PR', 'Puerto Rico'],
+            	                     ['es-DO', 'República Dominicana'],
+            	                     ['es-UY', 'Uruguay'],
+            	                     ['es-VE', 'Venezuela']],
+            	 ['Euskara',         ['eu-ES']],
+            	 ['Français',        ['fr-FR']],
+            	 ['Galego',          ['gl-ES']],
+            	 ['Hrvatski',        ['hr_HR']],
+            	 ['IsiZulu',         ['zu-ZA']],
+            	 ['Íslenska',        ['is-IS']],
+            	 ['Italiano',        ['it-IT', 'Italia'],
+            	                     ['it-CH', 'Svizzera']],
+            	 ['Magyar',          ['hu-HU']],
+            	 ['Nederlands',      ['nl-NL']],
+            	 ['Norsk bokmål',    ['nb-NO']],
+            	 ['Polski',          ['pl-PL']],
+            	 ['Português',       ['pt-BR', 'Brasil'],
+            	                     ['pt-PT', 'Portugal']],
+            	 ['Română',          ['ro-RO']],
+            	 ['Slovenčina',      ['sk-SK']],
+            	 ['Suomi',           ['fi-FI']],
+            	 ['Svenska',         ['sv-SE']],
+            	 ['Türkçe',          ['tr-TR']],
+            	 ['български',       ['bg-BG']],
+            	 ['Pусский',         ['ru-RU']],
+            	 ['Српски',          ['sr-RS']],
+            	 ['한국어',            ['ko-KR']],
+            	 ['中文',             ['cmn-Hans-CN', '普通话 (中国大陆)'],
+            	                     ['cmn-Hans-HK', '普通话 (香港)'],
+            	                     ['cmn-Hant-TW', '中文 (台灣)'],
+            	                     ['yue-Hant-HK', '粵語 (香港)']],
+            	 ['日本語',           ['ja-JP']],
+            	 ['Lingua latīna',   ['la']]];
+
+            	for (var i = 0; i < langs.length; i++) {
+            	  select_language.options[i] = new Option(langs[i][0], i);
+            	}
+            	select_language.selectedIndex = 9;
+            	updateCountry();
+            	select_dialect.selectedIndex = 9;
+
+            	function updateCountry() {
+            		  for (var i = select_dialect.options.length - 1; i >= 0; i--) {
+            		    select_dialect.remove(i);
+            		  }
+            		  var list = langs[select_language.selectedIndex];
+            		  for (var i = 1; i < list.length; i++) {
+            		    select_dialect.options.add(new Option(list[i][1], list[i][0]));
+            		  }
+            		  select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+            		  lbl_select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+			} 
+
+            	var final_transcript = '';
+            	var recognizing = false;
+            	var ignore_onend;
+            	var start_timestamp;
+            	if (!('webkitSpeechRecognition' in window)) {
+            	  upgrade();
+            	} else {
+            	 
+			  var recognition = new webkitSpeechRecognition();
+            	  recognition.continuous = true;
+            	  recognition.interimResults = true;
+
+            	  recognition.onstart = function() {
+            	    recognizing = true;
+            	    showInfo('info_speak_now');
+            	  };
+
+            	  recognition.onerror = function(event) {
+            	    if (event.error == 'no-speech') {
+            	      showInfo('info_no_speech');
+            	      ignore_onend = true;
+            	    }
+            	    if (event.error == 'audio-capture') {
+            	      showInfo('info_no_microphone');
+            	      ignore_onend = true;
+            	    }
+            	    if (event.error == 'not-allowed') {
+            	      if (event.timeStamp - start_timestamp < 100) {
+            	        showInfo('info_blocked');
+            	      } else {
+            	        showInfo('info_denied');
+            	      }
+            	      ignore_onend = true;
+            	    }
+            	  };
+
+            	  recognition.onend = function() {
+            	    recognizing = false;
+            	    if (ignore_onend) {
+            	      return;
+            	    }
+            	    if (!final_transcript) {
+            	      showInfo('info_start');
+            	      return;
+            	    }
+            	    showInfo('');
+            	    if (window.getSelection) {
+            	      window.getSelection().removeAllRanges();
+            	      var range = document.createRange();
+            	      range.selectNode(document.getElementById('final_span'));
+            	      window.getSelection().addRange(range);
+            	    }
+            	  };
+
+            	  recognition.onresult = function(event) {
+            	    var interim_transcript = '';
+            	    for (var i = event.resultIndex; i < event.results.length; ++i) {
+            	      if (event.results[i].isFinal) {
+            	        final_transcript += event.results[i][0].transcript;
+            	      } else {
+            	        interim_transcript += event.results[i][0].transcript;
+            	      }
+            	    }
+            	    final_transcript = capitalize(final_transcript);
+            	    final_span.innerHTML = linebreak(final_transcript);
+            	    interim_span.innerHTML = linebreak(interim_transcript);
+            	  };
+            	}
+
+            	function upgrade() {
+            	  start_button.style.visibility = 'hidden';
+            	  showInfo('info_upgrade');
+            	}
+
+            	var two_line = /\n\n/g;
+            	var one_line = /\n/g;
+            	function linebreak(s) {
+            	  return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+            	}
+
+            	var first_char = /\S/;
+            	function capitalize(s) {
+            	  return s.replace(first_char, function(m) { return m.toUpperCase(); });
+            	}
+
+            	function copyButton() {
+            	  if (recognizing) {
+            	    recognizing = false;
+            	    recognition.stop();
+            	  }
+            	  copy_button.style.display = 'none';
+            	  copy_info.style.display = 'inline-block';
+            	  showInfo('');
+            	}
+
+            	function startButton(event) {
+              if (recognizing) {
+            	    recognition.stop();
+            	    return;
+            	  }
+            	  final_transcript = '';
+            	  recognition.lang = select_dialect.value;
+            	  recognition.start();
+            	  ignore_onend = false;
+            	  final_span.innerHTML = '';
+            	  interim_span.innerHTML = '';
+            	  showInfo('info_allow');
+            	  start_timestamp = event.timeStamp;
+            	}
+
+            	function showInfo(s) {
+                	/*
+            	  if (s) {
+            	    for (var child = info.firstChild; child; child = child.nextSibling) {
+            	      if (child.style) {
+            	        child.style.display = child.id == s ? 'inline' : 'none';
+            	      }
+            	    }
+            	    info.style.visibility = 'visible';
+            	  } else {
+            	    info.style.visibility = 'hidden';
+            	  }
+              	  */
+            	}
+
+            	            	
+        </script>
+
+    </article>
+
+    <footer>
+		<div class="mercis">
+			<i class="fa fa-thumbs-up"></i><a href="https://github.com/streamproc/MediaStreamRecorder" target="_blank">WebRTC</a>
+			<i class="fa fa-thumbs-up"></i><a href="https://plus.google.com/+MuazKhan" target="_blank">Muaz Khan</a>
+		</div>            
+    </footer>
+</body>
+
+</html>
