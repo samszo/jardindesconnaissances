@@ -22,7 +22,7 @@
 		<div id="vis" ></div>
 		<script>
 		    var fill = d3.scale.category20b(),
-			idBase = "flux_DeleuzeSpinoza",
+			idBase = '<?php echo $this->idBase; ?>',
 			dtUtis = <?php echo $this->utis; ?>,
 			w = 800,
 			h= 800,
@@ -41,8 +41,7 @@
 				vis = svg.append("g")
 					.attr("transform", "translate(" + [w >> 1, h >> 1] + ")"); 
 			
-			//d3.json("<?php echo $this->urlStats; ?>", function(data) {
-			d3.json("http://localhost/jdc/data/aliento/milestone.js", function(data) {
+			d3.json("<?php echo $this->urlStats; ?>", function(data) {
 				var ext = d3.extent(data.map(function(x) { return parseInt(x.value); }));
 				fontSize = d3.scale.linear().domain([ext[0],ext[1]]).range([32,128]);
 				//fontSize = d3.scale.linear().domain([ext[0],ext[1]]).range([8,128]);
@@ -74,11 +73,16 @@
 			}
 			function setInput(){
 				//création des tableaux
+				if(dtUtis.length==0){
+					$("#configArea").remove();
+					return;
+				}
 				var dtU=[];
 				for (i=0;i<dtUtis.length;i++){
 					dtU.push(dtUtis[i].login);
 				}				
 		        $("#user").smartAutoComplete({source: dtU});
+		        
 			}
 			function multiSelect(item){
 			}	

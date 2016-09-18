@@ -185,7 +185,7 @@ class GapaiiController extends Zend_Controller_Action {
 		$this->initInstance();
 		
 		$g = new Flux_Gapaii($this->idBase);
-		$this->view->rs = $g->getRepQuest($this->_getParam('idDoc'),$this->_getParam('idUti'),$this->_getParam('idTag'));
+		$this->view->rs = $g->getRepQuest($this->_getParam('idDoc'),$this->_getParam('idUti'),$this->_getParam('idTag'),$this->_getParam('idQuest'));
 		$this->view->message = $this->_getParam('idDoc').",".$this->_getParam('idUti').",".$this->_getParam('idTag');
 		$this->view->csv = $this->_getParam('csv');
 		

@@ -35,6 +35,10 @@ data/proverbes
 
 data/gapaii
 
+data/databnf_rameau_xml
+
+data/databnf_test
+
 data/p2net
 
 bdd/bigdumpGapaii.php
@@ -199,3 +203,9 @@ public/img/gapaii/.DS_Store
 public/js/.DS_Store
 
 public/js/leaflet/.DS_Store
+
+bdd/flux_annotation.sql
+
+data/cnrtl/test.xml
+
+data/cnrtl/Concordance.xml

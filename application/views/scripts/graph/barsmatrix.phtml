@@ -10,8 +10,8 @@
   <body ><div id="chartContainer">
   <script type="text/javascript">
     var svg = dimple.newSvg("#chartContainer", 590, 400);
-    //d3.tsv("../data/example_data.tsv", function (data) {
-    d3.json("../spip/formgetdonnees?idBase=spip_dimi1415&idForm=3", function (data) {
+    d3.tsv("../data/example_data.tsv", function (data) {
+    //d3.json("../spip/formgetdonnees?idBase=spip_dimi1415&idForm=3", function (data) {
 
     		//reformatage des données
     		var dt = [];

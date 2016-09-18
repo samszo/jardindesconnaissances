@@ -343,13 +343,13 @@ try {
 	*/
 	//$response = $server->handle();
 
-	//
+	/*
 	$bnf = new Flux_Databnf();
 	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
 	$rs = $bnf->getRameauByIdBnf("11947434");
 	//$rs = $bnf->getGallicaByTerm($_GET["term"]);
 	//$s->trace(json_encode($rs));
-	//
+	*/
 	
 	/*
 	$s->getDb("flux_biolographes");
@@ -501,13 +501,13 @@ try {
 	$s->trace("Resultat post =",$arr);			
 	 */
 	
-	/*
+	//
 	$ei = new Flux_EditInflu("flux_editinflu");
 	$ei->bTrace = false;
 	$ei->idGeo = 0;
     //$rs = $ei->creaCrible(1, array("titre"=>"nouveau crible"));
 	$ei->importCrible("http://localhost/jdc/data/aliento/CategorisationRapports.csv");
-	*/
+	
 	//$solr_version = solr_get_version();
 	
 	/*
@@ -516,9 +516,16 @@ try {
 	//$p2net->mergeData("Ecosystems");	
 	$p2net->mergeContent("Ecosystems");
 	*/
-
+	/*
 	$gapaii = new Flux_Gapaii("flux_proverbes");
 	$gapaii->getRepQuest();
+	*/
+	
+	/*
+	$crntl = new Flux_Cnrtl("flux_proverbes");
+	$crntl->getSynonyme("aide");
+	$crntl->getAntonyme("fermeté");
+	*/
 	
 	$s->trace("FIN TEST");			
 	

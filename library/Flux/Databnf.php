@@ -243,24 +243,29 @@ ORDER BY ASC (?label_a)
 	   	//récupère les infos de data bnf
 		$query =
 			'PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-			SELECT DISTINCT ?sujet ?uLarge ?lLarge ?uLien ?lLien ?uPrecis ?lPrecis
+			SELECT DISTINCT ?uSujet ?lSujet ?aSujet ?uLarge ?iLarge ?lLarge ?uLien ?iLien ?lLien ?uPrecis ?iPrecis ?lPrecis 
 			WHERE {
-			 ?sujet skos:prefLabel "'.$label.'"@fr;
+ 				?uSujet skos:altLabel ?aSujet;
+				skos:prefLabel ?lSujet;  
+				skos:altLabel ?aSujet;  
 			    dcterms:isPartOf ?scheme.
+			  FILTER (regex(?aSujet, "'.$label.'", "i" ) || regex(?lSujet, "'.$label.'", "i" ))
 			  OPTIONAL {
-			    ?uLarge skos:narrower ?sujet;
+			    ?uLarge skos:narrower ?uSujet;
+			    bnf-onto:FRBNF ?iLarge;
 			    skos:prefLabel ?lLarge.
 			  }
 			  OPTIONAL {
-			    ?uLien skos:related ?sujet;
+			    ?uLien skos:related ?uSujet;
+			    bnf-onto:FRBNF ?iLien;
 			    skos:prefLabel ?lLien.
 			  }
 			  OPTIONAL {
-			    ?uPrecis skos:broader ?sujet;
+			    ?uPrecis skos:broader ?uSujet;
+			    bnf-onto:FRBNF ?iPrecis;
 			    skos:prefLabel ?lPrecis.
 			  }
-			} 
-			ORDER BY ASC (?lLien)';	   	
+			} ';	   	
 		$result = $this->query($query);
 		
 		//construction de la réponse

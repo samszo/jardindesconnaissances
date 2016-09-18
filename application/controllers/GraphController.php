@@ -77,7 +77,8 @@ class GraphController extends Zend_Controller_Action {
 	    $request = $this->getRequest();
 		$url = $request->getRequestUri();
 		$arrUrl = explode("?",$url);
-		$this->view->idBase = $this->_getParam('idBase', "flux_DeleuzeSpinoza");
+		//$this->view->idBase = $this->_getParam('idBase', "flux_DeleuzeSpinoza");
+		$this->view->idBase = $this->_getParam('idBase');
 		$s = new Flux_Site($this->view->idBase);		
 		$dbU = new Model_DbTable_Flux_Uti($s->db);
 		$this->view->utis = json_encode($dbU->getAll(array("login")));
@@ -86,6 +87,10 @@ class GraphController extends Zend_Controller_Action {
 		$this->view->svg = $this->_getParam('svg');
 		if($this->view->idUti){
 			$this->view->urlStats = "../stat/taguti?idBase=".$this->view->idBase."&idUti=".$this->view->idUti;	    
+		}elseif ($this->_getParam('idDoc')) {
+			$dbD = new Model_DbTable_Flux_Doc($s->db);
+			$rs = $dbD->findBydoc_id($this->_getParam('idDoc'));
+			$this->view->urlStats = $rs["url"];	    
 		}else{
 			//$this->view->urlStats = "../stat/tagassos?idBase=".$idBase."&tags[]=intelligence&tags[]=collective";	    
 			$this->view->urlStats = "../stat/tagassos?idBase=".$this->view->idBase."&tags[]=rapport";	    
@@ -290,6 +295,17 @@ class GraphController extends Zend_Controller_Action {
 		
     }
     
+    public function axeAction(){
+
+    		$dt = '[]';
+		$this->view->conceptG =  $this->_getParam('conceptG', "Concept gauche");    	
+		$this->view->conceptD =  $this->_getParam('conceptD', "Concept droite");    	
+		$this->view->data =  $this->_getParam('data', $dt);    	
+		$this->view->titre =  $this->_getParam('titre', "Axe sans titre");    	
+		
+    }
+        
+    
     public function roueemotionAction(){
 		$dt = "[
 	      	{id:'tspan4022',en:'disapproval',fr:'désapprobation',color:'#ffffff',value:0}
@@ -395,13 +411,15 @@ class GraphController extends Zend_Controller_Action {
     
     public function streamAction(){
 		$this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fdata%2FdataStreamTest.csv"));   
-		//$this->view->urlData =  $this->_getParam('urlData', "../gapaii/getrepquest?csv=1");   
 		$this->view->color =  $this->_getParam('color', "blue");     	
 		$this->view->cribles =  $this->_getParam('cribles', "false");    
 		$this->view->timeFormat =  $this->_getParam('timeFormat', "%m/%d/%y"); 
 		//https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Intervals.md   
 		$this->view->timeInterval =  $this->_getParam('timeInterval', "d3.time.weeks");    
 		$this->view->mc = $this->getSpipMot();		
+		/*url ppour stream emotion
+		http://localhost/jdc/public/graph/stream?timeFormat=%25Y-%25m-%25d%20%25H%3A%25M%3A%25S&urlData=..%2Fgapaii%2Fgetrepquest%3Fcsv%3D1%26idQuest%3D5163&idMotParent=26&idBase=spip_proverbe&timeInterval=d3.time.days		 
+		*/
 		 	
     }
     

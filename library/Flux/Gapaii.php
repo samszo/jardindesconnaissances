@@ -130,10 +130,11 @@ class Flux_Gapaii extends Flux_Site{
      * @param integer 	$idDoc
      * @param integer 	$idUti
      * @param integer 	$idTag
+     * @param integer 	$idQuest
      *
      * @return array
      */
-    function getRepQuest($idDoc=false, $idUti=false, $idTag=false){
+    function getRepQuest($idDoc=false, $idUti=false, $idTag=false, $idQuest=false){
 
 		//création des tables
 		$db = new Model_DbTable_Flux_Monade($this->db);
@@ -159,7 +160,10 @@ class Flux_Gapaii extends Flux_Site{
 			 INNER JOIN flux_acti ar ON rr.dst_id = ar.acti_id AND ar.code = "saveEvalRoueEmoAll"
 			 INNER JOIN flux_rapport re ON re.pre_id = rr.rapport_id AND re.src_obj = "tag" AND re.pre_obj = "rapport" AND re.dst_obj = "doc"
 			 INNER JOIN flux_tag te ON re.src_id = te.tag_id
-		ORDER BY re.maj';
+		';
+		if($idQuest) $sql .= ' WHERE dq.doc_id ='.$idQuest; 		
+		$sql .= ' ORDER BY re.maj';
+		
 		$db = $db->getAdapter()->query($sql);
         $rs = $db->fetchAll();
         

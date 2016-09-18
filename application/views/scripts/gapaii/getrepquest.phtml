@@ -2,7 +2,7 @@
 	if($this->csv){
 		$first = true;
 		//echo "nb=".count($this->rs["evals"]);
-		header("content-type:application/csv;charset=UTF-8");
+		//header("content-type:application/csv;charset=UTF-8");
 		foreach ($this->rs["evals"] as $v) {
 			if($first)echo "date,key,value\r\n";
 			$first = false;

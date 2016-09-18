@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<script type="text/javascript" src="../js/d3.v3.js" charset="utf-8"></script>
+		
 		<meta charset="utf-8">
 		<style>
 		
@@ -30,7 +31,22 @@
 		  right: 50px;
 		  top: 10px;
 		}
+
+		.clear-button {
+		  font: 14px sans-serif;
+		  cursor: pointer;
+		}
 		
+		.brush .extent {
+		  stroke: #fff;
+		  fill-opacity: .125;
+		  shape-rendering: crispEdges;
+		}
+		.zoom {
+		  cursor: move;
+		  fill: none;
+		  pointer-events: all;
+		}		
 		</style>
 	</head>
 	
@@ -39,93 +55,9 @@
 
 		<div class="chart">
 		</div>
-		
 		<script>
-
-		var datearray = [];
-		var colorrange = [];
-		var cribles = <?php echo $this->cribles;?>;
-		var mc = <?php echo $this->mc;?>;
-		
-		chart("<?php echo $this->urlData;?>", "<?php echo $this->color;?>");		
-		
-		function chart(csvpath, color) {
-		
-			if (color == "blue") {
-			  colorrange = ["#045A8D", "#2B8CBE", "#74A9CF", "#A6BDDB", "#D0D1E6", "#F1EEF6"];
-			}
-			else if (color == "pink") {
-			  colorrange = ["#980043", "#DD1C77", "#DF65B0", "#C994C7", "#D4B9DA", "#F1EEF6"];
-			}
-			else if (color == "orange") {
-			  colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9"];
-			}
-			strokecolor = colorrange[0];
-			if (mc && mc.length) {
-				strokecolor = "black";
-			}
-			
-			var format = d3.time.format("<?php echo $this->timeFormat;?>");
-			
-			var margin = {top: 20, right: 40, bottom: 30, left: 30};
-			var width = document.body.clientWidth - margin.left - margin.right;
-			var height = 400 - margin.top - margin.bottom;
-			
-			var tooltip = d3.select("body")
-			    .append("div")
-			    .attr("class", "remove")
-			    .style("position", "absolute")
-			    .style("z-index", "20")
-			    .style("visibility", "hidden")
-			    .style("top", "30px")
-			    .style("left", "55px");
-			
-			var x = d3.time.scale()
-			    .range([0, width]);
-			
-			var y = d3.scale.linear()
-			    .range([height-10, 0]);
-			
-			var z = d3.scale.ordinal()
-				    .range(colorrange);
-			
-			var xAxis = d3.svg.axis()
-			    .scale(x)
-			    .orient("bottom")
-			    .ticks(<?php echo $this->timeInterval;?>);
-			
-			var yAxis = d3.svg.axis()
-			    .scale(y);
-			
-			var yAxisr = d3.svg.axis()
-			    .scale(y);
-			
-			var stack = d3.layout.stack()
-			    .offset("silhouette")
-			    .values(function(d) { 
-				    return d.values; 
-				    })
-			    .x(function(d) { return d.date; })
-			    .y(function(d) { return d.value; });
-			
-			var nest = d3.nest()
-			    .key(function(d) { 
-				    	return d.key; 
-				    	});
-			
-			var area = d3.svg.area()
-			    .interpolate("basis")
-			    .x(function(d) { return x(d.date); })
-			    .y0(function(d) { return y(d.y0); })
-			    .y1(function(d) { return y(d.y0 + d.y); });
-			
-			var svg = d3.select(".chart").append("svg")
-			    .attr("width", width + margin.left + margin.right)
-			    .attr("height", height + margin.top + margin.bottom)
-			  .append("g")
-			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-			
-			var graph = d3.csv(csvpath, function(data) {
+		var dataGlobal, dataRun, clear_button, is_brushed; 
+		d3.csv('<?php echo $this->urlData;?>', function(data) {
 			  data.forEach(function(d) {
 			    d.date = format.parse(d.date);
 			    //if(d.value==0)d.value=10;
@@ -133,6 +65,104 @@
 			    //console.log(d);
 			    /*ATTENTION il doit y avoir le même nombre de valeur poru chaque date*/
 			  });
+			  dataGlobal = data
+			  chart(data);
+		});		
+		var datearray = [];
+		var colorrange = [];
+		var cribles = <?php echo $this->cribles;?>;
+		var mc = <?php echo $this->mc;?>;
+		var color = "<?php echo $this->color;?>";
+		
+		if (color == "blue") {
+		  colorrange = ["#045A8D", "#2B8CBE", "#74A9CF", "#A6BDDB", "#D0D1E6", "#F1EEF6"];
+		}
+		else if (color == "pink") {
+		  colorrange = ["#980043", "#DD1C77", "#DF65B0", "#C994C7", "#D4B9DA", "#F1EEF6"];
+		}
+		else if (color == "orange") {
+		  colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9"];
+		}
+		strokecolor = colorrange[0];
+		if (mc && mc.length) {
+			strokecolor = "black";
+		}
+		
+		var format = d3.time.format("<?php echo $this->timeFormat;?>");
+		
+		var margin = {top: 20, right: 40, bottom: 30, left: 30};
+		var width = document.body.clientWidth - margin.left - margin.right;
+		var height = 400 - margin.top - margin.bottom;
+		
+		var tooltip = d3.select("body")
+		    .append("div")
+		    .attr("class", "remove")
+		    .style("position", "absolute")
+		    .style("z-index", "20")
+		    .style("visibility", "hidden")
+		    .style("top", "30px")
+		    .style("left", "55px");
+		
+		var x = d3.time.scale()
+		    .range([0, width]);
+		
+		var y = d3.scale.linear()
+		    .range([height-10, 0]);
+		
+		var z = d3.scale.ordinal()
+			    .range(colorrange);
+		
+		var xAxis = d3.svg.axis()
+		    .scale(x)
+		    .orient("bottom")
+		    .ticks(<?php echo $this->timeInterval;?>);
+		
+		var yAxis = d3.svg.axis()
+		    .scale(y);
+					
+		var stack = d3.layout.stack()
+		    .offset("silhouette")
+		    .values(function(d) { 
+			    return d.values; 
+			    })
+		    .x(function(d) { return d.date; })
+		    .y(function(d) { return d.value; });
+		
+		var nest = d3.nest()
+		    .key(function(d) { 
+			    	return d.key; 
+			    	});
+		
+		var area = d3.svg.area()
+		    .interpolate("basis")
+		    .x(function(d) { return x(d.date); })
+		    .y0(function(d) { return y(d.y0); })
+		    .y1(function(d) { return y(d.y0 + d.y); });
+		
+		var svg = d3.select(".chart").append("svg")
+		    .attr("width", width + margin.left + margin.right)
+		    .attr("height", height + margin.top + margin.bottom)
+		  .append("g")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		var zoom = d3.behavior.zoom()
+		    .scaleExtent([1, Infinity])
+		    .extent([[0, 0], [width, height]])
+		    .on("zoom", zoomed);
+
+		var focus = svg.append("g")
+		    .attr("class", "focus")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	    		
+		function zoomed() {
+			  var t = d3.event.transform;
+			  x.domain(t.rescaleX(x2).domain());
+			  focus.select(".area").attr("d", area);
+			  focus.select(".axis--x").call(xAxis);
+			}
+				
+		function chart(data) {
+			dataRun = data;		
 			
 			  var layers = stack(nest.entries(data));
 				if (mc && mc.length) {
@@ -149,13 +179,13 @@
 				  return d.y0 + d.y; 
 				  })]);
 			
-			  svg.selectAll(".layer")
+			  focus.selectAll(".layer")
 			      .data(layers)
 			    .enter().append("path")
 			      .attr("class", "layer")
 			      .attr("d", function(d) { return area(d.values); })
 			      .style("fill", function(d, i) {
-				      console.log(d); 
+				      //console.log(d); 
 				      if(mc.length) 
 					      return d.color;
 				      else 
@@ -163,29 +193,28 @@
 				      });
 			
 			
-			  svg.append("g")
+			  focus.append("g")
 			      .attr("class", "x axis")
 			      .attr("transform", "translate(0," + height + ")")
 			      .call(xAxis);
 			
-			  svg.append("g")
+			  focus.append("g")
 			      .attr("class", "y axis")
 			      .attr("transform", "translate(" + width + ", 0)")
 			      .call(yAxis.orient("right"));
 			
-			  svg.append("g")
+			 focus.append("g")
 			      .attr("class", "y axis")
 			      .call(yAxis.orient("left"));
 			
-			  svg.selectAll(".layer")
+			  focus.selectAll(".layer")
 			    .attr("opacity", 1)
 			    .on("mouseover", function(d, i) {
 			      svg.selectAll(".layer").transition()
 			      .duration(250)
 			      .attr("opacity", function(d, j) {
 			        return j != i ? 0.6 : 1;
-			    })})
-			
+			    		})})
 			    .on("mousemove", function(d, i) {
 			      mousex = d3.mouse(this);
 			      mousex = mousex[0];
@@ -202,11 +231,12 @@
 			      time = d.values[mousedate].date;
 			
 			      d3.select(this)
-			      .classed("hover", true)
-			      .attr("stroke", strokecolor)
-			      .attr("stroke-width", "0.5px"), 
-			      tooltip.html( "<p>" + d.key + "<br>" + time + "<br>" + pro + "</p>" ).style("visibility", "visible");
-			      
+				      .classed("hover", true)
+				      .attr("stroke", strokecolor)
+				      .attr("stroke-width", "0.5px"), 
+				      tooltip.html(
+						      "<p>" + d.key + "<br>" + time + "<br>" + pro + "</p>" 
+						      ).style("visibility", "visible");			      
 			    })
 			    .on("mouseout", function(d, i) {
 			     svg.selectAll(".layer")
@@ -239,8 +269,79 @@
 			         mousex = d3.mouse(this);
 			         mousex = mousex[0] + 5;
 			         vertical.style("left", mousex + "px")});
-			});
+		      /*   
+			  svg.append("rect")
+			      .attr("class", "zoom")
+			      .attr("width", width)
+			      .attr("height", height)
+			      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+			      .call(zoom);
+		      */
 		}
+
+		var brush = d3.svg.brush()
+			.x(x)
+			.on("brush", brushmove)
+			.on("brushend", brushend);
+
+		svg.append("g")
+		    .attr("class", "brush")
+		    .call(brush)
+		  .selectAll('rect')
+		    .attr('height', height);
+	
+		svg.append("defs").append("clipPath")
+		    .attr("id", "clip")
+		  .append("rect")
+		    .attr("width", width)
+		    .attr("height", height + 20);
+    		
+		function brushmove() {
+			  var extent = brush.extent();
+			  dataRun = dataGlobal.filter(function(d) {
+			    is_brushed = extent[0] <= d.date && d.date <= extent[1];
+			    console.log(is_brushed + " = " + extent[0] + "<=" + d.date + " && " + d.date  + "<=" +  extent[1]);
+			    return is_brushed;
+			  });
+			}
+	
+		function brushend() {
+		
+		  get_button = d3.select(".clear-button");
+		  if(get_button.empty() === true) {
+		    clear_button = svg.append('text')
+		      .attr("y", 460)
+		      .attr("x", 825)
+		      .attr("class", "clear-button")
+		      .text("Clear Brush");
+		  }
+	
+		  x.domain(brush.extent());
+	
+		  transition_data();
+		  reset_axis();
+	
+		  //points.classed("selected", false);
+		  d3.select(".brush").call(brush.clear());
+	
+		  clear_button.on('click', function(){
+		    x.domain([0, 50]);
+		    transition_data();
+		    reset_axis();
+		    clear_button.remove();
+		  });
+		}
+	
+		function transition_data() {
+			chart(dataRun);
+		}
+	
+		function reset_axis() {
+		  svg.transition().duration(500)
+		   .select(".x.axis")
+		   .call(xAxis);
+		}		
+		
 		</script>
 	</body>
 </html>

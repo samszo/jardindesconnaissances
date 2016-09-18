@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+		<title><?php echo $this->titre;?></title>
+
+		<!-- D3.js -->
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+
+		<!-- w2ui.js -->
+		<script type="text/javascript" src="../js/jquery.min.js" charset="utf-8"></script>
+	    <script type="text/javascript" src="../js/w2ui.js" charset="utf-8"></script>
+	    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+	    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+		
+		
+		<style>
+			body {
+				cursor: default;
+				text-align: center;
+			}
+			.legend {
+				font-family: 'Raleway', sans-serif;
+				fill: #333333;
+				font-size: 11px;
+				font-weight: 300;
+				text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+								
+			}
+			
+			.tooltip {
+				fill: white;
+				text-anchor:middle;
+				text-align:center;
+			}
+			
+			.conceptG {
+				fill-opacity:1;			
+			}			
+			.conceptD {
+				fill-opacity:1;
+				text-anchor:end;			
+			}
+
+			.val {
+				fill:red;
+				fill-opacity:1;
+				text-anchor:middle;					
+			}
+
+
+			.arrow {
+				fill-rule:evenodd;
+				stroke:white;
+				stroke-width:5px;		
+			}
+
+			.arrowHead {
+				fill-rule:evenodd;
+				stroke:black;
+				stroke-width:0.3px;
+				fill:white;			
+			}
+			text{
+				fill:white;
+			}
+			
+			.w2ui-form .w2ui-page {
+			    background-color: black;
+			}
+			
+		</style>
+	
+	</head>
+	<body >
+		<div id="formAxe"></div>
+
+		<script>
+		var fctClear, fctSave;
+		
+		////////////////////////////////////////////////////////////// 
+		////////////////////////// Data ////////////////////////////// 
+		////////////////////////////////////////////////////////////// 
+		var axeData = <?php echo $this->data; ?>;
+		var conceptG = '<?php echo $this->conceptG; ?>';
+		var conceptD = '<?php echo $this->conceptD; ?>';
+	      
+		//création du formulaire		
+		if(w2ui['formAxe'])w2ui['formAxe'].destroy();		
+		$('#formAxe').w2form({
+		    name: 'formAxe',
+		    header: '<?php echo $this->titre;?>',		    
+		    style: 'border: 0px; background-color: transparent;',
+		    formHTML: 
+		        '<div class="w2ui-page page-0">'+
+		        '	<div id="axeChart"></div>'+
+		        '</div>'+
+		        '<div class="w2ui-buttons">'+
+		        '   <button class="w2ui-btn" name="reset">Reset</button>'+
+		        '    <button class="w2ui-btn w2ui-btn-green" name="save">Save</button>'+
+		        '</div>',
+		    fields: [],
+		    onRender: function(event) {		    
+		        console.log(event);
+		        event.onComplete = function () {
+			        drawAxe();
+		        }		        
+		    }, 
+		    record: {},
+		    actions: {
+		        "save": function () { 
+			        if(fctSave)fctSave(); 
+			    },
+		        "reset": function () { 
+					if(axeData.length){
+						//mise à zéro des axes
+						axeData.forEach(function(c){
+							c.forEach(function(d){
+								d.value = 0;
+							});
+						});
+						//
+						//AxeChart(".radarChart", axeData, radarChartOptions);
+					}
+			        if(fctClear)fctClear(); 					
+			    }
+		    }
+		});
+		//
+
+					
+		
+		function drawAxe(){
+
+			var margin = {top: 40, right: 40, bottom: 40, left: 40},
+			width = Math.min(1024, window.innerWidth - 10) - margin.left - margin.right,
+			height = 100, fontSize=50;
+
+			var dataArea = d3.range(-100, 100) ;
+			
+			var xD = d3.scaleLinear()
+			    .domain([-100, 100])
+			    .range([0, width]);			
+			var xG = d3.scaleLinear()
+			    .domain([100, -100])
+			    .range([0, width]);			
+			var pcTOinG = d3.scaleLinear()
+				.domain([-100, 100])
+				.range([1, 0]);
+			var pcTOinD = d3.scaleLinear()
+				.domain([-100, 100])
+				.range([0, 1]);
+			var color = d3.interpolateMagma;
+			/*
+			var color = d3.scaleLinear()
+				.domain([-100, 100])
+				.range(["blue", "red"]);
+			*/
+		    
+									
+			var svg = d3.select("#axeChart").append("svg")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom);
+			//ajoute un fond noir    
+			svg.append("rect")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom)
+			    .attr("x", 0)
+			    .attr("y", 0)				
+				.style("fill","black");
+
+			//ajoute le concept de gauche
+			var txtG = svg.append('text')
+				.attr("x",margin.left)
+				.attr("y",margin.top)
+				.attr("class","conceptG")
+				.style("font-size",fontSize)
+				.text(conceptG);
+			
+			//ajoute l'axe concept gauche
+			var gAxeG = svg.append("g")
+			    .attr("transform",
+			          "translate(" + margin.left + "," + (70) + ")")
+				.attr("class", "axisG")
+				.call(d3.axisTop(xG)
+			        .ticks(5)
+			        .tickFormat(function(d) { return d+"%"; }));	        
+			var xBarreG = d3.scaleBand()
+		          .range([0, width])
+		          .domain(dataArea.map(function(d) { return d; }));
+			gAxeG.selectAll(".axisG")
+		      .data(dataArea)
+			    .enter().append("rect")
+			      .attr("class", "barG")
+			      .attr("x", function(d) { return xBarreG(d);})
+			      .attr("width", xBarreG.bandwidth())
+			      .style("fill",function(d) { 
+				      return color(pcTOinG(d)); 
+				      })
+			      .attr("y", 0)
+			      .attr("height", 20);
+
+			//ajoute le concept de droite
+			var txtD = svg.append('text')
+				.attr("x",width + margin.right)
+				.attr("y",160)
+				.attr("class","conceptD")
+				.style("font-size",fontSize)
+				.text(conceptD);
+
+			//ajoute l'axe concept droit
+			var gAxeD = svg.append("g")
+			    .attr("transform","translate(" + margin.left + "," + (90) + ")")
+				.attr("class", "axisD");
+			var xBarreD = d3.scaleBand()
+		          .range([0, width])
+		          .domain(dataArea.map(function(d) { return d; }));
+			gAxeD.selectAll(".axisD")
+		      .data(dataArea)
+			    .enter().append("rect")
+			      .attr("class", "barD")
+			      .attr("x", function(d) { return xBarreD(d);})
+			      .attr("width", xBarreD.bandwidth())
+			      .style("fill",function(d) { 
+				      return color(pcTOinD(d)); 
+				      })
+			      .attr("y", 0)
+			      .attr("height", 20);				
+			gAxeD.append("g")
+		    		.attr("transform","translate(0,20)")
+				.call(d3.axisBottom(xD)
+			        .ticks(5)
+			        .tickFormat(function(d) { return d+"%"; }));	 			
+			//ajoute l'axe avec les flèches
+				defs = svg.append("defs");
+				defs.append("marker")
+						.attr("id","arrowStart")
+						.attr("refX",0)
+						.attr("refY",0)
+						.attr("orient","auto")
+						.attr("style","overflow:visible")
+					.append("path")
+							.attr("d", "M 0,0 5,-5 -12.5,0 5,5 0,0 z")
+							.attr("transform", "matrix(0.8,0,0,0.8,10,0)")
+							.attr("class","arrowHead");				
+				defs.append("marker")
+						.attr("id","arrowEnd")
+						.attr("refX",0)
+						.attr("refY",0)
+						.attr("orient","auto")
+						.attr("style","overflow:visible")
+					.append("path")
+						.attr("d", "M 0,0 5,-5 -12.5,0 5,5 0,0 z")
+						.attr("transform", "matrix(-0.8,0,0,-0.8,-10,0)")
+						.attr("class","arrowHead");
+				var line = svg.append("g")
+			    		.attr("transform",
+				          "translate(" + margin.left + "," + (margin.top) + ")");
+				line.append('line')
+					.attr("class","arrow")
+					.attr("marker-end","url(#arrowEnd)")
+					.attr("marker-start","url(#arrowStart)")
+					.attr("x1",0)
+					.attr("y1",height/2)
+					.attr("x2",width)
+					.attr("y2",height/2);				       
+				
+				//ajoute le sélectionneur
+				var brush = d3.brushX()
+				    .extent([[0, 0], [width, 40]])
+				    .on("brush", brushed);
+				var bBrush = svg.append("g")
+			    		.attr("transform","translate(" + margin.left + "," + (70) + ")")
+				    .attr("class", "brush")
+				    .call(brush)	;
+
+				//ajoute le suivi des valeurs
+				var valG = bBrush.append('g').attr("transform","translate(-100,-100)");
+				valG.append('rect')
+					.attr("x", -20)
+			    		.attr("y", -10)
+					.attr("width", 40)
+			    		.attr("height", 10)
+			    		.attr("fill","black");
+				var valGtxt = valG.append('text')
+							.attr('id','valG')
+							.attr('class','val')
+							.text('');
+				var valD = bBrush.append('g').attr("transform","translate(-100,-100)");
+				valD.append('rect')
+					.attr("x", -20)
+			    		.attr("y", -10)
+					.attr("width", 40)
+			    		.attr("height", 10)
+			    		.attr("fill","black");
+				var valDtxt = valD.append('text')
+					.attr('id','valD')
+					.attr('class','val')
+					.text('');
+			    
+				function brushed() {
+					  if (d3.event.sourceEvent.type === "brush") return;
+					  var domain = d3.event.selection.map(xG.invert);
+					  var rectSelect = d3.select(".selection");
+					  //console.log(rectSelect.attr("x"));
+					  valG.attr("transform","translate(" + rectSelect.attr("x") + ",-8)");
+					  valGtxt.text(" "+Math.floor(domain[0])+" %");
+					  valD.attr("transform","translate(" + (Number(rectSelect.attr("x"))+Number(rectSelect.attr("width"))) + ",56)");
+					  valDtxt.text(" "+(Math.floor(-domain[1]))+" %");
+					  //txtG.style("font-size",(-Math.floor(domain[0]))+"px");
+					  //txtG.style("fill-opacity",-Math.floor(domain[0])/100);
+					  //txtG.style("fill",color(-domain[0]));
+					  txtG.style("fill",color(pcTOinG(-domain[0])));
+					  txtD.style("fill",color(pcTOinD(-domain[1])));
+					  //console.log(domain);
+				}
+
+
+		}			
+		</script>
+	</body>
+</html>
