@@ -298,10 +298,15 @@ class GraphController extends Zend_Controller_Action {
     public function axeAction(){
 
     		$dt = '[]';
-		$this->view->conceptG =  $this->_getParam('conceptG', "Concept gauche");    	
-		$this->view->conceptD =  $this->_getParam('conceptD', "Concept droite");    	
+		$this->view->conceptG =  $this->_getParam('conceptG', "");    	
+		$this->view->conceptD =  $this->_getParam('conceptD', "BON");    	
+		$this->view->type =  $this->_getParam('type', "point");    	
 		$this->view->data =  $this->_getParam('data', $dt);    	
-		$this->view->titre =  $this->_getParam('titre', "Axe sans titre");    	
+		$this->view->titre =  $this->_getParam('titre', "Axe d'évaluation");    	
+
+		//$this->view->conceptG = "Littéral : celui qui baisse son regard, repose son coeur";
+		//$this->view->conceptD = "Figuré : celui qui s&apos;abstient de regarder les interdits, allège son cœur";
+		//$this->view->titre =  "Proverbe : "."من غضً طرفه أراح قلبه";
 		
     }
         
@@ -437,6 +442,7 @@ class GraphController extends Zend_Controller_Action {
 				$deb = false;
 			}
 		}    	
+		
 		$dt .= "]";			
 		return $dt;
     }

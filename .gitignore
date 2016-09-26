@@ -209,3 +209,5 @@ bdd/flux_annotation.sql
 data/cnrtl/test.xml
 
 data/cnrtl/Concordance.xml
+
+public/.DS_Store

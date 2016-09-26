@@ -148,9 +148,9 @@ class Model_DbTable_Spip_motsliens extends Zend_Db_Table_Abstract
     public function findByIdObj($objet, $id_objet)
     {
         $query = $this->select()
-                    ->from( array("s" => "spip_mots_liens") )                           
-                    ->where( "s.objet = ?", $objet )
-                    ->where( "s.id_objet = ?", $id_objet );
+			->from( array("s" => "spip_mots_liens") )                           
+            ->where( "s.objet = ?", $objet )
+            ->where( "s.id_objet = ?", $id_objet );
 
         return $this->fetchAll($query)->toArray(); 
     }

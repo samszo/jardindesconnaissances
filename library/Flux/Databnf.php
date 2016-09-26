@@ -230,58 +230,7 @@ ORDER BY ASC (?label_a)
 		return json_encode($objResult);
     }
 
-	/**
-     * Recherche un mot-clef rameau à partir d'un label
-     *
-     * @param  string $isbn
-     *
-     * @return string
-     */
-    public function getRameauByLabel($label){
-	   	$format = 'json';	 
-	   	
-	   	//récupère les infos de data bnf
-		$query =
-			'PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-			SELECT DISTINCT ?uSujet ?lSujet ?aSujet ?uLarge ?iLarge ?lLarge ?uLien ?iLien ?lLien ?uPrecis ?iPrecis ?lPrecis 
-			WHERE {
- 				?uSujet skos:altLabel ?aSujet;
-				skos:prefLabel ?lSujet;  
-				skos:altLabel ?aSujet;  
-			    dcterms:isPartOf ?scheme.
-			  FILTER (regex(?aSujet, "'.$label.'", "i" ) || regex(?lSujet, "'.$label.'", "i" ))
-			  OPTIONAL {
-			    ?uLarge skos:narrower ?uSujet;
-			    bnf-onto:FRBNF ?iLarge;
-			    skos:prefLabel ?lLarge.
-			  }
-			  OPTIONAL {
-			    ?uLien skos:related ?uSujet;
-			    bnf-onto:FRBNF ?iLien;
-			    skos:prefLabel ?lLien.
-			  }
-			  OPTIONAL {
-			    ?uPrecis skos:broader ?uSujet;
-			    bnf-onto:FRBNF ?iPrecis;
-			    skos:prefLabel ?lPrecis.
-			  }
-			} ';	   	
-		$result = $this->query($query);
-		
-		//construction de la réponse
-		$obj = json_decode($result);		
-		$objResult->liens = array();
-		foreach ($obj->results->bindings as $val) {
-			//ajoute les liens direct
-			if($val->p->value=="http://www.w3.org/2004/02/skos/core#exactMatch")
-				array_push($objResult->liens, $val->o->value);
-			//ajout l'isni
-			if($val->p->value=="http://isni.org/ontology#identifierValid")
-				$objResult->isni = $val->o->value;				
-		}
-		return json_encode($objResult);
-    }  
-
+	
 	/**
      * Compte le nombre de document avec un mot-clef rameau
      *
@@ -308,23 +257,35 @@ ORDER BY ASC (?label_a)
     }      
     
 	/**
-     * Recherche un mot-clef rameau à partir d'un IDBNF
+     * Recherche un mot-clef rameau à partir d'un IDBNF ou d'un label
      *
      * @param  string 	$idBnf
+     * @param  string 	$label
      * @param  int 		$niv
      * @param  int 		$nivMax
      *
      * @return string
      */
-    public function getRameauByIdBnf($idBnf, $niv=0, $nivMax=1){	   	
+    public function getRameau($idBnf, $label, $niv=0, $nivMax=1){	   	
 	   	//récupère les infos de data bnf
-		$query =
-			'SELECT DISTINCT ?uSujet ?lSujet ?uLarge ?iLarge ?lLarge ?uLien ?iLien ?lLien ?uPrecis ?iPrecis ?lPrecis 
-			WHERE {
-				?uSujet bnf-onto:FRBNF "'.$idBnf.'"^^xsd:integer;
-			    skos:prefLabel ?lSujet;
+		$query = 'SELECT DISTINCT ?iSujet ?uSujet ?lSujet ?uLarge ?iLarge ?lLarge ?uLien ?iLien ?lLien ?uPrecis ?iPrecis ?lPrecis ';
+		if($label){
+			$query .= ' WHERE {
+ 				?uSujet skos:altLabel ?aSujet;
+				bnf-onto:FRBNF ?iSujet;
+				skos:prefLabel ?lSujet;  
+				skos:altLabel ?aSujet;  
 			    dcterms:isPartOf ?scheme.
-			  OPTIONAL {
+			  FILTER (regex(?aSujet, "'.$label.'", "i" ) || regex(?lSujet, "'.$label.'", "i" )) ';
+		}
+		if($idBnf){
+			$query .=' WHERE {
+					?uSujet bnf-onto:FRBNF "'.$idBnf.'"^^xsd:integer;
+				    bnf-onto:FRBNF ?iSujet;
+				    skos:prefLabel ?lSujet;
+				    dcterms:isPartOf ?scheme. ';
+		}	    
+		$query .=' OPTIONAL {
 			    ?uLarge skos:narrower ?uSujet;
 			    bnf-onto:FRBNF ?iLarge;
 			    skos:prefLabel ?lLarge.
@@ -357,19 +318,20 @@ ORDER BY ASC (?label_a)
 									"links" => array());
 		if(!$this->doublons)$this->doublons = array();
 		foreach ($obj->results->bindings as $val) {
+			if(!$idBnf)$idBnf=$val->iSujet->value;
 			$s = $this->ajoutNoeud(array("name"=>$val->lSujet->value,"uri"=>$val->uSujet->value,"recid"=>$idBnf,"type"=>"sujet"));
 			if(isset($val->lLien) && $niv < $nivMax){
 				$l = $this->ajoutNoeud(array("name"=>$val->lLien->value,"uri"=>$val->uLien->value,"recid"=>$val->iLien->value,"type"=>"lien"));
 				if($niv < $nivMax){
 					//récupère la définition du lien
-					$this->getRameauByIdBnf($val->iLien->value,$niv+1,$nivMax);
+					$this->getRameau($val->iLien->value,'',$niv+1,$nivMax);
 				}
 			}
 			if(isset($val->lPrecis)){
 				$p = $this->ajoutNoeud(array("name"=>$val->lPrecis->value,"uri"=>$val->uPrecis->value,"recid"=>$val->iPrecis->value,"type"=>"precis"));
 				if($niv+1 < $nivMax){
 					//récupère la définition du lien
-					$this->getRameauByIdBnf($val->iPrecis->value,$niv+1,$nivMax);
+					$this->getRameau($val->iPrecis->value,'',$niv+1,$nivMax);
 				}				
 				$this->ajoutLien($s, $p);			
 				$this->ajoutLien($p, 1);			
@@ -380,7 +342,7 @@ ORDER BY ASC (?label_a)
 				$l = $this->ajoutNoeud(array("name"=>$val->lLarge->value,"uri"=>$val->uLarge->value,"recid"=>$val->iLarge->value,"type"=>"large"));
 				if($niv+1 < $nivMax){
 					//récupère la définition du lien
-					$this->getRameauByIdBnf($val->iLarge->value,$niv+1,$nivMax);
+					$this->getRameau($val->iLarge->value,'',$niv+1,$nivMax);
 				}				
 				$this->ajoutLien($l, $s);			
 				$this->ajoutLien(0, $l);			

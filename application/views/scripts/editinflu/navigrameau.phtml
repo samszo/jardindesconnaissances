@@ -96,8 +96,13 @@ function resize(){
 		.attr("viewBox","0 0 "+w+" "+h);	
     }
 
+var urlData = "../flux/databnf?obj=rameau&nivMax=<?php echo $this->nivMax;?>"
+	, idBNF='<?php echo $this->idBNF;?>'
+	, label="<?php echo $this->label;?>";
+if(idBNF)urlData+='&idBNF=<?php echo $this->idBNF;?>';
+if(label)urlData+="&label=<?php echo $this->label;?>";
 
-d3.json("../flux/databnf?obj=rameau&idBNF=<?php echo $this->idBNF;?>&nivMax=<?php echo $this->nivMax;?>", function(stats) {
+d3.json(urlData, function(stats) {
 
 	w = width*3;// * stats.nodes.length / 2;
 	h = height*3;// * stats.nodes.length / 2;

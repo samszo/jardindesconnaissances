@@ -43,6 +43,11 @@ class GapaiiController extends Zend_Controller_Action {
 		$this->view->idCpt = $this->idCpt;
 	}
 
+	public function testAction() {
+
+		
+	}
+	
 	public function savegenAction() {
 		$this->initInstance();
 		
