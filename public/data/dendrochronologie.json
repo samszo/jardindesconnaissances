@@ -1,0 +1,120 @@
+{
+    "name": "Période chronologique",
+    "children": [{
+		"name": "Occident",
+            "children": [{
+                "name": "paléolithique : jusq. -9000",
+                "debut": -8000000,
+                "fin": -9000,
+                "size": 100,
+                "children": [{
+		                "name": "néolithique : -9000 à -3300",
+		                "size": 100,
+		                "debut": -9000,
+		                "fin": -3300,
+		                "children": [{
+				                "name": "préhistoire : jusq. -3300",
+				                "size": 100,
+				                "debut": -9000,
+				                "fin": -3300,
+				                "children": [{
+						                "name": "Antiquité : -3300 à 476",
+						                "size": 100,
+						                "children": [{
+								                "name": "Moyen-âge : 476 à 1453",
+								                "size": 100,
+								                "children": [{
+										                "name": "haut moyen-âge : 476 à 814",
+										                "size": 100,
+										                "children": [{
+												                "name": "bas moyen-âge : 814 à 1453",
+												                "size": 100
+												        }]},{
+										                "name": "Temps modernes : 1453 à 1789",
+										                "size": 100,
+										                "children": [{
+												                "name": "renaissance : 1453 à 1688",
+												                "size": 100,
+												                "children": [{
+														                "name": "lumières : 1688 à 1789",
+														                "size": 100,
+														                "children": [{
+																                "name": "Epoque contemporaine : depuis 1789",
+																                "size": 100,
+																                "children": [{
+																		                "name": "révolutions : 1789 à 1815",
+																		                "size": 100,
+																		                "children": [{
+																				                "name": "industrie, impérialisme : 1815 à 1914",
+																				                "size": 100,
+																				                "children": [{
+																						                "name": "1ère guerre mondiale : 1914 à 1919",
+																						                "size": 100,
+																						                "children": [{
+																								                "name": "entre 2 guerres : 1919 à 1939",
+																								                "size": 100,
+																								                "children": [{
+																										                "name": "2è guerre mondiale : 1939 à 1945",
+																										                "size": 100,
+																										                "children": [{
+																												                "name": "guerre froide : 1945 à 1989",
+																												                "size": 100,
+																												                "children": [{
+																														                "name": "monde multipolaire : depuis 1989",
+																														                "size": 100
+																														        }]
+																												        }]
+																										        }]
+																								        }]
+																						        }]
+																				        }]
+																		        }]
+																        }]
+														        }]
+												        }]		                
+										        }]
+								        }]		                
+						        }]
+				        }]		                
+		        }]
+            }]
+		},{
+		"name": "Chine",
+            "children": [{
+                "name": "Antiquité : -2070 à -206",
+                "size": 100,
+                "children": [{
+		                "name": "Dynastie Han : -206 à 220",
+		                "size": 100,
+		                "children": [{
+				                "name": "3 Royaumes, Jin, Sud, Nord : 220 à 581",
+				                "size": 100,
+				                "children": [{
+						                "name": "Sui, Tang, Song, Yuan : 581 à 1368",
+						                "size": 100,
+						                "children": [{
+								                "name": "Dynastie Ming : 1368 à 1644",
+								                "size": 100,
+								                "children": [{
+										                "name": "Dynastie Qing : 1644 à 1912",
+										                "size": 100             
+										        }]
+								        }]		                
+						        }]
+				        }]		                
+		        }]
+            }]
+		},{
+		"name": "Japon",
+            "children": [{
+                "name": "Japon féodal : 1185 à 1603",
+                "size": 100,
+                "children": [{
+		                "name": "Période d'Edo : 1603 à 1868",
+		                "size": 100
+		        }]		  
+            }]
+        }
+	]
+}
+

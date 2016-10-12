@@ -39,7 +39,7 @@ class EditinfluController extends Zend_Controller_Action {
     {
     		$this->view->idBNF = $this->_getParam('idBNF');
     		$this->view->label = $this->_getParam('label');
-    		$this->view->fontSize = $this->_getParam('fontSize',18);
+    		$this->view->fontSize = $this->_getParam('fontSize',48);
     		$this->view->nivMax = $this->_getParam('nivMax',1);
     }	    
         

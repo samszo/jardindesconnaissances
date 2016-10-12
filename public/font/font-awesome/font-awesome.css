@@ -560,3 +560,6 @@ ajout samszo
 .fa-thumbs-up:before			   { content: "\f164"; }
 .fa-balance-scale:before		   { content: "\f24e"; }
 .fa-area-chart:before		   { content: "\f1fe"; }
+.fa-chain-broken:before			{ content: "\f127";}
+.fa-sliders:before				{ content: "\f1de";}
+.fa-meh-o:before 				{ content: "\f11a";}
