@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+
+@import url("../css/image-grid.css");
+
+body, html {
+    padding: 0;
+    margin: 0;
+}
+.row {
+    background-size: 100% auto;
+    position: absolute;
+    width: 100%;
+}
+.hidden {
+    opacity: 0;
+}
+img {
+    margin: 0;
+    border: 2px solid white;
+    -webkit-transition: opacity 500ms;
+    transition: opacity 500ms;
+}
+</style>
+
+<body>
+<div class="grid"></div>
+<script src="../js/d3.v3.js"></script>
+
+<script>
+var transformCSSProp = (function(property) {
+    var prefixes = ['webkit', 'ms', 'Moz', 'O'],
+        i = -1,
+        n = prefixes.length,
+        s = document.body.style;
+
+    if (property.toLowerCase() in s)
+        return property.toLowerCase();
+
+    while (++i < n)
+        if (prefixes[i] + property in s)
+            return '-' + prefixes[i].toLowerCase() + property.replace(/([A-Z])/g, '-$1').toLowerCase();
+
+    return false;
+})('Transform');
+
+var flickrApiKey = 'ea621d507593aa247dcaa792268b93d7';
+var maxImageSize = 32;
+var data = [];
+var buffer, lastHeight, dimensions, imagesPerRow, imagesPerPage, imageSize, nest;
+
+// var outer = d3.select('div.grid')
+//     .on('scroll', render);
+
+d3.select(window)
+    .on('resize', setDimensions)
+    .on('scroll', render);
+
+var inner = d3.select('div.grid');
+
+/* We pull down 500,000 images, but flickr only gives us 4,000 max, so there will be repeats
+for (var i = 0; i < 100; i++) {
+    d3.json('https://api.flickr.com/services/rest/?' +
+        'method=flickr.photos.search&' +
+        'api_key=ea621d507593aa247dcaa792268b93d7&' +
+        'tags=mountains,forest,beach&' +
+        'sort=interestingness-desc&' +
+        'media=photos&' +
+        'extras=url_q&' +
+        'format=json&' +
+        'nojsoncallback=1&' +
+        'per_page=500' +
+        'page=' + i,
+        function(err, json) {
+            if (err) return console.log(err);
+            data = data.concat(json.photos.photo.map(function(d) {
+                return d.url_q;
+            }));
+            setDimensions();
+        })
+}
+*/
+
+d3.csv('../data/googleApi.csv',
+        function(err, arr) {
+            if (err) return console.log(err);
+            data = arr;
+            setDimensions();
+        })
+
+
+function setDimensions() {
+    dimensions = [inner.node().clientWidth, innerHeight];
+    imagesPerRow = Math.ceil(dimensions[0] / maxImageSize);
+    imagesPerPage = Math.ceil(dimensions[1] / maxImageSize);
+    imageSize = dimensions[0] / imagesPerRow;
+
+    buffer = imagesPerPage;
+
+    nest = data.reduce(function(prev, item, i) {
+        var group = Math.floor(i / imagesPerRow);
+        (prev[group]) ? prev[group].value.push(item) : prev.push({
+            key: group,
+            value: [item]
+        });
+        return prev;
+    }, []);
+
+    var newHeight = Math.ceil(nest.length * imageSize) + 'px';
+
+    inner.style('height', newHeight);
+
+    if (newHeight > dimensions[1] && lastHeight < dimensions[1]) {
+        lastHeight = newHeight;
+        setDimensions();
+    }
+
+    //inner.style('background-image', 'url(grid-' + imagesPerRow + 'sm.png)');
+    inner.selectAll('div.row')
+        .call(styleRows);
+
+    inner.selectAll('img')
+        .call(styleImages);
+
+    render();
+}
+
+function render() {
+    if (!nest) return;
+    var scrollY = window.scrollY;
+    var count = imagesPerPage + buffer * 2;
+    var offset = Math.max(0, Math.floor(scrollY / imageSize) - buffer);
+
+    var dataSlice = nest.slice(offset, offset + count);
+
+    var pre = [],
+        post = [];
+
+    for (var i = 0; i < buffer * 2; i++) {
+        pre.push({
+            key: offset - i - 1,
+            value: []
+        });
+        post.push({
+            key: offset + count + i,
+            value: []
+        });
+    }
+
+    dataSlice = pre.concat(dataSlice, post);
+
+    var rows = inner.selectAll('div')
+        .data(dataSlice, function(d) {
+            return d.key;
+        });
+
+    reuseNodes.call(rows.enter(), rows.exit())
+        .attr('class', 'row')
+        .call(styleRows);
+
+    rows.exit()
+        .remove();
+
+    var images = rows.selectAll('img').data(function(d) {
+        return d.value;
+    });
+
+    images.enter()
+        .append('img')
+        .classed('hidden', true)
+        .call(styleImages);
+
+    images
+        .attr('src', function(d) {
+            return d.src;
+        })
+        .on('load', function() {
+            d3.select(this)
+                .classed('hidden', false);
+        });
+
+    images.exit()
+        .remove();
+
+    function reuseNodes(exitNodes) {
+        return this.select(function() {
+            var reusableNode;
+            for (var i = -1, n = exitNodes[0].length; ++i < n;) {
+                if (reusableNode = exitNodes[0][i]) {
+                    exitNodes[0][i] = undefined;
+                    d3.select(reusableNode)
+                        .selectAll('img')
+                        .classed('hidden', true);
+                    return reusableNode;
+                }
+            }
+            return this.appendChild(document.createElement('div'));
+        });
+    }
+}
+
+function styleRows(selection) {
+    selection
+        .attr('class', 'row grid-' + imagesPerRow)
+        .style('height', imageSize + 'px')
+        .style(transformCSSProp, function(d, i) {
+            return 'translate3d(0,' + d.key * imageSize + 'px,0)';
+        });
+}
+
+function styleImages(selection) {
+    selection
+        .style('width', imageSize - 4 + 'px')
+        .style('height', imageSize - 4 + 'px');
+}
+
+//d3.select(self.frameElement).attr('scrolling', null);
+</script>
+</body>

@@ -129,7 +129,22 @@ class GapaiiController extends Zend_Controller_Action {
 				$idCouche ++;
 			}		
 		}
-		//
+
+		//enregistre la période
+		if($this->_getParam('dendro')){
+			$this->saveRepDendro($this->_getParam('emo'),$acti,$g,$this->idDocEvalRoot);
+		}
+		
+		//enregistre toutes les périodes du donuts
+		if($this->_getParam('dendroData')){
+			$data = $this->_getParam('dendroData');
+			//enregistre chaque paériode
+			$idDocEval = $g->dbD->ajouter(array("titre"=>"Evaluations dendrochronologiques","parent"=>$this->idDocEvalRoot,"data"=>json_encode($data)));
+			foreach ($data as $dendro) {
+				$this->saveRepDendro($dendro,$acti,$g,$idDocEval);
+			}
+		}
+		
 	}
 	
 	function saveRepAxe($axe,$acti,$g,$idDocEval){
@@ -175,6 +190,31 @@ class GapaiiController extends Zend_Controller_Action {
 			,"niveau"=>$emo["value"]
 			),false);				
 	}
+
+	
+	function saveRepDendro($dendro,$acti,$g,$idDocEval){
+				
+		$idTag = $g->dbT->ajouter(array("code"=>$dendro["name"]));
+		$idAct = $g->dbA->ajouter(array("code"=>$acti));
+		if($dendro["id_mot"])$g->dbS->ajouter(array("id_flux"=>$idTag,"id_spip"=>$dendro["id_mot"],"obj_flux"=>"tag","obj_spip"=>"mots"));
+		//enregistre le rapport entre la question, l'utilisateur et l'action
+		$idRap = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+				,"src_id"=>$this->idRapQ,"src_obj"=>"rapport"
+				,"pre_id"=>$this->idUti,"pre_obj"=>"uti"
+				,"dst_id"=>$idAct,"dst_obj"=>"acti"
+		));
+		//enregistre la réponse
+		$idDocEval = $g->dbD->ajouter(array("titre"=>"Evaluations dendrochronologiques","parent"=>$idDocEval));
+		$idDocRep = $g->dbD->ajouter(array("titre"=>"rapport=".$idRap,"data"=>json_encode($dendro),"parent"=>$idDocEval),false);
+		//enregistre la réponse à la question par l'utilistaeur
+		$idRapRep = $g->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+				,"src_id"=>$idTag,"src_obj"=>"tag"
+				,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+				,"dst_id"=>$idDocRep,"dst_obj"=>"doc"
+				,"valeur"=>$dendro["debut"]." - ".$dendro["fin"]
+				,"niveau"=>$dendro["value"]
+		),false);
+	}
 	
 	public function savesemevalAction() {
 		//récupère les informations de la palette
@@ -212,6 +252,11 @@ class GapaiiController extends Zend_Controller_Action {
 		$this->initInstance("eval");
 		//vue pour l'évaluation des fragments
 		
+	}
+
+	public function gentreeAction() {
+		$this->initInstance("gentree");
+	
 	}
 	
 	/**TODO: utiliser ce type de requête pour proposer des images plutôt que des mots

@@ -3,7 +3,7 @@
 /**
  * Classe qui gère les flux Google calendar
  *
- * @copyright  2011 Samuel Szoniecky
+ * @copyright  2016 Samuel Szoniecky
  * @license    "New" BSD License
  * 
  */
@@ -16,6 +16,7 @@ class Flux_Gcalendar extends Flux_Site{
 	var $client_id = KEY_GOOGLE_CLIENT_ID;
  	var $client_secret = KEY_GOOGLE_CLIENT_SECRET;
 	var $redirect_uri = 'http://localhost/exemples/php/google-api/examples/user-example.php';
+	var $time_zone = 'Europe/Paris';
 	 	
 	public function __construct($token)
     {
@@ -24,7 +25,7 @@ class Flux_Gcalendar extends Flux_Site{
 		$client = new Google_Client();				
 		$client->setAccessToken($token);
 		$this->service = new Google_Service_Calendar($client);
-    		$this->token = $token;	    
+    	$this->token = $token;	    
     }
 	
     public function getListeCalendar()
@@ -179,6 +180,37 @@ class Flux_Gcalendar extends Flux_Site{
 		    $r['attendees'][] = $value;
 	    }
 		return $r;    	
+    }
+    /**
+     * @name 	insertEventPresence
+     * @example https://developers.google.com/google-apps/calendar/v3/reference/events/insert
+     * @param 	string 	$calendarId
+     * @param 	array	$params		
+     */    
+    public function insertEventPresence($calendarId, $params){
+    	
+    	$event = new Google_Service_Calendar_Event(array(
+    			'summary' => $params['summary'],
+    			'location' => $params['location'],
+    			'description' => $params['description'],
+    			'start' => array(
+    					'dateTime' => $params['start'],
+    					'timeZone' => $time_zone,
+    			),
+    			'end' => array(
+    					'dateTime' => $params['end'],
+    					'timeZone' => $time_zone,
+    			),
+    			'attendees' => array(
+    					array('email' => $params['mail']),
+    			),
+    			'reminders' => array(
+    					'useDefault' => TRUE
+    			),
+    	));
+    	
+    	$event = $this->service->events->insert($calendarId, $event);
+    	
     }
 
     public function getCalendarInfo($cal)

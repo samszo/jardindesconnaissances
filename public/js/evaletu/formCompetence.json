@@ -1,0 +1,104 @@
+{"titre":"paramètres des formulaires google", "data":[
+		{ "nom":"CFI"
+		, "debut":2016, "fin":2017
+		, "key":["Votre nom","Votre prénom"]
+		, "valeurs": {"je ne connais pas du tout":1,"je connais un peu":5,"je me débrouille":10,"je suis expert(e)":20}
+		, "competences":{
+	            "EditWeb":"Quelles sont vos compétences ? [connaître les outils d’édition web (éditeurs html, CSS, …) ]", 
+	            "HTML":"Quelles sont vos compétences ? [connaître les base du langage HTML 5]", 
+	            "Responsive":"Quelles sont vos compétences ? [connaître les bases du responsive web design (RWD)]",
+	            "ScenarStat":"Quelles sont vos compétences ? [savoir scénariser et réaliser les rubriques « statiques » d’un site web]",
+	            "ScenarMulti":"Quelles sont vos compétences ? [savoir scénariser et réaliser des rubriques multimédias (« page vidéo », « page photo », exposition virtuelle, …)]",
+	            "Carto":"Quelles sont vos compétences ? [savoir utiliser des cartes géographiques interactives]",
+	            "Rss":"Quelles sont vos compétences ? [savoir travailler avec le RSS]",
+	            "Meta":"Quelles sont vos compétences ? [savoir utiliser correctement les métadonnées pour une meilleure diffusion des contenus du site]",
+	            "LienSponsor":"Quelles sont vos compétences ? [savoir utiliser les programmes de liens sponsorisés]",
+	            "GestAccess":"Quelles sont vos compétences ? [savoir utiliser des outils de gestion d’accès aux rubriques (accès par mot de passe, …)]",
+	            "Forum":"Quelles sont vos compétences ? [savoir mettre en place et gérer un forum de discussion]",
+	            "Newsletter":"Quelles sont vos compétences ? [savoir mettre en place et gérer un service de type « newsletter » (impliquant la mise en place et la gestion d’un annuaire d’abonnés)]",
+	            "Enquete":"Quelles sont vos compétences ? [savoir mettre en place des enquêtes enligne]",
+	            "Veille":"Quelles sont vos compétences ? [savoir mettre en place et exploiter des outils de veille d’information]",
+	            "Ranking":"Quelles sont vos compétences ? [savoir mettre en place des outils de type « ranking »]",
+	            "SocialNetwork":"Quelles sont vos compétences ? [savoir intégrer, dans un page, des outils de diffusion web 2 (twitter, facebook, …)]",
+	            "Ecommerce":"Quelles sont vos compétences ? [savoir faire fonctionner, sur un site, un service de type « e-commerce » (vente de produits, …)]",
+	            "Epublication":"Quelles sont vos compétences ? [savoir réaliser et diffuser des e-publications : brochures, dépliants, publications multimédias, …]",
+	            "Podcast":"Quelles sont vos compétences ? [savoir réaliser des podcasts]",
+	            "PublicationDistance":"Quelles sont vos compétences ? [savoir gérer la publication à distance d’un site web]",
+	            "Multilingue":"Quelles sont vos compétences ? [savoir gérer un site multilingue]"
+			}
+		},
+		{ "nom":"CDNL"
+		, "debut":2016, "fin":2017
+		, "key":["Votre nom","Votre prénom"]
+		, "valeurs": {"je ne connais pas du tout":1,"je connais un peu":5,"je me débrouille":10,"je suis expert(e)":20}
+		, "competences":{
+	            "EditWeb":"Quelles sont vos compétences ? [connaître les outils d’édition web (éditeurs html, CSS, …) ]", 
+	            "HTML":"Quelles sont vos compétences ? [connaître les base du langage HTML 5]", 
+	            "Responsive":"Quelles sont vos compétences ? [connaître les bases du responsive web design (RWD)]",
+	            "ScenarStat":"Quelles sont vos compétences ? [savoir scénariser et réaliser les rubriques « statiques » d’un site web]",
+	            "ScenarMulti":"Quelles sont vos compétences ? [savoir scénariser et réaliser des rubriques multimédias (« page vidéo », « page photo », exposition virtuelle, …)]",
+	            "Carto":"Quelles sont vos compétences ? [savoir utiliser des cartes géographiques interactives]",
+	            "Rss":"Quelles sont vos compétences ? [savoir travailler avec le RSS]",
+	            "Meta":"Quelles sont vos compétences ? [savoir utiliser correctement les métadonnées pour une meilleure diffusion des contenus du site]",
+	            "LienSponsor":"Quelles sont vos compétences ? [savoir utiliser les programmes de liens sponsorisés]",
+	            "GestAccess":"Quelles sont vos compétences ? [savoir utiliser des outils de gestion d’accès aux rubriques (accès par mot de passe, …)]",
+	            "Forum":"Quelles sont vos compétences ? [savoir mettre en place et gérer un forum de discussion]",
+	            "Newsletter":"Quelles sont vos compétences ? [savoir mettre en place et gérer un service de type « newsletter » (impliquant la mise en place et la gestion d’un annuaire d’abonnés)]",
+	            "Enquete":"Quelles sont vos compétences ? [savoir mettre en place des enquêtes enligne]",
+	            "Veille":"Quelles sont vos compétences ? [savoir mettre en place et exploiter des outils de veille d’information]",
+	            "Ranking":"Quelles sont vos compétences ? [savoir mettre en place des outils de type « ranking »]",
+	            "SocialNetwork":"Quelles sont vos compétences ? [savoir intégrer, dans un page, des outils de diffusion web 2 (twitter, facebook, …)]",
+	            "Ecommerce":"Quelles sont vos compétences ? [savoir faire fonctionner, sur un site, un service de type « e-commerce » (vente de produits, …)]",
+	            "Epublication":"Quelles sont vos compétences ? [savoir réaliser et diffuser des e-publications : brochures, dépliants, publications multimédias, …]",
+	            "Podcast":"Quelles sont vos compétences ? [savoir réaliser des podcasts]",
+	            "PublicationDistance":"Quelles sont vos compétences ? [savoir gérer la publication à distance d’un site web]",
+	            "Multilingue":"Quelles sont vos compétences ? [savoir gérer un site multilingue]"
+			}
+		, "besoins":{
+	            "EditWeb":"Quelles sont besoins ? [connaître les outils d’édition web (éditeurs html, CSS, …) ]", 
+	            "HTML":"Quelles sont besoins ? [connaître les base du langage HTML 5]", 
+	            "Responsive":"Quelles sont besoins ? [connaître les bases du responsive web design (RWD)]",
+	            "ScenarStat":"Quelles sont besoins ? [savoir scénariser et réaliser les rubriques « statiques » d’un site web]",
+	            "ScenarMulti":"Quelles sont besoins ? [savoir scénariser et réaliser des rubriques multimédias (« page vidéo », « page photo », exposition virtuelle, …)]",
+	            "Carto":"Quelles sont besoins ? [savoir utiliser des cartes géographiques interactives]",
+	            "Rss":"Quelles sont besoins ? [savoir travailler avec le RSS]",
+	            "Meta":"Quelles sont besoins ? [savoir utiliser correctement les métadonnées pour une meilleure diffusion des contenus du site]",
+	            "LienSponsor":"Quelles sont besoins ? [savoir utiliser les programmes de liens sponsorisés]",
+	            "GestAccess":"Quelles sont besoins ? [savoir utiliser des outils de gestion d’accès aux rubriques (accès par mot de passe, …)]",
+	            "Forum":"Quelles sont besoins ? [savoir mettre en place et gérer un forum de discussion]",
+	            "Newsletter":"Quelles sont besoins ? [savoir mettre en place et gérer un service de type « newsletter » (impliquant la mise en place et la gestion d’un annuaire d’abonnés)]",
+	            "Enquete":"Quelles sont besoins ? [savoir mettre en place des enquêtes enligne]",
+	            "Veille":"Quelles sont besoins ? [savoir mettre en place et exploiter des outils de veille d’information]",
+	            "Ranking":"Quelles sont besoins ? [savoir mettre en place des outils de type « ranking »]",
+	            "SocialNetwork":"Quelles sont besoins ? [savoir intégrer, dans un page, des outils de diffusion web 2 (twitter, facebook, …)]",
+	            "Ecommerce":"Quelles sont besoins ? [savoir faire fonctionner, sur un site, un service de type « e-commerce » (vente de produits, …)]",
+	            "Epublication":"Quelles sont besoins ? [savoir réaliser et diffuser des e-publications : brochures, dépliants, publications multimédias, …]",
+	            "Podcast":"Quelles sont besoins ? [savoir gérer la publication à distance d’un site web]",
+	            "PublicationDistance":"Quelles sont besoins ? [savoir gérer un site multilingue]",
+	            "Multilingue":"Quelles sont vos compétences ? [savoir gérer un site multilingue]"
+			}
+		, "outils":{
+	            "Illustrator":"Quelles outils utilisez vous ? [Photoshop]",
+	            "Photoshop":"Quelles outils utilisez vous ? [Illustrator]", 
+	            "Gimp":"Quelles outils utilisez vous ? [Gimp]", 
+	            "Inkscape":"Quelles outils utilisez vous ? [Inkscape]",
+	            "Dreamweaver":"Quelles outils utilisez vous ? [Dreamweaver]",
+	            "Kompozer":"Quelles outils utilisez vous ? [Kompozer]",
+	            "Premier":"Quelles outils utilisez vous ? [Premier]",
+	            "Eclipse":"Quelles outils utilisez vous ? [Eclipse]",
+	            "SublimeText":"Quelles outils utilisez vous ? [Sublime text]",
+	            "InDesign":"Quelles outils utilisez vous ? [In design]",
+	            "FinalCut":"Quelles outils utilisez vous ? [Final Cut]",
+	            "Blender":"Quelles outils utilisez vous ? [Blender]",
+	            "Sketchup":"Quelles outils utilisez vous ? [Sketchup]",
+	            "Enquete":"Quelles outils utilisez vous ? [Unity]",
+	            "Unity":"Quelles outils utilisez vous ? [Wamp]",
+	            "Xamp":"Quelles outils utilisez vous ? [Xamp]",
+	            "Mamp":"Quelles outils utilisez vous ? [Mamp]",
+	            "PhpMyAdmin":"Quelles outils utilisez vous ? [PhpMyAdmin]",
+	            "MySqlWorkbench":"Quelles outils utilisez vous ? [MySqlWorkbench]",
+	            "Cordova":"Quelles outils utilisez vous ? [Cordova]"
+			}
+		}		
+	]
+}

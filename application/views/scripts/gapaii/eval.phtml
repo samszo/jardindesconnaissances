@@ -51,7 +51,10 @@
 <body onload="init()">
 	<div id="layout"></div>
 	<script type="text/javascript">
-	var pstyle = 'padding:3px;', evals, idEval, idQuest, q, idDivGen='txtGen', saveResult;
+	var pstyle = 'padding:3px;', evals
+		, idEval=0 //questionnement par défaut = texte
+		, idQuest, numQuest = 0 //question par défaut = 0
+		, q, idDivGen='txtGen', saveResult;
 	
 	function init(){
 		
@@ -126,7 +129,7 @@
 		
 		if(idLayout=='tbNewTxt'){
 			idEval = 0;
-	        	w2ui['layoutMain'].content('main', '<h1>Bientôt disponible</h1>');        	
+	        w2ui['layoutMain'].content('main', '<h1>veuillez patienter...</h1>');        	
 	        	/*
 			$('#tabs').w2tabs({
 		        name: 'tabs',
@@ -208,27 +211,33 @@
 	    		    	w2ui['mainTB'].refresh();
 	    		    	//chargement de la barre des évaluations
 	    		    var menuMaxWidth='400px';	
-				var sideEval = {
-				        name : 'sidebar',
-				        flatButton: true,
-				        nodes: [
-				        ],
-				        onFlat: function (event) {
-				            $('#sidebar').css('width', (event.goFlat ? '35px' : menuMaxWidth ));
-				            $('#layout_layoutMain_panel_left').css('width', (event.goFlat ? '35px' : menuMaxWidth));
-				            w2ui['layoutMain'].sizeTo('left', event.goFlat ? '35px' : menuMaxWidth);
-				            //w2ui['layoutMain'].resize();
-				        }
-				    };
-			    //
-				evals.evals.forEach(function(e){
-					var n = { id: 'eval-'+e.evalId, text: e.evalTitre, img: 'icon-folder', expanded: true, group: true, groupShowHide: true, nodes:[]};
-					e.quests.forEach(function(q){
-						n.nodes.push({ id: 'quest-'+q.questId, text: q.questTitre, icon: q.questIcone });
+					var sideEval = {
+					        name : 'sidebar',
+					        flatButton: true,
+					        nodes: [
+					        ],
+					        onFlat: function (event) {
+					            $('#sidebar').css('width', (event.goFlat ? '35px' : menuMaxWidth ));
+					            $('#layout_layoutMain_panel_left').css('width', (event.goFlat ? '35px' : menuMaxWidth));
+					            w2ui['layoutMain'].sizeTo('left', event.goFlat ? '35px' : menuMaxWidth);
+					            //w2ui['layoutMain'].resize();
+					        },
+			        		onClick: function(event){
+				        		console.log(event);
+				        		numQuest = event.node.num;
+				        		if(!$('#txtGen').text()) loadEval(idDivGen, idCpt, getNextQuest);					        		
+				        		else getNextQuest(event.node.id.substr(6));
+			        		}
+					    };
+				    //
+					evals.evals.forEach(function(e){
+						var n = { id: 'eval-'+e.evalId, text: e.evalTitre, img: 'icon-folder', expanded: true, group: true, groupShowHide: true, nodes:[]};
+						e.quests.forEach(function(q, i){
+							n.nodes.push({ id: 'quest-'+q.questId, num:i, text: q.questTitre, icon: q.questIcone });
+						});
+						sideEval.nodes.push(n);
 					});
-					sideEval.nodes.push(n);
-				});
-				//
+					//
 	    		    $('#sidebar').w2sidebar(sideEval);	    		    		    		    	
 	    		    w2ui.sidebar.goFlat();
             }
@@ -236,9 +245,9 @@
 	}
 
 	function getNextQuest(num){
-
 		if(!num){
-			q = evals.evals[idEval].quests[0];
+			q = evals.evals[idEval].quests[numQuest];
+			numQuest = 0;
 		}else{
 			evals.evals[idEval].quests.forEach(function(r){
 				if(r.questId==num)q=r;
@@ -294,7 +303,30 @@
 			});
 			return;
 	 	}
-		
+
+
+	 	if(q.formTitre=='dendro'){
+			//on charge l'url
+			var l = w2ui['layoutMain'].get('main');
+			l.height = l.height/1.5;
+			w2ui['layoutMain'].load('main', '../graph/dendrochronologie?titre='+q.questTitre+'&w='+l.width+'&h='+l.height, null, function () {
+				fctSave = function(){
+					saveEvalDendroAll();
+					if(q.process && q.process[q.questId]){
+						getNextQuest(q.process[q.questId].questId);
+					}
+				};
+				fctClickDendro = function(d){
+					saveEvalDendro(d);
+				};
+				fctClickDendroChoix = function(d){
+					saveEvalDendro(d.data);
+				};
+				
+			});
+			return;
+	 	}
+	 	
 	 	//construction des champs
 	 	var champs = [], opts = [];
 	 	if(q.formTitre=='select'){
@@ -375,6 +407,15 @@
 		saveRepQuest(dt);
 	}
 	
+	function saveEvalDendro(d){
+		var dt = {'dendro':d,"quest":q,'gen':dtGen.idDoc,'acti':'saveEvalDendro'};
+		saveRepQuest(dt);
+	}
+
+	function saveEvalDendroAll(){
+		var dt = {'dendroData':dendroData,"quest":q,'gen':dtGen.idDoc,'acti':'saveEvalDendroAll'};
+		saveRepQuest(dt);
+	}
 
 	function saveRepQuest(dt) {
 		$.ajax({

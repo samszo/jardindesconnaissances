@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Jardin des connaissances : login google</title>
+	<meta name="Description" CONTENT="jardin connaissances login google"/>
+	<meta name="Keywords" CONTENT="jardin connaissances login google"/>
+	<meta name="Author" CONTENT="Samuel Szoniecky"/>
+  	
+	
+</head>
+	<body>
+	  <div id="loadingScreen"></div>	
+	  <div class="request">
+	    <?php if (isset($this->authUrl)): ?>
+	      <a class='login' href='<?php echo $this->authUrl; ?>'>Connexion à Google !</a>
+	    <?php else: ?>
+	    	<a class='logout' href='?logout=1'>Déconecter</a>
+	    <?php endif ?>
+
+  </body>
+</html>	

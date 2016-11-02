@@ -117,7 +117,10 @@ class GraphController extends Zend_Controller_Action {
 
     public function dendrochronologieAction()
     {
-    		$this->view->urlStats = $this->_getParam('urlStats',"../data/dendrochronologieTOT.json");
+    	$this->view->w =  $this->_getParam('w', 0);
+    	$this->view->h =  $this->_getParam('h', 0);
+    	$this->view->titre =  $this->_getParam('titre', "Dendrochronologie");
+    	$this->view->urlStats = $this->_getParam('urlStats',"../data/dendrochronologieTOT.json");
     }	
 
     public function sankeyAction()
@@ -422,6 +425,11 @@ class GraphController extends Zend_Controller_Action {
 		*/
 		 	
     }
+    
+    public function imagegridAction(){
+    
+    }
+    
     
     function getSpipMot(){
 	    	//vérifie s'il faut récupérer les données dans spip

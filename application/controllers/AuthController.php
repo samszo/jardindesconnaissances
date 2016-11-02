@@ -148,7 +148,7 @@ class AuthController extends Zend_Controller_Action
 		Zend_Session::namespaceUnset('uti');
 		$auth = Zend_Auth::getInstance();
 		$auth->clearIdentity();
-	    	$this->_redirect($redir);            	
+	    $this->_redirect($redir);            	
     }
 
 	/**
@@ -177,13 +177,16 @@ class AuthController extends Zend_Controller_Action
 		"Spreadsheets"=>"https://spreadsheets.google.com/feeds/",
 		"Webmaster"=>"http://www.google.com/webmasters/tools/feeds/",
 		"YouTube"=>"http://gdata.youtube.com",
-    		"Drive"=>"https://www.googleapis.com/auth/drive"
+    	"Drive"=>"https://www.googleapis.com/auth/drive",
+    	"Profil"=>"https://www.googleapis.com/auth/userinfo.profile"	
     );
     
     
 	public function googleAction() {
 
 		$ssGoogle = new Zend_Session_Namespace('google');
+		//print_r($ssGoogle);
+		//echo $ssGoogle->redir;
 		
 		if(!$ssGoogle->client){
 			$client = new Google_Client();
@@ -205,42 +208,48 @@ class AuthController extends Zend_Controller_Action
 		  pour zend suppression de la session
 		************************************************/
 		if ($this->_getParam('logout')) {
-			unset($_SESSION['upload_token']);		  	
-		    $ssGoogle->token=false;
-		}
-		
-		/************************************************
-		  If we have a code back from the OAuth 2.0 flow,
-		  we need to exchange that with the authenticate()
-		  function. We store the resultant access token
-		  bundle in the session, and redirect to ourself.
-		 ************************************************/
-		if ($this->_getParam('code')) {
-		  $client->authenticate($this->_getParam('code'));
-		  $ssGoogle->token = $client->getAccessToken();
-		  $this->_redirect('/auth/google');
-		}
-		
-		if (isset($_SESSION['upload_token']) && $_SESSION['upload_token']) {
-		  $client->setAccessToken($_SESSION['upload_token']);
-		  if ($client->isAccessTokenExpired()) {
-		    unset($_SESSION['upload_token']);
-		  }
-		} else {
-			$authUrl = $client->createAuthUrl();
-		}
-				
-		/************************************************
-		  If we have an access token, we can make
-		  requests, else we generate la liste des plannings.
-		 ************************************************/
-		if ($ssGoogle->token) {
-		  	//echo "token=".$ssPlan->token;
-		  	$this->verifExpireToken($ssGoogle);
-		  	$this->_redirect('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/".urldecode($ssGoogle->redir));		  	
+			unset($_SESSION['upload_token']);		
+			$redir = 'http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl().urldecode($ssGoogle->redir);
+			Zend_Session::namespaceUnset('google');
+			$this->_redirect($redir);				
 		}else{
-		  	$this->view->authUrl = $client->createAuthUrl();						
-		}					
+					
+			/************************************************
+			  If we have a code back from the OAuth 2.0 flow,
+			  we need to exchange that with the authenticate()
+			  function. We store the resultant access token
+			  bundle in the session, and redirect to ourself.
+			 ************************************************/
+			if ($this->_getParam('code')) {
+			  $client->authenticate($this->_getParam('code'));
+			  $ssGoogle->token = $client->getAccessToken();
+			  $this->_redirect('/auth/google');
+			}
+			
+			if (isset($_SESSION['upload_token']) && $_SESSION['upload_token']) {
+			  $client->setAccessToken($_SESSION['upload_token']);
+			  if ($client->isAccessTokenExpired()) {
+			    unset($_SESSION['upload_token']);
+			  }
+			} else {
+				$authUrl = $client->createAuthUrl();
+			}
+					
+			/************************************************
+			  If we have an access token, we can make
+			  requests, else we generate la liste des plannings.
+			 ************************************************/
+			if ($ssGoogle->token) {
+			  	//echo "token=".$ssPlan->token;
+			  	$this->verifExpireToken($ssGoogle);
+			  	$this->_redirect('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl().urldecode($ssGoogle->redir));		  	
+			}else{
+			  	$this->view->authUrl = $client->createAuthUrl();						
+			}					
+		}
+			
+		//print_r($ssGoogle);
+		//echo $ssGoogle->redir;
 		
 	}
 

@@ -1,98 +1,522 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+	    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+	    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+		<!-- D3.js -->
+		<script type="text/javascript" src="../js/d3.v3.min.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/jquery.min.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/jquery.blast.min.js"></script>
+	    <script type="text/javascript" src="../js/w2ui.js" charset="utf-8"></script>
+	    <script type="text/javascript" src="../js/queue.v1.min.js" ></script>
+		<script type="text/javascript" src="../js/jquery.awesome-cursor.min.js" ></script>
 
-path {
-  stroke: #fff;
-}
+		<style>
+		
+			body{
+				background-color:black;
+			    cursor: default;
+			    text-align: center;				
+			}
+			
+			path {
+			  stroke: #fff;
+			}
+			
+			.axis {  font: 10px sans-serif; }
+			.axis path,
+			.axis line {
+			  fill: none;
+			  stroke: white;
+			  shape-rendering: crispEdges;
+			}
+			.axis text {
+				fill:white;
+			}
+			
+			div.tooltip {	
+			    position: absolute;			
+			    text-align: center;			
+			    width: 160px;					
+			    height: 32px;					
+			    padding: 2px;				
+			    font: 12px sans-serif;		
+			    background: white;	
+			    border: 0px;		
+			    border-radius: 8px;			
+			    pointer-events: none;
+			    color:black;			
+			}
+		
+			.w2ui-form .w2ui-page {
+			    background-color: black;
+			}
+			#layoutDendro{
+				width:100%;
+				height:100px;
+			}
+			path.slice{
+				stroke-width:2px;
+				stroke: white;
+			}
+			
+			polyline{
+				opacity: .3;
+				stroke: white;
+				stroke-width: 2px;
+				fill: none;
+			}
+			.textChoix{
+				fill: white;
+				font-size:14px;
+				text-align:center;
+				text-anchor:middle;
+			}
+			.w2ui-form .w2ui-buttons{
+				background-color:transparent;
+			}			
+		</style>
+	</head>
+	<body>	
+	<div id="layoutDendro" style="width:100%;height:100px;"></div>
 
-</style>
-<body>
-<script src="../js/d3.v3.min.js"></script>
-<script>
+	<script>
+	var fctClear, fctSave, fctClickDendro,fctClickDendroChoix;
+	var pstyle = 'border: 0px solid #dfdfdf; padding: 0px;';
+	var sizeTop = 40, wTot=<?php echo $this->w;?>, hTot=<?php echo $this->h;?>;
+	if(!wTot)wTot=window.innerWidth;
+	if(!hTot)hTot=window.innerHeight;
+	var margin = {top: 10, right: 10, bottom: 10, left: 10},
+    wGraph = (wTot - margin.left - margin.right)/2,
+    hGraph = hTot - margin.top - margin.bottom - sizeTop - (margin.bottom*2);
+	var radius = (Math.min(wGraph, hGraph) / 2),
+	dendroData = [];
+	
+	if(w2ui['layoutDendro'])w2ui['layoutDendro'].destroy();		
+    $('#layoutDendro').w2layout({
+        name: 'layoutDendro',
+        padding: 2,
+        panels: [
+            { type: 'top', size: sizeTop, resizable: false, style: pstyle, content: 
+	            '<h3 style="color:white;" >'
+	            +'<?php echo $this->titre; ?>'
+	            +'</h3>'
+	            },
+            { type: 'left', size:'50%', resizable: false, style: pstyle, content: '<div id="chartDendro"></div>'},
+            { type: 'main', size:'50%', resizable: false, style: pstyle, content: ''},
+            { type: 'bottom', size:margin.bottom, resizable: false, style: pstyle, content: '<div class="mercis"><i class="fa fa-thumbs-up"></i> <a href="http://www.kronobase.org/">kronobase</a></div>'},
+       	]
+    });
+	//met à jour la taille du div principal
+	d3.select("#layoutDendro")
+		    .style("height", hTot-margin.bottom+"px");				
+	window.onresize = resize;
+	
+	//création du formulaire		
+	if(w2ui['formDendro'])w2ui['formDendro'].destroy();		
+	var formDendro = {
+	    name: 'formDendro',
+	    style: 'border: 0px; background-color: transparent;',
+	    formHTML: 
+	        '<div class="w2ui-page page-0">'+
+	        '	<div id="chartChoixDendro"></div>'+
+	        '</div>'+
+	        '<div class="w2ui-buttons">'+
+	        '   <button class="w2ui-btn" name="reset">Annuler</button>'+
+	        '    <button class="w2ui-btn w2ui-btn-green" name="save">Enregistrer</button>'+
+	        '</div>',
+	    fields: [],
+	    onRender: function(event) {		    
+	        console.log(event);
+	        event.onComplete = function () {
+		        drawDendroChoix();
+	        }		        
+	    }, 
+	    record: {},
+	    actions: {
+	        "save": function () { 
+		        if(fctSave)fctSave(); 
+		    },
+	        "reset": function () { 
+				if(dendroData.length){
+					//mise à zéro des axes
+					dendroData.forEach(function(c){
+						c.forEach(function(d){
+							d.poids = 0;
+						});
+					});
+				}
+		        if(fctClear)fctClear(); 					
+		    }
+	    }
+	};
 
-var width = 960,
-    height = 700,
-    radius = (Math.min(width, height) / 2) - 10;
+    w2ui['layoutDendro'].content('main', $().w2form(formDendro));
 
-var formatNumber = d3.format(",d");
+		
+	//paramètre du graph
+	var idSvg = "svgChartDendro";
+	var x = d3.scale.linear()
+	    .range([0, 2 * Math.PI]);
+	
+	var y = d3.scale.linear()
+	    .range([0, radius]);
+	
+	//var color = d3.scale.category20c();
+	var color = d3.scale.linear()
+			.range(["black", "white"]);
+	
+	var partition = d3.layout.partition()
+	    .value(function(d) { return d.size; });
+	
+	var arc = d3.svg.arc()
+	    .startAngle(function(d) {         
+	    	return d.depth > 1 && d.parent && d.parent.children ? x(0.5) : 0;  
+	        })
+	    .endAngle(function(d) { 
+	    	return d.depth > 0 && d.children ? x(0.5) : x(1); 
+	        })
+	    .innerRadius(function(d) { 
+	        return Math.max(0, y(d.cerneIn)); 
+	        })
+	    .outerRadius(function(d) { 
+	        return Math.max(0, y(d.cerneOut)); 
+	        });
+	
+	//récupère les données du dendrogramme
+	d3.json('<?php echo $this->urlStats; ?>', function(error, root) {
+		if (error) throw error;
+		var svg = d3.select("#chartDendro").append("svg")
+				.attr("id",idSvg)
+			    .attr("width", wGraph)
+			    .attr("height", hGraph)
+			  	.append("g")
+			    .attr("transform", "translate(" + (wGraph / 2) + "," + (hGraph / 2) + ")");
+			//Define the div for the tooltip
+			var div = d3.select("#chartDendro").append("div")	
+			    .attr("class", "tooltip")				
+			    .style("opacity", 0);
+		  
+		  //calcul la taille des cernes
+		  var cerneSize = 10, domainAxeY = [], labelAxeY=[];
+		  labelAxeY[0]=root.debut;
+		  root.min = 0;
+		  root.cerneIn = 0;
+		  root.cerneOut = cerneSize;
+		  root.max = root.cerneOut;
+		  root.children.forEach(function(d){
+			  d.cerneIn = root.max;
+			  d.cerneOut = d.cerneIn + cerneSize;
+			  if(d.children){
+				  d.children.forEach(function(c,i){
+					 c.cerneIn = i==0 ? d.cerneIn : d.cerneIn+(cerneSize*i);
+					 c.cerneOut = c.cerneIn + cerneSize;
+					 d.cerneOut = c.cerneOut;  
+					  //ajoute la fin dans le domaine de l'axe Y s'il n'existe pas
+					 if(!domainAxeY.find(function(f){return f==c.cerneIn})) domainAxeY.push(c.cerneIn);
+					 labelAxeY[c.cerneOut]=c.fin;
+					  //data pour les choix
+					  dendroData.push({'name':c.name,'debut':c.debut,'fin':c.fin,'value':0});								 
+				  });
+			  }else{
+				  //ajoute la fin dans le domaine de l'axe Y s'il n'existe pas
+				 if(!domainAxeY.find(function(f){return f==d.cerneIn})) domainAxeY.push(d.cerneIn);
+				 labelAxeY[d.cerneOut]=d.fin;
+			  }	  
+			  //data pour les choix
+			  dendroData.push({'name':d.name,'debut':d.debut,'fin':d.fin,'value':0});								 
+			  root.max = d.cerneOut;
+			  });
+		  
+		  //met à jour le domaine y pour la hauteur de l'arc
+		  y.domain([root.min, root.max]);
+		  //met à jour le domain pour les couleurs
+		  color.domain([root.min, root.max]);
+		    
+		  //création der cernes
+		  svg.selectAll("path")
+		      .data(partition.nodes(root))
+		    .enter().append("path")
+		      .attr("d", arc)
+		      .attr("class", "cerne")
+		      .style("fill", function(d) { 
+			      d.color = color(d.cerneOut);
+		          return d.color;
+		      	 })
+		      .style("opacity",function(d) { 
+			      d.opacity = 0.5;
+		          return d.opacity;
+		   	 	})
+		      .on("click", clickDendro)
+			  .on("mouseover", function(d) {		
+		            div.transition()		
+		                .duration(200)		
+		                .style("opacity", .9);		
+		            div.html(d.name)	
+		                .style("left", (d3.event.pageX) + "px")		
+		                .style("top", (d3.event.pageY - 32) + "px");	
+		      })					
+		      .on("mouseout", function(d) {		
+		            div.transition()		
+		                .duration(500)		
+		                .style("opacity", 0);	
+		      });
 
-var x = d3.scale.linear()
-    .range([0, 2 * Math.PI]);
+		//ajoute un curseur +
+		 $('.cerne').awesomeCursor('plus', {
+		   color: 'black',
+		   outline: 'red'
+		 });	
+			 			
+		  //création de l'axe vertical
+		  // create function for y-axis mapping.
+		  //var yAxe = d3.scale.ordinal().rangeRoundBands([0,radius])
+		  //        .domain(labelAxeY);
+		    
+		  // Add x-axis to the histogram svg.
+		  svg.append("g").attr("class", "y axis")
+		      .attr("transform", "translate(0," + 0 + ")")
+		      .call(d3.svg.axis().scale(y)
+				.orient("right")
+		   	    .tickFormat(function(d) { 
+		   	   	    //console.log("axeY d="+d);
+		    		return labelAxeY[d]; 
+		    	 })
+		    	 );
+		  
+		  
+	});
+	
+	function clickDendro(d) {
+	
+		var e = d3.select(this);
+		var t = dendroData.find(function(f){return f.debut==d.debut && f.fin==d.fin});
+		t.value = t.value ? t.value + 1 : 1;	
+		t.color = d.color;
+		t.opacity = d.opacity;	
+		changeDendroChoix(dendroData);
+		if(fctClickDendro)fctClickDendro(dendroData);		
+	}
 
-var y = d3.scale.sqrt()
-    .range([0, radius]);
 
-var color = d3.scale.category20c();
+	/* ------- 
+	---------- DIAGRAMME D'AFFICHAGE DES CHOIX 		
+	-------*/
+	var svgChoix, pie, arcChoix, radiusChoix,  outerArcChoix, key, idSvgChoix="svgChoixDendro", onChange=false;
+	var posMinMax = [0,0];
+	
+	function drawDendroChoix(){
+		svgChoix = d3.select("#chartChoixDendro")
+			.append("svg")
+		    .attr("width", wGraph)
+		    .attr("height", hGraph)
+			.attr("id",idSvgChoix)
+			.append("g")
 
-var partition = d3.layout.partition()
-    .value(function(d) { return d.size; });
+		svgChoix.append("g")
+			.attr("class", "slices");
+		svgChoix.append("g")
+			.attr("class", "labels");
+		svgChoix.append("g")
+			.attr("class", "lines");
 
-var arc = d3.svg.arc()
-    .startAngle(function(d) {         
-        var a = Math.max(0, Math.min(2 * Math.PI, x(d.x))); 
-        a = d.depth > 1 && d.parent && d.parent.children ? x(0.5) : 0;  
-        return a;
-        })
-    .endAngle(function(d) { 
-        var a = Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))); 
-        a = d.depth > 0 && d.children ? x(0.5) : x(1); 
-        return a;
-        })
-    .innerRadius(function(d) { 
-        var r = Math.max(0, y(d.y));
-        var r1 = Math.max(0, y(d.debut));
-        return r1; 
-        })
-    .outerRadius(function(d) { 
-        var r = Math.max(0, y(d.y + d.dy));
-        var r1 = Math.max(0, y(d.fin));
-        return r1; 
-        });
+		pie = d3.layout.pie()
+			.sort(null)
+			.value(function(d) {
+				return d.value;
+			});
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height)
-  .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
+		//on enlève la teille du texte au rayon 
+		radiusChoix = radius-100;
+		arcChoix = d3.svg.arc()
+			.outerRadius(radiusChoix * 0.8)
+			.innerRadius(radiusChoix * 0.4);
 
-d3.json('<?php echo $this->urlStats; ?>', function(error, root) {
-  if (error) throw error;
-  //met à jour le domaine y pour la hauteur de l'arc
-  y.domain([root.min, root.max]);
-    
-  svg.selectAll("path")
-      .data(partition.nodes(root))
-    .enter().append("path")
-      .attr("d", arc)
-      .style("fill", function(d) { return "blue";//color((d.children ? d : d.parent).name);
-      	 })
-      .style("opacity",function(d) { 
-          return (d.depth*0.3);
-   	 	})
-      .on("click", click)
-    .append("title")
-      .text(function(d) { return d.name + "\n" + formatNumber(d.value); });
-});
+		outerArcChoix = d3.svg.arc()
+			.innerRadius(radiusChoix * 0.9)
+			.outerRadius(radiusChoix * 0.9);
 
-function click(d) {
-	/*Zoom
-  svg.transition()
-      .duration(750)
-      .tween("scale", function() {
-        var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
-            yd = d3.interpolate(y.domain(), [d.debut, 1]),
-            yr = d3.interpolate(y.range(), [20, radius]);
-        return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); };
-      })
-    .selectAll("path")
-      .attrTween("d", function(d) { return function() { return arc(d); }; });
-    */
-}
+		//déplace le graph au centre - la hauteur des boutons
+		svgChoix.attr("transform", "translate(" + wGraph / 2 + "," + ((hGraph / 2)-64) + ")");
 
-d3.select(self.frameElement).style("height", height + "px");
+		key = function(d){ 
+			return d.data.debut+"_"+d.data.fin; 
+			};
 
-</script>
+		changeDendroChoix(dendroData);
+	}
+		
+	function changeDendroChoix(data) {
+		onChange = true;
+
+		//flitre les objects sans valeur
+		var dt = data.filter(function(d){return d.value>0});
+		
+		/* ------- PIE SLICES -------*/
+		var slice = svgChoix.select(".slices").selectAll("path.slice")
+			.data(pie(dt), key);
+
+		slice.enter()
+			.insert("path")
+			.style("stroke", "#000000")
+			.style("stroke-width", 2)
+			.style("fill", function(d) { 
+				return d.data.color; 
+				})
+		      .style("opacity",function(d) { 
+		    	  return d.data.opacity; 
+		   	 	})
+			.attr("class", "slice")
+			.on('click',function(d, i){
+	    	  			//console.log(i+" - "+d.id+" / "+d.en+" / "+d.fr+" / "+d.color);
+	    	  			dendroData.forEach(function(rd){
+		    	  			if(rd.debut==d.data.debut && rd.fin==d.data.fin)rd.value --;
+		    	  			});
+	    	  			if(fctClickDendroChoix)fctClickDendroChoix(d);
+	    	  			
+	    	  			changeDendroChoix(dendroData);
+    	  			});
+
+			 //ajoute un curseur -
+			 $('.slice').awesomeCursor('minus', {
+			   color: 'black',
+			   outline: 'red'
+			 });		 
+
+		
+		slice		
+			.transition().duration(1000)
+			.attrTween("d", function(d) {
+				this._current = this._current || d;
+				var interpolate = d3.interpolate(this._current, d);
+				this._current = interpolate(0);
+				return function(t) {
+					return arcChoix(interpolate(t));
+				};
+			})
+
+		slice.exit()
+			.remove();
+
+		/* ------- TEXT LABELS -------*/
+
+		var text = svgChoix.select(".labels").selectAll("text")
+			.data(pie(dt), key);
+
+		text.enter()
+			.append("text")
+			.attr("dy", ".35em")
+			.attr("class","textChoix")
+			.text(function(d) {
+				return d.data.name;
+			})
+			.call(wrap, 100);
+
+		function midAngle(d){
+			return d.startAngle + (d.endAngle - d.startAngle)/2;
+		}
+
+		text.transition().duration(1000)
+			.attrTween("transform", function(d) {
+				this._current = this._current || d;
+				var interpolate = d3.interpolate(this._current, d);
+				this._current = interpolate(0);
+				return function(t) {
+					var d2 = interpolate(t);
+					var pos = outerArcChoix.centroid(d2);
+					pos[0] = radiusChoix * (midAngle(d2) < Math.PI ? 1 : -1);
+					//console.log(pos);
+					return "translate("+ pos +")";
+				};
+			})
+			.styleTween("text-anchor", function(d){
+				this._current = this._current || d;
+				var interpolate = d3.interpolate(this._current, d);
+				this._current = interpolate(0);
+				return function(t) {
+					var d2 = interpolate(t);
+					return midAngle(d2) < Math.PI ? "start":"end";
+				};
+			});
+
+		text.exit()
+			.remove();
+
+		/* ------- SLICE TO TEXT POLYLINES -------*/
+
+		var polyline = svgChoix.select(".lines").selectAll("polyline")
+			.data(pie(dt), key);
+		
+		polyline.enter()
+			.append("polyline");
+
+		polyline.transition().duration(1000)
+			.attrTween("points", function(d){
+				this._current = this._current || d;
+				var interpolate = d3.interpolate(this._current, d);
+				this._current = interpolate(0);
+				return function(t) {
+					var d2 = interpolate(t);
+					var pos = outerArcChoix.centroid(d2);
+					pos[0] = radiusChoix * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+					//posMinMax[0] = Math.min(posMinMax[0], pos[0]); 
+					//posMinMax[1] = Math.max(posMinMax[1], pos[1]); 
+					return [arcChoix.centroid(d2), outerArcChoix.centroid(d2), pos];
+				};			
+			})
+			.each("end", resize);
+		
+		polyline.exit()
+			.remove();
+
+		
+		
+	};
+
+	function wrap(text, width) {
+		  text.each(function() {
+		    var text = d3.select(this),
+		        words = text.text().split(/\s+/).reverse(),
+		        word,
+		        line = [],
+		        lineNumber = 0,
+		        lineHeight = 0.8, // ems
+		        y = text.attr("y"),
+		        dy = parseFloat(text.attr("dy")),
+		        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+		    while (word = words.pop()) {
+		      line.push(word);
+		      tspan.text(line.join(" "));
+		      if (tspan.node().getComputedTextLength() > width) {
+		        line.pop();
+		        tspan.text(line.join(" "));
+		        line = [word];
+		        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ((++lineNumber * lineHeight) + dy) + "em").text(word);
+		      }
+		    }
+		  });
+		}	
+	
+	function resize(){
+		width = (wTot - margin.left - margin.right)/2,
+	    height = hTot - margin.top - (margin.bottom*2);
+		d3.select("#"+idSvg).transition().duration(0)
+		    .attr("width", width)
+		    .attr("height", height - sizeTop)
+			.attr("viewBox","0 0 "+wGraph+" "+hGraph);	
+		if(document.getElementById(idSvgChoix) && onChange){
+			d3.select("#"+idSvgChoix).transition().duration(0)
+			    .attr("width", width)
+			    .attr("height", height - sizeTop) //enlève la taille de la barre de bouton
+				.attr("viewBox","0 0 "+wGraph+" "+hGraph);	
+			onChange = false;
+		}
+		
+	  	w2ui['layoutDendro'].resize();
+	}
+	
+	</script>
 	
   </body>
 </html>	

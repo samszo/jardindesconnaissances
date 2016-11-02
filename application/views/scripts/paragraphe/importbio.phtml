@@ -16,7 +16,7 @@
 		$("body").toggleClass("wait");
 		var url = "../public/paragraphe/conceptmap?googleId="+$("#idGoogle")[0].value;
 		//var urlData = "../../data/paragraphe/AxesCiTu-Paragraphe-cor.csv"; 
-		var urlData = "../flux/google?type=cssOpen&gDocId=<?php echo $this->googleId; ?>"; 
+		var urlData = "../flux/google?type=csvOpen&gDocId=<?php echo $this->googleId; ?>"; 
 		
 		d3.csv(urlData, function(data) {
 			

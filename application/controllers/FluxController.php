@@ -297,26 +297,33 @@ class FluxController extends Zend_Controller_Action {
 	    			$arr = $g->findBooks($this->_getParam('q'));
 	    			$this->view->content =  json_encode($arr);
 				break;
-    			case "cssOpen":
+    			case "csvOpen":
 	    			$s = new Flux_Site();
-	    			$this->view->content =  $s->getUrlBodyContent("https://docs.google.com/spreadsheets/d/".$this->_getParam('gDocId')."/pub?gid=0&single=true&output=csv",false,false);
+	    			$url = "https://docs.google.com/spreadsheets/d/".$this->_getParam('gDocId')."/pub?gid=".$this->_getParam('gid',0)."&single=true&output=csv";
+	    			$this->view->content = $s->getUrlBodyContent($url,false,false);
 				break;				
+				case "album":
+					//attention il faut rendre les albums public cf. https://casper.baghuis.nl/google-photos/Google-Photos-RSSerator.html
+					$s = new Flux_Site();
+					$url = "http://photos.googleapis.com/data/feed/api/user/".$this->_getParam('userId')."/albumid/".$this->_getParam('albumId')."?alt=json";
+					$this->view->content =  $s->getUrlBodyContent($url);
+					break;				
     			default:
 		    		$ssGoogle = new Zend_Session_Namespace('google');
-				$ssGoogle->type = $this->_getParam('type');
-				$ssGoogle->gDocId = $this->_getParam('gDocId');
-				if(!$ssGoogle->client || $this->verifExpireToken($ssGoogle)){
-					$this->_redirect('/auth/google?scope='.$this->_getParam('scope',"Drive"));
-				}elseif ($this->_getParam('logout')){
-					$this->_redirect('/auth/google?logout=1');			
-				}else{
-					if($ssGoogle->type == 'css' && $ssGoogle->gDocId){
-						$gDrive = new Flux_Gdrive($ssGoogle->token);
-						$this->view->content =  $gDrive->downloadFile($ssGoogle->gDocId,'text/csv');
+					$ssGoogle->type = $this->_getParam('type');
+					$ssGoogle->gDocId = $this->_getParam('gDocId');
+					if(!$ssGoogle->client || $this->verifExpireToken($ssGoogle)){
+						$this->_redirect('/auth/google?scope='.$this->_getParam('scope',"Drive"));
+					}elseif ($this->_getParam('logout')){
+						$this->_redirect('/auth/google?logout=1');			
 					}else{
-						$this->view->google = $ssGoogle;
+						if($ssGoogle->type == 'csv' && $ssGoogle->gDocId){
+							$gDrive = new Flux_Gdrive($ssGoogle->token);
+							$this->view->content =  $gDrive->downloadFile($ssGoogle->gDocId,'text/csv');
+						}else{
+							$this->view->google = $ssGoogle;
+						}
 					}
-				}
 				break;
     		}
     }
@@ -372,7 +379,7 @@ class FluxController extends Zend_Controller_Action {
 	   	}
     }
     
-	private function verifExpireToken($ss){
+	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);
 		if ($ss->client->isAccessTokenExpired()) {
 		    $ss->token=false;
