@@ -36,7 +36,7 @@ class FichierController extends Zend_Controller_Action
 			$dbDoc = new Model_DbTable_Flux_Doc($s->db);
 			$reponse["idDoc"]= $dbDoc->ajouter(array("url"=>$reponse["url"],"data"=>$_FILES["${type}-blob"]));
 		}
-    		$this->view->reponse=json_encode($reponse);
+    	$this->view->reponse=json_encode($reponse);
     }
     
     

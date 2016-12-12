@@ -27,6 +27,11 @@ class CartoController extends Zend_Controller_Action {
     {
     	
     }
+
+    public function mondeAction()
+    {
+    	 
+    }
     
     public function hexagoneAction(){
     	
