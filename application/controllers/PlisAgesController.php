@@ -33,6 +33,11 @@ class PlisAgesController extends Zend_Controller_Action
 		}   
 		 		
     }
+    
+    public function deAction()
+    {
+    	
+    }
 
     public function sauveinclinaisonAction()
     {

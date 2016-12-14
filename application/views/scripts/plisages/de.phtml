@@ -1,0 +1,185 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Générateur de dé</title>
+		
+		<link rel="stylesheet" href="../css/font-awesome.css">
+    	<script type="text/javascript" src="../js/d3.js"></script>
+	    <script type="text/javascript" src="../js/queue.v1.min.js" ></script>
+		<script type="text/javascript">
+
+		var ficIHM = "../svg/de.svg";
+		var chaineDate = d3.time.format("%x");
+		var chaineDateHeure = d3.time.format("Le %x à %X");
+		
+		//tableau des graphiques intéractifs
+		var arrIds = [
+			{"idEle":"de1","fonction":setIcone,"role":"ecrit"}
+			,{"idEle":"de2","fonction":setIcone,"role":"ecrit"}
+			,{"idEle":"de3","fonction":setIcone,"role":"ecrit"}
+			,{"idEle":"de4","fonction":setIcone,"role":"ecrit"}
+			,{"idEle":"de5","fonction":setIcone,"role":"ecrit"}
+			,{"idEle":"de6","fonction":setIcone,"role":"ecrit"}
+		];
+
+		var defaultStyle = {
+				  padding: "0px 5px 0px 5px",
+				  margin: "5px",
+				  "border-radius": "16px",
+				  "background-color": "white",
+				  "stroke": "none",
+				  "cursor": "pointer"
+				};
+
+		var hoveredStyle = { "background-color": "lightgray" };
+		var clickedStyle = { "background-color": "gray" };
+	 			
+		function load(){
+		    //	chargeData(ficCSV);
+		    chargeSVG(ficIHM, chargeIHM);
+		}
+
+	    function chargeSVG(url, fct){
+		 	//charge un SVG
+		    //merci à http://bl.ocks.org/KoGor/8162640
+		    	queue()
+		    		.defer(d3.xml, url, "image/svg+xml")
+		    		.await(fct);
+	    }		
+		
+	    function chargeIHM(error, xml){
+	    		//Adding our svg file to HTML document
+			var importedNode = document.importNode(xml.documentElement, true);
+    	  		d3.select("#viz").node().appendChild(importedNode);	    	    	  	
+    	  		ajoutEvent();
+ 	    }		
+	    
+		// fonction pour ajouter un écouteur à UN ÉLÉMENT
+		//merci à https://developer.mozilla.org/fr/docs/DOM/element.addEventListener
+		function ajoutEvent() { 
+		
+			for (var i = 0; i < arrIds.length; i++) {
+				//length = taille du tableau
+			     var el = document.getElementById(arrIds[i].idEle); 
+			     el.addEventListener("click", arrIds[i].fonction,false); 			    	
+			} 		
+		}
+		
+		function setIcone(evt){
+			var idEleEvt = evt.currentTarget.id;
+			var bb = document.getElementById(idEleEvt).getBBox();
+			var HTML = '<i id="i_'+idEleEvt+'" />';
+			var divStyle = "line-height:"+bb.height+"px;height:"+bb.height+"px;width:"+bb.width+"px;";
+			//divStyle = "display: table-cell;vertical-align: middle;"+divStyle;
+		    var svg = d3.select("#layer1").append("svg")
+		    	.attr('x', bb.x)
+	            .attr('y', bb.y);
+			svg.append('foreignObject')
+	            .attr('width', bb.width)
+	            .attr('height', bb.height)
+	            .append("xhtml:body")
+	            	.attr("xmlns","http://www.w3.org/1999/xhtml")
+		            .attr('width', bb.width)
+		            .attr('height', bb.height)
+		            .attr('class', "foreignBody")
+					.html('<div style="'+divStyle+'" >'+HTML+'</div>');	
+			
+		    d3.select('#i_'+idEleEvt)
+			  .attr("class", "icon fa fa-5x fa-question")
+			  .style("font-size","9em")		  
+			  .style(defaultStyle)
+			  .on("mouseover", function(){
+			    d3.select(this).style(hoveredStyle);
+			  })
+			  .on("click", function(){
+			    d3.select(this)
+			    	.attr("class", "icon fa fa-5x fa-youtube-square")
+			    	.style("font-size","9em");
+			  })
+			  .on("mouseout", function(){
+			    d3.select(this).style(defaultStyle);
+			  })
+			  .on("mousedown", function(d){
+			    d3.select(this).style(clickedStyle);
+			    iconClicked(d);
+			  })
+			  .on("mouseup", function(){
+			    d3.select(this).style(hoveredStyle);
+			  });
+			
+	    }
+
+
+
+		
+		</script>
+		
+		<style>
+		
+			.mainBody {
+			  background: white;
+			  font: 10px sans-serif;
+			  margin: auto;
+			  position: relative;
+			  width: 1024px;
+			}
+			
+			text {
+			  text-anchor: middle;
+			}
+			
+			#credit {
+			  position: absolute;
+			  right: 4px;
+			  bottom: 4px;
+			  color: #ddd;
+			}
+			
+			#credit a {
+			  color: #fff;
+			  font-weight: bold;
+			}
+		    @font-face {
+		        font-family: Origami;
+		        src: url('fonts/origami/ORIGAMI_.TTF');
+		    }
+		
+			#promptCompat{ 
+					display: none; 
+			} 
+			#promptCompat.no_dialog{ 
+				box-shadow: 0 0 5px 2px red; 
+				padding: 10px; 
+				display: block; 
+				text-align: center; 
+				font-weight: bold; 
+			} 
+			.boutons{ 
+				padding: 10px; 
+			} 
+			.foreignBody {
+				background-color:black;
+				margin:3px;
+				width: 0px;
+				
+			}
+			
+		</style>	
+	</head>
+	<body class="mainBody" >
+		<div id="viz" ></div>		
+		
+		<script type="text/javascript">
+
+		load();
+		
+		var icons = ["twitter-square", "facebook-square", "linkedin-square", "youtube-square", "github-square", "google-plus-square"];
+
+		function iconClicked(icon){
+		  console.log(icon + " clicked");
+		}
+
+
+		</script>		
+	</body>
+</html>

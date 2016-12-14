@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="800"
+   height="600"
+   id="svg9803"
+   version="1.1"
+   inkscape:version="0.91+devel+osxmenu r12832"
+   sodipodi:docname="tagcloud-plat.svg">
+  <metadata
+     id="metadata10013">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10011" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview10009"
+     showgrid="false"
+     inkscape:zoom="0.39333333"
+     inkscape:cx="400"
+     inkscape:cy="300"
+     inkscape:window-x="0"
+     inkscape:window-y="23"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg9803" />
+  <g
+     id="g9805" />
+  <g
+     transform="translate(407.62712,292.37288)"
+     id="g9807">
+    <text
+       transform="translate(96,71)"
+       style="font-size:18px;text-anchor:middle;fill:#393b79"
+       id="text9809">translittératie</text>
+    <text
+       transform="translate(-15,46)"
+       style="font-size:18px;text-anchor:middle;fill:#5254a3"
+       id="text9811">notions</text>
+    <text
+       transform="translate(-73,62)"
+       style="font-size:18px;text-anchor:middle;fill:#6b6ecf"
+       id="text9813">contextualisation</text>
+    <text
+       transform="translate(-82,88)"
+       style="font-size:18px;text-anchor:middle;fill:#9c9ede"
+       id="text9815">poésie numérique</text>
+    <text
+       transform="translate(123,115)"
+       style="font-size:18px;text-anchor:middle;fill:#637939"
+       id="text9817">visualisation (de données)</text>
+    <text
+       transform="translate(-98,16)"
+       style="font-size:18px;text-anchor:middle;fill:#8ca252"
+       id="text9819">éditeur</text>
+    <text
+       transform="translate(-199,134)"
+       style="font-size:18px;text-anchor:middle;fill:#b5cf6b"
+       id="text9821">interface</text>
+    <text
+       transform="translate(140,36)"
+       style="font-size:18px;text-anchor:middle;fill:#cedb9c"
+       id="text9823">attention</text>
+    <text
+       transform="translate(-78,-14)"
+       style="font-size:18px;text-anchor:middle;fill:#8c6d31"
+       id="text9825">métadonnées</text>
+    <text
+       transform="translate(111,-35)"
+       style="font-size:18px;text-anchor:middle;fill:#bd9e39"
+       id="text9827">curation</text>
+    <text
+       transform="translate(161,146)"
+       style="font-size:18px;text-anchor:middle;fill:#e7ba52"
+       id="text9829">réseau</text>
+    <text
+       transform="translate(-140,-33)"
+       style="font-size:18px;text-anchor:middle;fill:#e7cb94"
+       id="text9831">encre électronique</text>
+    <text
+       transform="translate(188,-65)"
+       style="font-size:18px;text-anchor:middle;fill:#843c39"
+       id="text9833">lecture numérique</text>
+    <text
+       transform="translate(-164,105)"
+       style="font-size:18px;text-anchor:middle;fill:#ad494a"
+       id="text9835">bibliothèque numérique</text>
+    <text
+       transform="translate(-89,122)"
+       style="font-size:18px;text-anchor:middle;fill:#d6616b"
+       id="text9837">navigation exploratoire</text>
+    <text
+       transform="translate(-206,-51)"
+       style="font-size:18px;text-anchor:middle;fill:#e7969c"
+       id="text9839">document numérique</text>
+    <text
+       transform="translate(-117,141)"
+       style="font-size:18px;text-anchor:middle;fill:#7b4173"
+       id="text9841">tablette</text>
+    <text
+       transform="translate(-113,42)"
+       style="font-size:18px;text-anchor:middle;fill:#a55194"
+       id="text9843">fiction interactive</text>
+    <text
+       transform="translate(-3,-95)"
+       style="font-size:18px;text-anchor:middle;fill:#ce6dbd"
+       id="text9845">linéaire / linéarité</text>
+    <text
+       transform="translate(154,-124)"
+       style="font-size:18px;text-anchor:middle;fill:#de9ed6"
+       id="text9847">code (écriture)</text>
+    <text
+       transform="translate(-69,-69)"
+       style="font-size:18px;text-anchor:middle;fill:#393b79"
+       id="text9849">oralité</text>
+    <text
+       transform="translate(105,21)"
+       style="font-size:18px;text-anchor:middle;fill:#5254a3"
+       id="text9851">texte</text>
+    <text
+       transform="translate(-182,-70)"
+       style="font-size:18px;text-anchor:middle;fill:#6b6ecf"
+       id="text9853">ebook</text>
+    <text
+       transform="translate(86,7)"
+       style="font-size:18px;text-anchor:middle;fill:#9c9ede"
+       id="text9855">humanités numériques</text>
+    <text
+       transform="translate(195,-80)"
+       style="font-size:18px;text-anchor:middle;fill:#637939"
+       id="text9857">livre (volumen, liber, codex)</text>
+    <text
+       transform="translate(187,-140)"
+       style="font-size:18px;text-anchor:middle;fill:#8ca252"
+       id="text9859">contenu</text>
+    <text
+       transform="translate(65,-13)"
+       style="font-size:18px;text-anchor:middle;fill:#b5cf6b"
+       id="text9861">propriété intellectuelle</text>
+    <text
+       transform="translate(-81,-1)"
+       style="font-size:18px;text-anchor:middle;fill:#cedb9c"
+       id="text9863">usages</text>
+    <text
+       transform="translate(-180,-1)"
+       style="font-size:18px;text-anchor:middle;fill:#8c6d31"
+       id="text9865">écriture numérique</text>
+    <text
+       transform="translate(-1,23)"
+       style="font-size:18px;text-anchor:middle;fill:#bd9e39"
+       id="text9867">indexation</text>
+    <text
+       transform="translate(186,52)"
+       style="font-size:18px;text-anchor:middle;fill:#e7ba52"
+       id="text9869">arborescence</text>
+    <text
+       transform="translate(89,52)"
+       style="font-size:18px;text-anchor:middle;fill:#e7cb94"
+       id="text9871">matérialité</text>
+    <text
+       transform="translate(88,87)"
+       style="font-size:18px;text-anchor:middle;fill:#843c39"
+       id="text9873">crowdsourcing</text>
+    <text
+       transform="translate(71,-53)"
+       style="font-size:18px;text-anchor:middle;fill:#ad494a"
+       id="text9875">récit hybride</text>
+    <text
+       transform="translate(-30,-111)"
+       style="font-size:18px;text-anchor:middle;fill:#d6616b"
+       id="text9877">émoticône (binette)</text>
+    <text
+       transform="translate(31,140)"
+       style="font-size:18px;text-anchor:middle;fill:#e7969c"
+       id="text9879">lectures industrielles</text>
+    <text
+       transform="translate(6,-133)"
+       style="font-size:18px;text-anchor:middle;fill:#7b4173"
+       id="text9881">base de données (et api)</text>
+    <text
+       transform="translate(229,20)"
+       style="font-size:18px;text-anchor:middle;fill:#a55194"
+       id="text9883">narration augmentée</text>
+    <text
+       transform="translate(-13,-149)"
+       style="font-size:18px;text-anchor:middle;fill:#ce6dbd"
+       id="text9885">dématérialisation</text>
+    <text
+       transform="translate(-159,-18)"
+       style="font-size:18px;text-anchor:middle;fill:#de9ed6"
+       id="text9887">support</text>
+    <text
+       transform="translate(170,68)"
+       style="font-size:18px;text-anchor:middle;fill:#393b79"
+       id="text9889">epub</text>
+    <text
+       transform="translate(-150,14)"
+       style="font-size:18px;text-anchor:middle;fill:#5254a3"
+       id="text9891">lien</text>
+    <text
+       transform="translate(142,-96)"
+       style="font-size:18px;text-anchor:middle;fill:#6b6ecf"
+       id="text9893">citation</text>
+    <text
+       transform="translate(42,159)"
+       style="font-size:18px;text-anchor:middle;fill:#9c9ede"
+       id="text9895">opt-int / opt-out (droits)</text>
+    <text
+       transform="translate(-166,76)"
+       style="font-size:18px;text-anchor:middle;fill:#637939"
+       id="text9897">e-album</text>
+    <text
+       transform="translate(-1,-31)"
+       style="font-size:18px;text-anchor:middle;fill:#8ca252"
+       id="text9899">télélecture</text>
+    <text
+       transform="translate(-202,26)"
+       style="font-size:18px;text-anchor:middle;fill:#b5cf6b"
+       id="text9901">gamification</text>
+    <text
+       transform="translate(-43,177)"
+       style="font-size:18px;text-anchor:middle;fill:#cedb9c"
+       id="text9903">littérature numérique</text>
+    <text
+       transform="translate(-197,-87)"
+       style="font-size:18px;text-anchor:middle;fill:#8c6d31"
+       id="text9905">communauté de lecteur (forum)</text>
+    <text
+       transform="translate(251,-40)"
+       style="font-size:18px;text-anchor:middle;fill:#bd9e39"
+       id="text9907">pratiques informationnelles</text>
+    <text
+       transform="translate(-41,-51)"
+       style="font-size:18px;text-anchor:middle;fill:#e7ba52"
+       id="text9909">livre augmente</text>
+    <text
+       transform="translate(26,-69)"
+       style="font-size:18px;text-anchor:middle;fill:#e7cb94"
+       id="text9911">écrit d'écran</text>
+    <text
+       transform="translate(217,38)"
+       style="font-size:18px;text-anchor:middle;fill:#843c39"
+       id="text9913">immersion</text>
+    <text
+       transform="translate(-165,157)"
+       style="font-size:18px;text-anchor:middle;fill:#ad494a"
+       id="text9915">application (livre applicatif)</text>
+    <text
+       transform="translate(-1,-169)"
+       style="font-size:18px;text-anchor:middle;fill:#d6616b"
+       id="text9917">longue traîne</text>
+    <text
+       transform="translate(202,-10)"
+       style="font-size:18px;text-anchor:middle;fill:#e7969c"
+       id="text9919">copier-coller</text>
+    <text
+       transform="translate(71,34)"
+       style="font-size:18px;text-anchor:middle;fill:#7b4173"
+       id="text9921">rhizome</text>
+    <text
+       transform="translate(-198,58)"
+       style="font-size:18px;text-anchor:middle;fill:#a55194"
+       id="text9923">éditorialisation</text>
+    <text
+       transform="translate(-142,-148)"
+       style="font-size:18px;text-anchor:middle;fill:#ce6dbd"
+       id="text9925">lecteur</text>
+    <text
+       transform="translate(-152,-110)"
+       style="font-size:18px;text-anchor:middle;fill:#de9ed6"
+       id="text9927">auto-édition</text>
+    <text
+       transform="translate(116,178)"
+       style="font-size:18px;text-anchor:middle;fill:#393b79"
+       id="text9929">moteur de recherche</text>
+    <text
+       transform="translate(179,131)"
+       style="font-size:18px;text-anchor:middle;fill:#5254a3"
+       id="text9931">creative commons</text>
+    <text
+       transform="translate(-132,-127)"
+       style="font-size:18px;text-anchor:middle;fill:#6b6ecf"
+       id="text9933">sérendipité</text>
+    <text
+       transform="translate(46,-184)"
+       style="font-size:18px;text-anchor:middle;fill:#9c9ede"
+       id="text9935">enrichissement</text>
+    <text
+       transform="translate(-255,177)"
+       style="font-size:18px;text-anchor:middle;fill:#637939"
+       id="text9937">lectures plurielles (sémantique)</text>
+    <text
+       transform="translate(-154,-166)"
+       style="font-size:18px;text-anchor:middle;fill:#8ca252"
+       id="text9939">carte conceptuelle</text>
+    <text
+       transform="translate(-55,198)"
+       style="font-size:18px;text-anchor:middle;fill:#b5cf6b"
+       id="text9941">open access / open data</text>
+    <text
+       transform="translate(19,63)"
+       style="font-size:18px;text-anchor:middle;fill:#cedb9c"
+       id="text9943">DRM</text>
+    <text
+       transform="translate(216,6)"
+       style="font-size:18px;text-anchor:middle;fill:#8c6d31"
+       id="text9945">TEI</text>
+    <text
+       transform="translate(184,97)"
+       style="font-size:18px;text-anchor:middle;fill:#bd9e39"
+       id="text9947">fragment</text>
+    <text
+       transform="translate(252,69)"
+       style="font-size:18px;text-anchor:middle;fill:#e7ba52"
+       id="text9949">liseuse (reader)</text>
+    <text
+       transform="translate(133,195)"
+       style="font-size:18px;text-anchor:middle;fill:#e7cb94"
+       id="text9951">collaborer</text>
+    <text
+       transform="translate(-211,-127)"
+       style="font-size:18px;text-anchor:middle;fill:#843c39"
+       id="text9953">partager</text>
+    <text
+       transform="translate(53,212)"
+       style="font-size:18px;text-anchor:middle;fill:#ad494a"
+       id="text9955">traduction</text>
+    <text
+       transform="translate(-30,4)"
+       style="font-size:18px;text-anchor:middle;fill:#d6616b"
+       id="text9957">écrire</text>
+    <text
+       transform="translate(-255,-24)"
+       style="font-size:18px;text-anchor:middle;fill:#e7969c"
+       id="text9959">hypertexte</text>
+    <text
+       transform="translate(105,-152)"
+       style="font-size:18px;text-anchor:middle;fill:#7b4173"
+       id="text9961">anthologie</text>
+    <text
+       transform="translate(45,229)"
+       style="font-size:18px;text-anchor:middle;fill:#a55194"
+       id="text9963">livre post-numérique</text>
+    <text
+       transform="translate(-246,80)"
+       style="font-size:18px;text-anchor:middle;fill:#ce6dbd"
+       id="text9965">contribution</text>
+    <text
+       transform="translate(-295,42)"
+       style="font-size:18px;text-anchor:middle;fill:#de9ed6"
+       id="text9967">remediation</text>
+    <text
+       transform="translate(140,-168)"
+       style="font-size:18px;text-anchor:middle;fill:#393b79"
+       id="text9969">web sémantique</text>
+    <text
+       transform="translate(116,-198)"
+       style="font-size:18px;text-anchor:middle;fill:#5254a3"
+       id="text9971">édition numérique</text>
+    <text
+       transform="translate(-11,246)"
+       style="font-size:18px;text-anchor:middle;fill:#6b6ecf"
+       id="text9973">Internet Archive</text>
+    <text
+       transform="translate(199,-97)"
+       style="font-size:18px;text-anchor:middle;fill:#9c9ede"
+       id="text9975">auteur</text>
+    <text
+       transform="translate(204,159)"
+       style="font-size:18px;text-anchor:middle;fill:#637939"
+       id="text9977">mémoire</text>
+    <text
+       transform="translate(-12,-202)"
+       style="font-size:18px;text-anchor:middle;fill:#8ca252"
+       id="text9979">copyright</text>
+    <text
+       transform="translate(-29,105)"
+       style="font-size:18px;text-anchor:middle;fill:#b5cf6b"
+       id="text9981">séquentiel</text>
+    <text
+       transform="translate(82,-220)"
+       style="font-size:18px;text-anchor:middle;fill:#cedb9c"
+       id="text9983">encyclopédie</text>
+    <text
+       transform="translate(290,87)"
+       style="font-size:18px;text-anchor:middle;fill:#8c6d31"
+       id="text9985">lecture sur écran</text>
+    <text
+       transform="translate(63,-114)"
+       style="font-size:18px;text-anchor:middle;fill:#bd9e39"
+       id="text9987">blog</text>
+    <text
+       transform="translate(262,-109)"
+       style="font-size:18px;text-anchor:middle;fill:#e7ba52"
+       id="text9989">numérisation</text>
+    <text
+       transform="translate(-112,221)"
+       style="font-size:18px;text-anchor:middle;fill:#e7cb94"
+       id="text9991">documentarisation</text>
+    <text
+       transform="translate(-209,-150)"
+       style="font-size:18px;text-anchor:middle;fill:#843c39"
+       id="text9993">tabularité</text>
+    <text
+       transform="translate(114,-111)"
+       style="font-size:18px;text-anchor:middle;fill:#ad494a"
+       id="text9995">format</text>
+    <text
+       transform="translate(-100,-150)"
+       style="font-size:18px;text-anchor:middle;fill:#d6616b"
+       id="text9997">lire</text>
+    <text
+       transform="translate(285,50)"
+       style="font-size:18px;text-anchor:middle;fill:#e7969c"
+       id="text9999">cognition</text>
+    <text
+       transform="translate(238,-128)"
+       style="font-size:18px;text-anchor:middle;fill:#7b4173"
+       id="text10001">page</text>
+    <text
+       transform="translate(-76,-186)"
+       style="font-size:18px;text-anchor:middle;fill:#a55194"
+       id="text10003">textualité</text>
+    <text
+       transform="translate(193,214)"
+       style="font-size:18px;text-anchor:middle;fill:#ce6dbd"
+       id="text10005">écosystème d'information</text>
+    <text
+       transform="translate(273,113)"
+       style="font-size:18px;text-anchor:middle;fill:#de9ed6"
+       id="text10007">hyperfiction</text>
+  </g>
+</svg>
