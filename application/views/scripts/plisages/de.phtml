@@ -5,12 +5,13 @@
 		
 		<link rel="stylesheet" href="../css/font-awesome.css">
     	<script type="text/javascript" src="../js/d3.v4.js"></script>
-	    <script type="text/javascript" src="../js/queue.v1.min.js" ></script>
+	    <script src="../js/canvg.js"></script>
+	    <script src="../js/svgenie.js"></script>
 		
 		<style>
 		
 			.mainBody {
-			  margin: auto;
+			  margin: 6px;
 			  position: relative;
 			}			
 			.foreignBody {
@@ -25,20 +26,6 @@
 			.btn:hover {
 			    background-color:lightgray;
 			}			
-			#palette {
-				width: 200px;							
-				height: 200mm;
-			    background-color:lightgray;
-				float:left;
-				margin: 6px;
-			    padding: 6px;
-			    overflow: scroll;
-			    display:none;
-			}			
-			#viz {
-				float:left;
-				margin: 6px;
-			}
 			i {
 			  	stroke: none;
 			  	cursor: pointer;
@@ -46,6 +33,8 @@
   			.active div {
 			    background-color:green;
 			}	
+
+
 
 		</style>	
 	</head>
@@ -56,31 +45,21 @@
 
 		var ficIHM = "../svg/de.svg";
 		var ficCSV = "../data/listeFontAwesome.csv";
-		var arrBtn = [{id:'btnListe',fct:showListe},{id:'btnRandom',fct:setRandomIcone}];
+		var arrBtn = [{id:'btnListe',fct:showListe},{id:'btnRandom',fct:setRandomIcone},{id:'btnTrash',fct:removeIcone}];
 		var onDrag = false;
-		var hoveredStyle = { "background-color": "lightgray" };
-		var clickedStyle = { "background-color": "gray" };
-		var defaultStyle = {
-				  padding: "0px 5px 0px 5px",
-				  margin: "5px",
-				  "border-radius": "16px",
-				  "background-color": "white",
-				  "stroke": "none",
-				  "cursor": "pointer"
-				};
-		var tPallette = {w:300,h:300}, tIcone = {w:60,h:60};
+		var tIHM = {w:1100,h:750}, tPalette = {w:800,h:750}, tIcone = {w:60,h:60}, tFont = 1;
+		var transform = d3.zoomIdentity;		
+		var arrFaces=[], arrIcones, rdm, svgGlobal,svgDrag, gPalette, iconeTarget, iconeDrag;
 		
 		//chargement des icones
-		var arrFaces=[], arrIcones, rdm, svgGlobal,svgDrag, iconeTarget, iconeDrag;
-		
 		d3.csv(ficCSV, function(error, data) {
 			if (error) throw error;		
 		  	arrIcones = data;
 		  	var xTot=0, yTot=0;
 		  	arrIcones.forEach(function(ico, i){
-			  	if(xTot+tIcone.w > tPallette.w){xTot = 0;yTot += tIcone.h/2;}			  	
+			  	if(xTot+tIcone.w > tPalette.w){xTot = 0;yTot += tIcone.h/2;}			  	
 			  	ico.bb = {width:tIcone.w, height:tIcone.h, x:xTot, y:yTot};
-			  	xTot += tIcone.w;
+			  	xTot += tIcone.w/2;
 			  	ico.id = 'ico_'+i
 			  	ico.type='palette';
 		  	});
@@ -88,28 +67,37 @@
 
 			//création du svg global
 			svgGlobal = d3.select("body")
+	            //.style('width', (tIHM.w+tPalette.w)+'px')
+	            //.style('height', (tIHM.h+tPalette.h)+'px')		    
 				.append("svg")
 	            .attr('width', '100%')
 	            .attr('height', '100%');			    
 			//ajoute le group de la palette
-			svgGlobal.append("g")
+			gPalette = svgGlobal.append("g")
 		  		.attr('id','gPalette')
-	            .attr('width', tPallette.w+'px')
-	            .attr('height', tPallette.h+'px');			    
-		  		
+			    .style("visibility","hidden")
+			    .attr("transform", "translate(" + (tIHM.w+20) + "," + 0 + ") scale(0.8)")				    		    				    				    		    
+	            .attr('width', tPalette.w+'px')
+	            .attr('height', tPalette.h+'px');			    
+			gPalette.call(d3.zoom()
+				    .scaleExtent([1 / 2, 8])
+				    .on("zoom", zoomed));
+			gPalette.call(d3.drag()
+			        .on("drag", draggedPalette));
+
 		  	//affiche l'IHM
 			d3.xml(ficIHM).mimeType("image/svg+xml").get(function(error, xml) {
 			  	if (error) throw error;
 			  	svgGlobal.append("g")
+				    .attr("transform", "translate(" + 0 + "," + 0 + ")")			    				    	
 			  		.attr('id','gPliage')
-					.attr("transform", "translate(" + tPallette.w + "," + 0 + ")")
 			  		.node().appendChild(xml.documentElement);
     	  		//d3.select("#viz").node().appendChild(xml.documentElement);	    	    	  	
     	  		ajoutEvent();
 			});
 
 			//affiche toutes les icones dans la palette
-		    var palette = d3.select("#gPalette").selectAll("svg")
+		    var palettes = d3.select("#gPalette").selectAll("svg")
 		    	.data(arrIcones)
 			    .enter().append("svg")
 		    	.attr('id', function(d){
@@ -120,12 +108,12 @@
 			    	})			    	
 		    	.attr('x', function(d,i){
 			    	return d.bb.x;
-			    	})			    	
+			    	})
 		    	.call(d3.drag()
 		            .on("start", dragstarted)
 		            .on("drag", dragged)
 		            .on("end", dragended));
-			icones = palette.append('foreignObject')
+			icones = palettes.append('foreignObject')
 	            .attr('width', function(d){return d.bb.width+'px';})
 	            .attr('height', function(d){return d.bb.height+'px';})
 	            .append("xhtml:body")
@@ -147,7 +135,7 @@
 						  });			    
 			icones.append("i")
 			    .attr("class", function(d){ 
-			      return "icon fa fa-2x " + d.icone;
+			      return "icon fa fa-"+tFont+"x " + d.icone;
 			    })
 			    .style("background-color", "white")
 			    .style('padding','4px')
@@ -166,11 +154,18 @@
 			    })
 		});
 
-		//fonction pour le drag & drop
+		//fonctionn de zoom et drag de la palette
+		function zoomed() {
+			  gPalette.attr("transform", d3.event.transform);
+			}
+		function draggedPalette(){
+			d3.select(this).attr("x", d3.event.x).attr("y", d3.event.y);
+		}
+		
+		//fonction pour le drag & drop des icones
 		function dragstarted(d) {
-		  //d3.select(this).raise().classed("active", true);
-		  console.log(d3.event.x+','+d3.event.y+' : '+d.bb.x+','+d.bb.y);
-		  console.log(d3.mouse(svgGlobal.node()));
+		  //console.log(d3.event.x+','+d3.event.y+' : '+d.bb.x+','+d.bb.y);
+		  //console.log(d3.mouse(svgGlobal.node()));
 		  var posi = d3.mouse(svgGlobal.node());
 		  d.bb.x = posi[0];
 		  d.bb.y = posi[1];
@@ -223,11 +218,6 @@
 		}
 		
 		function setIcones(){
-			//var idEleEvt = evt.currentTarget.id;
-			//var bb = document.getElementById(idEleEvt).getBBox();
-			//var HTML = '<i id="i_'+idEleEvt+'" />';
-			//var divStyle = "line-height:"+bb.height+"px;height:"+bb.height+"px;width:"+bb.width+"px;text-align: center;";
-			//divStyle = "display: table-cell;vertical-align: middle;"+divStyle;
 		    var svg = d3.select("#layer1").selectAll("svg")
 		    	.data(arrFaces)
 		    	.enter()
@@ -273,26 +263,31 @@
 			            	return d.bb.width+'px';
 		            	})
 		            	.style("text-align","center")
+						.on("click", function(d){
+					    	if(!d.select){
+						    	d3.select(this).style("background-color","red");
+						    	d.select = true;
+					    	}else{
+						    	d3.select(this).style("background-color","transparent");
+						    	d.select = false;
+					    	}
+						  	})		            	
 						.on("mouseover", function(d){
 					    	if(onDrag){
-						    	console.log('OVER -> drag:'+iconeDrag+',target:'+iconeTarget+',d.icone:'+d.icone);
+						    	//console.log('OVER -> drag:'+iconeDrag+',target:'+iconeTarget+',d.icone:'+d.icone);
 					    		iconeTarget = d.icone;
 					    		d.icone=iconeDrag;
 						    	d3.select(this).style("background-color","blue");
 						    	d3.select("#i_"+d.id).attr('class',"icon fa fa-4x "+iconeDrag);						    	 
-					    	}else d3.select(this).style("background-color","lightgray");
+					    	}else if(!d.select) d3.select(this).style("background-color","lightgray");
 						  	})
-						  	
-						.on("dragover", function(){
-					    	d3.select(this).style("background-color","red");
-						  })
 						.on("mouseout", function(d){
 							if(onDrag){
 								d3.select("#i_"+d.id).attr('class',"icon fa fa-4x "+iconeTarget);
 					    		d.icone=iconeTarget;
 							} 
-					    	console.log('OUT -> drag:'+iconeDrag+',target:'+iconeTarget+',d.icone:'+d.icone);
-					    	d3.select(this).style("background-color","transparent");
+					    	//console.log('OUT -> drag:'+iconeDrag+',target:'+iconeTarget+',d.icone:'+d.icone);
+					    	if(!d.select)d3.select(this).style("background-color","transparent");
 						  });
 			//.html('<div style="'+divStyle+'" >'+HTML+'</div>');	
 		    //d3.select('#i_'+idEleEvt)
@@ -328,7 +323,7 @@
 
 
 		function setSvgDrag(d){
-			console.log(d.bb.x+','+d.bb.y);
+			//console.log(d.bb.x+','+d.bb.y);
 		    svgDrag = svgGlobal.append("svg")
 		    	.attr('id', 'svgDrag')
 		    	.attr('x', d.bb.x-(d.bb.width/2))
@@ -366,21 +361,30 @@
 		var hideListe = false;
 		function showListe(evt){
 			//console.log(evt);
-			var p = d3.select("#palette");
+			var p = d3.select("#gPalette");
 			if(hideListe){
-				p.style("display","none");
+				p.style("visibility","hidden");
 				hideListe = false;
 			}else{
-				p.style("display","block");
+				p.style("visibility","visible");
 				hideListe = true;
 			}
+		}
+
+		function removeIcone(){
+			d3.select("#layer1").selectAll("i")
+		    	.attr("class",function(d){
+		    		return d.select ? "" : "icon fa fa-4x "+d.icone;
+		    	});
+			d3.select("#layer1").selectAll("div")
+				.style("background-color","transparent");
+				
 		}
 		
 		function iconClicked(icon){
 		  console.log(icon + " clicked");
 		}
-
-
+		
 		</script>		
 	</body>
 </html>
