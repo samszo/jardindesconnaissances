@@ -4,24 +4,62 @@
 		<title>Générateur de dé</title>
 		
 		<link rel="stylesheet" href="../css/font-awesome.css">
-    	<script type="text/javascript" src="../js/d3.js"></script>
+    	<script type="text/javascript" src="../js/d3.v4.js"></script>
 	    <script type="text/javascript" src="../js/queue.v1.min.js" ></script>
+		
+		<style>
+		
+			.mainBody {
+			  margin: auto;
+			  position: relative;
+			}			
+			.foreignBody {
+				background-color:black;
+				margin:0px;
+				width: 0px;				
+			}
+			.btn {
+				cursor:pointer;
+			    background-color:white;
+			}
+			.btn:hover {
+			    background-color:lightgray;
+			}			
+			#palette {
+				width: 200px;							
+				height: 200mm;
+			    background-color:lightgray;
+				float:left;
+				margin: 6px;
+			    padding: 6px;
+			    overflow: scroll;
+			    display:none;
+			}			
+			#viz {
+				float:left;
+				margin: 6px;
+			}
+			i {
+			  	stroke: none;
+			  	cursor: pointer;
+  			}		
+  			.active div {
+			    background-color:green;
+			}	
+
+		</style>	
+	</head>
+	<body class="mainBody" >
+		<div id="viz" ></div>		
+		
 		<script type="text/javascript">
 
 		var ficIHM = "../svg/de.svg";
-		var chaineDate = d3.time.format("%x");
-		var chaineDateHeure = d3.time.format("Le %x à %X");
-		
-		//tableau des graphiques intéractifs
-		var arrIds = [
-			{"idEle":"de1","fonction":setIcone,"role":"ecrit"}
-			,{"idEle":"de2","fonction":setIcone,"role":"ecrit"}
-			,{"idEle":"de3","fonction":setIcone,"role":"ecrit"}
-			,{"idEle":"de4","fonction":setIcone,"role":"ecrit"}
-			,{"idEle":"de5","fonction":setIcone,"role":"ecrit"}
-			,{"idEle":"de6","fonction":setIcone,"role":"ecrit"}
-		];
-
+		var ficCSV = "../data/listeFontAwesome.csv";
+		var arrBtn = [{id:'btnListe',fct:showListe},{id:'btnRandom',fct:setRandomIcone}];
+		var onDrag = false;
+		var hoveredStyle = { "background-color": "lightgray" };
+		var clickedStyle = { "background-color": "gray" };
 		var defaultStyle = {
 				  padding: "0px 5px 0px 5px",
 				  margin: "5px",
@@ -30,151 +68,314 @@
 				  "stroke": "none",
 				  "cursor": "pointer"
 				};
+		var tPallette = {w:300,h:300}, tIcone = {w:60,h:60};
+		
+		//chargement des icones
+		var arrFaces=[], arrIcones, rdm, svgGlobal,svgDrag, iconeTarget, iconeDrag;
+		
+		d3.csv(ficCSV, function(error, data) {
+			if (error) throw error;		
+		  	arrIcones = data;
+		  	var xTot=0, yTot=0;
+		  	arrIcones.forEach(function(ico, i){
+			  	if(xTot+tIcone.w > tPallette.w){xTot = 0;yTot += tIcone.h/2;}			  	
+			  	ico.bb = {width:tIcone.w, height:tIcone.h, x:xTot, y:yTot};
+			  	xTot += tIcone.w;
+			  	ico.id = 'ico_'+i
+			  	ico.type='palette';
+		  	});
+			rdm = d3.randomUniform(0, arrIcones.length-1);
 
-		var hoveredStyle = { "background-color": "lightgray" };
-		var clickedStyle = { "background-color": "gray" };
-	 			
-		function load(){
-		    //	chargeData(ficCSV);
-		    chargeSVG(ficIHM, chargeIHM);
+			//création du svg global
+			svgGlobal = d3.select("body")
+				.append("svg")
+	            .attr('width', '100%')
+	            .attr('height', '100%');			    
+			//ajoute le group de la palette
+			svgGlobal.append("g")
+		  		.attr('id','gPalette')
+	            .attr('width', tPallette.w+'px')
+	            .attr('height', tPallette.h+'px');			    
+		  		
+		  	//affiche l'IHM
+			d3.xml(ficIHM).mimeType("image/svg+xml").get(function(error, xml) {
+			  	if (error) throw error;
+			  	svgGlobal.append("g")
+			  		.attr('id','gPliage')
+					.attr("transform", "translate(" + tPallette.w + "," + 0 + ")")
+			  		.node().appendChild(xml.documentElement);
+    	  		//d3.select("#viz").node().appendChild(xml.documentElement);	    	    	  	
+    	  		ajoutEvent();
+			});
+
+			//affiche toutes les icones dans la palette
+		    var palette = d3.select("#gPalette").selectAll("svg")
+		    	.data(arrIcones)
+			    .enter().append("svg")
+		    	.attr('id', function(d){
+			    	return d.id;
+			    	})
+		    	.attr('y', function(d){
+			    	return d.bb.y;
+			    	})			    	
+		    	.attr('x', function(d,i){
+			    	return d.bb.x;
+			    	})			    	
+		    	.call(d3.drag()
+		            .on("start", dragstarted)
+		            .on("drag", dragged)
+		            .on("end", dragended));
+			icones = palette.append('foreignObject')
+	            .attr('width', function(d){return d.bb.width+'px';})
+	            .attr('height', function(d){return d.bb.height+'px';})
+	            .append("xhtml:body")
+	            	.attr("xmlns","http://www.w3.org/1999/xhtml")
+		            .attr('width', function(d){return d.bb.width+'px';})
+		            .attr('height', function(d){return d.bb.height+'px';})
+		            .attr('class', "foreignBody")
+		            .append('div')
+		            	.style("line-height",function(d){return d.bb.height+'px';})
+			            .attr('width', function(d){return d.bb.width+'px';})
+			            .attr('height', function(d){return d.bb.height+'px';})
+		            	.style("text-align","center")
+						.on("mouseover", function(){
+					    	if(onDrag) d3.select(this).style("background-color","red");
+					    	else d3.select(this).style("background-color","orange");
+						  	})
+						.on("mouseout", function(){
+					    	d3.select(this).style("background-color","transparent");
+						  });			    
+			icones.append("i")
+			    .attr("class", function(d){ 
+			      return "icon fa fa-2x " + d.icone;
+			    })
+			    .style("background-color", "white")
+			    .style('padding','4px')
+			    .style('margin','4px')
+			    .on("mouseover", function(){
+			      //d3.select(this).style(hoveredStyle);
+			    })
+			    .on("mouseout", function(){
+			      //d3.select(this).style(defaultStyle);
+			    })
+			    .on("mousedown", function(d){
+			      //d3.select(this).style(clickedStyle);
+			    })
+			    .on("mouseup", function(){
+			      //d3.select(this).style(hoveredStyle);
+			    })
+		});
+
+		//fonction pour le drag & drop
+		function dragstarted(d) {
+		  //d3.select(this).raise().classed("active", true);
+		  console.log(d3.event.x+','+d3.event.y+' : '+d.bb.x+','+d.bb.y);
+		  console.log(d3.mouse(svgGlobal.node()));
+		  var posi = d3.mouse(svgGlobal.node());
+		  d.bb.x = posi[0];
+		  d.bb.y = posi[1];
+		  iconeDrag = d.icone;
+		  if(d.type=='face')iconeTarget=d.icone;
+		  setSvgDrag(d);
+		  onDrag = true;
+		}
+		
+		function dragged(d) {
+		  //console.log(d+'='+d3.event.x+','+d3.event.y+":"+d.bb.width+','+d.bb.height);
+		  //d3.select(this).attr("x", d3.event.x-(d.bb.width/2)).attr("y", d3.event.y-(d.bb.height/2));
+		  //svgDrag.attr("x", d3.event.x-d.bb.width-10).attr("y", d3.event.y-d.bb.height-10);
+		  //svgDrag.attr("x", d3.event.x-(tIcone.w/2)).attr("y", d3.event.y-tIcone.h-10);
+		  var posi = d3.mouse(svgGlobal.node());
+		  svgDrag.attr("x", posi[0]-(d.bb.width/2)).attr("y", posi[1]-d.bb.height-10);
+		  
+		  
+		}
+		
+		function dragended(d, i) {
+		  //d3.select(this).classed("active", false);
+		  svgDrag.remove();
+		  onDrag = false;
 		}
 
-	    function chargeSVG(url, fct){
-		 	//charge un SVG
-		    //merci à http://bl.ocks.org/KoGor/8162640
-		    	queue()
-		    		.defer(d3.xml, url, "image/svg+xml")
-		    		.await(fct);
-	    }		
-		
-	    function chargeIHM(error, xml){
-	    		//Adding our svg file to HTML document
-			var importedNode = document.importNode(xml.documentElement, true);
-    	  		d3.select("#viz").node().appendChild(importedNode);	    	    	  	
-    	  		ajoutEvent();
- 	    }		
 	    
 		// fonction pour ajouter un écouteur à UN ÉLÉMENT
 		//merci à https://developer.mozilla.org/fr/docs/DOM/element.addEventListener
 		function ajoutEvent() { 
-		
-			for (var i = 0; i < arrIds.length; i++) {
-				//length = taille du tableau
-			     var el = document.getElementById(arrIds[i].idEle); 
-			     el.addEventListener("click", arrIds[i].fonction,false); 			    	
-			} 		
+			//ajoute les évenements sur les faces
+			for (var i = 1; i <= 4; i++) {
+				for (var j = 1; j <= 6; j++) {
+					var id = 'de'+i+'_'+j;
+					var bb = document.getElementById(id).getBBox();										
+					arrFaces.push({id:id, select:false, icone:'', bb:bb, type:'face'});
+					//console.log('id='+id);					
+			    	//var el = document.getElementById(id); 
+			    	//el.addEventListener("click", setIcone,false); 			    	
+				}
+			} 	
+			//initialise les icones
+			setIcones();
+			//ajoute les évenements sur les boutons
+			arrBtn.forEach(function(btn){
+			     var el = document.getElementById(btn.id); 
+			     el.addEventListener("click", btn.fct,false);
+			     el.setAttribute("class","btn"); 			    					
+			});	
 		}
 		
-		function setIcone(evt){
-			var idEleEvt = evt.currentTarget.id;
-			var bb = document.getElementById(idEleEvt).getBBox();
-			var HTML = '<i id="i_'+idEleEvt+'" />';
-			var divStyle = "line-height:"+bb.height+"px;height:"+bb.height+"px;width:"+bb.width+"px;";
+		function setIcones(){
+			//var idEleEvt = evt.currentTarget.id;
+			//var bb = document.getElementById(idEleEvt).getBBox();
+			//var HTML = '<i id="i_'+idEleEvt+'" />';
+			//var divStyle = "line-height:"+bb.height+"px;height:"+bb.height+"px;width:"+bb.width+"px;text-align: center;";
 			//divStyle = "display: table-cell;vertical-align: middle;"+divStyle;
-		    var svg = d3.select("#layer1").append("svg")
-		    	.attr('x', bb.x)
-	            .attr('y', bb.y);
-			svg.append('foreignObject')
-	            .attr('width', bb.width)
-	            .attr('height', bb.height)
+		    var svg = d3.select("#layer1").selectAll("svg")
+		    	.data(arrFaces)
+		    	.enter()
+		    	.append("svg")
+		    	.attr('id', function(d){
+			    	return "svg_"+d.id;
+			    	})
+		    	.attr('x', function(d){
+			    	return d.bb.x;
+			    	})
+	            .attr('y',  function(d){
+			    	return d.bb.y;
+		    	})
+		    	.call(d3.drag()
+		            .on("start", dragstarted)
+		            .on("drag", dragged)
+		            .on("end", dragended));
+		    
+			var faces = svg.append('foreignObject')
+	            .attr('width', function(d){
+			    	return d.bb.width+'px';
+		    		})
+	            .attr('height', function(d){
+			    	return d.bb.height+'px';
+	    			})
 	            .append("xhtml:body")
 	            	.attr("xmlns","http://www.w3.org/1999/xhtml")
-		            .attr('width', bb.width)
-		            .attr('height', bb.height)
+		            .attr('width', function(d){
+		            	return d.bb.width+'px';
+	            	})
+		            .attr('height', function(d){
+		            	return d.bb.height+'px';
+	            	})
 		            .attr('class', "foreignBody")
-					.html('<div style="'+divStyle+'" >'+HTML+'</div>');	
-			
-		    d3.select('#i_'+idEleEvt)
-			  .attr("class", "icon fa fa-5x fa-question")
-			  .style("font-size","9em")		  
-			  .style(defaultStyle)
-			  .on("mouseover", function(){
-			    d3.select(this).style(hoveredStyle);
-			  })
-			  .on("click", function(){
-			    d3.select(this)
-			    	.attr("class", "icon fa fa-5x fa-youtube-square")
-			    	.style("font-size","9em");
-			  })
-			  .on("mouseout", function(){
-			    d3.select(this).style(defaultStyle);
-			  })
-			  .on("mousedown", function(d){
-			    d3.select(this).style(clickedStyle);
-			    iconClicked(d);
-			  })
-			  .on("mouseup", function(){
-			    d3.select(this).style(hoveredStyle);
-			  });
-			
+		            .append('div')
+		            	.style("line-height",function(d){
+			            	return d.bb.height+'px';
+		            	})
+		            	.style("height",function(d){
+			            	return d.bb.height+'px';
+		            	})
+		            	.style("width",function(d){
+			            	return d.bb.width+'px';
+		            	})
+		            	.style("text-align","center")
+						.on("mouseover", function(d){
+					    	if(onDrag){
+						    	console.log('OVER -> drag:'+iconeDrag+',target:'+iconeTarget+',d.icone:'+d.icone);
+					    		iconeTarget = d.icone;
+					    		d.icone=iconeDrag;
+						    	d3.select(this).style("background-color","blue");
+						    	d3.select("#i_"+d.id).attr('class',"icon fa fa-4x "+iconeDrag);						    	 
+					    	}else d3.select(this).style("background-color","lightgray");
+						  	})
+						  	
+						.on("dragover", function(){
+					    	d3.select(this).style("background-color","red");
+						  })
+						.on("mouseout", function(d){
+							if(onDrag){
+								d3.select("#i_"+d.id).attr('class',"icon fa fa-4x "+iconeTarget);
+					    		d.icone=iconeTarget;
+							} 
+					    	console.log('OUT -> drag:'+iconeDrag+',target:'+iconeTarget+',d.icone:'+d.icone);
+					    	d3.select(this).style("background-color","transparent");
+						  });
+			//.html('<div style="'+divStyle+'" >'+HTML+'</div>');	
+		    //d3.select('#i_'+idEleEvt)
+			faces.append("i")
+				.attr('id',function(d){
+						return "i_"+d.id;
+					})
+				.attr("class",function(d){
+						d.icone = getRandomIcone();
+					 	return "icon fa fa-4x "+d.icone;
+					})
+			  	//.style("padding","0px 5px 0px 5px")
+		    	//.style("margin", "5px")
+		    	//.style("border-radius", "16px")
+		    	//.style("stroke", "none")
+		    	//.style("cursor", "pointer")
+		    	//.style("font-size", "7em")
+		    	.style("line-height", "inherit")
+		    	.on("mouseover", function(){
+			    	//d3.select(this).style(hoveredStyle);
+				  	})
+				  .on("mouseout", function(){
+				    //d3.select(this).style(defaultStyle);
+				  })
+				  .on("mousedown", function(d){
+				    //d3.select(this).style(clickedStyle);
+				    //iconClicked(d);
+				  })
+				  .on("mouseup", function(){
+				    //d3.select(this).style(hoveredStyle);
+				  });
 	    }
 
 
+		function setSvgDrag(d){
+			console.log(d.bb.x+','+d.bb.y);
+		    svgDrag = svgGlobal.append("svg")
+		    	.attr('id', 'svgDrag')
+		    	.attr('x', d.bb.x-(d.bb.width/2))
+	            .attr('y',  d.bb.y-d.bb.height-10)
+			var faces = svgDrag.append('foreignObject')
+	            .attr('width', d.bb.width+'px')
+	            .attr('height',d.bb.height+'px')
+	            .append("xhtml:body")
+	            	.attr("xmlns","http://www.w3.org/1999/xhtml")
+		            .attr('width', d.bb.width+'px')
+		            .attr('height', d.bb.height+'px')
+		            .attr('class', "foreignBody")
+		            .append('div')
+		            	.style("line-height",d.bb.height+'px')
+		            	.style("height",d.bb.height+'px')
+		            	.style("width",d.bb.width+'px')
+		            	.style("text-align","center");
+			faces.append("i")
+				.attr("class","icon fa fa-4x "+d.icone)
+		    	.style("line-height", "inherit");
+	    }		
 
-		
-		</script>
-		
-		<style>
-		
-			.mainBody {
-			  background: white;
-			  font: 10px sans-serif;
-			  margin: auto;
-			  position: relative;
-			  width: 1024px;
-			}
-			
-			text {
-			  text-anchor: middle;
-			}
-			
-			#credit {
-			  position: absolute;
-			  right: 4px;
-			  bottom: 4px;
-			  color: #ddd;
-			}
-			
-			#credit a {
-			  color: #fff;
-			  font-weight: bold;
-			}
-		    @font-face {
-		        font-family: Origami;
-		        src: url('fonts/origami/ORIGAMI_.TTF');
-		    }
-		
-			#promptCompat{ 
-					display: none; 
-			} 
-			#promptCompat.no_dialog{ 
-				box-shadow: 0 0 5px 2px red; 
-				padding: 10px; 
-				display: block; 
-				text-align: center; 
-				font-weight: bold; 
-			} 
-			.boutons{ 
-				padding: 10px; 
-			} 
-			.foreignBody {
-				background-color:black;
-				margin:3px;
-				width: 0px;
-				
-			}
-			
-		</style>	
-	</head>
-	<body class="mainBody" >
-		<div id="viz" ></div>		
-		
-		<script type="text/javascript">
+		function getRandomIcone(){
+			return arrIcones[Math.round(rdm())].icone;
+		}
 
-		load();
-		
-		var icons = ["twitter-square", "facebook-square", "linkedin-square", "youtube-square", "github-square", "google-plus-square"];
+		function setRandomIcone(){
+			d3.select("#layer1").selectAll('i')
+		    	.attr("class",function(d){
+			    	return "icon fa fa-4x "+getRandomIcone();
+		    	});
+			
+		}
 
+		var hideListe = false;
+		function showListe(evt){
+			//console.log(evt);
+			var p = d3.select("#palette");
+			if(hideListe){
+				p.style("display","none");
+				hideListe = false;
+			}else{
+				p.style("display","block");
+				hideListe = true;
+			}
+		}
+		
 		function iconClicked(icon){
 		  console.log(icon + " clicked");
 		}
