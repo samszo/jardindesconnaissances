@@ -1,7 +1,7 @@
 SELECT 
     COUNT(DISTINCT r.rapport_id) nbTag,
-    COUNT(DISTINCT r.src_id) nbDoc,
-    COUNT(DISTINCT rl.dst_id) nbTagL,
+--    COUNT(DISTINCT r.src_id) nbDoc,
+    COUNT(DISTINCT rl.dst_id) nbDoc,
     t.tag_id,
     t.code tag,
     a.code acti
@@ -19,7 +19,7 @@ FROM
         AND rl.src_obj = 'rapport'
         INNER JOIN
     flux_tag tl ON tl.tag_id = rl.dst_id
--- WHERE
---    t.tag_id = 27
+ WHERE
+    t.tag_id = 27 -- ecosystem info
 GROUP BY t.tag_id
 ORDER BY nbTag DESC

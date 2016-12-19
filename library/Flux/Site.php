@@ -51,6 +51,7 @@ class Flux_Site{
 	var $idMonade;
 	var $rs;
 	var $rsVerifGroup = array();
+	var $bconnect = false;
 	
     
     function __construct($idBase=false, $bTrace=false){    	
@@ -76,6 +77,15 @@ class Flux_Site{
                                      'File',
                                      $frontendOptions,
                                      $backendOptions); 
+        
+        //vérifie la connexion extérieur
+        try {        
+	        $g = fopen("http:\\www.google.com", "r") ? true : false;
+	        $this->bConnect = true;
+        }catch (Zend_Exception $e) {
+        	$this->bConnect = false;
+        }
+        
     
     }
 

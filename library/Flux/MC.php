@@ -11,7 +11,9 @@
  */
 class Flux_MC extends Flux_Site{
 	
-	var $kwe = array("autokeyword","zemanta", "alchemy", "opencalais", "yahoo", "textalytics","aylien");
+	//var $kwe = array("autokeyword","zemanta", "alchemy", "opencalais", "yahoo", "textalytics","aylien");
+	var $kwe = array("autokeyword");
+	var $idRap;
 	
 	/**
      * Constructeur de la classe
@@ -28,8 +30,8 @@ class Flux_MC extends Flux_Site{
 		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);	    	
 		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
 		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
-	    	
-    }
+
+	}
 
     /**
      * Fonction pour initialiser les tables de la base de données
@@ -399,7 +401,7 @@ class Flux_MC extends Flux_Site{
 		
 	}
 
-/**
+	/**
      * Sauvegarde d'un tag
      *
      * @param string/array 	$tag
@@ -410,6 +412,8 @@ class Flux_MC extends Flux_Site{
      */
 	function save($tag, $idRap, $poids){
 
+		//$this->trace(__METHOD__." DEBUT $tag, $idRap, $poids");
+		
 		//initialise les gestionnaires de base de données
 		$this->initDbTables();
 		//récupère l'action
@@ -421,7 +425,8 @@ class Flux_MC extends Flux_Site{
 		else
 			$idT = $this->dbT->ajouter(array("code"=>$tag));
 
-		//enregistre le rapport
+		//$this->trace(__METHOD__." enregistre le rapport");
+				
 		$idRapTag = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 			,"src_id"=>$idRap,"src_obj"=>"rapport"
 			,"pre_id"=>$idAct,"pre_obj"=>"acti"
@@ -429,9 +434,35 @@ class Flux_MC extends Flux_Site{
 			,"valeur"=>$poids
 			));					
 			
-		return $idRapTag;
+		//$this->trace(__METHOD__." FIN");
+		return array("idTag"=>$idT,"idRap"=>$idRapTag);
 	}
 	
+	/**
+	 * Sauvegarde d'un rapport de tag
+	 *
+	 * @param string/array 	$tagSrc
+	 * @param string/array 	$tagDst
+	 * @param string/array 	$tagPre
+     * @param integer 		$poids = poids de la relation
+	 *
+	 * @return integer
+	 */
+	function saveRapport($tagSrc, $tagDst, $tagPre, $poids=1){
+	
+		//initialise les gestionnaires de base de données
+		$this->initDbTables();
+		
+		//enregistre le rapport
+		$idRapTag = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+				,"src_id"=>$tagSrc,"src_obj"=>"tag"
+				,"pre_id"=>$tagPre,"pre_obj"=>"tag"
+				,"dst_id"=>$tagDst,"dst_obj"=>"tag"
+				,"valeur"=>$poids
+		));
+					
+		return $idRapTag;
+	}
     /**
      * enregistre les mots clefs d'une chaine
      *
@@ -444,24 +475,27 @@ class Flux_MC extends Flux_Site{
      */
 	function saveForChaine($idDoc, $texte, $html="", $class="all"){
 		
+		//$this->trace(__METHOD__." DEBUT :".$class." -> ".$idDoc);
+		
 		//initialise les gestionnaires de base de données
 		$this->initDbTables();
 		//récupère l'action
 		$idAct = $this->dbA->ajouter(array("code"=>__METHOD__."_".$class));
 		//enregistre le rapport entre le document et l'action
-		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+		$this->idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 			,"src_id"=>$idDoc,"src_obj"=>"doc"
 			,"dst_id"=>$idAct,"dst_obj"=>"acti"
 			));
-				
+		if(!$this->bConnect)$class=="autokeyword";
 		if($class=="all"){
 			foreach ($this->kwe as $c) {
 				$result[$c] = $this->saveForChaine($idDoc, $texte, $html, $c);
 			}
+			//$this->trace(__METHOD__." FIN");
 			return $result;
 		}else{
-			//récupère les mots clefs
-			$arrKW = $this->get($texte, $html, $class);			
+			$arrKW = $this->get($texte, $html, $class);		
+			//$this->trace("Mot clef récupérés = ".count($arrKW),$arrKW);			
 		}
 		
 
@@ -474,7 +508,7 @@ class Flux_MC extends Flux_Site{
 			switch ($class) {
 				case "autokeyword":
 					foreach ($arrKW as $kw=>$nb){
-						$this->save($kw, $idRap, $nb);
+						$this->save($kw, $this->idRap, $nb);
 						$i++;	    			
 				   	}
 					break;
@@ -543,7 +577,7 @@ class Flux_MC extends Flux_Site{
 							switch ($lbl) {
 								case "entity_list":
 									$sem = $w->sementity;
-									$this->saveTagTag($lbl, $w->form, $w->relevance, $d->get("c"), $idDoc, -1, -1, $idUdst);
+									$this->saveRapport($lbl, $w->form,$sem);
 									foreach ($w->variant_list as $v) {
 										$this->saveTagTag("variant_list", $v->form, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);
 										$idDocVar = $this->dbD->ajouter(array("titre"=>$v->form,"parent"=>$idDoc,"maj"=>$d->get("c"), "type"=>39, "url"=>"inip=".$v->inip."&endp=".$v->endp, "note"=>json_encode($v)));										
@@ -583,64 +617,80 @@ class Flux_MC extends Flux_Site{
 				case "opencalais":
 					foreach ($arrKW as $lbl=>$kw){
 						foreach ($kw as $w){
-							$this->saveTagTag($lbl, $w, 1, $d->get("c"), $idDoc, -1, -1, $idUdst);							
+							$aTag = $this->save($w, $this->idRap, 1);
+							$this->saveRapport($w, $lbl,"opencalais");
 						}
 				   	}
 					break;
 				case "zemanta":
-					if($arrKW->status=="ok"){
-						if(isset($arrKW->keywords)){
-							foreach ($arrKW->keywords as $kw){
-								$type = $kw->scheme;
-								$poids = $kw->confidence;
-								//enregistre le tag
-								$idT = $this->saveTag($kw->name, $idDoc, $poids, $d->get("c"), $idUdst);
-								if($type){
-									$this->saveTagTag("", $type, $poids, $d->get("c"), $idDoc, $idT, -1, $idUdst);
-								}
-						   	}
-						}
-						if(isset($arrKW->markup->links)){
-							foreach ($arrKW->markup->links as $kw){
-								$type=false;
-								$poids = $kw->relevance;
-								foreach ($kw->target as $t){
-									//enregistre le tag
-									$idT = $this->saveTag($t->title, $idDoc, $poids, $d->get("c"), $idUdst);
-									//récupère le document lié
-									$idD = $this->dbD->ajouter(array("url"=>$t->url,"titre"=>$t->title,"tronc"=>0,"maj"=>$d->get("c"), "type"=>39));
-									//ajoute un lien entre zemanta et le document avec un poids
-									$this->dbUD->ajouter(array("uti_id"=>$idUdst, "doc_id"=>$idD, "poids"=>$kw->confidence));										    
-									//enregistre le tag pour le document
-									$idTLie = $this->saveTag($t->type, $idD, $kw->confidence, $d->get("c"), $idUdst);
-									//enregistre les tags liés
-									$this->saveTagTag("", "", $poids, $d->get("c"), $idDoc, $idT, $idTLie, $idUdst);
-									//enregistre les types
-									if(isset($kw->entity_type)){
-										if(is_array($kw->entity_type)){
-											foreach ($kw->entity_type as $tp) {
-												//enregistre les tags liés
-												$this->saveTagTag("", $tp, $kw->confidence, $d->get("c"), $idD, $idTLie, -1, $idUdst);
-											}											
-										}else{
-											$this->saveTagTag("", $kw->entity_type, $kw->confidence, $d->get("c"), $idD, $idTLie, -1, $idUdst);
-										}
-								}
-									
-								}
-								$i++;	    			
-						   	}
-						}
-						/**TODO compléter avec les autres champs de réponse
-						 * http://developer.zemanta.com/docs/suggest_markup/
-						 */
-				   	}
+					$this->saveZemanta($arrKW);
 					break;
 			}
 	   	}
+	   	//$this->trace(__METHOD__." FIN");
+	   	 
 		return $arrKW;		
 	}
 
+	
+	/**
+	 * enregistre les mots clefs d'une chaine
+	 *
+	 * @param array $arrKW
+	 *
+	 */
+	function saveZemanta($arrKW){
+		
+		if($arrKW->status=="ok"){
+			if(isset($arrKW->keywords)){
+				foreach ($arrKW->keywords as $kw){
+					//enregistre le tag
+					$aTag = $this->save($kw->name, $this->idRap, $kw->confidence);
+					if($kw->scheme){
+						//enregistre la relation entre les tags
+						$this->saveRapport($kw->name, $kw->scheme,"scheme");
+					}
+				}
+			}
+			/*	
+			if(isset($arrKW->markup->links)){
+				foreach ($arrKW->markup->links as $kw){
+					$type=false;
+					$poids = $kw->relevance;
+					foreach ($kw->target as $t){
+						//enregistre le tag
+						$aTag = $this->save($t->title, $this->idRap);
+						//récupère le document lié
+						$idD = $this->dbD->ajouter(array("url"=>$t->url,"titre"=>$t->title,"tronc"=>0,"maj"=>$d->get("c"), "type"=>39));
+						//ajoute un lien entre zemanta et le document avec un poids
+						$this->dbUD->ajouter(array("uti_id"=>$idUdst, "doc_id"=>$idD, "poids"=>$kw->confidence));
+						//enregistre le tag pour le document
+						$idTLie = $this->saveTag($t->type, $idD, $kw->confidence, $d->get("c"), $idUdst);
+						//enregistre les tags liés
+						$this->saveTagTag("", "", $poids, $d->get("c"), $idDoc, $idT, $idTLie, $idUdst);
+						//enregistre les types
+						if(isset($kw->entity_type)){
+							if(is_array($kw->entity_type)){
+								foreach ($kw->entity_type as $tp) {
+									//enregistre les tags liés
+									$this->saveTagTag("", $tp, $kw->confidence, $d->get("c"), $idD, $idTLie, -1, $idUdst);
+								}
+							}else{
+								$this->saveTagTag("", $kw->entity_type, $kw->confidence, $d->get("c"), $idD, $idTLie, -1, $idUdst);
+							}
+						}
+							
+					}
+					$i++;
+				}
+			}
+			*/
+			/**TODO compléter avec les autres champs de réponse
+			 * http://developer.zemanta.com/docs/suggest_markup/
+			 */
+		}
+	}
+	
     /**
      * enregistre les mots clefs d'un utilisateur à partir d'un fichier csv
      *

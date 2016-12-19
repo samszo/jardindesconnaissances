@@ -13,7 +13,8 @@ class Flux_Diigo extends Flux_Site{
     const RSS_GROUP_URL = 'http://groups.diigo.com/group/';
     var $LUCENE_INDEX;
     var $setLucene = false;
-	
+    var $mc;
+    
     /**
      * Zend_Service_Rest instance
      *
@@ -27,22 +28,40 @@ class Flux_Diigo extends Flux_Site{
 
     	$this->LUCENE_INDEX = ROOT_PATH.'/data/diigo-index';
     	
-	$this->login = $login;
+    	//on récupère la racine des documents
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+    	$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+    	$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
+    	 
+    	
+		$this->login = $login;
     	if($login && $pwd){
 	    	$this->pwd = $pwd;
     		$this->rest = new Zend_Rest_Client();
 	        $this->rest->getHttpClient()->setAuth($login, $pwd);
 	        $this->rest->setUri(self::API_URI);
        	}
+       	
+       	$this->mc = new Flux_MC($idBase, $bTrace);
+       	
     }
     
-    function getRequest($params){
+    /**
+     * Fonction pour effectuer une requête sur l'API
+     *
+     * @param 	array	$params
+     * @param	boolean	$cache
+     * 
+     * @return array
+     */
+    function getRequest($params, $cache=true){
 
 		$c = str_replace("::", "_", __METHOD__)."_".$this->getParamString($params); 
-	   	$arr = $this->cache->load($c);
+	   	$arr = $cache ? $this->cache->load($c) : false;
         if(!$arr){
-		    	$params['key'] = KEY_DIIGO_API;
-		    	$response = $this->rest->restGet(self::API_URL, $params);
+		    $params['key'] = KEY_DIIGO_API;
+		    $response = $this->rest->restGet(self::API_URL, $params);
 			//$this->trace($response);	
 	        if (!$response->isSuccessful()) {
 				$this->trace("ERREUR : ".$response->getMessage());	
@@ -59,6 +78,23 @@ class Flux_Diigo extends Flux_Site{
         return $arr;
     	
     }
+
+    
+    /**
+     * Fonction pour initialiser les tables de la base de données
+     *
+     */
+    function initDbTables(){
+    	/*construction des objets*/
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+    	if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
+    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+    	if(!$this->dbR)$this->dbR = new Model_DbTable_Flux_Rapport($this->db);
+    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+    	if(!$this->dbA)$this->dbA = new Model_DbTable_Flux_Acti($this->db);
+    	if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
+    }
+    
     
 	/**
 	 * enegistre le bookmark d'un compte
@@ -76,66 +112,130 @@ class Flux_Diigo extends Flux_Site{
 		$this->trace("LOGIN ".$login." : ".$this->user);				
     		
 		//initialise les gestionnaires de base de données
-	    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
-		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc($this->db);
-		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
-		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
-    		
+		$this->initDbTables();
+		$this->trace("Tables initialisées");
+		
 		//initialise le moteur d'indexation
 		if($this->setLucene && !$this->lucene){
 			$this->lucene = new Flux_Lucene($this->login, $this->pwd, $this->idBase, false, $this->LUCENE_INDEX);
 			$this->lucene->classUrl = $this;
 			$this->lucene->index->optimize();	
+			$this->trace("moteur d'indexation initialisé");
 		}
 		
-    		$i = 1;
+		//
+		$i = 0;
+		$count = 100;
 		while ($i>0) {
-	    		$arr = $this->getRequest(array("user"=>$login,"count"=>100, "start"=>$i));
-	    		if(!$arr){
-		    		$i=-1;	
-	    		}else{				
-	    			$j = 0;
-		    		foreach ($arr as $item){
-					$this->trace("   ".$j." : ".$item->url);				
-		    			$this->saveItem($item);
-		    			$j++;
-		    		}
-				$this->trace("   ".$i." : ".count($arr));
-				if(count($arr)==0 || $j<100)$i=-1;
-				else $i = $i+count($arr);
+    		$arr = $this->getRequest(array("user"=>$login,"count"=>$count, "start"=>$i));
+    		if(!$arr){
+	    		$i=-1;	
+    		}else{				
+    			$j = 0;
+    			$this->trace("   ".$i." : ".count($arr));
+    			foreach ($arr as $item){
+					$this->trace($i."   ".$j." : ".$item->url);				
+	    			$this->saveItem($item);
+	    			$j++;
 	    		}
-	    	}
-	    	if($this->setLucenee)$this->lucene->index->optimize();
-	    	
+				if(count($arr)==0 || $j<$count)$i=-1;
+				else $i = $i+count($arr);
+    		}
+    		$i=-1;
+    	}
+    	if($this->setLucenee)$this->lucene->index->optimize();
+	    //
+		
 		$this->trace("FIN ".__METHOD__);				
     }    
 
+    /**
+     * enegistre les derniers bookmarks d'un compte
+     *
+     * @param string 	$login
+     *
+     * @return array
+     */
+    function saveRecent($login=false){
+    	 
+    	$this->trace("DEBUT ".__METHOD__);
+    	if(!$login)$login=$this->login;
+    	$this->getUser(array("login"=>$login,"flux"=>"diigo"));
+    
+    	$this->trace("LOGIN ".$login." : ".$this->user);
+    
+    	//initialise les gestionnaires de base de données
+    	$this->initDbTables();
+    	$this->trace("Tables initialisées");
+    
+    	//initialise le moteur d'indexation
+    	if($this->setLucene && !$this->lucene){
+    		$this->lucene = new Flux_Lucene($this->login, $this->pwd, $this->idBase, false, $this->LUCENE_INDEX);
+    		$this->lucene->classUrl = $this;
+    		$this->lucene->index->optimize();
+    		$this->trace("moteur d'indexation initialisé");
+    	}
+        	 
+    	//
+    	$i = 1;
+    	$count = 100;
+    	while ($i>0) {
+    		$arr = $this->getRequest(array("user"=>$login,"count"=>$count, "start"=>$i),false);
+    		if(!$arr){
+    			$i=-1;
+    		}else{
+    			$j = 0;
+    			$this->trace("   ".$i." : ".count($arr));
+    			foreach ($arr as $item){
+    				$this->trace($i."   ".$j." : ".$item->url);
+    				//vérifie que l'item existe
+    				$doc = $this->dbD->findByUrl($item->url);
+    				//$this->trace("vérifie que l'item existe ",$doc);
+    				if($doc) {
+    					$arr = array();
+    					break;
+    				}
+    				else $this->saveItem($item);
+    				$j++;
+    			}
+    			if(count($arr)==0 || $j<$count)$i=-1;
+    			else $i = $i+count($arr);
+    		}
+    	}
+    	if($this->setLucenee)$this->lucene->index->optimize();
+    	//
+    
+    	$this->trace("FIN ".__METHOD__);
+    }
     function saveItem($i){
 
     	
-		//TODO ajouter les db pour graine utigraine et grainedoc 
-		//$this->getGraine(array("titre"=>"Diigo","class"=>"Flux_Diigo","url"=>"http://www.diigo.com/"));
-		//TODO ajouter la utigraine 
-
-	    	//transforme l'objet en tableau dans le cas ou on n'utilise pas le json decode de Zen
-	    	$item['url'] = $i->url;
-	    	$item['title'] = $i->title;
-	    	$item['created_at'] = $i->created_at;
-	    	$item['annotations'] = $i->annotations;
-	    	$item['tags'] = $i->tags;
-	    	//sinon 
-	    	//$item = $i;
+    	//récupère l'action
+    	$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
     	
-		//ajouter un document correspondant au lien
-		$idD = $this->dbD->ajouter(array("url"=>$item['url'],"titre"=>$item['title'],"tronc"=>0,"pubDate"=>$item['created_at']));
+		//transforme l'objet en tableau dans le cas ou on n'utilise pas le json decode de Zen
+	    $item['url'] = $i->url;
+	    $item['title'] = $i->title;
+	    $item['created_at'] = $i->created_at;
+	    $item['annotations'] = $i->annotations;
+	    $item['tags'] = $i->tags;
 
+	    	
+	    $idD = $this->dbD->ajouter(array("url"=>$item['url'],"titre"=>$item['title'], "parent"=>$this->idDocRoot,"tronc"=>0,"pubDate"=>$item['created_at']));
+	    //$this->trace("document correspondant au lien ajouté = ".$idD);
+	     
 		//index le document
 		if($this->setLucene) $this->lucene->addDoc($item['url']);
 		
-		//TODO ajouter la grainedoc 
+		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+				,"src_id"=>$idD,"src_obj"=>"doc"
+				,"dst_id"=>$idAct,"dst_obj"=>"acti"
+		));
+		//$this->trace("enregistre le rapport entre le document et l'action = ".$idRap);
+		
+		
 		$i = 0;
-		//traitement des annotations
+		$this->trace("traitement des annotations");
 		if(count($item['annotations'])>0){
 			foreach ($item['annotations'] as $note){
 				$j['content'] = $note->content;
@@ -143,35 +243,34 @@ class Flux_Diigo extends Flux_Site{
 				$this->saveContent($j, $idD);
 			}
 		}		
-		//traitement des mots clefs
+		//traitement des mots clefs		
 		if($item['tags']!=""){
 			$arrTags = explode(",", $item['tags']);
 			foreach ($arrTags as $tag){
-				$this->saveTag($tag, $idD, 1, $item['created_at']);	    			
+				$this->mc->save($tag, $idRap, 1);	    			
 				$i++;
 			}						
 		}				
-		//ajoute un lien entre l'utilisateur et le document avec un poids correspondant au nombre de tag
-		$this->dbUD->ajouter(array("uti_id"=>$this->user, "doc_id"=>$idD, "poids"=>$i));										    
-		//TODO ajouter la grainedoc 
 		
     } 
 
 	function saveContent($item, $idD){
 	   	
-		//enregistre le document
 		$id = $this->dbD->ajouter(array("tronc"=>$idD,"data"=>$item['content'],"pubDate"=>$item['created_at']));
+		//$this->trace(__METHOD__." enregistre le document = ".$id);
 		
 		//récupère les mot clefs
-	   	$arrKW = $this->getKW($item['content']);
-	   	//enregistre les mots clefs
+	   	$arrKW = $this->mc->saveForChaine($idD, $item['content']);
+
+	   	/*enregistre les mots clefs
 	   	$i=0; 
 	   	foreach ($arrKW as $kw=>$nb){
 			$this->saveTag($kw, $id, $nb, $item['created_at']);
 			$i++;	    			
 	   	}
 		$this->dbUD->ajouter(array("uti_id"=>$this->user, "doc_id"=>$id, "poids"=>$i));										    
-	   	//$results = $dom->query('/html/body/table[2]/tr[2]/td[2]/p[1]/strong');		
+		*/
+	   	//$results = $dom->query('/html/body/table[2]/tr[2]/td[2]/p[1]/strong');	
 	}
     
     
