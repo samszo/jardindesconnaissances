@@ -211,3 +211,7 @@ data/cnrtl/test.xml
 data/cnrtl/Concordance.xml
 
 public/.DS_Store
+
+services/cron/script.php
+
+services/cron/traces.txt

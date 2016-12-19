@@ -5,8 +5,7 @@
 		
 		<link rel="stylesheet" href="../css/font-awesome.css">
     	<script type="text/javascript" src="../js/d3.v4.js"></script>
-	    <script src="../js/canvg.js"></script>
-	    <script src="../js/svgenie.js"></script>
+
 		
 		<style>
 		
@@ -79,11 +78,6 @@
 			    .attr("transform", "translate(" + (tIHM.w+20) + "," + 0 + ") scale(0.8)")				    		    				    				    		    
 	            .attr('width', tPalette.w+'px')
 	            .attr('height', tPalette.h+'px');			    
-			gPalette.call(d3.zoom()
-				    .scaleExtent([1 / 2, 8])
-				    .on("zoom", zoomed));
-			gPalette.call(d3.drag()
-			        .on("drag", draggedPalette));
 
 		  	//affiche l'IHM
 			d3.xml(ficIHM).mimeType("image/svg+xml").get(function(error, xml) {
@@ -154,13 +148,6 @@
 			    })
 		});
 
-		//fonctionn de zoom et drag de la palette
-		function zoomed() {
-			  gPalette.attr("transform", d3.event.transform);
-			}
-		function draggedPalette(){
-			d3.select(this).attr("x", d3.event.x).attr("y", d3.event.y);
-		}
 		
 		//fonction pour le drag & drop des icones
 		function dragstarted(d) {

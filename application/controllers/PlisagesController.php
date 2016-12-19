@@ -1,6 +1,6 @@
 <?php
 
-class PlisAgesController extends Zend_Controller_Action
+class PlisagesController extends Zend_Controller_Action
 {
 	var $idBase = "flux_plisages";
 	var $urlRedir = 'PlisAges?idBase=';
