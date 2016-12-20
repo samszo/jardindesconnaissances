@@ -470,10 +470,11 @@ class Flux_MC extends Flux_Site{
      * @param string $texte
      * @param string $html
      * @param string $class
+     * @param int $idRap
      *   
      * @return array
      */
-	function saveForChaine($idDoc, $texte, $html="", $class="all"){
+	function saveForChaine($idDoc, $texte, $html="", $class="all", $idRap=0){
 		
 		//$this->trace(__METHOD__." DEBUT :".$class." -> ".$idDoc);
 		
@@ -483,13 +484,14 @@ class Flux_MC extends Flux_Site{
 		$idAct = $this->dbA->ajouter(array("code"=>__METHOD__."_".$class));
 		//enregistre le rapport entre le document et l'action
 		$this->idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-			,"src_id"=>$idDoc,"src_obj"=>"doc"
-			,"dst_id"=>$idAct,"dst_obj"=>"acti"
-			));
+			,"src_id"=>$idRap,"src_obj"=>"rapport"
+			,"dst_id"=>$idDoc,"dst_obj"=>"doc"
+			,"pre_id"=>$idAct,"pre_obj"=>"acti"
+		));
 		if(!$this->bConnect)$class=="autokeyword";
 		if($class=="all"){
 			foreach ($this->kwe as $c) {
-				$result[$c] = $this->saveForChaine($idDoc, $texte, $html, $c);
+				$result[$c] = $this->saveForChaine($idDoc, $texte, $html, $c, $idRap);
 			}
 			//$this->trace(__METHOD__." FIN");
 			return $result;

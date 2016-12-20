@@ -425,6 +425,13 @@ class GraphController extends Zend_Controller_Action {
 		*/
 		 	
     }
+
+    public function streamvAction(){
+    	$this->view->titre =  $this->_getParam('titre', "Stream Graph Vertical");
+    	$this->view->soustitre =  $this->_getParam('soustitre', "Pour plonger dans le temps");
+    	$this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fdata%2Ftrends.csv"));
+    	 
+    }
     
     public function imagegridAction(){
     

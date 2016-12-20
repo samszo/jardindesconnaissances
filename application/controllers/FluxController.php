@@ -378,6 +378,27 @@ class FluxController extends Zend_Controller_Action {
 	   			break;
 	   	}
     }
+
+    public function orcidAction()
+    {
+    	 
+    	
+    }
+
+    public function diigoAction()
+    {
+    	if($this->_getParam('q')=="saveRecent"){
+	    	$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
+	    	$diigo->bTraceFlush = false;
+	    	$diigo->saveRecent($this->_getParam('login'));
+    	}    	 
+    	if($this->_getParam('q')=="saveAll"){
+    		$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
+    		$diigo->bTraceFlush = true;
+    		$diigo->saveAll($this->_getParam('login'));
+    	}
+    	 
+    }
     
 	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);

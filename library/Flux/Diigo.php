@@ -106,8 +106,11 @@ class Flux_Diigo extends Flux_Site{
     function saveAll($login=false){
     	
 		$this->trace("DEBUT ".__METHOD__);				
-    		if(!$login)$login=$this->login;
-    		$this->getUser(array("login"=>$login,"flux"=>"diigo"));
+		
+		set_time_limit(0);
+		
+  		if(!$login)$login=$this->login;
+    	$this->getUser(array("login"=>$login,"flux"=>"diigo"));
     		
 		$this->trace("LOGIN ".$login." : ".$this->user);				
     		
@@ -124,7 +127,7 @@ class Flux_Diigo extends Flux_Site{
 		}
 		
 		//
-		$i = 0;
+		$i = 1;
 		$count = 100;
 		while ($i>0) {
     		$arr = $this->getRequest(array("user"=>$login,"count"=>$count, "start"=>$i));
@@ -132,16 +135,16 @@ class Flux_Diigo extends Flux_Site{
 	    		$i=-1;	
     		}else{				
     			$j = 0;
-    			$this->trace("   ".$i." : ".count($arr));
+    			$this->trace("getRequest   ".$i." : ".count($arr));
     			foreach ($arr as $item){
 					$this->trace($i."   ".$j." : ".$item->url);				
 	    			$this->saveItem($item);
 	    			$j++;
 	    		}
-				if(count($arr)==0 || $j<$count)$i=-1;
-				else $i = $i+count($arr);
+				if(count($arr)==0)$i=-1;
+				else $i += $j;
     		}
-    		$i=-1;
+    		//$i=-1;
     	}
     	if($this->setLucenee)$this->lucene->index->optimize();
 	    //
@@ -230,17 +233,17 @@ class Flux_Diigo extends Flux_Site{
 		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 				,"src_id"=>$idD,"src_obj"=>"doc"
 				,"dst_id"=>$idAct,"dst_obj"=>"acti"
-		));
+			));
 		//$this->trace("enregistre le rapport entre le document et l'action = ".$idRap);
 		
 		
 		$i = 0;
-		$this->trace("traitement des annotations");
+		//$this->trace("traitement des annotations");
 		if(count($item['annotations'])>0){
 			foreach ($item['annotations'] as $note){
 				$j['content'] = $note->content;
 				$j['created_at'] = $note->created_at;
-				$this->saveContent($j, $idD);
+				$this->saveContent($j, $idD, $idRap);
 			}
 		}		
 		//traitement des mots clefs		
@@ -254,13 +257,21 @@ class Flux_Diigo extends Flux_Site{
 		
     } 
 
-	function saveContent($item, $idD){
+	function saveContent($item, $idD, $idRap){
 	   	
-		$id = $this->dbD->ajouter(array("tronc"=>$idD,"data"=>$item['content'],"pubDate"=>$item['created_at']));
+		//récupère l'action
+		$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));		
+		$id = $this->dbD->ajouter(array("parent"=>$idD,"tronc"=>$idRap,"data"=>$item['content'],"pubDate"=>$item['created_at']));
 		//$this->trace(__METHOD__." enregistre le document = ".$id);
+
+		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+				,"src_id"=>$idRap,"src_obj"=>"rapport"
+				,"dst_id"=>$id,"dst_obj"=>"doc"
+				,"pre_id"=>$idAct,"pre_obj"=>"acti"
+		));
 		
 		//récupère les mot clefs
-	   	$arrKW = $this->mc->saveForChaine($idD, $item['content']);
+	   	$arrKW = $this->mc->saveForChaine($idD, $item['content'],$idRap);
 
 	   	/*enregistre les mots clefs
 	   	$i=0; 
