@@ -479,6 +479,110 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 	}
 	
 	
+	/**
+	 * Récupère l'historique d'une liste de tag
+	 *
+	 * @param int 		$idMonade
+	 * @param int 		$idUti
+	 * @param int 		$idActi
+	 * @param int 		$idParent
+	 * @param array 	$arrTags
+	 * @param string 	$dateUnit unité de la date : year, month...
+	 * @param string 	$q requête full text
+	 * @param array 	$dates extrémités temporelles
+	 *
+	 * @return array
+	 */
+	function getTagHistoRapport($idMonade, $idUti, $idActi, $idParent="", $arrTags="",$dateUnit="%c-%y", $q="", $dates="") {
+	
+		//vérifie si on prend les tags du document racine ou de ces éléments
+		$where = " ";
+		
+		if($idParent) $idParent = " AND d.parent =".$idParent;
+		
+		if($dateUnit){
+			$temps = ' DATE_FORMAT(d.pubDate, "'.$dateUnit.'") ';
+		}
+	
+		if($q){
+			$score = " MATCH (d.titre, d.note) AGAINST ('".$q."') ";
+		}else{
+			$score = " 1 ";
+		}
+	
+		//définition de la requête
+		/*
+		SELECT
+		t.tag_id, t.code tag
+		,COUNT(DISTINCT rd.src_id) nbDoc
+		,  DATE_FORMAT(d.pubDate, "%c-%y") temps
+		FROM
+		flux_tag t
+		INNER JOIN
+		flux_rapport r ON r.monade_id = 2
+		AND r.src_obj = 'rapport'
+		AND r.dst_obj = 'tag'
+		AND r.pre_obj = 'acti'
+		AND r.pre_id = 2
+		AND t.tag_id = r.dst_id
+		INNER JOIN
+		flux_rapport rd ON rd.rapport_id = r.src_id
+		INNER JOIN
+		flux_doc d ON d.doc_id = rd.src_id AND d.parent = 1
+		-- WHERE
+		--    t.tag_id = 14 -- ecosystem info
+		GROUP BY t.tag_id, temps
+		*/
+		$query = $this->select()
+		->from( array("t" => "flux_tag"),array("key"=>"tag_id", "type"=>"code", "desc"))
+		->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+		->joinInner(array('r' => 'flux_rapport'),
+				"r.monade_id = ".$idMonade."
+					AND r.src_obj = 'rapport'
+					AND r.dst_obj = 'tag'
+					AND r.pre_obj = 'acti'
+					AND r.pre_id = ".$idActi."
+					AND t.tag_id = r.dst_id"
+				,array())
+		->joinInner(array('rd' => 'flux_rapport'),
+				'rd.rapport_id = r.src_id AND rd.pre_id ='.$idUti,array("value"=>"COUNT(DISTINCT rd.src_id)"))
+		->joinInner(array('d' => 'flux_doc'),
+				'd.doc_id = rd.src_id '.$idParent,array("temps"=>$temps
+						,"score"=> new Zend_Db_Expr("SUM(".$score.")")
+						, "MinDate"=>new Zend_Db_Expr("MIN(UNIX_TIMESTAMP(d.pubDate))")
+						, "MaxDate"=>new Zend_Db_Expr("MAX(UNIX_TIMESTAMP(d.pubDate))")
+				))
+		->group("t.tag_id")
+		->group($temps)
+		->order(array("t.code",$temps));
+		
+		
+	
+		//construction de la condition des tags
+		$where = "";
+		if($arrTags){
+			foreach ($arrTags as $tag) {
+				$where .= " t.code LIKE '%".$tag."%' OR ";
+			}
+			$where = substr($where, 0, -3);
+			$query->where($where);				
+		}
+		if($q){
+			$query->where($score);				
+		}
+		if($dates){
+			$minDate = new DateTime();
+			$minDate->setTimestamp($dates[0]);
+			$maxDate = new DateTime();
+			$maxDate->setTimestamp($dates[1]);
+			$where = "d.pubDate BETWEEN '".$minDate->format("Y-m-d H:i:s")."' AND '".$maxDate->format("Y-m-d H:i:s")."'";
+			//echo $where;
+			$query->where($where);
+		}
+		
+		return $this->fetchAll($query)->toArray();
+	
+	}
 	
 	/**
      * Récupère les tags associés à une liste de tag par document 

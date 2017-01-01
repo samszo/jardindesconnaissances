@@ -32,22 +32,6 @@ class Flux_MC extends Flux_Site{
 		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
 
 	}
-
-    /**
-     * Fonction pour initialiser les tables de la base de données
-     * 
-     */
-      function initDbTables(){
-    		//construction des objets
-		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-		if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
-		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
-		if(!$this->dbR)$this->dbR = new Model_DbTable_Flux_Rapport($this->db);
-		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
-		if(!$this->dbA)$this->dbA = new Model_DbTable_flux_acti($this->db);
-		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
-    	
-    }
     
     
      /**

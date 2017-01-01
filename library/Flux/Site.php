@@ -162,6 +162,23 @@ class Flux_Site{
     }
     
     /**
+     * Fonction pour initialiser les tables de la base de données
+     *
+     */
+    function initDbTables(){
+    	/*construction des objets*/
+    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+    	if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
+    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+    	if(!$this->dbR)$this->dbR = new Model_DbTable_Flux_Rapport($this->db);
+    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+    	if(!$this->dbA)$this->dbA = new Model_DbTable_Flux_Acti($this->db);
+    	if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
+    	
+    }
+    
+    
+    /**
      * Récupère l'identifiant d'utilisateur ou le crée
      *
      * @param array $user
@@ -237,7 +254,9 @@ class Flux_Site{
      */
 	function getUrlBodyContent($url, $param=false, $cache=true, $method=null, $rawData=false) {
 		$html = false;
+		/*pas d'encodage explicite
 		if(substr($url, 0, 7)!="http://")$url = urldecode($url);
+		*/
 		if($cache){
 			$c = str_replace("::", "_", __METHOD__)."_".md5($url); 
 			if($param)$c .= "_".$this->getParamString($param);
@@ -260,6 +279,36 @@ class Flux_Site{
 		return $html;
 	}
 
+	
+	/**
+	 * Formats a line (passed as a fields  array) as CSV and returns the CSV as a string.
+	 * Adapted from http://us3.php.net/manual/en/function.fputcsv.php#87120
+	 * 
+     * 
+	 */
+	function arrayToCsv( array &$fields, $delimiter = ';', $enclosure = '"', $encloseAll = false, $nullToMysqlNull = false ) {
+		$delimiter_esc = preg_quote($delimiter, '/');
+		$enclosure_esc = preg_quote($enclosure, '/');
+	
+		$output = array();
+		foreach ( $fields as $field ) {
+			if ($field === null && $nullToMysqlNull) {
+				$output[] = 'NULL';
+				continue;
+			}
+	
+			// Enclose fields containing $delimiter, $enclosure or whitespace
+			if ( $encloseAll || preg_match( "/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field ) ) {
+				$output[] = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
+			}
+			else {
+				$output[] = $field;
+			}
+	}
+	
+	return implode( $delimiter, $output );
+	}
+	
 	/**
      * création d'un tableau à partir d'un csv
      *

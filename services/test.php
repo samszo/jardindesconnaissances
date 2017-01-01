@@ -245,6 +245,11 @@ try {
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
 	/*
+	$diigo = new Flux_Diigo("","","flux_diigo",true);
+	$data = $diigo->getTagHisto('%Y-%m',1, 2, 2, 1, "", "", array('1158589136','1162191281'), "stream");
+	*/
+	
+	/*
     $diigo = new Flux_Diigo("luckysemiosis","samszo","flux_evaletu",true);
     $diigo->bTraceFlush = true;
     $arrCompte = array("ernestovi","Arso972","milounis","crazyyoshi","Ghislainguy","noelno","wumiolabisi","BCottereau","carolinemourer","DjamelMeziane","elographicdesigner","nazadounet","Sissiwiki","arzouz");
@@ -501,12 +506,13 @@ try {
 	$s->trace("Resultat post =",$arr);			
 	 */
 	
-	//
+	/*
 	$ei = new Flux_EditInflu("flux_editinflu");
 	$ei->bTrace = false;
 	$ei->idGeo = 0;
     //$rs = $ei->creaCrible(1, array("titre"=>"nouveau crible"));
 	$ei->importCrible("http://localhost/jdc/data/aliento/CategorisationRapports.csv");
+	*/
 	
 	//$solr_version = solr_get_version();
 	
@@ -526,6 +532,11 @@ try {
 	$crntl->getSynonyme("aide");
 	$crntl->getAntonyme("fermeté");
 	*/
+	
+	$ensuprefr = new Flux_Ensuprefr('flux_ecosystem');
+	$ensuprefr->getUser(array("login"=>"samszo"));
+	$content = $ensuprefr->saveMonade('écosystème');
+	
 	
 	$s->trace("FIN TEST");			
 	

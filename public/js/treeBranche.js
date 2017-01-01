@@ -7,6 +7,7 @@ function treeBranche(config) {
 	this.w = config.w;  
 	this.h = config.h;  
 	this.url = config.url;
+	this.div = config.div;
 	this.svgGroup = config.svgGroup;
 	
 	this.treeBranche = function() {
@@ -16,7 +17,9 @@ function treeBranche(config) {
 		
 		d3.json(self.url, function(error, treeData) {
 		
-		    // Calculate total nodes, max label length
+		    
+			if(!self.svgGroup)self.svgGroup = d3.select(self.div).append("svg");
+			// Calculate total nodes, max label length
 		    var totalNodes = 0;
 		    var maxLabelLength = 0;
 		    // variables for drag/drop
@@ -85,7 +88,7 @@ function treeBranche(config) {
 		    // Sort the tree initially incase the JSON isn't in a sorted order.
 		    sortTree();
 		
-		    // TODO: Pan function, can be better implemented.		
+		    /* TODO: Pan function, can be better implemented.		
 		    function pan(domNode, direction) {
 		        var speed = panSpeed;
 		        if (panTimer) {
@@ -110,7 +113,7 @@ function treeBranche(config) {
 		            }, 50);
 		        }
 		    }
-				
+			*/	
 		    function initiateDrag(d, domNode) {
 		        draggingNode = d;
 		        d3.select(domNode).select('.ghostCircle').attr('pointer-events', 'none');
@@ -301,9 +304,8 @@ function treeBranche(config) {
 		    };
 		
 		    // Function to center node when clicked/dropped so node doesn't get lost when collapsing/moving with large amount of children.
-		
 		    function centerNode(source) {
-		        //
+		        /*
 		        scale = zoomListener.scale();
 		        x = -source.y0;
 		        y = -source.x0;
@@ -314,7 +316,7 @@ function treeBranche(config) {
 		        groupTree.select('g').transition()
 		            .duration(duration)
 		            .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");
-		        /*
+		        
 		        zoomListener.scale(scale);
 		        zoomListener.translate([x, y]);
 		        */

@@ -78,22 +78,6 @@ class Flux_Diigo extends Flux_Site{
         return $arr;
     	
     }
-
-    
-    /**
-     * Fonction pour initialiser les tables de la base de données
-     *
-     */
-    function initDbTables(){
-    	/*construction des objets*/
-    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-    	if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
-    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
-    	if(!$this->dbR)$this->dbR = new Model_DbTable_Flux_Rapport($this->db);
-    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
-    	if(!$this->dbA)$this->dbA = new Model_DbTable_Flux_Acti($this->db);
-    	if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
-    }
     
     
 	/**
@@ -233,7 +217,8 @@ class Flux_Diigo extends Flux_Site{
 		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 				,"src_id"=>$idD,"src_obj"=>"doc"
 				,"dst_id"=>$idAct,"dst_obj"=>"acti"
-			));
+				,"pre_id"=>$this->user,"pre_obj"=>"uti"
+		));
 		//$this->trace("enregistre le rapport entre le document et l'action = ".$idRap);
 		
 		
@@ -536,5 +521,108 @@ class Flux_Diigo extends Flux_Site{
 		
 		return $this->dbUT->findTagByUtiId($this->user);
     }
+    
+    
+    /** erécupère l'historique des tags
+     *
+     * @param 	string	$dateUnit
+     * @param 	int	$idUti
+     * @param 	int	$idMonade
+     * @param 	int	$idActi
+     * @param 	int	$idParent
+     * @param 	array	$arrTags
+     * @param 	string	$req
+     * @param 	array	$dates
+     * @param 	string	$for
+     * 
+     * @return 	array	
+     *
+     */
+    function getTagHisto($dateUnit, $idUti, $idMonade, $idActi, $idParent, $arrTags, $req, $dates, $for){
+
+    	$sqlFormatDate = $dateUnit;
+    	$this->bTrace = false;
+    	$dbTag = new Model_DbTable_Flux_Tag($this->db);
+    	$data = $dbTag->getTagHistoRapport($idMonade
+    			, $idUti, $idActi, $idParent
+    			, $arrTags, $sqlFormatDate, $req, $dates);
+    	if($for=="stream"){
+    		//récupère les extrémité des dates
+    		$minDate = date("r");
+    		$maxDate = 0;
+    		foreach ($data as $d) {
+    			if($minDate>$d['MinDate'])$minDate=$d['MinDate'];
+    			if($maxDate<$d['MaxDate'])$maxDate=$d['MaxDate'];
+    		}
+    		$this->trace(date("r", $minDate)." -> ".date("r", $maxDate));
+    		//calcul le tableau des dates
+    		switch ($sqlFormatDate) {
+    			case '%Y-%m':
+    				$interval = new DateInterval('P1M');
+    				$phpFormatDate = 'Y-m';
+    				break;
+				case '%Y':
+    				$interval = new DateInterval('P1Y');
+    				$phpFormatDate = 'Y';
+    				break;
+    				
+    		}
+    		//
+    		$curDate = new DateTime();
+    		$curDate->setTimestamp($minDate);
+    		$mDate = new DateTime();
+    		$mDate->setTimestamp($maxDate);
+    		$this->trace($curDate->format('Y-m-d'));
+    		$arrDate = array();
+    		while ($curDate<$mDate) {
+    			$arrDate[]=$curDate->format($phpFormatDate);
+    			$curDate->add($interval);
+    		}
+    		$this->trace("le tableau des dates",$arrDate);
+    		//ajoute les valeurs vides pour chaque éléments
+    		$oTag = $data[0]['key'];
+    		$j=0; $i=0; $nbDate = count($arrDate); $nbData = count($data);
+    		$nData;
+    		//foreach ($data as $d) {
+    		for ($z = 0; $z < $nbData; $z++) {
+    			$d = $data[$z];
+    			$this->trace('temps '.$z.' : '.$i.' / '.$j,$d);
+    			//on vérifie si on passe à un nouveau type
+    			if($oTag!=$d['key']){
+    				//on fini les temps restant
+    				 for ($i = $j; $i < $nbDate; $i++) {
+	    				 $nD = array('key'=>$oD['key'],'type'=>$oD['type'],'desc'=>$oD['desc']
+	    				 ,'temps'=>$arrDate[$i],'score'=>0,'value'=>0
+	    				 ,'MinDate'=>0,'MaxDate'=>0
+	    				 );
+	    				 $nData[]=$nD;
+	    				 $this->trace('fin nouveau temps '.$i .' / '. $j,$nD);
+    				 }
+    				$j=0;
+    				$oTag=$d['key'];
+    			}
+    			//on calcul les temps manquant
+    			for ($i = $j; $i < $nbDate; $i++) {
+    				//$this->trace($arrDate[$i]."==".$d['temps']);
+    				if($arrDate[$i]==$d['temps']){
+    					$nData[]=$d;
+    					$j=$i+1;
+    					$i=$nbDate;
+    				}else{
+    					$nD = array('key'=>$d['key'],'type'=>$d['type'],'desc'=>$d['desc']
+    							,'temps'=>$arrDate[$i],'score'=>0,'value'=>0
+    							,'MinDate'=>0,'MaxDate'=>0
+    					);
+    					$nData[]=$nD;
+    					$this->trace('nouveau temps '.$i .' / '. $j,$nD);
+    				}
+    			}
+    			$oD = $d;
+    		}
+    		//ordonne le tableau
+    		$data = $nData;    		
+	    }
+	    return $data;
+	  	}
     
 }

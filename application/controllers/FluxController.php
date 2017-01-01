@@ -387,19 +387,48 @@ class FluxController extends Zend_Controller_Action {
 
     public function diigoAction()
     {
-    	if($this->_getParam('q')=="saveRecent"){
-	    	$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
-	    	$diigo->bTraceFlush = false;
-	    	$diigo->saveRecent($this->_getParam('login'));
-    	}    	 
-    	if($this->_getParam('q')=="saveAll"){
-    		$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
-    		$diigo->bTraceFlush = true;
-    		$diigo->saveAll($this->_getParam('login'));
-    	}
+    	switch ($this->_getParam('q')) {
+    		case "saveRecent":
+    			$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
+    			$diigo->bTraceFlush = false;
+    			$diigo->saveRecent($this->_getParam('login'));
+    			 break;    		
+			case "saveAll":
+				$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
+				$diigo->bTraceFlush = true;
+				$diigo->saveAll($this->_getParam('login'));
+				break;
+			case "getTagHisto":
+				$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);				
+				$data = $diigo->getTagHisto($this->_getParam("dateUnit", '%Y-%m')
+						, $this->_getParam("idUti"), $this->_getParam("idMonade")
+						, $this->_getParam("idActi"), $this->_getParam("idParent")
+						, $this->_getParam("arrTags"), $this->_getParam("req")
+						, $this->_getParam("dates"), $this->_getParam("for"));
+    			$this->view->content = json_encode($data);
+				break;
+		}
     	 
     }
     
+    public function ensuprefrAction()
+    {
+    	$ensuprefr = new Flux_Ensuprefr($this->_getParam('idBase', 'flux_ecosystem'),$this->_getParam('trace'));
+    	$ensuprefr->bTraceFlush = $this->_getParam('trace');    	 
+    	switch ($this->_getParam('q')) {
+    		case "getPubli":
+    			$this->view->content =$ensuprefr->getPubli($this->_getParam('req'));
+    			break;
+    		case "saveMonade":
+    			$ensuprefr->getUser(array("login"=>$this->_getParam('user','samszo')));
+    			$this->view->content = $ensuprefr->saveMonade($this->_getParam('req'));
+    			break;
+    			 
+    	}
+    
+    }
+    
+        
 	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);
 		if ($ss->client->isAccessTokenExpired()) {

@@ -215,3 +215,5 @@ public/.DS_Store
 services/cron/script.php
 
 services/cron/traces.txt
+
+bdd/flux_diigo.sql
