@@ -6,7 +6,7 @@
   <script src="../js/d3.v4.js"></script>
   <style>
     body { margin:0 auto;}
-        h1,h2,p {
+    h1,h2,p {
       margin:0px;
     }
     svg {
@@ -31,9 +31,12 @@
 	}
     
   </style>
-  <h1 align="center"><?php echo $this->titre;?></h1>
-  <h2 align="center"><?php echo $this->soustitre;?></h2>
-  <p align="center" id="major">!</p>
+  <div id='titresViz'>
+	  <h1 align="center"><?php echo $this->titre;?></h1>
+	  <h2 align="center"><?php echo $this->soustitre;?></h2>
+	  <p align="center" id="major">-</p>
+  </div>
+  <p align="center" id="viz">-</p>
 </head>
 
 <body>
@@ -54,7 +57,9 @@
 	    
 	//d3.csv('<?php echo $this->urlData;?>', function(err, d){
 	//&dates[]=1158589136&dates[]=1461471206
-	d3.json('http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&for=stream&dateUnit=%Y', function(err, d){
+	var url = 'http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&for=stream&dateUnit=%Y';
+	//var url = 'http://localhost/jdc/public/flux/ensuprefr?q=getTagHisto&idMonade=2&idUti=1&idActi=3&idParent=1&for=stream&query=34591&dates[]=946681200&dates[]=1285884000';
+	d3.json(url, function(err, d){
 
 		
 	  if(err) console.log(err);
@@ -101,20 +106,21 @@ function buildStreamGraph(mqpdata) {
 	    .offset(d3.stackOffsetWiggle);
 	
 	var series = stack(data);
-		
-	var width = 850,
-	    height = 600;
+	var divTitreHeight = document.getElementById('titresViz').clientHeight;	
+	var margin = {top: 20, right: 30, bottom: 30, left: 30};
+	var width = window.innerWidth - margin.left - margin.right;
+	var height = window.innerHeight - margin.top - margin.bottom - divTitreHeight;
 	var extData = d3.extent(data, function(d){ return d.month; });
 	var y = d3.scaleTime()
 	    .domain([extData[1],extData[0]])
-	    .range([100, height]);
+	    .range([margin.top, height-margin.bottom]);
 	
 	// setup axis
 	var yAxis = d3.axisLeft(y);
 	  
 	var x = d3.scaleLinear()
 	    .domain([0, d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); })])
-	    .range([width/2, -200]);
+	    .range([width/2, 0]);
 	
 	var color = d3.scaleLinear()
 	    .range(["#51D0D7", "#31B5BB"]);
@@ -135,7 +141,7 @@ function buildStreamGraph(mqpdata) {
 	  var tooltip = d3.select("body").append("div")
 		.attr("class", "tooltip");
 	  
-	var svg = d3.select("body").append("svg")
+	var svg = d3.select("#viz").append("svg")
 	    .attr("width", width)
 	    .attr("height", height);
 	
@@ -143,7 +149,7 @@ function buildStreamGraph(mqpdata) {
 	    .data(series)
 	    .enter().append("path")
 	    .attr("d", area)
-	    .style("fill", function() { return color(Math.random()); })
+	    .style("fill", function() { return color(Math.random()); })	    
 	    .on('mouseover', function(d){      
 		    d3.select(this).style('fill',d3.rgb( d3.select(this).style("fill") ).brighter());
 			d3.select("#major").text(refTag[d.key].type);
@@ -164,18 +170,16 @@ function buildStreamGraph(mqpdata) {
 	    .on('mouseout', function(d){      
 	      d3.select(this).style('fill', 
 	         d3.rgb( d3.select(this).style("fill") ).darker());
-	         d3.select("#major").text("");
+	         d3.select("#major").text("-");
 	  tooltip.transition()
 	               .duration(500)
 	               .style("opacity", 0);
 	})
 	
 	svg.append("g")
-	            .attr("class", "axis axis--y")
-	            .attr("transform", "translate(" + 40 + "," + 0 + ")")
-	            .call(yAxis);  
-  
-  	var yAxisGroup = svg.append("g").call(yAxis);
+            .attr("class", "axis axis--y")
+            .attr("transform", "translate(" + 40 + "," + 0 + ")")
+            .call(yAxis);    
 }
    
   </script>

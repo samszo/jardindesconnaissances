@@ -188,4 +188,102 @@ class Flux_Ensuprefr extends Flux_Site{
 		}
     
     }
+    /** récupère l'historique des tags
+     *
+     * @param 	string	$dateUnit
+     * @param 	int	$idUti
+     * @param 	int	$idMonade
+     * @param 	int	$idActi
+     * @param 	int	$idParent
+     * @param 	array	$arrTags
+     * @param 	string	$q
+     * @param 	array	$dates
+     * @param 	string	$for
+     * @param 	string	$req
+     *
+     * @return 	array
+     *
+     */
+    function getTagHisto($dateUnit, $idUti, $idMonade, $idActi, $idParent, $arrTags, $q, $dates, $for, $req=""){
+    
+    	//ini_set("memory_limit","300M");
+    	$stats = new Flux_Stats();
+    	$sqlFormatDate = $dateUnit;
+    	$this->bTrace = false;
+    	$dbTag = new Model_DbTable_Flux_Tag($this->db);
+    	$data = $dbTag->getTagHistoRapport($idMonade
+    			, $idUti, $idActi, $idParent
+    			, $arrTags, $sqlFormatDate, $q, $dates,"req",$req);
+    	if($for=="stream"){
+    		//récupère les intervales des dates
+    		$arrDate = $stats->GetDatesInterval($data, $sqlFormatDate);
+    		
+    		//ajoute les valeurs vides pour chaque éléments
+    		$oTag = $data[0]['monaId']."_".$data[0]['reqId']."_".$data[0]['key'];
+    		$j=0; $i=0; $nbDate = count($arrDate); $nbData = count($data);
+    		$nData;
+    		//foreach ($data as $d) {
+    		for ($z = 0; $z < $nbData; $z++) {
+    			$d = $data[$z];
+    			$this->trace('temps '.$z.' : '.$i.' / '.$j,$d);
+    			$k = $d['monaId']."_".$d['reqId']."_".$d['key'];    			
+    			//on vérifie si on passe à un nouveau type
+    			if($oTag!=$k){
+    				//on fini les temps restant
+    				for ($i = $j; $i < $nbDate; $i++) {
+    					$nD = array('key'=>$oTag,'type'=>$oD['type'],'desc'=>$oD['desc']
+    							,'temps'=>$arrDate[$i],'score'=>0,'value'=>0,'monade'=>$oD['monade'],'req'=>$oD['req']
+    							,'MinDate'=>0,'MaxDate'=>0
+    					);
+    					$nData[]=$nD;
+    					$this->trace('fin nouveau temps '.$i .' / '. $j,$nD);
+    				}
+    				$j=0;
+    				$oTag=$k;  
+    			}
+    			//on calcul les temps manquant
+    			for ($i = $j; $i < $nbDate; $i++) {
+    				//$this->trace($arrDate[$i]."==".$d['temps']);
+    				if($arrDate[$i]==$d['temps']){
+    					$D = array('key'=>$k,'type'=>$d['type'],'desc'=>$d['desc']
+    							,'temps'=>$arrDate[$i],'score'=>$d['score'],'value'=>$d['value'],'monade'=>$d['monade'],'req'=>$d['req']
+    							,'MinDate'=>$d['MaxDate'],'MaxDate'=>$d['MaxDate']
+    					);    						
+    					$nData[]=$D;
+    					$j=$i+1;
+    					$i=$nbDate;
+    				}else{
+    					$nD = array('key'=>$k,'type'=>$d['type'],'desc'=>$d['desc']
+    							,'temps'=>$arrDate[$i],'score'=>0,'value'=>0,'monade'=>$d['monade'],'req'=>$d['req']
+    							,'MinDate'=>0,'MaxDate'=>0
+    					);
+    					$nData[]=$nD;
+    					$this->trace('nouveau temps '.$i .' / '. $j,$nD);
+    				}
+    			}
+    			$oD = $d;
+    		}
+    		//ordonne le tableau
+    		$data = $nData;
+    	}
+    	return $data;
+    }
+    
+    
+    SELECT e.exi_id, e.nom, e.prenom, e.data
+    ,COUNT(DISTINCT d.doc_id) nbDoc
+    ,  DATE_FORMAT(d.pubDate, "%c-%y") temps
+    FROM
+    flux_exi e
+    INNER JOIN
+    flux_rapport r ON
+    r.src_obj = 'exi'
+    		AND r.dst_obj = 'doc'
+    				AND r.pre_obj = 'acti'
+    						AND e.exi_id = r.src_id
+    						INNER JOIN
+    						flux_doc d ON d.doc_id = r.dst_id
+    						WHERE e.data != ""
+    						GROUP BY e.exi_id, temps
+    						ORDER BY e.exi_id, d.pubDate
 }

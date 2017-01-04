@@ -739,5 +739,53 @@ INNER JOIN flux_TagDoc td ON td.doc_id = d.doc_id
 INNER JOIN flux_Tag t ON t.tag_id = td.tag_id 
 WHERE `url` LIKE '%http://opencrs.com/%'
 */
+
+	
+	/**
+	 * Calcul des dates suivant un interval
+	 *
+	 * @param array	$data
+	 * @param string $sqlFormatDate
+	 * @param string $sqlFormatDate
+	 *
+	 * @return array
+	 */
+	function GetDatesInterval($data, $sqlFormatDate="") {
+	
+	
+		//récupère les extrémité des dates
+		$minDate = date("r");
+		$maxDate = 0;
+		foreach ($data as $d) {
+			if($minDate>$d['MinDate'])$minDate=$d['MinDate'];
+			if($maxDate<$d['MaxDate'])$maxDate=$d['MaxDate'];
+		}
+		$this->trace(date("r", $minDate)." -> ".date("r", $maxDate));
+		//calcul le tableau des dates
+		switch ($sqlFormatDate) {
+			case '%Y-%m':
+				$interval = new DateInterval('P1M');
+				$phpFormatDate = 'Y-m';
+				break;
+			case '%Y':
+				$interval = new DateInterval('P1Y');
+				$phpFormatDate = 'Y';
+				break;
+		
+		}
+		//
+		$curDate = new DateTime();
+		$curDate->setTimestamp($minDate);
+		$mDate = new DateTime();
+		$mDate->setTimestamp($maxDate);
+		$this->trace($curDate->format('Y-m-d'));
+		$arrDate = array();
+		while ($curDate<$mDate) {
+			$arrDate[]=$curDate->format($phpFormatDate);
+			$curDate->add($interval);
+		}
+		$this->trace("le tableau des dates",$arrDate);
+		return $arrDate;
+	}
 	
 }

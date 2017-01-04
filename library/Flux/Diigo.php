@@ -523,7 +523,7 @@ class Flux_Diigo extends Flux_Site{
     }
     
     
-    /** erécupère l'historique des tags
+    /** récupère l'historique des tags
      *
      * @param 	string	$dateUnit
      * @param 	int	$idUti

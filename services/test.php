@@ -535,7 +535,8 @@ try {
 	
 	$ensuprefr = new Flux_Ensuprefr('flux_ecosystem');
 	$ensuprefr->getUser(array("login"=>"samszo"));
-	$content = $ensuprefr->saveMonade('écosystème');
+	//$content = $ensuprefr->saveMonade('écosystème');
+	$data = $ensuprefr->getTagHisto('%Y',1, 2, 3, 1, "", "", "", "stream",1);
 	
 	
 	$s->trace("FIN TEST");			

@@ -217,3 +217,11 @@ services/cron/script.php
 services/cron/traces.txt
 
 bdd/flux_diigo.sql
+
+data/ecosystem/.~lock.flux_exi.csv#
+
+data/ecosystem/.~lock.flux_tag.csv#
+
+data/ecosystem/flux_exi.csv
+
+data/ecosystem/flux_tag.csv

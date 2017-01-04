@@ -423,7 +423,14 @@ class FluxController extends Zend_Controller_Action {
     			$ensuprefr->getUser(array("login"=>$this->_getParam('user','samszo')));
     			$this->view->content = $ensuprefr->saveMonade($this->_getParam('req'));
     			break;
-    			 
+			case "getTagHisto":
+    			$data = $ensuprefr->getTagHisto($this->_getParam("dateUnit", '%Y')
+    				, $this->_getParam("idUti"), $this->_getParam("idMonade")
+    				, $this->_getParam("idActi"), $this->_getParam("idParent")
+    				, $this->_getParam("arrTags"), $this->_getParam("req")
+    				, $this->_getParam("dates"), $this->_getParam("for"), $this->_getParam("query"));
+    			$this->view->content = json_encode($data);
+    			break;    				 
     	}
     
     }
