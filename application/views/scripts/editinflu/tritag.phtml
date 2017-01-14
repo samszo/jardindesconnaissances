@@ -1,0 +1,278 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>TRIeur de TAG</title>
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="../css/bootstrap.min.css">
+		<script src="../js/jquery.min.js"></script>
+		<script src="../js/bootstrap.min.js"></script>
+  		
+    	<script type="text/javascript" src="../js/d3.v4.js"></script>
+    	<script type="text/javascript" src="../js/autocomplete.js"></script>
+		<link rel="stylesheet" href="../css/ac-liemots.css">
+		<link rel="stylesheet" href="../css/font-awesome.css">
+    			
+		<style>
+			body {
+				background:black;			
+			}
+			text {
+			  font: bold 48px monospace;
+			}
+			
+			.enter {
+			  fill: green;
+			}
+			
+			.update {
+			  fill: #333;
+			}
+			
+			.exit {
+			  fill: brown;
+			}
+		
+			#graphicContainer {
+				height:100%;
+			}
+		
+		</style>
+	</head>
+	<body >
+		<div id="titreHead" class="page-header text-center">
+		  <h1>TRIeur de TAG</h1>
+		  <h2 id="ficUrl">-</h2>
+		  <div id="ficStat">-</div>
+		</div>
+		
+		<div class="container">
+		  <div class="row">
+		    <div class="col-sm-12" id="viz">
+		    </div>
+		  </div>
+		</div>
+		
+		<script>
+		
+		var rectTH = document.getElementById("titreHead").getBoundingClientRect(),
+			rectViz = document.getElementById("viz").getBoundingClientRect(),
+			width = rectViz.width,
+		    height = window.innerHeight-rectTH.height,
+			graphic,
+			dropsPerSec = 1,
+			windStrength = 0,
+			rainSpeed = 5000,
+			ficCSV = "../../data/ecosystem/flux_tag.csv",
+			t = d3.scaleLinear()
+			    .range([0, width]),
+			rdm, stopRain = false,
+			svgDrag, onDrag = true;
+		
+		graphic = d3.select("#viz").append("svg")
+			.attr("width", width)
+			.attr("height", height)
+			.attr("id", "graphic")
+			.attr("overflow", "hidden");
+
+		//chargement des icones
+		d3.csv(ficCSV, function(error, data) {
+			if (error) throw error;		
+		  	arrTag = data;
+		  	t.domain([0, arrTag.length-1]);
+		  	rdm = d3.randomUniform(0, arrTag.length-1);
+		  	//
+		  	d3.select("#ficUrl").text(ficCSV);
+		  	d3.select("#ficStat").text("Nb Tag = "+arrTag.length);
+			//
+			showTag();
+		  	//lance la pluie
+			d3.interval(function() {
+				//makeRain();
+				if(!stopRain)showTag();
+				}, rainSpeed);	
+			  	
+		});
+
+		function getRdmTag() {
+			var id = d3.format("d")(rdm()),
+			tag = arrTag[id];
+			return tag.code;
+		} 
+
+		function setCrible() { 
+		}
+		
+		function showTag() { 
+					
+				var startX = width/2,
+				startY = height/2,
+				id = d3.format("d")(rdm()),
+				tag = arrTag[id],
+				trans;
+				tag.num = id;
+				
+				var g = graphic.insert("g")
+				    .attr("id", "g_"+tag.tag_id)			      
+					.attr("opacity", 0)
+				    .attr("transform", "translate(" + startX + "," + startY + ")")
+				    .on("click",function(){
+				    	d3.select(this).interrupt().selectAll("*").interrupt();
+				    	tag.bb = this.getBBox();				    	
+				    	stopRain = true;
+				    	setSvgDrag(tag);				    	
+					    });				    		    				    				    		    
+					
+				var cir = g.insert("circle")
+				    .attr("cx", 0)
+				    .attr("id", "c_"+tag.tag_id)			      
+				    .attr("cy", 10)
+				    .attr("r", 0)
+				    .style("fill","white");
+				var txt = g.insert("text")
+			      .attr("id", "t_"+tag.tag_id)			      
+			      .attr("x", 0)
+			      .attr("y", 0)
+			      .style("fill","red")
+			      .attr("text-anchor","middle")
+			      .attr("alignment-baseline","middle")
+			      .text(tag.code);
+		      trans = g.transition(t)
+				.duration(rainSpeed/2)
+		        .style("opacity", 1)
+		        .transition()
+				.duration(rainSpeed/2)
+		          .style("opacity", 0)
+		          .remove();
+		}
+
+		function setSvgDrag(tag){
+			//console.log(d.bb.x+','+d.bb.y);
+		    svgDrag = graphic.selectAll("svg")
+		    	.data([tag])
+			    .enter().append("svg")
+		    	.attr('id', 'svgDrag')
+		    	.attr('x', (width/2)-(tag.bb.width/2))
+	            .attr('y', (height/2)-(tag.bb.height/2))
+				.call(d3.drag()
+		            .on("start", dragstarted)
+		            .on("drag", dragged)
+		            .on("end", dragended));
+			var g = svgDrag.append("g")
+			//.attr("transform", "translate(" + startX + "," + startY + ")")			
+		    .attr("id", function(d){
+			    return "g_"+d.tag_id;
+			    })			      
+			.attr("opacity", 1)
+		    .on("click",function(){
+		    	stopRain = true;
+			    });				  
+		    /*  		    				    				    		    
+			var rect = g.insert("rect")
+			    .attr("x", 0)
+			    .attr("id", function(d){
+			    return "r_"+d.tag_id;
+			    })			      
+			    .attr("y", 0)
+	            .attr("width", 1000)
+				.attr("height", 1000)
+			    .style("fill","white");
+			*/
+			var cir = g.insert("circle")
+			    .attr("cx", function(d){
+			    	return d.bb.width/2;
+			    })
+			    .attr("id", function(d){
+			    return "c_"+d.tag_id;
+			    })			      
+			    .attr("cy", function(d){
+			    	return d.bb.height/2;
+			    })
+			    .attr("r", function(d){
+			    	return d.bb.height/2;
+			    })
+			    .style("fill","green");
+			var txt = g.insert("text")
+		      .attr("id", function(d){
+				    return "t_"+d.tag_id;
+			    })			      
+		      .attr("x", function(d){
+			    	return d.bb.width/2;
+			    })
+		      .attr("y", function(d){
+			    	return d.bb.height/2;
+			    })
+		      .style("fill","red")
+			  .attr("alignment-baseline","middle")
+		      .attr("text-anchor","middle")
+		      .text(function(d){
+				    return d.code;
+			    });
+	    }
+		
+		function makeRain() { 
+			
+			for (var i = 0; i < dropsPerSec; i++) {
+		
+				var startX = Math.random() * width,
+				startY = Math.random() * 100 - 100,
+				endX = startX,
+				endY = height + 200,
+				tag = arrTag[d3.format("d")(t(startX))];
+				
+				var cir = graphic.insert("circle")
+				    .attr("cx", startX)
+				    .attr("id", "c_"+tag.tag_id)			      
+				    .attr("cy", startY)
+				    .attr("r", 10)
+				    .style("fill","white")
+				    .transition()
+				    	.duration(rainSpeed)
+						.attr("cx", endX)
+				    	.attr("cy", endY)		
+				    	.remove();
+				var txt = graphic.insert("text")
+			      .attr("id", "t_"+tag.tag_id)			      
+			      .attr("x", startX)
+			      .attr("y", startY)
+			      .style("fill","red")
+			      .attr("text-anchor","middle")
+			      .text(tag.code)
+				  .transition()
+					    .duration(rainSpeed)
+						.attr("x", endX)
+					    .attr("y", endY)		
+					    .remove();
+			    
+		
+			};
+		
+		}
+
+		//fonctions pour le drag & drop des tag
+		function dragstarted(d) {
+		  onDrag = true;
+		}
+		
+		function dragged(d) {
+		  //console.log(d+'='+d3.event.x+','+d3.event.y+":"+d.bb.width+','+d.bb.height);
+		  //d3.select(this).attr("x", d3.event.x-(d.bb.width/2)).attr("y", d3.event.y-(d.bb.height/2));
+		  //svgDrag.attr("x", d3.event.x-d.bb.width-10).attr("y", d3.event.y-d.bb.height-10);
+		  //svgDrag.attr("x", d3.event.x-(tIcone.w/2)).attr("y", d3.event.y-tIcone.h-10);
+		  var posi = d3.mouse(graphic.node());
+		  svgDrag.attr("x", posi[0]-(d.bb.width/2)).attr("y", posi[1]-d.bb.height-10);		  
+		}
+		
+		function dragended(d, i) {
+		  //d3.select(this).classed("active", false);
+		  svgDrag.remove();
+		  onDrag = false;
+		  stopRain = false;
+		}
+
+
+		
+		</script>
+	
+	</body>
+</html>

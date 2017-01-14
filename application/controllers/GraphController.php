@@ -302,8 +302,8 @@ class GraphController extends Zend_Controller_Action {
 		$this->view->data =  $this->_getParam('data', $dt);    	
 		$this->view->titre =  $this->_getParam('titre', "Axe d'évaluation");    	
 
-		//$this->view->conceptG = "Littéral : celui qui baisse son regard, repose son coeur";
-		//$this->view->conceptD = "Figuré : celui qui s&apos;abstient de regarder les interdits, allège son cœur";
+		$this->view->conceptG = "Littéral : celui qui baisse son regard, repose son coeur";
+		$this->view->conceptD = "Figuré : celui qui s&apos;abstient de regarder les interdits, allège son cœur";
 		//$this->view->titre =  "Proverbe : "."من غضً طرفه أراح قلبه";
 		
     }

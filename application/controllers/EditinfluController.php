@@ -245,6 +245,12 @@ class EditinfluController extends Zend_Controller_Action {
 		$this->initInstance();
     		$this->view->connect =  $this->_getParam('connect', 0);
     }	    
+
+    public function tritagAction()
+    {
+    	$this->initInstance();
+    	$this->view->connect =  $this->_getParam('connect', 0);
+    }
     
     function initInstance(){
 		$this->view->ajax = $this->_getParam('ajax');

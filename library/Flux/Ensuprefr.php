@@ -103,9 +103,9 @@ class Flux_Ensuprefr extends Flux_Site{
     	));
     	 
     	//
-    	$i = 0;
+    	$i = 6756;
     	$rows = 100;
-    	$nhits = 1000;
+    	$nhits = 10000;
     	while ($i<$nhits) {
     		$rs = json_decode($this->getPubli($req,$i,$rows));
     		$nhits = $rs->nhits;
@@ -153,11 +153,11 @@ class Flux_Ensuprefr extends Flux_Site{
     	for ($i = 0; $i < count($nomAut); $i++) {
     		$idE = $this->dbE->ajouter(array("prenom"=>$preAut[$i],"nom"=>$nomAut[$i]));
     		//ATTENTION impossible de faire le lien entre les auteurs et la structure
-    		//enregistre le rapport avec le document
+    		//enregistre le rapport avec le document et la requête
     		$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
     				,"src_id"=>$idE,"src_obj"=>"exi"
     				,"dst_id"=>$idD,"dst_obj"=>"doc"
-    				,"pre_id"=>$idAct,"pre_obj"=>"acti"
+    				,"pre_id"=>$idRap,"pre_obj"=>"rapport"
     		));    		
     	 }
     	 
@@ -171,12 +171,12 @@ class Flux_Ensuprefr extends Flux_Site{
 	    	 	$idE = $this->dbE->ajouter(array("nom"=>$s->fields->libelle,"data"=>json_encode($s)));
     	 	else
     	 		$idE = $this->dbE->ajouter(array("nom"=>"STRUCTURE INCONNUE : ".$arrStruc[$i],"data"=>json_encode($s)));
-    	 	//enregistre le rapport avec le document
+    	 	//enregistre le rapport avec le document et la requête
     	 	$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
     	 			,"src_id"=>$idE,"src_obj"=>"exi"
     	 			,"dst_id"=>$idD,"dst_obj"=>"doc"
-    	 			,"pre_id"=>$idAct,"pre_obj"=>"acti"
-    	 	));
+    				,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+    	 		));
     	 }    	 
     
     	//traitement des mots clefs
@@ -270,20 +270,5 @@ class Flux_Ensuprefr extends Flux_Site{
     }
     
     
-    SELECT e.exi_id, e.nom, e.prenom, e.data
-    ,COUNT(DISTINCT d.doc_id) nbDoc
-    ,  DATE_FORMAT(d.pubDate, "%c-%y") temps
-    FROM
-    flux_exi e
-    INNER JOIN
-    flux_rapport r ON
-    r.src_obj = 'exi'
-    		AND r.dst_obj = 'doc'
-    				AND r.pre_obj = 'acti'
-    						AND e.exi_id = r.src_id
-    						INNER JOIN
-    						flux_doc d ON d.doc_id = r.dst_id
-    						WHERE e.data != ""
-    						GROUP BY e.exi_id, temps
-    						ORDER BY e.exi_id, d.pubDate
+
 }

@@ -1,0 +1,151 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Générateur de mots à lier</title>
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="../css/bootstrap.min.css">
+		<script src="../js/jquery.min.js"></script>
+		<script src="../js/bootstrap.min.js"></script>
+  		
+    	<script type="text/javascript" src="../js/d3.v4.js"></script>
+    	<script type="text/javascript" src="../js/autocomplete.js"></script>
+		<link rel="stylesheet" href="../css/ac-liemots.css">
+	</head>
+<body>
+
+<div class="page-header text-center">
+  <h3>Mots à lier</h3>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-4" id="gauche">
+    </div>
+    <div class="col-sm-4" id="centre">
+    </div>
+    <div class="col-sm-4" id="droite"> 
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+    //Variable to hold autocomplete options
+    var keysD, keysG;
+	//autres variables
+    var messageInput = "Taper une lettre pour sélectionner les mots à afficher";
+    var r=10, marge=4, dataset = {'droite':[],'gauche':[]};
+    for (i = 0; i < 13; i++) { 
+    	dataset.droite.push('acd_'+i);
+    	dataset.gauche.push('acg_'+i);
+    }    
+    
+    //Load US States as options from CSV - but this can also be created dynamically
+    var urlD = "../data/proverbeHaiti.csv";
+    var urlG = "../data/proverbeFrance.csv";
+    d3.csv(urlD,function (csv) {
+        keysD=csv;
+        d3.csv(urlG,function (csv) {
+            keysG=csv;
+            start();
+        });            
+    });
+
+
+    //Call back for when user selects an option
+    function onSelect(d) {
+        console.log(d.State);
+    }
+
+    //Setup and render the autocomplete
+    function start() {
+		//met en place les formulaire d'autocompletion
+    	var dDroite = d3.select("#droite").selectAll("div")
+	        .data(dataset.droite)
+	        .enter()
+	        .append("div")
+	        .attr("id",function(d){
+		        return d;
+	        });
+    	var dGauche = d3.select("#gauche").selectAll("div")
+	        .data(dataset.gauche)
+	        .enter()
+	        .append("div")
+	        .attr("id",function(d){
+		        return d;
+	        });
+    	setAutocomplete();        
+    }
+
+	function setAutocomplete(){
+		dataset.droite.forEach(function(d){
+	        var mc = autocomplete(document.getElementById(d))
+	        .keys(keysD)
+	        .dataField("valeur")
+	        .placeHolder(messageInput)
+	        .width(960)
+	        .height(500)
+	        .onSelected(onSelect)
+	        .render();
+		})
+		dataset.gauche.forEach(function(d){
+	        var mc = autocomplete(document.getElementById(d))
+	        .keys(keysG)
+	        .dataField("valeur")
+	        .placeHolder(messageInput)
+	        .width(960)
+	        .height(500)
+	        .onSelected(onSelect)
+	        .render();
+		})
+		setPoints();        
+	}
+
+	function setPoints(){
+        //ajoute les points
+		var svgContainer = d3.select("#centre").append("svg")
+			.attr("id", "svgGlobal")
+			.attr("width", "100%")
+            .attr("height", "100%");
+		//récupère les cordonnées du svg
+		var rectSVG = document.getElementById("svgGlobal").getBoundingClientRect();		 
+		//ajoute les points à droites
+		var circlesDroite = svgContainer.selectAll(".cD")
+			.data(dataset.droite)
+			.enter()
+			.append("circle")
+			.attr("class", "cD")
+			.attr("cx", function (d) {
+				return rectSVG.width - r; 
+				})
+			.attr("cy", function (d) {
+				var rect = document.getElementById(d).getBoundingClientRect();
+				return rect.top-rectSVG.top+(rect.height/2); 
+				 })
+			.attr("r", r)
+			.style("fill", "red");    	
+		//ajoute les points à gauche
+		var circlesGauche = svgContainer.selectAll(".cG")
+			.data(dataset.gauche)
+			.enter()
+			.append("circle")
+			.attr("class", "cG")
+			.attr("cx", function (d) {
+				return r; 
+				})
+			.attr("cy", function (d) {
+				var rect = document.getElementById(d).getBoundingClientRect();
+				return rect.top-rectSVG.top+(rect.height/2); 
+				 })
+			.attr("r", r)
+			.style("fill", "green");    	
+		
+	}
+    
+</script>
+
+</body>
+
+</html>

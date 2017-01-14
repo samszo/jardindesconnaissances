@@ -225,3 +225,5 @@ data/ecosystem/.~lock.flux_tag.csv#
 data/ecosystem/flux_exi.csv
 
 data/ecosystem/flux_tag.csv
+
+bdd/flux_ecosystem.sql

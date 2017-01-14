@@ -39,6 +39,11 @@ class PlisagesController extends Zend_Controller_Action
     	
     }
 
+    public function liemotsAction()
+    {
+    	 
+    }
+    
     public function sauveinclinaisonAction()
     {
     		$auth = Zend_Auth::getInstance();
