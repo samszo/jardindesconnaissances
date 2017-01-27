@@ -5,12 +5,29 @@
 		
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="../css/bootstrap.min.css">
-		<script src="../js/jquery.min.js"></script>
-		<script src="../js/bootstrap.min.js"></script>
-  		
+		<link rel="stylesheet" href="../css/font-awesome.css">
+		<link rel="stylesheet" href="../css/ac-liemots.css">
+		<script type="text/javascript" src="../js/jquery.min.js"></script>
+		<script type="text/javascript" src="../js/bootstrap.min.js"></script>  		
     	<script type="text/javascript" src="../js/d3.v4.js"></script>
     	<script type="text/javascript" src="../js/autocomplete.js"></script>
-		<link rel="stylesheet" href="../css/ac-liemots.css">
+    	
+		<style>
+			.btnIHM {
+				cursor:pointer;
+			    background-color:black;
+			}
+			.btnIHM:hover {
+			    background-color:lightgray;
+			}	
+			line {
+			    stroke: steelblue;
+			    stroke-width: 2px;
+			    stroke-linecap: round;
+			}		
+		</style>	
+    	
+    	
 	</head>
 <body>
 
@@ -19,6 +36,11 @@
 </div>
 
 <div class="container">
+  <div class="row" id="lstBoutons">
+    <div class="col-sm-12" >
+      <i class="fa fa-3x fa-random" id="btnRdm" aria-hidden="true"></i>
+    </div>  
+  </div>
   <div class="row">
     <div class="col-sm-4" id="gauche">
     </div>
@@ -34,12 +56,15 @@
 
     //Variable to hold autocomplete options
     var keysD, keysG;
+    var rdmD, rdmG;
+    var svgContainer, line, lineEnd=false;
+    
 	//autres variables
     var messageInput = "Taper une lettre pour sélectionner les mots à afficher";
-    var r=10, marge=4, dataset = {'droite':[],'gauche':[]};
+    var r=20, marge=4, dataset = {'droite':[],'gauche':[]};
     for (i = 0; i < 13; i++) { 
-    	dataset.droite.push('acd_'+i);
-    	dataset.gauche.push('acg_'+i);
+	    	dataset.droite.push('acd_'+i);
+	    	dataset.gauche.push('acg_'+i);
     }    
     
     //Load US States as options from CSV - but this can also be created dynamically
@@ -47,8 +72,10 @@
     var urlG = "../data/proverbeFrance.csv";
     d3.csv(urlD,function (csv) {
         keysD=csv;
+        rdmD = d3.randomUniform(0, keysD.length-1);
         d3.csv(urlG,function (csv) {
             keysG=csv;
+            rdmG = d3.randomUniform(0, keysG.length-1);
             start();
         });            
     });
@@ -62,26 +89,48 @@
     //Setup and render the autocomplete
     function start() {
 		//met en place les formulaire d'autocompletion
-    	var dDroite = d3.select("#droite").selectAll("div")
-	        .data(dataset.droite)
-	        .enter()
-	        .append("div")
-	        .attr("id",function(d){
-		        return d;
-	        });
-    	var dGauche = d3.select("#gauche").selectAll("div")
-	        .data(dataset.gauche)
-	        .enter()
-	        .append("div")
-	        .attr("id",function(d){
-		        return d;
-	        });
-    	setAutocomplete();        
+	    	var dDroite = d3.select("#droite").selectAll("div")
+		        .data(dataset.droite)
+		        .enter()
+		        .append("div")
+		        .attr("id",function(d){
+			        return d;
+		        });
+	    	var dGauche = d3.select("#gauche").selectAll("div")
+		        .data(dataset.gauche)
+		        .enter()
+		        .append("div")
+		        .attr("id",function(d){
+			        return d;
+		        });
+	    	setAutocomplete();
+	    	setButton();        
     }
 
+	function setButton(){
+		d3.select("#btnRdm")
+			.on("click",setRdmListe)
+			.style("cursor","pointer");
+			//.attr("class","btnIHM");		
+	}
+
+	function setRdmListe(){
+		console.log('setRdmListe');
+		d3.selectAll("input")
+			.each(setRdmValue);
+	}
+    function setRdmValue(d){
+        var val;
+        if(d.substr(0,3)=='acd')
+            val = keysD[Math.round(rdmD())].valeur;
+        else
+            val = keysG[Math.round(rdmG())].valeur;
+	    	d3.select(this).property("value", val);
+    }
+    
 	function setAutocomplete(){
 		dataset.droite.forEach(function(d){
-	        var mc = autocomplete(document.getElementById(d))
+			autocomplete(document.getElementById(d))
 	        .keys(keysD)
 	        .dataField("valeur")
 	        .placeHolder(messageInput)
@@ -105,10 +154,11 @@
 
 	function setPoints(){
         //ajoute les points
-		var svgContainer = d3.select("#centre").append("svg")
+		svgContainer = d3.select("#centre").append("svg")
 			.attr("id", "svgGlobal")
 			.attr("width", "100%")
-            .attr("height", "100%");
+            .attr("height", "100%")
+            .on("mouseup", mouseupVide);
 		//récupère les cordonnées du svg
 		var rectSVG = document.getElementById("svgGlobal").getBoundingClientRect();		 
 		//ajoute les points à droites
@@ -125,6 +175,10 @@
 				return rect.top-rectSVG.top+(rect.height/2); 
 				 })
 			.attr("r", r)
+            .on("mousedown", mousedown)			
+			.on("mouseup", mouseup)		
+			.on("mouseover", mouseoverCircle)		
+			.on("mouseout", mouseoutCircle)		
 			.style("fill", "red");    	
 		//ajoute les points à gauche
 		var circlesGauche = svgContainer.selectAll(".cG")
@@ -140,10 +194,56 @@
 				return rect.top-rectSVG.top+(rect.height/2); 
 				 })
 			.attr("r", r)
-			.style("fill", "green");    	
-		
+            .on("mousedown", mousedown)			
+			.on("mouseup", mouseup)		
+			.on("mouseover", mouseoverCircle)		
+			.on("mouseout", mouseoutCircle)		
+			.style("fill", "green");    			
 	}
-    
+
+	//pour le dessin 
+	function mousedown() {
+	    var m = d3.mouse(this);
+	    var c = d3.select(this);
+	    c.attr("r", r*2);
+	    line = svgContainer.append("line")
+	        .attr("x1", m[0])
+	        .attr("y1", m[1])
+	        .attr("x2", m[0])
+	        .attr("y2", m[1]);
+	    lineEnd = false;
+	    svgContainer.on("mousemove", mousemove);
+	}
+
+	function mousemove() {
+	    var m = d3.mouse(this);
+	    line.attr("x2", m[0])
+	        .attr("y2", m[1]);
+	}
+
+	function mouseup() {
+	    var c = d3.select(this);
+	    c.attr("r", r*2);
+	}	
+
+	function mouseupVide() {
+		if(!lineEnd)line.remove();
+		else lineEnd = false;		
+		svgContainer.on("mousemove", null);
+	}	
+
+	function mouseoverCircle(){
+	    var c = d3.select(this);
+	    c.attr("r", r*2);
+	    lineEnd = true;	    
+	}
+	function mouseoutCircle(){
+	    var c = d3.select(this);
+	    c.attr("r", r);
+	    lineEnd = false;	    
+	}
+
+	
 </script>
 
 </body>
