@@ -478,11 +478,12 @@ try {
 	$ris = new RISReader();
 	$ris->parseFile("../../cdnl-2015-prod/excode/bdd/shelf.ris");
 	*/
-	/*
-	$bup8 = new Flux_Bup8("cdnl_excode");
+	//
+	$bup8 = new Flux_Bup8("flux_excode");
 	$bup8->bCache = true;
-	$bup8->setListe(3713);
-    */
+	//$bup8->setListe(3913);
+	$bup8->getListe(3913);
+    //
 	
 	/*
 	$mp = new Flux_Proverbe("flux_proverbes",true);
@@ -532,12 +533,12 @@ try {
 	$crntl->getSynonyme("aide");
 	$crntl->getAntonyme("fermeté");
 	*/
-	
+	/*
 	$ensuprefr = new Flux_Ensuprefr('flux_ecosystem');
 	$ensuprefr->getUser(array("login"=>"samszo"));
 	//$content = $ensuprefr->saveMonade('écosystème');
 	$data = $ensuprefr->getTagHisto('%Y',1, 2, 3, 1, "", "", "", "stream",1);
-	
+	*/
 	
 	$s->trace("FIN TEST");			
 	

@@ -359,7 +359,7 @@ class Flux_Site{
 				if($cols){
 					$arrR = array();
 					for ($i = 0; $i < count($cols); $i++) {
-						$arrR[$cols[$i]]=$r[$i];
+						if(isset($r[$i]))$arrR[$cols[$i]]=$r[$i];
 					}
 					$r = $arrR;	
 				}

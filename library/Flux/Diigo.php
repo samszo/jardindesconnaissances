@@ -94,7 +94,7 @@ class Flux_Diigo extends Flux_Site{
 		set_time_limit(0);
 		
   		if(!$login)$login=$this->login;
-    	$this->getUser(array("login"=>$login,"flux"=>"diigo"));
+    		$this->getUser(array("login"=>$login,"flux"=>"diigo"));
     		
 		$this->trace("LOGIN ".$login." : ".$this->user);				
     		

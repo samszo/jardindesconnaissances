@@ -1,0 +1,305 @@
+/* Projet iks ray */
+@font-face {
+    font-family: 'comfortaabold';
+    src: url('../../fonts/../../fonts/comfortaa_bold-webfont.eot');
+    src: url('../../fonts/comfortaa_bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../../fonts/comfortaa_bold-webfont.woff2') format('woff2'),
+         url('../../fonts/comfortaa_bold-webfont.woff') format('woff'),
+         url('../../fonts/comfortaa_bold-webfont.ttf') format('truetype'),
+         url('../../fonts/comfortaa_bold-webfont.svg#comfortaabold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'comfortaaregular';
+    src: url('../../fonts/comfortaa_regular-webfont.eot');
+    src: url('../../fonts/comfortaa_regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../../fonts/comfortaa_regular-webfont.woff2') format('woff2'),
+         url('../../fonts/comfortaa_regular-webfont.woff') format('woff'),
+         url('../../fonts/comfortaa_regular-webfont.ttf') format('truetype'),
+         url('../../fonts/comfortaa_regular-webfont.svg#comfortaaregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'comfortaathin';
+    src: url('../../fonts/comfortaa_thin-webfont.eot');
+    src: url('../../fonts/comfortaa_thin-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../../fonts/comfortaa_thin-webfont.woff2') format('woff2'),
+         url('../../fonts/comfortaa_thin-webfont.woff') format('woff'),
+         url('../../fonts/comfortaa_thin-webfont.ttf') format('truetype'),
+         url('../../fonts/comfortaa_thin-webfont.svg#comfortaathin') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'rawengulksansregular';
+    src: url('../../fonts/rawengulksans-094-webfont.eot');
+    src: url('../../fonts/rawengulksans-094-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../../fonts/rawengulksans-094-webfont.woff2') format('woff2'),
+         url('../../fonts/rawengulksans-094-webfont.woff') format('woff'),
+         url('../../fonts/rawengulksans-094-webfont.ttf') format('truetype'),
+         url('../../fonts/rawengulksans-094-webfont.svg#rawengulksansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
+/* --------------------------------------HEADER--------------------------------------------------- */
+
+header{
+	background-color:#fff;
+	border-bottom:4px solid #48c0eb;
+	-webkit-box-shadow: 0 20px 10px 0 rgba(0,0,0,0.5);
+	box-shadow: 0 20px 10px 0 rgba(0,0,0,0.5);
+}
+@media (max-width: 767px){ 
+	header{
+		position:fixed;
+		width:100%;
+		z-index:15;
+	}
+	section{
+		padding-top:85px!important;
+	}
+}
+
+nav p{color:#452c1b;}
+header a{color:#452c1b;}
+header a:hover{color:#ea0806;}
+
+header li:nth-child(2) a:hover{color:#373393;}
+header li:nth-child(3) a:hover{color:#77b735;}
+header li:nth-child(4) a:hover{color:#951d2d;}
+header li:nth-child(5) a:hover{color:#6b1756;}
+header li:nth-child(6) a:hover{color:#c4be1e;}
+
+
+nav li a{
+	padding:15px;
+	font-size:20px;
+}
+
+@media (min-width: 768px){  /* grand ecran */
+	nav{
+		text-align:right;
+		padding-top:85px;/* 85 */
+	}
+	nav li, nav li a{ display:inline-block;}
+
+}
+@media (min-width: 768px) and (max-width: 991px){  /* moyen ecran */
+	nav{
+		padding-top:38px;
+	}
+}
+
+@media (max-width: 767px){  /* petit ecran */
+	nav{
+		text-align:center;
+	}
+	.menu ul{
+		display:none; /* au démarrage de la page  */
+	}
+	.menu{
+		position:absolute;
+		z-index:700;
+		width:100%;
+		background-color:#fff;
+		/*background-image:url("../design/menu-bg.png");
+		background-repeat:repeat-x;
+		border-bottom:4px solid #48c0eb;*/
+	}
+	nav li, nav li a{ display:block;}
+
+}
+
+
+/* ----- Bouton = et logo -------- */
+
+#logo-mini{display:none;}
+
+@media (max-width: 767px){  
+	#logo{display:none;}
+	#logo-mini{display:inline;}
+}
+#btn-nav{
+	display:none;
+	position:absolute;
+	top:0px;
+	right:0px;
+	cursor:pointer;
+}
+@media (max-width: 767px){  
+	#btn-nav{display:block;}
+}
+
+/* --------------- equipe icone ------------- */
+#btn-equipe-phone{display:none;}
+#info-equipe-joueur{display:none;}
+@media (max-width: 767px){  
+	#btn-equipe-phone{
+		display:inline-block;
+		position:absolute;
+		top:0px;
+		right:145px;
+		/*cursor:pointer;*/
+	}
+	#info-equipe-joueur{
+		display:inline-block;
+		position:absolute;
+		font-size:14px;
+		top:13px;
+		width:90px;
+		right:60px;
+	}
+}
+.btn-equipe-pc a{
+	padding:0;
+}
+.icone-equipe-joueur{
+	width:42px;
+	height:42px;
+	margin:6px;
+	background-color:#f00;
+}
+
+
+/* -----------------------------------------GENERAL----------------------------------------------------- */
+
+body{ 
+	background-color:#ffffff; 
+}
+#content{
+	background-color:#fff; 
+	background-image:url("../../img/excode/bg.png");
+	background-repeat:repeat-x;
+}
+
+p, select, textarea, .content input[type=text]{
+	font-family: 'comfortaaregular';
+	font-size: 16px;
+}
+a{
+	font-family: 'comfortaabold';
+	font-size: 16px;
+}
+strong{font-family: 'comfortaabold'; font-weight:normal;}
+.droite{text-align:right;}
+.centre{text-align:center;}
+.souligne{text-decoration:underline;}
+
+h1{
+	font-size:42px;
+	font-family:'rawengulksansregular';
+	margin-bottom:15px;
+}
+h2{
+	font-size:34px;
+	font-family:'rawengulksansregular';
+	margin-bottom:8px;
+}
+h3{
+	font-size:26px;
+	font-family:'comfortaabold';
+}
+h4{
+	font-size:18px;
+	font-family:'comfortaabold';
+}
+
+h1, h2, h3, h4, section p, section li{color:#452c1b;}
+
+
+/* -------------------------Content section----------------------- */
+
+section{
+	padding-top:25px;
+	padding-bottom:25px;
+}
+
+section p{
+	line-height:24px;
+	margin-bottom:25px;
+}
+
+.date{
+	font-style : italic;
+	margin-bottom:10px;
+}
+
+section a{color:#48c0eb;}
+section a:hover{color:#fbb03b;}
+section li{margin-bottom:5px;}
+
+section a{
+/*color:#2a0fef;*/ 
+text-decoration:underline;
+}
+
+
+
+
+
+
+
+/* --------------------------------------FOOTER--------------------------------------------------- */
+
+footer{
+	background-color:#c6c6c6;
+	padding-top:20px;
+	padding-bottom:40px;
+	text-align:center;
+	border-top:4px solid #faaf3a;
+}
+footer li{
+	display:inline;
+	color:#452c1b;
+}
+footer li a, .pagination-footer a{
+	padding: 5px;
+	margin: 10px;
+	color:#452c1b;
+	font-family: 'comfortaaregular';
+}
+.pagination-footer a{display:inline-block;}
+.pagination-footer a:hover{color:#452c1b;}
+
+footer p, footer p a, .pagination-footer{
+	color:#452c1b;
+	font-size:14px;
+}
+footer a:hover{color:#452c1b; font-family: 'comfortaaregular';}
+
+.pagination-footer{
+	text-align:right;
+	width:100%;
+	margin-top:10px;
+	margin-bottom:2px;
+}
+
+@media (max-width: 767px){
+	.pagination-footer{text-align:center;}
+	footer li{
+		display:block;
+		margin-bottom:15px;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

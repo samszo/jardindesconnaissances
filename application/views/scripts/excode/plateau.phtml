@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>ExCode</title>
+		<meta name="description" content=" " />
+		<meta name="keywords" content=" " />
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+		<link rel="icon" type="image/png" href="../img/excode/icon.png" />
+		<link href="../css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+		<link href="../css/excode/reset.css" rel="stylesheet" type="text/css"/>
+		<link href="../css/excode/style.css" rel="stylesheet" type="text/css"/>
+		<link href="../css/excode/jeu.css" rel="stylesheet" type="text/css"/>
+		
+	    	<script type="text/javascript" src="../js/d3.v3.js"></script>
+		<script type="text/javascript" src="../js/d3.hexbin.min.js"></script>
+		<script type="text/javascript" src="../js/jquery.min.js"></script>
+		<script type="text/javascript" src="../js/bootstrap.min.js"></script>  		
+		
+	</head>
+	<body>
+		<header>
+		<div class="container">
+		<div class="row">
+		<div class="col-sm-4">
+		<img id="logo" src="../img/excode/logo.png" title="iks-ray" alt="logo de iks-ray"/>
+		<img id="logo-mini" src="../img/excode/logo-mini.png" title="iks-ray" alt="logo de iks-ray"/>
+		<img id="btn-nav" src="../img/excode/bstrap.png" alt="menu"/>
+		<img id="btn-equipe-phone" class="icone-equipe-joueur" src="../img/excode/equipe.png" alt="equipe"/>
+		<p id="info-equipe-joueur">équipe</p>
+		</div>
+		<nav class="col-sm-8 menu">		
+		<ul>
+		<li><a id="btn-reset" href="#">Reset</a></li>
+		<li><a id="btncodebarre" href="#">Scan un livre</a></li>
+		<li><a id="btn-dev" href="#">Menu DEV.</a></li>
+		<li>
+		<div class="dropdown">
+		  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Cartes
+		  <span class="caret"></span></button>
+		  <ul class="dropdown-menu" id="lstCarte" >
+		  </ul>
+		</div>		
+		
+		</li>
+		<li><a id="btn-calcul" href="#">Calcul Points</a></li>
+		<li class="hidden-xs btn-equipe-pc"><a href="#"><img class="icone-equipe-joueur" src="../img/excode/equipe.png" title="Votre équipe" alt="equipe"/></a></li>
+		</ul>
+		</nav>
+		</div>
+		<div class="row">
+		<div class="col-sm-12 centre">
+		
+		
+			
+		</div>
+		</div>
+		<div class="row" id="interface-pose">
+		<div class="col-sm-12 centre">
+		<p><strong>Choisis</strong> et <strong>tourne</strong> la pièce</p>
+		<br>
+		<!--<button id="btn-p0">0</button><button id="btn-p1">1</button><button id="btn-p2">2</button> -->
+		<img id="btn-p0" src="../img/excode/p0.png" alt="O 1"/>
+		<img id="btn-p1" src="../img/excode/p1.png" alt="O 2"/>
+		<img id="btn-p2" src="../img/excode/p2.png" alt="O 3"/>
+		<br><br>
+		<button id="btn-valider"> Valider </button>
+		</div>
+		</div>
+		<div class="row" id="interface-infos">
+		<div class="col-xs-5 centre">
+		<img id="infos-couverture" src="../img/excode/livre.jpg" alt="couverture"/>
+		</div>
+		<div class="col-xs-7">
+		<p id="collection">collection</p>
+		<p id="titre">titre</p>
+		<br>
+		<p>Cote : </p>
+		<p id="cote">cote</p>
+		</div>
+		</div>
+		</div>
+		</header>
+		<div id="content">
+		</div>
+		
+		<script type="text/javascript" src="../js/excode.js"></script>
+	</body>
+</html>

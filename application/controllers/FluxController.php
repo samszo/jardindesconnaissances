@@ -250,10 +250,14 @@ class FluxController extends Zend_Controller_Action {
 	   	$buP8->bTrace = false;
 	   	$buP8->trace(__METHOD__." : ".$this->_getParam('obj'));
 	   	
-	   	switch ($this->_getParam('obj')) {
-	   		case 'getListe':
-				$this->view->reponse = $bnf->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
+	   	  switch ($this->_getParam('obj')) {
+	   		case 'getListeLivre':
+	   			$this->view->reponse = $buP8->getListeLivre($this->_getParam('idListe'));
 	   			break;	   		
+   			case 'getListe':
+	   			$this->view->reponse = json_encode($buP8->getListe());
+	   			//$this->view->reponse = $bnf->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
+	   			break;	   				 
 	   		case 'setListe':
 	   			$buP8->trace('idListe='.$this->_getParam('idListe'));
 	   			$arr = $buP8->setListe($this->_getParam('idListe'));

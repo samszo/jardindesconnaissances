@@ -1,0 +1,186 @@
+/* Projet iks ray                                 */
+/* Menu : Inscription, rejoindre une partie, etc. */
+
+
+
+form p{
+	margin:0;
+
+}
+input[type=text], input[type=password], input[type=email]{
+	margin-bottom:20px;
+	padding:8px;
+	font-family:"comfortaa";
+	color:#452c1b;
+	border:2px solid #47c0eb;
+	-webkit-box-shadow:inset 3px 3px 2px 4px #eee;
+	box-shadow:inset 3px 3px 2px 4px #eee;
+	-webkit-border-radius:3px;
+	border-radius: 3px;
+}
+input[type=text]:focus, input[type=password]:focus, input[type=email]:focus{
+	border:3px solid #faaf3a;
+	padding:7px;
+}
+
+input[type=submit], .btn-bleu{
+	color:#fff;
+	background-color:#47c0eb;
+	padding:10px 24px 14px 24px;
+	border:0;
+	font-family:"comfortaabold";
+	
+	background: -moz-linear-gradient(top, #47c0eb 0%, #47c0eb 89%, #3b9ebf 89%, #3b9ebf 100%);
+	background: -webkit-linear-gradient(top, #47c0eb 0%,#47c0eb 89%,#3b9ebf 89%,#3b9ebf 100%);
+	background: linear-gradient(to bottom, #47c0eb 0%,#47c0eb 89%,#3b9ebf 89%,#3b9ebf 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#47c0eb', endColorstr='#3b9ebf',GradientType=0 );
+}
+input[type=submit]:active, .btn-bleu:active{
+	background-color:#3B9EBF!important;
+	color:#fff;
+	text-decoration:none;
+	background: #3b9ebf;
+	background: -moz-linear-gradient(top, #3b9ebf 0%, #47c0eb 100%);
+	background: -webkit-linear-gradient(top, #3b9ebf 0%,#47c0eb 100%);
+	background: linear-gradient(to bottom, #3b9ebf 0%,#47c0eb 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b9ebf', endColorstr='#47c0eb',GradientType=0 );
+	padding:12px 24px 12px 24px;
+}
+.btn-bleu{
+	display:inline-block;
+	text-decoration:none;
+}
+.btn-bleu:hover{
+	color:#fff;
+	text-decoration:none;
+}
+
+
+
+
+/* ----------choix salle---------- */
+
+.choix-etage{
+	margin:0px;
+	padding:10px;
+}
+.choix-etage:hover{
+text-decoration:underline;
+}
+#container-slider{
+	width:100%;
+	height:400px;
+	overflow:hidden;
+	position:relative;
+	/*background-color:#ece;*/
+}
+
+#container-slider ul{
+	width:500px; /* largeur ecran X 2 */
+	position:absolute;
+	left:0px;
+	top:0px;
+	display:inline-block;
+}
+#container-slider li{
+	width:250px; /* largeur ecran */
+	float:left;
+	text-align:center;
+}
+#container-slider ul li:first-child{
+	/*background-color:#ffa;*/
+}
+#container-slider ul li:last-child{
+	/*background-color:#aff;*/
+}
+
+.plan{
+	position:relative;
+	display:inline-block;
+}
+.plan a{
+	position:absolute;
+	display:inline-block;
+	/*background-color:#ff8;*/
+}
+
+.salle-vert{height:32px;left:116px;top:22px;width:121px;}
+.salle-orange{height:40px;left:27px;top:152px;width:111px;}
+.salle-violet{height:59px;left:116px;top:214px;width:121px;}
+
+.salle-rose{width:61px;height:100px;top:33px;left:90px;}
+.salle-bleu{height:105px;left:167px;top:49px;width:73px;}
+.salle-rouge{height:76px;left:92px;top:174px;width:111px;}
+.salle-marron{height:59px;left:0px;top:136px;width:86px;}
+
+
+
+/* -----------------tableau equipe--------------- */
+
+table{
+	width:100%;
+	font-family:"comfortaa";
+	-webkit-box-shadow: 0 0 5px 5px #eeeeee;
+	box-shadow: 0 0 5px 5px #eeeeee;
+}
+/*table tr td:last-child{font-family:"comfortaabold";}*/
+
+table td{padding:10px 0 10px 0;}
+
+table tr:nth-child(1){
+	background-color: #452c1b;
+	/*font-family:"comfortaabold";*/
+	color:#fff;
+}
+table .logo-equipe{
+	height:40px;width:40px;
+	display:inline-block;
+	background-color:#f00;
+}
+table .logo-equipe img{
+	width:100%;
+	height:auto;
+}
+
+
+
+
+
+
+
+
+@media (min-width: 768px){  /* grand et moyen ecran */
+
+
+}
+@media (min-width: 768px) and (max-width: 991px){  /* moyen ecran uniquement */
+
+
+}
+@media (max-width: 767px){  /* petit ecran */
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
