@@ -82,18 +82,7 @@ $(document).ready(function(){
 	    .scaleExtent([0.5, 1])
 	    .on("zoom", zoomed);
 	
-	var svg = d3.select("#content").append("svg")
-	    .attr("width", width )
-	    .attr("height", height )
-		.append("g")
-		.call(zoom).on("dblclick.zoom", null).append("g");
-	
-	svg.append("clipPath")
-	    .attr("id", "clip")
-	  .append("rect")
-	    .attr("class", "mesh")
-	    .attr("width", width)
-	    .attr("height", height);
+	var svg;
 	
 	var selectTui, selectRot, selectColor;
 	
@@ -129,6 +118,21 @@ $(document).ready(function(){
 					val.data.couverture="../img/excode/logo-mini.png";
 			});
 			*/
+			d3.select("svg").remove();
+			svg = d3.select("#content").append("svg")
+			    .attr("width", width )
+			    .attr("height", height )
+				.append("g")
+				.call(zoom).on("dblclick.zoom", null).append("g");
+		
+			svg.append("clipPath")
+			    .attr("id", "clip")
+			  .append("rect")
+			    .attr("class", "mesh")
+			    .attr("width", width)
+			    .attr("height", height);			
+			
+			
 			liste = data;
 			livres = data.livres;
 			})
@@ -394,7 +398,7 @@ function creaGrille(){
 		limit2 = etendu; //nombre d'hexagone autour du centre
 		
 	//alert(livres[1].Titre);
-	
+	grille = [];
 	var bgcolor = "#eee";
 	var k = 0;
     for (var j = -etendu; j <= etendu; j++) {

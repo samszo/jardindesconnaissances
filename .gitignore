@@ -229,3 +229,4 @@ data/ecosystem/flux_tag.csv
 bdd/flux_ecosystem.sql
 
 data/persee/
+bdd/flux_excode.sql
