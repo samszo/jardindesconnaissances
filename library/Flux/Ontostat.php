@@ -269,18 +269,8 @@ EOT
      *
      */
     function exportToSimpleRDF(){
-    
-    	//récupère les data
-    	$rs = $this->getClassData();
-    
+        
     	$scheme = self::$scheme;
-    	$nomThe = self::$nomThe;
-    	$uriThe = $scheme."/mnd".$rs[0]['monade_id']."d".$rs[0]['docid'];
-    	$d = new DateTime();
-    	$dateJ = $d->format('Y-m-d');
-    
-    	//récupère l'identifiant unique
-    	$guid = $this->guid();
     
     	// Start building up a RDF graph
     	$ret = array(
@@ -296,15 +286,28 @@ EOT
     	);
     	$output = "";
     
+    	//création des concepts de regroupement
+    	$rsCptGroup = $this->getConceptGroup();
+    	foreach ($rsCptGroup as $cg) {
+    		$output .= '<rdfs:Class rdf:about="'.$scheme."/".$cg['code'].'">
+    			<rdfs:label xml:lang="fr">'.$this->xml_entities($cg['code']).'</rdfs:label>
+    			<rdfs:comment>Pas de commentaire</rdfs:comment>
+		    </rdfs:Class>'. PHP_EOL;
+    		$ret[] = $output;
+    	}
+    	 
+    	
     	//création du RDF
-    	$arrMember = array();
+    	//récupère les data
+    	$rs = $this->getClassData();
     	foreach ($rs as $r) {
     		$uri = $scheme."/".$r['code'];
     		//création des top Concepts
-    		$output .= '<owl:AnnotationProperty rdf:about="'.$uri.'">
+    		$output = '<rdfs:Class rdf:about="'.$uri.'">
             <rdfs:label xml:lang="fr">'.$r['code'].'</rdfs:label>
             <rdfs:comment xml:lang="fr">'.$this->xml_entities($r['desc']).'</rdfs:comment>
-	    </owl:AnnotationProperty>' . PHP_EOL;
+            	<rdfs:subClassOf rdf:resource="'.$scheme."/".$r['type'].'"/>	
+        </rdfs:Class>' . PHP_EOL;
     		$ret[] = $output;    		
     	}
 
