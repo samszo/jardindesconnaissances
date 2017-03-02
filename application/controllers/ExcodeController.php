@@ -3,7 +3,7 @@
 class ExcodeController extends Zend_Controller_Action
 {
 	var $idBase = "flux_excode";
-	var $urlRedir = 'Excode?idBase=';
+	var $urlRedir = 'excode/plateau';
 	
     public function indexAction()
     {
@@ -12,23 +12,16 @@ class ExcodeController extends Zend_Controller_Action
 		$apikeys = $config->getOption('apikeys');
     		$this->view->userGeoname = $apikeys['geoname']['username'];     	
 		$this->view->idBase = $this->_getParam('idBase', $this->idBase);
-
-    		$auth = Zend_Auth::getInstance();
-		if ($auth->hasIdentity()) {						
-			// l'identité existe ; on la récupère
-		    $this->view->identite = $auth->getIdentity();
-		    $ssUti = new Zend_Session_Namespace('uti');
-		    $ssUti->redir = $this->urlRedir.$this->dbNom;
-		    $this->view->uti = $ssUti->uti;
-		}else{			
-		    $this->view->identite = false;
-		}   
-		 		
+		$this->view->urlConnect = "auth/cas?idBase=".$this->view->idBase."&redir=".$this->urlRedir;
+			     
     }
 
     public function plateauAction()
     {
-
+    		$ssUti = new Zend_Session_Namespace('uti');
+    		echo "redir=".$this->_getParam('idUti');
+    		//if(!$ssUti->uti)	$this->_redirect('excode');
+    	 		
     	 
     }
     

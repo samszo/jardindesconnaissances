@@ -230,3 +230,27 @@ bdd/flux_ecosystem.sql
 
 data/persee/
 bdd/flux_excode.sql
+
+bdd/flux_ontostats.sql
+
+data/AN/FRAN_IR_050658.xml
+
+data/AN/inventairesdesarchivesnationales.zip
+
+data/AN/inventairesdesarchivesnationales/FRAN_IR_027940.xml
+
+data/AN/inventairesdesarchivesnationales/FRAN_IR_050658.xml
+
+data/AN/inventairesdesarchivesnationales/FRAN_IR_055457.xml
+
+data/unesco/unescothes.rdf
+
+services/rdf.xml
+
+services/skos.xml
+
+services/catalog-v001.xml
+
+services/skosOntoStats.xml
+
+services/skosOntoStatsSimple.xml

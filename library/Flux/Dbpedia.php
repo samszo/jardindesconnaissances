@@ -45,7 +45,54 @@ class Flux_Dbpedia extends Flux_Site{
 		return $this->getUrlBodyContent($url,false,$this->forceCalcul);
     }
     
-	/**
+    /**
+     * Recupère les données RDF dans un tableau PHP
+     *
+     * @param  string $url
+     *
+     * @return json
+     */
+    public function getRessourceObjet($url)
+    {
+	    	$this->trace(__METHOD__." ".$ressource);
+	    	//ajoute l'extension json
+	    	$url .= ".json";
+	    	//change dans l'url page en data
+	    	$url = str_replace("page","data",$url);
+	    	$json = $this->getUrlBodyContent($url);
+	    	return $json;
+    }
+    
+    /**
+     * Recupère une propriété RDF dans un objet PHP
+     *
+     * @param  string $url
+     * @param  string $prop
+     * @param  string $lang
+     *
+     * @return json
+     */
+    public function getPropObjet($url, $prop, $lang)
+    {
+	    	$this->trace(__METHOD__." ".$url);
+
+	    	//change dans l'url page en data
+	    	$uriD = str_replace("page","data",$url);
+	    	$uriR = str_replace("page","resource",$url);
+	    	
+	    	$graph = EasyRdf_Graph::newAndLoad($uriD.".rdf");
+	    	$res = $graph->resource(	$uriR); 
+	    	//attention la langue ne marche que si le type est défini
+	    	$p = $res->get('<'.$prop.'>','literal',$lang);
+	    	//si la langue n'est pas définie on prend l'anglais
+	    	if(!$p) $p = $res->get('<'.$prop.'>','literal','en');
+	    	
+	    	return $p;
+    }    
+    
+   
+    
+    /**
      * Recherche une biographie à partir d'une ressource databnf
      *
      * @param  string $ressource

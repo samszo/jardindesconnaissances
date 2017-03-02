@@ -193,6 +193,7 @@
             	success: function(result) {
                 	/*gestion des messages SPIP CRON                	
                 	pas nécessaire si header application/json
+                	MAIS des fois ça bug
             		result = result.replace("<!-- SPIP-CRON --><div style=\"background-image: url('"+urlSpip+"?action=cron');\"></div>","").trim();
         			console.log(result);            		  	
             		evals = JSON.parse(result);

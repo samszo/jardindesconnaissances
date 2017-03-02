@@ -694,7 +694,26 @@ class Flux_Site{
 	    return $ret;
 	}
 
-		
+	/**
+	 * Remplace les caratcères spéciaux
+	 *
+	 * @access public
+	 * @param string $string
+	 * @return string
+	 */
+	function xml_entities($string) {
+		return strtr(
+				$string,
+				array(
+						"<" => "&lt;",
+						">" => "&gt;",
+						'"' => "&quot;",
+						"'" => "&apos;",
+						"&" => "&amp;",
+				)
+				);
+	}
+	
 	/**
 	 * tri un tableau par une de ces clefs
 	 *
@@ -887,4 +906,18 @@ class Flux_Site{
 			$this->rsVerifGroup[$k.$id]=1;
 		}		
 	}	
+	
+	
+	static function guid($lowercase = TRUE) {
+		$charid = strtoupper(md5(uniqid(rand(), TRUE)));
+		$hyphen = chr(45);// "-"
+		$uuid = substr($charid, 0, 8) . $hyphen
+		. substr($charid, 8, 4) . $hyphen
+		. substr($charid, 12, 4) . $hyphen
+		. substr($charid, 16, 4) . $hyphen
+		. substr($charid, 20, 12);
+		return $lowercase ? strtolower($uuid) : $uuid;
+	}
+	
+	
 }

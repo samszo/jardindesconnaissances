@@ -24,7 +24,7 @@ $phpcas_path = '../../library/CAS/';
 ///////////////////////////////////////
 
 // Full Hostname of your CAS Server
-$cas_host = 'cas.example.com';
+$cas_host = 'cas.univ-paris8.fr';
 
 // Context of the CAS Server
 $cas_context = '/cas';
@@ -41,7 +41,7 @@ $cas_server_ca_cert_path = '/path/to/cachain.pem';
 
 // The "real" hosts of clustered cas server that send SAML logout messages
 // Assumes the cas server is load balanced across multiple hosts
-$cas_real_hosts = array('cas-real-1.example.com', 'cas-real-2.example.com');
+//$cas_real_hosts = array('cas-real-1.example.com', 'cas-real-2.example.com');
 
 // Client config for cookie hardening
 $client_domain = '127.0.0.1';
@@ -74,14 +74,15 @@ if ($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) {
 
 $curdir = dirname($_SERVER['REQUEST_URI']) . "/";
 
-// CAS client nodes for rebroadcasting pgtIou/pgtId and logoutRequest
-$rebroadcast_node_1 = 'http://cas-client-1.example.com';
-$rebroadcast_node_2 = 'http://cas-client-2.example.com';
+//CAS client nodes for rebroadcasting pgtIou/pgtId and logoutRequest
+$rebroadcast_node_1 = 'https://cas.univ-paris8.fr/cas';
+$rebroadcast_node_2 = 'https://cas.univ-paris8.fr/cas';
 
 // access to a single service
-$serviceUrl = $curbase . $curdir . 'example_service.php';
+$serviceUrl = $curbase . $curdir . 'simple.php';
 // access to a second service
-$serviceUrl2 = $curbase . $curdir . 'example_service_that_proxies.php';
+$serviceUrl2 = $curbase . $curdir . 'simple.php';
+
 
 $pgtBase = preg_quote(preg_replace('/^http:/', 'https:', $curbase . $curdir), '/');
 $pgtUrlRegexp = '/^' . $pgtBase . '.*$/';

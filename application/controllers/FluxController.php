@@ -296,6 +296,17 @@ class FluxController extends Zend_Controller_Action {
     {
     		//service n'ayant pas besoin d'une authentification cliente
     		switch ($this->_getParam('type')) {
+    			case "verifUrl":
+    				$s = new Flux_Site();
+    				$url = "https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run";
+    				$url .= "?fields=mobileFriendliness,mobileFriendlyIssues,resourceIssues,screenshot,testStatus"
+    						."&key=".KEY_GOOGLE_SERVER;
+    				$param = array(
+    						"requestScreenshot"=>"true"
+    						,"url"=>$this->_getParam('url') 
+    				); 
+    				$this->view->content = $s->getUrlBodyContent($url,$param,false,Zend_Http_Client::POST);
+    				break;
     			case "trouveLivre":
 	    			$g = new Flux_Gbooks();
 	    			$arr = $g->findBooks($this->_getParam('q'));
@@ -306,7 +317,7 @@ class FluxController extends Zend_Controller_Action {
 	    			$url = "https://docs.google.com/spreadsheets/d/".$this->_getParam('gDocId')."/pub?gid=".$this->_getParam('gid',0)."&single=true&output=csv";
 	    			$this->view->content = $s->getUrlBodyContent($url,false,false);
 				break;				
-				case "album":
+			case "album":
 					//attention il faut rendre les albums public cf. https://casper.baghuis.nl/google-photos/Google-Photos-RSSerator.html
 					$s = new Flux_Site();
 					$url = "http://photos.googleapis.com/data/feed/api/user/".$this->_getParam('userId')."/albumid/".$this->_getParam('albumId')."?alt=json";

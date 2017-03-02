@@ -5,6 +5,7 @@ try {
 	$application->bootstrap();
 	$s = new Flux_Site(false,true);
 	$s->trace("DEBUT TEST");		
+	$s->bTraceFlush = true;
 	
 	$user = "luckysemiosis";
 	$pwd = "samszo";
@@ -321,6 +322,7 @@ try {
 	$f = new Flux_Dbpedia();
 	//$f->SaveUserTagsLinks($user);
 	$rep = $f->getBio("Adam_Smith");
+	$arr = $f->getRessourceObjet("http://fr.dbpedia.org/page/Loi_z_de_Fisher");	
 	*/
 	
 	//$d = new Model_DbTable_Flux_Doc();
@@ -478,12 +480,12 @@ try {
 	$ris = new RISReader();
 	$ris->parseFile("../../cdnl-2015-prod/excode/bdd/shelf.ris");
 	*/
-	//
+	/*
 	$bup8 = new Flux_Bup8("flux_excode");
 	$bup8->bCache = true;
 	//$bup8->setListe(3913);
 	$bup8->getListe(3913);
-    //
+    */
 	
 	/*
 	$mp = new Flux_Proverbe("flux_proverbes",true);
@@ -540,6 +542,24 @@ try {
 	$data = $ensuprefr->getTagHisto('%Y',1, 2, 3, 1, "", "", "", "stream",1);
 	*/
 	
+	$oton = new Flux_Ontostat("flux_ontostats", true);
+	$d = new DateTime();
+	$dateJ = $d->format('Y-m-d');
+	//$rs = $isi->getGlossaire("http://isi.cbs.nl/glossary/term74.htm");
+	//$rs = $oton->saveGlossaireSelection("http://localhost/OntoStats/GlossaireISI.csv");
+	//$rs = $oton->exportToSkos();
+	//$t = file_put_contents("skosOntoStats.xml", $rs);
+	//
+	$rs = $oton->exportToSimpleRDF();
+	$t = file_put_contents("skosOntoStatsSimple.xml", $rs);
+	
+	/*EasyRdf_Namespace::set('dbpedia-owl', 'http://dbpedia.org/ontology/');
+	//$uri = 'http://fr.dbpedia.org/data/Bruit_de_mesure';
+	$graph = EasyRdf_Graph::newAndLoad($uri.".rdf");
+	$rs = $graph->resource('http://fr.dbpedia.org/resource/Bruit_de_mesure'); //returns the ebook resource
+	$a = $rs->get('<http://dbpedia.org/ontology/abstract>');
+	$b = $rs->all('<http://dbpedia.org/ontology/abstract>');
+	*/
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

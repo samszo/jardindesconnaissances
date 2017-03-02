@@ -456,4 +456,42 @@ WHERE {
 LIMIT 100
  * 
  */        
+    
+/* nombre de notice ayant un mot
+ * 
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+select ?decennie (count(?manif) as ?nbManif) where {
+  ?manif a <http://rdvocab.info/uri/schema/FRBRentitiesRDA/Manifestation>.
+  ?manif dcterms:title ?titre.
+  ?manif bnf-onto:firstYear ?date.
+  BIND (concat(substr(str(?date),1,3), "0") as ?decennie)
+  FILTER (regex(?titre, "science")).
+  FILTER (?date > 1599)
+}
+ORDER BY ?decennie
+ */    
+    
+/* tous les ouvrages lié à un sujet rameau
+ * 
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+SELECT ?doc ?title ?idArk ?date ?editeur ?cote
+WHERE {
+	?doc dcterms:subject <http://data.bnf.fr/ark:/12148/cb121118875>.   
+  
+	OPTIONAL{?doc dcterms:date ?date}
+	OPTIONAL{?doc dcterms:title ?title}
+	OPTIONAL{?doc dcterms:publisher ?editeur}
+  	OPTIONAL{?doc bnf-onto:FRBNF ?idArk}
+  	OPTIONAL{?doc bnf-onto:cote ?cote}
+}
+ */    
+/* les cote ayant "col" dans leur libéllé
+ SELECT DISTINCT ?cote ?a WHERE
+{
+  ?cote bnf-onto:cote ?a.
+  FILTER (regex(?a, "col", "i"))
+}
+ */
+    
 }
