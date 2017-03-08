@@ -72,7 +72,7 @@ class Flux_Ontostat extends Flux_Site{
 	    	//récupère les données
 	    	$arr = $this->csvToArray($file);
 	    	$nb = count($arr);
-	    	$deb = 3669;//0;
+	    	$deb = 1109;//page dbpedia impossibles:840,1108
 	    	$t = $arr[0];
 	    	//enregistre les données
 	    	for ($i = $deb; $i < $nb; $i++) {
@@ -120,12 +120,8 @@ class Flux_Ontostat extends Flux_Site{
 			    					//si colonne dbpedia récupérer la définition = abstract
 			    					if($j==5 && $d[$j]!=""){
 			    						$this->trace($d[$j]);			    						 
-			    						//récupère le résumé
-			    						$p = $dbP->getPropObjet($d[$j],"http://dbpedia.org/ontology/abstract","fr");
-			    						if($p){
-			    							$this->trace("//met à jour le tag : ".$d[$j]." = ".$p->getLang());
-				    						$this->dbT->edit($idTclass,array("desc"=>$p->getValue(),"uri"=>$d[$j]));
-			    						}
+			    						//enregistre les abstracts
+			    						$dbP->savePropObjet($d[$j],array("http://dbpedia.org/ontology/abstract","http://www.w3.org/2000/01/rdf-schema#label"),$idExt, $idTclass);
 			    					}
 		    					}
 	    				}
@@ -306,8 +302,11 @@ EOT
     		$output = '<rdfs:Class rdf:about="'.$uri.'">
             <rdfs:label xml:lang="fr">'.$r['code'].'</rdfs:label>
             <rdfs:comment xml:lang="fr">'.$this->xml_entities($r['desc']).'</rdfs:comment>
-            	<rdfs:subClassOf rdf:resource="'.$scheme."/".$r['type'].'"/>	
-        </rdfs:Class>' . PHP_EOL;
+            	<rdfs:subClassOf rdf:resource="'.$scheme."/".$r['type'].'"/>';
+    		if($r['uri']){
+    			$output .= '<rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">'.$r['uri'].'</rdfs:isDefinedBy>' . PHP_EOL;    			 
+    		}
+    		$output .= '</rdfs:Class>' . PHP_EOL;
     		$ret[] = $output;    		
     	}
 
@@ -476,7 +475,7 @@ WHERE tT.parent = 2
 ORDER BY tL.code; -- nbDoc desc;
     	 */
 	    	$query = $this->dbD->select()
-	    	->from( array("tT" => "flux_tag"), array("tag_id","label"=>"code"))
+	    	->from( array("tT" => "flux_tag"), array("tag_id","label"=>"code","uri"))
 	    	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
 	    	->joinInner(array('rTt' => 'flux_rapport'),"rTt.dst_id = tT.tag_id
 			AND rTt.src_id = tT.parent

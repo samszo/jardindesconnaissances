@@ -546,12 +546,12 @@ try {
 	$d = new DateTime();
 	$dateJ = $d->format('Y-m-d');
 	//$rs = $isi->getGlossaire("http://isi.cbs.nl/glossary/term74.htm");
-	//$rs = $oton->saveGlossaireSelection("http://localhost/OntoStats/GlossaireISI.csv");
+	$rs = $oton->saveGlossaireSelection("http://localhost/OntoStats/GlossaireISI.csv");
 	//$rs = $oton->exportToSkos();
 	//$t = file_put_contents("skosOntoStats.xml", $rs);
 	//
-	$rs = $oton->exportToSimpleRDF();
-	$t = file_put_contents("skosOntoStatsSimple.xml", $rs);
+	//$rs = $oton->exportToSimpleRDF();
+	//$t = file_put_contents("skosOntoStatsSimple.xml", $rs);
 	
 	/*EasyRdf_Namespace::set('dbpedia-owl', 'http://dbpedia.org/ontology/');
 	//$uri = 'http://fr.dbpedia.org/data/Bruit_de_mesure';

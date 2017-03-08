@@ -28,7 +28,14 @@ class Flux_Dbpedia extends Flux_Site{
      */
 	public function __construct($idBase=false, $bTrace=false)
     {
-    		parent::__construct($idBase, $bTrace);    	
+    		parent::__construct($idBase, $bTrace);
+    		
+    		//on récupère la racine des documents
+    		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+    		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+    		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+    		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
+    		
     }
 
     /**
@@ -64,33 +71,91 @@ class Flux_Dbpedia extends Flux_Site{
     }
     
     /**
-     * Recupère une propriété RDF dans un objet PHP
+     * Recupère un graph RDF 
      *
      * @param  string $url
-     * @param  string $prop
-     * @param  string $lang
+     *
+     * @return objet
+     */
+    public function getRessource($url)
+    {
+	    	$this->trace(__METHOD__." ".$url);
+	    
+	    	//change dans l'url page en data
+	    	$uriD = str_replace("page","data",$url);
+	    	$uriR = str_replace("page","resource",urldecode($url));
+	    
+	    	$graph = EasyRdf_Graph::newAndLoad($uriD.".rdf");
+	    	$res = $graph->resource(	$uriR);
+	    	
+	    	return $res;
+    }
+    
+    /**
+     * Recupère une propriété RDF dans un objet PHP
+     *
+     * @param  string   	$url
+     * @param  string   	$prop
+     * @param  string   	$lang
+     * @param  objet 	$res
      *
      * @return json
      */
-    public function getPropObjet($url, $prop, $lang)
+    public function getPropObjet($url, $prop, $lang=false, $res=false)
     {
 	    	$this->trace(__METHOD__." ".$url);
 
-	    	//change dans l'url page en data
-	    	$uriD = str_replace("page","data",$url);
-	    	$uriR = str_replace("page","resource",$url);
-	    	
-	    	$graph = EasyRdf_Graph::newAndLoad($uriD.".rdf");
-	    	$res = $graph->resource(	$uriR); 
-	    	//attention la langue ne marche que si le type est défini
-	    	$p = $res->get('<'.$prop.'>','literal',$lang);
-	    	//si la langue n'est pas définie on prend l'anglais
-	    	if(!$p) $p = $res->get('<'.$prop.'>','literal','en');
+	    if(!$res)$res = $this->getRessource($url);
+
+	    	if($lang){
+		    	//attention la langue ne marche que si le type est défini
+		    	$p = $res->get('<'.$prop.'>','literal',$lang);
+		    	//si la langue n'est pas définie on prend l'anglais
+		    	if(!$p) $p = $res->get('<'.$prop.'>','literal','en');
+	    	}else $p = $res->get('<'.$prop.'>');
 	    	
 	    	return $p;
     }    
     
-   
+    /**
+     * Enregistre les propriété d'une objet
+     *
+     * @param  string  	$url
+     * @param  array  	$arrProp
+     * @param  integer 	$idDoc
+     *
+     * @return json
+     */
+    public function savePropObjet($url, $arrProp, $idDoc, $idTag)
+    {
+	    	$this->trace(__METHOD__." ".$url);
+	    
+	    	$this->initDbTables();
+	    	 
+	    //	if(!$this->idTagLangue)$this->idTagLangue = $this->dbT->ajouter(array("code"=>"langues"));
+	    	 
+	    	//récupère la ressource
+	    	$res = $this->getRessource($url);
+	    	//met à jour le document
+	    	$this->dbD->edit($idDoc,array("data"=>$res->dump()));
+	    	 
+	    	//récupère les propriétés
+	    	foreach ($arrProp as $prop) {
+	    		$arrProp = $res->all('<'.$prop.'>');
+	    		foreach ($arrProp as $k=>$p) {
+	    			//on enregistre la propriété
+	    			$idT = $this->dbT->ajouter(array("code"=>$p->getValue(),"ns"=>$p->getLang(),"parent"=>$idTag,"uri"=>$prop));
+	    			//création du rapport
+	    			$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+	    					,"src_id"=>$idDoc,"src_obj"=>"doc"
+	    					,"dst_id"=>$idT,"dst_obj"=>"tag"
+	    					,"pre_id"=>$idTag,"pre_obj"=>"tag"
+	    			));
+	    		}	    		
+	    	}
+	
+	    	
+    }
     
     /**
      * Recherche une biographie à partir d'une ressource databnf

@@ -85,7 +85,7 @@ class Flux_Isi extends Flux_Site{
     	 
 	    //initialise les variables
 	    	$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));    	
-	    	if(!$this->idTagLangue)$this->idTagLangue = $this->dbT->ajouter(array("code"=>"langues"));
+	    //	if(!$this->idTagLangue)$this->idTagLangue = $this->dbT->ajouter(array("code"=>"langues"));
 	    	//enregistre le document
 	    if(!$this->idDocGloIsi){
 	    		$this->idDocGloIsi= $this->dbD->ajouter(array("url"=>"http://isi.cbs.nl/glossary/"
@@ -93,22 +93,24 @@ class Flux_Isi extends Flux_Site{
 	    			,"parent"=>$this->idDocRoot,"tronc"=>0
 	    		));
 	    }
-	    	$idD = $this->dbD->ajouter(array("url"=>$url
+	    //récupère la traduction
+	    $html = $this->getUrlBodyContent($url,false,true);
+	    $idD = $this->dbD->ajouter(array("url"=>$url
 	    			,"titre"=>$url
-	    			,"parent"=>$this->idDocGloIsi,"tronc"=>0
+	    			,"parent"=>$this->idDocGloIsi,"tronc"=>0,"data"=>$html
 	    	));
     	
 	    	//enregistre le rapport
 	    	$idRapDoc = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 	    			,"src_id"=>$idD,"src_obj"=>"doc"
 	    			,"dst_id"=>$idAct,"dst_obj"=>"acti"
+	    			,"pre_id"=>$idRap,"pre_obj"=>"rapport"	    			
 	    	));
-    	 	//récupère la traduction
-    		$html = $this->getUrlBodyContent($url,false,true);
 	    	//constuction du xml à requeter
 	    	$dom = new Zend_Dom_Query($html);
 	    	//récupère la liste des citations
-	    	$result = $dom->queryXpath("//tr/td");
+	    	$xp = "//tr/td";
+	    	$result = $dom->queryXpath($xp);
 	    	$i = 1;
 	    	foreach ($result as $cn) {
 	    		if ($i%2){
@@ -117,15 +119,15 @@ class Flux_Isi extends Flux_Site{
 	    			$cpt =  $cn->nodeValue;
 	    			
 	    			//on enregistre la class
-	    			$idTclass = $this->dbT->ajouter(array("code"=>$cpt,"parent"=>$idTag));
+	    			$idTclass = $this->dbT->ajouter(array("code"=>$cpt,"parent"=>$idTag,"ns"=>$this->langues[$langue],"uri"=>$xp."[".$i."]"));
 	    			//on enregistre la langue
-	    			$idTlangue = $this->dbT->ajouter(array("code"=>$langue,"parent"=>$this->idTagLangue,"ns"=>$this->langues[$langue]));
+	    			//$idTlangue = $this->dbT->ajouter(array("code"=>$langue,"parent"=>$this->idTagLangue,"ns"=>$this->langues[$langue]));
 	    			//création du rapport
 	    			$idRapClass = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 	    					,"src_id"=>$idTag,"src_obj"=>"tag"
 	    					,"dst_id"=>$idTclass,"dst_obj"=>"tag"
 	    					,"pre_id"=>$idRap,"pre_obj"=>"rapport"
-	    					,"valeur"=>$idTlangue
+	    					,"valeur"=>$this->langues[$langue]
 	    			));
 	    			
 	    			

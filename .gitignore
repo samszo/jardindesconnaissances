@@ -254,3 +254,5 @@ services/catalog-v001.xml
 services/skosOntoStats.xml
 
 services/skosOntoStatsSimple.xml
+
+bdd/jdcMin.mwb.bak
