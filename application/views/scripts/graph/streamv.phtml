@@ -55,28 +55,52 @@
 		else return new Date(dRef[0], dRef[1], dRef[2]);	
 	}
 	    
-	//d3.csv('<?php echo $this->urlData;?>', function(err, d){
+	//d3.csv('<?php echo $this->urlData;?>', function(err, data){
 	//&dates[]=1158589136&dates[]=1461471206
-	var url = 'http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&for=stream&dateUnit=%Y';
+	//var url = 'http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&for=stream&dateUnit=%Y';
 	//var url = 'http://localhost/jdc/public/flux/ensuprefr?q=getTagHisto&idMonade=2&idUti=1&idActi=3&idParent=1&for=stream&query=34591&dates[]=946681200&dates[]=1285884000';
-	d3.json(url, function(err, d){
+	//var url = "http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&for=stream&dateUnit=%Y-%m-%d&dates[]=1483228800&dates[]=1489415262";
+	//var url = "http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&dates[]=1456669433&dates[]=1489415262&arrTags[]=ecosysteminfo";
+	var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream";//&dates[]=1456669433&dates[]=1489415262";
+	d3.json(url, function(err, data){
 
 		
 	  if(err) console.log(err);
 	  //console.log(d)
 	  
 	  //création des datas de références
-	  d.forEach(function(dt){
+	  data.forEach(function(dt){
 		  //transforme le temps en date
 		  var dRef = tempsToDate(dt.temps, 'utc');
-		  refData[dt.key+'-'+dRef] = dt;
+		  var k = dt.key+'-'+dRef;
+		  refData[k] = dt;
 		  if(refKey.indexOf(dt.key)<0)refKey.push(dt.key);
 		  if(!refTag[dt.key])refTag[dt.key]={"type":dt.type,"desc":dt.desc};
 	  });
 	  var nested_data = d3.nest()
 			.key(function(d) { return d.temps; })
-			.entries(d);
-	  
+			.entries(data);
+		/*vérification du tableau
+		for (i = 0; i < nested_data.length-1; i++) { 
+			var n1 = nested_data[i].values;			
+			var n2 = nested_data[i+1].values;
+			console.log(i+" : "+n1[0].temps+" = "+n1.length);
+			if(n1.length != n2.length){
+				console.log(i+" : "+n1.length+' != '+n2.length);
+				for (j = 0; j < n1.length; j++) {
+					if(n1[j] && n2[j]){
+						if(n1[j].type!=n2[j].type)
+							console.log(i+" / "+j+" : "+n1[j].type+" ("+n1[j].temps+') '+n2[j].type+" ("+n2[j].temps+') ');
+						else
+							console.log(i+" / "+j+" OK "+n1[j].type+" ("+n1[j].temps+') '+n2[j].type+" ("+n2[j].temps+') ');
+					}else
+						console.log(i+" / "+j+" KO "+n1[j].type+" ("+n1[j].temps+') '+n2[j].type+" ("+n2[j].temps+') ');
+						
+				} 
+					
+			}			
+		}
+		*/
 	  //console.log(nested_data);
 	  
 	  var mqpdata = nested_data.map(function(d){
@@ -121,7 +145,7 @@ function buildStreamGraph(mqpdata) {
 	var x = d3.scaleLinear()
 	    .domain([0, d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); })])
 	    .range([width/2, 0]);
-	
+	console.log(x.domain());
 	var color = d3.scaleLinear()
 	    .range(["#51D0D7", "#31B5BB"]);
 	
@@ -133,8 +157,14 @@ function buildStreamGraph(mqpdata) {
 			//console.info('in area function', d); 
 			return y(d.data.month); 
 			})
-		.x0(function(d) { return x(d[0]); })
-		.x1(function(d) { return x(d[1]); })
+		.x0(function(d) { 
+			var xTest = x(d[0]);
+			return xTest; 
+			})
+		.x1(function(d) { 
+			var xTest = x(d[1]);
+			return xTest; 
+			})
 		.curve(d3.curveBasis);
 	
 	
@@ -178,7 +208,7 @@ function buildStreamGraph(mqpdata) {
 	
 	svg.append("g")
             .attr("class", "axis axis--y")
-            .attr("transform", "translate(" + 40 + "," + 0 + ")")
+            .attr("transform", "translate(" + 100 + "," + 0 + ")")
             .call(yAxis);    
 }
    

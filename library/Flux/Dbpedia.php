@@ -142,7 +142,7 @@ class Flux_Dbpedia extends Flux_Site{
 	    	//récupère les propriétés
 	    	foreach ($arrProp as $prop) {
 	    		$arrProp = $res->all('<'.$prop.'>');
-	    		foreach ($arrProp as $k=>$p) {
+	    		foreach ($arrProp as $p) {
 	    			//on enregistre la propriété
 	    			$idT = $this->dbT->ajouter(array("code"=>$p->getValue(),"ns"=>$p->getLang(),"parent"=>$idTag,"uri"=>$prop));
 	    			//création du rapport

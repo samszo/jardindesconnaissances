@@ -9,15 +9,6 @@ ignore_user_abort(1);
 
 require_once 'script.php';
 
-function fini()
-
-{
-
-	trace("fini");
-	fopen('./ERREUR', 'w');
-
-}
-
 
 
 register_shutdown_function(fini());
@@ -54,13 +45,22 @@ while(1){
 
 trace("FIN");
 
+function fini()
+
+{
+
+	trace("fini");
+	fopen('./ERREUR', 'w');
+
+}
+
 
 function trace($message){
 	$date = new DateTime();
 	$strDate = $date->format('Y-m-d_H-i-s');	
 	$t = fopen('traces.txt', 'a');
 	fputs($t, $strDate.' - '.$message.PHP_EOL);
-	fclose($t);
+	fclose($t);	
 }
 
 function getNextExecutionScript()

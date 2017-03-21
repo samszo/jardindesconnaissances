@@ -628,7 +628,10 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 			//echo $dates[0]." / ".$dates[1]." = ".$where;
 			$query->where($where);
 		}
-		
+		/* Pour afficher la requ$ete
+		  $sql = $query->__toString();
+		  echo "$sql\n";
+		*/
 		return $this->fetchAll($query)->toArray();
 	
 	}

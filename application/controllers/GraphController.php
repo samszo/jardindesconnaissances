@@ -288,8 +288,19 @@ class GraphController extends Zend_Controller_Action {
 						{axis:"Price Of Device",value:35},
 						{axis:"To Be A Smartphone",value:38}
     			]]';
+    		$dt = '[[//atelierlaboratoirestructurant
+    		{axis:"Durée",value:22},
+    		{axis:"Nombre d’étudiant",value:28},
+    		{axis:"Coût",value:29},
+    		{axis:"Théorie",value:17},
+    		{axis:"Pratique",value:22},
+    		{axis:"Pédagogie active",value:02},
+    		{axis:"Pédagogie passive",value:21},
+    		{axis:"ECTS",value:50}
+    		]]';
+    		
 		$this->view->data =  $this->_getParam('data', $dt);    	
-		$this->view->titre =  $this->_getParam('titre', "Radar sans titre");    	
+		$this->view->titre =  $this->_getParam('titre', "atelier laboratoire structurant");    	
 		
     }
     
@@ -308,6 +319,12 @@ class GraphController extends Zend_Controller_Action {
 		
     }
         
+    public function paralleleAction(){
+    
+	    	$this->view->titre =  $this->_getParam('titre', "Test Pararallèle");
+    
+    }
+    
     
     public function roueemotionAction(){
 		$dt = "[
@@ -427,9 +444,9 @@ class GraphController extends Zend_Controller_Action {
     }
 
     public function streamvAction(){
-    	$this->view->titre =  $this->_getParam('titre', "Stream Graph Vertical");
-    	$this->view->soustitre =  $this->_getParam('soustitre', "Pour plonger dans le temps");
-    	$this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fdata%2Ftrends.csv"));
+	    	$this->view->titre =  $this->_getParam('titre', "Stream Graph Vertical");
+	    	$this->view->soustitre =  $this->_getParam('soustitre', "Pour plonger dans le temps");
+	    	$this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fdata%2Ftrends.csv"));
     	 
     }
     
@@ -437,6 +454,20 @@ class GraphController extends Zend_Controller_Action {
     
     }
     
+    public function multilignesAction(){
+    	
+    		//pour les performance diigo
+    		$url ="../flux/diigo?q=performance&csv=1&deb=2017-01-01&fin=2017-31-01";
+    		$this->view->formatTemps =  "%Y-%m-%d %H:%M:%S";
+    		$this->view->champTemps =  "temps";
+    		//pour l'historique des tag
+    		$url ="../flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&dates[]=1456669433&dates[]=1489415262&for=multiligne&csv=1";
+    		$this->view->formatTemps =  "%Y-%m-%d";
+    		$this->view->champTemps =  "DateTimeId";
+    		
+    		$this->view->urlData =  urldecode($this->_getParam('urlData', $url));
+    
+    }
     
     function getSpipMot(){
 	    	//vérifie s'il faut récupérer les données dans spip

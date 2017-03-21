@@ -289,7 +289,6 @@ class Flux_Site{
 	function arrayToCsv( array &$fields, $delimiter = ';', $enclosure = '"', $encloseAll = false, $nullToMysqlNull = false ) {
 		$delimiter_esc = preg_quote($delimiter, '/');
 		$enclosure_esc = preg_quote($enclosure, '/');
-	
 		$output = array();
 		foreach ( $fields as $field ) {
 			if ($field === null && $nullToMysqlNull) {
@@ -306,7 +305,7 @@ class Flux_Site{
 			}
 	}
 	
-	return implode( $delimiter, $output );
+		return implode( $delimiter, $output );
 	}
 	
 	/**

@@ -540,89 +540,180 @@ class Flux_Diigo extends Flux_Site{
      */
     function getTagHisto($dateUnit, $idUti, $idMonade, $idActi, $idParent, $arrTags, $req, $dates, $for){
 
-    	$sqlFormatDate = $dateUnit;
-    	$this->bTrace = false;
-    	$dbTag = new Model_DbTable_Flux_Tag($this->db);
-    	$data = $dbTag->getTagHistoRapport($idMonade
-    			, $idUti, $idActi, $idParent
-    			, $arrTags, $sqlFormatDate, $req, $dates);
-    	if($for=="stream"){
-    		//récupère les extrémité des dates
-    		$minDate = date("r");
-    		$maxDate = 0;
-    		foreach ($data as $d) {
-    			if($minDate>$d['MinDate'])$minDate=$d['MinDate'];
-    			if($maxDate<$d['MaxDate'])$maxDate=$d['MaxDate'];
-    		}
-    		$this->trace(date("r", $minDate)." -> ".date("r", $maxDate));
-    		//calcul le tableau des dates
-    		switch ($sqlFormatDate) {
-    			case '%Y-%m':
-    				$interval = new DateInterval('P1M');
-    				$phpFormatDate = 'Y-m';
-    				break;
-				case '%Y':
-    				$interval = new DateInterval('P1Y');
-    				$phpFormatDate = 'Y';
-    				break;
-    				
-    		}
-    		//
-    		$curDate = new DateTime();
-    		$curDate->setTimestamp($minDate);
-    		$mDate = new DateTime();
-    		$mDate->setTimestamp($maxDate);
-    		$this->trace($curDate->format('Y-m-d'));
-    		$arrDate = array();
-    		while ($curDate<$mDate) {
-    			$arrDate[]=$curDate->format($phpFormatDate);
-    			$curDate->add($interval);
-    		}
-    		$this->trace("le tableau des dates",$arrDate);
-    		//ajoute les valeurs vides pour chaque éléments
-    		$oTag = $data[0]['key'];
-    		$j=0; $i=0; $nbDate = count($arrDate); $nbData = count($data);
-    		$nData;
-    		//foreach ($data as $d) {
-    		for ($z = 0; $z < $nbData; $z++) {
-    			$d = $data[$z];
-    			$this->trace('temps '.$z.' : '.$i.' / '.$j,$d);
-    			//on vérifie si on passe à un nouveau type
-    			if($oTag!=$d['key']){
-    				//on fini les temps restant
-    				 for ($i = $j; $i < $nbDate; $i++) {
-	    				 $nD = array('key'=>$oD['key'],'type'=>$oD['type'],'desc'=>$oD['desc']
-	    				 ,'temps'=>$arrDate[$i],'score'=>0,'value'=>0
-	    				 ,'MinDate'=>0,'MaxDate'=>0
-	    				 );
-	    				 $nData[]=$nD;
-	    				 $this->trace('fin nouveau temps '.$i .' / '. $j,$nD);
-    				 }
-    				$j=0;
-    				$oTag=$d['key'];
-    			}
-    			//on calcul les temps manquant
-    			for ($i = $j; $i < $nbDate; $i++) {
-    				//$this->trace($arrDate[$i]."==".$d['temps']);
-    				if($arrDate[$i]==$d['temps']){
-    					$nData[]=$d;
-    					$j=$i+1;
-    					$i=$nbDate;
-    				}else{
-    					$nD = array('key'=>$d['key'],'type'=>$d['type'],'desc'=>$d['desc']
-    							,'temps'=>$arrDate[$i],'score'=>0,'value'=>0
-    							,'MinDate'=>0,'MaxDate'=>0
-    					);
-    					$nData[]=$nD;
-    					$this->trace('nouveau temps '.$i .' / '. $j,$nD);
-    				}
-    			}
-    			$oD = $d;
-    		}
-    		//ordonne le tableau
-    		$data = $nData;    		
+	    	$this->bTrace = false;
+	    	$dbTag = new Model_DbTable_Flux_Tag($this->db);
+	    	$data = $dbTag->getTagHistoRapport($idMonade
+	    			, $idUti, $idActi, $idParent
+	    			, $arrTags, $dateUnit, $req, $dates);
+		$stat = new Flux_Stats();    	
+	    	if($for=="stream"){
+    		
+    			$nData = $stat->getDataForStream($data, $dateUnit);
+   		
+    			//ordonne le tableau
+    			$data = $nData;    		
 	    }
 	    return $data;
-	  	}
+  	}
+	  	
+  	/** récupère les performances d'importation
+  	 * 
+  	 * @param	$deb		string
+  	 * @param	$fin		string
+  	 * 
+  	 * @return 	array
+  	 *
+  	 */
+	function getPerformance($deb="", $fin=""){
+
+    		$db = new Model_DbTable_Flux_Doc($this->db);
+    		$sql = "SELECT 
+			    tempsD as temps, nbDoc, nbTag
+			FROM
+			    (SELECT 
+			        COUNT(d.doc_id) nbDoc,
+			            SUM(LENGTH(d.data)) nbOct,
+			            DATE_FORMAT(d.maj, '%Y-%m-%d %H:%i:%s') tempsD
+			    FROM
+			        flux_doc d
+			    GROUP BY tempsD
+			    ORDER BY nbDoc DESC) doc,
+			    (SELECT 
+			        COUNT(r.rapport_id) nbTag,
+			            DATE_FORMAT(r.maj, '%Y-%m-%d %H:%i:%s') tempsT
+			    FROM
+			        flux_rapport r
+			    WHERE
+			        r.src_obj = 'rapport'
+			            AND r.dst_obj = 'tag'
+			            AND r.pre_obj = 'acti'
+			    GROUP BY tempsT
+			    ORDER BY nbTag DESC) tag
+			WHERE
+			    doc.tempsD = tag.TempsT ";
+    		if($deb && $fin)
+    			$sql .= " AND doc.tempsD BETWEEN '".$deb."' AND '".$fin."' ";
+    		$sql .= " ORDER BY doc.tempsD";
+    		// 
+    		
+    		$rs = $db->getAdapter()->query($sql);
+    		return $rs->fetchAll();
+    		//return $dbDoc->fetchAll($query)->toArray();
+    }
+    
+    
+    /** récupère les performances d'importation
+     *
+     * @param 	string	$dateUnit
+     * @param 	int	$idUti
+     * @param 	int	$idMonade
+     * @param 	int	$idActi
+     * @param 	int	$idParent
+     * @param 	array	$dates
+     * @param 	string	$for
+     *
+     * @return 	array
+     *
+     */
+    function getHistoTagLies($idTag, $dateUnit, $idUti, $idMonade, $idActi, $idParent, $dates=false, $for="stream"){
+		    
+		$db = new Model_DbTable_Flux_Doc($this->db);
+		$sql = "SELECT 
+		    t.tag_id,
+		    t.code ,
+		    COUNT(DISTINCT rd.src_id) value,
+		    DATE_FORMAT(d.pubDate, '".$dateUnit."') temps,
+		    MIN(UNIX_TIMESTAMP(d.pubDate)) MinDate,
+		    MAX(UNIX_TIMESTAMP(d.pubDate)) MaxDate,
+		    tl.tag_id 'key', tl.code 'type', tl.desc ";
+		if ($for=="multiligne"){
+			$sql = "SELECT
+			t.tag_id,
+			t.code tag,
+			DATE_FORMAT(d.pubDate, '%Y-%m-%d') temps,
+			COUNT(DISTINCT rd.src_id) nbDoc,
+			group_concat(tl.tag_id) idTags,
+			group_concat(tl.code) tags ";
+		}
+		$sql .= " FROM
+		    flux_tag t
+		        INNER JOIN
+		    flux_rapport r ON r.monade_id = ".$idMonade."
+		        AND r.src_obj = 'rapport'
+		        AND r.dst_obj = 'tag'
+		        AND r.pre_obj = 'acti'
+		        AND r.pre_id = ".$idActi."
+		        AND t.tag_id = r.dst_id
+		        INNER JOIN
+		    flux_rapport rd ON rd.rapport_id = r.src_id
+		        INNER JOIN
+		    flux_doc d ON d.doc_id = rd.src_id AND d.parent = ".$idParent."
+		        INNER JOIN
+		    flux_rapport rl ON rl.src_id = r.src_id
+		        AND rl.src_obj = 'rapport'
+		        INNER JOIN
+		    flux_tag tl ON tl.tag_id = rl.dst_id
+		WHERE
+		    t.tag_id = ".$idTag;
+		
+		if($dates){
+			$minDate = new DateTime();
+			$minDate->setTimestamp($dates[0]);
+			$maxDate = new DateTime();
+			$maxDate->setTimestamp($dates[1]);
+			$sql .= " AND d.pubDate BETWEEN '".$minDate->format("Y-m-d H:i:s")."' AND '".$maxDate->format("Y-m-d H:i:s")."' ";
+		}
+		
+		if($for=="stream"){		
+			$sql .= " GROUP BY tl.tag_id, temps 
+					HAVING value > 3
+					ORDER BY tl.code, temps
+					";
+		}
+		if($for=="multiligne"){
+			$sql .= " GROUP BY temps
+				HAVING nbDoc > 3
+				ORDER BY temps
+						";
+		}		
+		
+		//echo $sql;
+		    		//
+    		//execution de la requête
+    		$rs = $db->getAdapter()->query($sql);
+    		$data = $rs->fetchAll();
+    		
+    		$stat = new Flux_Stats();
+    		if($for=="stream"){    		
+    			$data = $stat->getDataForStream($data, $dateUnit);    			 
+    		}
+    		if($for=="multiligne"){
+    			$colos = array();
+    			//construction des colones
+    			foreach ($data as $v) {
+    				$arr = explode(',',$v['tags']);
+    				foreach ($arr as $k) {
+    					if (!in_array($k, $colos)) {
+    						$colos[]=$k;
+    					}    						
+    				}
+    			}
+    			//construction des datas
+    			$ndata = array();
+    			foreach ($data as $v) {
+    				$r['DateTimeId']=$v['temps'];
+    				foreach ($colos as $c) {
+    					if(strstr($v['tags'], $c))
+ 	   					$r[$c]=$v['nbDoc']+0;
+    					else 
+    						$r[$c]=0;
+    				}
+    				$ndata[]=$r;
+    			}
+    			$data = $ndata;
+    		}
+    		return $data;
+    		
+    }
     
 }

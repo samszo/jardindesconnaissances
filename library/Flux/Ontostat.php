@@ -71,8 +71,8 @@ class Flux_Ontostat extends Flux_Site{
 	    	
 	    	//récupère les données
 	    	$arr = $this->csvToArray($file);
-	    	$nb = count($arr);
-	    	$deb = 1109;//page dbpedia impossibles:840,1108
+	    	$nb = 1109;//count($arr);
+	    	$deb = 1108;//page dbpedia impossibles:840,1108
 	    	$t = $arr[0];
 	    	//enregistre les données
 	    	for ($i = $deb; $i < $nb; $i++) {
@@ -303,7 +303,7 @@ EOT
             <rdfs:label xml:lang="fr">'.$r['code'].'</rdfs:label>
             <rdfs:comment xml:lang="fr">'.$this->xml_entities($r['desc']).'</rdfs:comment>
             	<rdfs:subClassOf rdf:resource="'.$scheme."/".$r['type'].'"/>';
-    		if($r['uri']){
+    		if(isset($r['uri'])){
     			$output .= '<rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">'.$r['uri'].'</rdfs:isDefinedBy>' . PHP_EOL;    			 
     		}
     		$output .= '</rdfs:Class>' . PHP_EOL;

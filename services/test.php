@@ -245,10 +245,15 @@ try {
 	//$s->update("simple");
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
-	/*
-	$diigo = new Flux_Diigo("","","flux_diigo",true);
-	$data = $diigo->getTagHisto('%Y-%m',1, 2, 2, 1, "", "", array('1158589136','1162191281'), "stream");
-	*/
+	//
+	$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
+	//$diigo->saveRecent("luckysemiosis");	
+	//$data = $diigo->getPerformance();
+	//$keys = array_keys($data[0]);
+	//$diigo->arrayToCsv($data);
+	//$data = $diigo->getTagHisto('%Y-%m-%d',1, 2, 2, 1, "", "", array('1456669433','1489415262'), "stream");
+	$data = $diigo->getHistoTagLies(27, '%Y-%m-%d',1, 2, 2, 1, array('1456669433','1489415262'),"multiligne");
+	//
 	
 	/*
     $diigo = new Flux_Diigo("luckysemiosis","samszo","flux_evaletu",true);
@@ -550,8 +555,8 @@ try {
 	//$rs = $oton->exportToSkos();
 	//$t = file_put_contents("skosOntoStats.xml", $rs);
 	//
-	//$rs = $oton->exportToSimpleRDF();
-	//$t = file_put_contents("skosOntoStatsSimple.xml", $rs);
+	$rs = $oton->exportToSimpleRDF();
+	$t = file_put_contents("skosOntoStatsSimple.xml", $rs);
 	
 	/*EasyRdf_Namespace::set('dbpedia-owl', 'http://dbpedia.org/ontology/');
 	//$uri = 'http://fr.dbpedia.org/data/Bruit_de_mesure';

@@ -788,4 +788,109 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 		return $arrDate;
 	}
 	
+	/**
+	 * Calcul un tableau de date avec les mêmes interval 
+	 * Utile pour les diagramme stream ou chaque date doit être renseignée même à vide
+	 * Les data doivent avoir les champs :
+	 * MinDate, MaxDate, key, type, desc, temps, score, value
+	 *
+	 * @param array	$data
+	 * @param string $sqlFormatDate
+	 *
+	 * @return array
+	 */
+	function getDataForStream($data, $sqlFormatDate){
+		//récupère les extrémité des dates
+		$minDate = date("r");
+		$maxDate = 0;
+		foreach ($data as $d) {
+			if($minDate>$d['MinDate'])$minDate=$d['MinDate'];
+			if($maxDate<$d['MaxDate'])$maxDate=$d['MaxDate'];
+		}
+		$this->trace(date("r", $minDate)." -> ".date("r", $maxDate));
+		//calcul le tableau des dates
+		switch ($sqlFormatDate) {
+			case '%Y-%m':
+				$interval = new DateInterval('P1M');
+				$phpFormatDate = 'Y-m';
+				break;
+			case '%Y':
+				$interval = new DateInterval('P1Y');
+				$phpFormatDate = 'Y';
+				break;
+			case '%Y-%m-%d':
+				$interval = new DateInterval('P1D');
+				$phpFormatDate = 'Y-m-d';
+				break;
+		
+		}
+		//
+		$curDate = new DateTime();
+		$curDate->setTimestamp($minDate);
+		$mDate = new DateTime();
+		$mDate->setTimestamp($maxDate);
+		$this->trace($curDate->format('Y-m-d'));
+		$arrDate = array();
+		while ($curDate->format($phpFormatDate) <= $mDate->format($phpFormatDate)) {
+			$arrDate[]=$curDate->format($phpFormatDate);
+			$curDate->add($interval);
+		}
+		$this->trace("le tableau des dates",$arrDate);
+		//ajoute les valeurs vides pour chaque éléments
+		$oTag = $data[0]['key'];
+		//définir une valeur par défaut pour la consistance du graph
+		$defVal = 0.01;
+		$j=0; $i=0; $nbDate = count($arrDate); $nbData = count($data);
+		$nData;
+		//foreach ($data as $d) {
+		for ($z = 0; $z < $nbData; $z++) {
+			$d = $data[$z];
+			if($d['type']=="voronoi"){
+				$this->trace('temps '.$z.' : '.$i.' / '.$j,$d);
+			}
+			$this->trace('temps '.$z.' : '.$i.' / '.$j,$d);
+			//on vérifie si on passe à un nouveau type
+			if($oTag!=$d['key']){
+				//on fini les temps restant
+				for ($i = $j; $i < $nbDate; $i++) {
+					$nD = array('key'=>$oD['key'],'type'=>$oD['type'],'desc'=>$oD['desc']
+							,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal
+							,'MinDate'=>0,'MaxDate'=>0
+					);
+					$nData[]=$nD;
+					$this->trace('fin nouveau temps '.$i .' / '. $j,$nD);
+				}
+				$j=0;
+				$oTag=$d['key'];
+			}
+			//on calcul les temps manquant
+			for ($i = $j; $i < $nbDate; $i++) {
+				//$this->trace($arrDate[$i]."==".$d['temps']);
+				if($arrDate[$i]==$d['temps']){
+					$nData[]=$d;
+					$j=$i+1;
+					$i=$nbDate;
+				}else{
+					$nD = array('key'=>$d['key'],'type'=>$d['type'],'desc'=>$d['desc']
+							,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal
+							,'MinDate'=>0,'MaxDate'=>0
+					);
+					$nData[]=$nD;
+					$this->trace('nouveau temps '.$i .' / '. $j,$nD);
+				}
+			}
+			$oD = $d;
+		}
+		//on fini les temps restant
+		for ($i = $j; $i < $nbDate; $i++) {
+			$nD = array('key'=>$oD['key'],'type'=>$oD['type'],'desc'=>$oD['desc']
+					,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal
+					,'MinDate'=>0,'MaxDate'=>0
+			);
+			$nData[]=$nD;
+			$this->trace('fin nouveau temps '.$i .' / '. $j,$nD);
+		}
+		return  $nData;
+	}
+	
 }

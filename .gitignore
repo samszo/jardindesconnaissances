@@ -256,3 +256,13 @@ services/skosOntoStats.xml
 services/skosOntoStatsSimple.xml
 
 bdd/jdcMin.mwb.bak
+
+bdd/flux_diigoJanvier2017.sql
+
+bdd/flux_diigoJanvier2017.sql.zip
+
+public/data/.~lock.gabarit-creatic.csv#
+
+public/data/gabarit-creatic.csv
+
+services/cron/execute1.php
