@@ -61,7 +61,7 @@
 	//var url = 'http://localhost/jdc/public/flux/ensuprefr?q=getTagHisto&idMonade=2&idUti=1&idActi=3&idParent=1&for=stream&query=34591&dates[]=946681200&dates[]=1285884000';
 	//var url = "http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&for=stream&dateUnit=%Y-%m-%d&dates[]=1483228800&dates[]=1489415262";
 	//var url = "http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&dates[]=1456669433&dates[]=1489415262&arrTags[]=ecosysteminfo";
-	var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream";//&dates[]=1456669433&dates[]=1489415262";
+	var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&arrTags[]=ecosysteminfo";//&dates[]=1456669433&dates[]=1489415262";
 	d3.json(url, function(err, data){
 
 		
@@ -188,14 +188,14 @@ function buildStreamGraph(mqpdata) {
                .style("opacity", 1);
 	    })
 	    .on('mousemove', function(d){      
-			console.log(d);
-	    	var mouse = d3.mouse(this);		    
-	    	var jour = formatJour(y.invert(mouse[1]));
-	    	var an = formatAn(y.invert(mouse[1]));
-			var dRef = Date.UTC(an, 0, 1);	    	
-			tooltip.html(refTag[d.key].type+" = "+refData[d.key+dRef]+"<br/>"+jour)
-	               .style("left", (d3.event.pageX + 5) + "px")
-	               .style("top", (d3.event.pageY - 28) + "px");
+			//console.log(d);
+		    	var mouse = d3.mouse(this);		    
+		    	var jour = formatJour(y.invert(mouse[1]));
+		    	var an = formatAn(y.invert(mouse[1]));
+				var dRef = Date.UTC(an, 0, 1);	    	
+				tooltip.html(refTag[d.key].type+" = "+refData[d.key+dRef]+"<br/>"+jour)
+		               .style("left", (d3.event.pageX + 5) + "px")
+		               .style("top", (d3.event.pageY - 28) + "px");
 	    })
 	    .on('mouseout', function(d){      
 	      d3.select(this).style('fill', 

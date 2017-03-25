@@ -25,6 +25,13 @@ class Flux_Databnf extends Flux_Site{
 	public function __construct($idBase=false, $bTrace=false)
     {
     		parent::__construct($idBase, $bTrace);    	
+    		
+    		//on récupère la racine des documents
+    		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+    		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+    		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+    		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
+    		
     }
 
     /**
@@ -369,6 +376,141 @@ ORDER BY ASC (?label_a)
 		return $this->doublons[$arr["name"]];		
     }
 
+    /**
+     * Enregistre les références bibliographique d'une cote
+     * ATTENTION les cotes ne sont pas toute dans databnf, il faut passer par le site de la BNF
+     *
+     * @param  	string $cote
+     * @param  	int $page
+     * @param	int $nbResult
+     *
+     * @return array
+     */
+    function saveCote($cote, $page=1, $nbResult=100){
+    	
+	    	$this->trace("DEBUT ".__METHOD__);	    	
+	    	set_time_limit(0);
+	    		    	
+	    	//initialise les gestionnaires de base de données
+	    	$this->initDbTables();
+	    	$this->trace("Tables initialisées");    	 
+    	
+	    	//récupère l'action
+	    if(!$this->idAct)$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+	    	
+    		//récupère la page des côtes
+    		$url = "http://catalogue.bnf.fr/changerPageCote.do?cote=".$cote."&pageRech=rco&listeAffinages=&nbResultParPage=".$nbResult."&afficheRegroup=false&affinageActif=false&pageEnCours=".$page."&triResultParPage=0";    	
+    		$html = $this->getUrlBodyContent($url);    		
+    		$this->trace("page récupérée ".$url);
+    		
+    		//enregistre la page
+    		$idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>"Recherche cote ".$cote." : ".$page, "parent"=>$this->idDocRoot,"data"=>$html));
+    		//$this->trace("document correspondant au lien ajouté = ".$idD);    		
+    		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    				,"src_id"=>$idD,"src_obj"=>"doc"
+    				,"dst_id"=>$this->idAct,"dst_obj"=>"acti"
+    		));
+    		
+    		//recherche les item;
+    		$dom = new Zend_Dom_Query($html);
+    		//récupère les items 
+    		$xPath = '//*[@class="notice-synthese"]/a';
+    		$results = $dom->queryXpath($xPath);
+    		$arr = array();
+    		foreach ($results as $result) {
+    			 $i = $this->saveItemBNF("http://catalogue.bnf.fr".$result->getAttribute('href'), $idRap);
+    			 $arr[] = $i;
+    		}
+    		$page++;
+    		if($i>0)$this->saveCote($cote, $page, $nbResult);
+    		
+	    	return $arr;
+    }
+    
+    
+
+    /**
+     * Enregistre les références du catalogue général de la BNF 
+     *
+     * @param  	string $url
+     * @param  	int $idRap
+     *
+     * @return int
+     */
+    function saveItemBNF($url, $idPre=0, $objPre='rapport'){
+    	 
+	    	$this->trace("DEBUT ".__METHOD__." = ".$url);    
+	    	 
+	    	//récupère l'action
+	    	if(!$this->idActItem)$this->idActItem = $this->dbA->ajouter(array("code"=>__METHOD__));
+	    	//récupère le tag général
+	    	if(!$this->idTagGen)$this->idTagGen = $this->dbT->ajouter(array("code"=>"Classe notice BNF"));
+	    	 
+	    	//récupère la page Web
+	    	$html = $this->getUrlBodyContent($url);
+	    
+	    	//enregistre la page
+	    	$idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>"Recherche cote ".$cote." : ".$page, "parent"=>$this->idDocRoot,"data"=>$html));
+	    	//$this->trace("document correspondant au lien ajouté = ".$idD);
+	    	$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+	    			,"src_id"=>$idD,"src_obj"=>"doc"
+	    			,"dst_id"=>$this->idActItem,"dst_obj"=>"acti"
+	    			,"pre_id"=>$idPre,"pre_obj"=>$objPre
+	    	));
+	    
+	    	//recherche les informations;
+	    	$dom = new Zend_Dom_Query($html);
+	    	//récupère les items
+	    	$xPath = '//*[@class="notice"]';
+	    	$results = $dom->queryXpath($xPath);
+	    	foreach ($results as $result) {
+	    		//enregistre le champ
+	    		$champ = $result->getAttribute('id');
+			$idTag = $this->dbT->ajouter(array("code"=>$champ,"parent"=>$this->idTagGen));
+			//récupère la valeur
+			$spans =  $result->getElementsByTagName("span");
+			$i=0;
+			foreach ($spans as $s) {
+				//on ne prend pas en compte le label
+				if($i>0){
+					//on récupère les liens
+					$liens =  $s->getElementsByTagName("a");
+					$j=0;
+					foreach ($liens as $l) {
+						$idRapChamp = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+								,"src_id"=>$idD,"src_obj"=>"doc"
+								,"dst_id"=>$idTag,"dst_obj"=>"tag"
+								,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+								,"valeur"=>$l->nodeValue
+						));						
+						$h = $l->getAttribute('href');
+						//on enregistre le lien vers le document
+						$idDocChamp = $this->dbD->ajouter(array("url"=>$h,"titre"=>$l->nodeValue, "parent"=>$idD));
+						$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+								,"src_id"=>$idD,"src_obj"=>"doc"
+								,"dst_id"=>$idDocChamp,"dst_obj"=>"doc"
+								,"pre_id"=>$idRapChamp,"pre_obj"=>"rapport"
+						));														
+						$j++;
+					}
+					//si pas de liens on enregistre  la valeur du span
+					if($j==0){
+						$idRapChamp = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+								,"src_id"=>$idD,"src_obj"=>"doc"
+								,"dst_id"=>$idTag,"dst_obj"=>"tag"
+								,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+								,"valeur"=>$s->nodeValue
+						));						
+					}
+				}
+				$i++;
+			}
+			
+	    	}
+	    	$this->trace("FIN ".__METHOD__." nb item = ".$i);	    	
+    		return $i;
+    }
+    
 	/**
      * Ajout un lien au résultat
      *
@@ -493,5 +635,15 @@ WHERE {
   FILTER (regex(?a, "col", "i"))
 }
  */
+/*requête pour renvoyer les différentes version d'une oeuvre
+ * SELECT DISTINCT ?edition ?title ?date ?editeur WHERE {
+<http://data.bnf.fr/ark:/12148/cb11947965f> foaf:focus ?Oeuvre .
+?edition rdarelationships:workManifested ?Oeuvre.
+OPTIONAL{?edition dcterms:date ?date}
+OPTIONAL{?edition dcterms:title ?title}
+OPTIONAL{?edition dcterms:publisher ?editeur}
+}
+ */ 
+    
     
 }

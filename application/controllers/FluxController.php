@@ -439,7 +439,7 @@ class FluxController extends Zend_Controller_Action {
 						, $this->_getParam("dateUnit", '%Y-%m')
 						, $this->_getParam("idUti"), $this->_getParam("idMonade")
 						, $this->_getParam("idActi"), $this->_getParam("idParent")
-						, $this->_getParam("dates"), $this->_getParam("for"));
+						, $this->_getParam("dates"), $this->_getParam("for"), $this->_getParam("tags"));
 				if($this->_getParam('csv')){
 					foreach ($data as $v) {
 						if(!$this->view->content)$this->view->content = $diigo->arrayToCsv(array_keys($v),",").PHP_EOL;

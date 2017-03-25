@@ -611,11 +611,12 @@ class Flux_Diigo extends Flux_Site{
      * @param 	int	$idParent
      * @param 	array	$dates
      * @param 	string	$for
+     * @param 	array	$tags
      *
      * @return 	array
      *
      */
-    function getHistoTagLies($idTag, $dateUnit, $idUti, $idMonade, $idActi, $idParent, $dates=false, $for="stream"){
+    function getHistoTagLies($idTag, $dateUnit, $idUti, $idMonade, $idActi, $idParent, $dates=false, $for="stream", $tags=false){
 		    
 		$db = new Model_DbTable_Flux_Doc($this->db);
 		$sql = "SELECT 
@@ -652,9 +653,12 @@ class Flux_Diigo extends Flux_Site{
 		    flux_rapport rl ON rl.src_id = r.src_id
 		        AND rl.src_obj = 'rapport'
 		        INNER JOIN
-		    flux_tag tl ON tl.tag_id = rl.dst_id
+		    flux_tag tl ON tl.tag_id = rl.dst_id  
 		WHERE
 		    t.tag_id = ".$idTag;
+		if($tags){
+			$sql .= " AND tl.tag_id IN (".implode(',',$tags).") ";
+		}
 		
 		if($dates){
 			$minDate = new DateTime();
@@ -666,7 +670,7 @@ class Flux_Diigo extends Flux_Site{
 		
 		if($for=="stream"){		
 			$sql .= " GROUP BY tl.tag_id, temps 
-					HAVING value > 3
+					HAVING value > 1
 					ORDER BY tl.code, temps
 					";
 		}

@@ -246,13 +246,13 @@ try {
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
 	//
-	$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
+	//$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
 	//$diigo->saveRecent("luckysemiosis");	
 	//$data = $diigo->getPerformance();
 	//$keys = array_keys($data[0]);
 	//$diigo->arrayToCsv($data);
 	//$data = $diigo->getTagHisto('%Y-%m-%d',1, 2, 2, 1, "", "", array('1456669433','1489415262'), "stream");
-	$data = $diigo->getHistoTagLies(27, '%Y-%m-%d',1, 2, 2, 1, array('1456669433','1489415262'),"multiligne");
+	//$data = $diigo->getHistoTagLies(27, '%Y-%m-%d',1, 2, 2, 1, array('1456669433','1489415262'),"multiligne");
 	//
 	
 	/*
@@ -355,13 +355,14 @@ try {
 	*/
 	//$response = $server->handle();
 
-	/*
-	$bnf = new Flux_Databnf();
+	//
+	$bnf = new Flux_Databnf("flux_databnf",true);
+	$bnf->saveCote("YE");
 	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
-	$rs = $bnf->getRameauByIdBnf("11947434");
+	//$rs = $bnf->getRameauByIdBnf("11947434");
 	//$rs = $bnf->getGallicaByTerm($_GET["term"]);
 	//$s->trace(json_encode($rs));
-	*/
+	//
 	
 	/*
 	$s->getDb("flux_biolographes");
@@ -547,6 +548,7 @@ try {
 	$data = $ensuprefr->getTagHisto('%Y',1, 2, 3, 1, "", "", "", "stream",1);
 	*/
 	
+	/*
 	$oton = new Flux_Ontostat("flux_ontostats", true);
 	$d = new DateTime();
 	$dateJ = $d->format('Y-m-d');
@@ -557,6 +559,7 @@ try {
 	//
 	$rs = $oton->exportToSimpleRDF();
 	$t = file_put_contents("skosOntoStatsSimple.xml", $rs);
+	*/
 	
 	/*EasyRdf_Namespace::set('dbpedia-owl', 'http://dbpedia.org/ontology/');
 	//$uri = 'http://fr.dbpedia.org/data/Bruit_de_mesure';
