@@ -36,7 +36,7 @@
 // *** Add Paypal button
 
 	$db_server   = "localhost";
-	$db_name     = "flux_diigo";
+	$db_name     = "flux_databnf";
 	$db_username = "root";
 	$db_password = "samszo";
 

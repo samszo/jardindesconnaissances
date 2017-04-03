@@ -774,5 +774,31 @@ WHERE d.titre = 'axesEval'
 
         return $dt; 
     }    
+
+    /**
+     * test l'url d'un document
+     *
+     * @param string $url
+     *
+     * @return array
+     * Array
+			(
+			    [0] => HTTP/1.1 200 OK
+			    [Date] => Sat, 29 May 2004 12:28:14 GMT
+			    [Server] => Apache/1.3.27 (Unix)  (Red-Hat/Linux)
+			    [Last-Modified] => Wed, 08 Jan 2003 23:11:55 GMT
+			    [ETag] => "3f80f-1b6-3e1cb03b"
+			    [Accept-Ranges] => bytes
+			    [Content-Length] => 438
+			    [Connection] => close
+			    [Content-Type] => text/html
+			)
+     * 
+     */
+    public function testUrl($url)
+    {    	
+	    return get_headers($url, 1);
+    }
+    
     
 }

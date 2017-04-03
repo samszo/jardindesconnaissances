@@ -460,14 +460,19 @@ class GraphController extends Zend_Controller_Action {
     		$url ="../flux/diigo?q=performance&csv=1&deb=2017-01-01&fin=2017-31-01";
     		$this->view->formatTemps =  "%Y-%m-%d %H:%M:%S";
     		$this->view->champTemps =  "temps";
-    		//pour l'historique des tags liés
-    		$url ="../flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&dates[]=1456669433&dates[]=1489415262&for=multiligne&csv=1";
-    		$this->view->formatTemps =  "%Y-%m-%d";
-    		$this->view->champTemps =  "DateTimeId";
     		//pour l'historique complet d'un tag
     		$url ="../flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&for=multiligne&csv=1&tags[]=27";
     		$this->view->formatTemps =  "%Y-%m-%d";
     		$this->view->champTemps =  "DateTimeId";
+    		//pour l'historique des tags liés
+    		$url ="../flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&dates[]=1456669433&dates[]=1489415262&for=multiligne&csv=1";
+    		$this->view->formatTemps =  "%Y-%m-%d";
+    		$this->view->champTemps =  "DateTimeId";
+    		//pour l'historique des statuts d'url non accessibles
+    		$url ="../flux/diigo?q=getStatutUrl&csv=1";//&statuts[]=404&statuts[]=200";
+    		$this->view->formatTemps =  "%Y";
+    		$this->view->champTemps =  "DateTimeId";
+    		
     		
     		$this->view->urlData =  urldecode($this->_getParam('urlData', $url));
     

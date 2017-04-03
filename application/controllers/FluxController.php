@@ -448,7 +448,22 @@ class FluxController extends Zend_Controller_Action {
 				}else				
 					$this->view->content = json_encode($data);
 				break;				
-		 }    	 
+			case "getStatutUrl":
+				$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);
+				$data = $diigo->getStatutUrl($this->_getParam("dateUnit", '%Y')
+						, $this->_getParam("idActi",7)
+						, $this->_getParam("deb"), $this->_getParam("fin")
+						, $this->_getParam("for","multiligne")
+						, $this->_getParam("statuts",false));
+				if($this->_getParam('csv')){
+					foreach ($data as $v) {
+						if(!$this->view->content)$this->view->content = $diigo->arrayToCsv(array_keys($v),",").PHP_EOL;
+						$this->view->content .= $diigo->arrayToCsv($v,",").PHP_EOL;
+					}
+				}else
+					$this->view->content = json_encode($data);
+					break;
+			}    	 
     }
     
     public function ensuprefrAction()

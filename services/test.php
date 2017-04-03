@@ -246,7 +246,9 @@ try {
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
 	//
-	//$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
+	$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
+	//$data = $diigo->getStatutUrl();
+	//$diigo->verifAllUrl();
 	//$diigo->saveRecent("luckysemiosis");	
 	//$data = $diigo->getPerformance();
 	//$keys = array_keys($data[0]);
@@ -357,12 +359,18 @@ try {
 
 	//
 	$bnf = new Flux_Databnf("flux_databnf",true);
-	$bnf->saveCote("YE");
+	//$bnf->savePropActeurCata();
+	//$bnf->savePropDocCata("Recherche cote  : ");
+	//$bnf->saveProp("http://data.bnf.fr/ark:/12148/cb35694795c");	
+	//ignore_user_abort(1);
+	//uniquement XIXe siècle listeAffinages=	
+	$bnf->saveCote("YE",346,100,"FacDat_1800.0%211899.9");
 	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
 	//$rs = $bnf->getRameauByIdBnf("11947434");
 	//$rs = $bnf->getGallicaByTerm($_GET["term"]);
 	//$s->trace(json_encode($rs));
 	//
+	
 	
 	/*
 	$s->getDb("flux_biolographes");

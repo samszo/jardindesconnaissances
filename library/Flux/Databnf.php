@@ -83,11 +83,12 @@ ORDER BY ASC (?label_a)
      * Recherche une biographie à partir d'un identifiant BNF
      * cf. http://www.bnf.fr/fr/professionnels/issn_isbn_autres_numeros/a.ark.html
      *
-     * @param  string $idBnf
+     * @param  string 	$idBnf
+     * @param  boolean 	$json
      *
      * @return string
      */
-    public function getBio($idBnf)
+    public function getBio($idBnf, $lies=true)
     {	   	
 	   	//récupère les infos de data bnf
 	   	$query =
@@ -102,12 +103,18 @@ ORDER BY ASC (?label_a)
 		}';	   			   	
 		$result = $this->query($query);
 		$obj1 = json_decode($result);
+		
+		if(!isset($obj1->results->bindings[0]))return false;
+		
 		//construction de la réponse
-		$objResult->data=array("bnf"=>array("idArk"=>$obj1->results->bindings[0]->idArk->value,"liens"=>array(),"isni"=>""));
+		$objResult = new stdClass();
 		$objResult->nom = $obj1->results->bindings[0]->nom->value;				
 		$objResult->prenom = $obj1->results->bindings[0]->prenom->value;				
 		$objResult->nait = $obj1->results->bindings[0]->nait->value;				
-		$objResult->mort = $obj1->results->bindings[0]->mort->value;				
+		$objResult->mort = $obj1->results->bindings[0]->mort->value;						
+		if(!$lies) return $objResult;
+		$objResult->data=array("bnf"=>array("idArk"=>$obj1->results->bindings[0]->idArk->value,"liens"=>array(),"isni"=>""));
+		
 		
 		//récupère les données liées
 		$query =
@@ -380,13 +387,14 @@ ORDER BY ASC (?label_a)
      * Enregistre les références bibliographique d'une cote
      * ATTENTION les cotes ne sont pas toute dans databnf, il faut passer par le site de la BNF
      *
-     * @param  	string $cote
-     * @param  	int $page
-     * @param	int $nbResult
+     * @param  	string 	$cote
+     * @param  	int 		$page
+     * @param	int		$nbResult
+     * @param	string  $affinage
      *
      * @return array
      */
-    function saveCote($cote, $page=1, $nbResult=100){
+    function saveCote($cote, $page=1, $nbResult=100, $affinage=""){
     	
 	    	$this->trace("DEBUT ".__METHOD__);	    	
 	    	set_time_limit(0);
@@ -396,15 +404,15 @@ ORDER BY ASC (?label_a)
 	    	$this->trace("Tables initialisées");    	 
     	
 	    	//récupère l'action
-	    if(!$this->idAct)$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+	    if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
 	    	
     		//récupère la page des côtes
-    		$url = "http://catalogue.bnf.fr/changerPageCote.do?cote=".$cote."&pageRech=rco&listeAffinages=&nbResultParPage=".$nbResult."&afficheRegroup=false&affinageActif=false&pageEnCours=".$page."&triResultParPage=0";    	
+    		$url = "http://catalogue.bnf.fr/changerPageCote.do?cote=".$cote."&pageRech=rco&listeAffinages=".$affinage."&nbResultParPage=".$nbResult."&afficheRegroup=false&affinageActif=false&pageEnCours=".$page."&triResultParPage=0";    	
     		$html = $this->getUrlBodyContent($url);    		
     		$this->trace("page récupérée ".$url);
     		
     		//enregistre la page
-    		$idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>"Recherche cote ".$cote." : ".$page, "parent"=>$this->idDocRoot,"data"=>$html));
+    		$idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>"Recherche cote ".$cote." p.".$page." : ".$affinage, "parent"=>$this->idDocRoot,"data"=>$html));
     		//$this->trace("document correspondant au lien ajouté = ".$idD);    		
     		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
     				,"src_id"=>$idD,"src_obj"=>"doc"
@@ -422,13 +430,11 @@ ORDER BY ASC (?label_a)
     			 $arr[] = $i;
     		}
     		$page++;
-    		if($i>0)$this->saveCote($cote, $page, $nbResult);
+    		if($i>0)$this->saveCote($cote, $page, $nbResult, $affinage);
     		
 	    	return $arr;
     }
     
-    
-
     /**
      * Enregistre les références du catalogue général de la BNF 
      *
@@ -441,6 +447,14 @@ ORDER BY ASC (?label_a)
     	 
 	    	$this->trace("DEBUT ".__METHOD__." = ".$url);    
 	    	 
+	    	//vérifie si l'url est dans la base
+	    	$existe = $this->dbD->findByUrl($url);
+	    	if($existe && count($existe)>0){
+	    		$this->trace("EXISTE ".$existe["doc_id"]);
+	    		return $existe["doc_id"];
+	    	}
+	    	
+	    	
 	    	//récupère l'action
 	    	if(!$this->idActItem)$this->idActItem = $this->dbA->ajouter(array("code"=>__METHOD__));
 	    	//récupère le tag général
@@ -450,7 +464,7 @@ ORDER BY ASC (?label_a)
 	    	$html = $this->getUrlBodyContent($url);
 	    
 	    	//enregistre la page
-	    	$idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>"Recherche cote ".$cote." : ".$page, "parent"=>$this->idDocRoot,"data"=>$html));
+	    	$idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>"Recherche cote ".$cote." : ".$page, "parent"=>$this->idDocRoot));
 	    	//$this->trace("document correspondant au lien ajouté = ".$idD);
 	    	$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 	    			,"src_id"=>$idD,"src_obj"=>"doc"
@@ -511,6 +525,143 @@ ORDER BY ASC (?label_a)
     		return $i;
     }
     
+    /**
+     * Enregistre les propriété pour une ressource
+     *
+     * @param  	string $url
+     *
+     * @return array
+     */
+    function saveProp($url){
+    
+	    	$this->trace("DEBUT ".__METHOD__." = ".$url);
+	    	$this->initDbTables();
+	    	
+	    	//récupère l'action
+	    	if(!isset($this->idActProp))$this->idActProp = $this->dbA->ajouter(array("code"=>__METHOD__));
+	    	//récupère le tag général
+	    	if(!isset($this->idTagProp))$this->idTagProp = $this->dbT->ajouter(array("code"=>"Propriétés databnf"));
+	    	
+	    	//récupère les données liées
+	    $query =
+	    'SELECT DISTINCT ?p ?o WHERE {
+			<'.$url.'> ?p ?o.
+			}';
+	    $result = $this->query($query);
+	    $obj2 = json_decode($result);
+	     
+	    //enregistre le document
+	    $idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>"Propriété databnf", "parent"=>$this->idDocRoot));
+	    $idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+	    		,"src_id"=>$idD,"src_obj"=>"doc"
+	    		,"dst_id"=>$this->idActProp,"dst_obj"=>"acti"
+	    ));
+	     
+	    
+	    //construction de la réponse
+	    $rs = array();
+	    $i=0;
+	    foreach ($obj2->results->bindings as $val) {
+	    		//enregistre la propriété
+	    		$c = parse_url($val->p->value, PHP_URL_FRAGMENT);
+	    		if(!$c){
+			    	$c = parse_url($val->p->value, PHP_URL_PATH);
+			    	$arrC = explode("/",$c);
+			    	$c = array_pop($arrC);
+	    		}
+	    		$rs[$c]=$val->o->value;
+	    		$idTag = $this->dbT->ajouter(array("code"=>$c,"parent"=>$this->idTagProp,"uri"=>$val->p->value));	    	
+		    $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+		    			,"src_id"=>$idD,"src_obj"=>"doc"
+		    			,"dst_id"=>$idTag,"dst_obj"=>"tag"
+		    			,"pre_id"=>$idRap,"dst_obj"=>"rapport"
+		    			,"valeur"=>$val->o->value
+		    ));
+	    }
+	    $rs["rapport_id"]=$idRap;
+	    $rs["doc_id"]=$idD;
+	     return $rs;
+	}
+	
+	/**enregistre les propriétés des documents du catalogue bnf
+	 * @param  	string 	$titre
+
+	 */
+	function savePropDocCata($titre){
+		
+		$this->trace("DEBUT ".__METHOD__);
+		$this->initDbTables();
+		
+		//récupère l'action
+		if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+	
+		$docs = $this->dbD->findByTitre($titre);
+		
+		foreach ($docs as $d) {
+			$url = str_replace("catalogue","data",$d["url"]);
+			$rs = $this->saveProp($url);
+			//change le titre
+			$this->dbD->edit($d["doc_id"],array("tronc"=>"item catalogue BNF","titre"=>$rs['title']));
+			//création du rapport
+			$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+					,"src_id"=>$d["doc_id"],"src_obj"=>"doc"
+					,"dst_id"=>$rs["doc_id"],"dst_obj"=>"doc"
+					,"pre_id"=>$rs["rapport_id"],"dst_obj"=>"rapport"
+			));				
+		}
+		
+		
+	}
+	
+	/**enregistre les propriétés des acteurs du catalogue bnf
+	 * 
+	 * 	
+	 */
+	function savePropActeurCata(){
+	
+		$this->trace("DEBUT ".__METHOD__);
+		$this->initDbTables();
+	
+		//récupère l'action
+		if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+		$sql = "SELECT * FROM `flux_doc` WHERE `url` LIKE '/ark:/12148/%'";
+		$docs = $this->dbD->exeQuery($sql);
+	
+		foreach ($docs as $d) {
+			$url = "http://data.bnf.fr".$d["url"];
+			$rs = $this->saveProp($url);
+			if($rs){
+				if(isset($rs['FRBNF'])){
+					$obj = $this->getBio($rs['FRBNF'], false);
+					if($obj){
+						$rs['nom']=$obj->nom;
+						$rs['prenom']=$obj->prenom;
+						$rs['nait']=$obj->nait;
+						$rs['mort']=$obj->mort;
+						if(!isset($rs["identifierValid"]))$rs["identifierValid"]=0;
+						//ajoute l'existence
+						$idExi = $this->dbE->ajouter(array("nom"=>$obj->nom,	"prenom"=>$obj->prenom
+								,	"data"=>json_encode($rs),	"nait"=>$obj->nait,	"mort"=>$obj->mort,	"isni"=>$rs["identifierValid"]));
+						//création du rapport
+						$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+								,"src_id"=>$d["doc_id"],"src_obj"=>"doc"
+								,"dst_id"=>$idExi,"dst_obj"=>"exi"
+								,"pre_id"=>$rs["rapport_id"],"dst_obj"=>"rapport"
+						));
+					}
+				}
+				//création du rapport
+				$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+						,"src_id"=>$d["doc_id"],"src_obj"=>"doc"
+						,"dst_id"=>$rs["doc_id"],"dst_obj"=>"doc"
+						,"pre_id"=>$rs["rapport_id"],"dst_obj"=>"rapport"
+				));				
+			}
+		}
+	
+	
+	}
+	
 	/**
      * Ajout un lien au résultat
      *

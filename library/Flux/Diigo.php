@@ -14,6 +14,54 @@ class Flux_Diigo extends Flux_Site{
     var $LUCENE_INDEX;
     var $setLucene = false;
     var $mc;
+    var $httpReponse = array(
+    		"100"=>array("lib"=>"Continue","cycle"=>"vivant"),
+    		"101"=>array("lib"=>"Switching Protocols","cycle"=>"vivant"),
+    		"200"=>array("lib"=>"OK","cycle"=>"vivant"),
+    		"201"=>array("lib"=>"Created","cycle"=>"vivant"),
+    		"202"=>array("lib"=>"Accepted","cycle"=>"vivant"),
+    		"203"=>array("lib"=>"Non-Authoritative Information","cycle"=>"malde"),
+    		"204"=>array("lib"=>"No Content","cycle"=>"malade"),
+    		"205"=>array("lib"=>"Reset Content","cycle"=>"vivant"),
+    		"206"=>array("lib"=>"Partial Content","cycle"=>"vivant"),
+    		"300"=>array("lib"=>"Multiple Choices","cycle"=>"malade"),
+    		"301"=>array("lib"=>"Moved Permanently","cycle"=>"vivant"),
+    		"302"=>array("lib"=>"Found","cycle"=>"vivant"),
+    		"303"=>array("lib"=>"See Other","cycle"=>"vivant"),
+    		"304"=>array("lib"=>"Not Modified","cycle"=>"vivant"),
+    		"305"=>array("lib"=>"Use Proxy","cycle"=>"vivant"),
+    		"307"=>array("lib"=>"Temporary Redirect","cycle"=>"vivant"),
+    		"400"=>array("lib"=>"Bad Request","cycle"=>"mort"),
+    		"401"=>array("lib"=>"Unauthorized","cycle"=>"mort"),
+    		"402"=>array("lib"=>"Payment Required","cycle"=>"malade"),
+    		"403"=>array("lib"=>"Forbidden","cycle"=>"mort"),
+    		"404"=>array("lib"=>"Not Found","cycle"=>"mort"),
+    		"405"=>array("lib"=>"Method Not Allowed","cycle"=>"malade"),
+    		"406"=>array("lib"=>"Not Acceptable","cycle"=>"mort"),
+    		"407"=>array("lib"=>"Proxy Authentication Required","cycle"=>"mort"),
+    		"408"=>array("lib"=>"Request Timeout","cycle"=>"mort"),
+    		"409"=>array("lib"=>"Conflict","cycle"=>"mort"),
+    		"410"=>array("lib"=>"Gone","cycle"=>"mort"),
+    		"411"=>array("lib"=>"Length Required","cycle"=>"malade"),
+    		"412"=>array("lib"=>"Precondition Failed","cycle"=>"mort"),
+    		"413"=>array("lib"=>"Payload Too Large","cycle"=>"mort"),
+    		"414"=>array("lib"=>"URI Too Long","cycle"=>"mort"),
+    		"415"=>array("lib"=>"Unsupported Media Type","cycle"=>"mort"),
+    		"416"=>array("lib"=>"Range Not Satisfiable","cycle"=>"mort"),
+    		"417"=>array("lib"=>"Expectation Failed","cycle"=>"mort"),
+    		"426"=>array("lib"=>"Upgrade Required","cycle"=>"mort"),
+    		"500"=>array("lib"=>"Internal Server Error","cycle"=>"mort"),
+    		"501"=>array("lib"=>"Not Implemented","cycle"=>"mort"),
+    		"502"=>array("lib"=>"Bad Gateway","cycle"=>"mort"),
+    		"503"=>array("lib"=>"Service Unavailable","cycle"=>"mort"),
+    		"504"=>array("lib"=>"Gateway Timeout","cycle"=>"mort"),
+    		"505"=>array("lib"=>"HTTP Version Not Supported","cycle"=>"mort"),
+    		"520"=>array("lib"=>"Origin Error","cycle"=>"mort"),
+	    "522"=>array("lib"=>"Origin Connection Time-out","cycle"=>"mort"),
+    		"596"=>array("lib"=>"596","cycle"=>"mort"),
+    		
+    		"999"=>array("lib"=>"Request denied","cycle"=>"mort")
+    );
     
     /**
      * Zend_Service_Rest instance
@@ -555,7 +603,74 @@ class Flux_Diigo extends Flux_Site{
 	    }
 	    return $data;
   	}
-	  	
+
+  	/** récupère le statut des url 
+  	 *
+     * @param 	string		$dateUnit
+     * @param 	int			$idActi
+     * @param 	string		$deb
+     * @param 	string		$fin
+     * @param 	string		$for
+  	 *
+  	 * @return 	array
+  	 *
+  	 */
+  	function getStatutUrl($dateUnit="%Y", $idActi = 7, $deb="", $fin="", $for="multiligne", $statuts=false){
+  	
+  		$db = new Model_DbTable_Flux_Doc($this->db);
+  		
+  		$sql = "SELECT 
+			    DATE_FORMAT(d.pubDate, '".$dateUnit."') temps,
+  				COUNT(DISTINCT d.doc_id) nbDoc,
+			    SUBSTRING(t.code, 10, 3) tags
+			FROM
+			    flux_rapport r
+			        INNER JOIN
+			    flux_tag t ON t.tag_id = r.dst_id
+			        INNER JOIN
+			    flux_doc d ON d.doc_id = r.src_id
+			WHERE
+			    r.src_obj = 'doc' AND r.dst_obj = 'tag'
+			        AND r.pre_obj = 'acti'
+			        AND r.pre_id = ".$idActi."
+			";
+  		if($deb && $fin)
+  			$sql .= " AND doc.temps BETWEEN '".$deb."' AND '".$fin."' ";
+  						
+  		$sql .= " GROUP BY temps , tags ";
+  		  		
+  		if($statuts){
+  			$sql .= " HAVING tags IN (";
+  			foreach ($statuts as $s) {
+  				$sql .= "'".$s."', ";
+  			}
+  			$sql .= "'rien') ";
+  		}
+  				
+  		$sql .= " ORDER BY temps , tags ";
+  		//echo $sql;
+  	
+  		//
+		$rs = $db->getAdapter()->query($sql);
+		$data = $rs->fetchAll();
+		
+		//regroupe les données suivant l'accessibilité
+		$dataN = array();
+		foreach ($data as $d) {
+			if (!$this->httpReponse[$d['tags']]["cycle"]){
+				$toto = 0;
+			}
+			$dataN[] = array('temps'=>$d['temps'],'nbDoc'=>$d['nbDoc'],"tags"=>$this->httpReponse[$d['tags']]["cycle"]);
+		}
+		
+		$stat = new Flux_Stats();
+		$data = $stat->getDataForMultiligne($dataN,"liste");
+		
+		return $data;
+  		//
+  		
+  	}
+  	 
   	/** récupère les performances d'importation
   	 * 
   	 * @param	$deb		string
@@ -692,32 +807,84 @@ class Flux_Diigo extends Flux_Site{
     			$data = $stat->getDataForStream($data, $dateUnit);    			 
     		}
     		if($for=="multiligne"){
-    			$colos = array();
-    			//construction des colones
-    			foreach ($data as $v) {
-    				$arr = explode(',',$v['tags']);
-    				foreach ($arr as $k) {
-    					if (!in_array($k, $colos)) {
-    						$colos[]=$k;
-    					}    						
-    				}
-    			}
-    			//construction des datas
-    			$ndata = array();
-    			foreach ($data as $v) {
-    				$r['DateTimeId']=$v['temps'];
-    				foreach ($colos as $c) {
-    					if(strstr($v['tags'], $c))
- 	   					$r[$c]=$v['nbDoc']+0;
-    					else 
-    						$r[$c]=0;
-    				}
-    				$ndata[]=$r;
-    			}
-    			$data = $ndata;
+    			$data = $stat->getDataForMultiligne($data);
     		}
     		return $data;
     		
+    }
+    
+    /** vérifie toutes les urls de la base
+     *
+     *
+     */
+    function verifAllUrl(){
+    
+	    	$this->trace("DEBUT ".__METHOD__);
+	    	$this->initDbTables();
+	    	set_time_limit(0);
+	    	
+	    	//récupère l'action
+	    	$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+	    	//récupère le tag général
+	    $idTagCV = $this->dbT->ajouter(array("code"=>"Cycle de vie"));	    
+	    $idTagIna = $this->dbT->ajouter(array("code"=>"HTTP/1.1 4040 Not Found","parent"=>$idTagCV));
+	    //$this->dbT->ajouter(array("code"=>"inaccessible","parent"=>$idTagCV));
+	     
+	    //récupère les url
+	    $arr = $this->dbD->findLikeUrl("http://");
+	    $nbDoc = count($arr);
+	    for ($i = 13431; $i < $nbDoc; $i++) {
+	    		$d = $arr[$i];
+	    		$r = $this->dbD->testUrl($d["url"]);
+	    		
+	    		if(!$r){
+	    			//récupère le tag du statut
+	    			$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+	    					,"src_id"=>$d["doc_id"],"src_obj"=>"doc"
+	    					,"dst_id"=>$idTagIna,"dst_obj"=>"tag"
+	    					,"pre_id"=>$idAct,"pre_obj"=>"acti"
+	    					,"valeur"=>"maintenant"
+	    					,"niveau"=>date('U')
+	    			));	    			
+	    		}else{
+	    			//récupère le tag du statut
+	    			if(isset($r[0]))$idTag = $this->dbT->ajouter(array("code"=>$r[0],"parent"=>$idTagCV));
+	    			else $idTag = $idTagIna;
+	    			
+	    			//calcule les valeurs de date
+	    			$arrDate = array();
+	    			if(isset($r["Last-Modified"])) $arrDate[]="Last-Modified";
+	    			if(isset($r["Expires"])) $arrDate[]="Expires";
+	    			if(isset($r["pubDate"])) $arrDate[]="pubDate";
+	    			if(isset($r["maj"])) $arrDate[]="maj";
+	    			if(isset($r["Date"])) $arrDate[]="Date";
+	    			
+				foreach ($arrDate as $iDate) {
+					if(is_array($r[$iDate]))$rD = $r[$iDate][0];
+					else $rD = $r[$iDate];
+							
+					if($rD==0 || !is_numeric(strtotime($rD))){
+						$dV = 0;						
+					}else{
+						$dV = new DateTime($rD);
+						$dV = $dV->format('U');						
+					}
+					//enregistre le rapport
+    					$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    						,"src_id"=>$d["doc_id"],"src_obj"=>"doc"
+    						,"dst_id"=>$idTag,"dst_obj"=>"tag"
+    						,"pre_id"=>$idAct,"pre_obj"=>"acti"
+    						,"valeur"=>$iDate
+    						,"niveau"=> $dV
+    							
+    					));
+    				}
+	    		}
+
+	    		$this->trace($i." = ".$d["url"]);
+	    		 
+	    	}
+
     }
     
 }

@@ -119,7 +119,7 @@ class Flux_Site{
 			$this->temps_nb ++;
 		}		
 	}
-    
+    	
     
     /**
     * @param string $c

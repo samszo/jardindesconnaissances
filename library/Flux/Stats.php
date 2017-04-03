@@ -892,5 +892,69 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 		}
 		return  $nData;
 	}
+
+	/**
+	 * Calcul un tableau de date avec les valeurs de tags mis en colonne
+	 * Utile pour les diagramme multiline ou chaque ligne correspond à une catégorie
+	 * Les data doivent avoir les champs :
+	 * tags : tag séparé par des ', temps, nbDoc
+	 *
+	 * @param array		$data
+	 * @param string		$trans
+	 *
+	 * @return array
+	 */
+	function getDataForMultiligne($data, $trans="group"){
 	
+		$colos = array();
+		//construction des colones
+		foreach ($data as $v) {
+			$arr = explode(',',$v['tags']);
+			foreach ($arr as $k) {
+				if (!in_array($k, $colos)) {
+					$colos[]=$k;
+				}
+			}
+		}
+		//construction des datas
+		$ndata = array();
+		$andata = array();
+		$oDate=$data[0]['temps'];
+		foreach ($data as $v) {
+			$r['DateTimeId']=$v['temps'];
+			if($trans=="group"){
+				foreach ($colos as $c) {
+					if(strstr($v['tags'], $c))
+						$r[$c]=$v['nbDoc']+0;
+						else
+							$r[$c]=0;
+				}			
+				$ndata[]=$r;
+			}
+			if($trans=="liste"){
+				//les données doivent triées par temps
+				if($oDate!=$v['temps']){
+					//vérifie la complétude des lignes
+					$rN=array();						
+					$rN['DateTimeId']=$oDate;
+					foreach ($andata as $ad) {
+						foreach ($colos as $c) {
+							if(isset($ad[$c]))
+								$rN[$c]+=($ad[$c]+0);
+							else
+								$rN[$c]=0;
+						}						
+					}
+					$ndata[]=$rN;
+						
+					$andata = array();
+				}
+				$r[$v['tags']]=$v['nbDoc']+0;
+				$andata[]=$r;				
+				$oDate=$v['temps'];
+			}
+				
+		}
+		return $ndata;
+	}	
 }
