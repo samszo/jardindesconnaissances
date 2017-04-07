@@ -14,53 +14,53 @@ class Flux_Diigo extends Flux_Site{
     var $LUCENE_INDEX;
     var $setLucene = false;
     var $mc;
+    //pour plus de détail cf. https://fr.wikipedia.org/wiki/Liste_des_codes_HTTP
     var $httpReponse = array(
-    		"100"=>array("lib"=>"Continue","cycle"=>"vivant"),
-    		"101"=>array("lib"=>"Switching Protocols","cycle"=>"vivant"),
-    		"200"=>array("lib"=>"OK","cycle"=>"vivant"),
-    		"201"=>array("lib"=>"Created","cycle"=>"vivant"),
-    		"202"=>array("lib"=>"Accepted","cycle"=>"vivant"),
-    		"203"=>array("lib"=>"Non-Authoritative Information","cycle"=>"malde"),
-    		"204"=>array("lib"=>"No Content","cycle"=>"malade"),
-    		"205"=>array("lib"=>"Reset Content","cycle"=>"vivant"),
-    		"206"=>array("lib"=>"Partial Content","cycle"=>"vivant"),
-    		"300"=>array("lib"=>"Multiple Choices","cycle"=>"malade"),
-    		"301"=>array("lib"=>"Moved Permanently","cycle"=>"vivant"),
-    		"302"=>array("lib"=>"Found","cycle"=>"vivant"),
-    		"303"=>array("lib"=>"See Other","cycle"=>"vivant"),
-    		"304"=>array("lib"=>"Not Modified","cycle"=>"vivant"),
-    		"305"=>array("lib"=>"Use Proxy","cycle"=>"vivant"),
-    		"307"=>array("lib"=>"Temporary Redirect","cycle"=>"vivant"),
-    		"400"=>array("lib"=>"Bad Request","cycle"=>"mort"),
-    		"401"=>array("lib"=>"Unauthorized","cycle"=>"mort"),
-    		"402"=>array("lib"=>"Payment Required","cycle"=>"malade"),
-    		"403"=>array("lib"=>"Forbidden","cycle"=>"mort"),
-    		"404"=>array("lib"=>"Not Found","cycle"=>"mort"),
-    		"405"=>array("lib"=>"Method Not Allowed","cycle"=>"malade"),
-    		"406"=>array("lib"=>"Not Acceptable","cycle"=>"mort"),
-    		"407"=>array("lib"=>"Proxy Authentication Required","cycle"=>"mort"),
-    		"408"=>array("lib"=>"Request Timeout","cycle"=>"mort"),
-    		"409"=>array("lib"=>"Conflict","cycle"=>"mort"),
-    		"410"=>array("lib"=>"Gone","cycle"=>"mort"),
-    		"411"=>array("lib"=>"Length Required","cycle"=>"malade"),
-    		"412"=>array("lib"=>"Precondition Failed","cycle"=>"mort"),
-    		"413"=>array("lib"=>"Payload Too Large","cycle"=>"mort"),
-    		"414"=>array("lib"=>"URI Too Long","cycle"=>"mort"),
-    		"415"=>array("lib"=>"Unsupported Media Type","cycle"=>"mort"),
-    		"416"=>array("lib"=>"Range Not Satisfiable","cycle"=>"mort"),
-    		"417"=>array("lib"=>"Expectation Failed","cycle"=>"mort"),
-    		"426"=>array("lib"=>"Upgrade Required","cycle"=>"mort"),
-    		"500"=>array("lib"=>"Internal Server Error","cycle"=>"mort"),
-    		"501"=>array("lib"=>"Not Implemented","cycle"=>"mort"),
-    		"502"=>array("lib"=>"Bad Gateway","cycle"=>"mort"),
-    		"503"=>array("lib"=>"Service Unavailable","cycle"=>"mort"),
-    		"504"=>array("lib"=>"Gateway Timeout","cycle"=>"mort"),
-    		"505"=>array("lib"=>"HTTP Version Not Supported","cycle"=>"mort"),
-    		"520"=>array("lib"=>"Origin Error","cycle"=>"mort"),
-	    "522"=>array("lib"=>"Origin Connection Time-out","cycle"=>"mort"),
-    		"596"=>array("lib"=>"596","cycle"=>"mort"),
-    		
-    		"999"=>array("lib"=>"Request denied","cycle"=>"mort")
+    		"100"=>array("lib"=>"Continue","type"=>"Information","cycle"=>"vivant"),
+    		"101"=>array("lib"=>"Switching Protocols","type"=>"Information","cycle"=>"vivant"),
+    		"200"=>array("lib"=>"OK","type"=>"Succès","cycle"=>"vivant"),
+    		"201"=>array("lib"=>"Created","type"=>"Succès","cycle"=>"vivant"),
+    		"202"=>array("lib"=>"Accepted","type"=>"Succès","cycle"=>"vivant"),
+    		"203"=>array("lib"=>"Non-Authoritative Succès","type"=>"Information","cycle"=>"malde"),
+    		"204"=>array("lib"=>"No Content","type"=>"Succès","cycle"=>"malade"),
+    		"205"=>array("lib"=>"Reset Content","type"=>"Succès","cycle"=>"vivant"),
+    		"206"=>array("lib"=>"Partial Content","type"=>"Succès","cycle"=>"vivant"),
+    		"300"=>array("lib"=>"Multiple Choices","type"=>"Redirection","cycle"=>"malade"),
+    		"301"=>array("lib"=>"Moved Permanently","type"=>"Redirection","cycle"=>"vivant"),
+    		"302"=>array("lib"=>"Found","type"=>"Redirection","cycle"=>"vivant"),
+    		"303"=>array("lib"=>"See Other","type"=>"Redirection","cycle"=>"vivant"),
+    		"304"=>array("lib"=>"Not Modified","type"=>"Redirection","cycle"=>"vivant"),
+    		"305"=>array("lib"=>"Use Proxy","type"=>"Redirection","cycle"=>"vivant"),
+    		"307"=>array("lib"=>"Temporary Redirect","type"=>"Redirection","cycle"=>"vivant"),
+    		"400"=>array("lib"=>"Bad Request","type"=>"Erreur du client","cycle"=>"mort"),
+    		"401"=>array("lib"=>"Unauthorized","type"=>"Erreur du client","cycle"=>"mort"),
+    		"402"=>array("lib"=>"Payment Required","type"=>"Erreur du client","cycle"=>"malade"),
+    		"403"=>array("lib"=>"Forbidden","type"=>"Erreur du client","cycle"=>"mort"),
+    		"404"=>array("lib"=>"Not Found","type"=>"Erreur du client","cycle"=>"mort"),
+    		"405"=>array("lib"=>"Method Not Allowed","type"=>"Erreur du client","cycle"=>"malade"),
+    		"406"=>array("lib"=>"Not Acceptable","type"=>"Erreur du client","cycle"=>"mort"),
+    		"407"=>array("lib"=>"Proxy Authentication Required","type"=>"Erreur du client","cycle"=>"mort"),
+    		"408"=>array("lib"=>"Request Timeout","type"=>"Erreur du client","cycle"=>"mort"),
+    		"409"=>array("lib"=>"Conflict","type"=>"Erreur du client","cycle"=>"mort"),
+    		"410"=>array("lib"=>"Gone","type"=>"Erreur du client","cycle"=>"mort"),
+    		"411"=>array("lib"=>"Length Required","type"=>"Erreur du client","cycle"=>"malade"),
+    		"412"=>array("lib"=>"Precondition Failed","type"=>"Erreur du client","cycle"=>"mort"),
+    		"413"=>array("lib"=>"Payload Too Large","type"=>"Erreur du client","cycle"=>"mort"),
+    		"414"=>array("lib"=>"URI Too Long","type"=>"Erreur du client","cycle"=>"mort"),
+    		"415"=>array("lib"=>"Unsupported Media Type","type"=>"Erreur du client","cycle"=>"mort"),
+    		"416"=>array("lib"=>"Range Not Satisfiable","type"=>"Erreur du client","cycle"=>"mort"),
+    		"417"=>array("lib"=>"Expectation Failed","type"=>"Erreur du client","cycle"=>"mort"),
+    		"426"=>array("lib"=>"Upgrade Required","type"=>"Erreur du client","cycle"=>"mort"),
+    		"500"=>array("lib"=>"Internal Server Error","type"=>"Erreur du serveur","cycle"=>"mort"),
+    		"501"=>array("lib"=>"Not Implemented","type"=>"Erreur du serveur","cycle"=>"mort"),
+    		"502"=>array("lib"=>"Bad Gateway","type"=>"Erreur du serveur","cycle"=>"mort"),
+    		"503"=>array("lib"=>"Service Unavailable","type"=>"Erreur du serveur","cycle"=>"mort"),
+    		"504"=>array("lib"=>"Gateway Timeout","type"=>"Erreur du serveur","cycle"=>"mort"),
+    		"505"=>array("lib"=>"HTTP Version Not Supported","type"=>"Erreur du serveur","cycle"=>"mort"),
+    		"520"=>array("lib"=>"Origin Error","type"=>"Erreur du serveur","cycle"=>"mort"),
+	    "522"=>array("lib"=>"Origin Connection Time-out","type"=>"Erreur du serveur","cycle"=>"mort"),
+    		"596"=>array("lib"=>"596","type"=>"Erreur du serveur","cycle"=>"mort"),    		
+    		"999"=>array("lib"=>"Request denied","type"=>"Erreur du serveur","cycle"=>"mort")
     );
     
     /**
@@ -660,13 +660,27 @@ class Flux_Diigo extends Flux_Site{
 			if (!$this->httpReponse[$d['tags']]["cycle"]){
 				$toto = 0;
 			}
-			$dataN[] = array('temps'=>$d['temps'],'nbDoc'=>$d['nbDoc'],"tags"=>$this->httpReponse[$d['tags']]["cycle"]);
+			if($for=="multiligne"){
+				$dataN[] = array('temps'=>$d['temps'],'nbDoc'=>$d['nbDoc'],"tags"=>$this->httpReponse[$d['tags']]["cycle"]);
+			}else{
+				$dataN[] = array('temps'=>$d['temps'],'nbDoc'=>$d['nbDoc']
+						,"tags"=>$d['tags']
+						,"lib"=>$this->httpReponse[$d['tags']]["lib"]
+						,"cycle"=>$this->httpReponse[$d['tags']]["cycle"]
+						,"type"=>$this->httpReponse[$d['tags']]["type"]						
+				);
+			}
+				
 		}
 		
-		$stat = new Flux_Stats();
-		$data = $stat->getDataForMultiligne($dataN,"liste");
-		
-		return $data;
+		if($for=="multiligne"){
+			$stat = new Flux_Stats();
+			$data = $stat->getDataForMultiligne($dataN,"liste");
+  		}	
+  		if($for=="area"){
+  			$data = $dataN;
+  		}
+  		return $data;
   		//
   		
   	}
@@ -746,7 +760,7 @@ class Flux_Diigo extends Flux_Site{
 			$sql = "SELECT
 			t.tag_id,
 			t.code tag,
-			DATE_FORMAT(d.pubDate, '%Y-%m-%d') temps,
+			DATE_FORMAT(d.pubDate, '".$dateUnit."') temps,
 			COUNT(DISTINCT rd.src_id) nbDoc,
 			group_concat(tl.tag_id) idTags,
 			group_concat(tl.code) tags ";
@@ -791,7 +805,7 @@ class Flux_Diigo extends Flux_Site{
 		}
 		if($for=="multiligne"){
 			$sql .= " GROUP BY temps
-				HAVING nbDoc > 3
+				HAVING nbDoc > 1
 				ORDER BY temps
 						";
 		}		
@@ -827,7 +841,7 @@ class Flux_Diigo extends Flux_Site{
 	    	$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
 	    	//récupère le tag général
 	    $idTagCV = $this->dbT->ajouter(array("code"=>"Cycle de vie"));	    
-	    $idTagIna = $this->dbT->ajouter(array("code"=>"HTTP/1.1 4040 Not Found","parent"=>$idTagCV));
+	    $idTagIna = $this->dbT->ajouter(array("code"=>"HTTP/1.1 404 inaccessible","parent"=>$idTagCV));
 	    //$this->dbT->ajouter(array("code"=>"inaccessible","parent"=>$idTagCV));
 	     
 	    //récupère les url

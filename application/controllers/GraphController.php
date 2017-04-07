@@ -456,7 +456,7 @@ class GraphController extends Zend_Controller_Action {
     
     public function multilignesAction(){
     	
-    		//pour les performance diigo
+    		/*pour les performance diigo
     		$url ="../flux/diigo?q=performance&csv=1&deb=2017-01-01&fin=2017-31-01";
     		$this->view->formatTemps =  "%Y-%m-%d %H:%M:%S";
     		$this->view->champTemps =  "temps";
@@ -472,9 +472,31 @@ class GraphController extends Zend_Controller_Action {
     		$url ="../flux/diigo?q=getStatutUrl&csv=1";//&statuts[]=404&statuts[]=200";
     		$this->view->formatTemps =  "%Y";
     		$this->view->champTemps =  "DateTimeId";
-    		
-    		
+    		*/
+
+	    	$this->view->formatTemps =  $this->_getParam('formatTemps', "%Y-%m-%d %H:%M:%S");
+	    	$this->view->champTemps =  $this->_getParam('champTemps', "temps");;
+    	 
     		$this->view->urlData =  urldecode($this->_getParam('urlData', $url));
+    
+    }
+
+    public function pourcentverticalstepareaAction(){
+    	 
+	    	/*pour l'historique des statuts d'url non accessibles
+	    	$url ="../flux/diigo?q=getStatutUrl&csv=1&for=area";//&statuts[]=404&statuts[]=200";
+	    	$this->view->formatTemps =  "%Y";
+	    	$this->view->champTemps =  "temps";
+	    	$this->view->champGroupe =  "type";
+	    	$this->view->filtreGroupe =  "'vivant','mort'";
+	    	$this->view->axeX =  "nbDoc";
+	    	*/
+    	
+    		$this->view->formatTemps =  $this->_getParam('formatTemps', "%Y-%m-%d %H:%M:%S");
+    		$this->view->champTemps =  $this->_getParam('champTemps', "temps");
+    		$this->view->champGroupe =  $this->_getParam('champGroupe', "type");
+     	$this->view->axeX =  $this->_getParam('axeX', "nbDoc");
+		$this->view->urlData =  urldecode($this->_getParam('urlData', $url));
     
     }
     

@@ -534,7 +534,7 @@ ORDER BY ASC (?label_a)
      */
     function saveProp($url){
     
-	    	$this->trace("DEBUT ".__METHOD__." = ".$url);
+	    //	$this->trace("DEBUT ".__METHOD__." = ".$url);
 	    	$this->initDbTables();
 	    	
 	    	//récupère l'action
@@ -548,7 +548,7 @@ ORDER BY ASC (?label_a)
 			<'.$url.'> ?p ?o.
 			}';
 	    $result = $this->query($query);
-	    $obj2 = json_decode($result);
+	    	$obj2 = json_decode($result);
 	     
 	    //enregistre le document
 	    $idD = $this->dbD->ajouter(array("url"=>$url,"titre"=>"Propriété databnf", "parent"=>$this->idDocRoot));
@@ -574,13 +574,15 @@ ORDER BY ASC (?label_a)
 		    $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 		    			,"src_id"=>$idD,"src_obj"=>"doc"
 		    			,"dst_id"=>$idTag,"dst_obj"=>"tag"
-		    			,"pre_id"=>$idRap,"dst_obj"=>"rapport"
+		    			,"pre_id"=>$idRap,"pre_obj"=>"rapport"
 		    			,"valeur"=>$val->o->value
 		    ));
 	    }
 	    $rs["rapport_id"]=$idRap;
 	    $rs["doc_id"]=$idD;
-	     return $rs;
+	    $this->trace("FIN ".__METHOD__." = ".$idD);
+	     
+	    return $rs;
 	}
 	
 	/**enregistre les propriétés des documents du catalogue bnf
@@ -591,14 +593,19 @@ ORDER BY ASC (?label_a)
 		
 		$this->trace("DEBUT ".__METHOD__);
 		$this->initDbTables();
+		set_time_limit(0);
 		
 		//récupère l'action
 		if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
 	
 		$docs = $this->dbD->findByTitre($titre);
 		
-		foreach ($docs as $d) {
+		//foreach ($docs as $d) {
+		$nbDoc = count($docs);
+		for ($i = 0; $i < $nbDoc; $i++) {
+			$d = $docs[$i];
 			$url = str_replace("catalogue","data",$d["url"]);
+			$this->trace($i." / ".$nbDoc."  = ".$url);
 			$rs = $this->saveProp($url);
 			//change le titre
 			$this->dbD->edit($d["doc_id"],array("tronc"=>"item catalogue BNF","titre"=>$rs['title']));

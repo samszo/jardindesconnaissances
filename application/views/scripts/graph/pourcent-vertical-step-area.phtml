@@ -1,0 +1,53 @@
+<html>
+    <!-- 
+    merci à http://dimplejs.org/examples_viewer.html?id=area_steps_vertical_stacked_100pct
+     -->    
+<div id="chartContainer">
+  <script src="../js/d3.v4.js"></script>
+  <script src="../js/dimple.v2.3.0.min.js"></script>
+  <script type="text/javascript">
+    var svg = dimple.newSvg("#chartContainer", 590, 400);
+    
+	var parseTime = d3.timeParse('<?php echo $this->formatTemps;?>');
+	var urlData =  '<?php echo $this->urlData;?>';
+	/*exemple de base
+    d3.tsv("../data/example_data.tsv", function (data) {
+        
+    	  data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
+      var myChart = new dimple.chart(svg, data);
+      myChart.setBounds(75, 30, 485, 330);
+      myChart.addPctAxis("x", "Unit Sales");
+      var y = myChart.addCategoryAxis("y", "Month");
+      y.addOrderRule("Date");
+      
+      var s = myChart.addSeries("Channel", dimple.plot.area);
+      s.interpolation = "step";
+      s.lineWeight = 1;
+      myChart.addLegend(60, 10, 500, 20, "right");
+      myChart.draw();
+    });
+    */
+    	d3.csv(urlData, type, function(error, data) {
+        
+      var myChart = new dimple.chart(svg, data);
+      myChart.setBounds(75, 30, 485, 330);
+      myChart.addPctAxis("x", '<?php echo $this->axeX;?>');
+      var y = myChart.addCategoryAxis("y", "<?php echo $this->champTemps;?>");
+      y.addOrderRule("Date");
+      
+      var s = myChart.addSeries('<?php echo $this->champGroupe;?>', dimple.plot.area);      
+      s.interpolation = "step";
+      s.lineWeight = 1;
+      myChart.addLegend(60, 10, 500, 20, "right");
+      myChart.draw();
+    });
+    //
+    
+    	function type(d, _, columns) {
+    		d.date = parseTime(d.<?php echo $this->champTemps;?>);
+    		return d;
+    	}
+        
+  </script>
+</div>
+</html>

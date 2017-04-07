@@ -21,8 +21,7 @@ class ExcodeController extends Zend_Controller_Action
     		$ssUti = new Zend_Session_Namespace('uti');
     		echo "redir=".$this->_getParam('idUti');
     		//if(!$ssUti->uti)	$this->_redirect('excode');
-    	 		
-    	 
+    	 		    	 
     }
     
 }

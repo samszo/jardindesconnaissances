@@ -359,12 +359,13 @@ try {
 
 	//
 	$bnf = new Flux_Databnf("flux_databnf",true);
+	$bnf->bTraceFlush = true;
 	//$bnf->savePropActeurCata();
-	//$bnf->savePropDocCata("Recherche cote  : ");
+	$bnf->savePropDocCata("Recherche cote  : ");
 	//$bnf->saveProp("http://data.bnf.fr/ark:/12148/cb35694795c");	
 	//ignore_user_abort(1);
 	//uniquement XIXe siècle listeAffinages=	
-	$bnf->saveCote("YE",346,100,"FacDat_1800.0%211899.9");
+	//$bnf->saveCote("YE",604,100,"FacDat_1800.0%211899.9");
 	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
 	//$rs = $bnf->getRameauByIdBnf("11947434");
 	//$rs = $bnf->getGallicaByTerm($_GET["term"]);
