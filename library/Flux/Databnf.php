@@ -613,7 +613,7 @@ ORDER BY ASC (?label_a)
 			$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 					,"src_id"=>$d["doc_id"],"src_obj"=>"doc"
 					,"dst_id"=>$rs["doc_id"],"dst_obj"=>"doc"
-					,"pre_id"=>$rs["rapport_id"],"dst_obj"=>"rapport"
+					,"pre_id"=>$rs["rapport_id"],"pre_obj"=>"rapport"
 			));				
 		}
 		

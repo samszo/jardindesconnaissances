@@ -302,3 +302,15 @@ bdd/flux_diigo 3.sql
 bdd/flux_diigoAvril2017.zip
 
 data/AN/FRAN_0145_7341_L-medium.jpg
+
+bdd/flux_databnf 4.sql
+
+bdd/flux_databnf 4.zip
+
+data/databnf/.~lock.dataBnfReeditionTitre.csv#
+
+data/databnf/dataBnfReeditionTitre.csv
+
+data/databnf/nbDocParAN.csv
+
+data/databnf/nbDocParCat.csv

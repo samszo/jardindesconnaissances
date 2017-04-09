@@ -500,6 +500,14 @@ class GraphController extends Zend_Controller_Action {
     
     }
     
+	public function matriceAction(){
+		
+	}
+	
+	public function correlationAction(){
+		
+	}
+    
     function getSpipMot(){
 	    	//vérifie s'il faut récupérer les données dans spip
 		$dt = "[";

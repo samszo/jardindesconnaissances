@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Correlation Matrix</title>
+    <script type="text/javascript" src="../js/d3.v3.min.js"></script>
+    <style type="text/css">
+		.axis text {
+		    font: 10px sans-serif;
+		}
+		
+		.axis line, .axis path {
+		    fill: none;
+		    stroke: #000;
+		    shape-rendering: crispEdges;
+		}    
+    </style>
+</head>
+<body>
+    <div style="display:inline-block;" id="legend"></div>
+    <div style="display:inline-block; float:left" id="container"></div>
+	<script src="../js/d3.correlation.js"></script>
+
+	<script>
+	//merci à https://bl.ocks.org/arpitnarechania/caeba2e6579900ea12cb2a4eb157ce74
+    var correlationMatrix = [
+        [-10, 0.3, 0, 0.8],
+        [0.3, 1, 0.5, 0.2],
+        [0, 0.5, 1, 0.4],
+        [0.8, 0.2, 0.4, 1]
+    ];
+
+    var labels = ['documents', 'acteurs', 'concepts', 'rapports'];
+
+    Matrix({
+        container : '#container',
+        data      : correlationMatrix,
+        labels    : labels,
+        start_color : '#ffffff',
+        end_color : '#3498db'
+    });
+
+</script>
+</body>

@@ -82,7 +82,7 @@
 	    //merci à http://bl.ocks.org/KoGor/8162640
 	    function chargeIHM(){
 	    	queue()
-	    		.defer(d3.xml, "img/ICE.svg", "image/svg+xml")
+	    		.defer(d3.xml, "svg/ICE.svg", "image/svg+xml")
 	    		.await(IHMcharge);
 	    }
 	    function IHMcharge(error, xml){
