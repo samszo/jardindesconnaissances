@@ -19,7 +19,7 @@ FROM
     flux_rapport rd ON rd.rapport_id = r.src_id
         INNER JOIN
     flux_doc d ON d.doc_id = rd.src_id AND d.parent = 1
- WHERE
-   t.tag_id = 27 -- ecosystem info
+-- WHERE
+--   t.tag_id = 27 -- ecosystem info
 GROUP BY t.tag_id, temps
 ORDER BY t.code, temps

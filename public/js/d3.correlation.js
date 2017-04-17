@@ -124,6 +124,14 @@ function Matrix(options) {
 	    .attr("text-anchor", "end")
 	    .text(function(d, i) { return d; });
 
+	var titreLabels = labels.selectAll(".titre-label")
+    .data(titresData)
+    .enter().append("g")
+    .attr("class", "titre-label")
+    .attr("transform", function(d, i) { 
+    		return "translate(" + 0 + "," + y(i) + ")"; 
+    		});
+	
     var key = d3.select("#legend")
     .append("svg")
     .attr("width", widthLegend)

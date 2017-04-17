@@ -107,13 +107,14 @@ ORDER BY ASC (?label_a)
 		if(!isset($obj1->results->bindings[0]))return false;
 		
 		//construction de la réponse
+		$b = $obj1->results->bindings[0];
 		$objResult = new stdClass();
-		$objResult->nom = $obj1->results->bindings[0]->nom->value;				
-		$objResult->prenom = $obj1->results->bindings[0]->prenom->value;				
-		$objResult->nait = $obj1->results->bindings[0]->nait->value;				
-		$objResult->mort = $obj1->results->bindings[0]->mort->value;						
+		$objResult->nom = $b->nom->value;				
+		$objResult->prenom = $b->prenom->value;				
+		$objResult->nait = isset($b->nait->value) ? $b->nait->value : "";				
+		$objResult->mort = isset($b->mort->value) ? $b->mort->value : "";						
 		if(!$lies) return $objResult;
-		$objResult->data=array("bnf"=>array("idArk"=>$obj1->results->bindings[0]->idArk->value,"liens"=>array(),"isni"=>""));
+		$objResult->data=array("bnf"=>array("idArk"=>$b->idArk->value,"liens"=>array(),"isni"=>""));
 		
 		
 		//récupère les données liées
@@ -627,14 +628,20 @@ ORDER BY ASC (?label_a)
 	function savePropActeurCata(){
 	
 		$this->trace("DEBUT ".__METHOD__);
+		set_time_limit(0);
+		
 		$this->initDbTables();
 	
 		//récupère l'action
 		if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+		
+		//recherche les FRBNF 
 		$sql = "SELECT * FROM `flux_doc` WHERE `url` LIKE '/ark:/12148/%'";
 		$docs = $this->dbD->exeQuery($sql);
-	
-		foreach ($docs as $d) {
+		$nbDoc = count($docs);
+		//foreach ($docs as $d) {
+		for ($i = 422; $i < $nbDoc; $i++) {				
+			$d = $docs[$i];
 			$url = "http://data.bnf.fr".$d["url"];
 			$rs = $this->saveProp($url);
 			if($rs){
@@ -662,12 +669,91 @@ ORDER BY ASC (?label_a)
 						,"src_id"=>$d["doc_id"],"src_obj"=>"doc"
 						,"dst_id"=>$rs["doc_id"],"dst_obj"=>"doc"
 						,"pre_id"=>$rs["rapport_id"],"dst_obj"=>"rapport"
-				));				
+				));	
+				$this->trace($i." / ".$nbDoc.' '.$d["url"]);
 			}
 		}
 	
 	
 	}
+	
+	
+	/**récupère les documents dans une période ou abscent d'une période
+	 * @param int		$deb année de début
+	 * @param int		$deb année de fin
+	 * @param string 	$not si NOT = récupère les docs qui ne sont pas dans la periode
+	 * 	 
+	 * @return array
+	 *
+	 */
+	function getDocPeriode($deb, $fin, $not=""){
+		
+		$idTag = 62; //"firstDate"
+		//cette requête ne renvoie pas les document qui n'ont pas le mot clef
+		$sql = "SELECT 
+			    d.doc_id, d.url, d.titre, SUBSTRING(d.url, 31)
+			FROM
+			    flux_rapport rFiltre
+			        INNER JOIN
+			    flux_doc d ON d.doc_id = rFiltre.src_id
+			WHERE
+			    rFiltre.dst_obj = 'tag'
+		        AND rFiltre.dst_obj = 'tag'
+		        AND rFiltre.src_obj = 'doc'
+		        AND rFiltre.pre_obj = 'rapport'
+			    	AND rFiltre.dst_id = $idTag
+			    AND CONVERT( rFiltre.valeur , UNSIGNED) $not BETWEEN $deb AND $fin
+			";
+		//cette requête revnoie tous les documents qui ne sont pas dans la liste de la période
+		//mais uniquement pour data.bnf.fr
+		$sql = "	SELECT
+			d.doc_id ,d.url, d.titre, SUBSTRING(d.url,31)
+			FROM flux_doc d
+			WHERE d.url LIKE 'http://data.bnf.fr/ark:/12148/%'
+			AND d.doc_id not in (
+					SELECT
+					d.doc_id
+					FROM flux_doc d
+					inner join  flux_rapport rFiltre on d.doc_id = rFiltre.src_id
+					AND rFiltre.dst_obj = 'tag' and rFiltre.dst_id = 62 AND CONVERT(rFiltre.valeur,UNSIGNED) BETWEEN 1800 and 1899
+					);";
+			echo $sql;
+				
+			$db = new Model_DbTable_Flux_Doc($this->db);
+			$rs = $db->getAdapter()->query($sql);
+			return $rs->fetchAll();
+	}
+
+	
+	/**supprime les documents qui sont ou pas dans une période
+	 * @param int		$deb année de début
+	 * @param int		$deb année de fin
+	 * @param string 	$not si NOT = récupère les docs qui ne sont pas dans la periode
+	 *
+	 */
+	function supDocPeriode($deb, $fin, $not=""){
+		
+		set_time_limit(0);
+		$arr = $this->getDocPeriode($deb, $fin, $not);
+		$db = new Model_DbTable_Flux_Doc($this->db);		
+		$nbDoc = count($arr);
+		for ($i = 0; $i < $nbDoc; $i++) {
+			$d = $arr[$i];			
+			//supprime le document et ses dépendances
+			$nbSup = $db->remove($d["doc_id"]);
+			$this->trace(__METHOD__." ".$i." / ".$nbDoc." = ".$nbSup." : ".$d["doc_id"].' '.$d["url"]);
+			//supprime le document catalogue
+			//oublie = 3
+			$dCat = $this->dbD->findByUrl(str_replace("data","catalogue",$d["url"]));
+			if($dCat){	
+				$nbSup = $db->remove($dCat["doc_id"]);
+				$this->trace(__METHOD__." ".$i." / ".$nbDoc." = ".$nbSup." : ".$dCat["doc_id"].' '.$dCat["url"]);
+			}
+		}
+	}
+	
+	
+	
 	
 	/**
      * Ajout un lien au résultat

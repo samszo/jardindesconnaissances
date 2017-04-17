@@ -88,7 +88,7 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
     		$this->delete('flux_rapport.rapport_id = ' . $id);
 		//supprime les rapports en lien avec le rapport
 		$where = '(src_id = '.$id.' AND src_obj = "rapport") OR (dst_id = '.$id.' AND dst_obj = "rapport") OR (pre_id = '.$id.' AND pre_obj = "rapport")'; 		
-	    	$this->delete($where);
+	    return $this->delete($where);
     	
     }
 
@@ -111,11 +111,12 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
      *
      * @param integer $id
      *
-     * @return void
+     * @return integer
      */
     public function removeDoc($id)
     {
     		//récupère les rapports en référence à ce doc
+    		$nbSup = 0;
     		$where = '(src_id = '.$id.' AND src_obj = "doc") OR (dst_id = '.$id.' AND dst_obj = "doc") OR (pre_id = '.$id.' AND pre_obj = "doc")'; 
 		$sql = 'SELECT *
 		FROM flux_rapport
@@ -124,8 +125,9 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
 	    	$arr =  $stmt->fetchAll();
 		foreach ($arr as $r){
 	    		//supprime les rapports en lien avec le doc
-			$this->remove($r["rapport_id"]);			
+			$nbSup += $this->remove($r["rapport_id"]);			
 		}
+		return $nbSup;
     }
     
     /**

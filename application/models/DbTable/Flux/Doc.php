@@ -209,15 +209,23 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      *
      * @param integer $id
      *
-     * @return void
+     * @return integer
      */
     public function remove($id)
     {
+    		$nbSup = 0;
     		foreach($this->_dependentTables as $t){
 			$tEnfs = new $t($this->_db);
-			$tEnfs->removeDoc($id);
+			$nbSup += $tEnfs->removeDoc($id);
 		}
-    		$this->delete('flux_doc.doc_id = ' . $id);
+		//supprime les enfants
+		$arrEnf = $this->findByParent($id);
+		foreach ($arrEnf as $enf) {
+			$nbSup += $this->remove($enf['doc_id']);
+		}
+		
+		$nbSup += $this->delete('flux_doc.doc_id = ' . $id);
+		return $nbSup;
     }
     
     /**

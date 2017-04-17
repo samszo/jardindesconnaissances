@@ -4,6 +4,8 @@
  * http://www.bulletins-electroniques.com
  * @copyright  2013 Samuel Szoniecky
  * @license    "New" BSD License
+ * @package library\Flus
+ * @version GIT: $Id$
  * 
  */
 class Flux_Adit extends Flux_Site{

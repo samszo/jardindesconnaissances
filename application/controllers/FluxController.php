@@ -402,8 +402,8 @@ class FluxController extends Zend_Controller_Action {
 
     public function diigoAction()
     {
-    	switch ($this->_getParam('q')) {
-    		case "saveRecent":
+    		switch ($this->_getParam('q')) {
+    			case "saveRecent":
 	    			$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
 	    			$diigo->bTraceFlush = false;
 	    			$diigo->saveRecent($this->_getParam('login'));
@@ -416,13 +416,6 @@ class FluxController extends Zend_Controller_Action {
 			case "performance":
 					$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
 					$data = $diigo->getPerformance($this->_getParam('deb',''),$this->_getParam('fin',''));
-					if($this->_getParam('csv')){						
-						foreach ($data as $v) {
-							if(!$this->view->content)$this->view->content = $diigo->arrayToCsv(array_keys($v),",").PHP_EOL;
-							$this->view->content .= $diigo->arrayToCsv($v,",").PHP_EOL;
-						}						
-					}else
-						$this->view->content = json_encode($data);
 					break;
 			case "getTagHisto":
 				$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);				
@@ -431,7 +424,6 @@ class FluxController extends Zend_Controller_Action {
 						, $this->_getParam("idActi"), $this->_getParam("idParent")
 						, $this->_getParam("arrTags"), $this->_getParam("req")
 						, $this->_getParam("dates"), $this->_getParam("for"));
-    				$this->view->content = json_encode($data);
 				break;
 			case "getHistoTagLies":
 				$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);
@@ -440,13 +432,6 @@ class FluxController extends Zend_Controller_Action {
 						, $this->_getParam("idUti"), $this->_getParam("idMonade")
 						, $this->_getParam("idActi"), $this->_getParam("idParent")
 						, $this->_getParam("dates"), $this->_getParam("for"), $this->_getParam("tags"));
-				if($this->_getParam('csv')){
-					foreach ($data as $v) {
-						if(!$this->view->content)$this->view->content = $diigo->arrayToCsv(array_keys($v),",").PHP_EOL;
-						$this->view->content .= $diigo->arrayToCsv($v,",").PHP_EOL;
-					}
-				}else				
-					$this->view->content = json_encode($data);
 				break;				
 			case "getStatutUrl":
 				$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);
@@ -455,15 +440,20 @@ class FluxController extends Zend_Controller_Action {
 						, $this->_getParam("deb"), $this->_getParam("fin")
 						, $this->_getParam("for","multiligne")
 						, $this->_getParam("statuts",false));
-				if($this->_getParam('csv')){
-					foreach ($data as $v) {
-						if(!$this->view->content)$this->view->content = $diigo->arrayToCsv(array_keys($v),",").PHP_EOL;
-						$this->view->content .= $diigo->arrayToCsv($v,",").PHP_EOL;
-					}
-				}else
-					$this->view->content = json_encode($data);
 					break;
+				case "getHistoUti":
+						$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);
+						$data = $diigo->getHistoUti();
+						break;					
 			}    	 
+			if($this->_getParam('csv')){
+				foreach ($data as $v) {
+					if(!$this->view->content)$this->view->content = $diigo->arrayToCsv(array_keys($v),",").PHP_EOL;
+					$this->view->content .= $diigo->arrayToCsv($v,",").PHP_EOL;
+				}
+			}else
+				$this->view->content = json_encode($data);
+					
     }
     
     public function ensuprefrAction()

@@ -901,15 +901,17 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 	 *
 	 * @param array		$data
 	 * @param string		$trans
+	 * @param string		$key
+	 * @param string		$val
 	 *
 	 * @return array
 	 */
-	function getDataForMultiligne($data, $trans="group"){
+	function getDataForMultiligne($data, $trans="group", $key="tags", $val="nbDoc"){
 	
 		$colos = array();
 		//construction des colones
 		foreach ($data as $v) {
-			$arr = explode(',',$v['tags']);
+			$arr = explode(',',$v[$key]);
 			foreach ($arr as $k) {
 				if (!in_array($k, $colos)) {
 					$colos[]=$k;
@@ -924,8 +926,8 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 			$r['DateTimeId']=$v['temps'];
 			if($trans=="group"){
 				foreach ($colos as $c) {
-					if(strstr($v['tags'], $c))
-						$r[$c]=$v['nbDoc']+0;
+					if(strstr($v[$key], $c))
+						$r[$c]=$v[$val]+0;
 						else
 							$r[$c]=0;
 				}			
@@ -949,7 +951,7 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 						
 					$andata = array();
 				}
-				$r[$v['tags']]=$v['nbDoc']+0;
+				$r[$v[$key]]=$v[$val]+0;
 				$andata[]=$r;				
 				$oDate=$v['temps'];
 			}

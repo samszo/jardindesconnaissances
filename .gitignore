@@ -17,6 +17,8 @@ application/configs/configP8-Paragraphe.php
 
 tmp/
 
+phpDoc/
+
 data/audios
 
 data/CIDE17
@@ -314,3 +316,9 @@ data/databnf/dataBnfReeditionTitre.csv
 data/databnf/nbDocParAN.csv
 
 data/databnf/nbDocParCat.csv
+
+bdd/flux_databnf 5.sql
+
+bdd/flux_databnf-CoteYE-XIXfinal.sql
+
+bdd/flux_databnfFinalCat.zip

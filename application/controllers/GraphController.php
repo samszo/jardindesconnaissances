@@ -480,7 +480,17 @@ class GraphController extends Zend_Controller_Action {
     		$this->view->urlData =  urldecode($this->_getParam('urlData', $url));
     
     }
-
+    
+    public function multiplelignesAction(){
+    	     
+	    	$this->view->formatTemps =  $this->_getParam('formatTemps', "%m-%Y");
+	    	$this->view->champX =  $this->_getParam('champX', "temps");;
+	    	$this->view->champY =  $this->_getParam('champY', "nbDoc");;
+	    	$this->view->champSerie =  $this->_getParam('champSerie', "login");;
+	    	
+	    	$this->view->urlData =  urldecode($this->_getParam('urlData', $url));
+    
+    }
     public function pourcentverticalstepareaAction(){
     	 
 	    	/*pour l'historique des statuts d'url non accessibles

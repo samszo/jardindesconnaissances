@@ -257,7 +257,7 @@ try {
 	//$data = $diigo->getHistoTagLies(27, '%Y-%m-%d',1, 2, 2, 1, array('1456669433','1489415262'),"multiligne");
 	//
 	
-	//
+	/*
     $diigo = new Flux_Diigo("luckysemiosis","samszo","flux_evaletu_cdnl_16-17",true);
     $diigo->bTraceFlush = true;
     $arrCompte = array("ernestovi","Arso972","milounis","crazyyoshi","Ghislainguy","noelno","wumiolabisi","BCottereau","carolinemourer","DjamelMeziane","elographicdesigner","nazadounet","Sissiwiki","arzouz");
@@ -266,7 +266,7 @@ try {
     foreach ($arrCompte as $c) {
     		$diigo->saveAll($c);
 	}
-	/*
+	
     $diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
     $diigo->getGroupeRss("bulles");
 	$diigo->getRequest(array("user"=>$user,"count"=>100));
@@ -359,20 +359,21 @@ try {
 	*/
 	//$response = $server->handle();
 
-	/*
+	//
 	$bnf = new Flux_Databnf("flux_databnf",true);
 	$bnf->bTraceFlush = true;
-	//$bnf->savePropActeurCata();
-	$bnf->savePropDocCata("Recherche cote  : ");
+	ignore_user_abort(1);
+	//$bnf->supDocPeriode(1800, 1899, "NOT");
+	$bnf->savePropActeurCata();
+	//$bnf->savePropDocCata("Recherche cote  : ");
 	//$bnf->saveProp("http://data.bnf.fr/ark:/12148/cb35694795c");	
-	//ignore_user_abort(1);
 	//uniquement XIXe siècle listeAffinages=	
 	//$bnf->saveCote("YE",604,100,"FacDat_1800.0%211899.9");
 	//$rs = $bnf->getSudocAutoriteByISBN("2-7073-0307-0");
 	//$rs = $bnf->getRameauByIdBnf("11947434");
 	//$rs = $bnf->getGallicaByTerm($_GET["term"]);
 	//$s->trace(json_encode($rs));
-	*/
+	//
 	
 	
 	/*

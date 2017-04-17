@@ -1,0 +1,34 @@
+<html>
+<div id="chartContainer">
+  <script src="../js/d3.v4.js"></script>
+  <script src="../js/dimple.v2.3.0.min.js"></script>
+  <script type="text/javascript">
+  
+	var urlData =  '<?php echo $this->urlData;?>';
+	var parseTime = d3.timeParse('<?php echo $this->formatTemps;?>');	
+    var svg = dimple.newSvg("#chartContainer", "100%", "100%");
+    //d3.tsv("../data/example_data.tsv", function (data) {
+    d3.csv(urlData, type, function (data) {
+      //data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
+      var myChart = new dimple.chart(svg, data);
+      myChart.setBounds(60, 40, 505, 305);
+      var x = myChart.addCategoryAxis("x", "<?php echo $this->champX;?>");
+      x.addOrderRule("Date");
+      x.timeField = "<?php echo $this->champX;?>";
+      x.tickFormat = '<?php echo $this->formatTemps;?>';
+      x.timePeriod = d3.timeWeek;
+      //x.timeInterval = 2;
+      myChart.addMeasureAxis("y", "<?php echo $this->champY;?>");
+      myChart.addSeries("<?php echo $this->champSerie;?>", dimple.plot.line);
+      myChart.addLegend(60, 10, 500, 30, "right");
+      myChart.draw();
+    });
+
+	function type(d, _, columns) {
+		d.<?php echo $this->champX;?> = parseTime(d.<?php echo $this->champX;?>);
+		return d;
+	}
+    
+  </script>
+</div>
+</html>
