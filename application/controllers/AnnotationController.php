@@ -4,9 +4,10 @@
  * AnnotationController
  * 
  * @author Samuel Szoniecky
+ * @category   Zend
  * @package Zend\Controller
  * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
- * @version $Id$
+ * @version    Release: @package_version@
  */
 
 require_once 'Zend/Controller/Action.php';
