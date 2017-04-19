@@ -1,5 +1,16 @@
 <?php
-
+/**
+ * ExcodeController
+ *
+ * Pour le projet Labex Arts H2H Excode
+ * http://www.labex-arts-h2h.fr/excode-humanum.html
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\Controller\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ */
 class ExcodeController extends Zend_Controller_Action
 {
 	var $idBase = "flux_excode";

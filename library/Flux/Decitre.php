@@ -1,10 +1,14 @@
 <?php
 /**
+ * Flux_Decitre
  * Classe qui gère les flux venant du site decitre
  * http://www.decitre.fr
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Scraping
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Decitre extends Flux_Site{
 	

@@ -2,9 +2,13 @@
 /**
  * Ce fichier contient la classe Flux_monade.
  *
- * @copyright  2013 Samuel Szoniecky
- * @license    "New" BSD License
-*/
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\DbTable\Flux
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ */
+
 class Model_DbTable_Flux_Monade extends Zend_Db_Table_Abstract
 {
     

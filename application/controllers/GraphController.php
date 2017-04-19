@@ -3,10 +3,14 @@
 /**
  * GraphController
  * 
+ * Pour la génération de graph à partir de données
+ *
  * @author Samuel Szoniecky
- * @version 0.0
+ * @category   Zend
+ * @package Zend\Controller\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-
 require_once 'Zend/Controller/Action.php';
 
 class GraphController extends Zend_Controller_Action {
@@ -491,6 +495,7 @@ class GraphController extends Zend_Controller_Action {
 	    	$this->view->urlData =  urldecode($this->_getParam('urlData', $url));
     
     }
+    
     public function pourcentverticalstepareaAction(){
     	 
 	    	/*pour l'historique des statuts d'url non accessibles

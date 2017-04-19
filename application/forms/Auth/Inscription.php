@@ -4,6 +4,7 @@
  * Enter description here ...
  * @author samszo
  * merci à http://www.dator.fr/tutorial-creer-une-application-avec-le-zend-framework-%E2%80%93-8-le-formulaire-dinscription-de-watchmydesk/
+ * @ignore
  */
 class Form_Auth_Inscription extends Zend_Form
 {

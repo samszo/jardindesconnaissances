@@ -1,14 +1,18 @@
 <?php
 /**
+ * Flux_Gurl
+ * 
  * Classe qui gère les flux venant du réducteur d'URL de Google
  * https://developers.google.com/url-shortener/v1/getting_started
- * 
  * merci à http://inchoo.net/tools-frameworks/zendframework-example-on-using-google-url-shortener-service/
  * 
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_Gurl extends Flux_Site{
 
 	var $client;

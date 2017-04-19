@@ -1,10 +1,14 @@
 <?php
 /**
- * Classe qui gère les flux de l'application mobile tagOcrible
- *
- * @copyright  2012 Samuel Szoniecky
- * @license    MIT License
+ * Flux_tagOcrible
  * 
+ * Classe qui gère les flux de l'application mobile tagOcrible
+ * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 
 class Flux_tagOcrible extends Flux_Site{

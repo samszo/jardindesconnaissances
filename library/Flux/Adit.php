@@ -1,12 +1,14 @@
 <?php
 /**
+ * Flux_Cairn
  * Classe qui gère les flux venant du site 
  * http://www.bulletins-electroniques.com
- * @copyright  2013 Samuel Szoniecky
- * @license    "New" BSD License
- * @package library\Flus
- * @version GIT: $Id$
- * 
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Scraping
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Adit extends Flux_Site{
 		

@@ -1,13 +1,16 @@
 <?php
 /**
+ * Flux_Rmngp
  * Classe qui gère les flux Rmn-GP
- *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
- * 
  * THANKS
  * https://docs.art.rmngp.fr/
  * https://docs.art.rmngp.fr/console/
+ * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Rmngp extends Flux_Site{
 

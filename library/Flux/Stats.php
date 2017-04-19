@@ -1,9 +1,13 @@
 <?php
 /**
+ * Flux_Stats
  * Classe qui gère les flux statistiques
  *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Stats  extends Flux_Site{
 

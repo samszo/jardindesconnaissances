@@ -1,12 +1,17 @@
 <?php
 
 /**
- * Classe qui gère les flux des Tweetpalette
- *
- * @copyright  2012 Samuel Szoniecky
- * @license    "New" BSD License
+ * Flux_Tweetpalette
  * 
+ * Classe qui gère les flux des Tweetpalette
+ * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_Tweetpalette extends Flux_Site{
 
     /**

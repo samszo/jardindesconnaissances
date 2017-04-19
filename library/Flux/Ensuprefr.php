@@ -1,13 +1,16 @@
 <?php
 /**
+ * Flux_Ensuprefr
  * Classe qui gère les flux du moteur open data de l'enseignement supérieur et de la recherche française
- * https://data.enseignementsup-recherche.gouv.fr
- *
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * https://data.enseignementsup-recherche.gouv.fr 
  * THANKS
  * https://data.enseignementsup-recherche.gouv.fr/api/v1/console/datasets/1.0/search/
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\LinkedOpenData
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Ensuprefr extends Flux_Site{
 

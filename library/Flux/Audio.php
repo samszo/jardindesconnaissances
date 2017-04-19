@@ -1,14 +1,17 @@
 <?php
 /**
+ * Flux_Audio
  * Classe qui gère les flux audio
- *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
- * 
  * THANKS
  * This code was adapted by [Andrew Freiday](http://andrewfreiday.com).
  * Based on the [PHP MP3 Waveform Generator](https://github.com/afreiday/php-waveform-png).
  * For getWave : http://www.phpclasses.org/browse/file/26978.html
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 require_once( "../library/mp3file.php" );
 

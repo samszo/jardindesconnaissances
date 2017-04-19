@@ -3,8 +3,13 @@
 /**
  * StatController
  * 
- * @author
- * @version 
+ * Pour gérer les statistiques
+ * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\Controller\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 
 require_once 'Zend/Controller/Action.php';

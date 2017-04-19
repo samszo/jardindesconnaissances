@@ -1,12 +1,16 @@
 <?php
 /**
+ * Flux_Freebase
  * Classe qui gère les flux freebase
- *
- * @copyright  2012 Samuel Szoniecky
- * @license    "New" BSD License
  * 
  * THANKS
  * http://code.google.com/p/google-refine/wiki/ReconciliationServiceApi
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Freebase{
 

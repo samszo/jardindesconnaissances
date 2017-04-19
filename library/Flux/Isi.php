@@ -1,14 +1,16 @@
 <?php
 /**
+ * Flux_Isi
  * Classe qui gère les flux du site de l'institut international de statistique
  * http://isi.cbs.nl/glossary/
- *
- * @copyright  2017 Samuel Szoniecky
- * @license    "New" BSD License
  * 
- * THANKS
- * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Scraping
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_Isi extends Flux_Site{
 
 	var $rs;

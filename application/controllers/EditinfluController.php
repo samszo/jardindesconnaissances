@@ -3,10 +3,15 @@
 /**
  * EditinfluController
  * 
+ * Pour le projet EditInflu
+ * cartographier les réseaux d'influences à travers l'Open Linked Data
+ *
  * @author Samuel Szoniecky
- * @version 0.0
+ * @category   Zend
+ * @package Zend\Controller\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-
 require_once 'Zend/Controller/Action.php';
 
 class EditinfluController extends Zend_Controller_Action {

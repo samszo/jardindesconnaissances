@@ -1,13 +1,17 @@
 <?php
 /**
+ * Flux_Databnf
  * Classe qui gère les flux dbpedia
  *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
- * 
  * THANKS
  * http://data.bnf.fr/sparql/
  * http://data.bnf.fr/docs/doc_requetes_data.pdf
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\LinkedOpenData
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Databnf extends Flux_Site{
 

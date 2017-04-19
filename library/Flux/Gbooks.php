@@ -1,13 +1,13 @@
 <?php
 /**
- * Classe qui gère les flux de google books
+ * Flux_Gbooks
+ * Class qui gère les flux de google books
  *
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
- * 
- * REFERENCES
- * 
- * THANKS
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Gbooks extends Flux_Site{
 

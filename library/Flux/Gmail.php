@@ -1,12 +1,16 @@
 <?php
 
 /**
- * Classe qui gère les flux Gmail
- *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
+ *  Flux_Gmail
+ *  Classe qui gère les flux Gmail
  * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_Gmail extends Flux_Site{
 
 	var $login;

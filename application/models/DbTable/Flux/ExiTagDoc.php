@@ -1,18 +1,16 @@
 <?php
-/**
- * Ce fichier contient la classe Flux_exitagdoc.
- *
- * @copyright  2014 Samuel Szoniecky
- * @license    "New" BSD License
-*/
-
 
 /**
  * Classe ORM qui représente la table 'flux_exitagdoc'.
  *
- * @copyright  2014 Samuel Szoniecky
- * @license    "New" BSD License
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\DbTable\Flux
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ * @ignore
  */
+
 class Model_DbTable_Flux_ExiTagDoc extends Zend_Db_Table_Abstract
 {
     

@@ -1,18 +1,20 @@
 <?php
 /**
- * Classe qui gère les flux Gdata
- *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
+ * Flux_Ontostat
  * 
+ * Classe qui gère les flux du projet Ontostat
  * merci à 
- *  * @file csv2skosxl.php
- * @license Licensed under WTFPL (http://www.wtfpl.net/txt/copying/)
- * @author Cristian Romanescu <cristian.romanescu@eaudeweb.ro>
- * 
+ * @file csv2skosxl.php
  * http://skos.um.es/unescothes/
  * https://www.w3.org/TR/2005/WD-swbp-skos-core-spec-20051102
+ * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_Ontostat extends Flux_Site{
 
     var $mc;

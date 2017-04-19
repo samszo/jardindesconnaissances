@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/Leaflet/Leaflet.label/0.8/dist/leaflet.label.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@0.4.9/dist/leaflet.draw.css" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://rawgit.com/mejackreed/Leaflet-IIIF/master/leaflet-iiif.js"></script>
+    <script src="https://cdn.rawgit.com/Leaflet/Leaflet.label/0.8/dist/leaflet.label.js"></script>
+    
+   <script src="https://unpkg.com/leaflet-draw@0.4.9/dist/leaflet.draw.js"></script>
+    		
+    
+    <style type="text/css">
+    html, body, #map{
+	  height: 100%;
+	  margin: 0;
+	}
+	</style>
+  </head>
+  <body>
+    <div id="map">
+    </div>
+    <script type="text/javascript">
+    var map;
+
+    map = L.map('map', {
+      center: [0, 0],
+      crs: L.CRS.Simple,
+      zoom: 0
+    });
+    var baseLayer;
+    var annoFeatures = new L.FeatureGroup();
+    map.addLayer(annoFeatures);
+    
+    //var urlJson = 'http://dms-data.stanford.edu/data/manifests/BnF/jr903ng8662/manifest.json';
+    var urlJson = 'http://gapai.univ-paris8.fr/ontostats/omk/iiif/464/manifest';
+    var urlJsonIma = "http://gallica.bnf.fr/iiif/ark:/12148/bpt6k5471671b/f4/info.json";   
+    $.getJSON(urlJson, function(data) {
+    
+      var page = data.sequences[0].canvases[0];
+      console.log(page.images[0].resource.service['@id'] + '/info.json');
+      baseLayer = L.tileLayer.iiif(
+    		  //urlJsonIma
+    	      page.images[0].resource.service['@id'] + '/info.json'
+      ).addTo(map);
+
+      /*
+      $.getJSON(page.otherContent[0]['@id'], function(annoData) {
+        $.each(annoData.resources, function(i, value) {
+          var b = /xywh=(.*)/.exec(value.on)[1].split(',');
+          var minPoint = L.point(b[0], b[1]);
+          var maxPoint = L.point(parseInt(b[0]) + parseInt(b[2]), parseInt(b[1]) + parseInt(b[3]));
+          var min = map.unproject(minPoint, 3);
+          var max = map.unproject(maxPoint, 3);
+          L.rectangle(L.latLngBounds(min, max)).bindLabel(value.resource.chars).addTo(map);
+        });
+      });
+      */
+    });
+
+
+	// Initialise the FeatureGroup to store editable layers
+	var drawnItems = new L.FeatureGroup();
+	map.addLayer(drawnItems);
+
+	// Initialise the draw control and pass it the FeatureGroup of editable layers
+	var drawControl = new L.Control.Draw({
+	  edit: {
+	    featureGroup: drawnItems
+	  }
+	});
+
+	map.addControl(drawControl);
+
+	map.on(L.Draw.Event.CREATED, function (e) {
+	  var type = e.layerType
+	  var layer = e.layer;
+
+	  // Do whatever else you need to. (save to db, add to map etc)
+
+	  drawnItems.addLayer(layer);
+	});
+    
+    </script>
+  </body>
+</html>

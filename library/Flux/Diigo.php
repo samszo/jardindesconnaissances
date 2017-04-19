@@ -1,10 +1,13 @@
 <?php
 /**
- * Classe qui gère les flux Gdata
+ * Flux_Diigo
+ * Classe qui gère les flux Diigo
  *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Diigo extends Flux_Site{
 
@@ -162,24 +165,24 @@ class Flux_Diigo extends Flux_Site{
 		$i = 1;
 		$count = 100;
 		while ($i>0) {
-    		$arr = $this->getRequest(array("user"=>$login,"count"=>$count, "start"=>$i));
-    		if(!$arr){
-	    		$i=-1;	
-    		}else{				
-    			$j = 0;
-    			$this->trace("getRequest   ".$i." : ".count($arr));
-    			foreach ($arr as $item){
-					$this->trace($i."   ".$j." : ".$item->url);				
-	    			$this->saveItem($item);
-	    			$j++;
-	    		}
+	    		$arr = $this->getRequest(array("user"=>$login,"count"=>$count, "start"=>$i));
+	    		if(!$arr){
+		    		$i=-1;	
+	    		}else{				
+	    			$j = 0;
+	    			$this->trace("getRequest   ".$i." : ".count($arr));
+	    			foreach ($arr as $item){
+						$this->trace($i."   ".$j." : ".$item->url);				
+		    			$this->saveItem($item);
+		    			$j++;
+		    		}
 				if(count($arr)==0)$i=-1;
 				else $i += $j;
-    		}
-    		//$i=-1;
-    	}
-    	if($this->setLucenee)$this->lucene->index->optimize();
-	    //
+	    		}
+	    		//$i=-1;
+	    	}
+	    	if($this->setLucenee)$this->lucene->index->optimize();
+		    //
 		
 		$this->trace("FIN ".__METHOD__);				
     }    

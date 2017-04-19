@@ -1,4 +1,8 @@
 <?php
+/**
+ * @ignore
+ */
+
 class Form_Auth_Login extends Zend_Form
 {
     public function init()

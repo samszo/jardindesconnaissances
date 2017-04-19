@@ -1,20 +1,16 @@
 <?php
-/**
- * Ce fichier contient la classe Flux_utitagdoc.
- *
- * @copyright  2008 Gabriel Malkas
- * @copyright  2010 Samuel Szoniecky
- * @license    "New" BSD License
-*/
-
 
 /**
  * Classe ORM qui représente la table 'flux_utitagdoc'.
  *
- * @copyright  2008 Gabriel Malkas
- * @copyright  2010 Samuel Szoniecky
- * @license    "New" BSD License
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\DbTable\Flux
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ * @ignore
  */
+
 class Model_DbTable_Flux_UtiTagDoc extends Zend_Db_Table_Abstract
 {
     

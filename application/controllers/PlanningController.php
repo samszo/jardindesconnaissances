@@ -3,10 +3,14 @@
 /**
  * PlanningController
  * 
- * @author : samuel szoniecky
- * @version 
+ * pour gérer les planning des formations avec Google Calendar
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\Controller\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-
 require_once 'Zend/Controller/Action.php';
 
 class PlanningController extends Zend_Controller_Action {

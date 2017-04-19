@@ -1,46 +1,20 @@
 <?php
 /**
+ * Flux_Scoopit
+ * 
  * Classe qui gère les flux avec Scoop IT
  *
- * @copyright  2016 Samuel Szoniecky
- * @license    MIT License
- * 
  * REFERENCES
  * http://www.scoop.it/dev/api/1/intro
- * 
  * THANKS
  * MERCI BEAUCOUP à https://github.com/vdemay/Scoopit-PHP
+ * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-
-// You may want to catch this to present a decent =  error message for you're
-// user ;)
-// Every call to every method (including the constructor) of the Scoop object
-// may throw this exception.
-class ScoopAuthenticationException extends Exception {
-	public function __construct($message){
-		parent::__construct($message);
-	}
-
-}
-
-class ScoopHttpNot200Exception extends Exception {
-	public $body;
-	public $status;
-	public $url;
-	public function __construct($url,$body, $status){
-		$this->url=$url;
-		$this->body = $body;
-		$this->status = $status;
-	}
-	public function toString(){
-		return "Url: $this->url\nStatus: $this->status\nBody: $this->body";
-	}
-}
-
-
-#################################################################################
-#################################################################################
-#################################################################################
 
 //class ScoopIt {
 class Flux_ScoopIt extends Flux_Site {
@@ -346,5 +320,46 @@ class Flux_ScoopIt extends Flux_Site {
 		return $this->get($this->scitServer."api/1/".$url);
 	}
 }
+
+
+// You may want to catch this to present a decent =  error message for you're
+// user ;)
+// Every call to every method (including the constructor) of the Scoop object
+// may throw this exception.
+/**
+ * 
+ * @author samszo
+ * @ignore
+ */
+class ScoopAuthenticationException extends Exception {
+	public function __construct($message){
+		parent::__construct($message);
+	}
+
+}
+/**
+ *
+ * @author samszo
+ * @ignore
+ */
+
+class ScoopHttpNot200Exception extends Exception {
+	public $body;
+	public $status;
+	public $url;
+	public function __construct($url,$body, $status){
+		$this->url=$url;
+		$this->body = $body;
+		$this->status = $status;
+	}
+	public function toString(){
+		return "Url: $this->url\nStatus: $this->status\nBody: $this->body";
+	}
+}
+
+
+#################################################################################
+#################################################################################
+#################################################################################
 
 ?>

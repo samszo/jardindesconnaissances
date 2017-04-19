@@ -1,16 +1,16 @@
 <?php
 /**
+ * Flux_TEI
  * Classe qui gère les flux TEI
- *
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
- * 
  * REFERENCES
  * http://www.tei-c.org/release/doc/tei-p5-exemplars/html/tei_lite_fr.doc.html
- * 
- * THANKS
- */
-class Flux_TEI extends Flux_Site{
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\LinkedOpenData
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ */class Flux_TEI extends Flux_Site{
 
 	var $idDocRoot;
 	var $idMonade;

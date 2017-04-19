@@ -3,10 +3,15 @@
 /**
  * Crible
  * 
- * @author : samuel szoniecky
- * @version 
+ * Pour la gestion des cribles
+ * https://www.zotero.org/luckysemiosis/items/itemKey/7BXBDBHW/tag/crible
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\Controller\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-
 require_once 'Zend/Controller/Action.php';
 
 class CribleController extends Zend_Controller_Action {

@@ -1,12 +1,16 @@
 <?php
 /**
+ * Flux_Aylien
+ * 
  * Classe qui gère les flux de l'API Ayliens
  *
- * @copyright  2014 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-class Flux_Aylien extends Flux_Site{
+ class Flux_Aylien extends Flux_Site{
 		
     /**
      * Constructeur de la classe

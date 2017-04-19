@@ -1,13 +1,15 @@
 <?php
 
 /**
+ * Flux_Gknowledgegraph
  * Classe qui gère les flux Google Knowledge Graph
- *
  * https://developers.google.com/knowledge-graph/reference/rest/v1/
  * 
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Gknowledgegraph extends Flux_Site{
 

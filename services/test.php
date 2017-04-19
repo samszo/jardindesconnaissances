@@ -257,16 +257,18 @@ try {
 	//$data = $diigo->getHistoTagLies(27, '%Y-%m-%d',1, 2, 2, 1, array('1456669433','1489415262'),"multiligne");
 	//
 	
-	/*
-    $diigo = new Flux_Diigo("luckysemiosis","samszo","flux_evaletu_cdnl_16-17",true);
+	//
+    $diigo = new Flux_Diigo("luckysemiosis","samszo","flux_evaletu_avun_16-17",true);
     $diigo->bTraceFlush = true;
     $arrCompte = array("ernestovi","Arso972","milounis","crazyyoshi","Ghislainguy","noelno","wumiolabisi","BCottereau","carolinemourer","DjamelMeziane","elographicdesigner","nazadounet","Sissiwiki","arzouz");
     $arrCompte = array("FatihiZakaria","jean888","ettanass","elyaagoubimhamed","thypbast","kesraoui","Elalami90","Yannmahuet","herrhilmi","mkrayem","babachir","darkmido","elmounjide","abdel1314","elmiloudiasmae","taoufik072","NKalmouni","faizaelmoufid","samiaMALKI","brenda78","BDalila","yasmina1");
     $arrCompte = array("andhanouni","hchaimovitch","Diako95","mohaestro","ikramghazali","Cedricldc","slouiba","antonygmarques","solennmass");
+    $arrCompte = array("maeaam","marinecorviole","alexandrine-p","calypsolgd","cirlae","ju97122","dhoimir","ben7777","digitalveille","gaellemolina");
     foreach ($arrCompte as $c) {
     		$diigo->saveAll($c);
 	}
 	
+	/*	
     $diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
     $diigo->getGroupeRss("bulles");
 	$diigo->getRequest(array("user"=>$user,"count"=>100));
@@ -359,7 +361,7 @@ try {
 	*/
 	//$response = $server->handle();
 
-	//
+	/*
 	$bnf = new Flux_Databnf("flux_databnf",true);
 	$bnf->bTraceFlush = true;
 	ignore_user_abort(1);

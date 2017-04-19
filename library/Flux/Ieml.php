@@ -1,11 +1,16 @@
 <?php
 /**
+ * Flux_Ieml
  * Classe qui gère les flux IEML
  *
- * @copyright  2012 Samuel Szoniecky
- * @license    "New" BSD License
  * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_Ieml extends Flux_Site{
 
   	var $PATH_STAR_PARSER = 'http://starparser.ieml.org/cgi-bin/star2xml.cgi?iemlExpression=';

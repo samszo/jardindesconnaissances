@@ -1,14 +1,16 @@
 <?php
 /**
+ * Flux_MC
+ * 
  * Classe qui gère les flux de mots clefs
- *
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
  * 
- * REFERENCES
- * 
- * THANKS
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_MC extends Flux_Site{
 	
 	//var $kwe = array("autokeyword","zemanta", "alchemy", "opencalais", "yahoo", "textalytics","aylien");

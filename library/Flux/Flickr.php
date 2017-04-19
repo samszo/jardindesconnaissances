@@ -1,10 +1,13 @@
 <?php
 /**
+ * Flux_Flickr
  * Classe qui gère les flux Flickr
  *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Flickr extends Flux_Site{
 

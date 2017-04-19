@@ -3,10 +3,15 @@
 /**
  * BiolographesController
  * 
+ * Pour le projet ANR Biolographes
+ * http://biolog.hypotheses.org/
+ *
  * @author Samuel Szoniecky
- * @version 0.0
+ * @category   Zend
+ * @package Zend\Controller\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-
 require_once 'Zend/Controller/Action.php';
 
 class BiolographesController extends Zend_Controller_Action {

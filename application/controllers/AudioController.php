@@ -1,4 +1,16 @@
 <?php
+/**
+ * AudioController
+ *
+ * Pour gérer de l'audio
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\Controller\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ */
+
 class AudioController extends Zend_Controller_Action
 {
 	var $idBase = "flux_proverbes";

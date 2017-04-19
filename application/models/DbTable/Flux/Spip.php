@@ -2,9 +2,14 @@
 /**
  * Ce fichier contient la classe Flux_Spip.
  *
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
-*/
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\DbTable\Flux
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ * @ignore
+ */
+
 class Model_DbTable_Flux_Spip extends Zend_Db_Table_Abstract
 {
     

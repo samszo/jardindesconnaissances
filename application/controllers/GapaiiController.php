@@ -1,12 +1,18 @@
 <?php
 
 /**
- * GAPAII
+ * GapaiiController
  * 
- * @author : samuel szoniecky
- * @version 
+ * Pour le projet Labex Arts H2H GAPAII
+ * http://www.labex-arts-h2h.fr/gapaii-347.html
+ * GÉNÉRATION AUTOMATIQUE DE PROVERBES ET ANALYSE DES INTERPRÉTATIONS EXPRIMÉES SUR INTERNET
+ * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\Controller\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-
 require_once 'Zend/Controller/Action.php';
 
 class GapaiiController extends Zend_Controller_Action {

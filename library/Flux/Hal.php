@@ -1,10 +1,14 @@
 <?php
 /**
+ * Flux_Hal
+ * 
  * Classe qui gère les flux HAL
  *
- * @copyright  2014 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Hal extends Flux_Site{
 

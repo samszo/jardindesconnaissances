@@ -2,8 +2,11 @@
 /**
  * Ce fichier contient la classe Gen_concepts_generateurs.
  *
- * @copyright  2013 Samuel Szoniecky
- * @license    "New" BSD License
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\DbTable\Gen
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 
 class Model_DbTable_Gen_conceptsxgenerateurs extends Zend_Db_Table_Abstract

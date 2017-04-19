@@ -1,10 +1,15 @@
 <?php
 /**
+ * Flux_P2Net
+ * 
  * Classe qui gère les flux venant des flux P2NET 
  * http://patent2netv2.vlab4u.info/
- * @copyright  2016 Samuel Szoniecky
- * @license    CC by-sa
  * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_P2Net extends Flux_Site{
 		

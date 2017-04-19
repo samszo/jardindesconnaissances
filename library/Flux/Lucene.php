@@ -1,11 +1,15 @@
 <?php
 /**
+ * Flux_Lucene
  * Classe qui gère les flux d'indexation Lucene
  *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_Lucene extends Flux_Site{
 	
 	var $index;

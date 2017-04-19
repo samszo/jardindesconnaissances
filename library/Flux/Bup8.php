@@ -1,14 +1,16 @@
 <?php
 /**
+ * FluxBup8
  * Classe qui gère les flux de la BU de Paris 8
- *
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
  * 
  * REFERENCES
  * http://catalogue.bu.univ-paris8.fr/cgi-bin/koha/opac-main.pl
  * 
- * THANKS
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Scraping
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Bup8 extends Flux_Site{
 

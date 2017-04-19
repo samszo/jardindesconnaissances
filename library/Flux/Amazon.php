@@ -1,12 +1,16 @@
 <?php
 /**
+ * Flux_Amazon
  * Classe qui gère les flux venant du site Amazon
  * http://www.amazon.com
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
  * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Scraping
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-class Flux_Amazon extends Flux_Site{
+ class Flux_Amazon extends Flux_Site{
 	
 	var $service;
 	

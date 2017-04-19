@@ -1,10 +1,14 @@
 <?php
 /**
+ * Flux_Deleuze
  * Classe qui gère les flux venant du site deleuze
  * http://www2.univ-paris8.fr/deleuze/
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Deleuze extends Flux_Site{
 	

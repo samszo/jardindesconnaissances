@@ -1,11 +1,14 @@
 <?php
 
 /**
+ * Flux_Gapaii
  * Classe qui gère les méthodes de GAPAII
  *
- * @copyright  2013 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Gapaii extends Flux_Site{
 	

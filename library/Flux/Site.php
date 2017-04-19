@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * Flux_Site
+ *
+ * Classe générique qui permet de gérer les méthodes globales pour la manipulation d'un site
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ */
 class Flux_Site{
     
     var $cache;
@@ -784,7 +794,8 @@ class Flux_Site{
     
     /** 
      * Copy file or folder from source to destination, it can do 
-     * recursive copy as well and is very smart 
+     * recursive copy as well and is very smart
+     *  
      * It recursively creates the dest file or directory path if there weren't exists 
      * Situtaions : 
      * - Src:/home/test/file.txt ,Dst:/home/test/b ,Result:/home/test/b -> If source was file copy file.txt name with b as name to destination 

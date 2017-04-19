@@ -1,4 +1,17 @@
 <?php
+/**
+ * SpipController
+ *
+ * Pour gérer SPIP et ses objets
+ * http://www.spip.net/fr_rubrique91.html
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\Controller\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ */
+
 class SpipController extends Zend_Controller_Action
 {
 	var $dbNom = "spip_citu";

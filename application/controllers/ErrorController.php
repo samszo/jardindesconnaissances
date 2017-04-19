@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * ErrorController
+ *
+ * Pour gérer les erreurs
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\Controller\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ */
 class ErrorController extends Zend_Controller_Action
 {
 

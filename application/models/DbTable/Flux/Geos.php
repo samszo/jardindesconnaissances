@@ -1,20 +1,15 @@
 <?php
-/**
- * Ce fichier contient la classe Flux_geos.
- *
- * @copyright  2008 Gabriel Malkas
- * @copyright  2010 Samuel Szoniecky
- * @license    "New" BSD License
-*/
-
 
 /**
  * Classe ORM qui représente la table 'flux_geos'.
  *
- * @copyright  2010 Samuel Szoniecky
- * @license    "New" BSD License
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\DbTable\Flux
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
-//ATTENTION le "s" de Models est nécessaire pour une compatibilité entre application et serveur
+
 class Model_DbTable_Flux_Geos extends Zend_Db_Table_Abstract
 {
     

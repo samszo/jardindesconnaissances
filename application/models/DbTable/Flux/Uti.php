@@ -1,18 +1,16 @@
 <?php
-/**
- * Ce fichier contient la classe Flux_Uti.
- *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
-*/
 
 
 /**
  * Classe ORM qui représente la table 'flux_Uti'.
  *
- * @copyright  2011 Samuel Szoniecky
- * @license    "New" BSD License
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package Zend\DbTable\Flux
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
 {
     

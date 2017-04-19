@@ -1,15 +1,18 @@
 <?php
 /**
- * Classe qui gère les flux Open Annotation
- *
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
+ * Flux_OpenAnnotation
  * 
+ * Classe qui gère les flux Open Annotation
  * REFERENCES
  * http://www.openannotation.org/spec/core/index.html
  * 
- * THANKS
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\LinkedOpenData
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_OpenAnnotation extends Flux_Site{
 
 	var $idDocRoot;

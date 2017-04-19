@@ -1,14 +1,15 @@
 <?php
 /**
+ * Flux_Proverbe
  * Classe qui gère les flux des bases de données de proverbes
- *
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
- * 
  * REFERENCES
  * http://www.culture.gouv.fr/public/mistral/proverbe_fr
  * 
- * THANKS
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Projet
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Proverbe extends Flux_Site{
 

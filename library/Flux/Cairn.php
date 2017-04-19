@@ -1,10 +1,14 @@
 <?php
 /**
+ * Flux_Cairn
  * Classe qui gère les flux du site Cairn
  * https://www.cairn.info/
- * @copyright  2015 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ *
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Scraping
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
 class Flux_Cairn extends Flux_Site{
 

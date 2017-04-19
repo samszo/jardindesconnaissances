@@ -1,4 +1,8 @@
 <?php
+/**
+ * @ignore
+ */
+
 class Form_Chercher extends Zend_Form
 {
     public function __construct($options = null)

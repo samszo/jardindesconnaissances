@@ -1,11 +1,15 @@
 <?php
 /**
+* Flux_Spip
+* 
 * Class pour gérer les flux de données SPIP
-*
-*
-* @author     Samuel Szoniecky <samuel.szoniecky@univ-paris8.fr>
-* @license    CC0 1.0 Universal (CC0 1.0) Public Domain Dedication http://creativecommons.org/publicdomain/zero/1.0/ 
-*/
+ * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\Outils
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
+ */
 class Flux_Spip extends Flux_Site{
         
 	var $statueDocument = "publie";

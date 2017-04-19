@@ -1,14 +1,18 @@
 <?php
 /**
+ * Flux_Istex
  * Classe qui gère les flux de l'API ISTEX
- * http://www.istex.fr/
- *
- * @copyright  2016 Samuel Szoniecky
- * @license    "New" BSD License
- * 
+ * http://www.istex.fr/ 
  * THANKS
  * https://api.istex.fr/documentation/
+ * 
+ * @author Samuel Szoniecky
+ * @category   Zend
+ * @package library\Flux\API
+ * @license https://creativecommons.org/licenses/by-sa/2.0/fr/ CC BY-SA 2.0 FR
+ * @version  $Id:$
  */
+
 class Flux_Istex extends Flux_Site{
 
 	var $searchUrl = 'https://api.istex.fr/document/?';
