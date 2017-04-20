@@ -29,6 +29,12 @@ class CartoController extends Zend_Controller_Action {
 
     public function iiifAction()
     {
+	    	$config = Zend_Controller_Front::getInstance()->getParam('bootstrap');
+	    	$apikeys = $config->getOption('resources');
+
+	    	$this->view->idBase = $this->_getParam('idBase',$apikeys['db']['params']['dbname']);
+    		$this->view->idUti = $this->_getParam('idUti',0);
+    	 
     }
     
     public function tempoAction()
