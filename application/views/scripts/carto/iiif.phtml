@@ -23,7 +23,7 @@
 	  height: 100%;
 	  margin: 0;
 	}
-	#export, #import {
+	#export, #import, #save {
             position: absolute;
             top:300px;
             left:10px;
@@ -40,6 +40,9 @@
         #import {
             top:340px;
         }	
+        #save {
+            top:380px;
+        }	
 	</style>
   </head>
   <body>
@@ -47,6 +50,7 @@
     </div>
     <a href='#' id='export'>Exporter</a>
     <a href='#' id='import'>Importer</a>
+    <a href='#' id='save'>Enregistrer</a>
     <script type="text/javascript">
     var map;
 
@@ -145,7 +149,7 @@
 
 	});
 
-	/**Enregistre les layers dans un json
+	/**Exporter les layers dans un json
 	merci à https://bl.ocks.org/danswick/d30c44b081be31aea483
 	**/
 	document.getElementById('export').onclick = function(e) {
@@ -160,11 +164,21 @@
         document.getElementById('export').setAttribute('download','data.geojson');
     }	
 
+	/**Enregistre les layers dans un json puis dans la base de données
+	**/
+	document.getElementById('save').onclick = function(e) {
+        // Extract GeoJson from featureGroup
+        var data = drawnItems.toGeoJSON();
+
+        saveLayer(data);
+
+    }	
+
 	/**
 	merci à 
 	**/
 	document.getElementById('import').onclick = function(e) {
-		  var geojsonLayer = new L.GeoJSON.AJAX("../data/data.geojson");
+		  var geojsonLayer = new L.GeoJSON.AJAX("../data/data1.geojson");
 
 		  //enregistre un label
 		  geojsonLayer.bindLabel('Staff Mass Storage GA', { noHide: true });
@@ -189,23 +203,22 @@
 	var idBase = '<?php echo $this->idBase;?>';
 	var idUti = '<?php echo $this->idUti;?>';
 		
-	function saveDoc(){
-		var p = getDocParams();
-		if (p.titre) {
-			$.post(prefUrl+"flux/sauvedoc", p,
-					 function(data){
-				 		if(data.erreur){
-				 			showMessage(data.erreur);
-				 		}else{
-				 			getDocs();							 		
-							showMessage("Graph ajouté.");
-					  		diagSauvDoc.close();						 		
-				 		}					 		
-					 }, "json");
-		}else{
-			showMessage("Veillez remplir tous les champs.");
-		}
+	//enregistre le document dans la base
+	function saveLayer(p){
+		var d = new Date();
+		p.idBase = idBase;
+		p.titre = "Layer : "+d.toString();
+		$.post(prefUrl+"savelayer", p,
+				 function(data){
+			 		if(data.erreur){
+			 			console.log("ERREUR:");				 		
+			 			console.log(data.erreur);
+			 		}else{
+			 			console.log(data);				 		
+			 		}					 		
+				 }, "json");
 	}
+	
 	function editDoc(){
 		var p = getDocParams();
 		p.idDoc = arrGraphs[lstGraph.selectedIndex].doc_id;
