@@ -60,6 +60,9 @@ class CartoController extends Zend_Controller_Action {
     public function getlayerAction()
     {
 	    	$idBase = $this->_getParam('idBase',$apikeys['db']['params']['dbname']);
+	    	
+	    	$idBase = $this->_getParam('idBase',$apikeys['db']['params']['dbname']);
+	    	
 	    
 	    	//création des objets de base de données sur la bonne base
 	    	$s = new Flux_Site($idBase);
