@@ -88,23 +88,23 @@
 		    items: [
 				{ type: 'html',  id: 'item6',
 				    html: '<h1>Cartographier les sagesses</h1>' 
-				},				    
+				},				    							
 		        { type: 'break',  id: 'break0'},
-		        { type: 'button',  id: 'tbNewTxt', caption: '', icon:'fa-font', hint: 'Nouveau texte'},
-		        { type: 'button',  id: 'tbNewImg', caption: '', icon:'fa-image', hint: 'Nouvelle image'},
-		        { type: 'button',  id: 'tbNewFilm', caption: '', icon:'fa-film', hint: 'Nouveau film'},	        
-		        { type: 'button',  id: 'tbNewSound', caption: '', icon:'fa-volume-up', hint: 'Nouveau son'},	        
+		        { ieml: "h.j.-'t.u.-b.u.-',", type: 'button', id: 'tbNewTxt', caption: '', icon:'fa-font', hint: 'Nouveau texte'},
+		        { ieml: "h.j.-'t.u.-l.u.-',", type: 'button',  id: 'tbNewImg', caption: '', icon:'fa-image', hint: 'Nouvelle image'},
+		        { ieml: "h.j.-'t.u.-l.u.-'u.F:.-',", type: 'button',  id: 'tbNewFilm', caption: '', icon:'fa-film', hint: 'Nouveau film'},	        
+		        { ieml: "h.j.-’t.u.-m.u.-'", type: 'button',  id: 'tbNewSound', caption: '', icon:'fa-volume-up', hint: 'Nouveau son'},	        
 		        { type: 'break',  id: 'break1'},
-		        { type: 'menu',   id: 'evalMenu', caption: 'Résultats', icon: 'fa-balance-scale', items: [
-					{id: 'evalCarte', caption: 'Carte', icon: 'fa-globe'},
-                    {id: 'evalStream', caption: 'Flux', icon: 'fa-area-chart'},
+		        { ieml: "u.o.-we.h.-'", type: 'menu',   id: 'evalMenu', caption: 'Résultats', icon: 'fa-balance-scale', items: [
+					{ieml: "d.u.-s.u.-'", id: 'evalCarte', caption: 'Carte', icon: 'fa-globe'},
+                    {ieml: "E:S:.m.-", id: 'evalStream', caption: 'Flux', icon: 'fa-area-chart'},
                     ]
                 },
 		        { type: 'break',  id: 'break4', hidden:uti.role=="admin" ? false : true },
 		        { type: 'button',  id: 'tbParam', caption: 'Paramètres', icon:'fa-cog', hidden:uti.role=="admin" ? false : true},
 		        { type: 'spacer' },
 		        { type: 'break',  id: 'break6'},
-		        { type: 'menu',   id: 'lngMenu', caption: 'langues', icon: 'fa-language', items: [
+		        { ieml: "b.o.-u.u.-'", type: 'menu',   id: 'lngMenu', caption: 'langues', icon: 'fa-language', items: [
 		            {id: 'lang_fr', caption: 'Français', icon: 'flag-icon flag-icon-fr'},
 		            {id: 'lang_en', caption: 'English', icon: 'flag-icon flag-icon-gb'},
 		            {id: 'lang_ar', caption: 'عربي', icon: 'flag-icon flag-icon-sa'},
@@ -112,8 +112,8 @@
     				},
     		        { type: 'break',  id: 'break5'},
     		        { type: 'menu',   id: 'utiMenu', caption: uti.login, icon: 'fa-user', items: [
-    					{ id: 'utiSignOut', caption: 'déconnexion', icon: 'fa-sign-out'}, 
-    					{ id: 'utiParam', caption: 'informations', icon: 'fa-newspaper-o'}
+    					{ ieml: "E:T:.t.-", id: 'utiSignOut', caption: 'déconnexion', icon: 'fa-sign-out'}, 
+    					{ ieml: "l.o.-o.o.-'", id: 'utiParam', caption: 'informations', icon: 'fa-newspaper-o'}
     					]},
 		    ]
 		});
@@ -199,17 +199,25 @@
             		evals = JSON.parse(result);
             		*/
             		evals = result;
-            		//chargment des propriétés de la barre d'outil
-            		evals.tb.forEach(function(tb){
-                		var i = w2ui['mainTB'].items[tb.num];
-            			if(tb.hint)i.tooltip=tb.hint;
-                		});
+            		/*chargement multilingue des libellés
+            		des barres de boutons
+				*/	            		
+				w2ui['mainTB'].items.forEach(function(tb){
+					if(tb.ieml){
+						itemChangeLibelle(tb,evals.btns[tb.ieml].titre);
+					}
+					//vérifie la présence de sous item
+					if(tb.items){
+						tb.items.forEach(function(stb){
+							if(stb.ieml){
+								itemChangeLibelle(stb,evals.btns[stb.ieml].titre);
+							}
+						});								
+					}				
+				});                						
             		w2ui['mainTB'].items[0].html='<h1>'+evals.expeTitre+'</h1>';
-            		w2ui['mainTB'].items[14].items[0].caption=evals.deconnexion;
-            		w2ui['mainTB'].items[14].items[1].caption=evals.information;
-            		w2ui['mainTB'].items[12].caption=evals.langue;
-            		w2ui['mainTB'].items[12].text=evals.langue;
 	    		    	w2ui['mainTB'].refresh();
+	    		    	
 	    		    	//chargement de la barre des évaluations
 	    		    var menuMaxWidth='400px';	
 					var sideEval = {
@@ -245,6 +253,14 @@
 		});
 	}
 
+	function itemChangeLibelle(i,lbl){
+		console.log(i.ieml+' '+i.caption+' '+i.hint);						
+		if(i.text)i.text=lbl;
+		if(i.caption)i.caption=lbl;
+		if(i.hint)i.hint=lbl;
+		console.log(i.ieml+' '+i.caption+' '+i.hint);								
+	}
+	
 	function getNextQuest(num){
 		if(!num){
 			q = evals.evals[idEval].quests[numQuest];
@@ -438,7 +454,7 @@
 		});
 	}
 	
-	chargeProcessEval('lang_fr');
+	chargeProcessEval('lang_<?php echo $this->langue;?>');
 
 	
 </script>

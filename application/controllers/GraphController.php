@@ -369,7 +369,12 @@ class GraphController extends Zend_Controller_Action {
 		if($this->_getParam('idMotParent', false) && $this->_getParam('idBase', false)){
 			$dt = $this->getSpipMot();
 		}
-				
+		if($this->_getParam('pageSPIP', false)){
+			//$dt = $this->getSpipMot();
+			$s = new Flux_Site();
+			$dt = $s->getUrlBodyContent($this->_getParam('pageSPIP'));
+		}
+		
 		$this->view->data =  $this->_getParam('data', $dt);    	
 		$this->view->w =  $this->_getParam('w', 0);    	
 		$this->view->h =  $this->_getParam('h', 0);    	

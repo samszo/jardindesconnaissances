@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+  <rdf:Description rdf:about="http://ontostats.univ-paris8.fr/terms/Aleatoire">
+	<dcterms:title xml:lang="en">Aleatoire</dcterms:title>
+    <rdfs:subClassOf xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:resource="http://www.co-ode.org/ontologies/ont.owl#ProprieteVariable"/>
+    <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="fr">Aleatoire</rdfs:comment>
+    <rdfs:label xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="fr">Aleatoire</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://ontostats.univ-paris8.fr/terms/Amplitude">
+	<dcterms:title xml:lang="en">Amplitude</dcterms:title>
+    <rdfs:subClassOf xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:resource="http://ontostats.univ-paris8.fr/terms/IndiceDeDissemblance"/>
+    <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="fr">Amplitude</rdfs:comment>
+    <rdfs:label xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="fr">Amplitude</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://ontostats.univ-paris8.fr/terms/AmplitudeInterquartile">
+	<dcterms:title xml:lang="en">AmplitudeInterquartile</dcterms:title>
+    <rdfs:subClassOf xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:resource="http://ontostats.univ-paris8.fr/terms/EcartInterdecile"/>
+    <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="fr">AmplitudeInterquartile</rdfs:comment>
+    <rdfs:label xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="fr">AmplitudeInterquartile</rdfs:label>
+  </rdf:Description>
+</rdf:RDF>

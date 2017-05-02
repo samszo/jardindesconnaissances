@@ -257,7 +257,7 @@ try {
 	//$data = $diigo->getHistoTagLies(27, '%Y-%m-%d',1, 2, 2, 1, array('1456669433','1489415262'),"multiligne");
 	//
 	
-	//
+	/*
     $diigo = new Flux_Diigo("luckysemiosis","samszo","flux_evaletu_avun_16-17",true);
     $diigo->bTraceFlush = true;
     $arrCompte = array("ernestovi","Arso972","milounis","crazyyoshi","Ghislainguy","noelno","wumiolabisi","BCottereau","carolinemourer","DjamelMeziane","elographicdesigner","nazadounet","Sissiwiki","arzouz");
@@ -267,6 +267,7 @@ try {
     foreach ($arrCompte as $c) {
     		$diigo->saveAll($c);
 	}
+	*/
 	
 	/*	
     $diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
@@ -562,18 +563,35 @@ try {
 	$data = $ensuprefr->getTagHisto('%Y',1, 2, 3, 1, "", "", "", "stream",1);
 	*/
 	
-	/*
-	$oton = new Flux_Ontostat("flux_ontostats", true);
+	//
+	//$oton = new Flux_Ontostat("flux_ontostats", true);
+	$oton = new Flux_Ontostat("omekas_test", true);
 	$d = new DateTime();
 	$dateJ = $d->format('Y-m-d');
+	//$doc = $oton->enrichirOnto("http://localhost/OntoStats/OntoStatsSimple.rdf");	
+	//$doc = $oton->creerVocabulairePourOmk("http://localhost/OntoStats/OntoStatsTest.rdf");
+	//$oton->trace('Écrit : ' . $doc->save("test.xml") . ' bytes');
+	$doc = $oton->creerOntoToOmeka("http://localhost/OntoStats/OntoStatsFull.rdf");
+	/*
+	$data = $oton->creerOntoCSV("http://localhost/OntoStats/OntoStatsFull.rdf");
+	$f = true;
+	foreach ($data as $v) {
+		if($f){
+			echo $oton->arrayToCsv(array_keys($v),";").PHP_EOL;
+			$f=false;
+		}
+		echo $oton->arrayToCsv(array_keys($v),";").PHP_EOL;
+	}
+	*/
+	
 	//$rs = $isi->getGlossaire("http://isi.cbs.nl/glossary/term74.htm");
-	$rs = $oton->saveGlossaireSelection("http://localhost/OntoStats/GlossaireISI.csv");
+	//$rs = $oton->saveGlossaireSelection("http://localhost/OntoStats/GlossaireISI.csv");
 	//$rs = $oton->exportToSkos();
 	//$t = file_put_contents("skosOntoStats.xml", $rs);
 	//
-	$rs = $oton->exportToSimpleRDF();
-	$t = file_put_contents("skosOntoStatsSimple.xml", $rs);
-	*/
+	//$rs = $oton->exportToSimpleRDF();
+	//$t = file_put_contents("skosOntoStatsSimple.xml", $rs);
+	//
 	
 	/*EasyRdf_Namespace::set('dbpedia-owl', 'http://dbpedia.org/ontology/');
 	//$uri = 'http://fr.dbpedia.org/data/Bruit_de_mesure';

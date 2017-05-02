@@ -283,6 +283,7 @@ class GapaiiController extends Zend_Controller_Action {
 		$this->view->idDoc = $this->idDoc;
 		$this->view->idCpt = $this->idCpt;
 		$this->view->idGeo = $this->idGeo;
+		$this->view->langue = $this->_getParam('langue','fr');
 		
 		//pas d'authentification si idUti
 		//echo "this->idUti=".$this->idUti."\n";

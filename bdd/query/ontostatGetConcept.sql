@@ -30,6 +30,6 @@ FROM
    -- flux_tag tL ON tL.tag_id = rTt.valeur
         INNER JOIN
     flux_tag tT ON tT.parent = t.tag_id
--- where tL.ns = 'fa'
+WHERE t.tag_id = 3
 GROUP BY tT.tag_id, t.tag_id
 ORDER BY t.code, tT.ns; -- nbDoc desc;
