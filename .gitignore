@@ -330,3 +330,19 @@ data/AN/FRAN_0133_0024_L-medium.jpg
 application/configs/JardinDesConnaissances-f5b2c4e5e74b.json
 
 data/AN/FRAN_0133_0036_L-medium.jpg
+
+bdd/flux_databnf-CoteYE-XIXfinal1.sql
+
+bdd/flux_databnf-CoteYE-XIXfinalNet.sql
+
+data/databnf/dataBnfReeditionTitreFinal.csv
+
+data/databnf/nbDocParANfinal.csv
+
+data/databnf/nbDocParAut.csv
+
+data/databnf/nbDocParCatFinal.csv
+
+data/eu/2103(INL).json
+
+data/eu/test.xml

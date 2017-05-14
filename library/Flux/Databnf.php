@@ -440,6 +440,40 @@ ORDER BY ASC (?label_a)
 	    	return $arr;
     }
     
+
+    /**
+     * Suppression des doublons créé par l'importation
+     *
+     *
+     * @return int
+     */
+    function supDoublons(){
+    	
+    		$dbR = new Model_DbTable_Flux_Rapport($this->db);
+    	
+    		//requête pour récupérer les doubons ark
+    		$sql = 'SELECT
+			    	COUNT(r.rapport_id) nb, r.valeur, r.src_id,
+			    	group_concat(r.rapport_id) ids
+		    	FROM flux_rapport r
+		    	WHERE
+			    	r.dst_id = 11 AND r.dst_obj = "tag" AND r.valeur != ""
+		    	GROUP BY r.valeur
+		    	HAVING nb > 1
+		    	ORDER BY nb DESC';
+	    	$docs = $this->dbD->exeQuery($sql);
+	    	$nbDoc = count($docs);
+	    	$nbSup = 0;
+	    	//foreach ($docs as $d) {
+	    	for ($i = 0; $i < $nbDoc; $i++) {
+	    		$ids = explode(",",$docs[$i]["ids"]);
+	    		$nbSup += $dbR->remove($ids[1]);
+	    		$this->trace($docs[$i]["valeur"]." = ".$nbSup);
+	    	}
+	    	return $nbSup;
+		    		 
+    }
+    
     /**
      * Enregistre les références du catalogue général de la BNF 
      *

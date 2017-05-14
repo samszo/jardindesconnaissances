@@ -323,7 +323,7 @@ class Flux_Diigo extends Flux_Site{
     
     function getGroupeRss($groupe){
 
-    	$url = self::RSS_GROUP_URL."/".$groupe."/rss?count=100&start=0";
+    	$url = self::RSS_GROUP_URL.$groupe."/rss?count=100&start=0";
 		Zend_Feed_Reader::setCache($this->cache);
 		Zend_Feed_Reader::useHttpConditionalGet();
     	

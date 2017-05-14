@@ -270,7 +270,7 @@ class FluxController extends Zend_Controller_Action {
 	   			$this->view->reponse = json_encode($arr);
 				break;	   		
 	   		case 'getLivre':
-				$this->view->reponse = $bnf->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
+				$this->view->reponse = $buP8->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
 	   			break;	   		
 	   		case 'setLivre':
 				$this->view->reponse = $buP8->setInfoPageLivre($this->_getParam('idLivre'));
@@ -485,7 +485,12 @@ class FluxController extends Zend_Controller_Action {
     
     }
     
-        
+    public function okapiAction()
+    {
+
+    
+    }
+    
 	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);
 		if ($ss->client->isAccessTokenExpired()) {

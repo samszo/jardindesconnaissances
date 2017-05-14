@@ -51,8 +51,9 @@ class Flux_Ontostat extends Flux_Site{
      	$this->dbVoc = new Model_DbTable_Omk_Vocabulary($this->db);
      	$this->dbP = new Model_DbTable_Omk_Property($this->db);
      	$this->dbRC = new Model_DbTable_Omk_ResourceClass($this->db);
+     	$this->dbIIS = new Model_DbTable_Omk_ItemItemSet($this->db);
      	$this->owner = "ontostats@univ-paris8.fr";
-     	$this->idOwner = 6;
+     	$this->idOwner = 2;
      	$this->ResClassId = 2;
      	$this->arrClass = array();
     }
@@ -90,9 +91,13 @@ class Flux_Ontostat extends Flux_Site{
 	    	
 	    	//parcourt les class
 	    	$class = $this->doc->getElementsByTagName('Class');
-	    	foreach ($class as $c) {
-	    		$this->creerResourceOmk($c);	    		 
-	    	}
+	    foreach ($class as $c) {
+	    		//if($i > 230 && $i < 240)
+	    		//if($i < 100)
+	    			$this->creerResourceOmk($c);
+	    		$this->trace($i);
+			$i++;
+	    }
 
 	    	$this->trace(__METHOD__." FIN ");
 	    	
@@ -108,14 +113,27 @@ class Flux_Ontostat extends Flux_Site{
      *
      */
     function creerResourceOmk($c){
-    	    	    	
+    	    	
+    		
     		//récupère la clef de la classe
 	    	$about = $c->getAttribute('rdf:about');
 	    	$k = substr($about, strlen(self::$scheme)+1);
 	    	$this->trace(__METHOD__." ".$k);
 	    	
+	    	/*pour tester les erreurs
+	    	$arrTest = array('SeuilDacceptation','SeuilDeConfiance','SeuilDeSignification');
+	    	if(in_array($k,$arrTest)){
+	    		$this->trace('ABANDON : '.$k);
+	    		return;
+	    	}
+	    	*/
+	    	
 	    	//vérifie que la class n'est pas déjà créée
-	    	if(isset($this->arrClass[$k]))return $this->arrClass[$k];
+	    	$rC = $this->dbV->findByUri($about);
+	    	if($rC){
+	    		$this->trace('EXISTE : '.$k);
+	    		return $rC['resource_id'];
+	    	}
 	    	 
 
 	    	//créer la ressource
@@ -124,6 +142,9 @@ class Flux_Ontostat extends Flux_Site{
 	    	$this->dbIS->ajouter(array("id"=>$idR,"is_open"=>1));
 
 	    	//ajouter les valeurs
+	    	//en limitant au français
+		$arrLang = array('fr','en');
+		
 	    	//reference
 	    	$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>10,"type"=>"uri","value"=>$k,"uri"=>$about));
 	    	
@@ -133,38 +154,37 @@ class Flux_Ontostat extends Flux_Site{
 	    	foreach ($vals as $v){
 	    		$lang = $v->getAttribute("xml:lang");
 	    		$comment = $v->nodeValue."";
-	    		$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>4,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
+	    		if(in_array($lang,$arrLang))$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>4,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
 	    	}
 	    	//titre
 	    	$vals = $c->getElementsByTagName('label');
 	    	foreach ($vals as $v){
 	    		$lang = $v->getAttribute("xml:lang");
-	    		$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>1,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
+	    		if(in_array($lang,$arrLang))$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>1,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
 	    	}
 	    	//short title
 	    	$vals = $c->getElementsByTagName('prefLabel');
 	    	foreach ($vals as $v){
 	    		$lang = $v->getAttribute("xml:lang");
-	    		$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>117,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
+	    		if(in_array($lang,$arrLang))$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>117,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
 	    	}
 	    	//alt terms
 	    	$vals = $c->getElementsByTagName('altLabel');
 	    	foreach ($vals as $v){
 	    		$lang = $v->getAttribute("xml:lang");
-	    		$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>17,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
+	    		if(in_array($lang,$arrLang))$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>17,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
 	    	}
 	    	//abstract
 	    	$vals = $c->getElementsByTagName('abstract');
 	    	foreach ($vals as $v){
 	    		$lang = $v->getAttribute("xml:lang");
-	    		$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>86,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
+	    		if(in_array($lang,$arrLang))$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>86,"type"=>"literal","lang"=>$lang,"value"=>$v->nodeValue));
 	    	}
 	    	//isReferencedBy
 	    	$vals = $c->getElementsByTagName('seeAlso');
 	    	foreach ($vals as $v){
-	    		$lang = $v->getAttribute("xml:lang");
 	    		$uri = $v->getAttribute("rdf:resource");
-	    		$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>35,"type"=>"uri","uri"=>$v->nodeValue,"value"=>$v->nodeValue));
+	    		$this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>35,"type"=>"uri","uri"=>$uri,"value"=>$uri));
 	    	}
 	    	
 	    	//gestion des subClassOf
@@ -172,17 +192,20 @@ class Flux_Ontostat extends Flux_Site{
 	    	foreach ($vals as $v){
 	    		$lbl = $v->nodeName;
 	    	
-	    		//création du vocabulaire
 	    		$res = $v->getAttribute("rdf:resource");
-	    		if($res=="http://ontostats.univ-paris8.fr/terms/Propriete"){
-	    			//créer une property
-	    			$idProp = $this->dbP->ajouter(array("owner_id"=>$this->idOwner,"vocabulary_id"=>$this->idVocab,"local_name"=>$k,"label"=>$k,"comment"=>$comment));
+	    		
+	    		//création du vocabulaire
+	    		if($this->idVocab){
+		    		if($res=="http://ontostats.univ-paris8.fr/terms/Propriete"){
+		    			//créer une property
+		    			$idProp = $this->dbP->ajouter(array("owner_id"=>$this->idOwner,"vocabulary_id"=>$this->idVocab,"local_name"=>$k,"label"=>$k,"comment"=>$comment));
+		    		}
+		    		//créer une class
+		    		$idClass = $this->dbRC->ajouter(array("owner_id"=>$this->idOwner,"vocabulary_id"=>$this->idVocab,"local_name"=>$k,"label"=>$k,"comment"=>$comment));
+		    		//mise à jour de la class
+		    		$this->dbR->edit($idR,array("resource_class_id"=>$idClass));
 	    		}
-	    		//créer une class
-	    		$idClass = $this->dbRC->ajouter(array("owner_id"=>$this->idOwner,"vocabulary_id"=>$this->idVocab,"local_name"=>$k,"label"=>$k,"comment"=>$comment));
-	    		//mise à jour de la class
-	    		$this->dbR->edit($idR,array("resource_class_id"=>$idClass));
-	    		 
+	    		
 	    		//récupère la classe parente
 	    		$q = '//owl:Class[@rdf:about="'.$res.'"]';
 	    		$elements = $this->xpath->query($q);
@@ -204,6 +227,65 @@ class Flux_Ontostat extends Flux_Site{
     }
     
     
+    /**
+     * Lier dans Omeka les items avec les itemSet 
+     * la comparaison se fait par égalité de chaine
+     *
+     * 
+     *
+     */
+    function lierItemToItemSet(){
+    		$this->trace(__METHOD__);
+    	 
+		/*
+		SELECT 
+			count(*) nb, 
+			vS.value, group_concat(vS.resource_id) ids, 
+			vC.value, vC.resource_id 
+			FROM value vS 
+			inner join value vC on vC.value LIKE CONCAT('%',vS.value,'%') AND vC.property_id IN (1,4,17,19,117)
+			inner join resource r on r.id = vC.resource_id AND r.resource_type = 'Omeka\\Entity\\ItemSet'
+			WHERE vS.property_id = 3 
+			 group by vS.value
+			 ORDER BY vS.value
+	    	*/
+    		$this->initVarOmk();
+    	 
+	    	$query = $this->dbV->select()
+		    	->from( array("vS" => "value"), array("vS"=>"value","ids"=>"group_concat(DISTINCT vS.resource_id)","nbItem"=>"COUNT(*)"))
+		    	->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+		    	->joinInner(array("vC" => "value")
+		    			,"vC.value LIKE CONCAT('%',vS.value,'%') AND vC.property_id IN (1,4,17,19,117)"
+		    			,array("vC"=>"value", "resource_id"))
+    			->joinInner(array("r" => "resource")
+    					,"r.id = vC.resource_id AND r.resource_type LIKE '%ItemSet'"
+    					,array())
+    			->where("vS.property_id = 3")
+    			->group(array("vS.value"))
+		    	->order(array("vS.value"));
+		$rs = $this->dbV->fetchAll($query)->toArray();
+		
+		$j = 0;
+		foreach ($rs as $v) {
+			if($j==100){
+				$this->trace($i." ".$id." => ".$v["resource_id"]);
+			}
+			$this->trace($j." : ".$v["vS"]." => ".$v["vC"]);
+			$arrId = explode(",",$v["ids"]);
+			$i=1;
+			foreach ($arrId as $id) {
+				$this->dbIIS->ajouter(array("item_id"=>$id,"item_set_id"=>$v["resource_id"]));
+				//création des rapports pour les itemSet liés
+				$this->dbIIS->ajouterTroncParBranche($id, $v["resource_id"]);
+				$this->trace($i." ".$id." => ".$v["resource_id"]);
+				$i++;
+			}
+			$j++;
+		}
+		$this->trace(__METHOD__." FIN ");
+		
+    }
+    	
     /**
      * Créer le vocabulaire pour Omaka avec l'ontologie
      * TODO : vérifier le format car bug d'importation

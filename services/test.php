@@ -246,10 +246,10 @@ try {
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
 	//
-	//$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
+	$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
 	//$data = $diigo->getStatutUrl();
 	//$diigo->verifAllUrl();
-	//$diigo->saveRecent("luckysemiosis");	
+	$diigo->saveRecent("luckysemiosis");	
 	//$data = $diigo->getPerformance();
 	//$keys = array_keys($data[0]);
 	//$diigo->arrayToCsv($data);
@@ -269,12 +269,12 @@ try {
 	}
 	*/
 	
-	/*	
-    $diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
-    $diigo->getGroupeRss("bulles");
-	$diigo->getRequest(array("user"=>$user,"count"=>100));
-    $diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));	
-	*/
+	//	
+    //$diigo->saveArchiveRss("http://localhost/jardindesconnaissances/data/182018_xml_2012_01_15_5b713.xml");
+    //$diigo->getGroupeRss("avun16_17");
+	//$diigo->getRequest(array("user"=>$user,"count"=>100));
+    //$diigo->getRequest(array("user"=>$user,"count"=>100, "tags"=>"actulivre", "start"=>500));	
+	//
 		
 	//$audio = new Flux_Audio(false);
 	//$audio->getOggInfos("c:\\wamp\\www\\jardindesconnaissances\\data\\deleuze\\mini\\106-.ogg");
@@ -366,8 +366,9 @@ try {
 	$bnf = new Flux_Databnf("flux_databnf",true);
 	$bnf->bTraceFlush = true;
 	ignore_user_abort(1);
+	$bnf->supDoublons();
 	//$bnf->supDocPeriode(1800, 1899, "NOT");
-	$bnf->savePropActeurCata();
+	//$bnf->savePropActeurCata();
 	//$bnf->savePropDocCata("Recherche cote  : ");
 	//$bnf->saveProp("http://data.bnf.fr/ark:/12148/cb35694795c");	
 	//uniquement XIXe siècle listeAffinages=	
@@ -376,7 +377,7 @@ try {
 	//$rs = $bnf->getRameauByIdBnf("11947434");
 	//$rs = $bnf->getGallicaByTerm($_GET["term"]);
 	//$s->trace(json_encode($rs));
-	//
+	*/
 	
 	
 	/*
@@ -564,15 +565,15 @@ try {
 	*/
 	
 	//
-	//$oton = new Flux_Ontostat("flux_ontostats", true);
+	/*$oton = new Flux_Ontostat("flux_ontostats", true);
 	$oton = new Flux_Ontostat("omekas_test", true);
 	$d = new DateTime();
 	$dateJ = $d->format('Y-m-d');
 	//$doc = $oton->enrichirOnto("http://localhost/OntoStats/OntoStatsSimple.rdf");	
 	//$doc = $oton->creerVocabulairePourOmk("http://localhost/OntoStats/OntoStatsTest.rdf");
 	//$oton->trace('Écrit : ' . $doc->save("test.xml") . ' bytes');
-	$doc = $oton->creerOntoToOmeka("http://localhost/OntoStats/OntoStatsFull.rdf");
-	/*
+	//$doc = $oton->creerOntoToOmeka("http://localhost/OntoStats/OntoStatsFull.rdf");
+	$oton->lierItemToItemSet();
 	$data = $oton->creerOntoCSV("http://localhost/OntoStats/OntoStatsFull.rdf");
 	$f = true;
 	foreach ($data as $v) {
@@ -600,6 +601,10 @@ try {
 	$a = $rs->get('<http://dbpedia.org/ontology/abstract>');
 	$b = $rs->all('<http://dbpedia.org/ontology/abstract>');
 	*/
+	
+	//$eu = new Flux_Eu("flux_eu",true);
+	//$eu->setDossierObsLegi("2015/2103(INL)");
+	
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

@@ -90,4 +90,43 @@ class Model_DbTable_Omk_Value extends Zend_Db_Table_Abstract
 	    	$this->delete('value.id = ' . $id);
     }
     
+    /**
+     * Recherche une entrée  avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param int $uri
+     * 
+     * @return array
+     * 
+     **/
+    public function findByUri($uri)
+    {
+	    	$query = $this->select()
+	    	->from( array("f" => "value") )
+	    ->where( "f.uri = ?", $uri);
+	    $arr = $this->fetchAll($query)->toArray();
+    		return count($arr) ? $arr[0] : false;
+    }
+    
+    /**
+     * Recherche une entrée  avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param int 		$prop
+     * @param string		$key
+     * @param string		$val
+     * 
+     * @return array
+     * 
+     **/
+    public function findByCatKeyVal($prop, $key, $val)
+    {
+	    	$query = $this->select()
+		    	->from( array("f" => "value") )
+		    	->where( "f.property_id = ?", $prop)
+		    	->where( "f.".$key."= ?", $val);
+	    	$arr = $this->fetchAll($query)->toArray();
+	    	return count($arr) ? $arr : false;
+    }
+    
 }

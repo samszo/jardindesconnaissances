@@ -289,6 +289,22 @@ class Flux_Site{
 		return $html;
 	}
 
+	/**
+	 * récupère le code XML d'un domNode
+	 * pour par exemple faire un Xpath dessus
+	 *
+	 * @param  domNode 	$n
+	 *
+	 * @return string
+	 */
+	function getStringDomNode($n) {
+		$newdoc = new DOMDocument();
+		$cloned = $n->cloneNode(TRUE);
+		$newdoc->appendChild($newdoc->importNode($cloned,TRUE));
+		$s = $newdoc->saveHTML();
+		return $s;
+	}
+	
 	
 	/**
 	 * Formats a line (passed as a fields  array) as CSV and returns the CSV as a string.

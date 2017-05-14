@@ -39,7 +39,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
 		$select = $this->select();
 		$select->from($this, array('exi_id'));
 		//vérifie les champs obligatoires et discriminants
-		$select->where('nom = ?', $data['nom']);
+		if(isset($data['nom']))$select->where('nom = ?', $data['nom']);
 		if(isset($data['prenom']))$select->where('prenom = ?', $data['prenom']);
 		if(isset($data['isni']))$select->where('isni = ?', $data['isni']);
 		$rows = $this->fetchAll($select);        
