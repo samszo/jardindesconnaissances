@@ -42,6 +42,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
 		if(isset($data['nom']))$select->where('nom = ?', $data['nom']);
 		if(isset($data['prenom']))$select->where('prenom = ?', $data['prenom']);
 		if(isset($data['isni']))$select->where('isni = ?', $data['isni']);
+		if(isset($data['url']))$select->where('url = ?', $data['url']);
 		$rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->exi_id; else $id=false;
         return $id;

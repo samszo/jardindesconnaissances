@@ -246,10 +246,10 @@ try {
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
 	//
-	$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
+	//$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
 	//$data = $diigo->getStatutUrl();
 	//$diigo->verifAllUrl();
-	$diigo->saveRecent("luckysemiosis");	
+	//$diigo->saveRecent("luckysemiosis");	
 	//$data = $diigo->getPerformance();
 	//$keys = array_keys($data[0]);
 	//$diigo->arrayToCsv($data);
@@ -602,8 +602,8 @@ try {
 	$b = $rs->all('<http://dbpedia.org/ontology/abstract>');
 	*/
 	
-	//$eu = new Flux_Eu("flux_eu",true);
-	//$eu->setDossierObsLegi("2015/2103(INL)");
+	$eu = new Flux_Eu("flux_eu",true);
+	$eu->setDossierObsLegi("2015/2103(INL)");
 	
 	$s->trace("FIN TEST");			
 	

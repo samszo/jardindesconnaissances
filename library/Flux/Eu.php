@@ -60,10 +60,10 @@ class Flux_Eu extends Flux_Site{
     		parent::__construct($idBase, $bTrace);    	
     		
     		//on récupère la racine des documents
-    		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-    		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+    		$this->initDbTables();
     		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
     		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
+    		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
     		
     		$this->mc = new Flux_MC($idBase, $bTrace);
     		
@@ -117,7 +117,7 @@ class Flux_Eu extends Flux_Site{
 	    	));
 	    	
 	    	//enregistre les sujets
-	    	$idTagSujet = $this->dbT->ajouter(array("code"=>"sujet"));	    	
+	    	$idTagSujet = $this->dbT->ajouter(array("code"=>"sujet", "parent"=>$this->idTagRoot));	    	
 	    	foreach ($obj->procedure->subject as $s) {
 	    		$idTag = $this->dbT->ajouter(array("code"=>$s, "parent"=>$idTagSujet));	    		 
     			$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
@@ -130,23 +130,23 @@ class Flux_Eu extends Flux_Site{
 	    	}
 	    	
 	    	$this->trace("//récupère les mots clefs");
-	    	$this->idTagCom = $this->dbT->ajouter(array("code"=>"commission"));
-	    	$this->idTagRoleCom = $this->dbT->ajouter(array("code"=>"rôle de la commission"));
+	    	$this->idTagCom = $this->dbT->ajouter(array("code"=>"commission", "parent"=>$this->idTagRoot));
+	    	$this->idTagRoleCom = $this->dbT->ajouter(array("code"=>"rôle de la commission", "parent"=>$this->idTagRoot));
 	    	$this->idTagRoleComFond = $this->dbT->ajouter(array("code"=>"au fond", "parent"=>$this->idTagRoleCom));
 	    	$this->idTagRoleComAvis = $this->dbT->ajouter(array("code"=>"pour avis", "parent"=>$this->idTagRoleCom));
-	    	$this->idTagRoleRap = $this->dbT->ajouter(array("code"=>"rôle du rapporteur"));
+	    	$this->idTagRoleRap = $this->dbT->ajouter(array("code"=>"rôle du rapporteur", "parent"=>$this->idTagRoot));
 	    	$this->idTagRap = $this->dbT->ajouter(array("code"=>"rapporteur","parent"=>$this->idTagRoleRap));
 	    	$this->idTagRapFic = $this->dbT->ajouter(array("code"=>"fictif","parent"=>$this->idTagRoleRap));
 	    	$this->idTagRapAvis = $this->dbT->ajouter(array("code"=>"avis","parent"=>$this->idTagRoleRap));
-	    	$this->idTagActi = $this->dbT->ajouter(array("code"=>"activité"));
+	    	$this->idTagActi = $this->dbT->ajouter(array("code"=>"activité", "parent"=>$this->idTagRoot));
 	    	$this->idTagActiNomi = $this->dbT->ajouter(array("code"=>"nomination","parent"=>$this->idTagActi));
-	    	$this->idTagLang = $this->dbT->ajouter(array("code"=>"langue"));
-	    	$this->idTagVote = $this->dbT->ajouter(array("code"=>"vote"));
+	    	$this->idTagLang = $this->dbT->ajouter(array("code"=>"langue", "parent"=>$this->idTagRoot));
+	    	$this->idTagVote = $this->dbT->ajouter(array("code"=>"vote", "parent"=>$this->idTagRoot));
 	    	$this->idTagVoteAbs = $this->dbT->ajouter(array("code"=>"abstention","parent"=>$this->idTagVote));
 	    	$this->idTagVoteCtr = $this->dbT->ajouter(array("code"=>"contre","parent"=>$this->idTagVote));
 	    	$this->idTagVotePour = $this->dbT->ajouter(array("code"=>"pour","parent"=>$this->idTagVote));
 	    	
-	    /*enregistre les activités
+	    //enregistre les activités
 	    	foreach ($obj->activities as $a) {
 	    		$this->getActivite($a);
 	    	}
@@ -155,7 +155,6 @@ class Flux_Eu extends Flux_Site{
 	    	foreach ($obj->amendments as $a) {
 	    		$this->getAmendement($a);
 	    	}
-	    	*/
 	    	//TODO:enregistrer les comeets
 	    	
 	    	//enregistre les votes
@@ -240,14 +239,14 @@ class Flux_Eu extends Flux_Site{
 		));
 		//ajoute les votes
 		foreach ($g->votes as $vo) {
-			$idExi = $this->dbE->ajouter(array("nom"=>$vo->name,"url"=>"http://www.europarl.europa.eu/meps/fr/".$vo->ep_id."/_history.html"));;
+			$idExi = $this->dbE->ajouter(array("nom"=>$vo->name,"url"=>"http://www.europarl.europa.eu/meps/fr/".$vo->ep_id."/_history.html"));
 			//création des rapports entre
 			// pre = cette importation
 			// src = le votant
 			// dst = le vote pour le groupe
 			// valeur = la date
 			$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-					,"src_id"=>$idRapporteur,"src_obj"=>"exi"
+					,"src_id"=>$idExi,"src_obj"=>"exi"
 					,"dst_id"=>$idRapVote,"dst_obj"=>"rapport"
 					,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
 					,"valeur"=>$date
@@ -370,7 +369,7 @@ class Flux_Eu extends Flux_Site{
     		//parcourt les documents
     		if(isset($a->docs)){
 	    		foreach ($a->docs as $d) {
-	    			$idRapD = $this->getDoc($d);
+	    			$idRapD = $this->getDoc($d, 	$this->idDocDossier);
 	    			//création des rapports entre
 	    			// pre = cette importation
 	    			// src = l'activité
@@ -390,15 +389,18 @@ class Flux_Eu extends Flux_Site{
     	 * création d'un document
     	 *
     	 * @param  objet		$d
+    	 * @param  int		$parent
     	 *
     	 * @return integer
     	 */
-    	function getDoc($d){
+    	function getDoc($d, $parent=0){
     		$this->trace(__METHOD__." ".$d->title);
-    		if(isset($d->text))
-	    		$idDoc = $this->dbD->ajouter(array("titre"=>$d->title, "url"=>$d->url, "tronc"=>$d->type, "note"=>$d->text));
-    		else
-    			$idDoc = $this->dbD->ajouter(array("titre"=>$d->title, "url"=>$d->url, "tronc"=>$d->type));
+    		$data = array("titre"=>$d->title, "url"=>$d->url, "tronc"=>$d->type);
+    		if($parent)$data["parent"]=$parent;
+    		if(isset($d->text))$data["note"]=$d->text;
+
+    		$idDoc = $this->dbD->ajouter($data);
+    		
     		return $idDoc;
     	}
     	
@@ -476,10 +478,10 @@ class Flux_Eu extends Flux_Site{
     function getRapporteur($r){
     	
     		$this->trace(__METHOD__." ".$r->name);
-    	 	//enregistre le rapporteur
-	    	$idExiRap = $this->dbE->ajouter(array("nom"=>$r->name,"url"=>$this->uriBase."mep/".$r->name));
 	    	//enregistre le groupe
 	    	$idExiGr = $this->dbE->ajouter(array("nom"=>$r->group,"url"=>$this->uriBase."meps/".$r->group));
+	    	//enregistre le rapporteur
+	    	$idExiRap = $this->dbE->ajouter(array("nom"=>$r->name,"url"=>$this->uriBase."mep/".$r->name));
 	    	//création du rapport entre groupe et rapporteur
 	    $idRapport = 	$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 	    			,"src_id"=>$idExiRap,"src_obj"=>"exi"

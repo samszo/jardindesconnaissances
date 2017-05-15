@@ -59,6 +59,7 @@ class Flux_Site{
     var $type;
 	var $idDocRoot;
 	var $idMonade;
+	var $idTagRoot;
 	var $rs;
 	var $rsVerifGroup = array();
 	var $bconnect = false;
