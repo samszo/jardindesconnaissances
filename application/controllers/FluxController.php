@@ -487,8 +487,12 @@ class FluxController extends Zend_Controller_Action {
     
     public function okapiAction()
     {
-
-    
+		$okapi = new Flux_Okapi("flux_okapi");
+		switch ($this->_getParam('v')) {
+			case "chercherMedia":
+				$this->view->reponse = $okapi->chercherMedia($this->_getParam('q'));				
+			break;
+		}
     }
     
 	function verifExpireToken($ss){

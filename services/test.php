@@ -602,8 +602,12 @@ try {
 	$b = $rs->all('<http://dbpedia.org/ontology/abstract>');
 	*/
 	
-	$eu = new Flux_Eu("flux_eu",true);
-	$eu->setDossierObsLegi("2015/2103(INL)");
+	//$eu = new Flux_Eu("flux_eu",true);
+	//$eu->setDossierObsLegi("2015/2103(INL)");
+	
+	$okapi = new Flux_Okapi("flux_okapi");
+	$reponse = $okapi->chercherMedia('test');
+	
 	
 	$s->trace("FIN TEST");			
 	
