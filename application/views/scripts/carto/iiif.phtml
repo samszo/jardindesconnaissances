@@ -65,8 +65,9 @@
     
     //var urlJson = 'http://dms-data.stanford.edu/data/manifests/BnF/jr903ng8662/manifest.json';
     var urlJson = 'http://gapai.univ-paris8.fr/DesignEdition/os/iiif/31/manifest';
-    var urlInfoJson = "http://gallica.bnf.fr/iiif/ark:/12148/btv1b52503224r/f1/info.json";   
+    //var urlInfoJson = "http://gallica.bnf.fr/iiif/ark:/12148/btv1b52503224r/f1/info.json";   
     //var urlInfoJson = 'http://gapai.univ-paris8.fr/DesignEdition/os/iiif-img/33/info.json';
+    var urlInfoJson = "http://gapai.univ-paris8.fr/ValArNum/omk/iiif-img/2/info.json";
     $.getJSON(urlJson, function(data) {
     
       var page = data.sequences[0].canvases[0];

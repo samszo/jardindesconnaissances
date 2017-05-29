@@ -53,25 +53,31 @@ class Flux_Okapi extends Flux_Site{
 	    return $json;
 	}
 
-	public function ajouterMedia($Download_url,$Streaming_url,$Creator,$Title,$Description)
+	/**
+	 * Ajoute un media sur le serveur
+	 *
+	 * @param  $urlDown : Une url à partir de laquelle le fichier média peut être téléchargé
+	 * @param  $urlStream : Une url à partir de laquelle le fichier média peut être diffusé par flux
+	 * @param  $contributor : nombre max de résultats renvoyés
+	 * @param  $creator : offset dans la liste des résultats. Permet de gérer avec « limit » la fourniture de résultats par pages.
+	 * @param  $data : paramètres supplémentaires
+	 *
+	 * @return array
+	 */
+	public function ajouterMedia($urlDown,$urlStream,$contributor,$creator,$params=false)
 	{
-	    $url = "http://gapai.univ-paris8.fr:3010/";
-	    $url .= "api/saphir/add_media?";
-	    $url .= "download_url=[".$Download_url."]&";
-	    $url .= "streaming_url=[".$Streaming_url."]&";
-	    $url .= "creator=[".$Creator."]&";
-	    $url .= "title=[".$Title."]&";
-	    $url .= "description=[".$Description."]&"; 
-	
-	
-	    $ch = curl_init(); 
-	    $timeout = 5; // set to zero for no timeout 
-	    curl_setopt ($ch, CURLOPT_URL, $url); 
-	    curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1); 
-	    curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, $timeout); 
-	    $file_contents = curl_exec($ch); 
-	    curl_close($ch); 
-	    echo  $file_contents;
+		$url = $this->urlBase."api/saphir/add_media?";
+	    $url .= "download_url=".$urlDown."&";
+	    $url .= "streaming_url=".$urlStream."&";
+	    $url .= "creator=".$contributor."&";
+	    $url .= "contributor=".$contributor."&";
+	    $url .= "title=".$params['title']."&";
+	    $url .= "description=".$params['description'];
+	    $this->trace($url); 
+	     
+	    $json = $this->getUrlBodyContent($url,false,false);
+	     
+	    return $json;
 	}
 
 }

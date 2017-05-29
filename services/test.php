@@ -605,9 +605,22 @@ try {
 	//$eu = new Flux_Eu("flux_eu",true);
 	//$eu->setDossierObsLegi("2015/2103(INL)");
 	
-	$okapi = new Flux_Okapi("flux_okapi");
-	$reponse = $okapi->chercherMedia('test');
-	
+	$okapi = new Flux_Okapi("flux_okapi",true);	
+	//$reponse = $okapi->chercherMedia('test');
+	$urlDown = "http://gapai.univ-paris8.fr/jdc/data/ina/films/CAA12006381.avi";
+	$urlStream = "http://gapai.univ-paris8.fr/jdc/data/ina/films/CAA12006381.avi";
+	$contributor = "samszo";
+	$creator = "samszo";
+	$params = array("title"=>"test","description"=>"test");
+	$reponse = $okapi->ajouterMedia($urlDown,$urlStream,$contributor,$creator,$params);
+	$s->trace($reponse);
+
+	/*
+	$an = new Flux_An('flux_an',true);
+	$an->bTraceFlush = false;
+	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";
+	$an->sauveXmlEad($url);
+	*/
 	
 	$s->trace("FIN TEST");			
 	

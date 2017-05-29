@@ -185,7 +185,8 @@ class Flux_Site{
     	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
     	if(!$this->dbA)$this->dbA = new Model_DbTable_Flux_Acti($this->db);
     	if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
-    	
+    	if(!$this->dbG)$this->dbG = new Model_DbTable_Flux_Geo($this->db);
+    	 
     }
     
     

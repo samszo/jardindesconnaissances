@@ -177,15 +177,16 @@
 
 			function ajoutEvent() { 
 
-	    	  		//var txt =d3.selectAll("text");
-		    	  	console.log(roueData);
-	    	  		txts = d3.selectAll('text')
+				//ajoute l'écouteur d'événement sur les textes
+    	  			txts = d3.selectAll('text')
 	    	  			.data(roueData)
 	    	  			.attr('class','txtRoueEmo')
 		    	  		.on('click',function(d, i){
-		    	  			console.log(i+" - "+d.id+" / "+d.en+" / "+d.fr+" / "+d.color);
+			    	  		//augmente la valeur de l'émotion
 		    	  			d.value ++;
+		    	  			//enregistre dans la bdd le clic sur la roue
 		    	  			if(fctClickRoue)fctClickRoue(d);
+		    	  			//affiche les modifications de choix
 		    	  			changeChoix(roueData);
 	    	  			});
 

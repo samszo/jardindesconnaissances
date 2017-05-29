@@ -43,6 +43,8 @@ data/databnf_test
 
 data/p2net
 
+data/an
+
 bdd/bigdumpGapaii.php
 
 bdd/deleuze.sql
@@ -346,3 +348,5 @@ data/databnf/nbDocParCatFinal.csv
 data/eu/2103(INL).json
 
 data/eu/test.xml
+
+bdd/flux_databnfFinalCreate.sql.zip
