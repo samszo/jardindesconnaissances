@@ -177,7 +177,7 @@
 
 			function ajoutEvent() { 
 
-				//ajoute l'écouteur d'événement sur les textes
+				//ajoute l'écouteur d'événement sur les textes du graphique
     	  			txts = d3.selectAll('text')
 	    	  			.data(roueData)
 	    	  			.attr('class','txtRoueEmo')
@@ -190,7 +190,7 @@
 		    	  			changeChoix(roueData);
 	    	  			});
 
-	   			 //ajoute un curseur +
+	   			 //ajoute un curseur + aux textes du graphique
 	   			 $('.txtRoueEmo').awesomeCursor('plus', {
 	   			   color: 'black',
 	   			   outline: 'red'
