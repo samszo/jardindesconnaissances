@@ -17,12 +17,6 @@ class Flux_Okapi extends Flux_Site{
 
 	var $urlBase = "http://gapai.univ-paris8.fr:3010/";
 	
-	/**
-	 * Zend_Service_Rest instance
-	 *
-	 * @var Zend_Service_Rest
-	 */
-	protected $rest;
 	
 	/**
 	 * Constructeur de la classe
@@ -42,12 +36,6 @@ class Flux_Okapi extends Flux_Site{
 	
 		$this->login = $login;
 		$this->pwd = $pwd;
-		if($login && $pwd){
-			$this->pwd = $pwd;
-			$this->rest = new Zend_Rest_Client();
-			$this->rest->getHttpClient()->setAuth($login, $pwd);
-			$this->rest->setUri($this->urlBase);
-		}
 		
 		
 	}
