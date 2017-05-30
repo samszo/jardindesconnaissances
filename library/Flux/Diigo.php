@@ -75,21 +75,20 @@ class Flux_Diigo extends Flux_Site{
 	
 	public function __construct($login="", $pwd="", $idBase=false, $bTrace=false)
     {
-    	parent::__construct($idBase,$bTrace);
-
-    	$this->LUCENE_INDEX = ROOT_PATH.'/data/diigo-index';
-    	
-    	//on récupère la racine des documents
-    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
-    	$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
-    	$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
-    	 
+	    	parent::__construct($idBase,$bTrace);
+	
+	    	$this->LUCENE_INDEX = ROOT_PATH.'/data/diigo-index';
+	    	
+	    	//on récupère la racine des documents
+	    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+	    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+	    	$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+	    	$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);    	 
     	
 		$this->login = $login;
-    	if($login && $pwd){
-	    	$this->pwd = $pwd;
-    		$this->rest = new Zend_Rest_Client();
+    		if($login && $pwd){
+		    	$this->pwd = $pwd;
+	    		$this->rest = new Zend_Rest_Client();
 	        $this->rest->getHttpClient()->setAuth($login, $pwd);
 	        $this->rest->setUri(self::API_URI);
        	}

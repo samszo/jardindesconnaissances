@@ -18,12 +18,19 @@ class Flux_Okapi extends Flux_Site{
 	var $urlBase = "http://gapai.univ-paris8.fr:3010/";
 	
 	/**
+	 * Zend_Service_Rest instance
+	 *
+	 * @var Zend_Service_Rest
+	 */
+	protected $rest;
+	
+	/**
 	 * Constructeur de la classe
 	 *
 	 * @param  string $idBase
 	 *
 	 */
-	public function __construct($idBase=false, $bTrace=false)
+	public function __construct($login="", $pwd="", $idBase=false, $bTrace=false)
 	{
 		parent::__construct($idBase, $bTrace);
 	
@@ -33,7 +40,38 @@ class Flux_Okapi extends Flux_Site{
 		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
 		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
 	
+		$this->login = $login;
+		$this->pwd = $pwd;
+		if($login && $pwd){
+			$this->pwd = $pwd;
+			$this->rest = new Zend_Rest_Client();
+			$this->rest->getHttpClient()->setAuth($login, $pwd);
+			$this->rest->setUri($this->urlBase);
+		}
+		
+		
 	}
+	
+	/**
+	 * connexion au serveur 
+	 *
+	 * @param  $login
+	 * @param  $pwd
+	 * 
+	 * @return Zend_Http_Client
+	 */
+	public function getLoginCookie($login="", $pwd="")
+	{
+		if(!$login)$login=$this->login;
+		if(!$pwd)$pwd=$this->pwd;		
+		
+		$url = $this->urlBase."api/saphir/login?user=".$login."&password=".$pwd;
+		$client = new Zend_Http_Client($url,array('timeout' => 30));
+		$response = $client->request();
+		$h = $response->getHeaders();
+		return array("Cookie"=>$h['Set-cookie']);
+	}
+	
 	
 	/**
 	 * Recherche un media sur le serveur
@@ -66,17 +104,25 @@ class Flux_Okapi extends Flux_Site{
 	 */
 	public function ajouterMedia($urlDown,$urlStream,$contributor,$creator,$params=false)
 	{
+				
 		$url = $this->urlBase."api/saphir/add_media?";
-	    $url .= "download_url=".$urlDown."&";
+		$url .= "download_url=".$urlDown."&";
 	    $url .= "streaming_url=".$urlStream."&";
 	    $url .= "creator=".$contributor."&";
 	    $url .= "contributor=".$contributor."&";
 	    $url .= "title=".$params['title']."&";
 	    $url .= "description=".$params['description'];
-	    $this->trace($url); 
-	     
-	    $json = $this->getUrlBodyContent($url,false,false);
-	     
+	    //$this->trace($url); 
+	    
+	    //création du client HTTP de login	    
+	    $h = $this->getLoginCookie();
+	    $client = new Zend_Http_Client($url);
+	    $client->setHeaders($h);
+	  
+	    //envoie de la requête
+	    	$response = $client->request();
+	    	$json = $response->getBody();
+	    	 	     
 	    return $json;
 	}
 
