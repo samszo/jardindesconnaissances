@@ -456,6 +456,13 @@ class GraphController extends Zend_Controller_Action {
 	    	$this->view->titre =  $this->_getParam('titre', "Stream Graph Vertical");
 	    	$this->view->soustitre =  $this->_getParam('soustitre', "Pour plonger dans le temps");
 	    	$this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fdata%2Ftrends.csv"));
+	    	$this->view->legendetitre =  $this->_getParam('legendetitre', "Catégories");
+	    	if($this->_getParam('type')=='getHistoDiscipline'){
+	    		$this->view->titre =  "Evolution des disciplines dans https://www.rechercheisidore.fr";
+	    		$this->view->soustitre =  "Pour la recherche : ".$this->_getParam('q', "écosystème");
+	    		$this->view->urlData = "../flux/isidore?q=getHistoDiscipline&req=".urldecode($this->_getParam('q', "écosystème"));
+	    		$this->view->legendetitre =  "Disciplines";	    		 
+	    	}
     	 
     }
     

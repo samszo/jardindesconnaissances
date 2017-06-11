@@ -463,25 +463,25 @@ class FluxController extends Zend_Controller_Action {
     
     public function ensuprefrAction()
     {
-    	$ensuprefr = new Flux_Ensuprefr($this->_getParam('idBase', 'flux_ecosystem'),$this->_getParam('trace'));
-    	$ensuprefr->bTraceFlush = $this->_getParam('trace');    	 
-    	switch ($this->_getParam('q')) {
-    		case "getPubli":
-    			$this->view->content =$ensuprefr->getPubli($this->_getParam('req'));
-    			break;
-    		case "saveMonade":
-    			$ensuprefr->getUser(array("login"=>$this->_getParam('user','samszo')));
-    			$this->view->content = $ensuprefr->saveMonade($this->_getParam('req'));
-    			break;
-			case "getTagHisto":
-    			$data = $ensuprefr->getTagHisto($this->_getParam("dateUnit", '%Y')
-    				, $this->_getParam("idUti"), $this->_getParam("idMonade")
-    				, $this->_getParam("idActi"), $this->_getParam("idParent")
-    				, $this->_getParam("arrTags"), $this->_getParam("req")
-    				, $this->_getParam("dates"), $this->_getParam("for"), $this->_getParam("query"));
-    			$this->view->content = json_encode($data);
-    			break;    				 
-    	}
+	    	$ensuprefr = new Flux_Ensuprefr($this->_getParam('idBase', 'flux_ecosystem'),$this->_getParam('trace'));
+	    	$ensuprefr->bTraceFlush = $this->_getParam('trace');    	 
+	    	switch ($this->_getParam('q')) {
+	    		case "getPubli":
+	    			$this->view->content =$ensuprefr->getPubli($this->_getParam('req'));
+	    			break;
+	    		case "saveMonade":
+	    			$ensuprefr->getUser(array("login"=>$this->_getParam('user','samszo')));
+	    			$this->view->content = $ensuprefr->saveMonade($this->_getParam('req'));
+	    			break;
+				case "getTagHisto":
+	    			$data = $ensuprefr->getTagHisto($this->_getParam("dateUnit", '%Y')
+	    				, $this->_getParam("idUti"), $this->_getParam("idMonade")
+	    				, $this->_getParam("idActi"), $this->_getParam("idParent")
+	    				, $this->_getParam("arrTags"), $this->_getParam("req")
+	    				, $this->_getParam("dates"), $this->_getParam("for"), $this->_getParam("query"));
+	    			$this->view->content = json_encode($data);
+	    			break;    				 
+	    	}
     
     }
     
@@ -494,6 +494,21 @@ class FluxController extends Zend_Controller_Action {
 			break;
 		}
     }
+
+    
+    public function isidoreAction()
+    {
+	    	$isidore = new Flux_Isidore($this->_getParam('idBase'),$this->_getParam('trace'));
+	    	$isidore->bTraceFlush = $this->_getParam('trace');
+	    	switch ($this->_getParam('q')) {
+	    		case "getHistoDiscipline":
+	    			$data = $isidore->getHistoDiscipline($this->_getParam('req'),"stream");
+	    			$this->view->content = json_encode($data);
+	    			break;
+	    	}
+    
+    }
+    
     
 	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);

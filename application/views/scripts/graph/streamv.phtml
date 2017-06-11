@@ -4,6 +4,12 @@
   <meta charset="utf-8">
   <title><?php echo $this->titre;?></title>
   <script src="../js/d3.v4.js"></script>
+  <script src="../js/d3-scale-chromatic.v1.min.js"></script>  
+  <script src="../js/d3-legend.min.js"></script>  
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+  <script src="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css" />
+      
   <style>
     body { margin:0 auto;}
     h1,h2,p {
@@ -41,11 +47,30 @@
 
 <body>
   <script>
+	//affiche le message de chargement
+    w2popup.open({
+        width: 500,
+        height: 300,
+        title: 'Chargement des données',
+        body: '<div class="w2ui-centered"></div>',
+        showMax: false,
+        showClose: false
+    });
+	w2popup.lock("Merci de patienter...", true);	
+  
 	//merci à http://bl.ocks.org/f94f/5554bf0a6874a64f46deacf3448ee5c8    
-    var refData=[],refKey=[],refTag=[];
+    var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0;
 	var formatJour = d3.timeFormat("%d %B %Y");
 	var formatAn = d3.timeFormat("%Y");
 
+	/*
+	var color = d3.scaleLinear()
+	    .range(["#51D0D7", "#31B5BB"]);
+	var color = d3.scaleOrdinal(d3.schemeCategory20);
+	*/
+	var color = d3.interpolateRainbow;//d3.interpolateRdYlBu;
+	var colorInit = "";
+	
 	function tempsToDate(temps, type) {
 	  	var dRef, arrTemps = temps.split('-')
 	  	if(arrTemps.length==3) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps[2]];
@@ -61,7 +86,9 @@
 	//var url = 'http://localhost/jdc/public/flux/ensuprefr?q=getTagHisto&idMonade=2&idUti=1&idActi=3&idParent=1&for=stream&query=34591&dates[]=946681200&dates[]=1285884000';
 	//var url = "http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&for=stream&dateUnit=%Y-%m-%d&dates[]=1483228800&dates[]=1489415262";
 	//var url = "http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&dates[]=1456669433&dates[]=1489415262&arrTags[]=ecosysteminfo";
-	var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&arrTags[]=ecosysteminfo";//&dates[]=1456669433&dates[]=1489415262";
+	//var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&arrTags[]=ecosysteminfo";//&dates[]=1456669433&dates[]=1489415262";
+	//var url = "http://localhost/jdc/public/flux/isidore?q=getHistoDiscipline&req=%C3%A9cosyst%C3%A8me";
+	var url = '<?php echo $this->urlData;?>';
 	d3.json(url, function(err, data){
 
 		
@@ -71,12 +98,30 @@
 	  //création des datas de références
 	  data.forEach(function(dt){
 		  //transforme le temps en date
-		  var dRef = tempsToDate(dt.temps, 'utc');
-		  var k = dt.key+'-'+dRef;
+		  var dRef = tempsToDate(dt.temps, 'utc');		  
+		  var k = dt.key+'-'+dRef;		  
 		  refData[k] = dt;
 		  if(refKey.indexOf(dt.key)<0)refKey.push(dt.key);
-		  if(!refTag[dt.key])refTag[dt.key]={"type":dt.type,"desc":dt.desc};
+		  if(!refTag[dt.key]){			  
+			  refTag[dt.key]={"type":dt.type,"desc":dt.desc,"value":Math.trunc(dt.value)};
+		  }else{
+			  refTag[dt.key].value += Math.trunc(dt.value);
+		  }
 	  });
+	  //création des couleurs et du tableau de la légende	  
+	  var sc = d3.scaleLinear().range([0, 1]).domain([0, refKey.length+1]);
+	  refKey.forEach(function(r,i){
+		  //var numColor = stringToBinary(dt.type);
+		  //numColor = 1/(numColor)*1000;
+		  //var numColor = 1/(refKey.length+1);	  
+		  nbTotal += refTag[r].value;
+		  var numColor = sc(i);	  
+		  refTag[r].color=color(numColor);
+		  legData.colors.push(refTag[r].color);		  
+		  legData.labels.push(refTag[r].type);		  
+		  //legData.labels.push(refTag[r].type+' : '+refTag[r].value);		  
+	  });
+	  //création des données liées
 	  var nested_data = d3.nest()
 			.key(function(d) { return d.temps; })
 			.entries(data);
@@ -117,13 +162,18 @@
 	  })
 	  
 	  buildStreamGraph(mqpdata);
+
+	  buildLegend();
+
+	  //supprime le message de chargement	
+	  w2popup.unlock();
+	  w2popup.close();
 	  
 	})
 
 function buildStreamGraph(mqpdata) {
 	var data = mqpdata;
-	  
-	
+	  	
 	var stack = d3.stack()
 	    .keys(refKey)
 	    .order(d3.stackOrderNone)
@@ -137,19 +187,16 @@ function buildStreamGraph(mqpdata) {
 	var extData = d3.extent(data, function(d){ return d.month; });
 	var y = d3.scaleTime()
 	    .domain([extData[1],extData[0]])
-	    .range([margin.top, height-margin.bottom]);
-	
-	// setup axis
-	var yAxis = d3.axisLeft(y);
+	    .range([margin.top, height-margin.bottom]);	
 	  
 	var x = d3.scaleLinear()
 	    .domain([0, d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); })])
-	    .range([width/2, 0]);
+	    .range([width/2, margin.left+margin.right]);
 	console.log(x.domain());
-	var color = d3.scaleLinear()
-	    .range(["#51D0D7", "#31B5BB"]);
-	
-	var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+	// setup axis
+	var yAxis = d3.axisLeft(y);
+	var xAxis = d3.axisBottom(x);
 	
 	
 	var area = d3.area()
@@ -179,9 +226,13 @@ function buildStreamGraph(mqpdata) {
 	    .data(series)
 	    .enter().append("path")
 	    .attr("d", area)
-	    .style("fill", function() { return color(Math.random()); })	    
-	    .on('mouseover', function(d){      
-		    d3.select(this).style('fill',d3.rgb( d3.select(this).style("fill") ).brighter());
+	    .style("fill", function(d) { 
+		    return refTag[d.key].color; 
+		    //return color(Math.random()); 
+		    })	    
+	    .on('mouseover', function(d){
+	    		colorInit = d3.select(this).style("fill");      
+		    d3.select(this).style('fill',d3.rgb(colorInit).brighter());
 			d3.select("#major").text(refTag[d.key].type);
 			tooltip.transition()
                .duration(700)
@@ -192,26 +243,72 @@ function buildStreamGraph(mqpdata) {
 		    	var mouse = d3.mouse(this);		    
 		    	var jour = formatJour(y.invert(mouse[1]));
 		    	var an = formatAn(y.invert(mouse[1]));
-				var dRef = Date.UTC(an, 0, 1);	    	
-				tooltip.html(refTag[d.key].type+" = "+refData[d.key+dRef]+"<br/>"+jour)
-		               .style("left", (d3.event.pageX + 5) + "px")
-		               .style("top", (d3.event.pageY - 28) + "px");
+			var dRef = Date.UTC(an, 0, 1);
+			var k = d.key+'-'+dRef;
+			var dt = refData[k];	    	
+			tooltip.html(refTag[d.key].type+" : "+refTag[d.key].value+"<br/>"
+						+dt.temps+" = "+dt.value+"<br/>")
+	               .style("left", (d3.event.pageX + 5) + "px")
+	               .style("top", (d3.event.pageY - 28) + "px");
 	    })
 	    .on('mouseout', function(d){      
-	      d3.select(this).style('fill', 
-	         d3.rgb( d3.select(this).style("fill") ).darker());
-	         d3.select("#major").text("-");
-	  tooltip.transition()
+	      	d3.select(this).style('fill',d3.rgb(colorInit));
+	      	d3.select("#major").text("-");
+			tooltip.transition()
 	               .duration(500)
 	               .style("opacity", 0);
-	})
+		})
 	
 	svg.append("g")
             .attr("class", "axis axis--y")
             .attr("transform", "translate(" + 100 + "," + 0 + ")")
             .call(yAxis);    
+	svg.append("g")
+	    .attr("class", "axis axis--x")
+	    .attr("transform", "translate(" + 0 + "," + (height-margin.bottom+10) + ")")
+	    .call(xAxis);    
+    
 }
-   
+
+	function buildLegend(){
+		
+		var ordinal = d3.scaleOrdinal()
+		  .domain(legData.labels)
+		  .range(legData.colors);
+
+		var svg = d3.select("svg");
+
+		svg.append("g")
+		  .attr("class", "legendOrdinal")
+		  .attr("transform", "translate(120,30)");
+
+		var legendOrdinal = d3.legendColor()
+		  //d3 symbol creates a path-string, for example
+		  //"M0,-8.059274488676564L9.306048591020996,
+		  //8.059274488676564 -9.306048591020996,8.059274488676564Z"
+		  //.shape("path", d3.symbol().type(d3.symbolTriangle).size(150)())		  
+		  .shape('circle')
+		  .shapePadding(0)
+		  //use cellFilter to hide the "e" cell
+		  //.cellFilter(function(d){ return d.label !== "e" })
+		  .scale(ordinal)
+		  //.title(legData.labels.length+' <?php echo $this->legendetitre;?> : '+nbTotal)
+		  .title(legData.labels.length+' <?php echo $this->legendetitre;?>')
+		  .titleWidth(100)
+		  ;
+
+		svg.select(".legendOrdinal")
+		  .call(legendOrdinal);	
+	}
+    function stringToBinary(s){
+        var c = 0;
+	    	for (var i=0; i<s.length; i++) {
+	    		c += s.charCodeAt(i).toString(2);
+	    }
+		return c;    
+    }
+    
+    
   </script>
 </body>
 </html>

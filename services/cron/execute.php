@@ -1,6 +1,5 @@
 <?php
 //merci à http://matthieu.developpez.com/execution_periodique/
-trace("DEBUT");
 require_once( "../../application/configs/config.php" );
 
 set_time_limit(0);
@@ -14,32 +13,33 @@ require_once 'script.php';
 register_shutdown_function(fini());
 
 
+trace("DEBUT");
 
 while(1){
 
-        if (file_exists("stop.php")) { 
-        	$message = "script arrêté. Effacez le fichier STOP avant de reprendre";
-        	trace($message);        	 
-        	die($message); 
-        }
+	if (file_exists("stop.php")) {
+		$message = "script arrêté. Effacez le fichier STOP avant de reprendre";
+		trace($message);
+		die($message);
+	}
 
-        
-        $next = getNextExecutionTime();                 /* on récupère lheure (timestamp) de la prochaine exécution */
 
-		$indexScript = getNextExecutionScript();        /* on récupère le numéro du prochain script à exécuter */
+	$next = getNextExecutionTime();                 /* on récupère lheure (timestamp) de la prochaine exécution */
 
-		$dodo = $next - time();                         /* le temps en seconde qu'il faut pour arriver à $next */
+	$indexScript = getNextExecutionScript();        /* on récupère le numéro du prochain script à exécuter */
 
-		sleep($dodo);                                   /* on dort jusqu'à ce qu'il soit temps d'exécuter le script */
+	$dodo = $next - time();                         /* le temps en seconde qu'il faut pour arriver à $next */
 
-		fopen($scripts[$indexScript]['URLScript'], 'r'); /* on lance le script. */
+	sleep($dodo);                                   /* on dort jusqu'à ce qu'il soit temps d'exécuter le script */
 
-		/* on enregistre l'execution */
-		trace($scripts[$indexScript]['nom']." next=".$next." dodo=".$dodo);		
-		
-		/* fopen peut être remplacé par une autre méthode, (shell_exec...) */
+	fopen($scripts[$indexScript]['URLScript'], 'r'); /* on lance le script. */
 
-		$scripts[$indexScript]['prochain'] = setNextExecutionTimeForScript($indexScript); /* prochaine exécution */
+	/* on enregistre l'execution */
+	trace($scripts[$indexScript]['nom']." next=".$next." dodo=".$dodo);
+
+	/* fopen peut être remplacé par une autre méthode, (shell_exec...) */
+
+	$scripts[$indexScript]['prochain'] = setNextExecutionTimeForScript($indexScript); /* prochaine exécution */
 
 }
 

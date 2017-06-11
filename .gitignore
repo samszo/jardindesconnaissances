@@ -350,3 +350,5 @@ data/eu/2103(INL).json
 data/eu/test.xml
 
 bdd/flux_databnfFinalCreate.sql.zip
+
+application/configs/applicationO.ini

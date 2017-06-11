@@ -14,7 +14,7 @@ class Flux_Stats  extends Flux_Site{
 	
  	public function __construct($idBase=false)
     {
-    	parent::__construct($idBase);
+	    	parent::__construct($idBase);
     	
     }
 	
@@ -828,11 +828,16 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 				break;
 		
 		}
-		//
-		$curDate = new DateTime();
-		$curDate->setTimestamp($minDate);
-		$mDate = new DateTime();
-		$mDate->setTimestamp($maxDate);
+		//gestion des temps Unix ou chaîne
+		if(!is_numeric($minDate)){
+			$curDate = new DateTime($minDate);
+			$mDate = new DateTime($maxDate);
+		}else{
+			$curDate = new DateTime();
+			$curDate->setTimestamp($minDate);
+			$mDate = new DateTime();
+			$mDate->setTimestamp($maxDate);					
+		}
 		$this->trace($curDate->format('Y-m-d'));
 		$arrDate = array();
 		while ($curDate->format($phpFormatDate) <= $mDate->format($phpFormatDate)) {
