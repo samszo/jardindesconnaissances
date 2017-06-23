@@ -436,7 +436,8 @@ class FluxController extends Zend_Controller_Action {
 						, $this->_getParam("dateUnit", '%Y-%m')
 						, $this->_getParam("idUti"), $this->_getParam("idMonade")
 						, $this->_getParam("idActi"), $this->_getParam("idParent")
-						, $this->_getParam("dates"), $this->_getParam("for"), $this->_getParam("tags"));
+						, $this->_getParam("dates"), $this->_getParam("for")
+						, $this->_getParam("tags"), $this->_getParam("nbLimit",1), $this->_getParam("nbMin",0));
 				break;				
 			case "getStatutUrl":
 				$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);

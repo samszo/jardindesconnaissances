@@ -457,11 +457,23 @@ class GraphController extends Zend_Controller_Action {
 	    	$this->view->soustitre =  $this->_getParam('soustitre', "Pour plonger dans le temps");
 	    	$this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fdata%2Ftrends.csv"));
 	    	$this->view->legendetitre =  $this->_getParam('legendetitre', "Catégories");
-	    	if($this->_getParam('type')=='getHistoDiscipline'){
-	    		$this->view->titre =  "Evolution des disciplines dans https://www.rechercheisidore.fr";
-	    		$this->view->soustitre =  "Pour la recherche : ".$this->_getParam('q', "écosystème");
-	    		$this->view->urlData = "../flux/isidore?q=getHistoDiscipline&req=".urldecode($this->_getParam('q', "écosystème"));
-	    		$this->view->legendetitre =  "Disciplines";	    		 
+	    	$this->view->nbMin = $this->_getParam('nbMin', 0);
+	    	switch ($this->_getParam('type')) {
+	    		case "diigo":
+	    			//var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&arrTags[]=ecosysteminfo";//&dates[]=1456669433&dates[]=1489415262";
+	    			$this->view->titre =  "Evolution des mots clefs dans https://www.diigo.com/user/luckysemiosis";
+	    			$this->view->soustitre =  "Pour la recherche : ".$this->_getParam('q', "ecosysteminfo");
+	    			$this->view->urlData = "../flux/diigo?q=getHistoTagLies&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream"
+	    						."&nbLimit=".$this->_getParam('nbLimit', 1)."&idTag=".urldecode($this->_getParam('idTag', "27"))
+	    						."&nbMin=".$this->_getParam('nbMin', 5);
+	    			$this->view->legendetitre =  "Mot-clefs";
+	    			break;
+	    		case "getHistoDiscipline":
+	    			$this->view->titre =  "Evolution des disciplines dans https://www.rechercheisidore.fr";
+	    			$this->view->soustitre =  "Pour la recherche : ".$this->_getParam('q', "écosystème");
+	    			$this->view->urlData = "../flux/isidore?q=getHistoDiscipline&req=".urldecode($this->_getParam('q', "écosystème"));
+	    			$this->view->legendetitre =  "Disciplines";
+	    			break;
 	    	}
     	 
     }

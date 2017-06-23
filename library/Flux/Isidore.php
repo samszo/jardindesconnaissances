@@ -61,6 +61,7 @@ class Flux_Isidore extends Flux_Site{
     public function getHistoDiscipline($req, $for="")
     {
     		$this->trace(__METHOD__." DEBUT ".$req);
+    		set_time_limit(0);
     		
     		//récupère la liste totale des disciplines et des dates
     		//pour une requête donnée

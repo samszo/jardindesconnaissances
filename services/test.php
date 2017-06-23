@@ -246,7 +246,9 @@ try {
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
 	//
-	//$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
+	$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
+	$diigo->bTraceFlush=true;
+	$diigo->saveAll();	
 	//$data = $diigo->getStatutUrl();
 	//$diigo->verifAllUrl();
 	//$diigo->saveRecent("luckysemiosis");	
@@ -623,10 +625,10 @@ try {
 	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";
 	$an->sauveXmlEad($url);
 	*/
-	
+	/*
 	$isidore = new Flux_Isidore('flux_isodore',true);
 	$isidore->getHistoDiscipline("écosystème","stream");
-	
+	*/
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

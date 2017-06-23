@@ -164,23 +164,29 @@ class Flux_Diigo extends Flux_Site{
 		$i = 1;
 		$count = 100;
 		while ($i>0) {
-	    		$arr = $this->getRequest(array("user"=>$login,"count"=>$count, "start"=>$i));
+	    		$arr = $this->getRequest(array("user"=>$login,"count"=>$count, "start"=>$i),false);
 	    		if(!$arr){
 		    		$i=-1;	
 	    		}else{				
 	    			$j = 0;
 	    			$this->trace("getRequest   ".$i." : ".count($arr));
 	    			foreach ($arr as $item){
-						$this->trace($i."   ".$j." : ".$item->url);				
-		    			$this->saveItem($item);
+					$this->trace($i."   ".$j." : ".$item->url);
+					//vérifie l'existence de l'url
+					$idD = $this->dbD->existe(array("url"=>$item->url,"titre"=>$item->title, "parent"=>$this->idDocRoot,"tronc"=>0,"pubDate"=>$item->created_at));
+					if($idD){
+						$this->trace("EXISTE = ".$idD);
+					}else{
+						$this->trace("ABSCENT",$item);						
+			    			$this->saveItem($item);
+					}
 		    			$j++;
 		    		}
 				if(count($arr)==0)$i=-1;
-				else $i += $j;
+				else $i = $i+$j-1;
 	    		}
-	    		//$i=-1;
 	    	}
-	    	if($this->setLucenee)$this->lucene->index->optimize();
+	    	if($this->setLucene)$this->lucene->index->optimize();
 		    //
 		
 		$this->trace("FIN ".__METHOD__);				
@@ -743,11 +749,13 @@ class Flux_Diigo extends Flux_Site{
      * @param 	array	$dates
      * @param 	string	$for
      * @param 	array	$tags
+     * @param 	int		$nbLimit
+     * @param 	int		$nbMin
      *
      * @return 	array
      *
      */
-    function getHistoTagLies($idTag, $dateUnit, $idUti, $idMonade, $idActi, $idParent, $dates=false, $for="stream", $tags=false){
+    function getHistoTagLies($idTag, $dateUnit, $idUti, $idMonade, $idActi, $idParent, $dates=false, $for="stream", $tags=false,$nbLimit=1,$nbMin=0){
 		    
 		$db = new Model_DbTable_Flux_Doc($this->db);
 		$sql = "SELECT 
@@ -801,7 +809,7 @@ class Flux_Diigo extends Flux_Site{
 		
 		if($for=="stream"){		
 			$sql .= " GROUP BY tl.tag_id, temps 
-					HAVING value > 1
+					HAVING value > ".$nbLimit."
 					ORDER BY tl.code, temps
 					";
 		}
@@ -817,6 +825,15 @@ class Flux_Diigo extends Flux_Site{
     		//execution de la requête
     		$rs = $db->getAdapter()->query($sql);
     		$data = $rs->fetchAll();
+    		
+    		//filtre les donnée
+    		if($nbMin){
+    			$newData = array();
+    			foreach ($data as $d) {
+    				if($d['value'] >= $nbMin) $newData[]=$d;
+    			}
+    			$data = $newData;
+    		}
     		
     		$stat = new Flux_Stats();
     		if($for=="stream"){    		
