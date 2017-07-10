@@ -177,17 +177,27 @@ class Flux_Site{
      *
      */
     function initDbTables(){
-    	/*construction des objets*/
-    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-    	if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
-    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
-    	if(!$this->dbR)$this->dbR = new Model_DbTable_Flux_Rapport($this->db);
-    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
-    	if(!$this->dbA)$this->dbA = new Model_DbTable_Flux_Acti($this->db);
-    	if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
-    	if(!$this->dbG)$this->dbG = new Model_DbTable_Flux_Geo($this->db);
-    	 
-    }
+    		$this->trace("DEBUT ".__METHOD__);
+    	 	/*construction des objets*/
+	    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+	    	$this->trace("Model_DbTable_Flux_Doc");
+	    	if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
+	    	$this->trace("Model_DbTable_Flux_Exi");
+	    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+	    	$this->trace("Model_DbTable_Flux_Tag");
+	    	if(!$this->dbR)$this->dbR = new Model_DbTable_Flux_Rapport($this->db);
+	    	$this->trace("Model_DbTable_Flux_Rapport");
+	    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+	    	$this->trace("Model_DbTable_Flux_Monade");
+	    	if(!$this->dbA)$this->dbA = new Model_DbTable_Flux_Acti($this->db);
+	    	$this->trace("Model_DbTable_Flux_Acti");
+	    	if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
+	    	$this->trace("Model_DbTable_Flux_Uti");
+	    	if(!$this->dbG)$this->dbG = new Model_DbTable_Flux_Geo($this->db);
+	    	$this->trace("Model_DbTable_Flux_Geo");
+	    	
+	    	$this->trace("FIN ".__METHOD__);
+	}
     
     
     /**
@@ -437,7 +447,7 @@ class Flux_Site{
 		$s="";
 		foreach ($params as $k=>$v){
 			if($md5) $s .= "_".md5($v);
-			else $s .= "_".$v;
+			else $s .= "_".str_replace(",","_",$v);
 		}
 		return $s;	
 	}

@@ -76,13 +76,14 @@ try {
 	$tp = new Flux_Tweetpalette('flux_tweetpalette');
 	$json = $tp->getPaletteClics('bernard stiegler', 'http://www.capdigital.com/evenements/enmi/', "../data/tweetpalette/AxePertiClair.png", 'ENMI', true);
 	*/
+	//
+	$zotero = new Flux_Zotero("luckysemiosis");
+	$zotero->bTrace = true;
+	$zotero->bTraceFlush=true;	
+	//$arr = $zotero->getDeweyTagDoc();
+	//print_r($arr);
+	$zotero->saveAll();
 	/*
-	$zotero = new Flux_Zotero($user);
-	$arr = $zotero->getDeweyTagDoc();
-	print_r($arr);
-	*/
-	/*
-	//$zotero->saveAll();
 	//$zotero->sauveOCLCInfo();
 	//$zotero->sauveAmazonInfo();
 	$code = simplexml_load_string("<DataTable>
@@ -245,10 +246,11 @@ try {
 	//$s->update("simple");
 	//$arr = $s->GetTagUserNetwork('bibliothèque', array("login"=>$user, "pwd"=>"Samszo0"));
 	
-	//
+	/*
 	$diigo = new Flux_Diigo("luckysemiosis","samszo","flux_diigo",true);
 	$diigo->bTraceFlush=true;
 	$diigo->saveAll();	
+	*/
 	//$data = $diigo->getStatutUrl();
 	//$diigo->verifAllUrl();
 	//$diigo->saveRecent("luckysemiosis");	
@@ -365,10 +367,11 @@ try {
 	//$response = $server->handle();
 
 	/*
-	$bnf = new Flux_Databnf("flux_databnf",true);
+	$bnf = new Flux_Databnf("flux_databnfSRU",true);	
 	$bnf->bTraceFlush = true;
-	ignore_user_abort(1);
-	$bnf->supDoublons();
+	//ignore_user_abort(1);
+	$bnf->saveCoteSRU("YE",45801,100,1800,1899);
+	//$bnf->supDoublons();
 	//$bnf->supDocPeriode(1800, 1899, "NOT");
 	//$bnf->savePropActeurCata();
 	//$bnf->savePropDocCata("Recherche cote  : ");
@@ -380,6 +383,7 @@ try {
 	//$rs = $bnf->getGallicaByTerm($_GET["term"]);
 	//$s->trace(json_encode($rs));
 	*/
+	
 	
 	
 	/*
@@ -629,6 +633,14 @@ try {
 	$isidore = new Flux_Isidore('flux_isodore',true);
 	$isidore->getHistoDiscipline("écosystème","stream");
 	*/
+	/*
+	if (!curl_version()['features'] & CURL_VERSION_SSL) {
+		$s->trace("SSL is not supported with this cURL installation.");
+	}else{
+		$s->trace("SSL est activé");		
+	}
+	*/
+	
 	$s->trace("FIN TEST");			
 	
 }catch (Zend_Exception $e) {

@@ -17,6 +17,7 @@ class Flux_Databnf extends Flux_Site{
 
 	var $formatResponse = "json";
 	var $searchUrl = 'http://data.bnf.fr/sparql?';
+	var $sruUrl = 'http://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve';
 	var $rs;
 	var $doublons;
 	
@@ -41,16 +42,25 @@ class Flux_Databnf extends Flux_Site{
     /**
      * Execute une resuète sur databnf
      *
-     * @param  string $query
+     * @param  	string 	$query
+     * @param	boolean	$sru = false
+     * @param	boolean	$cache = false
      *
      * @return string
      */
-    public function query($query)
+    public function query($query, $sru, $cache=false)
     {
-	    $url = $this->searchUrl.'query='.urlencode($query)
-	      	.'&format='.$this->formatResponse;
-		return $this->getUrlBodyContent($url,false);
-    }
+    		$this->trace("DEBUT ".__METHOD__);
+    	 	if($sru)
+    			$url = $this->sruUrl.$query;
+    		else
+		    $url = $this->searchUrl.'query='.urlencode($query)
+		      	.'&format='.$this->formatResponse;
+		$this->trace($url);
+		$body = $this->getUrlBodyContent($url,false,$cache);
+		$this->trace("FIN ".__METHOD__);
+		return $body;
+	}
     
     /**
      * Recherche un terme à partir de l'autocomplétion
@@ -440,7 +450,182 @@ ORDER BY ASC (?label_a)
 	    	return $arr;
     }
     
+    /**
+     * Enregistre les références bibliographique d'une cote
+     * en utilisant l'API SRU
+     * http://catalogue.bnf.fr/api/test
+     *
+     * @param  	string 	$cote
+     * @param  	int 		$record
+     * @param	int		$nbResult
+     * @param	string  $dateDeb
+     * @param	string  $dateFin
+     *
+     * @return array
+     */
+    function saveCoteSRU($cote, $record=1, $nbResult=100, $dateDeb="", $dateFin=""){
+    	 
+    	set_time_limit(0);
+    	$this->trace("DEBUT ".__METHOD__." : $cote, $record, $nbResult, $dateDeb, $dateFin");
+    
+    	$this->bExiste = false;
+    	
+    	//initialise les gestionnaires de base de données
+    	$this->initDbTables();
+    $this->trace("Tables initialisées");
+    	 
+    	//récupère l'action
+    	if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+    
+    	//récupère la page de résultat
+    	$params = "&recordSchema=dublincore&maximumRecords=".$nbResult."&startRecord=".$record."&query=";
+    	$query = '(bib.cote all "'.$cote.'")';
+    	if($dateDeb)
+    		$query .= " and (bib.publicationdate <= ".$dateFin.")";    		 
+    	if($dateFin)
+    		$query .= " and (bib.publicationdate >= ".$dateDeb.")";
+    	$params .= urlencode($query);
+    	$xml = $this->query($params, true, false);
+    
+    	//enregistre la page
+    	$this->idDocParent = $this->dbD->ajouter(array("url"=>$this->sruUrl.$params,"titre"=>"Recherche cote ".$cote." r.".$record." : ".$dateDeb." -> ".$dateFin, "parent"=>$this->idDocRoot,"data"=>$xml)
+    			);
+    
+    	$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    			,"src_id"=>$this->idDocParent,"src_obj"=>"doc"
+    			,"dst_id"=>$this->idAct,"dst_obj"=>"acti"
+    	),$this->bExiste);
+    	$this->trace("document correspondant au lien ajouté = ".$this->idDocParent." : ".$idRap);
+    	   
+    	//recherche les item;
+    	$dom = new Zend_Dom_Query($xml);
+    	//récupère les items
+    	$xPath = '//srw:record';
+    	$results = $dom->queryXpath($xPath);
+    	$arr = array();
+    	$i=0;
+    	foreach ($results as $result) {
+    		$i = $this->saveItemSRU($result, $idRap);
+    		$arr[] = $i;
+    	}
+    	$record+=$nbResult;
+    	if($i>0)$this->saveCoteSRU($cote, $record, $nbResult, $dateDeb, $dateFin);
+    
+    	return $arr;
+    }
 
+    /**
+     * Enregistre les références du catalogue général de la BNF au format SRU
+     *
+     * @param  	xmlObjet 	$r
+     * @param  	int 			$idPre
+     *
+     * @return	int 
+     */
+    function saveItemSRU($r, $idPre=0, $objPre='rapport'){
+    
+	    	$this->trace("DEBUT ".__METHOD__);
+	    	 
+		/* Exemple d'enregistrement
+		 * <srw:record>
+			<srw:recordSchema>dc</srw:recordSchema>
+			<srw:recordPacking>xml</srw:recordPacking>
+			<srw:recordData>
+				<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+				<dc:identifier>http://catalogue.bnf.fr/ark:/12148/cb33558760d</dc:identifier>
+				<dc:title>Puella ou la délivrance d'Orléans (Signé : Vom.)</dc:title>
+				<dc:publisher>A. [...] (Orléans)</dc:publisher>
+				<dc:date>1851</dc:date>
+				<dc:format>2 pièces in 12</dc:format>
+				<dc:language>fre</dc:language>
+				<dc:language>français</dc:language>
+				<dc:type xml:lang="fre">texte imprimé</dc:type>
+				<dc:type xml:lang="eng">printed text</dc:type>
+				<dc:type xml:lang="eng">text</dc:type>
+				<dc:rights xml:lang="fre">
+				Catalogue en ligne de la Bibliothèque nationale de France
+				</dc:rights>
+				<dc:rights xml:lang="eng">French National Library online Catalog</dc:rights>
+				</oai_dc:dc>
+			</srw:recordData>
+			<srw:recordIdentifier>ark:/12148/cb33558760d</srw:recordIdentifier>
+			<srw:recordPosition>3</srw:recordPosition>
+			<srw:extraRecordData>
+				<mn:score>4.0812473</mn:score>
+			</srw:extraRecordData>
+			</srw:record>
+		 */	    
+	    
+	    	//récupère l'action
+	    	if(!$this->idActItem)$this->idActItem = $this->dbA->ajouter(array("code"=>__METHOD__));
+	    	//récupère le tag général
+	    	if(!$this->idTagGen)$this->idTagGen = $this->dbT->ajouter(array("code"=>"Classe OAI - DC - BNF"));
+	    	 
+	    	//récupère l'identifiant
+	    	$ids =  $r->getElementsByTagName("recordIdentifier");
+	    	foreach ($ids as $i) {
+	    		$idRecord = $i->nodeValue;
+	    	}	    		    
+	    	
+	    	//valeur XML
+	    	$xml = $r->ownerDocument->saveXML( $r );
+	    		    	
+	    	//tableau des tags
+	    	$arrTag = array();
+	    	
+	    	//tableau des valeurs
+	    	$arrVal = array();
+	    	
+	    	//tableau du doc
+	    $arrDoc = array("url"=>$idRecord, "parent"=>$this->idDocParent, "data"=>$xml);
+	    $idD = $this->dbD->ajouter($arrDoc,$this->bExiste);
+	    $this->trace("doc_id : ".$idD." = ".$idRecord);
+	     
+	    	//décompose les datas
+	    	$rd =  $r->getElementsByTagName("dc");
+	    	foreach ($rd as $d) {
+	    		foreach($d->childNodes as $c) {
+	    			if($c->nodeName!="#text"){
+		    			//récupère le tag
+		    			if(!isset($arrTag[$c->localName])){
+			    			$idTag = $this->dbT->ajouter(array("code"=>$c->localName,"ns"=>$c->prefix,"parent"=>$this->idTagGen));
+			    			$arrTag[$c->localName] = $idTag;
+		    			}else 
+		    				$idTag = $arrTag[$c->localName];
+		    				
+	    				$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+	    						,"src_id"=>$idD,"src_obj"=>"doc"
+	    						,"dst_id"=>$idTag,"dst_obj"=>"tag"
+	    						,"pre_id"=>$idPre,"pre_obj"=>$objPre
+	    						,"valeur"=>$c->nodeValue
+	    				),$this->bExiste);
+		    				
+		    			//met à jour le document
+		    			switch ($c->nodeName) {
+		    				case "dc:title":
+		    					$arrDoc["titre"]=$c->nodeValue;
+		    					break;	    				
+	    					case "dc:identifier":
+	    						$arrDoc["url"]=$c->nodeValue;
+	    						break;
+						case "dc:date":
+							$arrDoc["pubDate"]=$c->nodeValue."-01-01";
+	    						break;
+	    				}
+	    			}
+	    		}
+	    	}
+	    	
+	    	//enregistre le doc
+	    	$this->dbD->edit($idD, $arrDoc);
+	    	$this->trace("MAJ doc_id : ".$idD." = ".$idRecord);	    	
+	    	
+	    	
+	    	$this->trace("FIN ".__METHOD__." doc_id = ".$idD);
+	    return $idD;
+    }
+    
+    
     /**
      * Suppression des doublons créé par l'importation
      *

@@ -9,8 +9,8 @@ WHERE
         AND rFiltre.dst_obj = 'tag'
         AND rFiltre.src_obj = 'doc'
         AND rFiltre.pre_obj = 'rapport'
-        AND rFiltre.dst_id = 62
-        AND CONVERT( rFiltre.valeur , UNSIGNED) NOT BETWEEN 1800 AND 1899
+        AND rFiltre.dst_id = 17
+        -- AND CONVERT( rFiltre.valeur , UNSIGNED) NOT BETWEEN 1800 AND 1899
 ; 
 
 /*

@@ -20,108 +20,146 @@ class Flux_Zotero extends Flux_Site{
 	var $latestEdition;
 	var $idTagLatestEdition;	
 	var $idUtiDewey = 638;	
+	var $zoteroAPIversion = 3;
 	
 	public function __construct($login, $idBase="flux_zotero", $libraryID=ZOTERO_ID_LIB)
     {
-    	parent::__construct($idBase);
-    	$this->libraryID = $libraryID;
-    	$this->login = $login;
+	    	parent::__construct($idBase);
+	    	$this->libraryID = $libraryID;
+	    	$this->login = $login;
+	    	
+	    	//on récupère la racine des documents
+	    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
+	    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+	    	$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+	    	$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
+	    	
+	    	
     }
 		
-    function getRequest($url, $params){
+    function getRequest($url, $params, $format="json"){
 
-		$c = str_replace("::", "_", __METHOD__)."_".$this->getParamString($params); 
-	   	$flux = $this->cache->load($c);
-        if(!$flux){
-	    	$params['key'] = KEY_ZOTERO;
-	    	$params['content'] = "json";
-	    	$params['order'] = "dateAdded";
-	    	if(!isset($params['sort']))$params['sort'] = "asc";
-	    	$params['format'] = "atom";
-	    	$atom = $this->getUrlBodyContent($url, $params);
-	    	$flux = Zend_Feed::importString($atom);	        
-			$this->cache->save($flux, $c);
-        }        
-        return $flux;
+		$this->trace(__METHOD__."_".$format."_".$this->getParamString($params)); 
+
+		$params['v'] = $this->zoteroAPIversion;
+        	$params['key'] = KEY_ZOTERO;
+        	$params['order'] = "dateAdded";
+        	$params['format'] = $format;
+        	if(!isset($params['sort']))$params['sort'] = "asc";
+        	  	    	
+	    	if($format == "atom"){
+	    		$params['content'] = "json";
+	    		$body = $this->getUrlBodyContent($url, $params);
+	    		$flux = Zend_Feed::importString($body);	        
+		}        
+		if($params['format'] == "json"){
+			$params['include'] = "data";
+			$body = $this->getUrlBodyContent($url, $params);
+			$flux = json_decode($body);
+		}
+				
+		return $flux;
     	
     }	
 
     function saveAll(){
 
-    	$this->getUser(array("login"=>$this->login,"flux"=>"zotero"));
-		//initialise les gestionnaires de base de données
-    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
-		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-		if(!$this->dbUD)$this->dbUD = new Model_DbTable_Flux_UtiDoc($this->db);
-		if(!$this->dbTD)$this->dbTD = new Model_DbTable_Flux_TagDoc($this->db);
-		if(!$this->dbUTD)$this->dbUTD = new Model_DbTable_Flux_UtiTagDoc($this->db);
-		
-    	$i = 1;
-    	$this->url = self::API_URI."/users/".$this->libraryID."/items";
+	    	$this->trace("DEBUT ".__METHOD__);
+	    	set_time_limit(0);
+	    	
+	    	//initialise les gestionnaires de base de données
+	    	$this->initDbTables();
+	    	$this->trace("Tables initialisées");
+	    	
+	    	//récupère l'action
+	    	if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+	    	$this->bExiste = true;
+	    	
+	    	$i = 1; $limit = 100; $j=0;
+	    	$this->url = self::API_URI."/users/".$this->libraryID."/items";
 		while ($i>0) {
-    		$flux = $this->getRequest($this->url,array("limit"=>99, "start"=>$i, "sort"=>"desc"));
-    		foreach ($flux as $item){
-    			$this->saveItem($item);
-    		}
-    		$i = $i+count($flux);
+	    		$flux = $this->getRequest($this->url,array("limit"=>$limit, "start"=>$i, "sort"=>"desc"));	    		 
+	    		foreach ($flux as $item){
+	    			$this->saveItem($item,$j);
+	    			$j++;
+	    		}
+	    		$i = $i+count($flux);
 		}
-    	//$this->lucene->index->optimize();
+    		//$this->lucene->index->optimize();
     }
 
-    function saveItem($i){
+    function saveItem($i,$j){
 
-    	
-		//TODO ajouter les db pour graine utigraine et grainedoc 
-		//$this->getGraine(array("titre"=>"Diigo","class"=>"Flux_Diigo","url"=>"http://www.diigo.com/"));
-		//TODO ajouter la utigraine 
+	    	$this->trace("DEBUT ".__METHOD__);
 
-    	$item['url'] = $i->id();
-    	$item['titre'] = $i->title();
-    	$item['tronc'] = 0;
-    	$item['pubDate'] = $i->updated();
-    	$item['note'] = $i->content();
-		$content = json_decode($item['note']);
-    	$item['type'] = $content->itemType;
-    	
-    	//gestion des notes
-    	if($item['type']=="note"){
-    		$item['note'] = $content->note;
-    		//récupération du parent
-    		$lienParent = $i->link("up");
-    		$lienParent = str_replace("?content=json", "", $lienParent);
-    		$idParent = substr($lienParent, strlen($this->url)+1);
-    		$docParent = $this->dbD->findLikeUrl($idParent);
-    		if($docParent[0]['doc_id'])
-	    		$item['tronc'] = $docParent[0]['doc_id'];
-	    	else
-	    		$item['tronc'] = $idParent;
-    	}
-    	
-		
-		//ajouter un document correspondant au lien
-		$idD = $this->dbD->ajouter($item);
-		//index le document
-		//$this->lucene->addDoc($item['url']);
-		
-		//TODO ajouter la grainedoc 
+	    	//enregistre le lien parent
+	    	$idDP = $this->idDocRoot;
+	    	if(isset($i->links->up)){
+	    		$idDP = $this->dbD->ajouter(array("url"=>$i->links->up->href, "parent"=>$this->idDocRoot));	    		 
+	    	}
+	    		
+	    	//enregistre le document
+	    	$url = $i->links->self->href;
+	    	$idD = $this->dbD->ajouter(array("url"=>$url,"tronc"=>$j,"parent"=>$idDP));
+	    //et son rapport 	
+	    	$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+	    			,"src_id"=>$idD,"src_obj"=>"doc"
+	    			,"dst_id"=>$this->idAct,"dst_obj"=>"acti"
+	    	));
+	    	
+    	 	//enregistre les data
+	    	if(!$this->idTagData)$this->idTagData = $this->dbT->ajouter(array("code"=>"Zotero data"));	    	
+	    	if(!$this->idTagZot)$this->idTagZot = $this->dbT->ajouter(array("code"=>"tags","parent"=>$this->idTagData));
+	    	foreach ($i->data as $k => $v) {
+	    		$this->trace($k."  ");	    		 
+    	 		if($k=="tags"){
+    	 			foreach ($k as $t) {
+    	 				$idTag = $this->dbT->ajouter(array("code"=>$t->tag,"parent"=>$this->idTagZot));
+    	 				$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    	 						,"src_id"=>$idD,"src_obj"=>"doc"
+    	 						,"dst_id"=>$idTag,"dst_obj"=>"tag"
+    	 						,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+    	 				),$this->bExiste);
+    	 			}
+    	 		}elseif($k=="relations"){
+    	 			
+    	 		}elseif($k=="creators"){
+    	 			foreach ($k as $t) {
+    	 				$idExi = $this->dbE->ajouter(array("nom"=>$t->lastName,"prenom"=>$t->firstName));
+    	 				$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    	 						,"src_id"=>$idD,"src_obj"=>"doc"
+    	 						,"dst_id"=>$idExi,"dst_obj"=>"exi"
+    	 						,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+    	 						,"valeur"=>$t->creatorType
+    	 				),$this->bExiste);
+    	 			}
+    	 				
+    	 		}else{
+	    	 		$idTag = $this->dbT->ajouter(array("code"=>$k,"parent"=>$this->idTagData));
+	    	 		$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+	    	 				,"src_id"=>$idD,"src_obj"=>"doc"
+	    	 				,"dst_id"=>$idTag,"dst_obj"=>"tag"
+	    	 				,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+	    	 				,"valeur"=>$v
+	    	 		),$this->bExiste);
+    	 		}    	 		    	 		
+    	 	}
 
-		//traitement des auteurs
-		$arrAuteurs = $content->creators;
-		foreach ($arrAuteurs as $auteur){
-			$idU = $this->getUser(array("login"=>$auteur->firstName." ".$auteur->lastName,"flux"=>"zotero","role"=>$auteur->creatorType),true);
-			$this->dbUD->ajouter(array("uti_id"=>$idU, "doc_id"=>$idD, "poids"=>0));										    
-		}
+    	 	//enregistre les meta
+    	 	if(!$this->idTagMeta)$this->idTagMeta = $this->dbT->ajouter(array("code"=>"Zotero meta"));
+    	 	foreach ($i->meta as $k => $v) {
+    	 		$idTag = $this->dbT->ajouter(array("code"=>$k,"parent"=>$this->idTagMeta));
+    	 		$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    	 				,"src_id"=>$idD,"src_obj"=>"doc"
+    	 				,"dst_id"=>$idTag,"dst_obj"=>"tag"
+    	 				,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+    	 				,"valeur"=>$v
+    	 		),$this->bExiste);
+    	 	
+    	 	}
+    	 	 									    
 
-		//traitement des mots clefs
-		$arrTags = $content->tags;
-		foreach ($arrTags as $tag){
-			$this->saveTag($tag->tag, $idD, 1, $item['pubDate']);	    			
-			$i++;
-		}						
-
-		//ajoute un lien entre l'utilisateur et le document avec un poids correspondant au nombre de tag
-		$this->dbUD->ajouter(array("uti_id"=>$this->user, "doc_id"=>$idD, "poids"=>$i));										    
-		//TODO ajouter la grainedoc 
+		$this->trace("FIN ".__METHOD__);
 		
     } 
 
