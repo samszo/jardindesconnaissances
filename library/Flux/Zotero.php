@@ -109,12 +109,14 @@ class Flux_Zotero extends Flux_Site{
 	    	
     	 	//enregistre les data
 	    	if(!$this->idTagData)$this->idTagData = $this->dbT->ajouter(array("code"=>"Zotero data"));	    	
-	    	if(!$this->idTagZot)$this->idTagZot = $this->dbT->ajouter(array("code"=>"tags","parent"=>$this->idTagData));
+	    	if(!$this->idTagTags)$this->idTagTags = $this->dbT->ajouter(array("code"=>"tags","parent"=>$this->idTagData));
+	    	if(!$this->idTagRel)$this->idTagRel = $this->dbT->ajouter(array("code"=>"relations","parent"=>$this->idTagData));
+	    	if(!$this->idTagCol)$this->idTagCol = $this->dbT->ajouter(array("code"=>"collections","parent"=>$this->idTagData));
 	    	foreach ($i->data as $k => $v) {
 	    		$this->trace($k."  ");	    		 
     	 		if($k=="tags"){
     	 			foreach ($k as $t) {
-    	 				$idTag = $this->dbT->ajouter(array("code"=>$t->tag,"parent"=>$this->idTagZot));
+    	 				$idTag = $this->dbT->ajouter(array("code"=>$t->tag,"parent"=>$this->idTagTags));
     	 				$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
     	 						,"src_id"=>$idD,"src_obj"=>"doc"
     	 						,"dst_id"=>$idTag,"dst_obj"=>"tag"
@@ -122,8 +124,28 @@ class Flux_Zotero extends Flux_Site{
     	 				),$this->bExiste);
     	 			}
     	 		}elseif($k=="relations"){
-    	 			
-    	 		}elseif($k=="creators"){
+    	 			//"owl:sameAs" : "http://zotero.org/groups/1/items/JKLM6543",
+    	 			foreach ($k as $t) {
+    	 				$idTag = $this->dbT->ajouter(array("code"=>$k,"parent"=>$this->idTagRel));
+    	 				$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    	 						,"src_id"=>$idD,"src_obj"=>"doc"
+    	 						,"dst_id"=>$idTag,"dst_obj"=>"tag"
+    	 						,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+    	 						,"valeur"=>$t    	 						
+    	 				),$this->bExiste);    	 				
+    	 			}    	 					
+    	 			}elseif($k=="collections"){
+    	 				//"owl:sameAs" : "http://zotero.org/groups/1/items/JKLM6543",
+    	 				foreach ($k as $t) {
+    	 					$idTag = $this->dbT->ajouter(array("code"=>$k,"parent"=>$this->$this->idTagCol));
+    	 					$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    	 							,"src_id"=>$idD,"src_obj"=>"doc"
+    	 							,"dst_id"=>$idTag,"dst_obj"=>"tag"
+    	 							,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+    	 							,"valeur"=>$t
+    	 					),$this->bExiste);
+    	 				}
+    	 			}elseif($k=="creators"){
     	 			foreach ($k as $t) {
     	 				$idExi = $this->dbE->ajouter(array("nom"=>$t->lastName,"prenom"=>$t->firstName));
     	 				$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
