@@ -62,10 +62,11 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      * @param array $data
      * @param boolean $existe
      * @param boolean $rs
+     * @param boolean $update
      *  
      * @return integer
      */
-    public function ajouter($data, $existe=true, $rs=false)
+    public function ajouter($data, $existe=true, $rs=false, $update=true)
     {
     	$id=false;
     	if($existe)$id = $this->existe($data);
@@ -87,7 +88,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     		}
     		*/    		
     		//met à jour les data
-    		if(isset($data["data"])){
+    	    if(isset($data["data"]) && $update){
     			$dt["data"] = $data["data"];
     			$this->edit($id[0]["doc_id"], $dt);
     		}
@@ -750,7 +751,7 @@ WHERE d.titre = 'axesEval'
                 ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
             ->from(array('d' => 'flux_doc'),array('titreO'=>'titre', 'doc_id0'=>'doc_id'))
             ->joinInner(array('enf' => 'flux_doc'),
-                'enf.lft BETWEEN d.lft AND d.rgt',array('titre', 'doc_id', 'url', 'niveau'))
+                'enf.lft BETWEEN d.lft AND d.rgt',array('titre', 'doc_id', 'url', 'niveau', 'parent'))
             ->where( "d.doc_id = ?", $idDoc)
            	->order("enf.".$order);        
         $result = $this->fetchAll($query);

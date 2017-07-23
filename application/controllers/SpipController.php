@@ -37,7 +37,7 @@ class SpipController extends Zend_Controller_Action
 		
 		switch ($this->_getParam('type')) {
 			case "fluxSKOs":
-				$dbA = new Models_DbTable_Spip_mots($sSpip->db);
+			    $dbA = new Model_DbTable_Spip_mots($sSpip->db);
 				$json = $sSpip->getUrlBodyContent("http://skos.um.es/unescothes/CS000/json");
 				
 				$arr = json_encode($json);

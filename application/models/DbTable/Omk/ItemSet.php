@@ -36,9 +36,7 @@ class Model_DbTable_Omk_ItemSet extends Zend_Db_Table_Abstract
     {
 		$select = $this->select();
 		$select->from($this, array('id'));
-		foreach($data as $k=>$v){
-			$select->where($k.' = ?', $v);
-		}
+		$select->where('id = ?', $data['id']);
 	    $rows = $this->fetchAll($select);        
 	    if($rows->count()>0)$id=$rows[0]->id; else $id=false;
         return $id;
@@ -103,4 +101,31 @@ class Model_DbTable_Omk_ItemSet extends Zend_Db_Table_Abstract
     		if(!isset($this->dbV))$this->dbV = new Model_DbTable_Omk_Value($this->_db);
     	 	return $this->dbV->findByCatKeyVal(33, "resource_id", $id);
     }
+    
+    /**
+     * Trouve les itemSet avec un titre
+     *
+     * @param string $titre
+     *
+     * @return void
+     */
+    public function getByTitre($titre)
+    {
+        if(!isset($this->dbV))$this->dbV = new Model_DbTable_Omk_Value($this->_db);
+        return $this->dbV->findByCatKeyVal(1, "value", $titre);
+    }
+
+    /**
+     * Trouve les itemSet avec une référence
+     *
+     * @param string $ref
+     *
+     * @return void
+     */
+    public function getByIdentifier($ref)
+    {
+        if(!isset($this->dbV))$this->dbV = new Model_DbTable_Omk_Value($this->_db);
+        return $this->dbV->findByCatKeyVal(10, "value", $ref);
+    }
+    
 }

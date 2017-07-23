@@ -34,11 +34,15 @@ class CartoController extends Zend_Controller_Action {
 
 	    	$this->view->idBase = $this->_getParam('idBase',$apikeys['db']['params']['dbname']);
     		$this->view->idUti = $this->_getParam('idUti',0);
+    		
+    		$this->view->manifest = $this->_getParam('manifest',"http://localhost/ValArNum/omk/iiif/1570/manifest");
+    		
     	 
     }
 
     public function savelayerAction()
     {
+    		
     		//récupère les paramètre passer	
     		$type = $this->_getParam('type');
     		$feat = $this->_getParam('features');
@@ -48,10 +52,13 @@ class CartoController extends Zend_Controller_Action {
     		
     		//création des objets de base de données sur la bonne base
     		$s = new Flux_Site($idBase);    		
-    		$dbDoc = new Model_DbTable_Flux_Doc($s->db);
-    		
+    		$dbDoc = new Model_DbTable_Flux_Doc($s->db);    		
+    		$data = array("titre"=>$titre,"note"=>json_encode($feat));    		
+    		if($this->_getParam('table')=="flux_doc" && $this->_getParam('col')=="doc_id" && $this->_getParam('val'))
+    		    $data['parent']=$this->_getParam('val');
+
     		//ajouter les données dans la base
-    		$rs = $dbDoc->ajouter(array("titre"=>$titre,"note"=>json_encode($feat)));
+    		$rs = $dbDoc->ajouter($data);
     		
     		$arr["savelayer"] = array("reponse"=>json_encode($rs),"type"=>$type, "nb"=>$nb,"feat"=>$feat);
     		$this->view->result = json_encode($arr);
@@ -59,20 +66,16 @@ class CartoController extends Zend_Controller_Action {
     
     public function getlayerAction()
     {
-	    	$idBase = $this->_getParam('idBase',$apikeys['db']['params']['dbname']);
-	    	
-	    	$idBase = $this->_getParam('idBase',$apikeys['db']['params']['dbname']);
-	    	
-	    
-	    	//création des objets de base de données sur la bonne base
+        //création des objets de base de données sur la bonne base
+        $idBase = $this->_getParam('idBase',$apikeys['db']['params']['dbname']);
 	    	$s = new Flux_Site($idBase);
 	    	$dbDoc = new Model_DbTable_Flux_Doc($s->db);
-	    
-	    	//ajouter les données dans la base
-	    	$rs = $dbDoc->ajouter(array("titre"=>$titre,"note"=>json_encode($feat)));
-	    
-	    	$arr["savelayer"] = array("reponse"=>json_encode($rs),"type"=>$type, "nb"=>$nb,"feat"=>$feat);
-	    	$this->view->result = json_encode($arr);
+	    	
+	    	//récupère les layers par leur parent
+	    	if($this->_getParam('table')=="flux_doc" && $this->_getParam('col')=="doc_id" && $this->_getParam('val'))
+	    	    $rs = $dbDoc->findByParent($this->_getParam('val'));
+	    	     
+	    	$this->view->result = json_encode($rs);
     }
     
     public function tempoAction()

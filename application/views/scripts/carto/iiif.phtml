@@ -2,7 +2,6 @@
   <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
     <link rel="stylesheet" href="https://cdn.rawgit.com/Leaflet/Leaflet.label/0.8/dist/leaflet.label.css" />
-	<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@0.4.9/dist/leaflet.draw.css" />
     <link rel="stylesheet" href="http://w2ui.com/src/w2ui-1.5.rc1.min.css" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -11,13 +10,51 @@
     
     <script type="text/javascript" src="http://w2ui.com/src/w2ui-1.5.rc1.min.js"></script>
         
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js" ></script>
+        
     <script src="https://rawgit.com/mejackreed/Leaflet-IIIF/master/leaflet-iiif.js"></script>
     <script src="https://cdn.rawgit.com/Leaflet/Leaflet.label/0.8/dist/leaflet.label.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>    
-	<script src="https://unpkg.com/leaflet-draw@0.4.9/dist/leaflet.draw.js"></script>
-    		
+
     
+    <!-- leaflet draw -->
+    <link rel="stylesheet" href="../js/leaflet/draw/leaflet.draw.css"/>
+
+    <script src="../js/leaflet/draw/Leaflet.draw.js"></script>
+    <script src="../js/leaflet/draw/Leaflet.Draw.Event.js"></script>
+
+    <script src="../js/leaflet/draw/edit/handler/Edit.Poly.js"></script>
+    <script src="../js/leaflet/draw/edit/handler/Edit.SimpleShape.js"></script>
+    <script src="../js/leaflet/draw/edit/handler/Edit.Rectangle.js"></script>
+    <script src="../js/leaflet/draw/edit/handler/Edit.Marker.js"></script>
+  	<script src="../js/leaflet/draw/edit/handler/Edit.CircleMarker.js"></script>
+  	<script src="../js/leaflet/draw/edit/handler/Edit.Circle.js"></script>
+
+    <script src="../js/leaflet/draw/draw/handler/Draw.Feature.js"></script>
+    <script src="../js/leaflet/draw/draw/handler/Draw.Polyline.js"></script>
+    <script src="../js/leaflet/draw/draw/handler/Draw.Polygon.js"></script>
+    <script src="../js/leaflet/draw/draw/handler/Draw.SimpleShape.js"></script>
+    <script src="../js/leaflet/draw/draw/handler/Draw.Rectangle.js"></script>
+    <script src="../js/leaflet/draw/draw/handler/Draw.Circle.js"></script>
+    <script src="../js/leaflet/draw/draw/handler/Draw.Marker.js"></script>
+    <script src="../js/leaflet/draw/draw/handler/Draw.CircleMarker.js"></script>
+
+    <script src="../js/leaflet/draw/ext/TouchEvents.js"></script>
+    <script src="../js/leaflet/draw/ext/LatLngUtil.js"></script>
+    <script src="../js/leaflet/draw/ext/GeometryUtil.js"></script>
+    <script src="../js/leaflet/draw/ext/LineUtil.Intersect.js"></script>
+    <script src="../js/leaflet/draw/ext/Polyline.Intersect.js"></script>
+    <script src="../js/leaflet/draw/ext/Polygon.Intersect.js"></script>
+
+    <script src="../js/leaflet/draw/Control.Draw.js"></script>
+    <script src="../js/leaflet/draw/Tooltip.js"></script>
+    <script src="../js/leaflet/draw/Toolbar.js"></script>
+
+    <script src="../js/leaflet/draw/draw/DrawToolbar.js"></script>
+    <script src="../js/leaflet/draw/edit/EditToolbar.js"></script>
+    <script src="../js/leaflet/draw/edit/handler/EditToolbar.Edit.js"></script>
+    <script src="../js/leaflet/draw/edit/handler/EditToolbar.Delete.js"></script>    
+
     <style type="text/css">
     html, body, #map{
 	  height: 100%;
@@ -38,9 +75,11 @@
             text-decoration:none;
         }
         #import {
+            visibility: hidden;
             top:340px;
         }	
-        #save {
+        #export {
+            visibility: hidden;
             top:380px;
         }	
 	</style>
@@ -52,7 +91,12 @@
     <a href='#' id='import'>Importer</a>
     <a href='#' id='save'>Enregistrer</a>
     <script type="text/javascript">
-    var map;
+
+	var prefUrl = "", arrLayer=[];
+	var idBase = '<?php echo $this->idBase;?>';
+	var idUti = '<?php echo $this->idUti;?>';
+    
+    var map, dataMap={};
 
     map = L.map('map', {
       center: [0, 0],
@@ -60,58 +104,74 @@
       zoom: 0
     });
     var baseLayer;
-    var annoFeatures = new L.FeatureGroup();
-    map.addLayer(annoFeatures);
     
-    //var urlJson = 'http://dms-data.stanford.edu/data/manifests/BnF/jr903ng8662/manifest.json';
-    var urlJson = 'http://gapai.univ-paris8.fr/DesignEdition/os/iiif/31/manifest';
-    //var urlInfoJson = "http://gallica.bnf.fr/iiif/ark:/12148/btv1b52503224r/f1/info.json";   
-    //var urlInfoJson = 'http://gapai.univ-paris8.fr/DesignEdition/os/iiif-img/33/info.json';
-    var urlInfoJson = "http://gapai.univ-paris8.fr/ValArNum/omk/iiif-img/2/info.json";
-    $.getJSON(urlJson, function(data) {
-    
-      var page = data.sequences[0].canvases[0];
-      console.log(page.images[0].resource.service['@id'] + '/info.json');
-      baseLayer = L.tileLayer.iiif(
-    		  urlInfoJson
-    	      //page.images[0].resource.service['@id'] + '/info.json'
-      ).addTo(map);
-
-      /*
-      $.getJSON(page.otherContent[0]['@id'], function(annoData) {
-        $.each(annoData.resources, function(i, value) {
-          var b = /xywh=(.*)/.exec(value.on)[1].split(',');
-          var minPoint = L.point(b[0], b[1]);
-          var maxPoint = L.point(parseInt(b[0]) + parseInt(b[2]), parseInt(b[1]) + parseInt(b[3]));
-          var min = map.unproject(minPoint, 3);
-          var max = map.unproject(maxPoint, 3);
-          L.rectangle(L.latLngBounds(min, max)).bindLabel(value.resource.chars).addTo(map);
-        });
-      });
-      */
-    });
-
 	// Initialise the FeatureGroup to store editable layers
 	var drawnItems = new L.FeatureGroup();
 	map.addLayer(drawnItems);
 
 	// Initialise the draw control and pass it the FeatureGroup of editable layers
 	var drawControl = new L.Control.Draw({
+        draw: {
+            circle: false
+            , circlemarker:false
+        },
 	  edit: {
 	    featureGroup: drawnItems
 	  }
 	});
 
+	
 	map.addControl(drawControl);
+	
+
+    
+    var urlJson = '<?php echo $this->manifest; ?>';
+    //var urlJson = 'http://dms-data.stanford.edu/data/manifests/BnF/jr903ng8662/manifest.json';
+    //var urlInfoJson = "http://gallica.bnf.fr/iiif/ark:/12148/btv1b52503224r/f1/info.json";   
+    //var urlInfoJson = 'http://gapai.univ-paris8.fr/DesignEdition/os/iiif-img/33/info.json';
+   	//var urlInfoJson = "http://gapai.univ-paris8.fr/ValArNum/omk/iiif-img/2/info.json";
+    //var urlInfoJson = "http://localhost/ValArNum/omk/iiif-img/1567/info.json";
+    $.getJSON(urlJson, function(data) {
+    
+		data.metadata.forEach(function(d){
+			dataMap[d.label] = d.value;
+		});
+        var page = data.sequences[0].canvases[0];
+        console.log(page.images[0].resource.service['@id'] + '/info.json');
+        baseLayer = L.tileLayer.iiif(
+        		//urlInfoJson
+        		page.images[0].resource.service['@id'] + '/info.json'
+    		).addTo(map);
+    
+          /*
+          $.getJSON(page.otherContent[0]['@id'], function(annoData) {
+            $.each(annoData.resources, function(i, value) {
+              var b = /xywh=(.*)/.exec(value.on)[1].split(',');
+              var minPoint = L.point(b[0], b[1]);
+              var maxPoint = L.point(parseInt(b[0]) + parseInt(b[2]), parseInt(b[1]) + parseInt(b[3]));
+              var min = map.unproject(minPoint, 3);
+              var max = map.unproject(maxPoint, 3);
+              L.rectangle(L.latLngBounds(min, max)).bindLabel(value.resource.chars).addTo(map);
+            });
+          });
+          */        
+	    	//chargement des layers de la base
+        chargeLayer();		
+            
+    });
+
 
 	map.on(L.Draw.Event.CREATED, function (e) {
 
 		var type = e.layerType
 	  	var layer = e.layer;
-		var coords = type=="marker" ? e.layer._latlng : e.layer._latlngs[0];
+		var coords;
+		if(type=="marker" || type=="circle" ) coords = e.layer._latlng;
+		else if(type=="rectangle") coords = e.layer._latlngs[0][0];
+		else coords = e.layer._latlngs[0];
 		  	
-	  // enregistre le dessin dans un groupe qui pourra être enregistré
-	  drawnItems.addLayer(layer);
+    	  	// enregistre le dessin dans un groupe qui pourra être enregistré
+		drawnItems.addLayer(layer);
 
 	    //création du formulaire de la popup
 	    //merci à https://gis.stackexchange.com/questions/144695/submit-a-form-from-within-a-leaflet-popup
@@ -144,11 +204,12 @@
           '<div style="text-align:center;" class="col-xs-4"><button type="submit" value="submit" class="btn btn-primary trigger-submit">Submit</button></div>'+
         '</div>'+
         '</form>';
+        
         layer.bindPopup(popupContent,{
 	      keepInView: true,
 	      closeButton: false
 	      }).openPopup();	  	
-
+        
 	});
 
 	/**Exporter les layers dans un json
@@ -200,15 +261,19 @@
 		//geojsonLayer.addTo(map);
 		drawnItems.addLayer(geojsonLayer);	
 	}
-
-	var prefUrl = ""
-	var idBase = '<?php echo $this->idBase;?>';
-	var idUti = '<?php echo $this->idUti;?>';
 		
-	//enregistre le document dans la base
+	//enregistre le layer dans la base
 	function saveLayer(p){
 		var d = new Date();
-		p.idBase = idBase;
+		//vérifie si on prend la référence JDC
+		if(dataMap['Is Referenced By']){
+			var arr = dataMap['Is Referenced By'].split('-');
+			p.idBase = arr[0];
+			p.table = arr[1];
+			p.col = arr[2];
+			p.val = arr[3];
+		}
+		if(!p.idBase)p.idBase = idBase;
 		p.titre = "Layer : "+d.toString();
 		$.post(prefUrl+"savelayer", p,
 				 function(data){
@@ -219,6 +284,52 @@
 			 			console.log(data);				 		
 			 		}					 		
 				 }, "json");
+	}
+
+	//charge les layers de la base
+	function chargeLayer(){
+		//vérifie si on prend la référence JDC
+		if(dataMap['Is Referenced By']){
+			var p = {};
+			var arr = dataMap['Is Referenced By'].split('-');
+			p.idBase = arr[0];
+			p.table = arr[1];
+			p.col = arr[2];
+			p.val = arr[3];
+
+			$.get(prefUrl+"getlayer", p,
+					 function(data){
+				 		if(data.erreur){
+				 			console.log("ERREUR:");				 		
+				 			console.log(data.erreur);
+				 		}else{
+				 			console.log(data);				 			
+			 				arrLayer = data;
+			 				var overlayMaps = {};
+				 			arrLayer.forEach(function(d, i){
+					 			var geojson = JSON.parse(d.note);
+					 			var geojsonLayer = L.geoJSON(geojson, {onEachFeature: onEachFeature});				 								 								 								 								 			
+					 			//L.geoJSON(geojsonLayer).addTo(map);				 								 			
+					 			//drawnItems.addLayer(geojsonLayer);						 			
+					 			overlayMaps[d.titre] = geojsonLayer;
+				 			});
+				 			L.control.layers(null,overlayMaps,{collapsed:false}).addTo(map);
+				 			
+				 		}					 		
+					 }, "json");
+			
+		}
+	}
+
+	function onEachFeature(feature, layer) {
+	    //bind click
+	    layer.on('click', function (e) {
+	      // e = event
+	      console.log(e);
+	      // You can make your ajax call declaration here
+	      //$.ajax(... 
+	    });
+
 	}
 	
 	function editDoc(){

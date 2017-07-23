@@ -96,7 +96,7 @@ class FrontieresController extends Zend_Controller_Action {
 					$d = new Zend_Date();		
 					$site = new Flux_Site();
 				    $db = $site->getDb($this->dbNom);
-					$dbG = new Model_DbTable_Flux_Geos($db);
+					$dbG = new Model_DbTable_Flux_Geo($db);
 					$dbGUD = new Model_DbTable_Flux_UtiGeoDoc($db);
 					//récupération de l'utilisateur	
 					//$idU = $site->getUser(array("login"=>$_SERVER['REMOTE_ADDR'],"flux"=>"frontières","date_inscription"=>$d->get("c")));

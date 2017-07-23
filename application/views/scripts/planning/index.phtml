@@ -86,8 +86,8 @@
 				<?php endforeach; ?>		
 			</select>		
 	    <?php endif ?>
-	    Date de début: <input type="text" id="datepickerMin" value="01/09/2016" />
-	    Date de fin: <input type="text" id="datepickerMax" value="30/09/2017" />
+	    Date de début: <input type="text" id="datepickerMin" value="01/09/2017" />
+	    Date de fin: <input type="text" id="datepickerMax" value="30/09/2018" />
 	  </div>
 	  <div>
 		<label for="cours">Cours :</label>
@@ -127,11 +127,11 @@
 			var urlCouTot = "flux/google?type=csv&gDocId=1vXOt_DiLRVdBWF9qw-XiP_DTFgmmM9cuZSMMnZyA3qo";
 			var urlIntTot = "flux/google?type=csv&gDocId=1R_Drqn_lubZgjkmu3kHicDt9GMFhqm-J7RyTmJVNtJs";
 			var gData, gDataCal, dataCour, idxCour, dataInt, idxInt;
-			//var urlCou = {"L3 PRO CDNL":"../data/planning/CDNL14-15_cours.csv"};
+			//var urlCou = {"L3 PRO DWM":"../data/planning/CDNL14-15_cours.csv"};
 			var urlCou = {
 					"Master 2 THYP":urlCouTot
 					,"Master 2 PTN":urlCouTot
-					,"L3 PRO CDNL":urlCouTot
+					,"L3 PRO DWM":urlCouTot
 					,"Master 2 NET":"flux/google?type=csv&gDocId=1gYZxHacQ-dy7mHpIKbxKlAu1YLTSs-4SrJEmoVdFolU"
 					,"Master 1 CEN":urlCouTot
 					,"Master 1 GSI":urlCouTot
@@ -140,11 +140,11 @@
 					,"Master 2 CEN":urlCouTot
 					,"CreaTIC Hypermedia":urlCouTot
 					};
-			//var urlInt = {"L3 PRO CDNL":"../data/planning/CDNL14-15_intervenants.csv"};
+			//var urlInt = {"L3 PRO DWM":"../data/planning/CDNL14-15_intervenants.csv"};
 			var urlInt = {
 					"Master 2 THYP":urlIntTot
 					,"Master 2 PTN":urlIntTot
-					,"L3 PRO CDNL":urlIntTot
+					,"L3 PRO DWM":urlIntTot
 					,"Master 2 NET":urlIntTot
 					,"Master 1 CEN":urlIntTot
 					,"Master 1 GSI":urlIntTot

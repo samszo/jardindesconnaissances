@@ -5,7 +5,7 @@ try {
 	$application->bootstrap();
 	$s = new Flux_Site(false,true);
 	$s->trace("DEBUT TEST");		
-	$s->bTraceFlush = true;
+	$s->bTraceFlush = false;
 	
 	$user = "luckysemiosis";
 	$pwd = "samszo";
@@ -76,14 +76,13 @@ try {
 	$tp = new Flux_Tweetpalette('flux_tweetpalette');
 	$json = $tp->getPaletteClics('bernard stiegler', 'http://www.capdigital.com/evenements/enmi/', "../data/tweetpalette/AxePertiClair.png", 'ENMI', true);
 	*/
-	//
+	/*
 	$zotero = new Flux_Zotero("luckysemiosis");
 	$zotero->bTrace = true;
 	$zotero->bTraceFlush=true;	
 	//$arr = $zotero->getDeweyTagDoc();
 	//print_r($arr);
 	$zotero->saveAll();
-	/*
 	//$zotero->sauveOCLCInfo();
 	//$zotero->sauveAmazonInfo();
 	$code = simplexml_load_string("<DataTable>
@@ -623,12 +622,13 @@ try {
 	$s->trace($reponse);
 	*/
 	
-	/*
-	$an = new Flux_An('flux_an',true);
-	$an->bTraceFlush = false;
+	//
+	$an = new Flux_An('flux_an','omk_valarnum',true);
+	$an->bTraceFlush = $s->bTraceFlush;
 	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";
-	$an->sauveXmlEad($url);
-	*/
+	//$an->sauveXmlEad($url);
+	//$an->setItemSetFromDocRoot(3);
+	$an->getCsvToOmeka(3, "/Library/WebServer/Documents/jdc/data/AN/testImportMin.csv");
 	/*
 	$isidore = new Flux_Isidore('flux_isodore',true);
 	$isidore->getHistoDiscipline("écosystème","stream");
@@ -645,12 +645,11 @@ try {
 	
 }catch (Zend_Exception $e) {
 	 echo "<h1>Erreur d'exécution</h1>
-  <h2>".$e->message."</h2>
   <h3>Exception information:</h3>
-  <p><b>Message:</b>".$e->exception->getMessage()."</p>
+  <p><b>Message:</b>".$e->getMessage()."</p>
   <h3>Stack trace:</h3>
-  <pre>".$e->exception->getTraceAsString()."</pre>
+  <pre>".$e->getTraceAsString()."</pre>
   <h3>Request Parameters:</h3>
-  <pre>".var_export($this->request->getParams(), true)."</pre>";
+  <pre>".var_export($_REQUEST, true)."</pre>";
 }
    		

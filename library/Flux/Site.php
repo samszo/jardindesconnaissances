@@ -179,23 +179,25 @@ class Flux_Site{
     function initDbTables(){
     		$this->trace("DEBUT ".__METHOD__);
     	 	/*construction des objets*/
-	    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-	    	$this->trace("Model_DbTable_Flux_Doc");
-	    	if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
-	    	$this->trace("Model_DbTable_Flux_Exi");
-	    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
-	    	$this->trace("Model_DbTable_Flux_Tag");
-	    	if(!$this->dbR)$this->dbR = new Model_DbTable_Flux_Rapport($this->db);
-	    	$this->trace("Model_DbTable_Flux_Rapport");
-	    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
-	    	$this->trace("Model_DbTable_Flux_Monade");
-	    	if(!$this->dbA)$this->dbA = new Model_DbTable_Flux_Acti($this->db);
-	    	$this->trace("Model_DbTable_Flux_Acti");
-	    	if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
-	    	$this->trace("Model_DbTable_Flux_Uti");
-	    	if(!$this->dbG)$this->dbG = new Model_DbTable_Flux_Geo($this->db);
-	    	$this->trace("Model_DbTable_Flux_Geo");
-	    	
+	    	if(!$this->dbD){
+	    	    $this->dbD = new Model_DbTable_Flux_Doc($this->db);
+        	    	$this->trace("Model_DbTable_Flux_Doc");
+        	    	if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
+        	    	$this->trace("Model_DbTable_Flux_Exi");
+        	    	if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+        	    	$this->trace("Model_DbTable_Flux_Tag");
+        	    	if(!$this->dbR)$this->dbR = new Model_DbTable_Flux_Rapport($this->db);
+        	    	$this->trace("Model_DbTable_Flux_Rapport");
+        	    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+        	    	$this->trace("Model_DbTable_Flux_Monade");
+        	    	if(!$this->dbA)$this->dbA = new Model_DbTable_Flux_Acti($this->db);
+        	    	$this->trace("Model_DbTable_Flux_Acti");
+        	    	if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
+        	    	$this->trace("Model_DbTable_Flux_Uti");
+        	    	if(!$this->dbG)$this->dbG = new Model_DbTable_Flux_Geo($this->db);
+        	    	$this->trace("Model_DbTable_Flux_Geo");  
+	    	}
+        	    	
 	    	$this->trace("FIN ".__METHOD__);
 	}
     
