@@ -1,20 +1,20 @@
 <!DOCTYPE html>
   <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
-    <link rel="stylesheet" href="https://cdn.rawgit.com/Leaflet/Leaflet.label/0.8/dist/leaflet.label.css" />
-    <link rel="stylesheet" href="http://w2ui.com/src/w2ui-1.5.rc1.min.css" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="../css/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="../css/leaflet/leaflet.label.css" />
+    <link rel="stylesheet" href="../css//w2ui.css" />
+
+    <script src="../js/jquery.min.js"></script>
     
-    <script type="text/javascript" src="http://w2ui.com/src/w2ui-1.5.rc1.min.js"></script>
+    <script src="../js/w2ui.min.js"></script>
         
-    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js" ></script>
+    <script src="../js/leaflet/leaflet.js" ></script>
         
-    <script src="https://rawgit.com/mejackreed/Leaflet-IIIF/master/leaflet-iiif.js"></script>
-    <script src="https://cdn.rawgit.com/Leaflet/Leaflet.label/0.8/dist/leaflet.label.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>    
+    <script src="../js/leaflet/leaflet-iiif.js"></script>
+    <script src="../js/leaflet/leaflet.label.js"></script>
+    <script src="../js/leaflet/leaflet.ajax.min.js"></script>    
 
     
     <!-- leaflet draw -->
@@ -167,51 +167,45 @@
 	  	var layer = e.layer;
 		var coords;
 		if(type=="marker" || type=="circle" ) coords = e.layer._latlng;
-		else if(type=="rectangle") coords = e.layer._latlngs[0][0];
+		else if(type=="rectangle" || type=="polygon" ) coords = e.layer._latlngs[0][0];
 		else coords = e.layer._latlngs[0];
 		  	
     	  	// enregistre le dessin dans un groupe qui pourra être enregistré
 		drawnItems.addLayer(layer);
 
 	    //création du formulaire de la popup
-	    //merci à https://gis.stackexchange.com/questions/144695/submit-a-form-from-within-a-leaflet-popup
-		var popupContent = '<form role="form" id="form" enctype="multipart/form-data" class = "form-horizontal" onsubmit="addMarker()">'+
-        '<div class="form-group">'+
-            '<label class="control-label col-sm-5"><strong>Date: </strong></label>'+
-            '<input type="date" placeholder="Required" id="date" name="date" class="form-control"/>'+ 
-        '</div>'+
-        '<div class="form-group">'+
-            '<label class="control-label col-sm-5"><strong>Gender: </strong></label>'+
-            '<select class="form-control" id="gender" name="gender">'+
-              '<option value="Male">Male</option>'+
-              '<option value="Female">Female</option>'+
-              '<option value="Other">Other</option>'+
-            '</select>'+ 
-        '</div>'+
-        '<div class="form-group">'+
-            '<label class="control-label col-sm-5"><strong>Age: </strong></label>'+
-            '<input type="number" min="0" class="form-control" id="age" name="age">'+ 
-        '</div>'+
-        //...
-        '<div class="form-group">'+
-            '<label class="control-label col-sm-5"><strong>Description: </strong></label>'+
-            '<textarea class="form-control" rows="6" id="descrip" name="descript">...</textarea>'+
-        '</div>'+
-        '<input style="display: none;" type="text" id="lat" name="lat" value="'+coords.lat.toFixed(6)+'" />'+
-        '<input style="display: none;" type="text" id="lng" name="lng" value="'+coords.lng.toFixed(6)+'" />'+
-        '<div class="form-group">'+
-          '<div style="text-align:center;" class="col-xs-4 col-xs-offset-2"><button type="button" class="btn">Cancel</button></div>'+
-          '<div style="text-align:center;" class="col-xs-4"><button type="submit" value="submit" class="btn btn-primary trigger-submit">Submit</button></div>'+
-        '</div>'+
-        '</form>';
+        popupContent = '<div id="form" style="width: 600px;"></div>';
         
         layer.bindPopup(popupContent,{
 	      keepInView: true,
-	      closeButton: false
-	      }).openPopup();	  	
-        
+	      closeButton: false,
+	      minWidth: 600
+	      }).openPopup();        
 	});
 
+	//pour charger le contenu de la popup
+    map.on('popupopen', function() {
+        $('#form').w2form({ 
+            name   : 'form',
+            header : "Commentez l'image",
+            fields : [
+                { field: 'titre', type: 'text', required: true, html: { caption: 'Titre', attr: 'style="width: 300px"' } },
+                { field: 'commentaires',   type: 'textarea', html: { caption: 'Comments', attr: 'style="width: 300px; height: 90px"' } }
+            ],
+            actions: {
+                'Save': function (event) {
+                    console.log('save', event);
+                    this.save();
+                },
+                'Clear': function (event) {
+                    console.log('clear', event);
+                    this.clear();
+                }
+            }
+        });            
+    });	  	
+
+	
 	/**Exporter les layers dans un json
 	merci à https://bl.ocks.org/danswick/d30c44b081be31aea483
 	**/
