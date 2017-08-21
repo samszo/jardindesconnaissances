@@ -14,6 +14,11 @@ class Flux_EditInflu extends Flux_Site{
 	var $formatResponse = "json";
 	var $idDocRoot;
 	var $idMonade;
+	var $idTagRoot;
+	var $idTagCatAppli;
+	var $idTagCrud;
+	var $idTagCatNotion;
+	var $idTagRameau;
 	
     /**
      * Constructeur de la classe
@@ -52,6 +57,22 @@ class Flux_EditInflu extends Flux_Site{
 		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
     	
     }
+    
+    /**
+     * Fonction pour initialiser les mots clefs
+     *
+     * @return	void
+     *
+     */
+    function initTags(){
+        //on ajoute les tags génériques
+        $this->idTagCatAppli = $this->dbT->ajouter(array("code"=>"Catégories de l'application","parent"=>$this->idTagRoot));
+        $this->idTagCrud = $this->dbT->ajouter(array("code"=>"CRUD","parent"=>$this->idTagCatAppli));
+        $this->idTagCatNotion = $this->dbT->ajouter(array("code"=>"Catégories de notion","parent"=>$this->idTagRoot));
+        $this->idTagRameau = $this->dbT->ajouter(array("code"=>"Matière Rameau","parent"=>$this->idTagCatNotion));
+    }
+    
+    
     
     /**
      * Fonction pour créer un crible
@@ -97,7 +118,7 @@ class Flux_EditInflu extends Flux_Site{
      * Fonction pour créer un graph
      *
      * @param  	int 		$idUti
-     * @param  	strinc	$tronc
+     * @param  	string	$tronc
      * @param  	array 	$data
      * 
      * @return	array
@@ -161,7 +182,7 @@ class Flux_EditInflu extends Flux_Site{
     		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 			,"src_id"=>$idUti,"src_obj"=>"uti"
 			,"dst_id"=>$idActi,"dst_obj"=>"acti"
-			));
+			),false);
 			
 		//nettoyage des paramètres
 		$idCrible = $data['idCrible'];		
@@ -170,6 +191,8 @@ class Flux_EditInflu extends Flux_Site{
 		
 		//enregistre l'acteur
 		$this->trace("data",$data);
+		if($data['nait'])unset($data['idCrible']);
+		
 		$arr = $this->dbE->ajouter($data,true,true);
 		//ajoute le(s) champ(s) pour le grid
 		$arr["recid"] = $arr["exi_id"];
@@ -380,6 +403,26 @@ class Flux_EditInflu extends Flux_Site{
 	            	
         return $this->dbD->fetchAll($query)->toArray(); 
     }    
+            
+    /**
+     * Fonction pour récupérer les notions
+     *
+     * @param	int		$idCrible
+     * @return	array
+     *
+     */
+    function getTagByCrible($idCrible){
+        if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
+        $query = $this->dbT->select()
+        ->from( array("e" => "flux_exi"), array("recid"=>"exi_id","nom","prenom","data","nait","mort"))
+        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        ->joinInner(array('r' => 'flux_rapport'),'r.dst_id = e.exi_id AND r.dst_obj="exi"
+	            		AND r.pre_obj = "doc" AND r.pre_id = '.$idCrible,array())
+	            		->joinInner(array('ru' => 'flux_rapport'),'ru.rapport_id = r.src_id',array())
+	            		->joinInner(array('u' => 'flux_uti'),'u.uti_id = ru.src_id',array('uti_id',"login"));
+	            		
+	            		return $this->dbD->fetchAll($query)->toArray();
+    }
     
      /**
      * Fonction pour importer un crible

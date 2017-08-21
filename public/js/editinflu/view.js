@@ -712,6 +712,10 @@ var gridResultBNFliens = {
             { field: 'value', caption: 'Lien', size: '80%',editable: { type: 'text' } },
             { field: 'type', caption: 'Type', size: '20%',editable: { type: 'text' } },
         ],
+        sort: [
+            { field: "value", direction: "ASC" },
+            { field: "type", direction: "ASC" }
+        ],        
         onClick: function (event) {
         		var item = this.get(event.recid);
 			$('#ifActeur').attr("src",item.value);            		
@@ -982,6 +986,69 @@ var gridDetails = {
 	    			},"json");                        
 	    }
 	};
+
+var tabsElem = {
+    name: 'tabsElem',
+    active: 'tabActeur',
+    tabs: [
+        { id: 'tabActeur',
+	        	text: function (item) {
+	            return 'Acteur(s) ('+ datas["Acteurs"].length+')';
+	        },
+	        tooltip: function (item) {
+	            return 'Pour sélectionnner ou ajouter des documents';
+	        }
+        },
+        { id: 'tabDoc', tooltip: 'Gestion des documents',
+            text: function (item) {
+                return 'Document(s) ('+ datas["Docs"].length+')';
+            },
+            tooltip: function (item) {
+                return 'Pour sélectionnner ou ajouter des documents';
+            }
+        },
+        { id: 'tabNotion', 
+            text: function (item) {
+                return 'Notion(s) ('+ datas["Tags"].length+')';
+            },
+            tooltip: function (item) {
+                return 'Pour sélectionnner ou ajouter des notions ';
+            }
+        }
+    ],
+    onClick: function (event) {
+        $('#selected-tab').html(event.target);
+        if (event.target == 'tabActeur') {
+            this.tooltipShow('tabDoc', null, true);
+	    	 	if(w2ui['grid_acteur'])w2ui['grid_acteur'].destroy();
+	    		$('#w2ui-popup #content').w2grid(gridActeur);
+        }
+        if (event.target == 'tabDoc') {
+            this.tooltipShow('tabDoc', null, true);
+	    		docSelect = false;
+	    	 	if(w2ui['layout_doc'])w2ui['layout_doc'].destroy();
+	    	 	if(w2ui['grid_doc'])w2ui['grid_doc'].destroy();
+	    	 	if(w2ui['grid_doc_frag'])w2ui['grid_doc_frag'].destroy();
+	    	 	if(w2ui['layout_doc_bottom'])w2ui['layout_doc_bottom'].destroy();
+	    	    	$('#w2ui-popup #content').w2layout(lyDoc);
+	
+	        gridDoc.records=datas["Docs"];
+	    	    	
+	    	    	w2ui['layout_doc'].content('left', $().w2grid(gridDoc));            		            		
+	    	    	w2ui['layout_doc'].content('main', $().w2grid(gridDocFrag));            		            		
+	    	    	w2ui['layout_doc'].content('bottom', $().w2layout(lyDocBottom));            		            		
+        }
+        if (event.target == 'tabNotion') {
+            this.tooltipShow('tabNotion', null, true);
+	    		gridTag.records=datas["Tags"];
+	    	 	if(w2ui['grid_tag'])w2ui['grid_tag'].destroy();
+	    		$('#w2ui-popup #content').w2grid(gridTag);
+            
+        }
+    }
+};
+
+
 function showDetails(data, layout, place){
 	if(w2ui['grid_details'])w2ui['grid_details'].destroy();
 	w2ui[layout].content(place,$().w2grid(gridDetails));			            
@@ -1004,19 +1071,22 @@ function pushObjTypeValToGrid(data, g, prefix){
 function openPopupAjoutActeur(){
 	
 	w2popup.open({
-        title   : 'Ajouter un acteur',
+        title   : 'Ajouter un élément',
         showMax : true,
+        /*
         buttons   : '<img class="imgButton" alt="Ajouter un acteur" onclick="openPopupAjoutActeur()" src="'+prefUrl+'img/document96.png">'+
         '<img class="imgButton" alt="Ajouter un document" onclick="openPopupAjoutDoc()" src="'+prefUrl+'img/document107.png">'+
         '<img class="imgButton" alt="Ajouter une notion" onclick="openPopupAjoutTag()" src="'+prefUrl+'img/document108.png">',
-        body    : '<div id="main" style="position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px;"></div>',
+        */
+        body    : '<div id="main" style="position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px;"><div id="tabs" style="width: 100%; height: 29px;"></div><div id="content" style="width: 100%; height: 96%;"></div></div>',
         onOpen  : function (event) {
             event.onComplete = function () {
+            		if(w2ui['tabsElem'])w2ui['tabsElem'].destroy();
+            		$('#w2ui-popup #tabs').w2tabs(tabsElem);
             		gridActeur.records=datas["Acteurs"];
             	 	if(w2ui['grid_acteur'])w2ui['grid_acteur'].destroy();
-            		$('#w2ui-popup #main').w2grid(gridActeur);
+            		$('#w2ui-popup #content').w2grid(gridActeur);
                 	w2popup.max();
-            		w2popup.resize(1000, 500);
             };
         },
     });
@@ -1027,7 +1097,7 @@ function showRefActeur(cherche){
  	if(w2ui['layout_acteur'])w2ui['layout_acteur'].destroy();
  	if(w2ui['form_acteur'])w2ui['form_acteur'].destroy();
  	if(w2ui['tb_acteur'])w2ui['tb_acteur'].destroy();
-    	$('#w2ui-popup #main').w2layout(lyActeur);            		
+    	$('#w2ui-popup #content').w2layout(lyActeur);            		
     	w2ui['layout_acteur'].content('left', $().w2form(formActeur));            		            		
     	w2ui['layout_acteur'].content('top', $().w2toolbar(tbActeur));
     	w2popup.max();
@@ -1041,7 +1111,7 @@ function showGoogleActeur(cherche){
  	if(w2ui['layout_acteur'])w2ui['layout_acteur'].destroy();
  	if(w2ui['form_acteur'])w2ui['form_acteur'].destroy();
  	if(w2ui['tb_acteur'])w2ui['tb_acteur'].destroy();
-    	$('#w2ui-popup #main').w2layout(lyActeur);            		
+    	$('#w2ui-popup #content').w2layout(lyActeur);            		
     	w2ui['layout_acteur'].content('left', $().w2form(formActeur));            		            		
     	w2ui['layout_acteur'].content('top', $().w2toolbar(tbActeur));
     	w2popup.max();
@@ -1248,7 +1318,7 @@ function showRefTag(cherche){
  	if(w2ui['layout_tag'])w2ui['layout_tag'].destroy();
  	if(w2ui['form_tag'])w2ui['form_tag'].destroy();
  	if(w2ui['tb_tag'])w2ui['tb_tag'].destroy();
-    	$('#w2ui-popup #main').w2layout(lyTag);
+    	$('#w2ui-popup #content').w2layout(lyTag);
 	formTag.fields[3].options.items = datas["Tags"];
     	
     	w2ui['layout_tag'].content('left', $().w2form(formTag));            		            		
@@ -1280,7 +1350,7 @@ function showRefDoc(cherche, type){
  	if(w2ui['layout_doc_ajout'])w2ui['layout_doc_ajout'].destroy();
  	if(w2ui['form_doc'])w2ui['form_doc'].destroy();
  	if(w2ui['tb_doc'])w2ui['tb_doc'].destroy();
-    	$('#w2ui-popup #main').w2layout(lyDocAjout);            		
+    	$('#w2ui-popup #content').w2layout(lyDocAjout);            		
     	w2ui['layout_doc_ajout'].content('left', $().w2form(formDoc));            		            		
     	w2ui['layout_doc_ajout'].content('top', $().w2toolbar(tbDoc));
     	w2popup.max();

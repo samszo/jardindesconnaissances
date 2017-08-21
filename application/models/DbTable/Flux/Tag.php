@@ -13,24 +13,29 @@
 class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 {
     
-    /*
+    /**
      * Nom de la table.
      */
     protected $_name = 'flux_tag';
     
-    /*
+    /**
      * Clef primaire de la table.
      */
     protected $_primary = 'tag_id';
 
+    /*version 0
+     protected $_dependentTables = array(
+     ,'Model_DbTable_Flux_TagDoc'
+     ,'Model_DbTable_Flux_UtiTagDoc'
+     ,'Model_DbTable_Flux_ExiTag'
+     ,'Model_DbTable_Flux_TagTag'
+     );
+     */
     protected $_dependentTables = array(
-       "Model_DbTable_flux_tagdoc"
-       ,"Model_DbTable_flux_tagtag"
-       ,"Model_DbTable_flux_utitag"
-       ,"Model_DbTable_Flux_UtiTagDoc"
-       );    
+        'Model_DbTable_Flux_Rapport'
+    );
     
-    /**
+    /***
      * Vérifie si une entrée flux_tag existe.
      *
      * @param array $data
@@ -49,7 +54,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         return $id;
     } 
         
-    /**
+    /***
      * Ajoute une entrée flux_tag.
      *
      * @param array $data
@@ -75,7 +80,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     	
     } 
 
-    /**
+    /***
      * Modifie la hiérarchie d'une entrée.
      *
      * @param array $data
@@ -119,7 +124,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     		return $data;
     }
 
-     /*
+     /**
      * Recherche une entrée avec la valeur spécifiée
      * et retourne la liste de tous ses parents
      *
@@ -141,7 +146,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         return $result->toArray(); 
     }
 
-     /*
+     /**
      * Recherche une entrée avec la valeur spécifiée
      * et retourne la liste de tous ses enfants
      *
@@ -164,7 +169,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     
     
     
-    /**
+    /***
      * Recherche une entrée flux_tag avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.
      *
@@ -178,31 +183,32 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         $this->update($data, 'flux_tag.tag_id = ' . $id);
     }
     
-    /**
+    /***
      * Recherche une entrée flux_tag avec la clef primaire spécifiée
      * et supprime cette entrée.
      *
      * @param integer $id
      *
-     * @return void
+     * @return int
      */
     public function remove($id)
     {
-    	
-		//suppression des données lieés
-        $dt = $this->getDependentTables();
-        foreach($dt as $t){
-        	$dbT = new $t($this->_db);
-        	if($t=="Model_DbTable_flux_tagtag"){
-	        	$dbT->delete('tag_id_src = '.$id);
-	        	$dbT->delete('tag_id_dst = '.$id);
-        	}else
-	        	$dbT->delete('tag_id = '.$id);
-        }        
-        $this->delete('flux_tag.tag_id = ' . $id);
+        $nbSup = 0;
+        foreach($this->_dependentTables as $t){
+            $tEnfs = new $t($this->_db);
+            $nbSup += $tEnfs->removeTag($id);
+        }
+        //supprime les enfants
+        $arrEnf = $this->findByParent($id);
+        foreach ($arrEnf as $enf) {
+            $nbSup += $this->remove($enf['tag_id']);
+        }
+        
+        $nbSup += $this->delete('flux_tag.tag_id = ' . $id);
+        return $nbSup;
     }
-    
-    /**
+        
+    /***
      * Récupère toutes les entrées flux_tag avec certains critères
      * de tri, intervalles
      */
@@ -224,7 +230,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray();
     }
     
-    /*
+    /**
      * Recherche une entrée flux_tag avec la valeur spécifiée
      * et retourne cette entrée.
      *
@@ -241,7 +247,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 		$arr = $this->fetchAll($query)->toArray();
         return count($arr) ? $arr[0] : false; 
     }
-    /*
+    /**
      * Recherche une entrée flux_tag avec la valeur spécifiée
      * et retourne cette entrée.
      *
@@ -256,7 +262,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 		$arr = $this->fetchAll($query)->toArray();
         return $arr[0]; 
     }
-    /*
+    /**
      * Recherche une entrée flux_tag avec la valeur spécifiée
      * et retourne cette entrée.
      *
@@ -271,11 +277,11 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 		return $this->fetchAll($query)->toArray();
     }
     
-    /*
+    /**
      * Recherche une entrée flux_tag avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param varchar $desc
+     * @param string $desc
      */
     public function findByDesc($desc)
     {
@@ -285,7 +291,23 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
-    /*
+    /**
+     * Recherche une entrée flux_tag avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param string $type
+     * 
+     * @return array
+     */
+    public function findByType($type)
+    {
+        $query = $this->select()
+        ->from( array("f" => "flux_tag") )
+        ->where( "f.type = ?", $type );
+        
+        return $this->fetchAll($query)->toArray();
+    }
+    /**
      * Recherche une entrée flux_tag avec la valeur spécifiée
      * et retourne cette entrée.
      *
@@ -299,11 +321,11 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
-    /*
+    /**
      * Recherche une entrée flux_tag avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param char $parent
+     * @param string $parent
      */
     public function findByParent($parent)
     {

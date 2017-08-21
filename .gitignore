@@ -382,3 +382,8 @@ data/databnf/SRUnbDocParSujet.csv
 data/databnf/SRUnbDocParType.csv
 
 data/databnf/SRUReeditionTitre.csv
+*.zip
+bdd/flux_acteurinterieur.sql.zip
+bdd/flux_editinfluSymogih.sql
+*.zip
+bdd/flux_eu.sql.zip

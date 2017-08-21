@@ -875,7 +875,7 @@ class Flux_Site{
         if (is_file($source)) { 
             if ($dest[strlen($dest)-1]=='/') { 
                 if (!file_exists($dest)) { 
-                    cmfcDirectory::makeAll($dest,$options['folderPermission'],true); 
+                    //cmfcDirectory::makeAll($dest,$options['folderPermission'],true); 
                 } 
                 $__dest=$dest."/".basename($source); 
             } else { 

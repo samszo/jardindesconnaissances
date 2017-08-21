@@ -4,11 +4,11 @@
 
     <link rel="stylesheet" href="../css/leaflet/leaflet.css" />
     <link rel="stylesheet" href="../css/leaflet/leaflet.label.css" />
-    <link rel="stylesheet" href="../css//w2ui.css" />
+    <link rel="stylesheet" href="../css/w2ui-1.5.rc1.min.css" />
 
     <script src="../js/jquery.min.js"></script>
     
-    <script src="../js/w2ui.min.js"></script>
+    <script src="../js/w2ui-1.5.rc1.min.js"></script>
         
     <script src="../js/leaflet/leaflet.js" ></script>
         
@@ -73,6 +73,7 @@
             cursor: pointer;
             font-size:12px;
             text-decoration:none;
+            visibility: hidden;
         }
         #import {
             visibility: hidden;
@@ -92,11 +93,11 @@
     <a href='#' id='save'>Enregistrer</a>
     <script type="text/javascript">
 
-	var prefUrl = "", arrLayer=[];
-	var idBase = '<?php echo $this->idBase;?>';
-	var idUti = '<?php echo $this->idUti;?>';
+	var prefUrl = "", arrLayer=[], idBase = '<?php echo $this->idBase;?>', idUti = '<?php echo $this->idUti;?>';
     
-    var map, dataMap={};
+    var map, dataMap={}, popupContent = '<div id="form" style="width: 600px;"></div>'
+        , popupOptions = {keepInView: true, closeButton: true,minWidth: 600}
+    		,clJDC, overlayMaps={};
 
     map = L.map('map', {
       center: [0, 0],
@@ -124,7 +125,7 @@
 	map.addControl(drawControl);
 	
 
-    
+    /*GESTION DES COUCHES IIIF*/
     var urlJson = '<?php echo $this->manifest; ?>';
     //var urlJson = 'http://dms-data.stanford.edu/data/manifests/BnF/jr903ng8662/manifest.json';
     //var urlInfoJson = "http://gallica.bnf.fr/iiif/ark:/12148/btv1b52503224r/f1/info.json";   
@@ -143,18 +144,6 @@
         		page.images[0].resource.service['@id'] + '/info.json'
     		).addTo(map);
     
-          /*
-          $.getJSON(page.otherContent[0]['@id'], function(annoData) {
-            $.each(annoData.resources, function(i, value) {
-              var b = /xywh=(.*)/.exec(value.on)[1].split(',');
-              var minPoint = L.point(b[0], b[1]);
-              var maxPoint = L.point(parseInt(b[0]) + parseInt(b[2]), parseInt(b[1]) + parseInt(b[3]));
-              var min = map.unproject(minPoint, 3);
-              var max = map.unproject(maxPoint, 3);
-              L.rectangle(L.latLngBounds(min, max)).bindLabel(value.resource.chars).addTo(map);
-            });
-          });
-          */        
 	    	//chargement des layers de la base
         chargeLayer();		
             
@@ -172,93 +161,74 @@
 		  	
     	  	// enregistre le dessin dans un groupe qui pourra être enregistré
 		drawnItems.addLayer(layer);
-
-	    //création du formulaire de la popup
-        popupContent = '<div id="form" style="width: 600px;"></div>';
         
-        layer.bindPopup(popupContent,{
-	      keepInView: true,
-	      closeButton: false,
-	      minWidth: 600
-	      }).openPopup();        
+        layer.bindPopup(popupContent,popupOptions);
+        layer.on('popupopen', function(e) { 
+			console.log(e.layer)
+			setForm({});        
+			});
+		layer.openPopup();	        
 	});
 
-	//pour charger le contenu de la popup
-    map.on('popupopen', function() {
+	/*pour détruire le formulaire à la fermeture de la popup
+    map.on('popupclose', function(e) {
+	    	w2ui['form'].destroy();
+    });	
+	*/
+	//pour charger le formulaire
+	function setForm(data){
         $('#form').w2form({ 
             name   : 'form',
             header : "Commentez l'image",
+            record : data,
             fields : [
-                { field: 'titre', type: 'text', required: true, html: { caption: 'Titre', attr: 'style="width: 300px"' } },
+                { field: 'titre', type: 'text', required: true, html: {caption: 'Titre', attr: 'style="width: 300px"' } },
                 { field: 'commentaires',   type: 'textarea', html: { caption: 'Comments', attr: 'style="width: 300px; height: 90px"' } }
             ],
             actions: {
-                'Save': function (event) {
-                    console.log('save', event);
-                    this.save();
+                'Supprimer': function (event) {
                 },
+                'Enregistrer': function (event) {
+                    //valide le formulaire
+            	        var errors = this.validate();
+            	        if (errors.length > 0) return;
+
+            	        //récupère les données du formulaire
+            	        var dataForm = this.record;
+            	        var changes = this.getChanges();
+            	        var original = this.original;
+
+                     //enregistre ou met à jour les données
+                	    	var dataLayer, nbDrawItems = drawnItems.getLayers().length;
+					if(nbDrawItems){
+						/**Exporter les layers dans un json
+						merci à https://bl.ocks.org/danswick/d30c44b081be31aea483	**/
+						dataLayer = drawnItems.toGeoJSON();//le nouveau layer dessiné
+						dataLayer.features[0].properties = dataForm;
+						//enregistre le layer dans la base
+						saveLayer(dataLayer);
+					}else{
+                     	dataLayer = overlayMaps[original.titre].toGeoJSON();
+                     	dataLayer.features[0].properties = dataForm;
+	                    //met à jour le layer dans la base
+                        updateLayer(dataLayer, original.titre);
+					}                	    	
+                },
+                /*
                 'Clear': function (event) {
                     console.log('clear', event);
                     this.clear();
                 }
+                */
             }
-        });            
-    });	  	
-
-	
-	/**Exporter les layers dans un json
-	merci à https://bl.ocks.org/danswick/d30c44b081be31aea483
-	**/
-	document.getElementById('export').onclick = function(e) {
-        // Extract GeoJson from featureGroup
-        var data = drawnItems.toGeoJSON();
-
-        // Stringify the GeoJson
-        var convertedData = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
-
-        // Create export
-        document.getElementById('export').setAttribute('href', 'data:' + convertedData);
-        document.getElementById('export').setAttribute('download','data.geojson');
-    }	
-
-	/**Enregistre les layers dans un json puis dans la base de données
-	**/
-	document.getElementById('save').onclick = function(e) {
-        // Extract GeoJson from featureGroup
-        var data = drawnItems.toGeoJSON();
-
-        saveLayer(data);
-
-    }	
-
-	/**
-	merci à 
-	**/
-	document.getElementById('import').onclick = function(e) {
-		  var geojsonLayer = new L.GeoJSON.AJAX("../data/data1.geojson");
-
-		  //enregistre un label
-		  geojsonLayer.bindLabel('Staff Mass Storage GA', { noHide: true });
-
-	  	/* create popup contents
-    		var customPopup = "Mozilla Toronto Offices<br/><img src='http://joshuafrazier.info/images/maptime.gif' alt='maptime logo gif' width='350px'/>";
-	    // specify popup options 
-	    var customOptions =
-	        {
-	        'maxWidth': '500',
-	        'className' : 'custom'
-	        }	  
-	  	layer.bindPopup(customPopup,customOptions);
-		*/
-
-		
-		//geojsonLayer.addTo(map);
-		drawnItems.addLayer(geojsonLayer);	
+        });
+        //on ne peut changer le titre pour éviter des problèmes avec le nom du layer dans le control
+        if(data.doc_id)$(w2ui.form.get('titre').el).prop('readonly', true);            		
 	}
-		
-	//enregistre le layer dans la base
-	function saveLayer(p){
-		var d = new Date();
+
+
+	//récupère les références JDC
+	function getDataLayer(p){
 		//vérifie si on prend la référence JDC
 		if(dataMap['Is Referenced By']){
 			var arr = dataMap['Is Referenced By'].split('-');
@@ -268,18 +238,73 @@
 			p.val = arr[3];
 		}
 		if(!p.idBase)p.idBase = idBase;
-		p.titre = "Layer : "+d.toString();
+
+		//récupère les données du formulaire
+		if(p.features && p.features[0].properties){
+			p.titre = p.features[0].properties.titre;
+			if(p.features[0].properties.doc_id)p.doc_id = p.features[0].properties.doc_id;
+		}else{
+			var d = new Date();
+			p.titre = "Layer : "+d.toString();
+		}
+		return p;
+	}   
+			
+	//enregistre le layer dans la base
+	function saveLayer(p){
+		//récupère les référence de la carte
+		p = getDataLayer(p);
+		//envoie la requête au serveur
 		$.post(prefUrl+"savelayer", p,
 				 function(data){
 			 		if(data.erreur){
 			 			console.log("ERREUR:");				 		
 			 			console.log(data.erreur);
 			 		}else{
-			 			console.log(data);				 		
+			 			console.log(data);
+			 			//vide le layer de dessin
+			 			drawnItems.clearLayers();	                    			 						 			
+			 			//ajoute un layer au control
+		 				geojsonLayer = setJsonLayer(data.rs);			 					 				
+			 			clJDC.addOverlay(geojsonLayer, data.rs.titre);
+			 			w2alert('Les données sont enregistrées');
+			 							 		
 			 		}					 		
 				 }, "json");
 	}
 
+	//update le layer dans la base
+	function updateLayer(p, oldTitre){
+		//récupère les référence de la carte
+		var dt = getDataLayer(p);
+		//envoie la requête au serveur
+		$.post(prefUrl+"updatelayer", dt,
+				 function(data){
+			 		if(data.erreur){
+			 			console.log("ERREUR:");				 		
+			 			console.log(data.erreur);
+			 		}else{
+			 			console.log(data);
+/*Pour éviter ce traitement on ne peut pas changer le nom du layer
+						//change le nom du layer
+						clJDC._layers[0].name = data.rs.titre
+			 			//supprime le layer du tableau
+			 			overlayMaps[oldTitre].closePopup();
+//			 			clJDC.removeLayer(overlayMaps[oldTitre]);
+//			 			map.removeLayer(overlayMaps[oldTitre]);
+			 			delete overlayMaps[oldTitre];
+			 			//ajoute un layer au control
+		 				geojsonLayer = setJsonLayer(data.rs);
+		 				overlayMaps[data.rs.titre]=geojsonLayer;			 			
+//			 			clJDC.addOverlay(geojsonLayer, data.rs.titre);
+//			 			geojsonLayer.openPopup();
+*/
+			 			w2alert('Les données sont enregistrées');				 		
+			 		}					 		
+				 }, "json");
+	}
+
+	
 	//charge les layers de la base
 	function chargeLayer(){
 		//vérifie si on prend la référence JDC
@@ -297,17 +322,15 @@
 				 			console.log("ERREUR:");				 		
 				 			console.log(data.erreur);
 				 		}else{
-				 			console.log(data);				 			
+				 			//console.log(data);				 			
 			 				arrLayer = data;
-			 				var overlayMaps = {};
 				 			arrLayer.forEach(function(d, i){
-					 			var geojson = JSON.parse(d.note);
-					 			var geojsonLayer = L.geoJSON(geojson, {onEachFeature: onEachFeature});				 								 								 								 								 			
-					 			//L.geoJSON(geojsonLayer).addTo(map);				 								 			
-					 			//drawnItems.addLayer(geojsonLayer);						 			
+
+				 				geojsonLayer = setJsonLayer(d);
 					 			overlayMaps[d.titre] = geojsonLayer;
+					 			
 				 			});
-				 			L.control.layers(null,overlayMaps,{collapsed:false}).addTo(map);
+				 			clJDC = L.control.layers(null,overlayMaps,{collapsed:false}).addTo(map);
 				 			
 				 		}					 		
 					 }, "json");
@@ -315,31 +338,36 @@
 		}
 	}
 
-	function onEachFeature(feature, layer) {
-	    //bind click
-	    layer.on('click', function (e) {
-	      // e = event
-	      console.log(e);
-	      // You can make your ajax call declaration here
-	      //$.ajax(... 
-	    });
-
+	function setJsonLayer(d){
+		var geojson = JSON.parse(d.note);
+		var geojsonLayer = L.geoJSON(geojson,{
+	 			// add a popup content to the marker
+		        onEachFeature: function (feature, layer) {
+		            if (feature.properties && feature.properties.titre) {
+		                layer.bindPopup(popupContent,popupOptions);
+		            }
+		        }});				 								 								 								 								 			
+		
+		geojsonLayer.on('popupopen', function(e) { 
+			console.log(e.layer)
+			//pour pouvoir modifier les layer
+			//il faut es supprimer et le recréer ou le faire un par un
+			//drawnItems.addLayer(e.layer);
+			//pour remplir le formulaire		    										
+			setForm(e.layer.feature.properties);        
+			});
+		//pour ouvrir la popup automatiquement
+		geojsonLayer.on("add", function (event) {
+			 event.target.getLayers()[0].openPopup();
+			})				
+	    	//pour détruire le formulaire à la fermeture de la popup
+        geojsonLayer.on('popupclose', function(e) {
+	    	    	w2ui['form'].destroy();
+        });	
+			
+				 			
+		return geojsonLayer;
 	}
-	
-	function editDoc(){
-		var p = getDocParams();
-		p.idDoc = arrGraphs[lstGraph.selectedIndex].doc_id;
-		$.post(prefUrl+"flux/sauvedoc", p,
-				 function(data){
-			 		if(data.erreur){
-			 			showMessage(data.erreur);
-			 		}else{
-			 			getDocs();							 		
-						showMessage("Graph enregistré.");
-				  		diagSauvDoc.close();						 		
-			 		}					 		
-				 }, "json");
-	}	
     
     </script>
   </body>

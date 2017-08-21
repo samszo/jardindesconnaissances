@@ -334,11 +334,12 @@ try {
 	//$zot->SaveRdf($_REQUEST);
 	*/
 	/* pour importer les flux Wikipedia
+	 */
 	$f = new Flux_Dbpedia();
 	//$f->SaveUserTagsLinks($user);
-	$rep = $f->getBio("Adam_Smith");
+	$rep = $f->getBio("Parlement_européen");
 	$arr = $f->getRessourceObjet("http://fr.dbpedia.org/page/Loi_z_de_Fisher");	
-	*/
+	//
 	
 	//$d = new Model_DbTable_Flux_Doc();
 	//$d->remove(7641);
@@ -622,13 +623,15 @@ try {
 	$s->trace($reponse);
 	*/
 	
-	//
+	/*
 	$an = new Flux_An('flux_an','omk_valarnum',true);
 	$an->bTraceFlush = $s->bTraceFlush;
 	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";
 	//$an->sauveXmlEad($url);
 	//$an->setItemSetFromDocRoot(3);
 	$an->getCsvToOmeka(3, "/Library/WebServer/Documents/jdc/data/AN/testImportMin.csv");
+	*/
+	
 	/*
 	$isidore = new Flux_Isidore('flux_isodore',true);
 	$isidore->getHistoDiscipline("écosystème","stream");
@@ -639,6 +642,12 @@ try {
 	}else{
 		$s->trace("SSL est activé");		
 	}
+	*/
+	/*
+	$sym = new Flux_Symogih("flux_editinflu",true);
+	$sym->bTraceFlush = $s->bTraceFlush;
+	//$sym->importOnto();
+	$sym->importTree();
 	*/
 	
 	$s->trace("FIN TEST");			

@@ -33,23 +33,17 @@ class Flux_Gknowledgegraph extends Flux_Site{
     }
 	
 	/**
-     * Execute uen requête sur le service
+     * Execute une requête sur le service
      *
-     * @param  string $query
-     * @param  boolean $bArray
+     * @param  array    $params
+     * @param  boolean  $bArray
      * 
-     * @return objet
+     * @return object
      * 
      */
-    public function getQuery($query, $bArray=false)
+    public function getReponse($params, $bArray=false)
     {
     		$this->trace("DEBUT ".__METHOD__);
-		$params = array(
-			  'query' => $query,
-			  'limit' => 10,
-			  'indent' => TRUE,
-			  'languages' => $this->langue,
-			  'key' => KEY_GOOGLE_SERVER);
 		$url = $this->service_url . '?' . http_build_query($params);
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -61,6 +55,48 @@ class Flux_Gknowledgegraph extends Flux_Site{
 	
 	    	$this->trace("FIN ".__METHOD__);
 		return $response;
+    }
+
+    /**
+     * Execute une recherche plein texte
+     *
+     * @param  string $query
+     * @param  boolean $bArray
+     *
+     * @return object
+     *
+     */
+    public function getQuery($query, $bArray=false)
+    {
+        $this->trace("DEBUT ".__METHOD__);
+        return $this->getReponse(array(
+            'query' => $query,
+            'limit' => 10,
+            'indent' => TRUE,
+            'languages' => $this->langue,
+            'key' => KEY_GOOGLE_SERVER),$bArray);
+    }
+
+    /**
+     * Recherche un identifiant
+     *
+     * @param  string   $id
+     * @param  boolean  $bArray
+     *
+     * @return object
+     *
+     */
+    public function getId($id, $bArray=false)
+    {
+        $this->trace("DEBUT ".__METHOD__);
+        // corrige l'id : kg:/m/02m0v = /m/02m0v
+        $id = substr($id, 3);
+        return $this->getReponse(array(
+            'ids' => $id,
+            'limit' => 10,
+            'indent' => TRUE,
+            'languages' => $this->langue,
+            'key' => KEY_GOOGLE_SERVER),$bArray);
     }
     
 }

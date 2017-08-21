@@ -125,7 +125,7 @@ function findAuteur(nom){
 	initFormAuteur()
 	itemSelect = false;
 	w2popup.lock("Veuillez patienter", true);
-	$.post(prefUrl+"flux/databnf?obj=term&term="+nom, null,
+	$.post(prefUrl+"flux/databnf?obj=term&idBase="+idBase+"&term="+nom, null,
 			 function(data){
 		 		//ne récupère que les personnes
 		 		dtAuteurFind = data.filter(function(d){
@@ -147,7 +147,7 @@ function findAuteurGoogle(nom){
 			if(data){
 		 		dtAuteurFind = data.itemListElement.filter(function(d){
 			 		var types = d.result["@type"].filter(function(t){
-			 			return t=="Person";
+			 			return t=="Person" || t=="Organization";
 			 			});
 			 		return types.length;
 			 		});
@@ -161,7 +161,7 @@ function selectAuteur(i){
 	//récupère la bio de l'auteur
 	//"http://data.bnf.fr/10945257"
 	var idBNF = dtAuteurFind[i].value.substring(19);
-	$.post(prefUrl+"flux/databnf?obj=bio&idBNF="+idBNF, null,
+	$.post(prefUrl+"flux/databnf?obj=bio&idBase="+idBase+"&idBNF="+idBNF, null,
 			 function(data){
 				setSelectAuteur(data);
 			 }, "json");	
@@ -173,7 +173,7 @@ function selectAuteurGoogle(i){
 	//var urlDbpedia = i.data.detailedDescription.url.replace("wikipedia.org/wiki", "dbpedia.org/data/")+".json";	
 	var res = i.data.detailedDescription.url.split("/");
 	res = res[res.length-1]; 
-	$.post(prefUrl+"flux/dbpedia?obj=bio&res="+res, null,
+	$.post(prefUrl+"flux/dbpedia?obj=bio&idBase="+idBase+"&res="+res, null,
 			 function(r){
 				//fusionne les données
 				if(!r.nom)r.nom = i.name;				
@@ -296,7 +296,7 @@ function chargeCrible(crible){
         					datas["Lieux"].push(d);
         				}
     				});
-    				w2alert(js.message);
+    				//w2alert(js.message);
        		},"json");		
 	
 }

@@ -69,7 +69,9 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
     	if($existe)$id = $this->existe($data);    			
     	if(!$id){
     		if(!isset($data["date_inscription"]))$data["date_inscription"]= new Zend_Db_Expr('NOW()');
-    	 	$id = $this->insert($data);
+    		if(!isset($data["maj"]))$data["maj"]= new Zend_Db_Expr('NOW()');
+    		if(!isset($data["ip_inscription"]) && isset($_SERVER['REMOTE_ADDR']))$data["ip_inscription"]= $_SERVER['REMOTE_ADDR'];
+    		$id = $this->insert($data);
     	 	$err = "";
     	}else{
     		$err = "le login existe déjà";

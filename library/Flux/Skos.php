@@ -26,7 +26,7 @@ class Flux_Skos extends Flux_Site{
     }
 
     /**
-     * Execute une resuète sur databnf
+     * Execute une requète sur le endpoint sparql
      *
      * @param  string $query
      *

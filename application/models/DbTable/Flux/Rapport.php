@@ -133,6 +133,32 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
 		}
 		return $nbSup;
     }
+
+    /**
+     * Recherche une entrée Flux_rapport avec la clef primaire spécifiée
+     * et supprime cette entrée.
+     *
+     * @param integer $id
+     *
+     * @return integer
+     */
+    public function removeTag($id)
+    {
+        //récupère les rapports en référence à ce doc
+        $nbSup = 0;
+        $where = '(src_id = '.$id.' AND src_obj = "tag") OR (dst_id = '.$id.' AND dst_obj = "tag") OR (pre_id = '.$id.' AND pre_obj = "tag")';
+        $sql = 'SELECT *
+		FROM flux_rapport
+		WHERE '.$where;
+        $stmt = $this->_db->query($sql);
+        $arr =  $stmt->fetchAll();
+        foreach ($arr as $r){
+            //supprime les rapports en lien avec le doc
+            $nbSup += $this->remove($r["rapport_id"]);
+        }
+        return $nbSup;
+    }
+    
     
     /**
      * Récupère toutes les entrées Flux_rapport avec certains critères

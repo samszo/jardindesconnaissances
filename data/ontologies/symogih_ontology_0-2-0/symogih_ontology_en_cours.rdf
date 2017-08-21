@@ -1,0 +1,842 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY symogih "http://symogih.org/ontology/" >
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY ontology "http://www.symogih.org/ontology/" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.w3.org/2002/07/owl"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:symogih="http://symogih.org/ontology/"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:ontology="http://www.symogih.org/ontology/">
+    <Ontology rdf:about="http://www.symogih.org/ontology">
+        <rdfs:comment xml:lang="en">This ontology is aimed at publishing in RDF format some of the relational data stored in the symogih.org project&apos;s collaborative platform: http://symogih.org.
+More generally, this generic data model allows to reformat and share historical data stemming from any structured data source</rdfs:comment>
+        <versionInfo xml:lang="en">Version 0.2.0 [09/10/2015]
+Author: Francesco Beretta (CNRS UMR5190 LARHRA)
+Licence: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</versionInfo>
+        <versionIRI rdf:resource="&ontology;0.2.0"/>
+    </Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.w3.org/2000/01/rdf-schema#label -->
+
+    <rdf:Description rdf:about="&rdfs;label">
+        <rdfs:domain rdf:resource="&owl;Thing"/>
+    </rdf:Description>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.symogih.org/ontology/associatesObject -->
+
+    <ObjectProperty rdf:about="&ontology;associatesObject">
+        <rdfs:comment xml:lang="fr">Associe l&apos;objet associé au rôle.</rdfs:comment>
+        <rdfs:range rdf:resource="&ontology;Object"/>
+        <rdfs:domain rdf:resource="&ontology;Role"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/associatesSourcingEntity -->
+
+    <ObjectProperty rdf:about="&ontology;associatesSourcingEntity">
+        <rdfs:domain rdf:resource="&ontology;Sourcing"/>
+        <rdfs:range rdf:resource="&ontology;SourcingEntity"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/associatesTarget -->
+
+    <ObjectProperty rdf:about="&ontology;associatesTarget">
+        <rdfs:comment>Associates a ReifiedAssociation to the object which is the ending point, the target of the association</rdfs:comment>
+        <rdfs:range rdf:resource="&ontology;Object"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/composes -->
+
+    <ObjectProperty rdf:about="&ontology;composes">
+        <rdfs:range rdf:resource="&ontology;KnowledgeUnitType"/>
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnitTypeComponent"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/dates -->
+
+    <ObjectProperty rdf:about="&ontology;dates">
+        <rdfs:domain rdf:resource="&ontology;Dating"/>
+        <rdfs:range rdf:resource="&ontology;KnowledgeUnit"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/hasDatingType -->
+
+    <ObjectProperty rdf:about="&ontology;hasDatingType"/>
+    
+
+
+    <!-- http://www.symogih.org/ontology/hasKnowledgeUnitType -->
+
+    <ObjectProperty rdf:about="&ontology;hasKnowledgeUnitType">
+        <rdfs:comment xml:lang="fr">Associe les unités de connaissance avec leur type.</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnit"/>
+        <rdfs:range rdf:resource="&ontology;KnowledgeUnitType"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/hasRoleType -->
+
+    <ObjectProperty rdf:about="&ontology;hasRoleType">
+        <rdfs:comment xml:lang="fr">Associe le Rôle à son type</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Role"/>
+        <rdfs:range rdf:resource="&ontology;RoleType"/>
+        <rdfs:subPropertyOf rdf:resource="&rdf;type"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/involves -->
+
+    <ObjectProperty rdf:about="&ontology;involves">
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnitTypeComponent"/>
+        <rdfs:range rdf:resource="&ontology;RoleType"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/isComponentOf -->
+
+    <ObjectProperty rdf:about="&ontology;isComponentOf">
+        <rdfs:comment xml:lang="fr">Ancienne dénomination v.0.1: belongsToKnowledgeUnit</rdfs:comment>
+        <rdfs:comment xml:lang="fr">Associe le rôle à l&apos;unité de connaissance à laquelle il appartient</rdfs:comment>
+        <rdfs:range rdf:resource="&ontology;KnowledgeUnit"/>
+        <rdfs:domain rdf:resource="&ontology;Role"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/qualifiesAssociatedObject -->
+
+    <ObjectProperty rdf:about="&ontology;qualifiesAssociatedObject">
+        <rdfs:comment>Associe un objet qui spécifie l&apos;objet associé</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Object"/>
+        <rdfs:range rdf:resource="&ontology;Role"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/qualifiesRole -->
+
+    <ObjectProperty rdf:about="&ontology;qualifiesRole">
+        <rdfs:comment>Associe un objet qui spécifie le rôle</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Object"/>
+        <rdfs:range rdf:resource="&ontology;Role"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/sources -->
+
+    <ObjectProperty rdf:about="&ontology;sources">
+        <rdfs:range rdf:resource="&ontology;SourcedEntity"/>
+        <rdfs:domain rdf:resource="&ontology;Sourcing"/>
+    </ObjectProperty>
+    
+
+
+    <!-- http://www.w3.org/1999/02/22-rdf-syntax-ns#type -->
+
+    <ObjectProperty rdf:about="&rdf;type"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.symogih.org/ontology/beginOrUniqueDate -->
+
+    <DatatypeProperty rdf:about="&ontology;beginOrUniqueDate">
+        <rdfs:comment>Renseigne la date de début ou unique</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnitLabel"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/beginYear -->
+
+    <DatatypeProperty rdf:about="&ontology;beginYear">
+        <rdfs:comment rdf:datatype="&rdfs;Literal">Renseigne l&apos;année de début </rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Object"/>
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </DatatypeProperty>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointProperties"/>
+        <members rdf:parseType="Collection">
+            <rdf:Description rdf:about="&ontology;beginYear"/>
+        </members>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.symogih.org/ontology/certaintyDate -->
+
+    <DatatypeProperty rdf:about="&ontology;certaintyDate">
+        <rdfs:domain rdf:resource="&ontology;Dating"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/certaintyHour -->
+
+    <DatatypeProperty rdf:about="&ontology;certaintyHour">
+        <rdfs:domain rdf:resource="&ontology;Dating"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/creationTimestamp -->
+
+    <DatatypeProperty rdf:about="&ontology;creationTimestamp">
+        <rdfs:comment xml:lang="fr">Date et heure de la création de l&apos;objet</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Entity"/>
+        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/creator -->
+
+    <DatatypeProperty rdf:about="&ontology;creator">
+        <rdfs:comment xml:lang="fr">Login BHP du créateur de l&apos;objet</rdfs:comment>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/datingLabelAccordingToSource -->
+
+    <DatatypeProperty rdf:about="&ontology;datingLabelAccordingToSource"/>
+    
+
+
+    <!-- http://www.symogih.org/ontology/description -->
+
+    <DatatypeProperty rdf:about="&ontology;description">
+        <rdfs:comment>Propriété générique associant un descriptif sous forme de texte</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain rdf:resource="&owl;Thing"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/endDate -->
+
+    <DatatypeProperty rdf:about="&ontology;endDate">
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnitLabel"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/endYear -->
+
+    <DatatypeProperty rdf:about="&ontology;endYear">
+        <rdfs:comment rdf:datatype="&rdfs;Literal">Renseigne l&apos;année de fin</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Object"/>
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/exact_reference -->
+
+    <DatatypeProperty rdf:about="&ontology;exact_reference">
+        <rdfs:domain rdf:resource="&ontology;Sourcing"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/exact_uri -->
+
+    <DatatypeProperty rdf:about="&ontology;exact_uri">
+        <rdfs:domain rdf:resource="&ontology;Sourcing"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/hasDatingTypeLabel -->
+
+    <DatatypeProperty rdf:about="&ontology;hasDatingTypeLabel"/>
+    
+
+
+    <!-- http://www.symogih.org/ontology/hasObjectType -->
+
+    <DatatypeProperty rdf:about="&ontology;hasObjectType">
+        <rdfs:comment xml:lang="en">Computed property</rdfs:comment>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/identificationCertainty -->
+
+    <DatatypeProperty rdf:about="&ontology;identificationCertainty">
+        <rdfs:comment xml:lang="fr">Degré de certitude de l&apos;identification de l&apos;objet associé : certain (1), probable(2),
+            incertain(3)</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Role"/>
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/knowledgeUnitLabel -->
+
+    <DatatypeProperty rdf:about="&ontology;knowledgeUnitLabel">
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnitLabel"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/knowledgeUnitStandardBeginDate -->
+
+    <DatatypeProperty rdf:about="&ontology;knowledgeUnitStandardBeginDate">
+        <rdfs:comment xml:lang="en">Computed property</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnit"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topDataProperty"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/knowledgeUnitStandardDate -->
+
+    <DatatypeProperty rdf:about="&ontology;knowledgeUnitStandardDate">
+        <rdfs:comment xml:lang="en">Computed property</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnit"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/knowledgeUnitStandardDateType -->
+
+    <DatatypeProperty rdf:about="&ontology;knowledgeUnitStandardDateType">
+        <rdfs:comment xml:lang="en">Computed property</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnit"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/knowledgeUnitStandardEndDate -->
+
+    <DatatypeProperty rdf:about="&ontology;knowledgeUnitStandardEndDate">
+        <rdfs:comment xml:lang="en">Computed property</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnit"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/knowledgeUnitStandardLabel -->
+
+    <DatatypeProperty rdf:about="&ontology;knowledgeUnitStandardLabel">
+        <rdfs:comment xml:lang="en">Computed property</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;KnowledgeUnit"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/lastModificationTimestamp -->
+
+    <DatatypeProperty rdf:about="&ontology;lastModificationTimestamp">
+        <rdfs:domain rdf:resource="&ontology;Entity"/>
+        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/numericValue -->
+
+    <DatatypeProperty rdf:about="&ontology;numericValue">
+        <rdfs:domain rdf:resource="&ontology;Role"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/objectStandardDate -->
+
+    <DatatypeProperty rdf:about="&ontology;objectStandardDate">
+        <rdfs:comment xml:lang="en">Computed property</rdfs:comment>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/objectStandardName -->
+
+    <DatatypeProperty rdf:about="&ontology;objectStandardName">
+        <rdfs:comment xml:lang="en">Computed property</rdfs:comment>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/objectType -->
+
+    <DatatypeProperty rdf:about="&ontology;objectType">
+        <rdfs:comment>Le type d&apos;objet de la BHP. Actuellement une chanite de caracères mais il faudrait transformer en association vers
+            l&apos;objet abstrait qui typer la classe d&apos;objets</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Object"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/roleObjectLabel -->
+
+    <DatatypeProperty rdf:about="&ontology;roleObjectLabel">
+        <rdfs:comment xml:lang="en">Computed property</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Role"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/roleObjectLabelAccordingToSource -->
+
+    <DatatypeProperty rdf:about="&ontology;roleObjectLabelAccordingToSource">
+        <rdfs:comment>Associe le nom de l&apos;objet tel qu&apos;il figure dans la source </rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Role"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/specifyAssociation -->
+
+    <DatatypeProperty rdf:about="&ontology;specifyAssociation">
+        <rdfs:comment>Gives a specification of the association reason</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.symogih.org/ontology/standardObjectLabel -->
+
+    <DatatypeProperty rdf:about="&ontology;standardObjectLabel">
+        <rdfs:comment>Standard name of the object</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;Object"/>
+        <rdfs:range rdf:resource="&rdfs;Literal"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.w3.org/2000/01/rdf-schema#label -->
+
+    <DatatypeProperty rdf:about="&rdfs;label">
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.w3.org/2003/01/geo/wgs84_pos#alt -->
+
+    <DatatypeProperty rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#alt">
+        <rdfs:comment xml:lang="fr">altitude (en mètres)</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;LocalizedObject"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.w3.org/2003/01/geo/wgs84_pos#lat -->
+
+    <DatatypeProperty rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#lat">
+        <rdfs:comment xml:lang="en">latitude (en degrés décimaux)</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;LocalizedObject"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- http://www.w3.org/2003/01/geo/wgs84_pos#long -->
+
+    <DatatypeProperty rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#long">
+        <rdfs:comment xml:lang="en">longitude (en degrès décimaux)</rdfs:comment>
+        <rdfs:domain rdf:resource="&ontology;LocalizedObject"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.symogih.org/ontology/AbstractObject -->
+
+    <Class rdf:about="&ontology;AbstractObject">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/Actor -->
+
+    <Class rdf:about="&ontology;Actor">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/Bibliography -->
+
+    <Class rdf:about="&ontology;Bibliography">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/CollectiveActor -->
+
+    <Class rdf:about="&ontology;CollectiveActor">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/Content -->
+
+    <Class rdf:about="&ontology;Content">
+        <rdfs:subClassOf rdf:resource="&ontology;KnowledgeUnit"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/ContentRole -->
+
+    <Class rdf:about="&ontology;ContentRole">
+        <rdfs:subClassOf rdf:resource="&ontology;Role"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/ContentType -->
+
+    <Class rdf:about="&ontology;ContentType">
+        <rdfs:subClassOf rdf:resource="&ontology;KnowledgeUnitType"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/Dating -->
+
+    <Class rdf:about="&ontology;Dating">
+        <rdfs:label xml:lang="en">Dating</rdfs:label>
+        <rdfs:label xml:lang="fr">Datation</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&ontology;SourcedEntity"/>
+        <rdfs:comment xml:lang="en">This entity records the action of providing one or more dates for a knowledge unit. The date of a knowledge unit can be unique, or extending over a period of time, or imprecise, etc. The reified association &apos;dating&apos; provides all the useful metadata of the dating process with the aim of coping with all different situations: date type, degree of certainty, etc.</rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/DigitalObject -->
+
+    <Class rdf:about="&ontology;DigitalObject">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/DocumentaryUnit -->
+
+    <Class rdf:about="&ontology;DocumentaryUnit">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/Entity -->
+
+    <Class rdf:about="&ontology;Entity"/>
+    
+
+
+    <!-- http://www.symogih.org/ontology/ImmovableConstruction -->
+
+    <Class rdf:about="&ontology;ImmovableConstruction">
+        <rdfs:subClassOf rdf:resource="&ontology;LocalizedObject"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/ImmovableConstructionConcreteForm -->
+
+    <Class rdf:about="&ontology;ImmovableConstructionConcreteForm">
+        <rdfs:subClassOf rdf:resource="&ontology;LocalizedObject"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/Information -->
+
+    <Class rdf:about="&ontology;Information">
+        <rdfs:subClassOf rdf:resource="&ontology;KnowledgeUnit"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/InformationRole -->
+
+    <Class rdf:about="&ontology;InformationRole">
+        <rdfs:subClassOf rdf:resource="&ontology;Role"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/InformationType -->
+
+    <Class rdf:about="&ontology;InformationType">
+        <rdfs:subClassOf rdf:resource="&ontology;KnowledgeUnitType"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/KnowledgeUnit -->
+
+    <Class rdf:about="&ontology;KnowledgeUnit">
+        <rdfs:subClassOf rdf:resource="&ontology;SourcedEntity"/>
+        <rdfs:comment xml:lang="en">This abstract class comprises all assertions of historians. It has two instantiated subclasses, Content and Informations.</rdfs:comment>
+        <rdfs:comment xml:lang="fr">Classe abstraite regroupe toutes les assertions des historiens. Elle comprend deux sous-classes instanciées: Contenu et Information.</rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/KnowledgeUnitElement -->
+
+    <Class rdf:about="&ontology;KnowledgeUnitElement">
+        <rdfs:subClassOf rdf:resource="&ontology;Entity"/>
+        <rdfs:comment xml:lang="en">This abstract class comprises the instantiated classes which compose a knowledge unit, i.e. the components of the assertions of a historian: the knowledge unit itself, the roles that associate the objects participating in the assertion, one or more datings, one or more labels, one or more sourcings, one (facultative) or more text properties (descriptions, complements, quotations, etc.).</rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/KnowledgeUnitLabel -->
+
+    <Class rdf:about="&ontology;KnowledgeUnitLabel">
+        <rdfs:subClassOf rdf:resource="&ontology;SourcedEntity"/>
+        <rdfs:comment xml:lang="en">Provides the assertions of the historian providing in form of a text the meaning of the knowledge unit.</rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/KnowledgeUnitTextProperty -->
+
+    <Class rdf:about="&ontology;KnowledgeUnitTextProperty">
+        <rdfs:subClassOf rdf:resource="&ontology;SourcedEntity"/>
+        <rdfs:comment xml:lang="en">Text properties are descriptions, complements, source quotations, etc. directly associated to the knowledge unit.</rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/KnowledgeUnitType -->
+
+    <Class rdf:about="&ontology;KnowledgeUnitType">
+        <rdfs:subClassOf rdf:resource="&ontology;KnowledgeUnitTypeElement"/>
+        <rdfs:comment xml:lang="fr">Les types d&apos;unités de conniassance, classe qui regroupe les TyIn et les TyCo. Les propriétés de cette classe
+            s&apos;appliques également à ses &quot;subclasses&quot; </rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/KnowledgeUnitTypeComponent -->
+
+    <Class rdf:about="&ontology;KnowledgeUnitTypeComponent">
+        <rdfs:subClassOf rdf:resource="&ontology;KnowledgeUnitTypeElement"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/KnowledgeUnitTypeElement -->
+
+    <Class rdf:about="&ontology;KnowledgeUnitTypeElement">
+        <rdfs:subClassOf rdf:resource="&ontology;Entity"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/LocalizedObject -->
+
+    <Class rdf:about="&ontology;LocalizedObject">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+        <rdfs:comment xml:lang="en">This abstract class comprises all classes of objects that can be located with geographic coordinates which are relatively stable in time (e.g. a castle but not a ship).</rdfs:comment>
+        <rdfs:comment xml:lang="fr">Classe qui regroupe les objets (i.e. classes d&apos;objets) susceptibles d&apos;être localisés avec des
+            coordonnées géographiques, bouning box et altitude</rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/MaterialObject -->
+
+    <Class rdf:about="&ontology;MaterialObject">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/NamedPlace -->
+
+    <Class rdf:about="&ontology;NamedPlace">
+        <rdfs:subClassOf rdf:resource="&ontology;LocalizedObject"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/NamedPlaceConcreteForm -->
+
+    <Class rdf:about="&ontology;NamedPlaceConcreteForm">
+        <rdfs:subClassOf rdf:resource="&ontology;LocalizedObject"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/Object -->
+
+    <Class rdf:about="&ontology;Object">
+        <rdfs:subClassOf rdf:resource="&ontology;Entity"/>
+        <rdfs:comment xml:lang="en">Abstract class comprising all kinds of objects. An object has the same meaning as an &quot;endurant&quot; in the Dolce ontology.</rdfs:comment>
+        <rdfs:comment xml:lang="fr">Classe abstraite qui regroupe tous les objets</rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/Role -->
+
+    <Class rdf:about="&ontology;Role">
+        <rdfs:subClassOf rdf:resource="&ontology;SourcedEntity"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/RoleType -->
+
+    <Class rdf:about="&ontology;RoleType">
+        <rdfs:subClassOf rdf:resource="&ontology;KnowledgeUnitTypeElement"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/SocialCharacteristic -->
+
+    <Class rdf:about="&ontology;SocialCharacteristic">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/SourcedEntity -->
+
+    <Class rdf:about="&ontology;SourcedEntity">
+        <rdfs:subClassOf rdf:resource="&ontology;KnowledgeUnitElement"/>
+        <rdfs:comment xml:lang="en">This abstract class comprises all elements of a knowledge unit that can be sourced, i.e. for whom one can provide a reference in a document or in literature.</rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/Sourcing -->
+
+    <Class rdf:about="&ontology;Sourcing">
+        <rdfs:subClassOf rdf:resource="&ontology;KnowledgeUnitElement"/>
+        <rdfs:comment xml:lang="en">Links a knowledge unit, and all of its elements, to the origin of the assertion, be it a handwritten document, a book or another knowledge unit. This reified association has properties that indicate the quality of the sourcing, the exact reference (pp., ff., url), etc.</rdfs:comment>
+    </Class>
+    
+
+
+    <!-- http://www.symogih.org/ontology/SourcingEntity -->
+
+    <Class rdf:about="&ontology;SourcingEntity">
+        <rdfs:subClassOf rdf:resource="&ontology;Object"/>
+    </Class>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#Thing -->
+
+    <rdf:Description rdf:about="&owl;Thing">
+        <rdfs:comment xml:lang="fr">Classe générale à laquelle sont associées les propriétés qui seront utilisées dans toutes les autres
+            classes</rdfs:comment>
+    </rdf:Description>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotations
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description rdf:about="&rdfs;label">
+        <rdfs:comment xml:lang="fr">Le nom de l&apos;objet</rdfs:comment>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.5.1) http://owlapi.sourceforge.net -->
+

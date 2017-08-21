@@ -197,6 +197,15 @@ class Flux_Dbpedia extends Flux_Site{
 				case "http://fr.dbpedia.org/property/décès":
 					$objResult->mort = $v->p->value;				
 					break;
+				case "http://www.w3.org/2003/01/geo/wgs84_pos#lat":
+				    $objResult->lat = $v->p->value;
+				    break;
+				case "http://www.w3.org/2003/01/geo/wgs84_pos#long":
+				    $objResult->lng = $v->p->value;
+				    break;
+				case "http://xmlns.com/foaf/0.1/homepage":
+				    $objResult->url = $v->p->value;
+				    break;				    
 				case "http://dbpedia.org/ontology/deathDate":
 					$date = new DateTime($v->p->value);
 					$objResult->mort = $date->format('Y-m-d');				
@@ -252,10 +261,12 @@ class Flux_Dbpedia extends Flux_Site{
 		
 		if(!$this->dbD) $this->dbD = new Model_DbTable_Flux_Doc();
 		if(!$this->dbT) $this->dbT = new Model_DbTable_Flux_Tag();
+		/*ancienne version
 		if(!$this->dbTD) $this->dbTD = new Model_DbTable_Flux_TagDoc();
 		if(!$this->dbED) $this->dbED = new Model_DbTable_Flux_ExiDoc();
 		if(!$this->dbET) $this->dbET = new Model_DbTable_Flux_ExiTag();
 		if(!$this->dbTT) $this->dbTT = new Model_DbTable_Flux_TagTag();
+		*/
 		
 		$links = $this->GetTagLinks($tag['code']);
 

@@ -53,16 +53,51 @@ class CartoController extends Zend_Controller_Action {
     		//création des objets de base de données sur la bonne base
     		$s = new Flux_Site($idBase);    		
     		$dbDoc = new Model_DbTable_Flux_Doc($s->db);    		
-    		$data = array("titre"=>$titre,"note"=>json_encode($feat));    		
+    		$data = array("titre"=>$titre);    		
     		if($this->_getParam('table')=="flux_doc" && $this->_getParam('col')=="doc_id" && $this->_getParam('val'))
     		    $data['parent']=$this->_getParam('val');
 
     		//ajouter les données dans la base
-    		$rs = $dbDoc->ajouter($data);
+    		$idDoc = $dbDoc->ajouter($data,false);
     		
-    		$arr["savelayer"] = array("reponse"=>json_encode($rs),"type"=>$type, "nb"=>$nb,"feat"=>$feat);
+    		//met à jour la propriété doc_id
+    		$feat[0]['properties']['doc_id']=$idDoc;
+    		$dbDoc->edit($idDoc, array("note"=>json_encode($feat)));
+    		
+    		//récupère les données
+    		$rs = $dbDoc->findBydoc_id($idDoc);
+    		
+    		$arr = array("rs"=>$rs);
     		$this->view->result = json_encode($arr);
     }
+    
+    public function updatelayerAction()
+    {
+        
+        //récupère les paramètre passer
+        $type = $this->_getParam('type');
+        $feat = $this->_getParam('features');
+        $titre = $this->_getParam('titre');
+        $nb = count($feat);
+        $idBase = $this->_getParam('idBase',$apikeys['db']['params']['dbname']);
+        
+        //création des objets de base de données sur la bonne base
+        $s = new Flux_Site($idBase);
+        $dbDoc = new Model_DbTable_Flux_Doc($s->db);
+        $data = array("titre"=>$titre,"note"=>json_encode($feat));
+        if($this->_getParam('table')=="flux_doc" && $this->_getParam('col')=="doc_id" && $this->_getParam('val'))
+            $data['parent']=$this->_getParam('val');
+            
+        //met à jour les données dans la base
+        $dbDoc->edit($this->_getParam('doc_id'), $data);
+        
+        //récupère les données
+        $rs = $dbDoc->findBydoc_id($this->_getParam('doc_id'));
+        
+        $arr = array("rs"=>$rs);
+        $this->view->result = json_encode($arr);
+    }
+    
     
     public function getlayerAction()
     {

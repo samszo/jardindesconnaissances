@@ -193,11 +193,11 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data, $url=null)
     {
-    	if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
-    	if($url)
-	        $this->update($data, 'flux_doc.url = "'. $url.'"');
-    	else        
-	        $this->update($data, 'flux_doc.doc_id = ' . $id);
+        	if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
+        	if($url)
+    	        $this->update($data, 'flux_doc.url = "'. $url.'"');
+        	else        
+    	        $this->update($data, 'flux_doc.doc_id = ' . $id);
     }
     
     /**

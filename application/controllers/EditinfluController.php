@@ -271,8 +271,8 @@ class EditinfluController extends Zend_Controller_Action {
 		    //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
 		    $this->ssUti->redir = "/editinflu";
 		    $this->ssUti->dbNom = $this->idBase;
-		    if($this->view->ajax)$this->_redirect('/auth/finsession');		    
-		    else $this->_redirect('/auth/login');
+		    if($this->view->ajax)$this->redirect('/auth/finsession');		    
+		    else $this->redirect('/auth/login');
 		}
 		    	
     }
