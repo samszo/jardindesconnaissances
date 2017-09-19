@@ -1,8 +1,8 @@
 SELECT 
-    d.doc_id,
-    d.url,
-    d.titre,
-    d.tronc,
+--    d.doc_id,
+--    d.url,
+--    d.titre,
+--    d.tronc,
     de.doc_id,
     de.url,
     de.titre,

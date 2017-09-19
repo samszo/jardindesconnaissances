@@ -35,28 +35,15 @@ class Flux_EditInflu extends Flux_Site{
     		//on récupère la racine des documents
 		$this->initDbTables();	    	
 		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
+		$this->initTags();
 		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
 		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
 		$this->idExiRoot = $this->dbE->ajouter(array("nom"=>__CLASS__));
 		$this->idGeo = $idGeo;
 		
+		
     }
 
-    /**
-     * Fonction pour initialiser les tables de la base de données
-     * 
-     */
-      function initDbTables(){
-    		//construction des objets
-		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-		if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
-		if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
-		if(!$this->dbR)$this->dbR = new Model_DbTable_Flux_Rapport($this->db);
-		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
-		if(!$this->dbA)$this->dbA = new Model_DbTable_flux_acti($this->db);
-		if(!$this->dbU)$this->dbU = new Model_DbTable_Flux_Uti($this->db);
-    	
-    }
     
     /**
      * Fonction pour initialiser les mots clefs
@@ -184,6 +171,12 @@ class Flux_EditInflu extends Flux_Site{
 			,"dst_id"=>$idActi,"dst_obj"=>"acti"
 			),false);
 			
+    		//vérifie la présence de données géographiques
+    		$idGeo = false;
+    		if(isset($data['lng'])){
+    		    $idGeo = $this->dbG->ajouter(array("lng"=>$data['lng'],"lat"=>$data['lat']));
+    		}
+    		
 		//nettoyage des paramètres
 		$idCrible = $data['idCrible'];		
 		$data = $this->cleanData($data);
@@ -191,7 +184,6 @@ class Flux_EditInflu extends Flux_Site{
 		
 		//enregistre l'acteur
 		$this->trace("data",$data);
-		if($data['nait'])unset($data['idCrible']);
 		
 		$arr = $this->dbE->ajouter($data,true,true);
 		//ajoute le(s) champ(s) pour le grid
@@ -210,6 +202,14 @@ class Flux_EditInflu extends Flux_Site{
 				,"pre_id"=>$idRapRep,"pre_obj"=>"rapport"
 				,"src_id"=>$arr["exi_id"],"dst_obj"=>"exi"
 				));
+		}
+		//enregistre le lien avec els données géographiques
+		if($idGeo){
+		    $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+		        ,"dst_id"=>$idGeo,"src_obj"=>"geo"
+		        ,"pre_id"=>$idRapRep,"pre_obj"=>"rapport"
+		        ,"src_id"=>$arr["exi_id"],"dst_obj"=>"exi"
+		    ));
 		}
 		
 		return $arr;    	
@@ -321,6 +321,11 @@ class Flux_EditInflu extends Flux_Site{
 	    	if(isset($data['data']))	$data['data'] = json_encode($data['data']);
     		unset($data['idCrible']);			
     		unset($data['recid']);			
+    		if(isset($data['parent']) && isset($data['code']) && !$data['parent'])$data['parent']=$this->idTagRameau;
+    		if(isset($data['nait']) && !$data['nait'])unset($data['nait']);
+    		if(isset($data['mort']) && !$data['mort'])unset($data['mort']);
+    		if($data['lat'])unset($data['lat']);
+    		if($data['lng'])unset($data['lng']);
     		
     		return $data;
     	}

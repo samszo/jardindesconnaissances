@@ -3,7 +3,8 @@ var pstyle = 'padding:3px;';
 var popMax = false; //pour gérer l'affichage plein écran de la carte
 var map, geocoder, markers = [];
 var objDetailId, objDetail; //pour gérer l'affichage des détails
-
+var sltActeur, htmlIframeVide = '<iframe id="idIf" src="'+prefUrl+'vide.html" height="100%" width="100%" />';
+var arrTypeLiens = ['homepage','bnf','viaf','sudoc','wikipedia','img','wikidata'];
 
 var colors =  d3.scale.ordinal()
 	.domain(["Acteur","Notion","Document"])
@@ -100,7 +101,7 @@ var gridGraph = {
         { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
         { field: 'titre', caption: 'Titre', editable: { type: 'text' }, size: '10%', sortable: true, resizable: true},
         //{ field: 'note', caption: 'Type', editable: { type: 'text' }, size: '10%', sortable: true, resizable: true},
-        //{ field: 'auteur', caption: 'Process', hidden:true, size: '100px', sortable: true, resizable: true},
+        //{ field: 'Acteur', caption: 'Process', hidden:true, size: '100px', sortable: true, resizable: true},
         //{ field: 'crible', caption: 'Process', hidden:true, size: '100px', sortable: true, resizable: true},
     ],
     records: rsGraphs,
@@ -160,14 +161,14 @@ var gridGraph = {
 }; 
 var gridActeur = {
     name: 'grid_acteur', 
-	header: 'Acteurs',		
+	header: 'Acteurs disponibles',		
 	show: {toolbar		: true,
 		toolbarReload   : false,
 		toolbarColumns  : false,
         	toolbarSearch   : true,
         	toolbarAdd      : true,
         	toolbarDelete   : true,
-        	toolbarSave		: true,
+        	toolbarSave		: false,
         	header			: true, 
         	columnHeaders	: true},
     columns: [      		  		           
@@ -179,17 +180,20 @@ var gridActeur = {
         { field: 'mort', caption: 'mort', size: '100px', sortable: true, resizable: true},
     ],
     onClick: function (event) {
-        var sltGraph = this.get(event.recid);
+        sltActeur = this.get(event.recid);
+        showDetailsActeur('#layout_layout_acteur_liste_panel_main');
     },
     onAdd: function(event) {
-		isUpdate = false;
-    		showRefActeur();
+        sltActeur = false;
+        showDetailsActeur('#layout_layout_acteur_liste_panel_main');
 	},
     toolbar: {
         items: [
             { id: 'ajout_reseau', type: 'button', caption: 'Ajouter au réseau', icon: 'fa-file' },
+            /*
             { id: 'find_bnf', type: 'button', caption: 'Trouver dans DataBNF', icon: 'fa-file-excel-o' },
             { id: 'find_google', type: 'button', caption: 'Trouver dans Google Knowledge Graph', icon: 'fa-google' }
+            */
         ],
         onClick: function (event) {
         		if(event.target == 'w2ui-add')return;
@@ -198,33 +202,30 @@ var gridActeur = {
         		if(!acteur){
         			w2alert("Veuillez sélectionner un acteur");
         			return;
-        		}
+        		}else acteur = acteur[0];
             if (event.target == 'ajout_reseau') {
             		rs.creaNode("Acteur",acteur.nom,acteur);
             }
-            if (event.target == 'find_bnf') {
+            if (event.target == 'find_bnf' || event.target == 'find_google') {
             		idUpdate = acteur.recid;
-            		showRefActeur(acteur.prenom+' '+acteur.nom);
-            }
-            if (event.target == 'find_google') {
-	        		idUpdate = acteur.recid;
-	        		showGoogleActeur(acteur.prenom+' '+acteur.nom);
-	        }
-            
+            		findRefActeur(acteur.prenom+' '+acteur.nom, event.target);
+            }            
         }
     },	
 }; 
 var formActeur = { 
-    header: 'Information sur l\'acteur',
+    header: 'Définition de l\'acteur',
     msgSaving  : 'Merci de patienter...',
     name: 'form_acteur',
     focus  : -1,
     fields: [
-        { name: 'nom', type: 'text', html: { caption: 'Nom' } },
-        { name: 'prenom', type: 'text', html: { caption: 'Prénom' } },
-        { name: 'nait', type: 'date', options:{format: 'yyyy-mm-dd'}, html: { caption: 'Date de naissance' } },
-        { name: 'mort', type: 'date', options:{format: 'yyyy-mm-dd'}, html: { caption: 'Date de mort' } },
-        { name: 'isni', type: 'text', html: { caption: 'ISNI' } },
+        { name: 'nom', type: 'text', html: { caption: 'Nom'}},
+        { name: 'prenom', type: 'text', html: { caption: 'Prénom'}},
+        { name: 'nait', type: 'date', options:{format: 'yyyy-mm-dd'}, html: { caption: 'Date de naissance'} },
+        { name: 'mort', type: 'date', options:{format: 'yyyy-mm-dd'}, html: { caption: 'Date de mort' }},
+        //{ name: 'isni', type: 'text', html: { caption: 'ISNI' }},
+        //{ name: 'viaf', type: 'text', html: { caption: 'VIAF' }},
+        //{ name: 'url', type: 'text', html: { caption: 'Site Web' }},
         //{ name: 'profession', type: 'text', html: { caption: 'Profession' } },
         //{ name: 'specialite', type: 'text', html: { caption: 'Spécialité' } },
         //{ name: 'fonction', type: 'text', html: { caption: 'Fonction' } },
@@ -277,46 +278,103 @@ var tbActeur = {
         { type: 'html',  id: 'ipNom',
             html: '<div style="padding: 3px 10px;">'+
                   ' Nom de l\'acteur:'+
-                  '    <input id="tb_acteur_ip" size="100" style="padding: 3px; border-radius: 2px; border: 1px solid silver"/>'+
+                  '    <input id="tb_acteur_nom" size="80px" style="padding: 3px; border-radius: 2px; border: 1px solid silver"/>'+
                   '</div>' 
         },
-        { type: 'button',  id: 'btnGetBio',  caption: 'DataBNF', icon: 'fa-search' },
-        { type: 'button',  id: 'btnGetGoogle',  caption: 'Google KG', icon: 'fa-google' },
+        { type: 'button',  id: 'btnGetBio',  caption: 'chercher', icon: 'fa-search' },
+        { type: 'button',  id: 'btnAjoutLod',  caption: 'ajouter', icon: 'fa-plus' }
     ],
     onClick: function (event) {
 		if(event.target=="btnGetBio"){
 			itemSelect = false;
-			findAuteur($('#tb_acteur_ip')[0].value);			
+			if(w2ui['tabsLinkDataActeur'].active=='tabKG')
+				findActeurGoogle($('#tb_acteur_nom')[0].value);			
+			if(w2ui['tabsLinkDataActeur'].active=='tabBNF')
+				findActeur($('#tb_acteur_nom')[0].value);			
 		}
-		if(event.target=="btnGetGoogle"){
-			itemSelect = false;
-			findAuteurGoogle($('#tb_acteur_ip')[0].value);			
+		if(event.target=="btnAjoutLod"){
+			if(w2ui['tabsLinkDataActeur'].active=='tabKG')
+				ajoutActeurGoogle();			
+			if(w2ui['tabsLinkDataActeur'].active=='tabBNF')
+				findActeur($('#tb_acteur_nom')[0].value);			
 		}
     },
 	onRender: function(event) {
 		event.onComplete = function () {
-		    document.getElementById("tb_acteur_ip").focus();		            			        			
+		    //document.getElementById("tb_acteur_nom").focus();		            			        			
 	    }		        
 	},
 
 };
+var lyActeurListe = {
+        name: 'layout_acteur_liste',
+        panels: [
+            { type: 'left', size:"40%", style: pstyle, content: '',resizable: true },
+            { type: 'main', size:"60%", style: pstyle, content: '', title:'détails sur l\'acteur',resizable: true },
+        ],
+    };
 var lyActeur = {
         name: 'layout_acteur',
         panels: [
-            { type: 'top', size: 50, style: pstyle, content: '',resizable: true },
-            { type: 'left', size:"400px", style: pstyle, content: '',resizable: true },
-            { type: 'main', size:"60%", style: pstyle, content: '',resizable: true },
-            { type: 'bottom', size: "40%", style: pstyle, content: '',resizable: true }
+            //{ type: 'top', size: 50, style: pstyle, content: '',resizable: true },
+            { type: 'left', size:"300px", style: pstyle, content: '',resizable: true },
+            { type: 'main', size:"30%", style: pstyle, content: '', resizable: true },
+            { type: 'right', size:"40%", title:"Détail du lien",  style: pstyle, content: htmlIframeVide.replace(/idIf/gi,'ifActeur'), resizable: true },
+            { type: 'bottom', size: "70%", title:"Données du Linked Open Data",  style: pstyle, content: '<div id="mainLOD" style="position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px;"><div id="tabsLOD" style="width: 100%; height: 29px;"></div><div id="contentLOD" style="width: 100%; height: 96%;"></div></div>',resizable: true }
         ],
     };
-var lyActeurBottom = {
-        name: 'layout_acteur_bottom',
+var lyActeurLOD = {
+        name: 'layout_acteur_lod',
         panels: [
+            { type: 'top', size:"50px", style: pstyle, content: '',resizable: true },
             { type: 'left', size:"400px", style: pstyle, content: '',resizable: true },
-            { type: 'main', size:"40%", style: pstyle, content: '<iframe id="ifActeur" src="'+prefUrl+'vide.html" height="100%" width="100%" />',resizable: true },
+            { type: 'main', size:"40%", style: pstyle, content: '',resizable: true },
+            { type: 'right', size:"40%", title:"Détail du lien", style: pstyle, content: htmlIframeVide.replace(/idIf/gi,'ifActeurLod'), resizable: true },
         ]
     };
-
+var tabsLinkDataActeur = {
+	    name: 'tabsLinkDataActeur',
+	    active: 'tabKG',
+	    tabs: [
+	        { id: 'tabKG',
+		        	text: function (item) {
+		            return 'Knowledge Graph';
+		        },
+	        },
+	        { id: 'tabBNF', 
+	            text: function (item) {
+	                return 'Data BNF';
+	            },
+	        },
+	        { id: 'tabISIDORE', 
+	            text: function (item) {
+	                return 'ISIDORE';
+	            },
+	        },
+	        { id: 'tabISTEX', 
+	            text: function (item) {
+	                return 'ISTEX';
+	            },
+	        }
+	    ],
+	    onClick: function (event) {
+	        $('#selected-tab').html(event.target);
+	        if (event.target == 'tabKG') {
+	        		if(sltActeur.data.kg){
+	        			showDetailsLOD(sltActeur.data.kg);
+	        		}else{
+	        			//affiche le moteur de recherche
+	        			showFindActeur(sltActeur.prenom+' '+sltActeur.nom, event.target);
+	        		}
+	        }
+	        if (event.target == 'tabBNF') {
+	        }
+	        if (event.target == 'tabISIDORE') {
+	        }
+	        if (event.target == 'tabISTEX') {
+	        }
+	    }
+	};
 var gridDoc = {
 	    name: 'grid_doc', 
 		header: 'Documents',		
@@ -694,14 +752,14 @@ var gridResultBNF = {
 				selectTag(event.recid);				
 				setSelectTag(itemSelect);
 			}
-			if(itemSelect.raw_category=="Person")selectAuteur(event.recid);
+			if(itemSelect.raw_category=="Person")selectActeur(event.recid);
 			if(itemSelect.raw_category=="Work" || itemSelect.raw_category=="Periodic"){
 				setSelectDoc(itemSelect);
 			}			
         }	    
 	};
-var gridResultBNFliens = {
-        name: 'grid_result_bnf_liens', 
+var gridLiens = {
+        name: 'grid_liens', 
 		header: 'Liens de références',		
         show: { 
 			header	: true,		
@@ -722,6 +780,28 @@ var gridResultBNFliens = {
         }	    
 	};
 
+var gridResultLiens = {
+        name: 'grid_result_liens', 
+		header: 'Liens de références',		
+        show: { 
+			header	: true,		
+            	footer	: true,
+        },		
+        columns: [                
+            { field: 'recid', hidden:true},
+            { field: 'value', caption: 'Lien', size: '80%',editable: { type: 'text' } },
+            { field: 'type', caption: 'Type', size: '20%',editable: { type: 'text' } },
+        ],
+        sort: [
+            { field: "value", direction: "ASC" },
+            { field: "type", direction: "ASC" }
+        ],        
+        onClick: function (event) {
+        		var item = this.get(event.recid);
+			$('#ifActeurLod').attr("src",item.value);            		
+        }	    
+	};
+
 var gridResultGoogleKG = {
         name: 'grid_result_googlekg', 
         recordHeight : 200,
@@ -731,19 +811,25 @@ var gridResultGoogleKG = {
             	footer	: true,
         },		
         columns: [                
-            { field: 'id', caption: 'ID', size: '100px' },
-            { field: 'name', caption: 'Nom', size: '200px'},
-            { field: 'desc', caption: 'Description', size: '200px'},
+            { field: 'id', caption: 'ID', size: '100px', hidden:true },
+            { field: 'name', caption: 'Nom', size: '100px'},
+            { field: 'type', caption: 'Type', size: '100px'},
+            { field: 'desc', caption: 'Description', size: '100%',
+                render: function (record) {
+                    return '<div style="width: 190px; margin: auto; height:180px;white-space: normal;" >' + record.desc + '</div>';
+                }},
+            /*
             { field: 'img', caption: 'Image', size: '200px',
                 render: function (record) {
                     return '<img height="200px" src="' + record.img + '" />';
                 }},
             { field: 'detail', caption: 'Détail', size: '20%'},
+             */
         ],
         onClick: function (event) {
 			if(itemSelect && itemSelect.recid == event.recid) return;
 			itemSelect = this.get(event.recid);
-			if(itemSelect.type=="Person")selectAuteurGoogle(itemSelect);
+			selectActeurGoogle(itemSelect);
         }	    
 	};
 
@@ -759,7 +845,7 @@ var gridResultGoogleBook = {
             { field: 'id', caption: 'ID', size: '100px' },
             { field: 'titre', caption: 'Titre', size: '200px'},
             { field: 'date', caption: 'Date', size: '200px'},
-            { field: 'auteurs', caption: 'Auteurs', size: '200px'},
+            { field: 'Acteurs', caption: 'Acteurs', size: '200px'},
             { field: 'img', caption: 'Image', size: '200px',
                 render: function (record) {
                     return '<img height="200px" src="' + record.img + '" />';
@@ -1020,8 +1106,7 @@ var tabsElem = {
         $('#selected-tab').html(event.target);
         if (event.target == 'tabActeur') {
             this.tooltipShow('tabDoc', null, true);
-	    	 	if(w2ui['grid_acteur'])w2ui['grid_acteur'].destroy();
-	    		$('#w2ui-popup #content').w2grid(gridActeur);
+            initListeActeurs();
         }
         if (event.target == 'tabDoc') {
             this.tooltipShow('tabDoc', null, true);
@@ -1049,6 +1134,27 @@ var tabsElem = {
 };
 
 
+
+function showFindActeur(cherche, src){
+	
+ 	if(w2ui['layout_acteur_find'])w2ui['layout_acteur_find'].destroy();
+ 	if(w2ui['tb_acteur'])w2ui['tb_acteur'].destroy();
+	w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurFind));            		            		
+
+ 	w2ui['layout_acteur_find'].content('top', $().w2toolbar(tbActeur));
+	$('#tb_acteur_nom').value = cherche;		
+
+	if(cherche && src=='find_bnf'){
+		findActeur(cherche);
+	}
+	if(cherche && src=='tabKG'){
+		findActeurGoogle(cherche);
+	}
+	
+}
+
+
+
 function showDetails(data, layout, place){
 	if(w2ui['grid_details'])w2ui['grid_details'].destroy();
 	w2ui[layout].content(place,$().w2grid(gridDetails));			            
@@ -1058,6 +1164,62 @@ function showDetails(data, layout, place){
 	    pushObjTypeValToGrid(data, g,"");
 	}	    			
 }
+
+function showDetailsActeur(dst){
+
+	if(w2ui['form_acteur'])w2ui['form_acteur'].destroy();
+	if(w2ui['tabsLinkDataActeur'])w2ui['tabsLinkDataActeur'].destroy();
+	if(w2ui['layout_acteur'])w2ui['layout_acteur'].destroy();
+	if(w2ui['grid_liens'])w2ui['grid_liens'].destroy();
+	
+	
+	//chargement du layout acteur dans la destination
+	$(dst).w2layout(lyActeur);
+	//chargement des liens
+	gridLiens.records=sltActeur.liens; 
+	w2ui['layout_acteur'].content('main', $().w2grid(gridLiens));
+	//chargement des tab
+	$('#tabsLOD').w2tabs(tabsLinkDataActeur);
+	//chargement du formulaire acteur
+	w2ui['layout_acteur'].content('left', $().w2form(formActeur));            		            		
+	if(sltActeur){		
+		showDetailsLOD(sltActeur.data.kg);
+		formActeur.record = sltActeur;		
+	}else{
+		showDetailsLOD();		
+	}
+	w2ui['form_acteur'].refresh();
+
+}
+
+
+
+function showDetailsLOD(dt){
+
+	//affiche le détail des données
+	if(w2ui['layout_acteur_lod'])w2ui['layout_acteur_lod'].destroy();
+	if(w2ui['tb_acteur'])w2ui['tb_acteur'].destroy();
+	if(w2ui['grid_result_liens'])w2ui['grid_result_liens'].destroy();	
+	
+	$('#contentLOD').w2layout(lyActeurLOD);	        			
+
+	//vérifie si on affiche le formulaire de recherche
+	if(!dt){
+		w2ui['layout_acteur_lod'].content('top', $().w2toolbar(tbActeur));		
+	}else{
+		w2ui['layout_acteur_lod'].content('top', '<div style="width: 100%;">Données enregistrées le '+dt.maj+'</div>');				
+		var html = '<div style="width: 100%;"><h1>'+dt.name+'</h1><img src="'+dt.img+'</img></div>';
+		w2ui['layout_acteur_lod'].content('left', html);		
+		gridResultLiens.records = dt.kg.liens;
+		w2ui['layout_acteur_lod'].content('main', $().w2grid(gridResultLiens));
+		w2ui['layout_acteur_lod'].content('right', htmlIframeVide.replace(/idIf/gi,'ifActeurLod'));			        					
+				
+	}	
+	
+}
+
+
+
 function pushObjTypeValToGrid(data, g, prefix){
     var name;
     for (name in data) {
@@ -1067,6 +1229,8 @@ function pushObjTypeValToGrid(data, g, prefix){
     			g.add({ recid:g.records.length+1, name:prefix+name, value:data[name]});               
     }			
 }
+
+
 
 function openPopupAjoutActeur(){
 	
@@ -1083,43 +1247,64 @@ function openPopupAjoutActeur(){
             event.onComplete = function () {
             		if(w2ui['tabsElem'])w2ui['tabsElem'].destroy();
             		$('#w2ui-popup #tabs').w2tabs(tabsElem);
-            		gridActeur.records=datas["Acteurs"];
-            	 	if(w2ui['grid_acteur'])w2ui['grid_acteur'].destroy();
-            		$('#w2ui-popup #content').w2grid(gridActeur);
+            		initListeActeurs();
                 	w2popup.max();
             };
         },
     });
 }	
 
-function showRefActeur(cherche){
+
+function initListeActeurs(){
+	gridActeur.records=datas["Acteurs"];
+		
+ 	if(w2ui['layout_acteur_liste'])w2ui['layout_acteur_liste'].destroy();
+ 	if(w2ui['grid_acteur'])w2ui['grid_acteur'].destroy();            	 	
+	$('#w2ui-popup #content').w2layout(lyActeurListe);
+	w2ui['layout_acteur_liste'].content('left', $().w2grid(gridActeur));            		            		
+	
+}
+
+/*
+function findRefActeur(cherche, type){
 	
  	if(w2ui['layout_acteur'])w2ui['layout_acteur'].destroy();
  	if(w2ui['form_acteur'])w2ui['form_acteur'].destroy();
  	if(w2ui['tb_acteur'])w2ui['tb_acteur'].destroy();
-    	$('#w2ui-popup #content').w2layout(lyActeur);            		
+ 	$('#w2ui-popup #content').w2layout(lyActeur);
     	w2ui['layout_acteur'].content('left', $().w2form(formActeur));            		            		
     	w2ui['layout_acteur'].content('top', $().w2toolbar(tbActeur));
-    	w2popup.max();
-	if(cherche){
-		findAuteur(cherche);
+	$('#tb_acteur_nom').value = cherche;		
+
+    	//w2popup.max();
+	if(cherche && type=='find_bnf'){
+		findActeur(cherche);
 	}
+	if(cherche && type=='find_google'){
+		findActeurGoogle(cherche);
+	}
+
 }
 
-function showGoogleActeur(cherche){
+
+function showRefActeur(cherche, type){
 	
  	if(w2ui['layout_acteur'])w2ui['layout_acteur'].destroy();
  	if(w2ui['form_acteur'])w2ui['form_acteur'].destroy();
  	if(w2ui['tb_acteur'])w2ui['tb_acteur'].destroy();
-    	$('#w2ui-popup #content').w2layout(lyActeur);            		
+    	$('#w2ui-popup #main').w2layout(lyActeur);            		
     	w2ui['layout_acteur'].content('left', $().w2form(formActeur));            		            		
     	w2ui['layout_acteur'].content('top', $().w2toolbar(tbActeur));
-    	w2popup.max();
-	if(cherche){
-		findAuteurGoogle(cherche);
+    	//w2popup.max();
+	if(cherche && type=='find_bnf'){
+		findActeur(cherche);
 	}
-}
+	if(cherche && type=='find_google'){
+		findActeurGoogle(cherche);
+	}
 
+}
+*/
 
 function openPopupAjoutDoc(){
 	
@@ -1243,75 +1428,135 @@ function openOverlaySpatioTempo(d){
     });
 }
 
-function setFindAuteur(){
-	if(dtAuteurFind.length==0)w2alert("Aucun acteur trouvé.");
+function setFindActeur(){
+	if(dtActeurFind.length==0)w2alert("Aucun acteur trouvé.");
 	//ajoute un recid
-	dtAuteurFind.forEach(function(d,i){
+	dtActeurFind.forEach(function(d,i){
 		d.recid = i;
 	});
 	//affiche les résultats
-	gridResultBNF.records = dtAuteurFind;
+	gridResultBNF.records = dtActeurFind;
  	if(w2ui['grid_result_bnf'])w2ui['grid_result_bnf'].destroy();	
 	w2ui['layout_acteur'].content('main', $().w2grid(gridResultBNF));
  	if(w2ui['layout_acteur_bottom'])w2ui['layout_acteur_bottom'].destroy();	
 	w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurBottom));            			
 }
 
-function setFindAuteurGoogle(){
-	if(dtAuteurFind.length==0)w2alert("Aucun acteur trouvé.");
+function showFindActeurGoogle(){
+	if(dtActeurFind.length==0)w2alert("Aucun acteur trouvé.");
 	//création du tableau des résultats
 	var dtGKG = [];
-	dtAuteurFind.forEach(function(d,i){
-		var r = {type:"Person",recid:i,id:d.result["@id"],name:d.result.name,desc:d.result.description,data:d.result,img:"",detail:""};
+	dtActeurFind.forEach(function(d,i){
+		var r = {type:d.result["@type"].join(', '),recid:i,id:d.result["@id"],name:d.result.name,url:d.result.url,data:d.result,img:"",detail:""};
 		if(d.result.image)r.img=d.result.image.contentUrl;
-		if(d.result.detailedDescription)r.detail=d.result.detailedDescription.articleBody;
+		if(d.result.detailedDescription)r.desc=d.result.detailedDescription.articleBody;
 		dtGKG.push(r);
 	});
 	
 	//affiche les résultats
 	gridResultGoogleKG.records = dtGKG;
  	if(w2ui['grid_result_googlekg'])w2ui['grid_result_googlekg'].destroy();	
-	w2ui['layout_acteur'].content('main', $().w2grid(gridResultGoogleKG));
- 	if(w2ui['layout_acteur_bottom'])w2ui['layout_acteur_bottom'].destroy();	
-	w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurBottom));            		
+ 	
+ 	//if(w2ui['layout_acteur_lod'])w2ui['layout_acteur_lod'].destroy();
+
+ 	w2ui['layout_acteur_lod'].content('left', $().w2grid(gridResultGoogleKG));		
+ 	w2ui['layout_acteur_lod'].content('main', '');		
+ 	w2ui['layout_acteur_lod'].content('right', htmlIframeVide.replace(/idIf/gi,'ifActeurLod'));		
+	
+	
+ 	//if(w2ui['layout_acteur_bottom'])w2ui['layout_acteur_bottom'].destroy();	
+	//w2ui['layout_acteur'].content('bottom', $().w2layout(lyActeurBottom));            		
 	
 }
 
-function initFormAuteur(){
-	idUpdate = false;
-    w2ui['form_acteur'].clear();
+function showSelectActeurGoogle(dt){
+	
+ 	if(w2ui['grid_result_liens'])w2ui['grid_result_liens'].destroy();	
+	gridResultLiens.records = dt.liens;
+	w2ui['layout_acteur_lod'].content('main', $().w2grid(gridResultLiens));		
+ 	w2ui['layout_acteur_lod'].content('right', htmlIframeVide.replace(/idIf/gi,'ifActeurLod'));	
+ 	if(sltActeur)sltActeur.data.kg = dt;
+ 	else sltActeur.data = {kg:dt};
+}
+
+function ajoutActeurGoogle(){
+	
+	//ajoute les liens de références s'il n'existe pas
+	sltActeur.data.kg.liens.forEach(function(d){
+		var inArr = jQuery.inArray(d.type, arrTypeLiens);
+		if(inArr > 0){
+			var recs = w2ui['grid_liens'].find({value: d.value});
+			//console.log(d);
+			if(!recs.length){
+				w2ui['grid_liens'].add(d);
+				sltActeur.data.liens.push(d);
+			}
+		}
+	});	
+	//met à jour le formulaire d'acteur
+	if(sltActeur.data.kg.nom)sltActeur.nom=sltActeur.data.kg.nom;
+	if(sltActeur.data.kg.prenom)sltActeur.prenom=sltActeur.data.kg.prenom;
+	if(sltActeur.data.kg.nait)sltActeur.nait=sltActeur.data.kg.nait;
+	if(sltActeur.data.kg.mort)sltActeur.mort=sltActeur.data.kg.mort;
+	w2ui['form_acteur'].record = sltActeur;		
+	w2ui['form_acteur'].refresh();
+	
 }
 
 
-function setSelectAuteur(dt){
+function openPopupDetailsActeur(d){
+	    	
+	idUpdate = false;
+	w2popup.open({
+        title   : "Information sur l'acteur",
+        showMax : true,
+        /*
+        buttons   : '<img class="imgButton" alt="Ajouter un acteur" onclick="openPopupAjoutActeur()" src="'+prefUrl+'img/document96.png">'+
+        '<img class="imgButton" alt="Ajouter un document" onclick="openPopupAjoutDoc()" src="'+prefUrl+'img/document107.png">'+
+        '<img class="imgButton" alt="Ajouter une notion" onclick="openPopupAjoutTag()" src="'+prefUrl+'img/document108.png">',
+        */
+        body    : '<div id="main" style="position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px;"></div>',
+        onOpen  : function (event) {
+            event.onComplete = function () {
+        			if(d){
+        			    sltActeur = d;
+        			    
+        			    showDetailsActeur('#w2ui-popup #main');
+
+                    	w2popup.max();
+
+            			//document.querySelector('#addActeur').innerHTML = "Modifier";	
+        			}else{
+            			document.querySelector('#nomActeur').value = d.desc;		
+            			document.querySelector('#addActeur').innerHTML = "Modifier";	
+        			}
+
+            	};
+        },
+    });	
+	
+    //w2ui['form_acteur'].clear();
+}
+
+/*
+function setSelectActeur(dt){
 	if(dt==null)
-		w2alert("Aucunne référence dans data.bnf.fr");
+		w2alert("Aucunne référence");
 	else{
         var g = w2ui['form_acteur'];
         g.clear();
 		g.record = dt;
 		g.refresh();
 		$('#ifActeur').attr("src",dt.idArk);            		
+		if(dt.idArk)$('#ifActeur').attr("src",dt.idArk);            		
 		
-		gridResultBNFliens.records = dt.data.liens;
-	 	if(w2ui['grid_result_bnf_liens'])w2ui['grid_result_bnf_liens'].destroy();	
-		w2ui['layout_acteur_bottom'].content('left', $().w2grid(gridResultBNFliens));
+		gridResultLiens.records = dt.data.liens;
+	 	if(w2ui['grid_result_liens'])w2ui['grid_result_liens'].destroy();	
+		w2ui['layout_acteur'].content('main', $().w2grid(gridResultLiens));
 		
 	}
 }
-
-function setSelectAuteurGoogle(dt){
-    var g = w2ui['form_acteur'];
-    g.clear();
-	g.record = dt;
-	g.refresh();
-	$('#ifActeur').attr("src",dt.idArk);            		
-	
-	gridResultBNFliens.records = dt.data.liens;
- 	if(w2ui['grid_result_bnf_liens'])w2ui['grid_result_bnf_liens'].destroy();	
-	w2ui['layout_acteur_bottom'].content('left', $().w2grid(gridResultBNFliens));
-}
-
+*/
 
 function showRefTag(cherche){
 	

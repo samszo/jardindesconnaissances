@@ -10,7 +10,7 @@ var itemSelect, idUpdate, linkSelect, stSelect, docSelect, docFragSelect;
 var dtOrigine, dtDoublons;
 var dtCrible = [];
 var dtGraph = [];
-var dtAuteurFind, dtTagFind, dtDocFind;
+var dtActeurFind, dtTagFind, dtDocFind;
 
 
 function finsession(js){
@@ -120,74 +120,92 @@ function editDoc(){
 		 		}					 		
 			 }, "json");
 }			
-function findAuteur(nom){
-	//supprime les résultats
-	initFormAuteur()
+function findActeur(nom){
 	itemSelect = false;
 	w2popup.lock("Veuillez patienter", true);
 	$.post(prefUrl+"flux/databnf?obj=term&idBase="+idBase+"&term="+nom, null,
 			 function(data){
 		 		//ne récupère que les personnes
-		 		dtAuteurFind = data.filter(function(d){
+		 		dtActeurFind = data.filter(function(d){
 			 		return d.raw_category=="Person";
 		 			});
-		 		setFindAuteur();
+		 		setFindActeur();
 		 	    w2popup.unlock();		 		
 			 }, "json");
 }
 
-function findAuteurGoogle(nom){
-	//supprime les résultats
-	initFormAuteur()
+function findActeurGoogle(nom){
 	w2popup.lock("Veuillez patienter", true);
 	$.post(prefUrl+"flux/googlekg?q="+nom, null,
 		 function(data){
 	 		//ne récupère que les personnes
-			dtAuteurFind = false;
+			dtActeurFind = false;
 			if(data){
-		 		dtAuteurFind = data.itemListElement.filter(function(d){
+		 		dtActeurFind = data.itemListElement.filter(function(d){
 			 		var types = d.result["@type"].filter(function(t){
 			 			return t=="Person" || t=="Organization";
 			 			});
 			 		return types.length;
 			 		});
 			}
-	 		setFindAuteurGoogle();
+			showFindActeurGoogle();
 	 	    w2popup.unlock();		 		
 		 }, "json");
 }
 
-function selectAuteur(i){
-	//récupère la bio de l'auteur
+function selectActeur(i){
+	//récupère la bio de l'Acteur
 	//"http://data.bnf.fr/10945257"
-	var idBNF = dtAuteurFind[i].value.substring(19);
+	var idBNF = dtActeurFind[i].value.substring(19);
 	$.post(prefUrl+"flux/databnf?obj=bio&idBase="+idBase+"&idBNF="+idBNF, null,
 			 function(data){
-				setSelectAuteur(data);
+				setSelectActeur(data);
 			 }, "json");	
 }
 
-function selectAuteurGoogle(i){
-	//récupère la bio de l'auteur
+function selectActeurGoogle(i){
+	//récupère la bio de l'Acteur
 	//via dbpedia
 	//var urlDbpedia = i.data.detailedDescription.url.replace("wikipedia.org/wiki", "dbpedia.org/data/")+".json";	
-	var res = i.data.detailedDescription.url.split("/");
-	res = res[res.length-1]; 
-	$.post(prefUrl+"flux/dbpedia?obj=bio&idBase="+idBase+"&res="+res, null,
-			 function(r){
-				//fusionne les données
-				if(!r.nom)r.nom = i.name;				
-				r.data.liens.push({"value":i.data.detailedDescription.url,"recid":r.data.liens.length+1,type:"kg"});
-				if(i.data.image)r.data.liens.push({"value":i.data.image.url,"recid":r.data.liens.length+1,type:"img"});
-			    r.data.kg = {"idKg":i.data['@id'],"data":i};
-				setSelectAuteurGoogle(r);
-			 }, "json");	
+	if(i.data.detailedDescription){
+		w2popup.lock("Veuillez patienter", true);
+		var res = i.data.detailedDescription.url.split("/");
+		res = res[res.length-1]; 
+		$.post(prefUrl+"flux/dbpedia?obj=bio&idBase="+idBase+"&res="+res, null,
+				 function(r){
+					if(r.error){
+						w2popup.unlock();
+		  				w2alert("Une erreur s'est produite :<br/>"+r.error.message);
+					}
+					//fusionne les données
+					if(!r.nom)r.nom = i.name;				
+					//if(!r.url)r.url = i.data.detailedDescription.url;				
+					r.liens.push({"value":i.data.detailedDescription.url,"recid":r.liens.length+1,type:"wikipedia"});
+					if(i.data.image)r.liens.push({"value":i.data.image.url,"recid":r.liens.length+1,type:"img"});
+				    r.data = i;
+					showSelectActeurGoogle(r);
+			 	    w2popup.unlock();		 		
+				 }, "json")
+			  .fail(function(r) {
+			 	  w2popup.unlock();
+  				  w2alert("Une erreur s'est produite :<br/>"+r);
+			  });			
+	}else{
+		var r = {};
+		r.nom = i.name;				
+	    r.kg = i;
+		if(i.data.image){
+			r.liens = [{"value":i.data.image.url,"recid":0,type:"img"}];
+		    r.kg.liens = r.liens;
+		}
+		showSelectActeurGoogle(r);
+	}
 }
 
 
 function findTag(code){
 	//supprime les résultats
-	//initFormAuteur()
+	//initFormActeur()
 	w2popup.lock("Veuillez patienter", true);
 	$.post(prefUrl+"flux/databnf?obj=term&term="+code, null,
 			 function(data){
@@ -212,7 +230,7 @@ function selectTag(i){
 
 function findDoc(code, type){
 	//supprime les résultats
-	//initFormAuteur()
+	//initFormActeur()
 	itemSelect = null;
 	w2popup.lock("Veuillez patienter", true);
 	if(type=='bnf'){
@@ -256,12 +274,20 @@ function chargeCrible(crible){
         		function(js){
     				finsession(js);
     		        d3.select("#titreCrible").text("Crible : "+sltCrible.titre);        
-    				//parse les data
+
+    				//initalise les documents
     				js.rs["docs"].forEach(function(d){
     					if(d.data)d.data = JSON.parse(d.data);
     				});
     				datas["Docs"]=js.rs["docs"];
+
+    				//initalise les acteurs    				
     				datas["Acteurs"] = js.rs["acteurs"];   				
+    				datas["Acteurs"].forEach(function(d){
+    					if(d.data)d.data = JSON.parse(d.data);   					
+    				});    				
+    				
+    				//initalise les notions    				
     				js.rs["notions"].forEach(function(d){
     					/*hiérarchie 3 niveaux
     					var p1 = d.parent1, p2 = d.parent2;

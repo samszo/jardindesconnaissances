@@ -80,7 +80,7 @@ class Flux_Eu extends Flux_Site{
      */
     public function setDossierObsLegi($idDossier)
     {    	
-    		$this->trace(__METHOD__." ".$s);
+        $this->trace(__METHOD__." ".$idDossier);
     	 
     		set_time_limit(0);
     		$this->initDbTables();
@@ -101,8 +101,9 @@ class Flux_Eu extends Flux_Site{
 	    	
 	    	//récupère le document
 	    $url = $this->uriBase."dossier/".$idDossier."?format=json";
-	    	$urlL = "http://localhost/jdc/data/eu/2103(INL).json";
-	    	$json = $this->getUrlBodyContent($urlL);
+	    $json = $this->getUrlBodyContent($url);
+	    //	$urlL = "http://localhost/jdc/data/eu/2103(INL).json";
+	    //	$json = $this->getUrlBodyContent($urlL);
 	    	$obj = json_decode($json);
 	    	
 	    	
@@ -150,7 +151,7 @@ class Flux_Eu extends Flux_Site{
 	    	foreach ($obj->activities as $a) {
 	    		$this->getActivite($a);
 	    	}
-	    		    	
+	    	//	    	
 	    	//enregistre les amendements
 	    	foreach ($obj->amendments as $a) {
 	    		$this->getAmendement($a);
@@ -161,6 +162,7 @@ class Flux_Eu extends Flux_Site{
 	    	foreach ($obj->votes as $v) {
 	    		$this->getVote($v);
 	    	}
+	    	//
 	}    
     
 	/**
@@ -369,15 +371,15 @@ class Flux_Eu extends Flux_Site{
     		//parcourt les documents
     		if(isset($a->docs)){
 	    		foreach ($a->docs as $d) {
-	    			$idRapD = $this->getDoc($d, 	$this->idDocDossier);
+	    			$idD = $this->getDoc($d, 	$this->idDocDossier);
 	    			//création des rapports entre
 	    			// pre = cette importation
 	    			// src = l'activité
-	    			// dst = la commission
+	    			// dst = le document
 	    			// valeur = la date
 	    			$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 	    					,"src_id"=>$idTagTA,"src_obj"=>"tag"
-	    					,"dst_id"=>$idRapD,"dst_obj"=>"rapport"
+	    			        ,"dst_id"=>$idD,"dst_obj"=>"doc"
 	    					,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
 	    					,"valeur"=>$a->date
 	    			));
@@ -395,9 +397,10 @@ class Flux_Eu extends Flux_Site{
     	 */
     	function getDoc($d, $parent=0){
     		$this->trace(__METHOD__." ".$d->title);
+    		if(!isset($d->type))$d->type='inconnu';
     		$data = array("titre"=>$d->title, "url"=>$d->url, "tronc"=>$d->type);
     		if($parent)$data["parent"]=$parent;
-    		if(isset($d->text))$data["note"]=$d->text;
+    		if(isset($d->text))$data["note"]=implode(".", $d->text);
 
     		$idDoc = $this->dbD->ajouter($data);
     		
@@ -462,7 +465,7 @@ class Flux_Eu extends Flux_Site{
 	    				,"src_id"=>$r[2],"src_obj"=>"rapport"
 	    				,"dst_id"=>$this->idTagRapAvis,"dst_obj"=>"tag"
 	    				,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
-	    				,"niveau"=>$idRapCR,"valeur"=>$c->date
+	    				,"niveau"=>$idRapCR //,"valeur"=>$c->date
 	    		));
 	    	}
     		return $idRapRap;

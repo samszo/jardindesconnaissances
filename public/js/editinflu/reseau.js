@@ -224,16 +224,7 @@ function reseau(config) {
   
   this.showInfos=function (d){
 		if(d.type=="Acteur"){
-			initFormAuteur();
-			if(d.dt){
-				setSelectAuteur(d.dt)
-    			document.querySelector('#addActeur').innerHTML = "Modifier";	
-			}else{
-    			document.querySelector('#nomActeur').value = d.desc;		
-    			document.querySelector('#addActeur').innerHTML = "Modifier";	
-			}
-			
-			this.dialogues.acteur.showModal();
+			openPopupDetailsActeur(d.dt);
 		}			
   }
 
@@ -342,6 +333,9 @@ function reseau(config) {
 	  var g = node.enter().append('svg:g')
 	  	.attr('class', 'node')
 	    .attr("id", function(d){
+	    		//formate les datas du noeud
+	    		d.dt = d.dt[0];
+	    		d.dt.data = JSON.parse(d.dt.data);
 	  		return "g"+d.id;
 	  		})
 	  	.call(node_drag);

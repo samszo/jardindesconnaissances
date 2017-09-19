@@ -21,7 +21,9 @@ class Flux_Dbpedia extends Flux_Site{
 	var $del;
 	var $lang = "fr";
 	var $formatResponse = "json";
-	var $searchUrl = 'http://fr.dbpedia.org/sparql?';
+	//attention fr est régulièrement en RAD
+	//var $searchUrl = 'http://fr.dbpedia.org/sparql?';
+	var $searchUrl = 'https://dbpedia.org/sparql?';
     const IDEXI = 1;
     
     /**
@@ -171,8 +173,10 @@ class Flux_Dbpedia extends Flux_Site{
     public function getBio($ressource)
     {	   	
 	   	$this->trace(__METHOD__." ".$ressource);
-    		//récupère les infos de data bnf
-	   	$query = "select * where {<http://fr.dbpedia.org/resource/".$ressource."> ?r ?p}";	   			   	
+    		//récupère les infos de fr.dbpedia
+	   	//$query = "select * where {<http://fr.dbpedia.org/resource/".$ressource."> ?r ?p}";
+	   	//récupère les infos de dbpedia.org
+	   	$query = "select * where {<http://dbpedia.org/resource/".$ressource."> ?r ?p}";
 	   	$this->trace($query);
 		$result = $this->query($query);
 	   	$this->trace($result);
@@ -185,7 +189,7 @@ class Flux_Dbpedia extends Flux_Site{
 	   		$this->trace($key,$v->r->value);
 			switch ($v->r->value) {
 				case "http://fr.dbpedia.org/property/bnf":
-					$liens[] = array("value"=>"http://data.bnf.fr/"+$v->p->value,"recid"=>count($liens)+1,"type"=>"bnf");				
+					$liens[] = array("value"=>"http://data.bnf.fr/".$v->p->value,"recid"=>count($liens)+1,"type"=>"bnf");				
 					break;
 				case "http://fr.dbpedia.org/property/naissance":
 					$objResult->nait = $v->p->value;				
@@ -204,6 +208,7 @@ class Flux_Dbpedia extends Flux_Site{
 				    $objResult->lng = $v->p->value;
 				    break;
 				case "http://xmlns.com/foaf/0.1/homepage":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"homepage");
 				    $objResult->url = $v->p->value;
 				    break;				    
 				case "http://dbpedia.org/ontology/deathDate":
@@ -211,20 +216,77 @@ class Flux_Dbpedia extends Flux_Site{
 					$objResult->mort = $date->format('Y-m-d');				
 					break;	
 				case "http://fr.dbpedia.org/property/sudoc":
-					$liens[] = array("value"=>"http://data.bnf.fr/"+$v->p->value,"recid"=>count($liens)+1,"type"=>"sudoc");														
+				    $liens[] = array("value"=>"http://www.sudoc.abes.fr//DB=2.1/SET=3/TTL=8/REL?PPN=0".$v->p->value."X","recid"=>count($liens)+1,"type"=>"sudoc");														
 					break;
 				case "http://fr.dbpedia.org/property/viaf":
-					$liens[] = array("value"=>"http://viaf.org/viaf/"+$v->p->value,"recid"=>count($liens)+1,"type"=>"viaf");																								
+					$liens[] = array("value"=>"http://viaf.org/viaf/".$v->p->value,"recid"=>count($liens)+1,"type"=>"viaf");																								
 					break;
 				case "http://xmlns.com/foaf/0.1/depiction":
 					$liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"img");																								
 					break;
 				case "http://dbpedia.org/ontology/wikiPageWikiLink":	
-					$liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"wiki");																								
+					$liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"WikiLink");																								
 					break;
+				case "http://dbpedia.org/ontology/wikiPageExternalLink":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"ExternalLink");
+				    break;
+				case "http://purl.org/dc/terms/subject":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"subject");
+				    break;
+				case "http://dbpedia.org/ontology/influenced":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"à influencé");
+				    break;
+				case "http://dbpedia.org/ontology/influencedBy":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"influencé par");
+				    break;
+				case "http://www.w3.org/1999/02/22-rdf-syntax-ns#type":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"type");
+				    break;				    
+				case "http://dbpedia.org/ontology/abstract":
+				    if($v->p->{'xml:lang'}=="fr")$objResult->abstract = $v->p->value;
+				    break;
+				case "http://fr.dbpedia.org/property/activit%C3%A9sAutres":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"activité");
+				    break;
+				case "http://dbpedia.org/ontology/birthPlace":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"lieu naissance");
+				    break;
+				case "http://xmlns.com/foaf/0.1/givenName":
+				    $objResult->prenom = $v->p->value;
+				    break;				    
+				case "http://xmlns.com/foaf/0.1/surname":
+				    $objResult->nom = $v->p->value;
+				    break;
+				case "http://dbpedia.org/ontology/thumbnail":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"img");
+				    break;
+				case "http://www.w3.org/2002/07/owl#sameAs":
+				    $p = strrpos($v->p->value, "www.wikidata.org/entity/");
+				    if($p)
+				        $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"wikidata");
+				    $p = strrpos($v->p->value, "viaf.org/viaf/");
+				    if($p)
+			            $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"viaf");
+				    break;
+				case "http://dbpedia.org/ontology/philosophicalSchool":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"école philosophique");
+				    break;
+				case "http://dbpedia.org/property/institutions":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"institutions");
+				    break;
+				case "http://dbpedia.org/property/awards":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"récompenses");
+				    break;
+				case "http://dbpedia.org/ontology/notableIdea":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"idée importante");
+				    break;				  
+				case "http://dbpedia.org/property/almaMater":
+				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"almaMater");
+				    break;
+				    
 			}
 		}	
-		$objResult->data->liens = $liens;
+		$objResult->liens = $liens;
 		
 	   	$this->trace("result",$objResult);
 	   	$js = json_encode($objResult); 

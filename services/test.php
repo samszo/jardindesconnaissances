@@ -334,12 +334,12 @@ try {
 	//$zot->SaveRdf($_REQUEST);
 	*/
 	/* pour importer les flux Wikipedia
-	 */
+	//
 	$f = new Flux_Dbpedia();
 	//$f->SaveUserTagsLinks($user);
-	$rep = $f->getBio("Parlement_européen");
+	$rep = $f->getBio("Bruno_Latour");
 	$arr = $f->getRessourceObjet("http://fr.dbpedia.org/page/Loi_z_de_Fisher");	
-	//
+	*/
 	
 	//$d = new Model_DbTable_Flux_Doc();
 	//$d->remove(7641);
@@ -608,8 +608,10 @@ try {
 	$b = $rs->all('<http://dbpedia.org/ontology/abstract>');
 	*/
 	
-	//$eu = new Flux_Eu("flux_eu",true);
-	//$eu->setDossierObsLegi("2015/2103(INL)");
+	$eu = new Flux_Eu("flux_eu",true);
+	//éthique robotique $eu->setDossierObsLegi("2015/2103(INL)");
+	//marché objet connecté 
+	$eu->setDossierObsLegi("2012/0283(COD)");
 	
 	//$okapi = new Flux_Okapi(OKAPI_LOGIN,OKAPI_PWD,"flux_okapi",true);	
 	//$c = $okapi->connexion();
