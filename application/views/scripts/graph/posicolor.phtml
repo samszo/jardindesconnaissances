@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <title>Sequential scale interpolators</title>
+</head>
+
+  <style>
+    body { margin:0 auto;}
+    h1,h2,p {
+      margin:0px;
+    }
+    svg {
+	  margin-left:auto; margin-right:auto; display:block;
+    }
+    
+    .axis {
+	  font: 10px sans-serif;
+		}
+    
+    .axis path,
+	  .axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+    .tooltip {
+	  position: absolute;
+	  width: 300px;
+	  height: 35px;
+	  pointer-events: none;
+	}
+    
+  </style>
+</head>
+
+<body>
+  <div id='titresViz'>
+	  <h1 align="center"><?php echo $this->titre;?></h1>
+	  <h2 align="center"><?php echo $this->soustitre;?></h2>
+	  <h3 align="center" id="major">-</h3>
+	  <h4 align="center" id="minor">-</h4>
+  </div>
+  <svg width="1400" height="1000">
+  	<g id="wrapper" transform="translate(40, 40)">
+  	</g>
+  	<g id="dataviz" transform="translate(40, 40)">
+  	</g>
+  </svg>
+
+  <script src="../js/d3.v4.js"></script>
+  <script>
+var linearScale = d3.scaleLinear()
+	.domain([0, 1000])
+	.range([0, 1000]);
+
+var sequentialScale = d3.scaleSequential()
+	.domain([0, 1000]);
+
+var interpolators = [
+	'interpolateViridis',
+	'interpolateInferno',
+	'interpolateMagma',
+	'interpolatePlasma',
+	'interpolateWarm',
+	'interpolateCool',
+	'interpolateRainbow',
+	'interpolateCubehelixDefault'
+];
+
+var tooltip = d3.select("body").append("div")
+	.attr("class", "tooltip");
+var colorInit, hRec = 30, dataScale;
+
+var myData = d3.range(0, 1000, 1), urlData = '<?php echo $this->urlData;?>', refLbl = '<?php echo $this->refLbl;?>', refNb = '<?php echo $this->refNb;?>';
+
+
+if(urlData){
+	d3.csv(urlData, function(err, data){
+
+		//transformation des data
+		  var min=0, max=0;
+		  data.forEach(function(dt){
+			  dt[refNb] = parseInt(dt[refNb]);
+			  if(dt[refNb]<min)min=dt[refNb];
+			  if(dt[refNb]>max)max=dt[refNb];
+		  });
+		  
+		  //définition des échelles		  
+	      dataScale = d3.scaleLinear()
+        		.domain([min, max])
+		    	.range([0, 1000]);
+
+    	  	//création des conteneur graphique
+	      d3.select('#dataviz')
+          	.selectAll('g.dt')
+          	.data(data)
+          	.enter()
+          	.append('g')
+          	.classed('dt', true)
+            	.attr('transform', function(d, i) {
+            		return 'translate('+dataScale(d[refNb])+', -10)';
+            	})          	
+          	.each(ligneData);
+
+		
+		showColors();
+	});	
+}else{
+	showColors();
+}
+
+function ligneData(dt, i) {
+	var h = 600+(16*(i+1));
+	d3.select(this)
+		.append('text')
+		.attr('y', h)
+		.text(dt[refLbl]);
+
+	d3.select(this)
+		.append('rect')
+		.attr('width', 1)
+		.attr('height', h-16)
+		//.style('fill', sequentialScale(dataScale(dt[refNb])))
+		;
+}
+
+
+function dots(d) {
+	sequentialScale
+		.interpolator(d3[d]);
+
+	d3.select(this)
+		.append('text')
+		.attr('x', 1010)
+		.attr('y', hRec/2)
+		.text(d);
+
+	d3.select(this)
+		.selectAll('rect')
+		.data(myData)
+		.enter()
+		.append('rect')
+		.attr('x', function(d) {
+			return linearScale(d);
+		})
+		.attr('width', 1)
+		.attr('height', hRec)
+		.style('fill', function(d) {
+			return sequentialScale(d);
+		})
+	    .on('click', function(d){
+	    		colorInit = d3.select(this).style("fill");      
+		    	var mouse = d3.mouse(this);	
+		    	var dRef = linearScale.invert(mouse[0]);	    
+			if(urlData){
+	      		d3.select("#major").text(refNb+" = "+parseInt(dataScale.invert(mouse[0])));
+				d3.select("#minor").text(dRef+" = "+colorInit);
+			}else{			
+	      		d3.select("#major").text(dRef);
+				d3.select("#minor").text(colorInit);
+			}
+	    })
+	    .on('mouseover', function(d){
+	    		colorInit = d3.select(this).style("fill");      
+			tooltip.transition()
+               .duration(700)
+               .style("opacity", 1);
+	    })
+	    .on('mousemove', function(d){      
+			//console.log(d);
+		    	var mouse = d3.mouse(this);	
+		    	var dRef = linearScale.invert(mouse[0]);	    
+			//var k = d.key+'-'+dRef;
+			//var dt = refData[k];
+			var html="", topTT = (d3.event.pageY + (hRec/2) - mouse[1]);
+			if(urlData){
+				html = refNb+" = "+parseInt(dataScale.invert(mouse[0]))+"<br/>";
+				topTT += 14;
+			}			
+			
+			tooltip.html(html
+						+"Couleur = "+colorInit+"<br/>"
+						+"Nombre = "+dRef+"<br/>")
+	               .style("left", (d3.event.pageX) + "px")
+	               .style("top",  topTT + "px");
+	    })
+	    .on('mouseout', function(d){
+			tooltip.transition()
+	               .duration(500)
+	               .style("opacity", 0);
+		});
+}
+
+function showColors(){
+    d3.select('#wrapper')
+        	.selectAll('g.interpolator')
+        	.data(interpolators)
+        	.enter()
+        	.append('g')
+        	.classed('interpolator', true)
+        	.attr('transform', function(d, i) {
+        		return 'translate(0, ' + (i * 80) + ')';
+        	})
+        	.each(dots);
+}
+
+  </script>
+</body>
+</html>

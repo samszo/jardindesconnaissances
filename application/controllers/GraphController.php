@@ -322,6 +322,18 @@ class GraphController extends Zend_Controller_Action {
 		//$this->view->titre =  "Proverbe : "."من غضً طرفه أراح قلبه";
 		
     }
+    
+    public function posicolorAction(){
+        
+        $dt = '[]';
+        $this->view->data =  $this->_getParam('data', $dt);
+        $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2F..%2Fdata%2Fice%2FActeurChromecastNbIndividu.csv"));
+        $this->view->refNb = 'Nb individu';
+        $this->view->refLbl = 'Acteur';
+        $this->view->titre =  $this->_getParam('titre', "Positions en couleur");
+        
+    }
+    
         
     public function paralleleAction(){
     

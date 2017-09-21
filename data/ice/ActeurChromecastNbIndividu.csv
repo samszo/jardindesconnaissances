@@ -1,0 +1,12 @@
+Acteur,Nb individu,nœud,ancre
+ENEDIS,39000,https://fr.wikipedia.org/wiki/Enedis,
+Google,57100,http://dbpedia.org/resource/Google,http://dbpedia.org/ontology/numberOfEmployees
+SFR,14500,http://dbpedia.org/resource/SFR,http://dbpedia.org/ontology/numberOfEmployees
+Samsung,489000,http://dbpedia.org/resource/Samsung,http://dbpedia.org/ontology/numberOfEmployees
+Philips,105365,http://dbpedia.org/resource/Philips,http://dbpedia.org/ontology/numberOfEmployees
+Laboratoire Paragraphe,66,http://paragraphe.info/index.php/tous-les-membres,
+Parlement européen,594,https://github.com/samszo/jardindesconnaissances/blob/master/library/Flux/Eu.php#L81,
+Famille C-S,5,perso,
+Lucie,1,perso,
+Marina,1,perso,
+Samuel,1,perso,
