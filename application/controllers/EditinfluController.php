@@ -81,12 +81,15 @@ class EditinfluController extends Zend_Controller_Action {
 	    $ei = new Flux_EditInflu($this->view->idBase);
 	    $ei->bTrace = false;
 	    $ei->idGeo = 0;
+	    //echo 'post_max_size='.ini_get('post_max_size');
 	    
     		//récupère les paramètres
     		$params = $this->_request->getParams();
     		//$ei->trace("params",$params);
-    		$oName = $params['obj'];
+    		$oName = $this->_getParam('obj');
+    		$ei->trace("oName ".$oName);
     		$idUti = $this->_getParam('idUti', $this->ssUti->uti["uti_id"]);
+    		$ei->trace("idUti ".$idUti);
     		
     		//enlève les paramètres Zend
     		$params = $this->cleanParamZend($params);
@@ -125,7 +128,7 @@ class EditinfluController extends Zend_Controller_Action {
     {
 		$this->initInstance();
 	    $s = new Flux_Site($this->view->idBase);
-	    $s->bTrace = false;
+	    $s->bTrace = true;
 	    
     		//récupère les paramètres
     		$params = $this->_request->getParams();
@@ -137,6 +140,7 @@ class EditinfluController extends Zend_Controller_Action {
     		//et les paramètres de l'ajout
 		$id = $params['recid'];
     		unset($params['recid']);
+    		$s->trace("params clean",$params);
     		
     		//ajout suivant les cas	    
     		switch ($oName) {
@@ -151,6 +155,7 @@ class EditinfluController extends Zend_Controller_Action {
     				//initialise les objets
 		    		$s->dbE = new Model_DbTable_Flux_Exi($s->db);
 		    		//met à jour les données
+		    		if(isset($params['data']))$params['data'] = json_encode($params['data'],JSON_NUMERIC_CHECK);		    		
     				$this->view->rs = $s->dbE->edit($id, $params);
     				$this->view->message = "L'acteur est mis à jour"; 
     				break;
@@ -188,7 +193,13 @@ class EditinfluController extends Zend_Controller_Action {
     		
     		//ajout suivant les cas	    
     		switch ($oName) {
-    			case "crible":
+    		    case "acteur":
+    		        //initialise les objets
+    		        $s->dbE = new Model_DbTable_Flux_Exi($s->db);
+    		        $this->view->rs = $s->dbE->remove($params['id']);
+    		        $this->view->message = "L'acteur est supprimé.";
+    		        break;
+    		    case "crible":
     				//initialise les objets
 		    		$s->dbD = new Model_DbTable_Flux_Doc($s->db);
     				$this->view->rs = $s->dbD->remove($params['id']);
@@ -251,6 +262,12 @@ class EditinfluController extends Zend_Controller_Action {
     		$this->view->connect =  $this->_getParam('connect', 0);
     }	    
 
+    public function diagrammeAction()
+    {
+        $this->initInstance();
+        $this->view->connect =  $this->_getParam('connect', 0);
+    }
+    
     public function tritagAction()
     {
     	$this->initInstance();

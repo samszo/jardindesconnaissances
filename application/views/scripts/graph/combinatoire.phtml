@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Combinatoire</title>
+    <script type="text/javascript" src="../js/d3.v3.min.js"></script>
+    <script type="text/javascript" src="../js/combinatorics.js"></script>
+    
+    <style type="text/css">
+		.axis text {
+		    font: 10px sans-serif;
+		}
+		
+		.axis line, .axis path {
+		    fill: none;
+		    stroke: #000;
+		    shape-rendering: crispEdges;
+		}   
+		table {
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+    <div style="display:inline-block;" id="legend"></div>
+    <div style="display:inline-block; float:left; width:100%; height:600px; overflow:scroll;" id="container"></div>
+
+	<script>
+	//merci à https://github.com/dankogai/js-combinatorics
+    //cp = Combinatorics.cartesianProduct(['source', 'destination', 'prédicat'],['physique', 'acteur', 'concept', 'rapport']);
+    //cp = Combinatorics.combination(['physique', 'acteur', 'concept', 'rapport'], 3);
+    //cp = Combinatorics.permutationCombination(['physique', 'acteur', 'concept', 'rapport'],3);
+    //cp = Combinatorics.baseN(['physique', 'acteur', 'concept', 'rapport', 'vide'], 3);
+    cp = Combinatorics.power(['physique', 'acteur', 'concept', 'rapport']);
+        
+    var myData = cp.toArray();
+    var hLigne = 20;
+    var wColo = 100;
+
+	d3.select('#container')
+	.append('table')
+  	.selectAll('tr')
+  	.data(myData)
+  	.enter()
+  	.append('tr')
+  	/*
+  	.classed('ligne', true)
+    	.attr('transform', function(d, i) {
+    		return 'translate(0, '+((i+1)*hLigne)+')';
+    	})
+    	*/          	
+  	.each(ligneData);
+
+
+	function ligneData(dt, i) {
+		d3.select(this)
+        	.selectAll('td')
+        	.data(dt)
+        	.enter()
+	        	.append('td')
+	        	/*
+            	.attr('x', function(d, i) {
+            		return wColo*i;
+            	})
+            	.attr('y', function(d, i) {
+                		return 0;//hLigne*i;
+                	})
+             */
+            	.text(function(d, i) {
+            		return d;
+            	});
+	}
+    
+
+
+</script>
+</body>

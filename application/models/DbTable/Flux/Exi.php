@@ -24,8 +24,8 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     protected $_primary = 'exi_id';
 
     protected $_dependentTables = array(
-       "Model_DbTable_Flux_ExiTagDoc"
-       );
+        'Model_DbTable_Flux_Rapport'
+    );
     
     /**
      * Vérifie si une entrée Flux_Uti existe.
@@ -140,17 +140,20 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
      *
      * @param integer $id
      *
-     * @return void
+     * @return int
      */
     public function remove($id)
     {
 		//suppression des données lieés
         $dt = $this->getDependentTables();
-        foreach($dt as $t){
-        	$dbT = new $t($this->_db);
-	        $dbT->delete('uti_id = '.$id);
-        }            	
-	    	$this->delete('flux_exi.exi_id = '.$id);
+        $nbSup = 0;
+        foreach($this->_dependentTables as $t){
+            $tEnfs = new $t($this->_db);
+            $nbSup += $tEnfs->removeExi($id);
+        }
+        
+        $nbSup += $this->delete('flux_exi.exi_id = '.$id);
+        return $nbSup;
     }
     
     /**

@@ -153,6 +153,7 @@ function findActeurGoogle(nom){
 		 }, "json");
 }
 
+
 function selectActeur(i){
 	//récupère la bio de l'Acteur
 	//"http://data.bnf.fr/10945257"
@@ -200,6 +201,90 @@ function selectActeurGoogle(i){
 		}
 		showSelectActeurGoogle(r);
 	}
+}
+
+function saveActeur(data){
+	
+    data.obj = "acteur";
+    data.idCrible = sltCrible.recid;
+    var url = 'editinflu/ajout'
+    if(idUpdate){
+    		url = 'editinflu/edit';
+    		data.recid = idUpdate;
+		delete data.idCrible;			
+    }	        
+    
+    $.ajax({
+    		url: prefUrl+url,
+    		dataType: "json",
+    		data: data,
+    		method: 	"POST",
+        	error: function(error){
+        		w2alert("Erreur : "+error.responseText);
+        	},            	
+        	success: function(js) {
+				finsession(js);
+				if(js.rs.data)js.rs.data = JSON.parse(js.rs.data);   					
+
+				if(idUpdate){
+					//mise à jour de la data
+					datas["Acteurs"].forEach(function(d, i){
+						if(d.recid==js.rs.recid)datas["Acteurs"][i]=js.rs;
+					});
+					idUpdate = false;
+				}else{
+					datas["Acteurs"].push(js.rs);
+				}
+			    editGraph();
+    			openPopupAjoutActeur();
+        }
+	});	        
+		
+}
+
+function deleteActeur(id){
+	
+	var data = {"idBase":idBase,"obj":"acteur","id":id};	
+    var url = 'editinflu/delete'
+    
+    $.ajax({
+    		url: prefUrl+url,
+    		dataType: "json",
+    		data: data,
+    		method: 	"POST",
+        	error: function(error){
+        		console.log("Erreur : "+error.responseText);
+        	},            	
+        	success: function(js) {
+			finsession(js);
+	        sltActeur = false;
+	        showDetailsActeur('#layout_layout_acteur_liste_panel_main');
+        }
+	});	        
+		
+}
+
+function deleteActeurLOD(acteur, tab){
+	var k = tab.substring(3).toLowerCase();
+	delete acteur.data[k];
+	var data = {"idBase":idBase,"obj":"acteur","recid":acteur.recid,"data":acteur.data};	
+    var url = 'editinflu/edit'
+    
+    $.ajax({
+    		url: prefUrl+url,
+    		dataType: "json",
+    		data: data,
+    		method: 	"POST",
+        	error: function(error){
+        		console.log("Erreur : "+error.responseText);
+        	},            	
+        	success: function(js) {
+			finsession(js);
+	        sltActeur = false;
+	        showDetailsActeur('#layout_layout_acteur_liste_panel_main');
+        }
+	});	        
+		
 }
 
 

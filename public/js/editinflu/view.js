@@ -187,6 +187,11 @@ var gridActeur = {
         sltActeur = false;
         showDetailsActeur('#layout_layout_acteur_liste_panel_main');
 	},
+    onDelete: function (event) {
+		if(event.force){	
+			deleteActeur(sltActeur.recid);
+		}
+    },
     toolbar: {
         items: [
             { id: 'ajout_reseau', type: 'button', caption: 'Ajouter au réseau', icon: 'fa-file' },
@@ -238,37 +243,7 @@ var formActeur = {
 	        var errors = this.validate();
 	        if (errors.length > 0) return;
 	        var data = this.record;
-	        data.obj = "acteur";
-	        data.idCrible = sltCrible.recid;
-	        var url = 'editinflu/ajout'
-	        if(idUpdate){
-	        		url = 'editinflu/edit';
-	        		data.recid = idUpdate;
-	    			delete data.idCrible;			
-	        }	        
-	        
-	        $.ajax({
-	        		url: prefUrl+url,
-	        		dataType: "json",
-	        		data: data,
-	        		method: 	"POST",
-	            	error: function(error){
-	            		w2alert("Erreur : "+error.responseText);
-	            	},            	
-	            	success: function(js) {
-	    				finsession(js);
-	    				if(idUpdate){
-	    					//mise à jour de la data
-	    					datas["Acteurs"].forEach(function(d, i){
-	    						if(d.recid==js.rs.recid)datas["Acteurs"][i]=js.rs;
-	    					});
-	    				}else{
-	    					datas["Acteurs"].push(js.rs);
-	    				}
-	    			    editGraph();
-	        			openPopupAjoutActeur();
-	            }
-			});	        
+	        saveActeur(data);
 	    }
     }
 };
@@ -305,6 +280,24 @@ var tbActeur = {
 	    }		        
 	},
 
+};
+var tbLOD = {
+    name: 'tbLOD',
+    items: [
+        { type: 'button', id: 'update', text: 'Mettre à jour', icon: 'fa-repeat' },
+        { type: 'button', id: 'delete', text: 'Supprimer', icon: 'fa-trash' },
+    ],
+    onClick: function (event) {
+        switch (event.target) {
+            case 'update':
+	    			if(w2ui['tabsLinkDataActeur'].active=='tabKG')
+	    				updateActeurGoogle(sltActeur.data.kg.ressource);			
+                break;
+            case 'delete':
+            		deleteActeurLOD(sltActeur,w2ui['tabsLinkDataActeur'].active);
+                break;
+        }
+    }
 };
 var lyActeurListe = {
         name: 'layout_acteur_liste',
@@ -1175,19 +1168,26 @@ function showDetailsActeur(dst){
 	
 	//chargement du layout acteur dans la destination
 	$(dst).w2layout(lyActeur);
-	//chargement des liens
-	gridLiens.records=sltActeur.liens; 
-	w2ui['layout_acteur'].content('main', $().w2grid(gridLiens));
+
 	//chargement des tab
 	$('#tabsLOD').w2tabs(tabsLinkDataActeur);
-	//chargement du formulaire acteur
-	w2ui['layout_acteur'].content('left', $().w2form(formActeur));            		            		
+	
+	//affiche le détail
 	if(sltActeur){		
-		showDetailsLOD(sltActeur.data.kg);
+		//chargement des liens
+		gridLiens.records=sltActeur.data.liens; 
+		//chargement des onglets LOD
+		showDetailsLOD(sltActeur.data);
+		//charment du formulaire de l'acteur
 		formActeur.record = sltActeur;		
 	}else{
+		gridLiens.records=[]; 
+		formActeur.record = {};		
 		showDetailsLOD();		
 	}
+	//chargement des composant du layout
+	w2ui['layout_acteur'].content('main', $().w2grid(gridLiens));
+	w2ui['layout_acteur'].content('left', $().w2form(formActeur));            		            		
 	w2ui['form_acteur'].refresh();
 
 }
@@ -1200,20 +1200,36 @@ function showDetailsLOD(dt){
 	if(w2ui['layout_acteur_lod'])w2ui['layout_acteur_lod'].destroy();
 	if(w2ui['tb_acteur'])w2ui['tb_acteur'].destroy();
 	if(w2ui['grid_result_liens'])w2ui['grid_result_liens'].destroy();	
+	if(w2ui['tbLOD'])w2ui['tbLOD'].destroy();	
 	
 	$('#contentLOD').w2layout(lyActeurLOD);	        			
 
 	//vérifie si on affiche le formulaire de recherche
-	if(!dt){
-		w2ui['layout_acteur_lod'].content('top', $().w2toolbar(tbActeur));		
-	}else{
-		w2ui['layout_acteur_lod'].content('top', '<div style="width: 100%;">Données enregistrées le '+dt.maj+'</div>');				
-		var html = '<div style="width: 100%;"><h1>'+dt.name+'</h1><img src="'+dt.img+'</img></div>';
+	if(dt && dt.kg){
+		//chargement des boutons
+		w2ui['layout_acteur_lod'].content('top', $().w2toolbar(tbLOD));				
+		//récupère l'image
+		var img = "";
+		if(dt.kg.data.img)img='<img src="'+dt.kg.data.img+'" />';
+		else{
+			dt.kg.liens.forEach(function(d){
+				if(d.type=='img'){
+					img += '<img src="'+d.value+'" />';
+				}
+			})
+		}
+		//affiche les données knowledge graph		
+		var html = '<div style="width: 100%;">'
+			+'<h1>'+dt.kg.prenom+' '+dt.kg.nom+'</h1>'
+			+'<div style="width: 100%;"><h2>'+dt.kg.data.id+'</h2><h3>'+dt.kg.data.type+'</h3>'
+			+img+'<p>'+dt.kg.abstract+'</p></div>';
+			+'</div>';
 		w2ui['layout_acteur_lod'].content('left', html);		
 		gridResultLiens.records = dt.kg.liens;
 		w2ui['layout_acteur_lod'].content('main', $().w2grid(gridResultLiens));
-		w2ui['layout_acteur_lod'].content('right', htmlIframeVide.replace(/idIf/gi,'ifActeurLod'));			        					
-				
+		w2ui['layout_acteur_lod'].content('right', htmlIframeVide.replace(/idIf/gi,'ifActeurLod'));	
+	}else{
+		w2ui['layout_acteur_lod'].content('top', $().w2toolbar(tbActeur));		
 	}	
 	
 }
@@ -1475,13 +1491,14 @@ function showSelectActeurGoogle(dt){
 	gridResultLiens.records = dt.liens;
 	w2ui['layout_acteur_lod'].content('main', $().w2grid(gridResultLiens));		
  	w2ui['layout_acteur_lod'].content('right', htmlIframeVide.replace(/idIf/gi,'ifActeurLod'));	
- 	if(sltActeur)sltActeur.data.kg = dt;
- 	else sltActeur.data = {kg:dt};
+ 	if(sltActeur.data)sltActeur.data.kg = dt;
+ 	else sltActeur = {data:{kg:dt}};
 }
 
 function ajoutActeurGoogle(){
 	
 	//ajoute les liens de références s'il n'existe pas
+	if(!sltActeur.data.liens)sltActeur.data.liens=[];
 	sltActeur.data.kg.liens.forEach(function(d){
 		var inArr = jQuery.inArray(d.type, arrTypeLiens);
 		if(inArr > 0){
@@ -1493,6 +1510,8 @@ function ajoutActeurGoogle(){
 			}
 		}
 	});	
+	//on n'enregsitre pas les liens pour ne pas charger la base
+	sltActeur.data.kg.liens = [];
 	//met à jour le formulaire d'acteur
 	if(sltActeur.data.kg.nom)sltActeur.nom=sltActeur.data.kg.nom;
 	if(sltActeur.data.kg.prenom)sltActeur.prenom=sltActeur.data.kg.prenom;

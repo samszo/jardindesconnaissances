@@ -203,7 +203,7 @@ class Flux_EditInflu extends Flux_Site{
 				,"src_id"=>$arr["exi_id"],"dst_obj"=>"exi"
 				));
 		}
-		//enregistre le lien avec els données géographiques
+		//enregistre le lien avec les données géographiques
 		if($idGeo){
 		    $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 		        ,"dst_id"=>$idGeo,"src_obj"=>"geo"
@@ -211,8 +211,9 @@ class Flux_EditInflu extends Flux_Site{
 		        ,"src_id"=>$arr["exi_id"],"dst_obj"=>"exi"
 		    ));
 		}
-		
-		return $arr;    	
+		$r = $this->getExiById($arr["exi_id"]);
+		//print_r($r);
+		return $r[0];    	
     }
 
  	/**
@@ -390,7 +391,7 @@ class Flux_EditInflu extends Flux_Site{
     }    
 
     /**
-     * Fonction pour récupérer les acteurs
+     * Fonction pour récupérer les acteurs dans un crible
      *
      * @param	int		$idCrible
      * @return	array
@@ -399,7 +400,7 @@ class Flux_EditInflu extends Flux_Site{
     function getExiByCrible($idCrible){
 		if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
     	    $query = $this->dbE->select()
-			->from( array("e" => "flux_exi"), array("recid"=>"exi_id","nom","prenom","data","nait","mort"))                           
+    	    ->from( array("e" => "flux_exi"), array("recid"=>"exi_id","nom","prenom","data","nait","mort","maj"))                           
 	        		->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
 	            	->joinInner(array('r' => 'flux_rapport'),'r.dst_id = e.exi_id AND r.dst_obj="exi" 
 	            		AND r.pre_obj = "doc" AND r.pre_id = '.$idCrible,array())
@@ -408,7 +409,28 @@ class Flux_EditInflu extends Flux_Site{
 	            	
         return $this->dbD->fetchAll($query)->toArray(); 
     }    
-            
+         
+    
+    /**
+     * Fonction pour récupérer un acteur
+     *
+     * @param	int		$idExi
+     * @return	array
+     *
+     */
+    function getExiById($idExi){
+        if(!$this->dbE)$this->dbE = new Model_DbTable_Flux_Exi($this->db);
+        $query = $this->dbE->select()
+        ->distinct()
+        ->from( array("e" => "flux_exi"), array("recid"=>"exi_id","nom","prenom","data","nait","mort","maj"))
+        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        ->joinInner(array('r' => 'flux_rapport'),'r.dst_id = e.exi_id AND r.dst_obj="exi"
+	            		AND r.pre_obj = "doc" AND r.dst_id = '.$idExi,array())
+    		->joinInner(array('ru' => 'flux_rapport'),'ru.rapport_id = r.src_id',array())
+    		->joinInner(array('u' => 'flux_uti'),'u.uti_id = ru.src_id',array('uti_id',"login"));
+    		
+    		return $this->dbD->fetchAll($query)->toArray();
+    }    
     /**
      * Fonction pour récupérer les notions
      *
@@ -419,7 +441,7 @@ class Flux_EditInflu extends Flux_Site{
     function getTagByCrible($idCrible){
         if(!$this->dbT)$this->dbT = new Model_DbTable_Flux_Tag($this->db);
         $query = $this->dbT->select()
-        ->from( array("e" => "flux_exi"), array("recid"=>"exi_id","nom","prenom","data","nait","mort"))
+        ->from( array("e" => "flux_exi"), array("recid"=>"exi_id","nom","prenom","data","nait","mort","maj"))
         ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         ->joinInner(array('r' => 'flux_rapport'),'r.dst_id = e.exi_id AND r.dst_obj="exi"
 	            		AND r.pre_obj = "doc" AND r.pre_id = '.$idCrible,array())

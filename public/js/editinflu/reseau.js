@@ -334,9 +334,9 @@ function reseau(config) {
 	  	.attr('class', 'node')
 	    .attr("id", function(d){
 	    		//formate les datas du noeud
-	    		d.dt = d.dt[0];
-	    		d.dt.data = JSON.parse(d.dt.data);
-	  		return "g"+d.id;
+	    		//d.dt = d.dt[0];
+	    		//d.dt.data = JSON.parse(d.dt.data);
+	  		return "g"+d.dt.recid;
 	  		})
 	  	.call(node_drag);
 	  var r = 12;

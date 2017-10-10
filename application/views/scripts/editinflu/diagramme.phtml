@@ -1,0 +1,287 @@
+<?php
+if(!$this->ajax){
+	$prefUrl = "../";
+	echo '<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!--
+    
+      This program is a tool for visualizing small directed graphs.
+      Inspired by:
+        Force Dragging I
+        http://bl.ocks.org/mbostock/2675ff61ea5e063ede2b5d63c08020c7
+        Reactive Flow Diagram
+        http://bl.ocks.org/curran/5905182da50a4667dc00
+         
+      Curran Kelleher May 2016
+    -->
+
+    <meta name="viewport" content="width=device-width">
+
+    <title>Editeur de diagramme</title>
+	<script type="text/javascript">
+	    var prefUrl = "../";
+	  	var setAutoComplet = true;
+		var idBase = "'.$this->idBase.'";
+		var uti = '.$this->uti.';
+		var rsCribles = [];
+		var rsGraphs = [];		
+	</script>
+    <link rel="stylesheet" type="text/css" href="../css/w2ui.css" />
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+	<script type="text/javascript" src="../js/d3.v4.0.0-alpha.40.min.js"></script>
+
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/w2ui.js"></script>
+	<script type="text/javascript" src="../js/editinflu/flux.js"></script>
+
+    <style>
+      
+      .node-rect {
+        fill: white;
+        stroke: black;
+        stroke-width: 1.5;
+        cursor: move;
+      }
+      
+      .node-text {
+        font-family: "Roboto", sans-serif;
+        font-size: 2em;
+        text-anchor: middle;
+        alignment-baseline: middle;
+        pointer-events: none;
+        /* Disable text selection
+           from http://stackoverflow.com/questions/826782/css-rule-to-disable-text-selection-highlighting */
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none;   /* Chrome/Safari/Opera */
+        -khtml-user-select: none;    /* Konqueror */
+        -moz-user-select: none;      /* Firefox */
+        -ms-user-select: none;       /* Internet Explorer/Edge */
+        user-select: none;
+      }
+      
+      .link-line {
+        stroke: black;
+        stroke-width: 1.5;
+      }
+      
+      /* Set the arrowhead size. */
+      .arrow {
+        stroke-width: 1.5px;
+      }
+    </style>
+	
+  </head>
+  
+  <body >
+';
+}else{
+	$prefUrl = "";
+	echo '<script type="text/javascript">
+	</script>';	
+}
+?>
+    <script>
+      
+      var width = 960,
+          height = 500,
+          nodeSize = 20,
+          arrowWidth = 8,
+          svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+          linkG = svg.append("g")
+          nodeG = svg.append("g")
+          // Arrows are separate from link lines so that their size
+          // can be controlled independently from the link lines.
+          arrowG = svg.append("g");
+      
+      // Arrowhead setup.
+      // Draws from Mobile Patent Suits example:
+      // http://bl.ocks.org/mbostock/1153292
+      svg.append("defs")
+        .append("marker")
+          .attr("id", "arrow")
+          .attr("orient", "auto")
+          .attr("preserveAspectRatio", "none")
+          // See also http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
+          //.attr("viewBox", "0 -" + arrowWidth + " 10 " + (2 * arrowWidth))
+          .attr("viewBox", "0 -5 10 10")
+          // See also http://www.w3.org/TR/SVG/painting.html#MarkerElementRefXAttribute
+          .attr("refX", 10)
+          .attr("refY", 0)
+          .attr("markerWidth", 10)
+          .attr("markerHeight", arrowWidth)
+        .append("path")
+          .attr("d", "M0,-5L10,0L0,5");
+      
+      var simulation = d3.forceSimulation()
+        .force("link", d3.forceLink())
+        .force("charge", d3.forceManyBody())
+        .force("center", d3.forceCenter(width / 2, height / 2));
+      
+      simulation.force("link")
+        .distance(140);
+      
+      var drag = d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+      
+      function dragstarted(d) {
+        if (!d3.event.active) simulation.alphaTarget(0.3).restart()
+        simulation.fix(d);
+      }
+      
+      function dragged(d) {
+        simulation.fix(d, d3.event.x, d3.event.y);
+      }
+      
+      function dragended(d) {
+        if (!d3.event.active) simulation.alphaTarget(0);
+      }
+      
+      function render(graph){
+        
+        var link = linkG.selectAll("line").data(graph.links);
+        var linkEnter = link.enter().append("line")
+          .attr("class", "link-line");
+        link.exit().remove();
+        link = link.merge(linkEnter);
+        
+        var arrow = arrowG.selectAll("line").data(graph.links);
+        var arrowEnter = arrow.enter().append("line")
+          .attr("class", "arrow")
+          .attr("marker-end", "url(#arrow)" );
+        arrow.exit().remove();
+        arrow = arrow.merge(arrowEnter);
+        
+        var node = nodeG.selectAll("g").data(graph.nodes);
+        var nodeEnter = node.enter().append("g").call(drag);
+        node.exit().remove();
+        
+        nodeEnter.append("rect")
+            .attr("class", "node-rect")
+          .attr("y", -nodeSize)
+          .attr("height", nodeSize * 2)
+          .attr("rx", nodeSize)
+          .attr("ry", nodeSize)
+          .on("click", function (d){
+            simulation.unfix(d);
+          });
+        
+        nodeEnter.append("text")
+          .attr("class", "node-text");
+        
+        node = node.merge(nodeEnter);
+        
+        node.select(".node-text")
+          .text(function (d){ return d.name; })
+          .each(function (d) {
+          
+            var circleWidth = nodeSize * 2,
+                textLength = this.getComputedTextLength(),
+                textWidth = textLength + nodeSize;
+          
+            if(circleWidth > textWidth) {
+              d.isCircle = true;
+              d.rectX = -nodeSize;
+              d.rectWidth = circleWidth;
+            } else {
+              d.isCircle = false;
+              d.rectX = -(textLength + nodeSize) / 2;
+              d.rectWidth = textWidth;
+              d.textLength = textLength;
+            }
+          });
+        
+        node.select(".node-rect")
+          .attr("x", function(d) { return d.rectX; })
+          .attr("width", function(d) { return d.rectWidth; });
+        
+        simulation.force("link").links(graph.links);
+        
+        simulation.nodes(graph.nodes).on("tick", function (){
+          
+          graph.nodes.forEach(function (d) {
+            if(d.isCircle){
+              d.leftX = d.rightX = d.x;
+            } else {
+              d.leftX =  d.x - d.textLength / 2 + nodeSize / 2;
+              d.rightX = d.x + d.textLength / 2 - nodeSize / 2;
+            }
+          });
+          
+          link.call(edge);
+          arrow.call(edge);
+          
+          node.attr("transform", function(d) {      
+            return "translate(" + d.x + "," + d.y + ")";
+          });
+        });
+      }
+      
+      // Sets the (x1, y1, x2, y2) line properties for graph edges.
+      function edge(selection){
+        selection
+          .each(function (d) {
+            var sourceX, targetX, midX, dy, dy, angle;
+          
+            // This mess makes the arrows exactly perfect.
+            if( d.source.rightX < d.target.leftX ){
+              sourceX = d.source.rightX;
+              targetX = d.target.leftX;
+            } else if( d.target.rightX < d.source.leftX ){
+              targetX = d.target.rightX;
+              sourceX = d.source.leftX;
+            } else if (d.target.isCircle) {
+              targetX = sourceX = d.target.x;
+            } else if (d.source.isCircle) {
+              targetX = sourceX = d.source.x;
+            } else {
+              midX = (d.source.x + d.target.x) / 2;
+              if(midX > d.target.rightX){
+                midX = d.target.rightX;
+              } else if(midX > d.source.rightX){
+                midX = d.source.rightX;
+              } else if(midX < d.target.leftX){
+                midX = d.target.leftX;
+              } else if(midX < d.source.leftX){
+                midX = d.source.leftX;
+              }
+              targetX = sourceX = midX;
+            }
+          
+            dx = targetX - sourceX;
+            dy = d.target.y - d.source.y;
+            angle = Math.atan2(dx, dy);
+          
+            // Compute the line endpoint such that the arrow
+            // is touching the edge of the node rectangle perfectly.
+            d.sourceX = sourceX + Math.sin(angle) * nodeSize;
+            d.targetX = targetX - Math.sin(angle) * nodeSize;
+            d.sourceY = d.source.y + Math.cos(angle) * nodeSize;
+            d.targetY = d.target.y - Math.cos(angle) * nodeSize;
+          })
+          .attr("x1", function(d) { return d.sourceX; })
+          .attr("y1", function(d) { return d.sourceY; })
+          .attr("x2", function(d) { return d.targetX; })
+          .attr("y2", function(d) { return d.targetY; });
+      }
+      
+      var graph = {"nodes":["socks","shoes","shirt","belt","tie","jacket","pants","underpants"],"links":[{"source":0,"target":1},{"source":2,"target":3},{"source":2,"target":4},{"source":3,"target":5},{"source":4,"target":5},{"source":6,"target":1},{"source":6,"target":3},{"source":7,"target":6}]};
+      
+      graph.nodes = graph.nodes.map(function (d){
+        return { name: d };
+      });
+      graph.links = graph.links.map(function (d){
+        d.source = graph.nodes[d.source];
+        d.target = graph.nodes[d.target];
+        return d;
+      });
+      render(graph);
+    </script>
+  </body>
+</html>

@@ -64,7 +64,7 @@ class Flux_Flickr extends Flux_Site{
     	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
     	if(!$this->dbDT)$this->dbDT = new Model_DbTable_Flux_DocTypes($this->db);
     	if(!$this->dbUD)$this->dbUD = new Model_DbTable_flux_utidoc($this->db);
-    	if(!$this->dbG)$this->dbG = new Model_DbTable_Flux_Geos($this->db);
+    	if(!$this->dbG)$this->dbG = new Model_DbTable_Flux_Geo($this->db);
     	if(!$this->dbGUD)$this->dbGUD = new Model_DbTable_Flux_UtiGeoDoc($this->db);
     	
     	//création des données du document

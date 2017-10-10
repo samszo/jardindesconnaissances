@@ -459,22 +459,51 @@ try {
 	$s->trace($json);			
 	*/
 	
-	/*
+	//UTILISATION DE L'API VISION
 	$url = '1404571653141.jpg';
 	$url = 'http://gallica.bnf.fr/iiif/ark:/12148/bpt6k63191b/f508/806.7551430159441,842.9350218708103,1044.2048577376822,201.16030534351148/571,110/0/native.jpg';
 	$url = 'https://books.google.fr/books?id=VpNa9UckT24C&hl=fr&pg=PA22&img=1&zoom=3&sig=ACfU3U3WWrRLzXiX-8wX29Bl_d1LxQuLlw&w=1280';
 	$url = 'http://localhost/jdc/data/ocr/800px-LNP_OCR_ex1.png';
-	$fichier = 'image_test.jpeg';
+	$url = 'http://localhost/ValArNum/omk/files/original/8d4dc00ea8f602194c63ae9fa5e49a7f7a27cf46.jpg';
 	
+	
+	
+	/*exemple à creuser en utilisant composer...
+	$gC = new Google_Client();
+	$gC->setClientId(KEY_GOOGLE_CLIENT_ID);
+	$gC->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
+	$gC->setDeveloperKey(KEY_GOOGLE_SERVER);
+	
+	//merci à https://gist.github.com/shoma/e64d0ecb9d3aa0673114		
+	$gC->setScopes([Google_Service_Vision::CLOUD_PLATFORM]);
+	$service = new Google_Service_Vision($gC);
+	$body = new Google_Service_Vision_BatchAnnotateImagesRequest();
+	$feature = new Google_Service_Vision_Feature();
+	$feature->setType('FACE_DETECTION');
+	$feature->setMaxResults(100);
+	$src = new Google_Service_Vision_ImageSource();
+	$src->setGcsImageUri($url);
+	$image = new Google_Service_Vision_Image();
+	$image->setSource($src);
+	$payload = new Google_Service_Vision_AnnotateImageRequest();
+	$payload->setFeatures($features);
+	$payload->setImage($image);
+	$body->setRequests([$payload]);
+	$res = $service->images->annotate($body, $optParams);
+	*/
+	
+	
+	/*
+	$fichier = 'image_test.jpeg';	
 	$current = file_get_contents($url);
-	file_put_contents($fichier, $current);
-	
+	file_put_contents($fichier, $current);	
     $response = $s->getUrlBodyContent($url,false,false);
 	copy($url, $fichier);	
 	$s->trace("url de l'image = ".$url);			
 	$s->trace("<img src='".$fichier."'>");			
+	*/
 	
-	$im = file_get_contents($fichier);	
+	$im = file_get_contents($url);	
     $imdata = base64_encode($im); 
     $json = '{
 		 "requests": [
@@ -483,22 +512,25 @@ try {
 		        "content":"'.$imdata.'"
 		      },
 			  "features": [
-				{
-				  "type": "TEXT_DETECTION"
-				}
+				{"type": "FACE_DETECTION"}
+				,{"type": "LANDMARK_DETECTION"}
+				,{"type": "LABEL_DETECTION"}
+				,{"type": "TEXT_DETECTION"}
 			  ]		   
 		  }
 		 ]
 		}';
     //"type": "LANDMARK_DETECTION"
-    
+    //"type": "LABEL_DETECTION"
+    //"type": "TEXT_DETECTION"
+        
 	$s->trace("requête envoyée = ".$json);			
     
     $url = "https://vision.googleapis.com/v1/images:annotate?key=".KEY_GOOGLE_SERVER."&fields=responses";
     $response = $s->getUrlBodyContent($url,false,false,Zend_Http_Client::POST,array("value"=>$json, "type"=>'application/json'));//"Content-Type: application/json"
 	//$ curl -v -k -s -H "Content-Type: application/json" https://vision.googleapis.com/v1/images:annotate?key=browser_key --data-binary @request_filename
 	$s->trace("reponse de google = ".$response);			
-	*/
+	//
 	
 	/*
 	$bt = new BibTeX_Parser("../../cdnl-2015-prod/excode/bdd/shelf.bibtex");
@@ -608,10 +640,10 @@ try {
 	$b = $rs->all('<http://dbpedia.org/ontology/abstract>');
 	*/
 	
-	$eu = new Flux_Eu("flux_eu",true);
+	//$eu = new Flux_Eu("flux_eu",true);
 	//éthique robotique $eu->setDossierObsLegi("2015/2103(INL)");
 	//marché objet connecté 
-	$eu->setDossierObsLegi("2012/0283(COD)");
+	//$eu->setDossierObsLegi("2012/0283(COD)");
 	
 	//$okapi = new Flux_Okapi(OKAPI_LOGIN,OKAPI_PWD,"flux_okapi",true);	
 	//$c = $okapi->connexion();
@@ -631,7 +663,7 @@ try {
 	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";
 	//$an->sauveXmlEad($url);
 	//$an->setItemSetFromDocRoot(3);
-	$an->getCsvToOmeka(3, "/Library/WebServer/Documents/jdc/data/AN/testImportMin.csv");
+	$an->getCsvToOmeka(3, "/Library/WebServer/Documents/jdc/data/AN/testImportTot.csv");
 	*/
 	
 	/*

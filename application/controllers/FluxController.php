@@ -312,6 +312,10 @@ class FluxController extends Zend_Controller_Action {
     				); 
     				$this->view->content = $s->getUrlBodyContent($url,$param,false,Zend_Http_Client::POST);
     				break;
+    			case "analyseImage":
+    			    $g = new Flux_Gvision();
+    			    $this->view->content = $g->analyseImage($this->_getParam('q','http://localhost/ValArNum/omk/files/original/8d4dc00ea8f602194c63ae9fa5e49a7f7a27cf46.jpg'));
+    			    break;
     			case "trouveLivre":
 	    			$g = new Flux_Gbooks();
 	    			$arr = $g->findBooks($this->_getParam('q'));
@@ -324,6 +328,7 @@ class FluxController extends Zend_Controller_Action {
 				break;				
 			case "album":
 					//attention il faut rendre les albums public cf. https://casper.baghuis.nl/google-photos/Google-Photos-RSSerator.html
+					//IMPOSSIBLE DEPUIS Février 2017
 					$s = new Flux_Site();
 					$url = "http://photos.googleapis.com/data/feed/api/user/".$this->_getParam('userId')."/albumid/".$this->_getParam('albumId')."?alt=json";
 					$this->view->content =  $s->getUrlBodyContent($url);
@@ -512,6 +517,54 @@ class FluxController extends Zend_Controller_Action {
     
     }
     
+    public function iiifAction()
+    {
+        $iiif = new Flux_Iiif();
+        $iiif->bTrace=false;
+        $iiif->urlRoot = $this->_getParam('iif',"http://localhost/ValArNum/omk/iiif");
+        switch ($this->_getParam('q')) {
+            case "getOmkCollection":
+                $this->view->content = json_encode($iiif->getOmkCollection($this->_getParam('idCol',1572)));
+                break;
+            case "getCollectionFaces":
+                $g = new Flux_Gvision();                
+                $g->bTrace = false;
+                //récupère la collection
+                $arr = $iiif->getOmkCollection($this->_getParam('idCol',1572));
+                $i=1;
+                $rs[] = array("label"=>$col->label,"id"=>"root","value"=>"");
+                foreach ($arr as $t) {
+                    if ($t['id']!='root'){
+                        //récupère les données de google
+                        $data = json_decode($g->analyseImage($t['original']));
+                        //$g->trace("",$data);
+                        foreach ($data->responses[0]->faceAnnotations as $fa) {
+                            $g->trace("",$fa);
+                            //calcule la position de l'image
+                            $v = $fa->boundingPoly->vertices;
+                            //ajoute l'image à la collection
+                            $rs[] = array("id"=>"root.".$i,"value"=>"","label"=>"Fragment de ".$t['label'],"idOmk"=>$t['idOmk'],"imgOmk"=>$t['imgOmk']
+                                ,"original"=>$t['original']
+                                ,"imgFull"=>$t['imgOmk'].'/'.$v[0]->x.','.$v[0]->y.','.($v[1]->x - $v[0]->x).','.($v[2]->y - $v[0]->y).'/full/0/default.jpg'
+                                ,"width"=>($v[1]->x - $v[0]->x), "height"=> ($v[2]->y - $v[0]->y) );
+                            $i++;
+                        }
+                    }
+                }
+                if($this->_getParam('csv')){
+                    foreach ($rs as $v) {
+                        if ($v['id']!='root'){                            
+                            if(!$this->view->content)$this->view->content = 'id,src'.PHP_EOL;
+                            $this->view->content .= $v["id"].",".$v["imgFull"].PHP_EOL;
+                        }
+                    }
+                }else                       
+                    $this->view->content = json_encode($rs);
+                break;
+                
+        }
+        
+    }
     
 	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);

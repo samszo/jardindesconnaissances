@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>Gallerie dynamique de photos</title>
+    <style>
+    html, body{
+        width: 100%;
+        height: 100%;
+        padding: 0px;
+        margin: 0px;
+    }
+    #graph {
+        width: 100%;
+        height: 100%;
+        
+    }
+    .node {
+        position: absolute;
+        background-size:cover;
+    }
+    .curseur {
+        position: absolute;
+        width: 100px;
+        height: 100px;   
+        left: 100px;     
+        top: 100px;     
+    }
+    #curseurSelect {
+        font-size: 56px;
+    }
+    
+    </style>
+    
+    <script src="../js/d3.min.js"></script>    
+    <script src="../js/jquery.min.js"></script>    
+
+</head>
+
+<body>
+<div id="graph" ></div>    
+<div id="curseurPalette" class="curseur"></div>
+<div id="curseurSelect" class="curseur"></div>
+        
+    
+<script>
+	//merci beaucoup à https://bl.ocks.org/shimizu/79409cca5bcc57c32ddae0a5f0a1a564
+    "use strict"
+
+
+    var data = [
+        {id:"root",value:null},
+        {id:"root.1",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1569/340,600,150,400/600,1600/0/gray.png"},
+        {id:"root.2",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1563/full/full/0/gray.png"},
+        {id:"root.3",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1564/full/full/0/gray.png"},
+        {id:"root.4",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1562/full/full/0/gray.png"},
+        {id:"root.5",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1565/full/full/0/gray.png"},
+    ]
+	var q = '<?php echo $this->q; ?>';
+  	d3.json("../flux/iiif?q="+q+"&idCol=<?php echo $this->idCol; ?>",function(dataOmk) {
+ 		data=dataOmk;
+        if(q != 'getCollectionFaces')setInterval(draw, 8000);
+ 	    draw(); 	 		
+ 	}); 
+ 	        
+
+	/*
+	Chargement du curseur palette
+	*/
+	var curseurData = [
+	 {idG:'g4854',idText:'tspan3891',en:'ecstasy',fr:'extase',color:'#ffe854',value:0}
+  	/*
+  	,{id:'g4341',idText:'tspan4022',en:'disapproval',fr:'désapprobation',color:'#ffffff',value:0}
+  	,{id:'g4341',idText:'tspan4026',en:'remorse',fr:'remord',color:'#ffffff',value:0}
+  	,{id:'g4341',idText:'tspan4030',en:'contempt',fr:'mépris',color:'#ffffff',value:0}
+  	,{id:'g4341',idText:'tspan4034',en:'awe',fr:'crainte',color:'#ffffff',value:0}
+  	,{id:'g4341',idText:'tspan4038',en:'submission',fr:'soumission',color:'#ffffff',value:0}
+  	,{id:'g4341',idText:'tspan4042',en:'love',fr:'amour',color:'#ffffff',value:0}
+  	,{id:'g4341',idText:'tspan4046',en:'optimism',fr:'optimisme',color:'#ffffff',value:0}
+  	,{id:'g4341',idText:'tspan4050',en:'aggressiveness',fr:'aggressivité',color:'#ffffff',value:0}
+  	,{id:'g4341',idText:'tspan3007',en:'pensiveness',fr:'songerie',color:'#8c8cff',value:0}
+  	,{id:'g4341',idText:'tspan3836',en:'annoyance',fr:'gêne',color:'#ff8c8c',value:0}
+  	,{id:'g4341',idText:'tspan3840',en:'anger',fr:'colère',color:'#ff0000',value:0}
+  	,{id:'g4341',idText:'tspan3844',en:'rage',fr:'rage',color:'#d40000',value:0}
+  	,{id:'g4341',idText:'tspan3895',en:'joy',fr:'joie',color:'#ffff54',value:0}
+  	,{id:'g4346',idText:'tspan3899',en:'serenity',fr:'sérénité',color:'#ffffb1',value:0}
+  	,{id:'g4341',idText:'tspan3903',en:'terror',fr:'terreur',color:'#008000',value:0}
+  	,{id:'g4341',idText:'tspan3907',en:'fear',fr:'peur',color:'#009600',value:0}
+  	,{id:'g4341',idText:'tspan3911',en:'apprehension',fr:'appréhension',color:'#8cc68c',value:0}
+  	,{id:'g4341',idText:'tspan3915',en:'admiration',fr:'adoration',color:'#00b400',value:0}
+  	,{id:'g4341',idText:'tspan3919',en:'trust',fr:'confiance',color:'#54ff54',value:0}
+  	,{id:'g4341',idText:'tspan3923',en:'acceptance',fr:'résignation',color:'#8cff8c',value:0}
+  	,{id:'g4356',idText:'tspan3927',en:'vigilance',fr:'vigilance',color:'#ff7d00',value:0}
+  	,{id:'g4341',idText:'tspan3931',en:'anticipation',fr:'excitation',color:'#ffa854',value:0}
+  	,{id:'g4341',idText:'tspan3935',en:'interest',fr:'intérêt',color:'#ffc48c',value:0}
+  	,{id:'g4341',idText:'tspan3939',en:'boredom',fr:'ennui',color:'#ffc6ff',value:0}
+  	,{id:'g4341',idText:'tspan3943',en:'disgust',fr:'dégoût',color:'#ff54ff',value:0}
+  	,{id:'g4341',idText:'tspan3947',en:'loathing',fr:'aversion',color:'#de00de',value:0}
+  	,{id:'g4341',idText:'tspan3951',en:'amazement',fr:'stupéfaction',color:'#0089e0',value:0}
+  	,{id:'g4341',idText:'tspan3955',en:'surprise',fr:'surprise',color:'#59bdff',value:0}
+  	,{id:'g4341',idText:'tspan3959',en:'distraction',fr:'distraction',color:'#a5dbff',value:0}
+  	,{id:'g4341',idText:'tspan3828',en:'sadness',fr:'tristesse',color:'#5151ff',value:0}
+  	,{id:'g4341',idText:'tspan3832',en:'grief',fr:'chagrin',color:'#0000c8',value:0}
+  	*/
+  	];	
+
+	d3.xml("../svg/Plutchik-wheel.svg",function(node) { 
+  		//importe le curseur
+  		var importedNode = document.importNode(node.documentElement, true);
+  		d3.select("#curseurPalette").node().appendChild(importedNode);	  
+  		//redimensionne
+  		var idSvg="svg3360", w="715.41962", h="724.66992";
+		var svg = d3.select("#"+idSvg).transition().duration(0)
+        	    .attr("width", 300)
+        	    .attr("height", 300)
+        		.attr("viewBox","0 0 "+w+" "+h);	
+		//ajoute les événements
+		var txts = d3.selectAll('.gRoueEmo')
+  			.data(curseurData)
+  			//.attr('class','gRoueEmo')
+	  		.on('mouseover',function(d, i){
+		  		var m = d3.event;
+		  		
+	    	  		//affiche le texte en plus grand
+	  			d3.select("#curseurSelect")
+                    .style("left", function(d) { return m.x + "px" })
+                    .style("top", function(d) { return m.y + "px" })
+	  				.style('color',d.color)
+                	    .text(d.fr);
+  			})
+	  		.on('mouseout',function(d, i){
+	    	  		//supprime le texte 
+	  			d3.select("#curseurSelect")
+		        	    .text("");
+  			})
+	  		.on('click',function(d, i){
+	    	  		//augmente la valeur de l'émotion
+	  			d.value ++;
+  			});
+		
+  		  	    	  	
+	});
+  
+    
+    var width = document.querySelector("#graph").clientWidth
+    var height = document.querySelector("#graph").clientHeight
+    var div = d3.select("#graph").append("div").attr("width", width).attr("height", height)    
+        
+    function draw() {
+
+        randomize()
+                
+        var stratify = d3.stratify()
+            .parentId(function(d) {return d.id.substring(0, d.id.lastIndexOf(".")); });
+
+        var root = stratify(data).sum(function(d) { return d.value })
+
+        var treemap = d3.treemap()
+            .tile(d3.treemapBinary)
+            .size([width, height])
+            .padding(1)
+            .round(true);        
+
+        treemap(root)
+        drawTreemap(root)                
+            
+    }
+    
+    function randomize() {
+        data.filter(function(d){ return d.id !== "root"})
+            .forEach(function(d){
+                //modifie la taille de la photo dans le treemap
+                d.value = ~~(d3.randomUniform(1, 10)()); 
+                //modifie la taille de la photo
+                if(d.imgOmk){
+                    var minPixel = 10;
+                    if(q != 'getCollectionFaces'){ 
+                        //calcul la taille de la photo
+                        var x1 = parseInt(d3.randomUniform(minPixel, d.width)());
+                        var x2 = parseInt(d3.randomUniform(minPixel, (d.width-x1-minPixel))());
+                        var y1 = parseInt(d3.randomUniform(minPixel, d.height)());
+                        var y2 = parseInt(d3.randomUniform(minPixel, (d.height-y1-minPixel))());
+                        var s = parseInt(d3.randomUniform(1, 4)());
+                        var w = (x1+x2) * s;
+                        var h = (y1+y2) * s;
+                        var r = 0;
+        	                d.imgAleaTot=d.imgOmk+'/'+x1+','+y1+','+x2+','+y2+'/'+w+','+h+'/'+r+'/default.jpg';
+        	                d.imgAleaPosi=d.imgOmk+'/'+x1+','+y1+','+x2+','+y2+'/full/'+r+'/default.jpg';
+        	                d.img=d.imgAleaPosi;
+                    }else{
+                         d.img=d.imgFull;
+                         d.value = d.width*d.height;
+                    }
+	                /*
+	                console.log(d.img);    	                
+	                console.log(d.imgAleaTot);    	                
+	                console.log(d.imgAleaPosi);    	                
+	                */
+                }
+            })
+    }
+    
+    
+    function drawTreemap(root) {
+
+        var node = div.selectAll(".node").data(root.children)
+          
+        var newNode = node.enter()
+           .append("div").attr("class", "node")
+	  	   .on('mousedown',function(d, i){
+    	  			//affiche le curseur selecteur
+  			});
+
+        node.merge(newNode)
+            //PROBLEME avec la réécriture des liens IIIF
+            //.transition()
+            //.duration(1000)
+            .style("left", function(d) { return d.x0 + "px" })
+            .style("top", function(d) { return d.y0 + "px" })
+            .style("width", function(d) { return (d.x1 - d.x0) + "px" })
+            .style("height", function(d) { return (d.y1 - d.y0) + "px"})
+            .style("background-image", function(d){ 
+                console.log(d.data.img);    	                                
+                return "url("+d.data.img+")"
+                });
+            
+    }
+
+</script>    
+</body>
+</html>

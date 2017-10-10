@@ -387,3 +387,6 @@ bdd/flux_acteurinterieur.sql.zip
 bdd/flux_editinfluSymogih.sql
 *.zip
 bdd/flux_eu.sql.zip
+.DS_Store
+bdd/omk_valarnum.sql
+data/ice/.~lock.iceCommun.ods#

@@ -265,7 +265,7 @@ class GraphController extends Zend_Controller_Action {
     		$this->view->idBase =  $this->_getParam('idBase', "flux_biolographes");
     	
     }
-    
+        
     public function barsmatrixAction(){
     	
     }
@@ -327,9 +327,19 @@ class GraphController extends Zend_Controller_Action {
         
         $dt = '[]';
         $this->view->data =  $this->_getParam('data', $dt);
-        $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2F..%2Fdata%2Fice%2FActeurChromecastNbIndividu.csv"));
-        $this->view->refNb = 'Nb individu';
-        $this->view->refLbl = 'Acteur';
+        $ex = $this->_getParam('ex', 'ActeurChromecastNbIndividu');
+        switch ($ex) {
+            case 'ActeurChromecastNbIndividu':
+                $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2F..%2Fdata%2Fice%2FActeurChromecastNbIndividu.csv"));
+                $this->view->refNb = 'Nb individu';
+                $this->view->refLbl = 'Acteur';
+                break;            
+            case 'iceCommunChromecastPereEnfant':
+                $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2F..%2Fdata%2Fice%2FiceCommunChromecastPereEnfant.csv"));
+                $this->view->refNb = '% commun';
+                $this->view->refLbl = 'Dimensions communes';
+                break;
+        }
         $this->view->titre =  $this->_getParam('titre', "Positions en couleur");
         
     }
@@ -493,6 +503,25 @@ class GraphController extends Zend_Controller_Action {
     public function imagegridAction(){
     
     }
+
+    /**
+     * action pour afficher des images dynamique dans un treemap
+     *
+     * @param  	string 		$q = pour afficher un type de collection
+     * @example 'getOmkCollection' = une collection à partir d'un ItemSet d'Omeka S + IIIF 
+     * @example 'getCollectionFaces' = une collection de visage à partir d'un ItemSet d'Omeka S + IIIF + Google Vision
+     *
+     * @param  	int  		$idCol = identifiant de l'ItemSet Omeka
+     *
+     */
+    public function dynatofsAction(){
+        
+        $this->view->q =  $this->_getParam('q', "getOmkCollection");
+        $this->view->idCol =  $this->_getParam('idCol', 1572);
+        
+        
+    }
+    
     
     public function multilignesAction(){
     	
@@ -558,7 +587,11 @@ class GraphController extends Zend_Controller_Action {
 	public function correlationAction(){
 		
 	}
-    
+
+	public function combinatoireAction(){
+	    
+	}
+	
     function getSpipMot(){
 	    	//vérifie s'il faut récupérer les données dans spip
 		$dt = "[";

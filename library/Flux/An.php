@@ -388,14 +388,16 @@ class Flux_An extends Flux_Site{
 	    //construction du tableau pour le csv
 	    $i=0;
 	    foreach ($arrH as $h) {
-	        if($h["niveau"]>4 && substr($h["url"],0,4)=="http" && $i<10){
+	        if($h["niveau"]>4){
 	            //récupère l'item set du parent
 	            $is = $this->dbIS->getByIdentifier("flux_an-flux_doc-doc_id-".$h["parent"]);	            
 	            $path_parts = pathinfo($h["url"]);
-	            $arrItem[] = array("Item-set"=>$is[0]["resource_id"],"owner"=>$this->owner ,"dcterms:title"=>$h["titre"]
-	                ,"referenceAN"=>$h["url"]
-	                ,"referenceJDC"=>"flux_an-flux_doc-doc_id-".$h["doc_id"]
-	                ,"file"=>$path_parts["basename"],"dcterms:type"=>"image");	        	        
+	            if(substr($h["url"],0,4)=="http"){ 
+        	            $arrItem[] = array("Item-set"=>$is[0]["resource_id"],"owner"=>$this->owner ,"dcterms:title"=>$h["titre"]
+        	                ,"referenceAN"=>$h["url"]
+        	                ,"referenceJDC"=>"flux_an-flux_doc-doc_id-".$h["doc_id"]
+        	                ,"file"=>$path_parts["basename"],"dcterms:type"=>"image");	        	        
+	            }
 	        }
         	    $pTitre = $h["titre"];
         	    $i++;
