@@ -334,8 +334,13 @@ class GraphController extends Zend_Controller_Action {
                 $this->view->refNb = 'Nb individu';
                 $this->view->refLbl = 'Acteur';
                 break;            
-            case 'iceCommunChromecastPereEnfant':
-                $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2F..%2Fdata%2Fice%2FiceCommunChromecastPereEnfant.csv"));
+            case 'iceCommunChromecastMiseSurMarchePereEnfant':
+                $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2F..%2Fdata%2Fice%2FiceCommunChromecastMiseSurMarchePereEnfant.csv"));
+                $this->view->refNb = '% commun';
+                $this->view->refLbl = 'Dimensions communes';
+                break;
+            case 'iceCommunChromecastPereFille':
+                $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2F..%2Fdata%2Fice%2FiceCommunChromecastPereFille.csv"));
                 $this->view->refNb = '% commun';
                 $this->view->refLbl = 'Dimensions communes';
                 break;
@@ -496,6 +501,12 @@ class GraphController extends Zend_Controller_Action {
 	    			$this->view->urlData = "../flux/isidore?q=getHistoDiscipline&req=".urldecode($this->_getParam('q', "écosystème"));
 	    			$this->view->legendetitre =  "Disciplines";
 	    			break;
+	    		case "valarnum":
+	    		    $this->view->titre =  "Evolution des explorations émotionnelles";
+	    		    $this->view->soustitre =  "Valorisation des archives numériques";
+	    		    $this->view->urlData = "../flux/an?q=getEvalsMonadeHistoTag&stream=1";
+	    		    $this->view->legendetitre =  "Emotions";
+	    		    break;
 	    	}
     	 
     }
@@ -589,6 +600,10 @@ class GraphController extends Zend_Controller_Action {
 	}
 
 	public function combinatoireAction(){
+	    
+	}
+	
+	public function concentricringAction(){
 	    
 	}
 	

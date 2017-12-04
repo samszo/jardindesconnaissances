@@ -86,7 +86,7 @@ if(!$this->ajax){
       
       var width = 960,
           height = 500,
-          nodeSize = 20,
+          nodeSize = 40,
           arrowWidth = 8,
           svg = d3.select("body")
             .append("svg")
@@ -123,7 +123,7 @@ if(!$this->ajax){
         .force("center", d3.forceCenter(width / 2, height / 2));
       
       simulation.force("link")
-        .distance(140);
+        .distance(100);
       
       var drag = d3.drag()
         .on("start", dragstarted)

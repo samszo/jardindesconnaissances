@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Evaluation des acteurs</title>
+	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+        <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+        <script src="../js/d3.min.js"></script>
+        <script src="../js/jquery.min.js"></script>
+        <script src="../js/valarnum/flux.js"></script>
+
+		<style type="text/css">
+		/*pour les initiales en majuscule*/
+		.card-title:first-letter{
+			text-transform: uppercase;
+		}
+		/*pour le donuts merci à https://bl.ocks.org/mbhall88/b2504f8f3e384de4ff2b9dfa60f325e2 */
+		polyline{
+		    opacity: .3;
+		    stroke: black;
+		    stroke-width: 2px;
+		    fill: none;
+		}		
+		/* Make the percentage on the text labels bold*/
+		.labelName tspan {
+		    font-style: normal;
+		    font-weight: 700;
+		}		
+		/* In biology we generally italicise species names. */
+		.labelName {
+		    font-size: 0.9em;
+		    font-style: italic;
+		}
+		
+		
+		</style>
+		
+	<script src="../js/valarnum/flux.js"></script>
+
+    <script type="text/javascript">
+    var uti = <?php echo $this->uti; ?>;
+    
+    </script>
+		
+	</head>
+<body>
+
+<div class="jumbotron">
+  <h1 class="display-3">Visages présidentiels</h1>
+			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+				<a class="navbar-brand" href="#">Menu</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse"
+					data-target="#navbarTogglerDemo02"
+					aria-controls="navbarTogglerDemo02" aria-expanded="false"
+					aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+					<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+						<li class="nav-item"><a class="nav-link" href="../valarnum">Accueil<span
+								class="sr-only">(current)</span></a></li>
+						<li class="nav-item"><a class="nav-link" href="../valarnum/exploemo">Explorations
+								émotionnelles</a></li>
+						<li class="nav-item active"><a class="nav-link" href="#">Evaluation des
+								acteurs</a></li>
+					</ul>
+					<form class="form-inline my-2 my-lg-0">
+						<button class="btn btn-outline-success my-2 my-sm-0" type="button"><?php echo $this->login; ?></button>
+						<button class="btn btn-outline-danger my-2 my-sm-0" onclick="deconnexion()" type="button">déconnexion</button>
+					</form>
+				</div>
+			</nav>				
+  <hr class="my-4">
+</div>
+
+	<div class="container">
+		<div class="row" id="visaCards" >
+		</div>
+	</div>	
+			
+<script>
+
+var dataPhoto;
+
+//récupération des photos IIIF calculées par google Vision
+var urlIIIF = "http://localhost/jdc/public/flux/iiif?q=getCollectionFaces&idCol=15399"; 
+$.getJSON(urlIIIF,
+function(data){
+	dataPhoto = data.filter(function(d){ return d.id != 'root'});
+			
+		var cards = d3.select('#visaCards').selectAll(".col-sm-3 mb-4").data(dataPhoto).enter()
+			.append('div').attr('class','col-sm-3 mb-4')
+			.append("div").attr('class','card');
+	  	cards.append("img")
+	  			.attr('id',function(d) {return 'imgCard'+d['idOmk']})
+	  			.attr('class','card-img-top')
+	  			.attr('src',function(d) { 
+		    			return d['imgFull']; 
+			    		});
+  		//ajoute le corps de la carte
+		var cardBody = cards.append('div').attr('class','card-body');
+		cardBody.append('h4').attr('class','card-title')	  			
+	    			.text(function(d) { 
+		    			return d['label']; 
+				    		});
+		//construction du layout pour les graphiques
+		var html = '<form>';
+		html += '<div class="form-group row">';
+		html += '<div class="col-sm-6"><input type="text" class="form-control" placeholder="Nom"></div>';
+		html += '<div class="col-sm-6"><input type="text" class="form-control" placeholder="Prénom"></div>';
+		html += '</div>';
+		html += '<div class="form-group row">';
+		html += '<div class="col-sm-12"><button type="submit" class="btn btn-primary">Enregistrer</button></div>';
+		html += '</div>';
+		html += '</form>';
+		cardBody.append('div').attr('class','card-text').attr('id',function(d, i) { return 'visaNum_'+i; })
+			.html(function(d, i) { return html;});	  			
+		cards.append('div').attr('class','card-footer')
+			.append('small').attr('class','text-muted')
+			.html(function(d, i) {
+		    			return "<a href='"+d['original']+"' target='_blank' ><img src='"+d['original']+"' width='100px' /></a>"; 
+				    		});		
+});
+
+
+
+//Fin appel JSON
+
+</script>
+	<script src="../js/popper.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+
+</body>
+</html>

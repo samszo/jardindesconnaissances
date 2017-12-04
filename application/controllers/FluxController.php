@@ -314,8 +314,10 @@ class FluxController extends Zend_Controller_Action {
     				break;
     			case "analyseImage":
     			    $g = new Flux_Gvision();
-    			    $this->view->content = $g->analyseImage($this->_getParam('q','http://localhost/ValArNum/omk/files/original/8d4dc00ea8f602194c63ae9fa5e49a7f7a27cf46.jpg'));
+    			    $this->view->content = $g->analyseImage($this->_getParam('q','http://localhost/jdc/data/an/photos/FRAN_0023_00033_L-medium.jpg'));
     			    break;
+    			case "analyseTexte":
+                break;    			    
     			case "trouveLivre":
 	    			$g = new Flux_Gbooks();
 	    			$arr = $g->findBooks($this->_getParam('q'));
@@ -516,6 +518,51 @@ class FluxController extends Zend_Controller_Action {
 	    	}
     
     }
+
+    public function anAction()
+    {
+        $an = new Flux_An($this->_getParam('idBase','flux_an'),false,$this->_getParam('trace'));
+        $an->bTraceFlush = $this->_getParam('trace');
+        $an->trace("DEBUT ".__METHOD__);        
+        switch ($this->_getParam('q')) {
+            case "getEvalsMonade":
+                $data = $an->getEvalsMonade($this->_getParam('idMonade',3));
+                $this->view->content = json_encode($data);
+                break;
+            case "getEvalsMonadeHistoTag":
+                //récupère les évaluations par tag
+                $sta = new Flux_Stats();
+                $data = $an->getEvalsMonadeHistoByTag($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d'));
+                if($this->_getParam('stream')){
+                    //calcul les données pour le stream
+                    $data = $sta->array_orderby($data, 'type', SORT_ASC, 'temps', SORT_ASC);
+                    $data = $sta->getDataForStream($data, $this->_getParam("dateUnit", '%Y-%m-%d'));
+                }
+                $this->view->content = json_encode($data);
+                break;
+            case "getEvalsMonadeHistoUti":
+                //récupère les évaluations par utilisateur
+                $data = $an->getEvalsMonadeHistoByUti($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d %H:%i'));
+                if($this->_getParam('stream')){
+                    //calcul les données pour le stream
+                    $data = $sta->array_orderby($data, 'type', SORT_ASC, 'temps', SORT_ASC);
+                    $data = $sta->getDataForStream($data, $this->_getParam("dateUnit", '%Y-%m-%d %H:%i'));
+                }
+                $this->view->content = json_encode($data);
+                break;
+            case "getEvalsMonadeHistoDoc":
+                //récupère les évaluations par document
+                $data = $an->getEvalsMonadeHistoByDoc($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d %H:%i'));
+                if($this->_getParam('stream')){
+                    //calcul les données pour le stream
+                    $data = $sta->array_orderby($data, 'type', SORT_ASC, 'temps', SORT_ASC);
+                    $data = $sta->getDataForStream($data, $this->_getParam("dateUnit", '%Y-%m-%d %H:%i'));
+                }                
+                $this->view->content = json_encode($data);
+                break;
+        }
+        
+    }
     
     public function iiifAction()
     {
@@ -551,6 +598,7 @@ class FluxController extends Zend_Controller_Action {
                         }
                     }
                 }
+                //ATTENTION les url iiif possèdent de ,               
                 if($this->_getParam('csv')){
                     foreach ($rs as $v) {
                         if ($v['id']!='root'){                            

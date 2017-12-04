@@ -12,9 +12,9 @@
 class Flux_Stats  extends Flux_Site{
 
 	
- 	public function __construct($idBase=false)
+    public function __construct($idBase=false,$bTrace=false)
     {
-	    	parent::__construct($idBase);
+        parent::__construct($idBase,$bTrace);
     	
     }
 	
@@ -826,7 +826,18 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 				$interval = new DateInterval('P1D');
 				$phpFormatDate = 'Y-m-d';
 				break;
-		
+			case '%Y-%m-%d %H':
+			    $interval = new DateInterval('PT1H');
+			    $phpFormatDate = 'Y-m-d H';
+			    break;
+			case '%Y-%m-%d %H:%i':
+			    $interval = new DateInterval('PT1M');
+			    $phpFormatDate = 'Y-m-d H:i';
+			    break;
+			case '%Y-%m-%d %H:%i:%s':
+			    $interval = new DateInterval('PT1S');
+			    $phpFormatDate = 'Y-m-d H:i:s';
+			    break;			    
 		}
 		//gestion des temps Unix ou chaîne
 		if(!is_numeric($minDate)){
@@ -838,7 +849,7 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 			$mDate = new DateTime();
 			$mDate->setTimestamp($maxDate);					
 		}
-		$this->trace($curDate->format('Y-m-d'));
+		$this->trace($curDate->format('Y-m-d H:i:s'));
 		$arrDate = array();
 		while ($curDate->format($phpFormatDate) <= $mDate->format($phpFormatDate)) {
 			$arrDate[]=$curDate->format($phpFormatDate);
@@ -881,7 +892,7 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 					$i=$nbDate;
 				}else{
 					$nD = array('key'=>$d['key'],'type'=>$d['type'],'desc'=>$d['desc']
-							,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal
+					    ,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal,'color'=>$d['color']
 							,'MinDate'=>0,'MaxDate'=>0
 					);
 					$nData[]=$nD;
@@ -893,7 +904,7 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 		//on fini les temps restant
 		for ($i = $j; $i < $nbDate; $i++) {
 			$nD = array('key'=>$oD['key'],'type'=>$oD['type'],'desc'=>$oD['desc']
-					,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal
+			    ,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal,'color'=>$d['color']
 					,'MinDate'=>0,'MaxDate'=>0
 			);
 			$nData[]=$nD;

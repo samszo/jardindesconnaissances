@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Valorisation des archives numériques</title>
+<style>
+html, body {
+	height: 100%;
+}
+</style>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css"
+	href="font/font-awesome/font-awesome.css" />
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+<script src="js/d3.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/valarnum/flux.js"></script>
+
+<script type="text/javascript">
+var uti = <?php echo $this->uti; ?>;
+
+</script>
+
+</head>
+
+<body>
+
+
+	<div class="card text-center">
+		<div class="card-header">
+			<h1>Valorisation des archives numériques</h1>
+			<h2 class="card-title">explorer, cartographier, naviguer, raconter</h2>
+			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+				<a class="navbar-brand" href="#">Menu</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse"
+					data-target="#navbarTogglerDemo02"
+					aria-controls="navbarTogglerDemo02" aria-expanded="false"
+					aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+					<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+						<li class="nav-item active"><a class="nav-link" href="#">Accueil<span
+								class="sr-only">(current)</span></a></li>
+						<li class="nav-item"><a class="nav-link" href="valarnum/Exploemo">Explorations
+								émotionnelles</a></li>
+						<li class="nav-item"><a class="nav-link" href="valarnum/evalacteurs">Evaluation des
+								acteurs</a></li>
+					</ul>
+					<form class="form-inline my-2 my-lg-0">
+						<button class="btn btn-outline-success my-2 my-sm-0" type="button"><?php echo $this->login; ?></button>
+						<button class="btn btn-outline-danger my-2 my-sm-0" onclick="deconnexion()" type="button">déconnexion</button>
+					</form>
+				</div>
+			</nav>
+		</div>
+
+		<div class="card-body">
+			<h3>Bienvenu dans l'application de valorisation des archives
+				numériques</h3>
+
+		</div>
+		<div id="pied" class="card-footer text-muted">
+			<h4>Conception &amp; réalisation : Samuel Szoniecky</h4>
+		</div>
+	</div>
+
+
+
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+</body>
+</html>

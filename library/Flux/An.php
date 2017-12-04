@@ -1,4 +1,6 @@
 <?php
+use function GuzzleHttp\json_encode;
+
 /**
  * Flux_An
  * Classe qui gère les flux des sites des archives nationales
@@ -112,14 +114,16 @@ class Flux_An extends Flux_Site{
     			}
     		}
     		
-    		//enregistre les séries    		
+    		
+    		//enregistre les séries        		
     		$xPath = '//dsc/c';
     		//$xPath = '//c[@id="c-1y68bw3v2-1wqsh11mhqsq"]';
     		$results = $this->dom->queryXpath($xPath);
     		$i=0;
     		foreach ($results as $result) {
     			$this->trace("Série : ".$i);
-    			$this->sauveSerie($result, $idDoc); 
+    			//if($i>=618)
+        			$this->sauveSerie($result, $idDoc); 
     			$i++; 
     		}
     		    		
@@ -128,7 +132,7 @@ class Flux_An extends Flux_Site{
 	/**
 	 * enregistre une série
 	 *
-	 * @param  objet		$c
+	 * @param  object		$c
 	 * @param  int		$idDoc
 	 *
 	 * @return void
@@ -137,8 +141,9 @@ class Flux_An extends Flux_Site{
 			
 		//enregistre la série
 		$id = $c->getAttribute('id');
-		//
-		if($id=='c-cimw17fjw-198351nl5y6ey'){
+		//Flux_An::sauveSerie c-a57vz4drc-1pgslyhluxn5p |5951,431|0
+		
+		if($id=='c-a57vz4drc-1pgslyhluxn5p'){
 			$to = 'toto';
 		}
 		//
@@ -171,7 +176,7 @@ class Flux_An extends Flux_Site{
 							$d = $r->getAttribute('normal');
 						}
 						if(isset($d)){
-							$ds = explode('/',$d);
+						    $ds = explode('/',trim($d));
 							//vérifie les dates 00XX-01-01
 							if(substr($ds[0], 0, 2)=="00"){
 							    $arrD = explode("-", $ds[1]);
@@ -221,10 +226,13 @@ class Flux_An extends Flux_Site{
 					    //gestion des photos directement par 
 					    //<daoloc href="FRAN_0138_2365_L.msp#FRAN_0138_2394_L.msp"/>
 					    $j=0;
+					    //ATTENTION le nombre de 0 varie suivant les collections
+					    $numZero = strlen($arrFicNum[2]);
 					    $deb = $arrFicNum[2]+0;
 					    $fin = $arrFicNum[5]+0;
 					    for ($i = $deb; $i <= $fin; $i++) {
-					        $numFic = str_pad($i, 4, "0", STR_PAD_LEFT);					        
+					        //ATTENTION le nombre de 0 varie suivant les collections
+					        $numFic = str_pad($i, $numZero, "0", STR_PAD_LEFT);					        
 					        $this->arrItem[$j]['fic']=$arrFicNum[0]."_".$arrFicNum[1]."_".$numFic."_L-medium.jpg";		
 					        $this->arrItem[$j]['text']="photo ".$numFic;
 					        $this->arrItem[$j]['tronc'] = $arrFicNum[0]."_".$arrFicNum[1];
@@ -421,7 +429,7 @@ class Flux_An extends Flux_Site{
 	 */
 	function initVarOmk(){
 	    //initialistion des variables
-	    $this->dbR = new Model_DbTable_Omk_Resource($this->dbOmk);
+	    $this->dbOmkR = new Model_DbTable_Omk_Resource($this->dbOmk);
 	    $this->dbIS = new Model_DbTable_Omk_ItemSet($this->dbOmk);
 	    $this->dbI = new Model_DbTable_Omk_Item($this->dbOmk);
 	    $this->dbV = new Model_DbTable_Omk_Value($this->dbOmk);
@@ -569,7 +577,7 @@ class Flux_An extends Flux_Site{
 	        $idR = $is[0]["resource_id"];
 	    }else{
         	    //créer la ressource
-        	    $idR = $this->dbR->ajouter(array("resource_type"=>"Omeka\Entity\ItemSet","owner_id"=>$this->idOwner,"is_public"=>1,"resource_class_id"=>$i["idClass"]),false);
+        	    $idR = $this->dbOmkR->ajouter(array("resource_type"=>"Omeka\Entity\ItemSet","owner_id"=>$this->idOwner,"is_public"=>1,"resource_class_id"=>$i["idClass"]),false);
         	    //ajouter l'itemSet
         	    $this->dbIS->ajouter(array("id"=>$idR,"is_open"=>1));
         	    //reference
@@ -595,7 +603,7 @@ class Flux_An extends Flux_Site{
 	 */
 	function setItem($i){
 	    //créer la ressource
-	    $idR = $this->dbR->ajouter(array("resource_type"=>"Omeka\Entity\Item","owner_id"=>$this->idOwner,"is_public"=>1,"resource_class_id"=>$i["idClass"]),false);
+	    $idR = $this->dbOmkR->ajouter(array("resource_type"=>"Omeka\Entity\Item","owner_id"=>$this->idOwner,"is_public"=>1,"resource_class_id"=>$i["idClass"]),false);
 	    //ajouter l'item
 	    $this->dbI->ajouter(array("id"=>$idR));
 	    //reference
@@ -668,4 +676,292 @@ class Flux_An extends Flux_Site{
 	    
 	}
 	
+
+	/**
+	 * renvoit les évaluation d'une monade
+	 * @param  int $idMonade
+	 *
+	 */
+	function getEvalsMonade($idMonade){
+	    
+	    $sql = "select r.rapport_id, r.maj, r.niveau, r.valeur
+        	, u.uti_id, u.login
+        	, t.tag_id, t.code
+        	, d.doc_id, d.url, d.note
+        	, dp.doc_id, dp.url
+        	, dgp.doc_id, dgp.titre
+        	from flux_rapport r
+        	inner join flux_doc d on d.doc_id = r.src_id
+        	inner join flux_doc dp on dp.doc_id = d.parent
+        	inner join flux_doc dgp on dgp.doc_id = dp.parent
+        	inner join flux_uti u on u.uti_id = r.pre_id
+        	inner join flux_tag t on t.tag_id = r.dst_id
+        	where r.monade_id = ".$idMonade;
+	    
+	    return $this->dbD->exeQuery($sql);
+	    
+	}
+	
+
+	/**
+	 * renvoit les évaluations temporelle d'une monade par Tag
+	 * @param  int      $idMonade
+     * @param  string   $dateUnit
+     * @param  string   $dateType
+	 *
+	 */
+	function getEvalsMonadeHistoByTag($idMonade, $dateUnit, $dateType="dateChoix"){
+	    
+	    if($dateType=="dateChoix")$colTemps = "r.maj";
+	    if($dateType=="dateDoc")$colTemps = "r.maj";
+	    
+	    
+	    $sql = "select
+        	SUM(r.niveau) value
+        	, GROUP_CONCAT(u.uti_id) utis
+        	, t.tag_id 'key', t.code 'type', t.desc , t.type color
+        	, GROUP_CONCAT(d.doc_id) docs
+        	,	DATE_FORMAT(".$colTemps.", '".$dateUnit."') temps
+        	,	MIN(UNIX_TIMESTAMP(".$colTemps.")) MinDate
+        	,	MAX(UNIX_TIMESTAMP(".$colTemps.")) MaxDate
+        	
+        	from flux_rapport r
+        	inner join flux_doc d on d.doc_id = r.src_id
+        	inner join flux_uti u on u.uti_id = r.pre_id
+        	inner join flux_tag t on t.tag_id = r.dst_id
+        	where r.monade_id = ".$idMonade."
+        	GROUP BY t.tag_id, temps
+        	ORDER BY temps ";
+	    $this->trace($sql);
+	    return $this->dbD->exeQuery($sql);
+	    
+	}
+	
+	
+	/**
+	 * renvoit les évaluations temporelle d'une monade par Utilisateur
+	 * @param  int      $idMonade
+	 * @param  string   $dateUnit
+	 * @param  string   $dateType
+	 *
+	 */
+	function getEvalsMonadeHistoByUti($idMonade, $dateUnit, $dateType="dateChoix"){
+	    
+	    if($dateType=="dateChoix")$colTemps = "r.maj";
+	    if($dateType=="dateDoc")$colTemps = "r.maj";
+	    
+	    
+	    $sql = "SELECT
+            	SUM(r.niveau) value,
+            	GROUP_CONCAT(t.tag_id) tags,
+            	u.uti_id 'key',
+            	u.login 'type',
+            	GROUP_CONCAT(d.doc_id) docs
+        	,	DATE_FORMAT(".$colTemps.", '".$dateUnit."') temps
+        	,	MIN(UNIX_TIMESTAMP(".$colTemps.")) MinDate
+        	,	MAX(UNIX_TIMESTAMP(".$colTemps.")) MaxDate
+            	FROM
+            	flux_rapport r
+            	INNER JOIN
+            	flux_doc d ON d.doc_id = r.src_id
+            	INNER JOIN
+            	flux_uti u ON u.uti_id = r.pre_id
+            	INNER JOIN
+            	flux_tag t ON t.tag_id = r.dst_id
+            	WHERE
+            	r.monade_id = ".$idMonade."
+            	GROUP BY u.uti_id , temps
+            	ORDER BY temps";
+	    
+        	    $this->trace($sql);
+        	    return $this->dbD->exeQuery($sql);
+        	    
+        	}
+
+        	/**
+        	 * renvoit les évaluations temporelle d'une monade par Document
+        	 * @param  int      $idMonade
+        	 * @param  string   $dateUnit
+        	 * @param  string   $dateType
+        	 *
+        	 */
+        	function getEvalsMonadeHistoByDoc($idMonade, $dateUnit, $dateType="dateChoix"){
+        	    
+        	    if($dateType=="dateChoix")$colTemps = "r.maj";
+        	    if($dateType=="dateDoc")$colTemps = "r.maj";
+        	    
+        	    
+        	    $sql = "SELECT 
+                SUM(r.niveau) value,
+                GROUP_CONCAT(t.tag_id) tags,
+                CONCAT(dgp.doc_id,'_',dp.doc_id) 'key',
+                CONCAT(dgp.titre, ' : ',dp.titre) 'type',
+                dp.note,
+                GROUP_CONCAT(d.note) evals,
+                GROUP_CONCAT(u.uti_id) utis
+                	,	DATE_FORMAT(".$colTemps.", '".$dateUnit."') temps
+                	,	MIN(UNIX_TIMESTAMP(".$colTemps.")) MinDate
+                	,	MAX(UNIX_TIMESTAMP(".$colTemps.")) MaxDate
+            FROM
+                flux_rapport r
+                    INNER JOIN
+                flux_doc d ON d.doc_id = r.src_id
+                    INNER JOIN
+                flux_doc dp ON dp.doc_id = d.parent
+                    INNER JOIN
+                flux_doc dgp ON dgp.doc_id = dp.parent
+                    INNER JOIN
+                flux_uti u ON u.uti_id = r.pre_id
+                    INNER JOIN
+                flux_tag t ON t.tag_id = r.dst_id
+            WHERE
+                r.monade_id = ".$idMonade."
+            GROUP BY dp.doc_id, temps
+            ORDER BY temps";
+        	    
+        	    $this->trace($sql);
+        	    return $this->dbD->exeQuery($sql);
+        	    
+        	}
+        	
+        	
+        	/**
+        	 * renvoit le nombre de photo pour chaque item
+        	 * @param  string   $dateUnit
+        	 * 
+        	 * @return array
+        	 *
+        	 */
+        	function getNbPhoto($dateUnit="%Y-%m-%d"){
+        	            	    
+        	    
+        	    $sql = "SELECT 
+                dp.doc_id, dp.titre,
+                COUNT(de.doc_id) nbTof,
+                DATE_FORMAT(dgprDeb.valeur, '".$dateUnit."') temps,
+                MIN(DATEDIFF(DATE_FORMAT(dgprDeb.valeur, '%Y-%m-%d'),
+                        FROM_UNIXTIME(0)) * 24 * 3600) MinDate,
+                MAX(DATEDIFF(DATE_FORMAT(dgprDeb.valeur, '%Y-%m-%d'),
+                        FROM_UNIXTIME(0)) * 24 * 3600) MaxDate,
+                MAX(DATEDIFF(DATE_FORMAT(dgprFin.valeur, '%Y-%m-%d'),
+                        FROM_UNIXTIME(0)) * 24 * 3600) MaxFinDate
+            FROM
+                flux_doc dp
+                    INNER JOIN
+                flux_doc de ON de.lft BETWEEN dp.lft AND dp.rgt
+                    AND SUBSTRING(de.url, - 4) = '.jpg'
+                    INNER JOIN
+                flux_rapport dgprDeb ON dgprDeb.src_id = dp.doc_id
+                    AND dgprDeb.src_obj = 'doc'
+                    AND dgprDeb.dst_id = 4
+                    AND dgprDeb.dst_obj = 'tag'
+                    LEFT JOIN
+                flux_rapport dgprFin ON dgprFin.src_id = dp.doc_id
+                    AND dgprFin.src_obj = 'doc'
+                    AND dgprFin.dst_id = 5
+                    AND dgprFin.dst_obj = 'tag'
+            GROUP BY dp.doc_id , temps";
+        	    
+        	    $this->trace($sql);
+        	    return $this->dbD->exeQuery($sql);
+        	    
+        	}
+        	
+        	/**
+        	 * enregistre les analyses de language faite par google
+        	 * 
+        	 * @param  string  $champ
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getAnalyseGoogle($champ="titre"){
+        	    $this->trace(__METHOD__);
+        	    //récupère les références
+        	    //récupère les items
+        	    $arr = $this->getNbPhoto();
+        	    //création de l'analyseur
+        	    $gl = new Flux_Glanguage($this->idBase);
+        	    $idTagSent = $this->dbT->ajouter(array('code'=>'sentiment','parent'=>$gl->idTagRoot));
+        	    foreach ($arr as $item) {
+        	        $this->trace($item[$champ]);        	        
+        	        //execute et sauve l'analyse uniquement sur les types possible en français
+        	        $analyses = $gl->sauveAnalyseTexte($item[$champ], $item["doc_id"], array('analyzeEntities','analyzeSentiment','analyzeSyntax'));
+        	        //décompose l'analyse
+        	        $notes = json_decode($analyses["note"], true);
+    	            //enregistre les data
+    	            foreach ($notes as $k => $prop) {
+    	                $this->trace($k,$prop);
+    	                switch ($k) {
+    	                    case 'analyzeEntities':
+    	                        foreach ($prop as $p => $v) {
+    	                            $desc = "";
+    	                            if (array_key_exists('wikipedia_url', $v['metadata'])) {
+    	                                $desc = $v['metadata']['wikipedia_url'];
+    	                            }
+    	                            $uri = "";
+    	                            if (array_key_exists('mid', $v['metadata'])) {
+    	                                $uri = $v['metadata']['mid'];
+    	                            }
+    	                            if($v['type']=="PERSON"){
+    	                                //enregistre une existence
+    	                                $id = $this->dbE->ajouter(array("nom"=>$v['name'],'uri'=>$uri,'data'=>$desc));
+    	                                $obj = "exi";
+    	                            }elseif($v['type']=="LOCATION" && $desc != ""){
+    	                                //enregistre une géographie
+    	                                $id = $this->dbG->ajouter(array("adresse"=>$v['name'],'uri'=>$uri,'data'=>$desc));
+    	                                $obj = "geo";    	                                
+    	                            }else{
+        	                            //enregistre le tag
+        	                            $id = $this->dbT->ajouter(array('code'=>$v['name'],'type'=>$v['type'],'parent'=>$gl->idTagRoot,'desc'=>$desc,'uri'=>$uri));
+        	                            $obj = "tag";
+    	                            }
+        	                        //enregistre le rapport
+    	                            $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    	                                ,"src_id"=>$item["doc_id"],"src_obj"=>"doc"
+    	                                ,"dst_id"=>$id,"dst_obj"=>$obj
+    	                                ,"pre_id"=>$gl->idMonade,"pre_obj"=>"monade"
+    	                                ,"niveau"=>$v['salience']
+    	                                ,"valeur"=>json_encode($v)
+    	                            ));    	                                
+    	                        }
+    	                    break;
+    	                    case 'analyzeSentiment':
+    	                        //sentiment global du document
+    	                        $idSent = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    	                           ,"src_id"=>$item["doc_id"],"src_obj"=>"doc"
+    	                           ,"dst_id"=>$idTagSent,"dst_obj"=>"tag"
+    	                           ,"pre_id"=>$gl->idMonade,"pre_obj"=>"monade"
+    	                           ,"niveau"=>$prop['magnitude']
+    	                           ,"valeur"=>$prop['score']
+    	                                ));    	                       
+    	                        $numSent = 0;
+    	                        foreach ($prop->sentences as $p => $v) {    	                            
+    	                            //création du document si le texte est différent.
+    	                            $cnt = $v["text"]["content"];
+    	                            if($cnt != $item[$champ]){
+    	                                $idDocSent = $this->dbD->ajouter(array("parent"=>$item["doc_id"], "tronc"=>$v["text"]["beginOffset"],"titre"=>"Phrase :".$idSent."_".$numSent,"note"=>json_encode($v)));    	                                
+    	                            }else{
+    	                                $idDocSent = $item["doc_id"];
+    	                            }
+    	                            //sentiment de la phrase
+    	                            $idSent = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    	                                ,"src_id"=>$idDocSent,"src_obj"=>"doc"
+    	                                ,"dst_id"=>$idTagSent,"dst_obj"=>"tag"
+    	                                ,"pre_id"=>$gl->idMonade,"pre_obj"=>"monade"
+    	                                ,"niveau"=>$v["sentiment"]['magnitude']
+    	                                ,"valeur"=>$v["sentiment"]['score']
+    	                            ));
+    	                            
+    	                        }
+    	                    break;    	                        
+    	                }
+    	            }
+    	            $this->trace('analyse sauvée');
+        	        //attend pour éviter de stresser google
+        	        sleep(10);
+        	    }
+        	}
+        	    
+        	
 }

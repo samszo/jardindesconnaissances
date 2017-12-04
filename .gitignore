@@ -390,3 +390,10 @@ bdd/flux_eu.sql.zip
 .DS_Store
 bdd/omk_valarnum.sql
 data/ice/.~lock.iceCommun.ods#
+application/configs/JardinDesConnaissances-7f248c6779e9.json
+bdd/flux_an.sql
+bdd/flux_valarnum.sql
+bdd/gapaiFlux.sql
+bdd/gapaiGenGevu.sql
+bdd/gapaiOmeka.sql
+bdd/gapaiSpip.sql

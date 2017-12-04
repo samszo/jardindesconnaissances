@@ -85,11 +85,14 @@ if(urlData){
 		//transformation des data
 		  var min=0, max=0;
 		  data.forEach(function(dt){
-			  dt[refNb] = parseFloat(dt[refNb].replace(/,/i,'.'));
+			  dt[refNb] = parseFloat(dt[refNb].replace(/,/i,'.'));			  
 			  if(dt[refNb]<min)min=dt[refNb];
 			  if(dt[refNb]>max)max=dt[refNb];
+			  //pour avoir les couleurs en % il faut un min = 1 et max = 99
+			  //if(dt[refNb]==0)dt[refNb]=1;
+			  //if(dt[refNb]==100)dt[refNb]=99;
+			  
 		  });
-		  
 		  //définition des échelles		  
 	      dataScale = d3.scaleLinear()
         		.domain([min, max])

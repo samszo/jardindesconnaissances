@@ -52,12 +52,21 @@ class Flux_Iiif extends Flux_Site{
         foreach ($col->manifests as $m) {
             //récupère les infos de la photo
             $p = json_decode($this->getUrlBodyContent($m->{'@id'}));
+            $arrMtd = array();
+            //récupère les metadata
+            foreach ($p->metadata as $mtd) {
+                $arrMtd[$mtd->label]=$mtd->value;
+            }
             //enregistre les informations
             $r = $p->sequences[0]->canvases[0]->images[0]->resource;
             $ori = $r->{'@id'};
             $img = $r->service->{'@id'};
-            $id = substr($img, strrpos($img, "/"));
-            $data[] = array("id"=>"root.".$i,"value"=>"","label"=>$p->label,"original"=>$ori,"idOmk"=>$id,"imgOmk"=>$img,"imgFull"=>$img.'/full/full/0/default.jpg',"width"=>$r->width,"height"=>$r->height);
+            $id = substr($img, strrpos($img, "/")+1);
+            $data[] = array("id"=>"root.".$i,"idCol"=>$idCol,"value"=>"","label"=>$p->label
+                ,"original"=>$ori,"idOmk"=>$id,"imgOmk"=>$img,"imgFull"=>$img.'/full/full/0/default.jpg'
+                ,"width"=>$r->width,"height"=>$r->height
+                ,"metadata"=>$arrMtd
+                );
             $i++;
         }
         

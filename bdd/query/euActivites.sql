@@ -2,7 +2,7 @@ SELECT
     t.code
     , r.rapport_id, r.valeur
     , rC.valeur
-    , tC.code
+    , tC.tag_id, tC.code
     , dD.doc_id, dD.titre
 FROM
     flux_tag t

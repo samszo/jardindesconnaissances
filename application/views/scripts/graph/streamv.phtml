@@ -6,9 +6,9 @@
   <script src="../js/d3.v4.js"></script>
   <script src="../js/d3-scale-chromatic.v1.min.js"></script>  
   <script src="../js/d3-legend.min.js"></script>  
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-  <script src="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css" />
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/w2ui.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="../css/w2ui.css" />
       
   <style>
     body { margin:0 auto;}
@@ -61,7 +61,7 @@
 	//merci à http://bl.ocks.org/f94f/5554bf0a6874a64f46deacf3448ee5c8    
     var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, refTotal=[];
 	var formatJour = d3.timeFormat("%d %B %Y"), formatAn = d3.timeFormat("%Y"), formatMois = d3.timeFormat("%Y %B");
-	var formatTemps, formatTempsSplit = d3.timeFormat("%Y %m %d");
+	var formatTemps;
 	
 	
 	/*
@@ -75,18 +75,30 @@
 	function tempsToDate(temps, type) {
 	  	var dRef, arrTemps = temps.split('-')
 	  	formatTemps = arrTemps.length;
-	  	if(arrTemps.length==3) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps[2]];
-	  	if(arrTemps.length==2) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, 1];
-		if(arrTemps.length==1) dRef = [arrTemps[0], 0, 1];
-		if(type=="utc") return Date.UTC(dRef[0], dRef[1], dRef[2]);
-		else return new Date(dRef[0], dRef[1], dRef[2]);	
+	  	if(arrTemps.length==3){
+			//vérifie la présence d'heure
+			var arrTemps2 = arrTemps[2].split(' ');
+			if(arrTemps2.length==1) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps[2], 0, 0, 0];
+			else{
+				var arrTemps3 = arrTemps2[1].split(':');
+				formatTemps += arrTemps3.length;				
+        			if(arrTemps3.length==1) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps2[1], 0, 0];
+        			if(arrTemps3.length==2) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps3[0], arrTemps3[1], 0];		  	 
+        			if(arrTemps3.length==3) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps3[0], arrTemps3[1], arrTemps3[2]];		  	 
+			}
+		}
+	  	if(arrTemps.length==2) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, 1, 0, 0, 0];
+		if(arrTemps.length==1) dRef = [arrTemps[0], 0, 1, 0, 0, 0];
+		if(type=="utc") return Date.UTC(dRef[0], dRef[1], dRef[2], dRef[3], dRef[4], dRef[5]);
+		else return new Date(dRef[0], dRef[1], dRef[2], dRef[3], dRef[4], dRef[5]);	
 	}
 	function dateToTemps(dt) {
-		var t = formatTempsSplit(dt);
-		t = t.split(" ");
-		if(formatTemps==3) return Date.UTC(t[0], parseInt(t[1])-1, t[0]);
-		if(formatTemps==2) return Date.UTC(t[0], parseInt(t[1])-1, 1);
-		if(formatTemps==1) return Date.UTC(t[0], 0, 1);	    			
+		if(formatTemps==6) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(), dt.getHours(), dt.getMinutes(), dt.getSeconds());
+		if(formatTemps==5) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(), dt.getHours(), dt.getMinutes(),0);
+		if(formatTemps==4) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(), dt.getHours(),0, 0);
+		if(formatTemps==3) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(),0,0,0);
+		if(formatTemps==2) return Date.UTC(dt.getFullYear(), dt.getMonth(), 1,0,0,0);
+		if(formatTemps==1) return Date.UTC(dt.getFullYear(), 0, 1,0,0,0);	    			
 	}
 	    
 	//d3.csv('<?php echo $this->urlData;?>', function(err, data){
@@ -171,11 +183,13 @@
 	  
 	  var mqpdata = nested_data.map(function(d){
 	    var obj = {
-	      month: tempsToDate(d.key),
+	      utc: tempsToDate(d.key, 'utc'),
+	      dt: tempsToDate(d.key),	      
 	    }
 	    
 	    d.values.forEach(function(v){
 	      obj[v.key] = v.value;
+	      obj.k = v.key+'-'+obj.utc;		  	      
 	      //console.log(d.value)
 	    })
 	    
@@ -205,7 +219,9 @@ function buildStreamGraph(mqpdata) {
 	var margin = {top: 20, right: 30, bottom: 30, left: 30};
 	var width = window.innerWidth - margin.left - margin.right;
 	var height = window.innerHeight - margin.top - margin.bottom - divTitreHeight;
-	var extData = d3.extent(data, function(d){ return d.month; });
+	var extData = d3.extent(data, function(d){ 
+		return d.utc; 
+		});
 	var y = d3.scaleTime()
 	    .domain([extData[1],extData[0]])
 	    .range([margin.top, height-margin.bottom]);	
@@ -223,7 +239,7 @@ function buildStreamGraph(mqpdata) {
 	var area = d3.area()
 		.y(function(d) { 
 			//console.info('in area function', d); 
-			return y(d.data.month); 
+			return y(d.data.utc); 
 			})
 		.x0(function(d) { 
 			var xTest = x(d[0]);
@@ -262,10 +278,13 @@ function buildStreamGraph(mqpdata) {
 	    })
 	    .on('mousemove', function(d){      
 			//console.log(d);
-		    	var mouse = d3.mouse(this);	
+			//récupère les datas liés à la position de la souris
+		    	var mouse = d3.mouse(this);		    		
 		    	var dRef = dateToTemps(y.invert(mouse[1]));	    
 			var k = d.key+'-'+dRef;
 			var dt = refData[k];
+			//récupère les datas liés au path
+			//dt = refData[d[d.index].data.k];
 			var pcRef = Math.trunc(dt.value)/refTotal[dt.temps]*100;	    	
 			var pcTot = refTag[d.key].value/refTotal['total']*100;	    	
 			tooltip.html(refTag[d.key].type+"<br/>"
@@ -281,17 +300,18 @@ function buildStreamGraph(mqpdata) {
 	               .duration(500)
 	               .style("opacity", 0);
 		})
-	
+	//construction de l'axe y
 	svg.append("g")
             .attr("class", "axis axis--y")
             .attr("transform", "translate(" + 100 + "," + 0 + ")")
             .call(yAxis);    
+	/*construction de l'axe des X
 	svg.append("g")
 		.attr("id","axeXBas")
 	    .attr("class", "axis axis--x")
 	    .attr("transform", "translate(" + 0 + "," + (height-margin.bottom+10) + ")")
 	    .call(xAxis);    
-    
+    */
 }
 
 	function buildLegend(){
@@ -299,8 +319,9 @@ function buildStreamGraph(mqpdata) {
 
 		//calcul le nombre de légende
 		var bbG = document.getElementById("svgGlobal").getBBox();
-		var bbA = document.getElementById("axeXBas").getBBox();
-		var nbItem = Math.ceil((bbG.height-bbA.height)/20)-1;
+		//var bbA = document.getElementById("axeXBas").getBBox();
+		//var nbItem = Math.ceil((bbG.height-bbA.height)/20)-1;
+		var nbItem = Math.ceil((bbG.height-10)/20)-1;
 		var nbLeg = Math.ceil(legData.labels.length/nbItem);
 		var arrLeg = [];
 		

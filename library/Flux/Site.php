@@ -94,7 +94,7 @@ class Flux_Site{
 	        $g = fopen("http:\\www.google.com", "r") ? true : false;
 	        $this->bConnect = true;
         }catch (Zend_Exception $e) {
-        	$this->bConnect = false;
+            	$this->bConnect = false;
         }
         
     

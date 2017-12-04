@@ -1,6 +1,7 @@
 <?php
 require_once( "../application/configs/config.php" );
 
+
 try {
 	$application->bootstrap();
 	$s = new Flux_Site(false,true);
@@ -459,21 +460,20 @@ try {
 	$s->trace($json);			
 	*/
 	
-	//UTILISATION DE L'API VISION
+	/*UTILISATION DE L'API VISION
 	$url = '1404571653141.jpg';
 	$url = 'http://gallica.bnf.fr/iiif/ark:/12148/bpt6k63191b/f508/806.7551430159441,842.9350218708103,1044.2048577376822,201.16030534351148/571,110/0/native.jpg';
 	$url = 'https://books.google.fr/books?id=VpNa9UckT24C&hl=fr&pg=PA22&img=1&zoom=3&sig=ACfU3U3WWrRLzXiX-8wX29Bl_d1LxQuLlw&w=1280';
 	$url = 'http://localhost/jdc/data/ocr/800px-LNP_OCR_ex1.png';
 	$url = 'http://localhost/ValArNum/omk/files/original/8d4dc00ea8f602194c63ae9fa5e49a7f7a27cf46.jpg';
-	
+	*/
 	
 	
 	/*exemple à creuser en utilisant composer...
 	$gC = new Google_Client();
 	$gC->setClientId(KEY_GOOGLE_CLIENT_ID);
 	$gC->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
-	$gC->setDeveloperKey(KEY_GOOGLE_SERVER);
-	
+	$gC->setDeveloperKey(KEY_GOOGLE_SERVER);    
 	//merci à https://gist.github.com/shoma/e64d0ecb9d3aa0673114		
 	$gC->setScopes([Google_Service_Vision::CLOUD_PLATFORM]);
 	$service = new Google_Service_Vision($gC);
@@ -503,6 +503,7 @@ try {
 	$s->trace("<img src='".$fichier."'>");			
 	*/
 	
+	/*
 	$im = file_get_contents($url);	
     $imdata = base64_encode($im); 
     $json = '{
@@ -530,9 +531,16 @@ try {
     $response = $s->getUrlBodyContent($url,false,false,Zend_Http_Client::POST,array("value"=>$json, "type"=>'application/json'));//"Content-Type: application/json"
 	//$ curl -v -k -s -H "Content-Type: application/json" https://vision.googleapis.com/v1/images:annotate?key=browser_key --data-binary @request_filename
 	$s->trace("reponse de google = ".$response);			
-	//
+	*/
 	
-	/*
+
+	/*The text to analyze
+	$text = 'Reportage n° 2702 / Déjeuner et entretien avec Zulfikor Ali Bhutto, président de la République du Pakistan (25 juillet 1973).';
+	$gL = new Flux_Glanguage();
+	$r = $gL->analyzeEntities($text);
+	*/
+	
+    /*
 	$bt = new BibTeX_Parser("../../cdnl-2015-prod/excode/bdd/shelf.bibtex");
 	$bt->parse();
 	//
@@ -657,14 +665,22 @@ try {
 	$s->trace($reponse);
 	*/
 	
-	/*
-	$an = new Flux_An('flux_an','omk_valarnum',true);
+	//
+	$an = new Flux_An('flux_valarnum','omk_valarnum',true);
 	$an->bTraceFlush = $s->bTraceFlush;
 	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";
+	$url = "http://localhost/jdc/data/an/inventairesdesarchivesnationales/FRAN_IR_055457.xml";	
 	//$an->sauveXmlEad($url);
 	//$an->setItemSetFromDocRoot(3);
-	$an->getCsvToOmeka(3, "/Library/WebServer/Documents/jdc/data/AN/testImportTot.csv");
-	*/
+	$an->getAnalyseGoogle();
+	//$an->getCsvToOmeka(3, "/Library/WebServer/Documents/jdc/data/AN/importTot.csv");
+	/*
+    $sta = new Flux_Stats(false, true);
+    $data = $an->getEvalsMonadeHistoByTag(3,'%Y-%m-%d %H:%i:%s');
+    //calcul les données pour le stream
+    $data = $sta->array_orderby($data, 'type', SORT_ASC, 'temps', SORT_ASC);
+    $data = $sta->getDataForStream($data, '%Y-%m-%d %H:%i:%s');
+	*/            
 	
 	/*
 	$isidore = new Flux_Isidore('flux_isodore',true);

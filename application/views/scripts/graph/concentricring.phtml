@@ -1,0 +1,34 @@
+<html>
+<div id="chartContainer">
+	<script src="../js/d3.v4.js"></script>
+	<script src="http://dimplejs.org/dist/dimple.v2.3.0.min.js"></script>
+	<script type="text/javascript">
+    var svg = dimple.newSvg("#chartContainer", 590, 400);
+    d3.tsv("../data/example_data.tsv", function (data) {
+      var myChart = new dimple.chart(svg, data);
+      //myChart.setBounds(20, 20, 460, 360)
+	  myChart.setBounds(6, 6, 200, 200)
+      
+      myChart.addMeasureAxis("p", "Unit Sales");
+      var outerRing = myChart.addSeries("Channel", dimple.plot.pie);
+      var innerRing = myChart.addSeries("Price Tier", dimple.plot.pie);
+      var twoRing = myChart.addSeries("Brand", dimple.plot.pie);
+      /* Negatives are calculated from outside edge, positives from center
+      outerRing.innerRadius = "-30px";
+      innerRing.outerRadius = "-40px";
+      innerRing.innerRadius = "-70px";
+      twoRing.outerRadius = "-80px";
+      twoRing.innerRadius = "-110px";
+      */
+      outerRing.innerRadius = "-10px";
+      innerRing.outerRadius = "-20px";
+      innerRing.innerRadius = "-30px";
+      twoRing.outerRadius = "-40px";
+      twoRing.innerRadius = "-50px";
+      
+      myChart.addLegend(500, 20, 90, 300, "left");
+      myChart.draw();
+    });
+  </script>
+</div>
+</html>

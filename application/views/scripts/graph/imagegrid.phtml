@@ -47,7 +47,7 @@ var transformCSSProp = (function(property) {
 })('Transform');
 
 var flickrApiKey = 'ea621d507593aa247dcaa792268b93d7';
-var maxImageSize = 32;
+var maxImageSize = 320;
 var data = [];
 var buffer, lastHeight, dimensions, imagesPerRow, imagesPerPage, imageSize, nest;
 
@@ -84,10 +84,13 @@ for (var i = 0; i < 100; i++) {
 */
 
 //d3.csv('../data/googleApi.csv',
-d3.csv('../flux/iiif?q=getCollectionFaces&idCol=15399&csv=1',
+d3.json('../flux/iiif?q=getCollectionFaces&idCol=15399',
         function(err, arr) {
             if (err) return console.log(err);
-            data = arr;
+            data = [];
+            arr.forEach(function(c){
+            		data.push({'src':c.imgFull,'id':c.id});
+			});
             setDimensions();
         })
 

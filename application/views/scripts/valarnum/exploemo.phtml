@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Gallerie dynamique de photos</title>
+<title>Explorations émotionnelles des archives numériques</title>
 <style>
 html, body {
 	height: 100%;
@@ -32,16 +32,12 @@ html, body {
 }
 
 #curseurSelect {
-	font-size: 56px;
+	font-size: 42px;
 	text-align: center;
 }
 
 .choix {
 	position: absolute;
-	width: 100%;
-	height: 100%;
-	left: 0px;
-	top: 0px;
 	z-index: 100;
 }
 
@@ -54,7 +50,6 @@ html, body {
 	z-index: 100;
 }
 
-
 .carousel .item {
 	height: 300px;
 }
@@ -65,56 +60,99 @@ html, body {
 	left: 0;
 	min-height: 300px;
 }
+
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 200px;
+  height: 200px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: white;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
 </style>
 
 <!-- CSS -->
-<link rel="stylesheet" type="text/css"
-	href="../font/font-awesome/font-awesome.css" />
+<link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
 <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
 <script src="../js/d3.min.js"></script>
 <script src="../js/jquery.min.js"></script>
+<script src="../js/valarnum/flux.js"></script>
+
+<script type="text/javascript">
+var uti = <?php echo $this->uti; ?>;
+
+</script>
 
 </head>
 
 <body>
 
 
-<div class="card text-center">
-  <div class="card-header">
-		<nav class="navbar navbar-light bg-light">
-			<span class="h1" class="navbar-brand mb-0">Evaluations émotionnelles</span>
-		</nav>
-  </div>
-  <div class="card-body">
-    <h2 class="card-title">Collections photographiques des Archives Nationales</h2>
-    
-	<div class="container-fluid">
-		<div id="rowGen" class="row">
-			<div class="col-4 hidden-md-down">
-				<div id="carouselEvals" class="carousel slide" data-ride="carousel">
+	<div class="card text-center">
+		<div class="card-header">
+			<h1>Explorations émotionnelles</h1>
+			<h2 class="card-title">Collections photographiques des Archives
+				Nationales</h2>
+			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+				<a class="navbar-brand" href="#">Menu</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse"
+					data-target="#navbarTogglerDemo02"
+					aria-controls="navbarTogglerDemo02" aria-expanded="false"
+					aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+					<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+						<li class="nav-item"><a class="nav-link" href="../valarnum">Accueil<span
+								class="sr-only">(current)</span></a></li>
+						<li class="nav-item active"><a class="nav-link" href="#">Explorations
+								émotionnelles</a></li>
+						<li class="nav-item"><a class="nav-link" href="../valarnum/evalacteurs">Evaluation des
+								acteurs</a></li>
+					</ul>
+					<form class="form-inline my-2 my-lg-0">
+						<button class="btn btn-outline-success my-2 my-sm-0" type="button"><?php echo $this->login; ?></button>
+						<button class="btn btn-outline-danger my-2 my-sm-0" onclick="deconnexion()" type="button">déconnexion</button>
+					</form>
+				</div>
+			</nav>				
+				
+			<ul class="nav nav-pills card-header-pills" id="myTab" role="tablist">
+				<li class="nav-item"><a class="nav-link" id="carto-tab"
+					data-toggle="tab" href="#carto" role="tab" aria-controls="carto"
+					aria-selected="true">Cartographier</a></li>
+				<li class="nav-item"><a class="nav-link" id="navig-tab"
+					data-toggle="tab" href="#navig" role="tab" aria-controls="navig"
+					aria-selected="false">Naviguer</a></li>
+				<li class="nav-item"><a class="nav-link disabled" id="story-tab"
+					data-toggle="tab" href="#story" role="tab" aria-controls="story"
+					aria-selected="false">Raconter</a></li>
+			</ul>
+		</div>
+
+	<div class="card-body" >
+
+
+		<div class="tab-content" id="myTabContent">
+			<div class="tab-pane fade show active" id="carto" role="tabpanel"
+				aria-labelledby="carto-tab">
+				<div class="col-12 hidden-md-down" id="graph">
+					<div id="curseurPalette" class="curseur"></div>
+					<div id="curseurSelect" class="curseur"></div>
+				</div>
+			</div>
+			<div class="tab-pane fade" id="navig" role="tabpanel"
+				aria-labelledby="navig-tab">
+
+				<div id="carouselEvals" class="carousel slide" data-ride="carousel" style="text-align:-webkit-center">
 					<ol class="carousel-indicators" id="car-ind">
-						<!--  
-    <li data-target="#carouselEvals" data-slide-to="0" class="active"></li>
-    <li data-target="#carouselEvals" data-slide-to="1"></li>
-   -->
 					</ol>
 					<div class="carousel-inner" id="car-inn">
-						<!--  
-    <div class="carousel-item active">
-      <img class="d-block w-100" src="http://localhost/ValArNum/omk/iiif-img/15314/1290,753,258,552/full/0/default.jpg" alt="First slide">
-      <div class="carousel-caption d-none d-md-block">
-        <h3>Titre 1</h3>
-        <p>blbab</p>
-      </div>
-   </div>
-    <div class="carousel-item">
-      <img class="img-fluid" src="http://localhost/ValArNum/omk/iiif-img/15350/334,549,1612,1326/full/0/default.jpg" alt="Second slide">
-      <div class="carousel-caption d-none d-md-block">
-        <h3>Titre 1</h3>
-        <p>blbab</p>
-      </div>
-    </div>
-    -->
 					</div>
 					<a class="carousel-control-prev" href="#carouselEvals"
 						role="button" data-slide="prev"> <span
@@ -126,22 +164,18 @@ html, body {
 						class="sr-only">Next</span>
 					</a>
 				</div>
-
 			</div>
-			<div class="col-8 hidden-md-down" id="graph">
-				<div id="curseurPalette" class="curseur"></div>
-				<div id="curseurSelect" class="curseur"></div>
-			</div>
+			<div class="tab-pane fade" id="story" role="tabpanel"
+				aria-labelledby="story-tab"></div>
 		</div>
 
+
 	</div>
-    
-  </div>
-  <div id="pied" class="card-footer text-muted">
-			<h4>Conception &amp; réalisation : Samuel Szoniecky</h4>
-			<h5>Merci à : </h5>
-  </div>
-</div>
+	<div id="pied" class="card-footer text-muted">
+		<h4>Conception &amp; réalisation : Samuel Szoniecky</h4>
+		<h5>Merci à : <a href="https://bl.ocks.org/shimizu/79409cca5bcc57c32ddae0a5f0a1a564">shimizu</a></h5>
+	</div>
+	</div>
 
 
 
@@ -221,6 +255,11 @@ html, body {
 			ee.parent = p;
 		}) 
 	});
+
+
+	var divTT = d3.select("body").append("div")
+	    .attr("class", "tooltip")
+	    .style("opacity", 0);
 	
 	var onFlux=true, onSelect=false, onChoix=false, noCurseur, curSelect, rootTofs, tofSelect, tofEval=[], idSvg="svg3360", l, t
 		, mousedownID, cChoix, rChoix = 10, wCurseur = 300, hCurseur = 300, w="715.41962", h="724.66992", padding = 30
@@ -231,9 +270,54 @@ html, body {
 	var graph = document.querySelector("#graph");
     var width = graph.clientWidth;
     var height = window.innerHeight-graph.offsetTop-pied.offsetHeight-padding;
-    d3.select("#rowGen").style("height", height+"px");
-    var div = d3.select("#graph").append("div").attr("width", width).attr("height", height);
+    d3.select("#carto").style("height", height+"px");
+    var svgTof = d3.select("#graph").append("svg").attr("width", width).attr("height", height);
     var rdmCur = d3.randomUniform(curseurData.length-1);
+	
+
+    //ajoute le déplacement suivant la souris
+	d3.select('#graph')
+		.on('mousedown',function(e){
+    	        //affiche les fonds des fragments
+    	        d3.selectAll(".gCurseur").selectAll('path').style('fill-opacity',1);
+    	  		//commence la sélection en bloquant le curseur
+    	  		onSelect = true;
+    	  		//stop le flux d'image
+    	  		onFlux = false;
+    	  		//récupère la photo de dessous par filtrage des coordonnées
+    	  		//car pas trouvé le moyen de le faire sur un event de la photo
+    	  		//à cause de la séparation des div entre curseur et photo
+    	  		var m = d3.mouse(this);    	  		
+    	  		//var m = d3.event;    	  		
+    			tofSelect = rootTofs.children.filter(function(d){
+        	  		return m[0] > d.x0 && m[1] > d.y0 && m[0] < d.x1 && m[1] < d.y1;
+        	  		//return m.x > d.x0 && m.y > d.y0 && m.x < d.x1 && m.y < d.y1;
+    	  			})[0];
+    	  		//met les bords en rouge
+        	  	d3.select('#div'+tofSelect.data.idOmk).style('border-style','solid');		
+			})
+		.on('mousemove',function(e){
+			if(onSelect)return;
+			if(noCurseur)return;
+			var mT = d3.mouse(this);
+			var x = mT[0]-(wCurseur/2);
+	        var y = mT[1]-(hCurseur/2);
+	        l = x-graph.offsetLeft+(hCurseur/2)+(rChoix/2);
+	        t = y+(hCurseur/2)-(rChoix);
+
+	  		var m = d3.event;
+			if(m.x < graph.offsetLeft)return;
+			if(m.y < graph.offsetTop || m.y > (graph.offsetTop+graph.clientHeight))return;
+	  			
+  			d3.select("#curseurPalette")
+                .style("left",  x + "px")
+                .style("top", y + "px");
+  			d3.select("#curseurSelect")
+    	            .style("width", wCurseur+"px")
+    	            .style("left", x+"px")
+    	            .style("top", (y-42) +"px");
+                
+		});
     
     function showCurseurFragment(){
 		if(onSelect)return;
@@ -286,68 +370,70 @@ html, body {
             .forEach(function(d){
                 //modifie la taille de la photo dans le treemap
                 d.value = ~~(d3.randomUniform(1, 10)()); 
-                //modifie la taille de la photo
-                if(d.imgOmk){
-                    var minPixel = 10;
-                    if(q != 'getCollectionFaces'){ 
-                        //calcul la taille de la photo
-                        d.x1 = parseInt(d3.randomUniform(minPixel, d.width)());
-                        d.x2 = parseInt(d3.randomUniform(minPixel, (d.width-d.x1-minPixel))());
-                        d.y1 = parseInt(d3.randomUniform(minPixel, d.height)());
-                        d.y2 = parseInt(d3.randomUniform(minPixel, (d.height-d.y1-minPixel))());
-                        var s = parseInt(d3.randomUniform(1, 4)());
-                        var w = (d.x1+d.x2) * s;
-                        var h = (d.y1+d.y2) * s;
-                        d.r = 0;
-        	                d.imgAleaTot=d.imgOmk+'/'+d.x1+','+d.y1+','+d.x2+','+d.y2+'/'+w+','+h+'/'+d.r+'/default.jpg';
-        	                d.imgAleaPosi=d.imgOmk+'/'+d.x1+','+d.y1+','+d.x2+','+d.y2+'/full/'+d.r+'/default.jpg';
-        	                d.img=d.imgAleaPosi;
-                    }else{
-                         d.img=d.imgFull;
-                         d.value = d.width*d.height;
-                    }
-	                /*
-	                console.log(d.img);    	                
-	                console.log(d.imgAleaTot);    	                
-	                console.log(d.imgAleaPosi);    	                
-	                */
-                }
             })
     }
     
     
     function drawTreemap(root) {
 
-        var node = div.selectAll(".node")
+        var node = svgTof.selectAll(".node")
         		.data(root.children);
           
         var newNode = node.enter()
-           .append("div").attr("class", "node")
-	  	   ;
+           .append("image").attr("class", "node");
 
         node.merge(newNode)
-            /*PROBLEME avec la réécriture des liens IIIF
-            .transition()
-            .duration(1000)
-            */
             .attr('id',function(d) { 
-                return 'div'+d.data.idOmk 
+                return 'img_'+d.data.idOmk 
                 })
-            .style("left", function(d) { return d.x0 + "px" })
-            .style("top", function(d) { return d.y0 + "px" })
-            .style("width", function(d) { return (d.x1 - d.x0) + "px" })
-            .style("height", function(d) { return (d.y1 - d.y0) + "px"})
-            .style("background-image", function(d){ 
-                //console.log(d.data.img);    	                                
-                return "url("+d.data.img+")"
-                })                    		
-            .on('click',function(d, i){
-    	  			//affiche le curseur selecteur
-	  			console.log(d);
-  			});
-            
+            .attr("x", function(d) { return d.x0 })
+            .attr("y", function(d) { return d.y0 })
+            .attr("width", function(d) { 
+				d.w = (d.x1 - d.x0);
+                return d.w + "px" 
+                })
+            .attr("height", function(d) { 
+				d.h = (d.y1 - d.y0);
+                return d.h + "px"
+                })
+            .attr("xlink:href", function(d){ 
+               //console.log(d.data.img);    	                                
+               return getImgIIIF(d);
+               })
+            .on("click",function(e){
+                console.log(e);
+            });
+        
     }
 
+
+    function getImgIIIF(d){
+        //modifie la taille de la photo
+        if(d.data.imgOmk){
+            var minPixel = 10;
+            if(q != 'getCollectionFaces'){ 
+                //calcul la taille de la photo
+                d.data.x = parseInt(d3.randomUniform(minPixel, d.data.width-(d.x1-d.x0))());
+                d.data.w = d.w;
+                d.data.y = parseInt(d3.randomUniform(minPixel, d.data.height-(d.y1-d.y0))());
+                d.data.h = d.h;
+                d.data.r = 0;
+	            d.data.img=d.data.imgOmk+'/'+d.data.x+','+d.data.y+','+d.data.w+','+d.data.h+'/full/'+d.data.r+'/default.jpg';
+            }else{
+                 d.data.img=d.data.imgFull;
+                 d.data.value = d.data.width*d.data.height;
+            }
+        }
+        //console.log(d);        
+		return d.data.img;
+        /*
+        console.log(d.img);    	                
+        console.log(d.imgAleaTot);    	                
+        console.log(d.imgAleaPosi);    	                
+        */
+        
+    }
+    
 
 	d3.xml("../svg/Plutchik-wheel.svg",function(node) { 
 		//return true;
@@ -437,16 +523,15 @@ html, body {
 	  			//merci à  https://stackoverflow.com/questions/15505272/javascript-while-mousedown
 	  			if(mousedownID==-1){  //Prevent multimple loops!		  			
 	  				curSelect = d;
-        	  			var x = l+(wCurseur/2)-rChoix, y = t+(hCurseur/2)-rChoix;
         	  			//ajoute un cercle de la couleur
-        	  			cChoix = d3.select('body').append("svg").attr("class","choix")
-        	  				.append('circle')
-        	  				.attr("cx",rChoix)
+        	  			cChoix = svgTof.append('circle')
+        	  				.attr("class",'choix')
+        	  				.attr("cx",0)
         	  				.attr("cy",rChoix)
         	  				.attr("r",rChoix)
         	  				.style('fill-opacity',0.3)       	  				
         	  				.style("fill",d.o.color)
-        	  				.attr('transform', 'translate(' + x + ',' + y + ')')
+        	  				.attr('transform', 'translate(' + l + ',' + t + ')')
         	  				;
 	  			    mousedownID = setInterval(augmenteChoix, 100 /*execute every 100ms*/); 			     	  			    	  				
 	  			}
@@ -477,8 +562,11 @@ html, body {
 		console.log('stockeChoix');	
 		if(!cChoix)return;
 				
-		//calcul la position du choix
-		var x = l+(wCurseur/2)-rChoix, y = t+(hCurseur/2)-rChoix;
+		//calcul la position du choix par rapport à l'image
+		//var x = l+(wCurseur/2)-rChoix-tofSelect.x0+tofSelect.data.x
+		//	, y = t+(hCurseur/2)-rChoix-tofSelect.y0+tofSelect.data.y;
+		var x = l-tofSelect.x0+tofSelect.data.x
+		, y = t-tofSelect.y0+tofSelect.data.y;
 
 		//récupère l'évaluation pour la photo omk
 		var to = tofEval.filter(function(d){
@@ -486,16 +574,23 @@ html, body {
 			});
 		//enregistre les références de l'émotion dans la photo
 		var ev = {'img':tofSelect.data.img
-			,'x1':tofSelect.data.x1,'x2':tofSelect.data.x2,'y1':tofSelect.data.y1,'y2':tofSelect.data.y2
+			,'x':tofSelect.data.x,'y':tofSelect.data.y,'w':tofSelect.data.w,'h':tofSelect.data.h
 			,'cx':x,'cy':y,'r':cChoix.attr("r"),'d':d.o};
-		//ajoute les échelles de la photo
-		ev.echelleX = d3.scaleLinear().range([ev.x1, ev.x2]);
-		ev.echelleY = d3.scaleLinear().range([ev.y1, ev.y2]);
-	    //stocke l'avaluation	
+			
+		//enregistre l'évaluation dans la base		
+		sauveEmo(tofSelect, ev);
+
+		
+	    //stocke l'évaluation	
 		if(to.length > 0){
 			 to[0].evals.push(ev);
 		}else{
-			tofEval.push({'idOmk':tofSelect.data.idOmk,'label':tofSelect.data.label,'original':tofSelect.data.original
+			//création de la référence de la photo
+			tofEval.push({'idOmk':tofSelect.data.idOmk,'label':tofSelect.data.label
+				,'original':tofSelect.data.original
+				,'h':tofSelect.data.height,'w':tofSelect.data.width
+				,'scaleX':d3.scaleLinear().domain([0, tofSelect.data.width])
+				,'scaleY':d3.scaleLinear().domain([0, tofSelect.data.height])
 				,'evals':[ev]
 				});
 
@@ -518,68 +613,86 @@ html, body {
 				.append('div').attr('class','carousel-item '+active);
 			item.append('img')
 				.attr('id','carImg_'+tofSelect.data.idOmk)
-				.attr('class','d-block w-100')
+				.attr('class','d-block img-fluid')
+				.style('max-height',height+"px")
 				.attr('src',tofSelect.data.imgFull);
 			//ajoute le descriptif
 			var block = item.append('div').attr('class','carousel-caption d-none d-md-block');
 			block.append('h3').text(tofSelect.data.label);
+			block.append('h4').text(tofSelect.data.idOmk);
 			block.append('p').append('a').attr('href',tofSelect.data.original).attr('target','_blank').text('original');
 			
 		}
-		
 
 		if(tofEval.length == 1){
 			$('.carousel').carousel();
 			//ajoute le svg pour les cercle de choix
 			svgChoix = d3.select('#carouselEvals').append('svg')			
+				.attr('id','svgChoix')
 				.attr('class','choixCarousel')
 				.append('g').attr('id','gChoix');
-			//ajoute la première évaluation
-			var fEv = tofEval[0].evals[0];		
-			  //met à jour l'échelle de la photo
-			var carImg = d3.select("#carImg_"+tofSelect.data.idOmk);
-			fEv.echelleX.domain([carImg.x, carImg.width]);
-			fEv.echelleY.domain([carImg.y, carImg.height]);
-				
-			svgChoix.append('circle')					  
-				.attr('cx',fEv.cx)
-			  	.attr('cy',fEv.cy)					  
-			  	.attr('r',fEv.r)
-			  	.attr('fill',fEv.d.color);
-			svgChoix.append('rect')					  
-        			.attr('x',fEv.x1)
-        		  	.attr('y',fEv.y1)					  
-        		  	.attr('width',fEv.x2)
-        		  	.attr('height',fEv.y2)
-        		  	.attr('fill','none')
-				.attr('stroke','red');
+			
 			//ajoute les événements
-			$('#carouselEvals').on('slide.bs.carousel', function (e) {
-				  console.log(e);
-				  //récupère la définition des cercles
-				  var te = tofEval[e.from].evals;
+			$('#carouselEvals').on('slid.bs.carousel', function (e) {
+				  //console.log(e);
+
+				var tEv = tofEval[e.to];		
+				var carImg = d3.select("#carImg_"+tEv.idOmk).node();
+				tEv.scaleX.range([0, carImg.width]);
+				tEv.scaleY.range([0, carImg.height]);
+				  
+				//récupère la définition des cercles
+				var te = tEv.evals;
 						  
 				  //construction du rectangle de zoom
-				  d3.select('#gChoix').selectAll('rect').data(te).enter()
+				  svgChoix.selectAll('rect').remove();
+				  var evRect = svgChoix.selectAll('rect').data(te);
+				  //ajoute les nouvelles évaluations
+				  evRect.enter()
 				  	  .append('rect')
-					  .attr('x',function(d){
-						  return d.x1
+					  .attr("width", function(d){
+						  return tEv.scaleX(d.w);
 						  })
-					  .attr('y',function(d){return d.y1})
-					  .attr("width", function(d){return d.x2})
-		        	    	  .attr("height", function(d){return d.y2})
+                        .attr("height", function(d){
+                          return tEv.scaleY(d.h);
+                          })
 					  .attr('fill','none')
-					  .attr('stroke','red');
+					  .attr('stroke','red')
+					  .attr('transform',function(d){
+						return  'translate('+(carImg.offsetLeft+tEv.scaleX(d.x))+' '+(carImg.offsetTop+tEv.scaleY(d.y))+')'
+					  	});
+                  
+				  
 				  //construction des cercles d'évaluation
-				  d3.select('#gChoix').selectAll('circle').data(te).enter()
+				  svgChoix.selectAll('circle').remove();
+				  var evCirc = svgChoix.selectAll('circle').data(te);
+				  evCirc.enter()
 				  	  .append('circle')
-					  .attr('cx',function(d){return d.cx})
-					  .attr('cy',function(d){return d.cy})					  
-					  .attr('r',function(d){return d.r})
+				  	  .attr('cx',function(d){
+					  	  return carImg.offsetLeft+tEv.scaleX(d.cx)
+					  	  })
+					  .attr('cy',function(d){
+						  return carImg.offsetTop+tEv.scaleY(d.cy)
+						  })					  
+					  .attr('r',function(d){return tEv.scaleX(d.r)})
+        	  			  .style('fill-opacity',0.3)       	  				
 					  .attr('fill',function(d){
 						  return d.d.color
-						  });
-				  
+						  })
+					  .on("mouseover", function(d) {
+						  divTT.transition()
+					         .duration(200)
+					         .style("opacity", .9);
+						  divTT.html(d.d.fr)
+					         .style("left", (d3.event.pageX) + "px")
+					         .style("top", (d3.event.pageY - 28) + "px");
+					       })
+				     .on("mouseout", function(d) {
+        				    	 divTT.transition()
+        				         .duration(500)
+        				         .style("opacity", 0);
+				       });
+			       				  
 				})
 		}
 		//$('.carousel').carousel('cycle');
@@ -597,50 +710,73 @@ html, body {
 		onFlux = true;
 	}
 
-	//ajoute le déplacement suivant la souris
-	d3.select('#graph')
-		.on('mousedown',function(e){
-    	        //affiche les fonds des fragments
-    	        d3.selectAll(".gCurseur").selectAll('path').style('fill-opacity',1);
-    	  		//commence la sélection en bloquant le curseur
-    	  		onSelect = true;
-    	  		//stop le flux d'image
-    	  		onFlux = false;
-    	  		//récupère la photo de dessous par filtrage des coordonnées
-    	  		//car pas trouvé le moyen de le faire sur un event de la photo
-    	  		//à cause de la séparation des div entre curseur et photo
-    	  		var m = d3.mouse(this);    	  		
-    	  		//var m = d3.event;    	  		
-    			tofSelect = rootTofs.children.filter(function(d){
-        	  		return m[0] > d.x0 && m[1] > d.y0 && m[0] < d.x1 && m[1] < d.y1;
-        	  		//return m.x > d.x0 && m.y > d.y0 && m.x < d.x1 && m.y < d.y1;
-    	  			})[0];
-    	  		//met les bords en rouge
-        	  	d3.select('#div'+tofSelect.data.idOmk).style('border-style','solid');		
+
+	function ajoutPhotosGallerie(){
+
+		//Ajoute la photo à la gallerie
+		var li = d3.select('#car-ind').selectAll('li').data(tofEval).append('li')
+			.attr('data-target',"#carouselEvals")	
+			.attr('data-slide-to',function(d,i){return i;})
+			.attr('class',function(d,i){if(i==0)return 'active';});	
+		
+		var items = d3.select('#car-inn').selectAll('div').data(tofEval)
+			.append('div').attr('class',function(d,i){
+				var c = 'carousel-item';
+				if(i==0) c+= 'active';
+				return c;
+				});
+		items.append('img')
+			.attr('id',function(d){
+				'carImg_'+d.idOmk
 			})
-		.on('mousemove',function(e){
-			if(onSelect)return;
-			if(noCurseur)return;
-			var mT = d3.mouse(this);
-			var x = mT[0]-(wCurseur/2);
-	        var y = mT[1]-(hCurseur/2);
-	  		var m = d3.event;
-	        l = m.x-(wCurseur/2);
-	        t = m.y-(hCurseur/2);
-
-			if(m.x < graph.offsetLeft)return;
-			if(m.y < graph.offsetTop)return;
-	  			
-  			d3.select("#curseurPalette")
-                .style("left",  x + "px")
-                .style("top", y + "px");
-  			d3.select("#curseurSelect")
-    	            .style("width", wCurseur+"px")
-    	            .style("left", x+"px")
-    	            .style("top", (y-56) +"px");
-                
+			.attr('class','d-block img-fluid')
+			.style('max-height',height+"px")
+			.attr('src',function(d){
+				'carImg_'+d.imgFull
+			});
+		//ajoute le descriptif
+		var block = item.append('div').attr('class','carousel-caption d-none d-md-block');
+		block.append('h3').text(function(d){
+			'carImg_'+d.label;
 		});
+		block.append('h4').text(function(d){
+			'carImg_'+d.idOmk;
+		});
+		block.append('p').append('a')
+		.attr('href',function(d){
+			'carImg_'+d.original;
+		})
+		.attr('target','_blank').text('original');
 
+		
+	}	
+	
+	function sauveEmo(tof, e) {
+
+		//récupère les référence de l'image "flux_an-flux_doc-doc_id-3538"
+		var ref = tof.data.metadata.Identifier.split('-');
+		var doc = {'idDoc':ref[3],'idOmk':tof.data.idOmk,'label':tof.data.label,'original':tof.data.original
+				,'w':tof.data.width,'h':tof.data.height};		
+		e.color = e.d.o.color;
+		e.d = e.d.o.fr;
+		e.idOmkCol = tof.data.idCol;
+		var p = {'q':'emo','doc':doc,'eval':e,'idBase':ref[0]};			
+	    $.ajax({
+	    		url: "../valarnum/sauve",
+	    		dataType: "json",
+	    		data: p,
+	    		method: 	"POST",
+	        	error: function(error){
+	        		console.log("Erreur : "+error.responseText);
+	        	},            	
+	        	success: function(data) {
+	  			  console.log(data);
+	        }
+		});	        
+
+		
+	}
+	
 	var lstChoix = d3.select('#listeChoix')
 		.on('mouseenter',function(d, i){
 			noCurseur = true;
