@@ -88,27 +88,27 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
 	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
 	    		//vérifie si le parent à des enfants
 	    		$arrP = $this->findByParent($data["parent"]);
-	    		if(count($arrP)){
-	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arr['rgt'];
-	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arr['rgt'];
-	    			$stmt = $this->_db->query($sql);
-	    			//
-	    			$data['lft'] = $arr['rgt']+1;
-	    			$data['rgt'] = $arr['rgt']+2;
-	    		}else{
-	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arr['lft'];
-	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arr['lft'];
-	    			$stmt = $this->_db->query($sql);
-	    			//
-	    			$data['lft'] = $arr['lft']+1;
-	    			$data['rgt'] = $arr['lft']+2;
-	    		}    		
 	    		$data['niveau'] = $arr['niveau']+1;
     		}
+    		if(count($arrP)){
+    			//met à jour les niveaux 
+    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arr['rgt'];
+    			$stmt = $this->_db->query($sql);
+    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arr['rgt'];
+    			$stmt = $this->_db->query($sql);
+    			//
+    			$data['lft'] = $arr['rgt']+1;
+    			$data['rgt'] = $arr['rgt']+2;
+    		}else{
+    			//met à jour les niveaux 
+    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arr['lft'];
+    			$stmt = $this->_db->query($sql);
+    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arr['lft'];
+    			$stmt = $this->_db->query($sql);
+    			//
+    			$data['lft'] = $arr['lft']+1;
+    			$data['rgt'] = $arr['lft']+2;
+    		}    		
     		if(!isset($data['lft']))$data['lft']=0;    		
     		if(!isset($data['rgt']))$data['rgt']=1;    		
     		if(!isset($data['niveau']))$data['niveau']=1;    		

@@ -134,30 +134,30 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
 	    		$arrP = $this->findBydoc_id($data["parent"]);
     			//récupère les information du parent
 	    		$arr = $this->findByParent($data["parent"]);
-	    		//gestion des hiérarchies gauche droite
-	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
-    			if(count($arr)>0){
-	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
-	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
-	    			$stmt = $this->_db->query($sql);
-	    			//
-	    			$data['lft'] = $arr[0]['rgt']+1;
-	    			$data['rgt'] = $arr[0]['rgt']+2;
-	    		}else{
-	    			//vérifie si la base n'est pas vide
-	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arrP['lft'];
-	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arrP['lft'];
-	    			$stmt = $this->_db->query($sql);
-	    			//
-	    			$data['lft'] = $arrP['lft']+1;
-	    			$data['rgt'] = $arrP['lft']+2;
-	    		}    		
 	    		$data['niveau'] = $arrP['niveau']+1;
     		}
+    		//gestion des hiérarchies gauche droite
+    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
+			if(count($arr)>0){
+    			//met à jour les niveaux 
+    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
+    			$stmt = $this->_db->query($sql);
+    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
+    			$stmt = $this->_db->query($sql);
+    			//
+    			$data['lft'] = $arr[0]['rgt']+1;
+    			$data['rgt'] = $arr[0]['rgt']+2;
+    		}else{
+    			//vérifie si la base n'est pas vide
+    			//met à jour les niveaux 
+    			$sql = 'UPDATE flux_doc SET rgt = rgt + 2 WHERE rgt >'.$arrP['lft'];
+    			$stmt = $this->_db->query($sql);
+    			$sql = 'UPDATE flux_doc SET lft = lft + 2 WHERE lft >'.$arrP['lft'];
+    			$stmt = $this->_db->query($sql);
+    			//
+    			$data['lft'] = $arrP['lft']+1;
+    			$data['rgt'] = $arrP['lft']+2;
+    		}    		
     		if(!isset($data['lft']))$data['lft']=0;    		
     		if(!isset($data['rgt']))$data['rgt']=1;    		
     		if(!isset($data['niveau']))$data['niveau']=1;    		

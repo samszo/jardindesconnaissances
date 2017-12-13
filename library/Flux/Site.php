@@ -648,6 +648,30 @@ class Flux_Site{
 		return $idDoc;   	
 	} 	
 
+	
+	/**
+	 * sauveJson
+	 *
+	 * enregistre un tableau en json
+	 *
+	 * @param string   $chemin
+	 * @param array    $arr
+	 *
+	 * @return int
+	 */
+	function sauveJson($chemin, $arr){
+	    $this->trace(__METHOD__.' '.$chemin);
+	    
+	    // Ouverture du fichier
+	    $fichier = fopen($chemin, 'w+');
+	    
+	    // Ecriture dans le fichier
+	    fwrite($fichier, json_encode($arr));
+	    
+	    // Fermeture du fichier
+	    fclose($fichier);
+	} 	
+	
     /**
      * sauveUtiByImage
      *

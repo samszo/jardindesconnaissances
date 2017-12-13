@@ -96,6 +96,14 @@ class Flux_Gvision extends Flux_Site{
 		$this->client->setClientId(KEY_GOOGLE_CLIENT_ID);
 		$this->client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
 		*/
+    		
+    		//on récupère la racine des documents
+    		$this->initDbTables();
+    		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+    		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
+    		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
+    		
+    		
     }
 
     /**

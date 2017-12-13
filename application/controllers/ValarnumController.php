@@ -44,6 +44,10 @@ class ValarnumController extends Zend_Controller_Action
     
     }
 
+    public function keshifAction(){
+        
+        
+    }
     
     public function sauveAction() {
         $this->initInstance();

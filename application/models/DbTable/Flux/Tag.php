@@ -93,30 +93,30 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 	    		$arrP = $this->findByTag_id($data["parent"]);
     			//récupère les information du parent
 	    		$arr = $this->findByParent($data["parent"]);
-	    		//gestion des hiérarchies gauche droite
-	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
-    			if(count($arr)>0){
-	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
-	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
-	    			$stmt = $this->_db->query($sql);
-	    			//
-	    			$data['lft'] = $arr[0]['rgt']+1;
-	    			$data['rgt'] = $arr[0]['rgt']+2;
-	    		}else{
-	    			//vérifie si la base n'est pas vide
-	    			//met à jour les niveaux 
-	    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arrP['lft'];
-	    			$stmt = $this->_db->query($sql);
-	    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arrP['lft'];
-	    			$stmt = $this->_db->query($sql);
-	    			//
-	    			$data['lft'] = $arrP['lft']+1;
-	    			$data['rgt'] = $arrP['lft']+2;
-	    		}    		
 	    		$data['niveau'] = $arrP['niveau']+1;
     		}
+    		//gestion des hiérarchies gauche droite
+    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
+		if(count($arr)>0){
+    			//met à jour les niveaux 
+    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
+    			$stmt = $this->_db->query($sql);
+    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
+    			$stmt = $this->_db->query($sql);
+    			//
+    			$data['lft'] = $arr[0]['rgt']+1;
+    			$data['rgt'] = $arr[0]['rgt']+2;
+    		}else{
+    			//vérifie si la base n'est pas vide
+    			//met à jour les niveaux 
+    			$sql = 'UPDATE flux_tag SET rgt = rgt + 2 WHERE rgt >'.$arrP['lft'];
+    			$stmt = $this->_db->query($sql);
+    			$sql = 'UPDATE flux_tag SET lft = lft + 2 WHERE lft >'.$arrP['lft'];
+    			$stmt = $this->_db->query($sql);
+    			//
+    			$data['lft'] = $arrP['lft']+1;
+    			$data['rgt'] = $arrP['lft']+2;
+    		}    		
     		if(!isset($data['lft']))$data['lft']=0;    		
     		if(!isset($data['rgt']))$data['rgt']=1;    		
     		if(!isset($data['niveau']))$data['niveau']=1;    		
@@ -160,7 +160,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
             ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
             ->from(array('node' => 'flux_tag'),array('libO'=>'code', 'idTag0'=>'tag_id', "lft", "rgt"))
             ->joinInner(array('enfants' => 'flux_tag'),
-                'enfants.lft BETWEEN node.lft AND node.rgt',array("recid"=>"tag_id",'text'=>'code','code', 'desc', 'tag_id', 'parent', 'niveau'))
+                'enfants.lft BETWEEN node.lft AND node.rgt',array("recid"=>"tag_id",'text'=>'code','code','type','uri', 'desc', 'tag_id', 'parent', 'niveau'))
             ->where( "node.tag_id = ?", $idTag)
            	->order("enfants.".$order);        
 		$result = $this->fetchAll($query);

@@ -118,10 +118,13 @@
 	  
 	  //création des datas de références
 	  refTotal['total']=0;
+      //pour éviter les division par 0
 	  data.forEach(function(dt){
 		  //transforme le temps en date
 		  var dRef = tempsToDate(dt.temps, 'utc');		  
-		  var k = dt.key+'-'+dRef;		  
+		  var dateVerif =  tempsToDate(dt.temps);
+		  var dRefVerif = dateToTemps(dateVerif);		  
+		  var k = dt.key+'-'+dRefVerif;		  
 		  refData[k] = dt;
 		  //cumul les clefs
 		  if(refKey.indexOf(dt.key)<0)refKey.push(dt.key);
@@ -136,6 +139,7 @@
 		  //cumul les tags
 		  if(!refTag[dt.key]){			  
 			  refTag[dt.key]={"type":dt.type,"desc":dt.desc,"value":Math.trunc(dt.value)};
+			  if(dt.color)refTag[dt.key].color=dt.color;
 		  }else{
 			  refTag[dt.key].value += Math.trunc(dt.value);
 		  }
@@ -148,8 +152,10 @@
 		  //numColor = 1/(numColor)*1000;
 		  //var numColor = 1/(refKey.length+1);	  
 		  nbTotal += refTag[r].value;
-		  var numColor = sc(i);	  
-		  refTag[r].color=color(numColor);
+		  if(!refTag[r].color){
+        		  var numColor = sc(i);	  
+        		  refTag[r].color=color(numColor);
+		  }
 		  legData.colors.push(refTag[r].color);		  
 		  legData.labels.push(refTag[r].type);		  
 		  //legData.labels.push(refTag[r].type+' : '+refTag[r].value);		  
@@ -285,6 +291,7 @@ function buildStreamGraph(mqpdata) {
 			var dt = refData[k];
 			//récupère les datas liés au path
 			//dt = refData[d[d.index].data.k];
+			if(refTotal[dt.temps]==0)refTotal[dt.temps] = 0.1;			
 			var pcRef = Math.trunc(dt.value)/refTotal[dt.temps]*100;	    	
 			var pcTot = refTag[d.key].value/refTotal['total']*100;	    	
 			tooltip.html(refTag[d.key].type+"<br/>"

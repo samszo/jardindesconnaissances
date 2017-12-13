@@ -1,10 +1,11 @@
 SELECT 
+	d.doc_id,
     d.titre,
     d.niveau,
     DATE_FORMAT(rDeb.valeur, '%Y-%m-%d') temps,
     MIN(DATEDIFF(DATE_FORMAT(rDeb.valeur, '%Y-%m-%d'),
             FROM_UNIXTIME(0)) * 24 * 3600) MinDate,
-    COUNT(de.doc_id) nbTof,
+    COUNT(DISTINCT de.doc_id) nbTof,
     GROUP_CONCAT(DISTINCT g.adresse) geos,
     GROUP_CONCAT(DISTINCT CONCAT(e.prenom,' ',e.nom)) exis
 FROM
@@ -17,6 +18,8 @@ FROM
         INNER JOIN
     flux_doc de ON de.parent = d.doc_id
         AND SUBSTRING(de.url, - 4) = '.jpg'
+
+        
         LEFT JOIN
     flux_rapport rGeo ON rGeo.src_id = d.doc_id
         AND rGeo.src_obj = 'doc'

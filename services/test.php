@@ -4,9 +4,10 @@ require_once( "../application/configs/config.php" );
 
 try {
 	$application->bootstrap();
-	$s = new Flux_Site(false,true);
+	$s = new Flux_Site(false);
+	$s->bTrace = true;
 	$s->trace("DEBUT TEST");		
-	$s->bTraceFlush = false;
+	$s->bTraceFlush = true;
 	
 	$user = "luckysemiosis";
 	$pwd = "samszo";
@@ -666,14 +667,24 @@ try {
 	*/
 	
 	//
-	$an = new Flux_An('flux_valarnum','omk_valarnum',true);
+	$an = new Flux_An('flux_valarnum','omk_valarnum1',$s->bTrace);
 	$an->bTraceFlush = $s->bTraceFlush;
 	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";
 	$url = "http://localhost/jdc/data/an/inventairesdesarchivesnationales/FRAN_IR_055457.xml";	
 	//$an->sauveXmlEad($url);
+	//$an->setItemSetFromTag();
+	//$an->setItemSetFromExi();
+	//$an->setItemSetFromGeo();
 	//$an->setItemSetFromDocRoot(3);
-	$an->getAnalyseGoogle();
-	//$an->getCsvToOmeka(3, "/Library/WebServer/Documents/jdc/data/AN/importTot.csv");
+	//$an->getAnalyseGoogle();
+	//$an->getAnalyseGoogle("titre", "titre photo");
+	//$an->getAnalyseGooglePhoto();
+	//$an->sauveJson("/Library/WebServer/Documents/jdc/data/AN/getPhotosDatasSansParentTot.json", $an->getPhotosDatas());
+	$an->exploseGoogleVisage();
+	//$an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/',"/Library/WebServer/Documents/jdc/data/AN/importVisageTot.csv");
+	$an->idOwner = 2;
+	$an->owner = "communication.archives-nationales@culture.gouv.fr";
+	//$an->getCsvToOmeka("/Library/WebServer/Documents/jdc/data/AN/import10.csv");
 	/*
     $sta = new Flux_Stats(false, true);
     $data = $an->getEvalsMonadeHistoByTag(3,'%Y-%m-%d %H:%i:%s');
