@@ -12,7 +12,8 @@
  */
 class ValarnumController extends Zend_Controller_Action
 {
-
+    var $idBase = "flux_an";
+    
     public function indexAction()
     {
         $this->initInstance();        
@@ -44,7 +45,18 @@ class ValarnumController extends Zend_Controller_Action
     
     }
 
-    public function keshifAction(){
+    public function identacteursAction(){
+        
+        $this->initInstance();
+        
+    }
+    
+    public function photofacettesAction(){
+        
+        
+    }
+
+    public function visagefacettesAction(){
         
         
     }
@@ -95,7 +107,7 @@ class ValarnumController extends Zend_Controller_Action
             ,"pre_id"=>$this->ssUti->uti['uti_id'],"pre_obj"=>"uti"
             ,"dst_id"=>$idTag,"dst_obj"=>"tag"
             ,"niveau"=>$e['r']
-            ,"valeur"=>json_encode(array("cx"=>$e['cx'],"cy"=>$e['cy'],"r"=>$e['r'],"d"=>$e['d']))
+            ,"valeur"=>json_encode(array("cx"=>$e['cx'],"cy"=>$e['cy'],"r"=>$e['r'],"d"=>$e['d'],"color"=>$e['color']))
         ));
     }
     
@@ -107,12 +119,22 @@ class ValarnumController extends Zend_Controller_Action
         
         $auth = Zend_Auth::getInstance();
         $this->ssUti = new Zend_Session_Namespace('uti');
-        if ($auth->hasIdentity()) {
-            // l'identité existe ; on la récupère
-            $this->view->identite = $auth->getIdentity();
+        $ssGoogle = new Zend_Session_Namespace('google');
+        
+        if ($auth->hasIdentity() || isset($this->ssUti->uti)) {
+            //utilisateur authentifier
             $this->ssUti->uti['mdp'] = '***';
             $this->view->login = $this->ssUti->uti['login'];
             $this->view->uti = json_encode($this->ssUti->uti);
+        }elseif($this->_getParam('idUti') ){
+            //authentification CAS ou google
+            $s = new Flux_Site($this->idBase);
+            $dbUti = new Model_DbTable_Flux_Uti($s->db);
+            $uti = $dbUti->findByuti_id($this->_getParam('idUti'));
+            $this->ssUti->uti = $uti;
+            $this->ssUti->uti['mdp'] = '***';
+            $this->view->login = $this->ssUti->uti['login'];
+            $this->view->uti = json_encode($uti);                        
         }else{
             //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
             $this->ssUti->redir = "/valarnum";

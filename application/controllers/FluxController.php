@@ -525,6 +525,12 @@ class FluxController extends Zend_Controller_Action {
         $an->bTraceFlush = $this->_getParam('trace');
         $an->trace("DEBUT ".__METHOD__);        
         switch ($this->_getParam('q')) {
+            case "getVisagesDatas":
+                //utiliser avec la base flux_valarnum
+                $data = $an->getVisagesDatas();
+                $this->view->content = json_encode($data);
+                $an->sauveJson(ROOT_PATH."/data/AN/getVisageData.json", $data);                
+                break;
             case "getEvalsMonade":
                 $data = $an->getEvalsMonade($this->_getParam('idMonade',3));
                 $this->view->content = json_encode($data);
@@ -542,7 +548,8 @@ class FluxController extends Zend_Controller_Action {
                 break;
             case "getEvalsMonadeHistoUti":
                 //récupère les évaluations par utilisateur
-                $data = $an->getEvalsMonadeHistoByUti($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d %H:%i'));
+                $data = $an->getEvalsMonadeHistoByUti($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d %H:%i')
+                    ,$this->_getParam("dateType", 'dateChoix'),$this->_getParam("idTag", false));
                 if($this->_getParam('stream')){
                     //calcul les données pour le stream
                     $data = $sta->array_orderby($data, 'type', SORT_ASC, 'temps', SORT_ASC);

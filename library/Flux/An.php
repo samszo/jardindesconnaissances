@@ -850,19 +850,40 @@ class Flux_An extends Flux_Site{
 	 */
 	function getEvalsMonade($idMonade){
 	    
-	    $sql = "select r.rapport_id, r.maj, r.niveau, r.valeur
-        	, u.uti_id, u.login
-        	, t.tag_id, t.code
-        	, d.doc_id, d.url, d.note
-        	, dp.doc_id, dp.url
-        	, dgp.doc_id, dgp.titre
-        	from flux_rapport r
-        	inner join flux_doc d on d.doc_id = r.src_id
-        	inner join flux_doc dp on dp.doc_id = d.parent
-        	inner join flux_doc dgp on dgp.doc_id = dp.parent
-        	inner join flux_uti u on u.uti_id = r.pre_id
-        	inner join flux_tag t on t.tag_id = r.dst_id
-        	where r.monade_id = ".$idMonade;
+	    $sql = "SELECT 
+    r.rapport_id,
+    r.maj,
+    r.niveau,
+    r.valeur,
+    u.uti_id,
+    u.login,
+    t.tag_id,
+    t.code,
+    d.doc_id,
+    d.url,
+    d.note,
+    d.tronc,
+    dp.doc_id,
+    dp.note pNote,
+    dp.url,
+    dgp.doc_id,
+    dgp.titre
+FROM
+    flux_rapport r
+        INNER JOIN
+    flux_doc d ON d.doc_id = r.src_id
+        INNER JOIN
+    flux_doc dp ON dp.doc_id = d.parent
+        INNER JOIN
+    flux_doc dgp ON dgp.doc_id = dp.parent
+        INNER JOIN
+    flux_uti u ON u.uti_id = r.pre_id
+        INNER JOIN
+    flux_tag t ON t.tag_id = r.dst_id
+WHERE
+    r.monade_id = ".$idMonade."
+ORDER BY d.tronc
+";
 	    
 	    return $this->dbD->exeQuery($sql);
 	    
@@ -886,7 +907,8 @@ class Flux_An extends Flux_Site{
         	SUM(r.niveau) value
         	, GROUP_CONCAT(u.uti_id) utis
         	, t.tag_id 'key', t.code 'type', t.desc , t.type color
-        	, GROUP_CONCAT(d.doc_id) docs
+        	, GROUP_CONCAT(DISTINCT d.parent) docsP
+        	, GROUP_CONCAT(DISTINCT d.doc_id) docs
         	,	DATE_FORMAT(".$colTemps.", '".$dateUnit."') temps
         	,	MIN(UNIX_TIMESTAMP(".$colTemps.")) MinDate
         	,	MAX(UNIX_TIMESTAMP(".$colTemps.")) MaxDate
@@ -909,9 +931,10 @@ class Flux_An extends Flux_Site{
 	 * @param  int      $idMonade
 	 * @param  string   $dateUnit
 	 * @param  string   $dateType
+	 * @param  int      $idTag
 	 *
 	 */
-	function getEvalsMonadeHistoByUti($idMonade, $dateUnit, $dateType="dateChoix"){
+	function getEvalsMonadeHistoByUti($idMonade, $dateUnit, $dateType="dateChoix", $idTag=false){
 	    
 	    if($dateType=="dateChoix")$colTemps = "r.maj";
 	    if($dateType=="dateDoc")$colTemps = "r.maj";
@@ -935,7 +958,9 @@ class Flux_An extends Flux_Site{
             	INNER JOIN
             	flux_tag t ON t.tag_id = r.dst_id
             	WHERE
-            	r.monade_id = ".$idMonade."
+            	r.monade_id = ".$idMonade;
+	    if($idTag) $sql .= "	AND t.tag_id = ".$idTag;         
+         $sql .= "
             	GROUP BY u.uti_id , temps
             	ORDER BY temps";
 	    
@@ -1077,8 +1102,10 @@ class Flux_An extends Flux_Site{
                     AND SUBSTRING(ov.value, 31) = dp.doc_id
                     INNER JOIN
                 ".$this->idBaseOmk.".media om ON om.item_id = ov.resource_id
+                    LEFT JOIN
+                flux_visage v ON v.doc_id = d.doc_id 
             WHERE
-                d.tronc = 'visage'
+                d.tronc = 'visage' AND v.doc_id is null
             ORDER BY d.parent";
         	    
         	    $this->trace($sql);
@@ -1148,8 +1175,10 @@ class Flux_An extends Flux_Site{
                 flux_doc d
                     INNER JOIN
                 flux_doc dp ON dp.doc_id = d.parent
+                    LEFT JOIN
+                flux_visage v ON v.doc_id = d.doc_id
             WHERE
-                d.tronc = 'visage'
+                d.tronc = 'visage' AND v.doc_id is null
             ORDER BY d.doc_id";
         	    
         	    $this->trace($sql);
@@ -1218,7 +1247,7 @@ class Flux_An extends Flux_Site{
         	    $idTagWE = $this->dbT->ajouter(array('code'=>'webEntities','parent'=>$g->idTagRoot));
         	    $numItem = 0;
         	    foreach ($arr as $item) {
-        	        if($item["doc_id"]>=5981){
+        	        if($item["doc_id"]>=19397){
         	            $this->trace($item["doc_id"]);
         	            $c = json_decode($g->analyseImage($item['url']), true);
             	        foreach ($c['responses'][0] as $k => $r) {
@@ -1503,6 +1532,82 @@ class Flux_An extends Flux_Site{
         	    return $result;
         	}
 
+        	/**
+        	 * récupère les données pour chaque visage
+        	 *
+        	 * @param  boolean $bParent
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getVisagesDatas(){
+        	    
+        	    $this->trace(__METHOD__);
+        	    
+        	    //recupère les données pour les photos
+        	    $sql = "SELECT 
+    dv.doc_id,
+    MIN(d.doc_id) pId,
+    MIN(d.titre) label,
+    MIN(d.url) original,
+    MIN(dp.titre) theme,
+    MIN(DATE_FORMAT(rDeb.valeur, '%Y-%m-%d')) temps,
+    MIN(DATEDIFF(DATE_FORMAT(rDeb.valeur, '%Y-%m-%d'),
+            FROM_UNIXTIME(0)) * 24 * 3600) MinDate,
+    dv.titre,
+    om.source imgFull,
+    om.item_id idOmk,
+    COUNT(v.visage_id) nbVisage,
+    SUM(FIND_IN_SET(v.joy,
+            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) joie,
+    SUM(FIND_IN_SET(v.anger,
+            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) colere,
+    SUM(FIND_IN_SET(v.surprise,
+            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) surprise,
+    SUM(FIND_IN_SET(v.sorrow,
+            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) ennui,
+    SUM(FIND_IN_SET(v.blurred,
+            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) flou,
+    SUM(FIND_IN_SET(v.headwear,
+            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) chapeau
+FROM
+    flux_doc d
+        INNER JOIN
+    flux_rapport rDeb ON rDeb.src_id = d.parent
+        AND rDeb.src_obj = 'doc'
+        AND rDeb.dst_obj = 'tag'
+        AND rDeb.dst_id = 4
+        INNER JOIN
+    flux_doc dp ON dp.doc_id = d.parent
+        INNER JOIN
+    flux_doc dv ON dv.parent = d.doc_id
+        INNER JOIN
+    flux_visage v ON v.doc_id = dv.doc_id
+        INNER JOIN
+    omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+        AND SUBSTRING(ov.value, 31) = dv.doc_id
+        INNER JOIN
+    omk_valarnum1.media om ON om.item_id = ov.resource_id
+WHERE
+    d.type = 1
+GROUP BY dv.doc_id, om.item_id, om.source
+            ";
+        	    
+        	    //LIMIT 40";
+        	    
+        	    $this->trace($sql);
+        	    $arr =  $this->dbD->exeQuery($sql);
+        	            	    
+        	    
+        	    return $arr;
+        	}
+        	
+        	
+        	
+        	                                        
+        	
+        	
+        	
         	/**
         	 * transforme un group_concat en array
         	 *

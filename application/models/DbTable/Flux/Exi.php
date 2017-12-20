@@ -82,40 +82,46 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     public function updateHierarchie($data){
     	
     		if(isset($data["parent"])){
-	    		//récupère les information du parent
-	    		$arr = $this->findByExiId($data["parent"]);
-	    		//gestion des hiérarchies gauche droite
-	    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
-	    		//vérifie si le parent à des enfants
-	    		$arrP = $this->findByParent($data["parent"]);
-	    		$data['niveau'] = $arr['niveau']+1;
+    		    //récupère les information du parent
+    		    $arrP = $this->findByexi_id($data["parent"]);
+    		    //récupère les information des enfants
+    		    $arr = $this->findByParent($data["parent"]);
+	    		$data['niveau'] = $arrP['niveau']+1;
+    		}else{
+    		    //récupère l'extrémité gauche
+    		    $sql = 'SELECT MAX(rgt) lft FROM '.$this->_name;
+    		    $stmt = $this->_db->query($sql);
+    		    $arrP = $stmt->fetch();
     		}
-    		if(count($arrP)){
+    		
+    		//gestion des hiérarchies gauche droite
+    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
+		if(count($arr)>0){
     			//met à jour les niveaux 
-    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arr['rgt'];
+    			$sql = 'UPDATE '.$this->_name.' SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
     			$stmt = $this->_db->query($sql);
-    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arr['rgt'];
+    			$sql = 'UPDATE '.$this->_name.' SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
     			$stmt = $this->_db->query($sql);
     			//
-    			$data['lft'] = $arr['rgt']+1;
-    			$data['rgt'] = $arr['rgt']+2;
+    			$data['lft'] = $arr[0]['rgt']+1;
+    			$data['rgt'] = $arr[0]['rgt']+2;
     		}else{
     			//met à jour les niveaux 
-    			$sql = 'UPDATE flux_exi SET rgt = rgt + 2 WHERE rgt >'.$arr['lft'];
+    			$sql = 'UPDATE '.$this->_name.' SET rgt = rgt + 2 WHERE rgt >'.$arrP['lft'];
     			$stmt = $this->_db->query($sql);
-    			$sql = 'UPDATE flux_exi SET lft = lft + 2 WHERE lft >'.$arr['lft'];
+    			$sql = 'UPDATE '.$this->_name.' SET lft = lft + 2 WHERE lft >'.$arrP['lft'];
     			$stmt = $this->_db->query($sql);
     			//
-    			$data['lft'] = $arr['lft']+1;
-    			$data['rgt'] = $arr['lft']+2;
+    			$data['lft'] = $arrP['lft']+1;
+    			$data['rgt'] = $arrP['lft']+2;
     		}    		
     		if(!isset($data['lft']))$data['lft']=0;    		
     		if(!isset($data['rgt']))$data['rgt']=1;    		
     		if(!isset($data['niveau']))$data['niveau']=1;    		
-    		
+    		    		
     		return $data;
-    }     
-           
+    	
+    }
     /**
      * Recherche une entrée Flux_exi avec la clef primaire spécifiée
      * et modifie cette entrée avec les nouvelles données.

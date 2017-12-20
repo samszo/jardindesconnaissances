@@ -13,13 +13,22 @@
     			<style>
 			#main {
 				width:400px;
-				height:500px;
+				height:630px;
 				position:absolute;
 				left:50%;
 				top:50%;
 				margin:-250px 0 0 -200px;
-			}    			
-			</style>
+			}
+            .btnAut {
+                cursor:pointer;
+                height:50px;
+            }
+            .divAut {    			
+                padding:3px 3px;
+                background-color:white;
+                margin-right:10px;
+			}
+            </style>
 		</head>
 		<body style="background-color:black;" >
 			<div id="main"></div>
@@ -39,6 +48,33 @@
 			        name     : "formLog",
 			        url      : "login",
 			        header   : "Jardin des connaissances : login",
+                    toolbar: {
+                            name : "tbFormLog",
+                                items: [
+                                    { type: "html",  id: "P8",
+                                        html: function (item) {
+                                            var html =
+                                              "<div class=\'divAut\' >"+
+                                              "<a href=\'http://localhost/jdc/public/auth/cas?idBase='.$this->idBase.'&redir='.$this->redir.'\'><img src=\'../img/logop8-3.jpg\' class=\'btnAut\' alt=\'connexion Paris 8\' /></a>"+
+                                              "</div>";
+                                            return html;
+                                        }
+                                    },
+                                    { type: "html",  id: "google",
+                                        html: function (item) {
+                                            var html =
+                                              "<div style=\'padding: 3px 3px;background-color:white;\'>"+
+                                              "<a href=\'http://localhost/jdc/public/auth/google?idBase='.$this->idBase.'&redir='.$this->redir.'\'><img src=\'../img/google.png\' class=\'btnAut\' alt=\'connexion Google\' /></a>"+
+                                              "</div>";
+                                            return html;
+                                        }
+                                    },
+                                ],
+                                onClick: function (event) {
+                                    if (event.target == "P8") console.log(event);
+                                    if (event.target == "Google") console.log(event);
+                                }
+                            },
 			        fields: [
 			            { field: "login", type: "text", required: true },
 			            { field: "mdp", type: "password", required: true }
@@ -47,37 +83,36 @@
 			            save: function () {
 			                var errors = this.validate();
 			                if (errors.length > 0) return;
-			                window.location.assign("login?login="+this.record.login+"&mdp="+this.record.mdp);
+			                window.location.assign("login?login="+this.record.login+"&mdp="+this.record.mdp+"&idBase="+"'.$this->idBase.'");
 			            }
 					},
 			    		})
 			    	);
-			    	if(codeErreur==-1){
-				    	w2ui["layout"].content("bottom",$().w2form({ 
-				        name     : "formIns",
-				        header   : "Jardin des connaissances : inscription",
-				        fields: [
-				            { field: "login", type: "text", required: true },
-				            { field: "mdp", type: "password", required: true },
-				            { field: "email", type: "email", required: true }
-				            ],
-				        actions: {
-				            save: function () {
-				                var errors = this.validate();
-				                if (errors.length > 0) return;
-				                var data = this.record;
-				                data.ajax = 1;
-								$.get("inscription",
-									data,
-						        		function(js){
-						        			w2alert(js.message);
-						        			window.location.assign("../"+js.redir);
-						       		},"json");				                				                
-				            }
-						},
-				    		})
-				    	); 
-				}
+			    	w2ui["layout"].content("bottom",$().w2form({ 
+			        name     : "formIns",
+			        header   : "Jardin des connaissances : inscription",
+			        fields: [
+			            { field: "login", type: "text", required: true },
+			            { field: "mdp", type: "password", required: true },
+			            { field: "email", type: "email", required: true }
+			            ],
+			        actions: {
+			            save: function () {
+			                var errors = this.validate();
+			                if (errors.length > 0) return;
+			                var data = this.record;
+                            data.idBase="'.$this->idBase.'";
+			                data.ajax = 1;
+							$.get("inscription",
+								data,
+					        		function(js){
+					        			w2alert(js.message);
+                                     if(codeErreur=="") window.location.assign("../"+js.redir);
+					       		},"json");				                				                
+			            }
+					},
+			    		})
+			    	); 
 			});
 			</script>
 		  </body>

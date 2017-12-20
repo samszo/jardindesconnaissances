@@ -156,7 +156,9 @@ class Model_DbTable_Flux_Uti extends Zend_Db_Table_Abstract
                     ->from( array("f" => "flux_uti") )                           
                     ->where( "f.uti_id = ?", $uti_id );
 
-        return $this->fetchAll($query)->toArray(); 
+        $arr = $this->fetchAll($query)->toArray(); 
+        if(count($arr))return$arr[0];
+        else return false;
     }
     
     /*

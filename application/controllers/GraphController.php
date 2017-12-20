@@ -485,6 +485,7 @@ class GraphController extends Zend_Controller_Action {
 	    	$this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fdata%2Ftrends.csv"));
 	    	$this->view->legendetitre =  $this->_getParam('legendetitre', "Catégories");
 	    	$this->view->nbMin = $this->_getParam('nbMin', 0);
+	    	$this->view->legende =  1;//par défaut la légende apparait     
 	    	switch ($this->_getParam('type')) {
 	    		case "diigo":
 	    			//var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&arrTags[]=ecosysteminfo";//&dates[]=1456669433&dates[]=1489415262";
@@ -506,6 +507,7 @@ class GraphController extends Zend_Controller_Action {
 	    		    $this->view->soustitre =  "Valorisation des archives numériques";
 	    		    $this->view->urlData = "../flux/an?q=getEvalsMonadeHistoTag&stream=1";
 	    		    $this->view->legendetitre =  "Emotions";
+	    		    $this->view->legende =  0;//pas de légende pour ce graph
 	    		    break;
 	    	}
     	 

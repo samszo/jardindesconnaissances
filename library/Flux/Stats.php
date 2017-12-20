@@ -877,6 +877,8 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 							,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal
 							,'MinDate'=>0,'MaxDate'=>0
 					);
+					if(isset($oD['docsP']))$nD['docsP']=$oD['docsP'];
+					if(isset($oD['color']))$nD['color']=$oD['color'];
 					$nData[]=$nD;
 					$this->trace('fin nouveau temps '.$i .' / '. $j,$nD);
 				}
@@ -892,9 +894,11 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 					$i=$nbDate;
 				}else{
 					$nD = array('key'=>$d['key'],'type'=>$d['type'],'desc'=>$d['desc']
-					    ,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal,'color'=>$d['color']
+					    ,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal
 							,'MinDate'=>0,'MaxDate'=>0
 					);
+					if(isset($d['docsP']))$nD['docsP']=$d['docsP'];
+					if(isset($d['color']))$nD['color']=$d['color'];					
 					$nData[]=$nD;
 					$this->trace('nouveau temps '.$i .' / '. $j,$nD);
 				}
@@ -904,15 +908,17 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 		//on fini les temps restant
 		for ($i = $j; $i < $nbDate; $i++) {
 			$nD = array('key'=>$oD['key'],'type'=>$oD['type'],'desc'=>$oD['desc']
-			    ,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal,'color'=>$d['color']
+			    ,'temps'=>$arrDate[$i],'score'=>0,'value'=>$defVal
 					,'MinDate'=>0,'MaxDate'=>0
 			);
+			if(isset($oD['docsP']))$nD['docsP']=$oD['docsP'];
+			if(isset($oD['color']))$nD['color']=$oD['color'];			
 			$nData[]=$nD;
 			$this->trace('fin nouveau temps '.$i .' / '. $j,$nD);
 		}
 		return  $nData;
 	}
-
+	
 	/**
 	 * Calcul un tableau de date avec les valeurs de tags mis en colonne
 	 * Utile pour les diagramme multiline ou chaque ligne correspond à une catégorie

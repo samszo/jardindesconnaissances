@@ -680,8 +680,8 @@ try {
 	//$an->getAnalyseGoogle("titre", "titre photo");
 	//$an->getAnalyseGooglePhoto();
 	//$an->sauveJson("/Library/WebServer/Documents/jdc/data/AN/getPhotosDatasSansParentTot.json", $an->getPhotosDatas());
-	$an->exploseGoogleVisage();
-	//$an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/',"/Library/WebServer/Documents/jdc/data/AN/importVisageTot.csv");
+	//$an->exploseGoogleVisage();
+	//$an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/',"/Library/WebServer/Documents/jdc/data/AN/importVisageTot1.csv");
 	$an->idOwner = 2;
 	$an->owner = "communication.archives-nationales@culture.gouv.fr";
 	//$an->getCsvToOmeka("/Library/WebServer/Documents/jdc/data/AN/import10.csv");

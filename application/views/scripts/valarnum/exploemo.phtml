@@ -74,6 +74,13 @@ div.tooltip {
   border-radius: 8px;
   pointer-events: none;
 }
+
+iframe {
+    min-height: 600px;
+    width: 100%;
+    border: none;
+}
+
 </style>
 
 <!-- CSS -->
@@ -85,7 +92,8 @@ div.tooltip {
 
 <script type="text/javascript">
 var uti = <?php echo $this->uti; ?>;
-
+var uti = <?php echo $this->uti; ?>;
+prefUrl = "../"
 </script>
 
 </head>
@@ -112,7 +120,7 @@ var uti = <?php echo $this->uti; ?>;
 								class="sr-only">(current)</span></a></li>
 						<li class="nav-item active"><a class="nav-link" href="#">Explorations
 								émotionnelles</a></li>
-						<li class="nav-item"><a class="nav-link" href="../valarnum/evalacteurs">Evaluation des
+						<li class="nav-item"><a class="nav-link" href="../valarnum/identacteurs">Identification des
 								acteurs</a></li>
 					</ul>
 					<form class="form-inline my-2 my-lg-0">
@@ -128,7 +136,7 @@ var uti = <?php echo $this->uti; ?>;
 					aria-selected="true">Cartographier</a></li>
 				<li class="nav-item"><a class="nav-link" id="navig-tab"
 					data-toggle="tab" href="#navig" role="tab" aria-controls="navig"
-					aria-selected="false">Naviguer</a></li>
+					aria-selected="false" >Naviguer</a></li>
 				<li class="nav-item"><a class="nav-link disabled" id="story-tab"
 					data-toggle="tab" href="#story" role="tab" aria-controls="story"
 					aria-selected="false">Raconter</a></li>
@@ -148,22 +156,30 @@ var uti = <?php echo $this->uti; ?>;
 			</div>
 			<div class="tab-pane fade" id="navig" role="tabpanel"
 				aria-labelledby="navig-tab">
-
-				<div id="carouselEvals" class="carousel slide" data-ride="carousel" style="text-align:-webkit-center">
-					<ol class="carousel-indicators" id="car-ind">
-					</ol>
-					<div class="carousel-inner" id="car-inn">
-					</div>
-					<a class="carousel-control-prev" href="#carouselEvals"
-						role="button" data-slide="prev"> <span
-						class="carousel-control-prev-icon" aria-hidden="true"></span> <span
-						class="sr-only">Previous</span>
-					</a> <a class="carousel-control-next" href="#carouselEvals"
-						role="button" data-slide="next"> <span
-						class="carousel-control-next-icon" aria-hidden="true"></span> <span
-						class="sr-only">Next</span>
-					</a>
-				</div>
+				<div class="container-fluid">
+				<div class="row">
+        				<div class="col" >
+        					<iframe id="frmStream" src=""></iframe>
+        				</div>
+        				<div class="col" >
+            				<div id="carouselEvals" class="carousel slide" data-ride="carousel" style="text-align:-webkit-center">
+            					<ol class="carousel-indicators" id="car-ind">
+            					</ol>
+            					<div class="carousel-inner" id="car-inn">
+            					</div>
+            					<a class="carousel-control-prev" href="#carouselEvals"
+            						role="button" data-slide="prev"> <span
+            						class="carousel-control-prev-icon" aria-hidden="true"></span> <span
+            						class="sr-only">Previous</span>
+            					</a> <a class="carousel-control-next" href="#carouselEvals"
+            						role="button" data-slide="next"> <span
+            						class="carousel-control-next-icon" aria-hidden="true"></span> <span
+            						class="sr-only">Next</span>
+            					</a>
+            				</div>
+	    				</div>
+    				</div>
+    				</div>
 			</div>
 			<div class="tab-pane fade" id="story" role="tabpanel"
 				aria-labelledby="story-tab"></div>
@@ -261,7 +277,7 @@ var uti = <?php echo $this->uti; ?>;
 	    .attr("class", "tooltip")
 	    .style("opacity", 0);
 	
-	var onFlux=true, onSelect=false, onChoix=false, noCurseur, curSelect, rootTofs, tofSelect, tofEval=[], idSvg="svg3360", l, t
+	var onFlux=true, onSelect=false, onChoix=false, noCurseur, curSelect, rootTofs, tofSelect, tofEvalOri=[], tofEval=[], idSvg="svg3360", l, t
 		, mousedownID, cChoix, rChoix = 10, wCurseur = 300, hCurseur = 300, w="715.41962", h="724.66992", padding = 30
 		, svgChoix;
   
@@ -306,9 +322,14 @@ var uti = <?php echo $this->uti; ?>;
 	        t = y+(hCurseur/2)-(rChoix);
 
 	  		var m = d3.event;
-			if(m.x < graph.offsetLeft)return;
-			if(m.y < graph.offsetTop || m.y > (graph.offsetTop+graph.clientHeight))return;
-	  			
+	  		//gestion du dépassement de la zone
+			if(m.x < graph.offsetLeft){
+				return;
+			}
+			if(m.y < graph.offsetTop || m.y > (graph.offsetTop+graph.clientHeight)){
+				return;
+			}
+				
   			d3.select("#curseurPalette")
                 .style("left",  x + "px")
                 .style("top", y + "px");
@@ -341,7 +362,7 @@ var uti = <?php echo $this->uti; ?>;
         
     function draw() {
 
-		//vérifie si'l faut stopper le flux
+		//vérifie s'il faut stopper le flux
 		if(!onFlux)return;
 
         //enlève les choix        
@@ -594,109 +615,7 @@ var uti = <?php echo $this->uti; ?>;
 				,'evals':[ev]
 				});
 
-			//vérifie s'il faut activer les photos
-			var active = 'active';
-			if(tofEval.length > 1){
-				active = ''
-				//$('.carousel').carousel('pause');
-				//d3.select('#car-ind').selectAll('li').attr('class','');				
-				//d3.selectAll('#car-inn').selectAll('div').attr('class','carousel-item');				
-			}
-			
-			//Ajoute la photo à la gallerie
-			var li = d3.select('#car-ind').append('li')
-				.attr('data-target',"#carouselEvals")	
-				.attr('data-slide-to',tofEval.length-1);
-			if(active) li.attr('class',"active");	
-			
-			var item = d3.select('#car-inn')
-				.append('div').attr('class','carousel-item '+active);
-			item.append('img')
-				.attr('id','carImg_'+tofSelect.data.idOmk)
-				.attr('class','d-block img-fluid')
-				.style('max-height',height+"px")
-				.attr('src',tofSelect.data.imgFull);
-			//ajoute le descriptif
-			var block = item.append('div').attr('class','carousel-caption d-none d-md-block');
-			block.append('h3').text(tofSelect.data.label);
-			block.append('h4').text(tofSelect.data.idOmk);
-			block.append('p').append('a').attr('href',tofSelect.data.original).attr('target','_blank').text('original');
-			
-		}
-
-		if(tofEval.length == 1){
-			$('.carousel').carousel();
-			//ajoute le svg pour les cercle de choix
-			svgChoix = d3.select('#carouselEvals').append('svg')			
-				.attr('id','svgChoix')
-				.attr('class','choixCarousel')
-				.append('g').attr('id','gChoix');
-			
-			//ajoute les événements
-			$('#carouselEvals').on('slid.bs.carousel', function (e) {
-				  //console.log(e);
-
-				var tEv = tofEval[e.to];		
-				var carImg = d3.select("#carImg_"+tEv.idOmk).node();
-				tEv.scaleX.range([0, carImg.width]);
-				tEv.scaleY.range([0, carImg.height]);
-				  
-				//récupère la définition des cercles
-				var te = tEv.evals;
-						  
-				  //construction du rectangle de zoom
-				  svgChoix.selectAll('rect').remove();
-				  var evRect = svgChoix.selectAll('rect').data(te);
-				  //ajoute les nouvelles évaluations
-				  evRect.enter()
-				  	  .append('rect')
-					  .attr("width", function(d){
-						  return tEv.scaleX(d.w);
-						  })
-                        .attr("height", function(d){
-                          return tEv.scaleY(d.h);
-                          })
-					  .attr('fill','none')
-					  .attr('stroke','red')
-					  .attr('transform',function(d){
-						return  'translate('+(carImg.offsetLeft+tEv.scaleX(d.x))+' '+(carImg.offsetTop+tEv.scaleY(d.y))+')'
-					  	});
-                  
-				  
-				  //construction des cercles d'évaluation
-				  svgChoix.selectAll('circle').remove();
-				  var evCirc = svgChoix.selectAll('circle').data(te);
-				  evCirc.enter()
-				  	  .append('circle')
-				  	  .attr('cx',function(d){
-					  	  return carImg.offsetLeft+tEv.scaleX(d.cx)
-					  	  })
-					  .attr('cy',function(d){
-						  return carImg.offsetTop+tEv.scaleY(d.cy)
-						  })					  
-					  .attr('r',function(d){return tEv.scaleX(d.r)})
-        	  			  .style('fill-opacity',0.3)       	  				
-					  .attr('fill',function(d){
-						  return d.d.color
-						  })
-					  .on("mouseover", function(d) {
-						  divTT.transition()
-					         .duration(200)
-					         .style("opacity", .9);
-						  divTT.html(d.d.fr)
-					         .style("left", (d3.event.pageX) + "px")
-					         .style("top", (d3.event.pageY - 28) + "px");
-					       })
-				     .on("mouseout", function(d) {
-        				    	 divTT.transition()
-        				         .duration(500)
-        				         .style("opacity", 0);
-				       });
-			       				  
-				})
-		}
-		//$('.carousel').carousel('cycle');
-		$('.carousel').carousel(tofEval.length-1);
+		}			
 		
 		
 		//augmente le Z-index du curseur pour que les événements soient pris en compte
@@ -713,43 +632,134 @@ var uti = <?php echo $this->uti; ?>;
 
 	function ajoutPhotosGallerie(){
 
+		// Remove old elements as needed.
+		d3.select('#car-ind').selectAll('li').remove();
+		d3.select('#car-inn').selectAll('div').remove();
+
+		
 		//Ajoute la photo à la gallerie
-		var li = d3.select('#car-ind').selectAll('li').data(tofEval).append('li')
+		var li = d3.select('#car-ind').selectAll('li')
+			.data(tofEval).enter().append('li')
 			.attr('data-target',"#carouselEvals")	
 			.attr('data-slide-to',function(d,i){return i;})
-			.attr('class',function(d,i){if(i==0)return 'active';});	
+			.attr('class',function(d,i){
+				if(i==0)return 'active';
+				});	
 		
-		var items = d3.select('#car-inn').selectAll('div').data(tofEval)
-			.append('div').attr('class',function(d,i){
+		var items = d3.select('#car-inn').selectAll('div')
+			.data(tofEval).enter().append('div')
+			.attr('class',function(d,i){
 				var c = 'carousel-item';
-				if(i==0) c+= 'active';
+				if(i==0) c+= ' active';
 				return c;
 				});
 		items.append('img')
 			.attr('id',function(d){
-				'carImg_'+d.idOmk
+				return 'carImg_'+d.idOmk;
 			})
 			.attr('class','d-block img-fluid')
 			.style('max-height',height+"px")
 			.attr('src',function(d){
-				'carImg_'+d.imgFull
+				return d.original;
 			});
 		//ajoute le descriptif
-		var block = item.append('div').attr('class','carousel-caption d-none d-md-block');
+		var block = items.append('div').attr('class','carousel-caption d-none d-md-block');
 		block.append('h3').text(function(d){
-			'carImg_'+d.label;
+			return d.label;
 		});
 		block.append('h4').text(function(d){
-			'carImg_'+d.idOmk;
+			return d.idOmk;
 		});
 		block.append('p').append('a')
 		.attr('href',function(d){
-			'carImg_'+d.original;
+			return d.original;
 		})
 		.attr('target','_blank').text('original');
-
-		
+				
+		initCarousel();
 	}	
+
+	function initCarousel(){
+
+		//
+		if(svgChoix){
+			svgChoix.selectAll('rect').remove();
+		}else{
+			svgChoix = d3.select('#carouselEvals').append('svg')			
+        		.attr('id','svgChoix')
+        		.attr('class','choixCarousel')
+        		.append('g').attr('id','gChoix');
+		}
+		//
+		//ajoute les événements
+		$('#carouselEvals').on('slid.bs.carousel', function (e) {
+			  //console.log(e);
+			if(!tofEval[e.to])return;
+			var tEv = tofEval[e.to];		
+			var carImg = d3.select("#carImg_"+tEv.idOmk).node();
+			tEv.scaleX.range([0, carImg.width]);
+			tEv.scaleY.range([0, carImg.height]);
+			  
+			//récupère la définition des cercles
+			var te = tEv.evals;
+					  
+			  //construction du rectangle de zoom
+			  svgChoix.selectAll('rect').remove();
+			  var evRect = svgChoix.selectAll('rect').data(te);
+			  //ajoute les nouvelles évaluations
+			  evRect.enter()
+			  	  .append('rect')
+				  .attr("width", function(d){
+					  return tEv.scaleX(d.w);
+					  })
+                    .attr("height", function(d){
+                      return tEv.scaleY(d.h);
+                      })
+				  .attr('fill','none')
+				  .attr('stroke','red')
+				  .attr('transform',function(d){
+					return  'translate('+(carImg.offsetLeft+tEv.scaleX(d.x))+' '+(carImg.offsetTop+tEv.scaleY(d.y))+')'
+				  	});
+              
+			  
+			  //construction des cercles d'évaluation
+			  svgChoix.selectAll('circle').remove();
+			  var evCirc = svgChoix.selectAll('circle').data(te);
+			  evCirc.enter()
+			  	  .append('circle')
+			  	  .attr('cx',function(d){
+				  	  return carImg.offsetLeft+tEv.scaleX(d.cx)
+				  	  })
+				  .attr('cy',function(d){
+					  return carImg.offsetTop+tEv.scaleY(d.cy)
+					  })					  
+				  .attr('r',function(d){return tEv.scaleX(d.r)})
+    	  			  .style('fill-opacity',0.3)       	  				
+				  .attr('fill',function(d){
+					  return d.color;
+					  })
+				  .on("mouseover", function(d) {
+					  divTT.transition()
+				         .duration(200)
+				         .style("opacity", .9);
+					  divTT.html(d.d.fr)
+				         .style("left", (d3.event.pageX) + "px")
+				         .style("top", (d3.event.pageY - 28) + "px");
+				       })
+			     .on("mouseout", function(d) {
+    				    	 divTT.transition()
+    				         .duration(500)
+    				         .style("opacity", 0);
+			       });
+		       				  
+			})
+
+			$('.carousel').carousel();
+			$('.carousel').carousel('cycle');
+			$('.carousel').carousel(tofEval.length-1);		
+
+	}
+
 	
 	function sauveEmo(tof, e) {
 
@@ -757,8 +767,8 @@ var uti = <?php echo $this->uti; ?>;
 		var ref = tof.data.metadata.Identifier.split('-');
 		var doc = {'idDoc':ref[3],'idOmk':tof.data.idOmk,'label':tof.data.label,'original':tof.data.original
 				,'w':tof.data.width,'h':tof.data.height};		
-		e.color = e.d.o.color;
-		e.d = e.d.o.fr;
+		e.color = e.d.color;
+		e.d = e.d.fr;
 		e.idOmkCol = tof.data.idCol;
 		var p = {'q':'emo','doc':doc,'eval':e,'idBase':ref[0]};			
 	    $.ajax({
@@ -775,6 +785,41 @@ var uti = <?php echo $this->uti; ?>;
 		});	        
 
 		
+	}
+
+	function filtreEmo(d, dPosi, onClick){
+		if(!onClick){
+	        	//recharge les évaluations à partir des photos filtrées pour ne pas impacter le tableau original			
+			getTofEval();		        				
+        		return;
+		}
+		//console.log(d);
+		//console.log(dPosi);
+		//var docs = dPosi.docs.split(',');
+		var docsP = dPosi.docsP.split(',');
+		var p = {'q':'getEvalsMonadeHistoUti','idTag':d.key};
+		$.ajax({
+	    		url: "../flux/an",
+	    		dataType: "json",
+	    		data: p,
+	    		method: 	"POST",
+	        	error: function(error){
+	        		console.log("Erreur : "+error.responseText);
+	        	},            	
+	        	success: function(dtUti) {
+		        	//filtre les photo originales
+		       tofEval = tofEvalOri.filter(function(dt){
+		        		return docsP.indexOf(dt.idDoc);
+			        	});	
+		       tofEval = tofEval.filter(function(dt){
+		    	   		dt.evals = dt.evals.filter(function(de){
+				        	return de.d == dPosi.type;
+			        	});
+		        		return dt.evals.length;		        	
+		        	})
+		        	ajoutPhotosGallerie();		        	
+	        }
+		});	  		
 	}
 	
 	var lstChoix = d3.select('#listeChoix')
@@ -811,7 +856,68 @@ var uti = <?php echo $this->uti; ?>;
             });
             
     }
-   
+
+    function chargeStream(){
+		d3.select("#frmStream").attr('src',"<?php echo WEB_ROOT_AJAX;?>/graph/streamv?type=valarnum");
+    }
+
+    function getTofEval(){
+        
+		var p = {'q':'getEvalsMonade'};
+		tofEval = [];			
+	    $.ajax({
+	    		url: "../flux/an",
+	    		dataType: "json",
+	    		data: p,
+	    		method: 	"POST",
+	        	error: function(error){
+	        		console.log("Erreur : "+error.responseText);
+	        	},            	
+	        	success: function(data) {
+		        	var idO = 0, id=-1;
+		        	data.forEach(function(d){
+		  			//enregistre les références de l'émotion dans la photo
+		  			var e = JSON.parse(d.note);
+		  			var v = JSON.parse(d.valeur);
+		  			var ev = {'img':d.url, 'idDoc':d.idDoc
+		  				,'x':e.x,'y':e.y,'w':e.w,'h':e.h
+		  				,'cx':v.cx,'cy':v.cy,'r':v.r,'d':v.d,'color':v.color};
+		  		    //stocke l'évaluation	
+		  			if(idO == d.tronc){
+		  				tofEval[id].evals.push(ev);
+		  			}else{
+		  				//création de la référence de la photo
+		  				var n = JSON.parse(d.pNote);
+		  				tofEval.push({'idOmk':n.idOmk,'label':n.label
+		  					,'idDoc':n.idDoc
+		  					,'original':n.original
+		  					,'h':n.h,'w':n.w
+		  					,'scaleX':d3.scaleLinear().domain([0, n.w])
+		  					,'scaleY':d3.scaleLinear().domain([0, n.h])
+		  					,'evals':[ev]
+		  					});
+		  				idO = d.tronc;
+		  				id++;
+		  			}	  							        	
+		        	})
+		        	tofEvalOri = tofEval;
+		        	ajoutPhotosGallerie();
+		        	//fixe la fonction pour le filtrage par le streamv
+	    		    document.getElementById('frmStream').contentWindow.fctClickStrealPath = filtreEmo;//fonction sur le click filtrer le détail
+		        	
+	        }
+		});	        
+    }
+
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    	  if(e.target.innerText=="Naviguer"){
+        	chargeStream();
+      	getTofEval();      	  
+    	  }
+    	  e.relatedTarget // previous active tab
+    	})
+    
 	</script>
 	<script src="../js/popper.min.js"></script>
 	<script src="../js/bootstrap.min.js"></script>

@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Archives Nationales - Reportages photographiques - Présidence de la république française</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script type="text/javascript" src="../js/d3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../js/keshif.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="../css/keshif.css"/ type="text/css">
+    <link rel="stylesheet" href="../font/keshif-font-awesome/css/font-awesome.min.css">
+
+    <script type="text/javascript" src="../js/keshifDemo.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="../css/keshifDemo.css" type="text/css">
+
+    <script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(){
+  browser = new kshf.Browser({
+    domID: "#demo_Browser",
+    recordName: "Photos Archives Nationales",
+    categoryTextWidth: 150,
+    barChartWidth: 100,
+    source: {
+      dirPath: '<?php echo WEB_ROOT;?>/data/AN/',
+      fileType: 'json',
+      tables: { name: "getPhotosTot", id:"doc_id" }
+    },
+    summaries: [
+      { name: "Intensité", value: "magnitude", panel: "right"},
+      { name: "Sentiment", value: "score", panel: "right"},
+      { name: "Nb de visage", value: 'nbVisage', panel: "right"},
+      { name: "Mot-clefs de la photo", value: 'tags', panel: "right"},
+      { name: "Personnes de la photo", value: 'exis', panel: "right"},
+      { name: "Lieux de la photo", value: 'geos', panel: "right"},
+      { name: "Mot-clefs du thème", value: 'tagsTheme', panel: "left"},
+      { name: "Personnes du thème", value: 'exisTheme', panel: "left"},
+      { name: "Lieux du thème", value: 'geosTheme', panel: "left"},
+      { name: "Intensité", value: "magnitudeTheme", panel: "left"},
+      { name: "Sentiment", value: "scoreTheme", panel: "left"},
+      { name: "Date événement", value: "temps", panel: "middle", timeFormat: "%Y-%m-%d"},
+    ],
+    recordDisplay: {
+      sortBy: 'MinDate',
+      textSearch: "theme",
+      displayType: 'grid',
+      recordView: function(){
+        var url = this.url.replace('http://www.siv.archives-nationales.culture.gouv.fr/mm/media/download/', '<?php echo WEB_ROOT;?>/data/AN/photos/')
+        var img = "<img class='thumbImg' src='"+url+"'>";
+        var link = "<a href='"+this.url+"' target='_blank'>";
+        var th = "<h4>"+this.theme+"</h4>"
+        return th+link+"<span class='thumbnail'>"+img+"</span><span class='name'>"+this.titre+"</span></a>";
+      }
+    }
+  });
+});
+</script>
+<style id="kshfStyle">
+#demo_Browser{
+  height: calc(100vh - 100px);
+}
+.kshfRecord{ width: 300px; font-size: 0.8em; }
+.name{
+  display: block;
+  text-align: center;
+  color: black;
+  font-weight: 300;
+}
+img.thumbImg{ 
+  border-radius: 4px;
+}
+</style>
+	</head>
+  <body>
+    <div class="contents">
+      <div id="demo_PageTitle" align="center">Archives Nationales</div>
+      <div id="demo_PageSubtitle" align="center">Reportages photographiques - Présidences de la république française</div>
+      <div id="demo_Browser"></div>
+      </div>
+
+    <div id="demo_Infobox">
+      Les données sont extraites, compilées et mises en forme par Samuel Szoniecky 
+      <a href="http://www.samszo.univ-paris8.fr" target='_blank'>http://www.samszo.univ-paris8.fr</a>.
+      <a href='http://creativecommons.org/licenses/by-sa/4.0/' target='_blank'><img src='https://i.creativecommons.org/l/by-sa/4.0/80x15.png'></a>
+      </div>
+  </body>
+</html>

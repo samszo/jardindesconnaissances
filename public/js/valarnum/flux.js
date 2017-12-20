@@ -1,6 +1,7 @@
+var prefUrl = "";
 
 function deconnexion(){
-	window.location.assign('auth/deconnexion?redir=valarnum');
+	window.location.assign(prefUrl+'auth/deconnexion?redir=valarnum');
 }
 
 
