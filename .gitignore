@@ -402,3 +402,6 @@ services/3
 bdd/flux_valarnumGoogleExplode.sql
 bdd/flux_valarnumAllVisage.sql
 bdd/omk_valarnumWithVisages.sql
+bdd/flux_valarnumGoogleExplodeTot.sql
+bdd/flux_valarnumProd1.sql.crdownload
+bdd/omk_valarnum1AfterImportVisageTot1.sql

@@ -7,7 +7,7 @@ body {
   background-color: #FBFAF7;
 }
 .contents {
-  padding-top: 45px;
+  /*padding-top: 45px;*/
 }
 #demo_Browser {
   margin: 0 auto;
@@ -98,15 +98,17 @@ body {
 }
 .keshif_logo {
   display: block;
+  /*
   position: absolute;
   top: 3px;
   left: 3px;
+  overflow: hidden;
+  */
   width: 110px;
   height: 30px;
   font-size: 12px;
   background-color: #EEEEEE;
   border: solid 1px rgba(0, 0, 0, 0);
-  overflow: hidden;
   cursor: auto;
   -webkit-transition: width 500ms ease-in-out, background-color 500ms ease-in-out;
   -moz-transition: width 500ms ease-in-out, background-color 500ms ease-in-out;

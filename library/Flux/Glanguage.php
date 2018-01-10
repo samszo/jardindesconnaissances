@@ -334,7 +334,7 @@ class Flux_Glanguage extends Flux_Site{
         }
         
         //création du document d'analyse
-        $rs = $this->dbD->ajouter(array("parent"=>$idDoc,"titre"=>__CLASS__."_".__METHOD__,"note"=>json_encode($arrReponse)),true, true);
+        $rs = $this->dbD->ajouter(array("parent"=>$idDoc,"titre"=>__METHOD__,"note"=>json_encode($arrReponse)),true, true);
         
         return $rs;
     }

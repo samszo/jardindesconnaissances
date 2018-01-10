@@ -128,7 +128,7 @@ class EditinfluController extends Zend_Controller_Action {
     {
 		$this->initInstance();
 	    $s = new Flux_Site($this->view->idBase);
-	    $s->bTrace = true;
+	    $s->bTrace = false;
 	    
     		//récupère les paramètres
     		$params = $this->_request->getParams();

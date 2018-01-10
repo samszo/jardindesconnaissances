@@ -681,17 +681,25 @@ try {
 	//$an->getAnalyseGooglePhoto();
 	//$an->sauveJson("/Library/WebServer/Documents/jdc/data/AN/getPhotosDatasSansParentTot.json", $an->getPhotosDatas());
 	//$an->exploseGoogleVisage();
-	//$an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/',"/Library/WebServer/Documents/jdc/data/AN/importVisageTot1.csv");
+	/*
+	$an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/'
+	   ,"/Library/WebServer/Documents/jdc/data/AN/importVisageFail.csv"
+	   ,"/Library/WebServer/Documents/jdc/data/AN/importFail.php");
+	   */
+	$an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/'
+	    ,"/Library/WebServer/Documents/jdc/data/AN/importVisagesManquant.csv","",true);
+	/*
 	$an->idOwner = 2;
 	$an->owner = "communication.archives-nationales@culture.gouv.fr";
 	//$an->getCsvToOmeka("/Library/WebServer/Documents/jdc/data/AN/import10.csv");
-	/*
     $sta = new Flux_Stats(false, true);
     $data = $an->getEvalsMonadeHistoByTag(3,'%Y-%m-%d %H:%i:%s');
     //calcul les données pour le stream
     $data = $sta->array_orderby($data, 'type', SORT_ASC, 'temps', SORT_ASC);
     $data = $sta->getDataForStream($data, '%Y-%m-%d %H:%i:%s');
-	*/            
+	$an->iiif = new Flux_Iiif("http://gapai.univ-paris8.fr/ValArNum/omks/iiif",$an->idBase,$an->bTrace);	
+	$data = $an->getAleaTofs();
+	*/
 	
 	/*
 	$isidore = new Flux_Isidore('flux_isodore',true);

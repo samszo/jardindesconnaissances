@@ -1,16 +1,16 @@
-<?php
-	if($this->ajax){
-		echo json_encode(array("uti"=>$this->rs,"erreur"=>$this->erreur));
-	}else{
-		echo '<!DOCTYPE html>
+<!DOCTYPE html>
 		<html>
 		<head>
 			<meta charset="utf-8" />
-			<title>Jardin des connaissances : login</title>
-		    <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
+			<title>Jardin des connaissances : connexion</title>
+	        <link rel="stylesheet" type="text/css" href="../css/w2ui-dark.css" />
     			<script src="../js/jquery.min.js"></script>
-    			<script type="text/javascript" src="../js/w2ui.js"></script>
+    		    <script src="../js/w2ui-1.5.rc1.min.js"></script>
+        
     			<style>
+    			body{
+    			 background-color:black;
+    			 }
 			#main {
 				width:400px;
 				height:630px;
@@ -30,16 +30,16 @@
 			}
             </style>
 		</head>
-		<body style="background-color:black;" >
+		<body >
 			<div id="main"></div>
 			<script type="text/javascript">
-			var codeErreur = '.	$this->code.';
+			var codeErreur = '<?php echo $this->code;?>';
 			$(function () {
 			    var pstyle = "border: 1px solid #dfdfdf; padding: 5px;";
 			    $("#main").w2layout({
 			        name: "layout",
 			        panels: [
-			            { type: "top", size: 50, style: pstyle, content: "'.$this->erreur.'" },
+			            { type: "top", size: 50, style: pstyle, content: "<?php echo $this->erreur;?>" },
 			            { type: "main", size: "50%", style: pstyle},
 			            { type: "bottom", size: "50%", style: pstyle}
 			            ]
@@ -54,17 +54,28 @@
                                     { type: "html",  id: "P8",
                                         html: function (item) {
                                             var html =
-                                              "<div class=\'divAut\' >"+
-                                              "<a href=\'cas?idBase='.$this->idBase.'&redir='.$this->redir.'\'><img src=\'../img/logop8-3.jpg\' class=\'btnAut\' alt=\'connexion Paris 8\' /></a>"+
+                                              "<div onclick='showP8Auth()' class=\'divAut\' >"+
+                                              "<img src=\'../img/logop8-3.jpg\' class=\'btnAut\' alt=\'connexion Paris 8\' />"+
                                               "</div>";
                                             return html;
                                         }
                                     },
+                                    { type: "html",  id: "aideTB",
+                                        html: function (item) {
+                                            var html =
+                                              "<div  >"+
+                                              "<p>Choisissez une authentification</p>"+
+                                              "<p>P8, Google ou interne</p>"+
+                                              "</div>";
+                                            return html;
+                                        }
+                                    },                                    
+                                    { type: 'spacer' },
                                     { type: "html",  id: "google",
                                         html: function (item) {
                                             var html =
-                                              "<div style=\'padding: 3px 3px;background-color:white;\'>"+
-                                              "<a href=\'google?idBase='.$this->idBase.'&redir='.$this->redir.'\'><img src=\'../img/google.png\' class=\'btnAut\' alt=\'connexion Google\' /></a>"+
+                                              "<div onclick='showGoogleAuth()' class=\'divAut\' >"+
+                                              "<img src=\'../img/google.png\' class=\'btnAut\' alt=\'connexion Google\' />"+
                                               "</div>";
                                             return html;
                                         }
@@ -76,14 +87,14 @@
                                 }
                             },
 			        fields: [
-			            { field: "login", type: "text", required: true },
-			            { field: "mdp", type: "password", required: true }
+			            { field: "l", html: { caption: 'login'},  type: "text", required: true },
+			            { field: "m", html: { caption: 'mot de passe'},  type: "password", required: true }
 			        ],
 			        actions: {
 			            save: function () {
 			                var errors = this.validate();
 			                if (errors.length > 0) return;
-			                window.location.assign("login?login="+this.record.login+"&mdp="+this.record.mdp+"&idBase="+"'.$this->idBase.'");
+			                window.location.assign("login?login="+this.record.l+"&mdp="+this.record.m+"&idBase=<?php echo $this->idBase;?>");
 			            }
 					},
 			    		})
@@ -93,7 +104,7 @@
 			        header   : "Jardin des connaissances : inscription",
 			        fields: [
 			            { field: "login", type: "text", required: true },
-			            { field: "mdp", type: "password", required: true },
+			            { field: "mdp", html: { caption: 'mot de passe'}, type: "password", required: true },
 			            { field: "email", type: "email", required: true }
 			            ],
 			        actions: {
@@ -101,7 +112,7 @@
 			                var errors = this.validate();
 			                if (errors.length > 0) return;
 			                var data = this.record;
-                            data.idBase="'.$this->idBase.'";
+                            data.idBase="<?php echo $this->idBase;?>";
 			                data.ajax = 1;
 							$.get("inscription",
 								data,
@@ -114,8 +125,22 @@
 			    		})
 			    	); 
 			});
+			function showGoogleAuth(){
+				var html = '<iframe src="google?idBase=<?php echo $this->idBase;?>&redir=<?php echo $this->redir;?>" style="width: 100%; height: 100%;">';
+				w2popup.open({
+			        title   : 'Authentification Google',
+			        showMax : false,
+			        body    : html,
+			        onOpen  : function (event) {
+			            event.onComplete = function () {
+			            };
+			        },
+			    });	
+				
+			}
+			function showP8Auth(){
+				window.location.assign("cas?idBase=<?php echo $this->idBase;?>&redir=<?php echo $this->redir;?>");				
+			}
 			</script>
 		  </body>
-		</html>	';	
-	}
-?>
+		</html>

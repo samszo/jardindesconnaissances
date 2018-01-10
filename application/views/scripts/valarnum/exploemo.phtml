@@ -89,11 +89,14 @@ iframe {
 <script src="../js/d3.min.js"></script>
 <script src="../js/jquery.min.js"></script>
 <script src="../js/valarnum/flux.js"></script>
+<script src="../js/w2ui.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/w2ui.css" />
 
 <script type="text/javascript">
 var uti = <?php echo $this->uti; ?>;
-var uti = <?php echo $this->uti; ?>;
-prefUrl = "../"
+var idBase = '<?php echo $this->idBase; ?>';
+var idMonade = '<?php echo $this->idMonade; ?>';
+var prefUrl = "../"
 </script>
 
 </head>
@@ -188,11 +191,11 @@ prefUrl = "../"
 
 	</div>
 	<div id="pied" class="card-footer text-muted">
-		<h4>Conception &amp; réalisation : Samuel Szoniecky</h4>
+        <h4>Conception &amp; réalisation : <a href="http://www.samszo@univ-paris8.fr">Samuel Szoniecky <img style="height:26px;" src="../img/logo_paragraphe.gif"></a></h4>
 		<h5>Merci à : <a href="https://bl.ocks.org/shimizu/79409cca5bcc57c32ddae0a5f0a1a564">shimizu</a></h5>
 	</div>
-	</div>
 
+	</div>
 
 
 	<script>
@@ -200,22 +203,78 @@ prefUrl = "../"
     "use strict"
 
     
-    var data = [
-        {id:"root",value:null},
-        {id:"root.1",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1569/340,600,150,400/600,1600/0/gray.png"},
-        {id:"root.2",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1563/full/full/0/gray.png"},
-        {id:"root.3",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1564/full/full/0/gray.png"},
-        {id:"root.4",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1562/full/full/0/gray.png"},
-        {id:"root.5",value:null,img:"http://localhost/ValArNum/omk/iiif-img/1565/full/full/0/gray.png"},
-    ]
-	var q = '<?php echo $this->q; ?>';
-  	d3.json("../flux/iiif?q="+q+"&idCol=<?php echo $this->idCol; ?>",function(dataOmk) {
- 		data=dataOmk;
+	//affiche le message de chargement
+    w2popup.open({
+        width: 500,
+        height: 300,
+        title: 'Chargement des données',
+        body: '<div class="w2ui-centered"></div>',
+        showMax: false,
+        showClose: false
+    });
+	w2popup.lock("<p>Merci de patienter...</p>", true);	
+    
+    var data=[], dataOmk, rdmTofs, nbTof = <?php echo $this->nbTof; ?>, q = '<?php echo $this->q; ?>';
+	var url = "../flux/iiif?q="+q+"&idCol=<?php echo $this->idCol; ?>";
+	url = "../flux/an?q=getAleaTofs&idBase="+idBase+"&nb=<?php echo $this->nb; ?>";
+  	d3.json(url,function(dt) {
+ 		dataOmk=dt;
+ 		rdmTofs = d3.randomUniform(1, (dataOmk.length-1));
+ 		 		 		
         if(q != 'getCollectionFaces')setInterval(draw, 8000);
+
  	    draw(); 	 		
+ 		//supprime le message de chargement	
+ 		w2popup.unlock();
+ 		w2popup.close();
+ 	    
  	}); 
  	        
 
+  	function getAleaTofs(){
+  		data = [];
+ 		data.push(dataOmk[0]);
+		//sélectionne les photos
+ 		for (var i = 1; i <= nbTof; i++) {
+ 			data[i] = clone(dataOmk[parseInt(rdmTofs())]);
+ 	 		//rénumérote les id
+	 		data[i].id = "root."+i;
+ 		}
+		return data;  	  	
+  	}
+  	
+  	function clone(obj) {
+  	    // Handle the 3 simple types, and null or undefined
+  	    if (null == obj || "object" != typeof obj) return obj;
+
+  	    // Handle Date
+  	    if (obj instanceof Date) {
+  	        var copy = new Date();
+  	        copy.setTime(obj.getTime());
+  	        return copy;
+  	    }
+
+  	    // Handle Array
+  	    if (obj instanceof Array) {
+  	        var copy = [];
+  	        for (var i = 0, len = obj.length; i < len; i++) {
+  	            copy[i] = clone(obj[i]);
+  	        }
+  	        return copy;
+  	    }
+
+  	    // Handle Object
+  	    if (obj instanceof Object) {
+  	        var copy = {};
+  	        for (var attr in obj) {
+  	            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+  	        }
+  	        return copy;
+  	    }
+
+  	    throw new Error("Unable to copy obj! Its type isn't supported.");
+  	}
+  	
 	/*
 	Chargement du curseur palette
 	*/
@@ -386,7 +445,8 @@ prefUrl = "../"
             
     }
     
-    function randomize() {
+    function randomize() {        
+ 		data=getAleaTofs();        
         data.filter(function(d){ return d.id !== "root"})
             .forEach(function(d){
                 //modifie la taille de la photo dans le treemap
@@ -405,7 +465,7 @@ prefUrl = "../"
 
         node.merge(newNode)
             .attr('id',function(d) { 
-                return 'img_'+d.data.idOmk 
+                return 'img_'+d.data.idOmkMedia 
                 })
             .attr("x", function(d) { return d.x0 })
             .attr("y", function(d) { return d.y0 })
@@ -434,15 +494,15 @@ prefUrl = "../"
             var minPixel = 10;
             if(q != 'getCollectionFaces'){ 
                 //calcul la taille de la photo
-                d.data.x = parseInt(d3.randomUniform(minPixel, d.data.width-(d.x1-d.x0))());
+                d.data.x = parseInt(d3.randomUniform(minPixel, d.data.w-(d.x1-d.x0))());
                 d.data.w = d.w;
-                d.data.y = parseInt(d3.randomUniform(minPixel, d.data.height-(d.y1-d.y0))());
+                d.data.y = parseInt(d3.randomUniform(minPixel, d.data.h-(d.y1-d.y0))());
                 d.data.h = d.h;
                 d.data.r = 0;
 	            d.data.img=d.data.imgOmk+'/'+d.data.x+','+d.data.y+','+d.data.w+','+d.data.h+'/full/'+d.data.r+'/default.jpg';
             }else{
                  d.data.img=d.data.imgFull;
-                 d.data.value = d.data.width*d.data.height;
+                 d.data.value = d.data.w*d.data.h;
             }
         }
         //console.log(d);        
@@ -607,11 +667,11 @@ prefUrl = "../"
 			 to[0].evals.push(ev);
 		}else{
 			//création de la référence de la photo
-			tofEval.push({'idOmk':tofSelect.data.idOmk,'label':tofSelect.data.label
+			tofEval.push({'idOmkMedia':tofSelect.data.idOmkMedia,'idOmkItem':tofSelect.data.idOmkItem,'label':tofSelect.data.label
 				,'original':tofSelect.data.original
 				,'h':tofSelect.data.height,'w':tofSelect.data.width
-				,'scaleX':d3.scaleLinear().domain([0, tofSelect.data.width])
-				,'scaleY':d3.scaleLinear().domain([0, tofSelect.data.height])
+				,'scaleX':d3.scaleLinear().domain([0, tofSelect.data.w])
+				,'scaleY':d3.scaleLinear().domain([0, tofSelect.data.h])
 				,'evals':[ev]
 				});
 
@@ -655,7 +715,7 @@ prefUrl = "../"
 				});
 		items.append('img')
 			.attr('id',function(d){
-				return 'carImg_'+d.idOmk;
+				return 'carImg_'+d.idOmkMedia;
 			})
 			.attr('class','d-block img-fluid')
 			.style('max-height',height+"px")
@@ -693,64 +753,8 @@ prefUrl = "../"
 		//
 		//ajoute les événements
 		$('#carouselEvals').on('slid.bs.carousel', function (e) {
-			  //console.log(e);
-			if(!tofEval[e.to])return;
-			var tEv = tofEval[e.to];		
-			var carImg = d3.select("#carImg_"+tEv.idOmk).node();
-			tEv.scaleX.range([0, carImg.width]);
-			tEv.scaleY.range([0, carImg.height]);
-			  
-			//récupère la définition des cercles
-			var te = tEv.evals;
-					  
-			  //construction du rectangle de zoom
-			  svgChoix.selectAll('rect').remove();
-			  var evRect = svgChoix.selectAll('rect').data(te);
-			  //ajoute les nouvelles évaluations
-			  evRect.enter()
-			  	  .append('rect')
-				  .attr("width", function(d){
-					  return tEv.scaleX(d.w);
-					  })
-                    .attr("height", function(d){
-                      return tEv.scaleY(d.h);
-                      })
-				  .attr('fill','none')
-				  .attr('stroke','red')
-				  .attr('transform',function(d){
-					return  'translate('+(carImg.offsetLeft+tEv.scaleX(d.x))+' '+(carImg.offsetTop+tEv.scaleY(d.y))+')'
-				  	});
-              
-			  
-			  //construction des cercles d'évaluation
-			  svgChoix.selectAll('circle').remove();
-			  var evCirc = svgChoix.selectAll('circle').data(te);
-			  evCirc.enter()
-			  	  .append('circle')
-			  	  .attr('cx',function(d){
-				  	  return carImg.offsetLeft+tEv.scaleX(d.cx)
-				  	  })
-				  .attr('cy',function(d){
-					  return carImg.offsetTop+tEv.scaleY(d.cy)
-					  })					  
-				  .attr('r',function(d){return tEv.scaleX(d.r)})
-    	  			  .style('fill-opacity',0.3)       	  				
-				  .attr('fill',function(d){
-					  return d.color;
-					  })
-				  .on("mouseover", function(d) {
-					  divTT.transition()
-				         .duration(200)
-				         .style("opacity", .9);
-					  divTT.html(d.d.fr)
-				         .style("left", (d3.event.pageX) + "px")
-				         .style("top", (d3.event.pageY - 28) + "px");
-				       })
-			     .on("mouseout", function(d) {
-    				    	 divTT.transition()
-    				         .duration(500)
-    				         .style("opacity", 0);
-			       });
+			//console.log(e);
+			showTofEvals(e);
 		       				  
 			})
 
@@ -760,12 +764,79 @@ prefUrl = "../"
 
 	}
 
+
+	function showTofEvals(e){
+
+		if(!tofEval[e.to])return;
+		var tEv = tofEval[e.to];		
+		var carImg = d3.select("#carImg_"+tEv.idOmkMedia).node();
+		tEv.scaleX.range([0, carImg.width]);
+		tEv.scaleY.range([0, carImg.height]);
+		  
+		//récupère la définition des cercles
+		var te = tEv.evals;
+				  
+		  //construction du rectangle de zoom
+		  svgChoix.selectAll('rect').remove();
+		  var evRect = svgChoix.selectAll('rect').data(te);
+		  //ajoute les nouvelles évaluations
+		  evRect.enter()
+		  	  .append('rect')
+			  .attr("width", function(d){
+				  return tEv.scaleX(d.w);
+				  })
+                .attr("height", function(d){
+                  return tEv.scaleY(d.h);
+                  })
+			  .attr('fill','none')
+			  .attr('stroke','red')
+			  .attr('transform',function(d){
+				return  'translate('+(carImg.offsetLeft+tEv.scaleX(d.x))+' '+(carImg.offsetTop+tEv.scaleY(d.y))+')'
+			  	});
+          
+		  
+		  //construction des cercles d'évaluation
+		  svgChoix.selectAll('circle').remove();
+		  var evCirc = svgChoix.selectAll('circle').data(te);
+		  evCirc.enter()
+		  	  .append('circle')
+		  	  .attr('cx',function(d){
+			  	  return carImg.offsetLeft+tEv.scaleX(d.cx)
+			  	  })
+			  .attr('cy',function(d){
+				  return carImg.offsetTop+tEv.scaleY(d.cy)
+				  })					  
+			  .attr('r',function(d){return tEv.scaleX(d.r)})
+	  			  .style('fill-opacity',0.3)       	  				
+			  .attr('fill',function(d){
+				  return d.color;
+				  })
+			  .on("mouseover", function(d) {
+				  /*TODO
+				  divTT.transition()
+			         .duration(200)
+			         .style("opacity", .9);
+				  divTT.html(d.d.fr)
+			         .style("left", function(dt){
+				         return (d3.event.pageX-d.r) + "px";
+				         })
+			         .style("top", (d3.event.pageY - 28) + "px");
+			         */
+			       })			       
+		     .on("mouseout", function(d) {
+				  /*TODO			     
+				    	 divTT.transition()
+				         .duration(500)
+				         .style("opacity", 0);
+		         */
+		       });		
+	}
 	
 	function sauveEmo(tof, e) {
 
 		//récupère les référence de l'image "flux_an-flux_doc-doc_id-3538"
 		var ref = tof.data.metadata.Identifier.split('-');
-		var doc = {'idDoc':ref[3],'idOmk':tof.data.idOmk,'label':tof.data.label,'original':tof.data.original
+		var doc = {'idDoc':ref[3],'idOmkMedia':tof.data.idOmkMedia,'idOmkItem':tof.data.idOmkItem,'label':tof.data.label,'original':tof.data.original
 				,'w':tof.data.width,'h':tof.data.height};		
 		e.color = e.d.color;
 		e.d = e.d.fr;
@@ -858,12 +929,12 @@ prefUrl = "../"
     }
 
     function chargeStream(){
-		d3.select("#frmStream").attr('src',"<?php echo WEB_ROOT_AJAX;?>/graph/streamv?type=valarnum");
+		d3.select("#frmStream").attr('src',"<?php echo WEB_ROOT_AJAX;?>/graph/streamv?type=valarnum&idBase="+idBase+"&idMonade="+idMonade);
     }
 
     function getTofEval(){
         
-		var p = {'q':'getEvalsMonade'};
+		var p = {'q':'getEvalsMonade','idBase':idBase,'idMonade':idMonade};
 		tofEval = [];			
 	    $.ajax({
 	    		url: "../flux/an",
@@ -888,7 +959,7 @@ prefUrl = "../"
 		  			}else{
 		  				//création de la référence de la photo
 		  				var n = JSON.parse(d.pNote);
-		  				tofEval.push({'idOmk':n.idOmk,'label':n.label
+		  				tofEval.push({'idOmkItem':n.idOmkItem,'idOmkMedia':n.idOmkMedia,'label':n.label
 		  					,'idDoc':n.idDoc
 		  					,'original':n.original
 		  					,'h':n.h,'w':n.w

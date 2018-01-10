@@ -1,5 +1,6 @@
 <?php
-use function GuzzleHttp\json_encode;
+// use function GuzzleHttp\json_encode;
+use function Composer\Autoload\includeFile;
 
 /**
  * Flux_An
@@ -30,6 +31,7 @@ class Flux_An extends Flux_Site{
     var $owner = "samuel.szoniecky@univ-paris8.fr";
     var $idOwner = 1;
     var $idClassImage = 26;
+    var $iiif;
     
     /**
      * Constructeur de la classe
@@ -1034,56 +1036,88 @@ ORDER BY d.tronc
         	/**
         	 * renvoit le nombre de photo pour chaque item
         	 * @param  string   $dateUnit
+        	 * @param  string   $q
         	 * 
         	 * @return array
         	 *
         	 */
-        	function getNbPhoto($dateUnit="%Y-%m-%d"){
+        	function getNbPhoto($dateUnit="%Y-%m-%d",$q='par doc'){
         	            	    
         	    
-        	    $sql = "SELECT 
-                dp.doc_id, dp.titre,
-                COUNT(de.doc_id) nbTof,
-                DATE_FORMAT(dgprDeb.valeur, '".$dateUnit."') temps,
-                MIN(DATEDIFF(DATE_FORMAT(dgprDeb.valeur, '%Y-%m-%d'),
-                        FROM_UNIXTIME(0)) * 24 * 3600) MinDate,
-                MAX(DATEDIFF(DATE_FORMAT(dgprDeb.valeur, '%Y-%m-%d'),
-                        FROM_UNIXTIME(0)) * 24 * 3600) MaxDate,
-                MAX(DATEDIFF(DATE_FORMAT(dgprFin.valeur, '%Y-%m-%d'),
-                        FROM_UNIXTIME(0)) * 24 * 3600) MaxFinDate
-            FROM
-                flux_doc dp
-                    INNER JOIN
-                flux_doc de ON de.lft BETWEEN dp.lft AND dp.rgt
-                    AND SUBSTRING(de.url, - 4) = '.jpg'
-                    INNER JOIN
-                flux_rapport dgprDeb ON dgprDeb.src_id = dp.doc_id
-                    AND dgprDeb.src_obj = 'doc'
-                    AND dgprDeb.dst_id = 4
-                    AND dgprDeb.dst_obj = 'tag'
-                    LEFT JOIN
-                flux_rapport dgprFin ON dgprFin.src_id = dp.doc_id
-                    AND dgprFin.src_obj = 'doc'
-                    AND dgprFin.dst_id = 5
-                    AND dgprFin.dst_obj = 'tag'
-            GROUP BY dp.doc_id , temps";
-        	    
+        	    if($q='total'){
+        	        $sql = "SELECT COUNT(doc_id) nbTof
+                FROM flux_doc
+                WHERE type = 1";        	        
+        	    }else{        	    
+            	    $sql = "SELECT 
+                    dp.doc_id, dp.titre,
+                    COUNT(de.doc_id) nbTof,
+                    DATE_FORMAT(dgprDeb.valeur, '".$dateUnit."') temps,
+                    MIN(DATEDIFF(DATE_FORMAT(dgprDeb.valeur, '%Y-%m-%d'),
+                            FROM_UNIXTIME(0)) * 24 * 3600) MinDate,
+                    MAX(DATEDIFF(DATE_FORMAT(dgprDeb.valeur, '%Y-%m-%d'),
+                            FROM_UNIXTIME(0)) * 24 * 3600) MaxDate,
+                    MAX(DATEDIFF(DATE_FORMAT(dgprFin.valeur, '%Y-%m-%d'),
+                            FROM_UNIXTIME(0)) * 24 * 3600) MaxFinDate
+                FROM
+                    flux_doc dp
+                        INNER JOIN
+                    flux_doc de ON de.lft BETWEEN dp.lft AND dp.rgt
+                        AND SUBSTRING(de.url, - 4) = '.jpg'
+                        INNER JOIN
+                    flux_rapport dgprDeb ON dgprDeb.src_id = dp.doc_id
+                        AND dgprDeb.src_obj = 'doc'
+                        AND dgprDeb.dst_id = 4
+                        AND dgprDeb.dst_obj = 'tag'
+                        LEFT JOIN
+                    flux_rapport dgprFin ON dgprFin.src_id = dp.doc_id
+                        AND dgprFin.src_obj = 'doc'
+                        AND dgprFin.dst_id = 5
+                        AND dgprFin.dst_obj = 'tag'
+                GROUP BY dp.doc_id , temps";
+        	    }        	    
         	    $this->trace($sql);
         	    return $this->dbD->exeQuery($sql);
         	    
         	}
         	
         	/**
+        	 * renvoit le nombre de visage
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getNbVisage(){
+            $sql = "SELECT COUNT(doc_id) nbVisage
+                FROM flux_doc
+                WHERE tronc = 'visage'";
+
+        	    $this->trace($sql);
+        	    return $this->dbD->exeQuery($sql);        	    
+        	}
+        	
+        	/**
         	 * exporte une liste de visage pour pour une importation dans Omeka
         	 *
         	 * @param  string  $pathIIIF
-        	 * @param  string  &fic
+        	 * @param  string  $fic
+        	 * @param  string  $ficFail
+        	 * @param  boolean $ajoutAbscent
         	 * 
         	 * @return array
         	 *
         	 */
-        	function getCsvGoogleVisageToOmk($pathIIIF, $fic){
+        	function getCsvGoogleVisageToOmk($pathIIIF, $fic, $ficFail="", $ajoutAbscent=false){
         	    $this->trace(__METHOD__);
+        	    
+        	    if($ficFail) require_once($ficFail);
+        	    
+        	    /*pour récupérer les visages qui ne sont pas dans OMK = $ajoutAbscent = true
+        	     INSERT INTO  test (id) 
+        	     SELECT SUBSTRING(ov.value, 31)    
+             FROM omk_valarnum1.value ov 
+             WHERE ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+        	     */        	    
         	    
         	    $sql = "SELECT 
                 d.doc_id,
@@ -1101,12 +1135,11 @@ ORDER BY d.tronc
                 ".$this->idBaseOmk.".value ov ON ov.value LIKE '".$this->idBase."-flux_doc-doc_id-%'
                     AND SUBSTRING(ov.value, 31) = dp.doc_id
                     INNER JOIN
-                ".$this->idBaseOmk.".media om ON om.item_id = ov.resource_id
-                    LEFT JOIN
-                flux_visage v ON v.doc_id = d.doc_id 
-            WHERE
-                d.tronc = 'visage' AND v.doc_id is null
-            ORDER BY d.parent";
+                ".$this->idBaseOmk.".media om ON om.item_id = ov.resource_id ";
+        	    if($ajoutAbscent) $sql .= " LEFT JOIN test t on t.id = d.doc_id ";
+            $sql .= " WHERE d.tronc = 'visage' ";
+        	    if($ajoutAbscent) $sql .= " AND t.id is null "; 
+            $sql .= " ORDER BY d.parent";
         	    
         	    $this->trace($sql);
         	    $arr = $this->dbD->exeQuery($sql);
@@ -1114,29 +1147,44 @@ ORDER BY d.tronc
         	    $nb = count($arr);
         	    $arrItem = array();
         	    for ($i = 0; $i < $nb; $i++) {
-        	        $this->trace($nb." ".$h["doc_id"]." ".$h["titre"]);
         	        $h = $arr[$i];
         	        $h["idClass"] = $this->idClassImage;//image
         	        $data = json_decode($h["note"]);
         	        $h["titre"] = str_replace('faceAnnotations 0', 'visage', $h["titre"]);
-    	            //calcule la position de l'image
-    	            $v = $data->boundingPoly->vertices;
-    	            $h["url"] = $pathIIIF.$h['imageId'].'/'.$v[0]->x.','.$v[0]->y.','.($v[1]->x - $v[0]->x).','.($v[2]->y - $v[0]->y).'/full/0/default.jpg';
-    	            $h["item_set"]=$this->isVisage;
-    	            $h["reference"]=$this->idBase."-flux_doc-doc_id-".$h["doc_id"];
-    	            unset($h['note']);
-    	            unset($h['doc_id']);
-    	            unset($h['parent']);
-    	            unset($h['titreParent']);
-    	            unset($h['imageId']);    	            
-    	            $arrItem[] = $h;
-    	            /*ajoute l'item
-    	            $idR = $this->setItem($h);
-    	            //ajoute le lien vers la photo originale
-    	            $this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>$this->isPartOf,"type"=>"resource","value_resource_id"=>$h['resource_id']));
-    	            //ajoute un lien vers l'itemset visage
-    	            $this->dbIIS->ajouter(array("item_set"=>$idR,"item_set_id"=>$this->isVisage));
-    	            */
+        	        //calcule la position de l'image
+        	        $v = $data->boundingPoly->vertices;
+        	        if($ficFail && !in_array($h['imageId'], $arrFail) ){
+        	            $this->trace("PAS FAIL");
+        	        }elseif($ficFail && isset($v[0]->x) && isset($v[0]->y) && isset($v[1]->x) && isset($v[2]->y)){
+        	                $this->trace("FAIL OK");
+        	        }else{
+        	            $this->trace($nb." ".$h["doc_id"]." ".$h["titre"]);
+        	            //met des 0 pour les valeurs abscentes
+        	            if(!isset($v[0]->x))$v[0]->x=0;
+        	            if(!isset($v[0]->y))$v[0]->y=0;
+        	            if(!isset($v[1]->x))$v[1]->x=0;
+        	            if(!isset($v[1]->y))$v[1]->y=0;
+        	            if(!isset($v[2]->x))$v[2]->x=0;
+        	            if(!isset($v[2]->y))$v[2]->y=0;
+        	            //construction de l'url
+        	            $h["url"] = $pathIIIF.$h['imageId'].'/'.$v[0]->x.','.$v[0]->y.','.($v[1]->x - $v[0]->x).','.($v[2]->y - $v[0]->y).'/full/0/default.jpg';
+        	            $h["item_set"]=$this->isVisage;
+        	            $h["reference"]=$this->idBase."-flux_doc-doc_id-".$h["doc_id"];
+        	            unset($h['note']);
+        	            unset($h['doc_id']);
+        	            unset($h['parent']);
+        	            unset($h['titreParent']);
+        	            unset($h['imageId']);    	            
+        	            $arrItem[] = $h;
+        	            $this->trace($h["url"]);        	            
+        	            /*ajoute l'item
+        	            $idR = $this->setItem($h);
+        	            //ajoute le lien vers la photo originale
+        	            $this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>$this->isPartOf,"type"=>"resource","value_resource_id"=>$h['resource_id']));
+        	            //ajoute un lien vers l'itemset visage
+        	            $this->dbIIS->ajouter(array("item_set"=>$idR,"item_set_id"=>$this->isVisage));
+        	            */
+        	        }
         	    }
         	    
         	    //enregistre le csv dans un fichier
@@ -1186,7 +1234,7 @@ ORDER BY d.tronc
         	    //foreach ($arr as $h) {
         	    $nb = count($arr);
         	    $arrItem = array();
-        	    for ($i = 9605; $i < $nb; $i++) {
+        	    for ($i = 0; $i < $nb; $i++) {
         	        $this->trace($i." ".$h["doc_id"]." ".$h["titre"]);
         	        $h = $arr[$i];
         	        $data = json_decode($h["note"]);
@@ -1287,7 +1335,7 @@ ORDER BY d.tronc
                 	                        ,"valeur"=>$la['score']
                 	                    ));        	  
             	                    }
-            	                break;
+            	                   break;
             	                case 'imagePropertiesAnnotation':
             	                    //enregistre l'analyse
             	                    $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$k." ".$numItem,"note"=>json_encode($r)));
@@ -1535,66 +1583,96 @@ ORDER BY d.tronc
         	/**
         	 * récupère les données pour chaque visage
         	 *
-        	 * @param  boolean $bParent
+        	 * @param  int         $deb
+        	 * @param  int         $nb
+        	 * @param  boolean     $bCount
         	 *
         	 * @return array
         	 *
         	 */
-        	function getVisagesDatas(){
+        	function getVisagesDatas($deb="",$nb="",$bCount=false){
         	    
         	    $this->trace(__METHOD__);
         	    
-        	    //recupère les données pour les photos
-        	    $sql = "SELECT 
-    dv.doc_id,
-    MIN(d.doc_id) pId,
-    MIN(d.titre) label,
-    MIN(d.url) original,
-    MIN(dp.titre) theme,
-    MIN(DATE_FORMAT(rDeb.valeur, '%Y-%m-%d')) temps,
-    MIN(DATEDIFF(DATE_FORMAT(rDeb.valeur, '%Y-%m-%d'),
-            FROM_UNIXTIME(0)) * 24 * 3600) MinDate,
-    dv.titre,
-    om.source imgFull,
-    om.item_id idOmk,
-    COUNT(v.visage_id) nbVisage,
-    SUM(FIND_IN_SET(v.joy,
-            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) joie,
-    SUM(FIND_IN_SET(v.anger,
-            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) colere,
-    SUM(FIND_IN_SET(v.surprise,
-            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) surprise,
-    SUM(FIND_IN_SET(v.sorrow,
-            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) ennui,
-    SUM(FIND_IN_SET(v.blurred,
-            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) flou,
-    SUM(FIND_IN_SET(v.headwear,
-            'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) chapeau
-FROM
-    flux_doc d
-        INNER JOIN
-    flux_rapport rDeb ON rDeb.src_id = d.parent
-        AND rDeb.src_obj = 'doc'
-        AND rDeb.dst_obj = 'tag'
-        AND rDeb.dst_id = 4
-        INNER JOIN
-    flux_doc dp ON dp.doc_id = d.parent
-        INNER JOIN
-    flux_doc dv ON dv.parent = d.doc_id
-        INNER JOIN
-    flux_visage v ON v.doc_id = dv.doc_id
-        INNER JOIN
-    omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
-        AND SUBSTRING(ov.value, 31) = dv.doc_id
-        INNER JOIN
-    omk_valarnum1.media om ON om.item_id = ov.resource_id
-WHERE
-    d.type = 1
-GROUP BY dv.doc_id, om.item_id, om.source
-            ";
+        	    if($bCount){
+        	        $sql = "SELECT 
+                        COUNT(DISTINCT v.visage_id) nbVisage
+                    FROM
+                        flux_visage v
+                            INNER JOIN
+                        omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+                            AND SUBSTRING(ov.value, 31) = v.doc_id
+                            INNER JOIN
+                        omk_valarnum1.media om ON om.item_id = ov.resource_id
+                            INNER JOIN
+                        flux_doc dv ON dv.doc_id = v.doc_id
+                            INNER JOIN
+                        flux_doc d ON d.doc_id = dv.parent
+                            INNER JOIN
+                        flux_rapport rDeb ON rDeb.src_id = d.parent
+                            AND rDeb.src_obj = 'doc'
+                            AND rDeb.dst_obj = 'tag'
+                            AND rDeb.dst_id = 4
+                    ";
+        	    }else{
+            	    //recupère les données pour les photos
+            	    $sql = "SELECT 
+            dv.doc_id,
+            MIN(d.parent) gpId,
+            MIN(d.doc_id) pId,
+            MIN(d.titre) label,
+            MIN(d.url) original,
+            MIN(dp.titre) theme,
+            MIN(DATE_FORMAT(rDeb.valeur, '%Y-%m-%d')) temps,
+            MIN(DATEDIFF(DATE_FORMAT(rDeb.valeur, '%Y-%m-%d'),
+                    FROM_UNIXTIME(0)) * 24 * 3600) MinDate,
+            dv.titre,
+            om.source imgFull,
+            om.item_id idOmk,
+            COUNT(v.visage_id) nbVisage,
+            SUM(FIND_IN_SET(v.joy,
+                    'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) joie,
+            SUM(FIND_IN_SET(v.anger,
+                    'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) colere,
+            SUM(FIND_IN_SET(v.surprise,
+                    'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) surprise,
+            SUM(FIND_IN_SET(v.sorrow,
+                    'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) ennui,
+            SUM(FIND_IN_SET(v.blurred,
+                    'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) flou,
+            SUM(FIND_IN_SET(v.headwear,
+                    'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) chapeau        	            	        
+            FROM
+                flux_doc d
+                    INNER JOIN
+                flux_rapport rDeb ON rDeb.src_id = d.parent
+                    AND rDeb.src_obj = 'doc'
+                    AND rDeb.dst_obj = 'tag'
+                    AND rDeb.dst_id = 4
+                    INNER JOIN
+                flux_doc dp ON dp.doc_id = d.parent
+                    INNER JOIN
+                flux_doc dv ON dv.parent = d.doc_id
+                    INNER JOIN
+                flux_visage v ON v.doc_id = dv.doc_id
+                    INNER JOIN
+                omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+                    AND SUBSTRING(ov.value, 31) = dv.doc_id
+                    INNER JOIN
+                omk_valarnum1.media om ON om.item_id = ov.resource_id
+            WHERE
+                d.type = 1 
+            GROUP BY dv.doc_id, om.item_id, om.source  ";
         	    
-        	    //LIMIT 40";
-        	    
+        	        if($deb=='alea'){
+            	        $sql .= " ORDER BY RAND() LIMIT ".$nb;
+            	    }else{
+            	        $sql .= " ORDER BY MinDate ";          	        
+                    if($deb!="")$sql .=" LIMIT ".$deb;                
+                    if($nb!="")$sql .=",".$nb;
+            	    }
+            	    //LIMIT 40";
+        	    }        	    
         	    $this->trace($sql);
         	    $arr =  $this->dbD->exeQuery($sql);
         	            	    
@@ -1802,6 +1880,166 @@ GROUP BY dv.doc_id, om.item_id, om.source
     	        return $arrP;
         	    
         	}
+
         	
+        	/**
+        	 * récupère les acteurs pour un contexte documentaire
+        	 * 
+        	 * @param  int         $idDoc
+        	 * @param  string      $q -- spécifier le type de requête
+        	 * @param  int         $idTheme -- pour récupérer les stats d'une photo
+        	 * @param  int         $idVisage -- pour récupérer les stats d'un visage
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getActeursContexte($idDoc, $q=false, $idTheme=false, $idVisage=false){
+        	    
+        	    //recupère les données pour les photos
+        	    $sql = "SELECT 
+                    e.exi_id,
+                    e.nom,
+                    e.prenom,
+                    e.nait,
+                    e.mort,
+                    e.url,
+                    e.data,
+                    e.exi_id recid,
+                    SUM(dt.niveau) + COUNT(DISTINCT dt.doc_id) pertinenceTof,
+                    SUM(dp.niveau) + COUNT(DISTINCT dp.doc_id) pertinenceParent,
+                    SUM(dt.niveau) + COUNT(DISTINCT dt.doc_id) + SUM(dp.niveau) + COUNT(DISTINCT dp.doc_id) pertinence,
+                    COUNT(DISTINCT rU.rapport_id)+COUNT(DISTINCT rV.rapport_id) nbVote,
+                    SUM(rU.niveau)/COUNT(rU.src_id) confiancePhoto,
+                    SUM(rV.niveau)/COUNT(rV.src_id) confianceVisage
+                FROM
+                    flux_exi e
+                        INNER JOIN
+                    flux_rapport r ON r.dst_id = e.exi_id
+                        AND r.dst_obj = 'exi'
+                        AND r.src_obj = 'doc'
+                        INNER JOIN
+                    flux_doc dt ON dt.doc_id = r.src_id
+                        LEFT JOIN
+                    flux_doc dp ON dp.doc_id = ".$idDoc."
+                        AND dt.lft BETWEEN dp.lft AND dp.rgt
+                        LEFT JOIN
+                    flux_rapport rU ON rU.dst_id = e.exi_id
+                        AND rU.dst_obj = 'exi'
+                        AND rU.src_obj = 'doc'
+                        AND rU.src_id = ".$idTheme."
+                        AND rU.pre_obj = 'uti'
+                        LEFT JOIN
+                    flux_rapport rV ON rV.dst_id = e.exi_id
+                        AND rV.dst_obj = 'exi'
+                        AND rV.src_obj = 'doc'
+                        AND rV.src_id = ".$idVisage."
+                        AND rV.pre_obj = 'uti' ";
+        	    if($q == "strict"){
+        	        $sql .= " WHERE dp.doc_id IS NOT NULL ";
+        	    }
+        	    if($q == "statTof"){
+        	        $sql .= " WHERE dt.doc_id = ".$idTheme." ";
+        	    }
+        	    $sql .= " GROUP BY e.exi_id
+                ORDER BY confianceVisage DESC, confiancePhoto DESC, pertinence DESC, e.nom
+                ";
+        	    
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	            	    
+        	    return $arr;
+        	    
+        	}
+        
+        	        
+        	/**
+        	 * Fonction pour récupérer une liste de photo aléatoire
+        	 *
+        	 * @param  	int 		$nb
+        	 *
+        	 * @return	array
+        	 *
+        	 */
+        	function getAleaTofs($nb=10){
+        	    
+        	    $this->trace(__METHOD__." ".$idCol);
+        	            	    
+        	    
+        	    $data= array();
+        	    //récupère une liste aléatoire des photos
+        	    $sql = "SELECT 
+    d.parent gpId,
+    d.doc_id pId,
+    d.note,
+    d.titre label,
+    d.url original,
+    dp.titre theme,
+    MIN(DATE_FORMAT(rDeb.valeur, '%Y-%m-%d')) temps,
+    om.source imgFull,
+    om.item_id idOmkItem,
+    MIN(om.id) idOmkMedia
+FROM
+    flux_doc d
+        INNER JOIN
+    flux_rapport rDeb ON rDeb.src_id = d.parent
+        AND rDeb.src_obj = 'doc'
+        AND rDeb.dst_obj = 'tag'
+        AND rDeb.dst_id = 4
+        INNER JOIN
+    flux_doc dp ON dp.doc_id = d.parent
+        INNER JOIN
+    omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+        AND SUBSTRING(ov.value, 31) = d.doc_id
+        INNER JOIN
+    omk_valarnum1.media om ON om.item_id = ov.resource_id
+WHERE
+    d.type = 1
+GROUP BY d.doc_id , om.item_id , om.source
+ORDER BY RAND()
+LIMIT ".$nb;
+        	    
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    //constuction des résultats
+        	    $data[] = array("label"=>"racine","id"=>"root","value"=>"");
+        	    $i=1;
+        	    foreach ($arr as $t) {
+        	        if(!$t['note']){
+        	            //pas assez performant par IIF
+        	            //$dt = $this->iiif->getTofInfos($this->iiif->urlRoot."/".$t['idOmkItem']."/manifest",$i);
+        	            //récupère la taille de la photo        	                    	            
+        	            $filename = WEB_ROOT."/data/AN/photos/".$t['imgFull'];
+        	            $this->trace($filename);
+        	            if ($this->url_exists($filename)) {
+        	                $size = getimagesize($filename);
+        	                //construction des données
+        	                $img = $this->iiif->urlRoot."-img/".$t['idOmkMedia'];
+        	                $dt = array("gpId"=>$t['gpId'],"idDoc"=>$t['pId'],"idCol"=>'alea',"value"=>"","label"=>$t['label']
+        	                    ,"original"=>$t['original'],"idOmkItem"=>$t['idOmkItem'],"idOmkMedia"=>$t['idOmkMedia'],"imgOmk"=>$img,"imgFull"=>$img.'/full/full/0/default.jpg'
+        	                    ,"w"=>$size[0],"h"=>$size[1]
+        	                    ,"metadata"=>array("Identifier"=>$this->idBase."-flux_doc-doc_id-".$t['pId']));
+        	                $json = json_encode($dt);
+        	                $this->dbD->edit($t['pId'], array('note'=>$json));
+        	                $dt["id"]="root.".$i;
+        	            }else{
+        	                $this->dbD->edit($t['pId'], array('data'=>"Le fichier $filename n'existe pas."));
+        	            }        	            
+        	            //pour réinitialisé 
+        	            //update `flux_doc` set note='' WHERE `note` IS NOT NULL AND `type` = 1 ORDER BY `note` DESC
+        	        }else{
+        	            $this->trace($i." : ".$t['note']);        	            
+    	                $dt = json_decode($t['note']);
+    	                $this->trace(json_last_error());
+        	            $dt->id="root.".$i;
+        	        }
+        	        $data[] = $dt;
+        	        $i++;
+        	    }
+        	    
+        	    $this->trace(__METHOD__." FIN");
+        	    return $data;
+        	    
+        	}
         	
 }

@@ -23,7 +23,7 @@ class Flux_Dbpedia extends Flux_Site{
 	var $formatResponse = "json";
 	//attention fr est régulièrement en RAD
 	var $searchUrl = 'http://fr.dbpedia.org/sparql?';//'https://dbpedia.org/sparql?'
-	var $searchSparqls = array('dbpedia.org','fr.dbpedia.org');
+	var $searchSparqls = array('dbpedia.org','fr.dbpedia.org','de.dbpedia.org');
     const IDEXI = 1;
     
     /**
@@ -250,8 +250,12 @@ class Flux_Dbpedia extends Flux_Site{
         				case "http://www.w3.org/1999/02/22-rdf-syntax-ns#type":
         				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"type");
         				    break;				    
-        				case "http://dbpedia.org/ontology/abstract":
-        				    if($v->p->{'xml:lang'}=="fr")$objResult->abstract = $v->p->value;
+        				case "http://dbpedia.org/ontology/abstract":        				    
+        				    //pour forcer les langues possibles
+        				    if($v->p->{'xml:lang'}=="fr")
+            				    $objResult->abstract = $v->p->value;
+            				elseif (!$objResult->abstract && ($v->p->{'xml:lang'}=="en" || $v->p->{'xml:lang'}=="de"))
+                				$objResult->abstract = $v->p->value;
         				    break;
         				case "http://fr.dbpedia.org/property/activit%C3%A9sAutres":
         				    $liens[] = array("value"=>$v->p->value,"recid"=>count($liens)+1,"type"=>"activité");

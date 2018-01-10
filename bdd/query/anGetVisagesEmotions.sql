@@ -8,8 +8,10 @@ SELECT
     MIN(DATEDIFF(DATE_FORMAT(rDeb.valeur, '%Y-%m-%d'),
             FROM_UNIXTIME(0)) * 24 * 3600) MinDate,
     dv.titre,
+    /*
     om.source imgFull,
     om.item_id idOmk,
+    */
     COUNT(v.visage_id) nbVisage,
     SUM(FIND_IN_SET(v.joy,
             'VERY_UNLIKELY,UNLIKELY,POSSIBLE,LIKELY,VERY_LIKELY')) / COUNT(v.visage_id) joie,
@@ -36,11 +38,14 @@ FROM
     flux_doc dv ON dv.parent = d.doc_id
         INNER JOIN
     flux_visage v ON v.doc_id = dv.doc_id
+	/*
         INNER JOIN
     omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
         AND SUBSTRING(ov.value, 31) = dv.doc_id
         INNER JOIN
     omk_valarnum1.media om ON om.item_id = ov.resource_id
+    */
 WHERE
     d.type = 1
-GROUP BY dv.doc_id, om.item_id, om.source
+GROUP BY dv.doc_id -- , om.item_id, om.source
+-- order by idOmk desc

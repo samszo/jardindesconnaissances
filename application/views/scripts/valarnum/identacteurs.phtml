@@ -2,15 +2,18 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Evaluation des acteurs</title>
+		<title>Identification des acteurs</title>
 	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		
-        <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
         <script src="../js/d3.min.js"></script>
         <script src="../js/jquery.min.js"></script>
-        <script src="../js/valarnum/flux.js"></script>
-
+		<script src="../js/jquery.simplePagination.js"></script>
+        <script src="../js/w2ui-1.5.rc1.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
+        <link rel="stylesheet" type="text/css" href="../css/simplePagination.css" />
+		
 		<style type="text/css">
 		/*pour les initiales en majuscule*/
 		.card-title:first-letter{
@@ -34,21 +37,34 @@
 		    font-style: italic;
 		}
 		
+        div.tooltip {
+          position: absolute;
+          text-align: center;
+          width: 200px;
+          height: 200px;
+          padding: 2px;
+          font: 12px sans-serif;
+          background: white;
+          border: 0px;
+          border-radius: 8px;
+          pointer-events: none;
+        }
+        .imgFullPopUp {
+            cursor:pointer;
+        }
 		
 		</style>
 		
 	<script src="../js/valarnum/flux.js"></script>
-
-    <script type="text/javascript">
-    var uti = <?php echo $this->uti; ?>;
-    
-    </script>
 		
 	</head>
 <body>
 
-<div class="jumbotron">
-  <h1 class="display-3">Visages présidentiels</h1>
+	<div class="card text-center">
+		<div class="card-header">
+			<h1>Identification des acteurs</h1>
+			<h2 class="card-title">Collections photographiques des Archives
+				Nationales</h2>
 			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 				<a class="navbar-brand" href="#">Menu</a>
 				<button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -61,77 +77,278 @@
 					<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
 						<li class="nav-item"><a class="nav-link" href="../valarnum">Accueil<span
 								class="sr-only">(current)</span></a></li>
-						<li class="nav-item"><a class="nav-link" href="../valarnum/exploemo">Explorations
-								émotionnelles</a></li>
-						<li class="nav-item active"><a class="nav-link" href="#">Evaluation des
-								acteurs</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="../valarnum/exploemo">Explorations émotionnelles</a></li>
+						<li class="nav-item active"><a class="nav-link" href="#">Identification
+								des acteurs</a></li>
 					</ul>
 					<form class="form-inline my-2 my-lg-0">
 						<button class="btn btn-outline-success my-2 my-sm-0" type="button"><?php echo $this->login; ?></button>
-						<button class="btn btn-outline-danger my-2 my-sm-0" onclick="deconnexion()" type="button">déconnexion</button>
+						<button class="btn btn-outline-danger my-2 my-sm-0"
+							onclick="deconnexion()" type="button">déconnexion</button>
 					</form>
 				</div>
-			</nav>				
-  <hr class="my-4">
-</div>
-
-	<div class="container">
-		<div class="row" id="visaCards" >
+			</nav>
 		</div>
-	</div>	
-			
-<script>
 
+		<div class="card-body">
+            <div class="row justify-content-md-center" style="margin-bottom: 4px;" >
+                <div class="btn-group-sm mr-2" role="group" id="btnTri" aria-label="Ordres des photos" data-toggle="buttons">
+                  <label class="btn btn-secondary active" id="btnTriChrono">
+                    <input type="radio" name="options" autocomplete="off" checked>Ordre chronologique
+                  </label>
+                  <!--  
+                  <label class="btn btn-secondary" id="btnTriConnu" >
+                    <input type="radio" name="options" autocomplete="off">Trier par plus connus
+                  </label>
+                  -->
+                  <label class="btn btn-secondary" id="btnTriAlea">
+                    <input type="radio" name="options"  autocomplete="off">Liste aléatoire
+                  </label>
+                </div>
+                <!--              
+                <div class="btn-group-sm" id="btnFnct" role="group" aria-label="Fonctions des photos"  >
+                    <button type="button" id="btnNommer" class="btn btn-dark">Nommer</button>
+                    <button type="button" id="btnQuali" class="btn btn-dark">Qualifier</button>
+                </div>
+                -->            
+            </div>
+            <div class="row justify-content-md-center" style="margin-bottom: 4px;" >
+                  <div class="btn-group mr-2" role="group" aria-label="Pagination des photos">
+    					<div class="sync-pagination" id="pagination_haut"></div>
+                  </div>
+            </div>		
+            <div class="row justify-content-md-center" id="visaCards"></div>
+            <div class="row justify-content-md-center" style="margin-top: 4px;" >
+			    <div class="btn-toolbar" role="toolbar" aria-label="Outils pour manipuler les photos">
+                  <div class="btn-group mr-2" role="group" aria-label="Pagination des photos">
+    					<div class="sync-pagination" id="pagination_haut"></div>
+                  </div>
+                </div>		
+            </div>
+		</div>
+        	<div id="pied" class="card-footer text-muted">
+        		<h4>Conception &amp; réalisation : <a href="http://www.samszo@univ-paris8.fr">Samuel Szoniecky <img style="height:26px;" src="../img/logo_paragraphe.gif"></a></h4>
+        		<h5>
+        			Merci à : <a href="http://flaviusmatis.github.io/simplePagination.js/">@flaviusmatis.</a>
+        				<a href="https://cloud.google.com/vision/?hl=fr"><img style="height:26px;" src="https://cloud.google.com/_static/0d76052693/images/cloud/gcp-logo.svg?hl=fr"></a>
+        		</h5>
+        
+        	</div>
+	</div>
+
+	<script>
+
+//variables globales
 var dataPhoto;
+var uti = <?php echo $this->uti; ?>, idBase = '<?php echo $this->idBase; ?>';
+var divTof, cards, nbTof = <?php echo $this->nbTof; ?>, numTofDeb = 0, numTofFin = 48, nbTofPage = 48, nbPage = Math.ceil(nbTof/nbTofPage);
+var emoPC = d3.scaleLinear().domain([0, 5]).range([0, 100]);
+var prefUrl = "../"
+	
+//url des photos IIIF calculées par google Vision
+var urlIIIF = "<?php echo WEB_ROOT;?>/public/flux/an?q=getVisagesDatas&idBase="+idBase;
 
-//récupération des photos IIIF calculées par google Vision
-//var urlIIIF = "<?php echo WEB_ROOT;?>/public/flux/iiif?q=getCollectionFaces&idCol=15399"; 
-var urlIIIF = "<?php echo WEB_ROOT;?>/public/flux/an?q=getVisagesDatas&idBase=flux_valarnum";
-$.getJSON(urlIIIF,
-function(data){
-	dataPhoto = data.filter(function(d){ return d.id != 'root'});
-			
-		var cards = d3.select('#visaCards').selectAll(".col-sm-3 mb-4").data(dataPhoto).enter()
-			.append('div').attr('class','col-sm-3 mb-4')
-			.append("div").attr('class','card');
-	  	cards.append("img")
-	  			.attr('id',function(d) {return 'imgCard'+d['idOmk']})
-	  			.attr('class','card-img-top')
-	  			.attr('src',function(d) { 
-		    			return d['imgFull']; 
-			    		});
-  		//ajoute le corps de la carte
-		var cardBody = cards.append('div').attr('class','card-body');
-		cardBody.append('h4').attr('class','card-title')	  			
-	    			.text(function(d) { 
-		    			return d['label']; 
-				    		});
-		//construction du layout pour les graphiques
-		var html = '<form>';
-		html += '<div class="form-group row">';
-		html += '<div class="col-sm-6"><input type="text" class="form-control" placeholder="Nom"></div>';
-		html += '<div class="col-sm-6"><input type="text" class="form-control" placeholder="Prénom"></div>';
-		html += '</div>';
-		html += '<div class="form-group row">';
-		html += '<div class="col-sm-12"><button type="submit" class="btn btn-primary">Enregistrer</button></div>';
-		html += '</div>';
-		html += '</form>';
-		cardBody.append('div').attr('class','card-text').attr('id',function(d, i) { return 'visaNum_'+i; })
-			.html(function(d, i) { return html;});	  			
-		cards.append('div').attr('class','card-footer')
-			.append('small').attr('class','text-muted')
-			.html(function(d, i) {
-		    			return "<a href='"+d['original']+"' target='_blank' ><img src='"+d['original']+"' width='100px' /></a>"; 
-				    		});		
+//initialisation de la page
+updatePagination();
+
+var divTT = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+
+//ajouter les écouteurs d'évenements
+$(document).ready(function(){
+	//pour les tris
+    $('#btnTri label').on('click', function(event) {
+        if(event.currentTarget.id == "btnTriChrono"){
+            	numTofDeb = 0;
+            	$('.sync-pagination').pagination('enable');	
+            	getPageTof();
+        }
+        if(event.currentTarget.id == "btnTriAlea"){
+            	numTofDeb = 'alea';
+            	$('.sync-pagination').pagination('disable');	
+            	getPageTof();
+        }
+        if(event.currentTarget.id == "btnTriConnu"){
+            	numTofDeb = 0;
+            	$('.sync-pagination').pagination('enable');	
+            	getPageTof();
+        }
+    });
+	//pour les fonctions
+    $('#btnFnct button').on('click', function(event) {
+	    	console.log(event.currentTarget.id);
+	    	//récupère les élements sélectionnés
+	    	var items = 	dataPhoto.filter(function(d){ return d.active});
+		if(!items.length){
+			w2alert("Veuillez sélectionner des photos.");			
+		}	    	
+        if(event.currentTarget.id == "btnNommer"){
+        		showNommerActeur(items);
+        }
+        if(event.currentTarget.id == "btnQuali"){
+        }
+    });
 });
 
+function showPatienter(){
+	//affiche le message de chargement
+	w2popup.open({
+	    width: 500,
+	    height: 300,
+	    title: 'Chargement des données',
+	    body: '<div class="w2ui-centered"></div>',
+	    showMax: false,
+	    showClose: false
+	});
+	w2popup.lock("<p>Merci de patienter...</p>", true);		
+}
+
+function getPageTof(){	
+	showPatienter();	
+    $.getJSON(urlIIIF+"&deb="+numTofDeb+"&nb="+nbTofPage,
+        function(data){
+        					
+        		updateTofs(data)
+        
+        		//supprime le message de chargement	
+         	w2popup.unlock();
+         	w2popup.close();
+        		
+        });
+        //Fin appel JSON
+}
+
+function updatePagination() {
+
+	//pagination		
+	$('.sync-pagination').pagination({
+      //totalPages: nbPage,
+      //visiblePages: 4,
+      //first:'<i class="fa fa-fast-backward" aria-hidden="true"></i>',
+      //last:'<i class="fa fa-fast-forward" aria-hidden="true"></i>',
+	  //paginationClass:'pagination justify-content-center',
+	  cssStyle: 'light-theme',
+	  items: nbPage,
+      itemOnPage: nbTofPage,
+      currentPage: 1,      
+      prevText:'<i class="fa fa-backward" aria-hidden="true"></i>',
+	  nextText:'<i class="fa fa-forward" aria-hidden="true"></i>',
+	  onInit: function () {
+	      getPageTof();
+      },	  
+      onPageClick: function (page,event) {
+        //$('#page-content').text('Page ' + page);        
+        console.log(page);
+        numTofFin = page*nbTofPage;
+        numTofDeb = numTofFin-nbTofPage;
+        getPageTof();
+      }
+    });
+	
+}
 
 
-//Fin appel JSON
+function updateTofs(data) {
+
+	//filtre les données
+	dataPhoto = data.filter(function(d){ return d.id != 'root'});
+	
+	//supprime les anciennes photos
+	if(divTof)divTof.remove();
+
+	//constuction des cartes pour chaque photo
+	divTof = d3.select('#visaCards').selectAll(".col-sm-1 mb-1").data(dataPhoto).enter()
+	.append('div').attr('class','col-sm-1 mb-1')
+	cards = divTof.append("div").attr('class','card')	    		
+        	.on("click",function(d){
+            	//déselectionne les photos pour limiter la sélection à une photo
+        		d3.selectAll(".card").attr('style',function(d){
+            		if(d)d.active = false;
+            		return 'border:0px;';
+            		});
+        		//sélectionne la carte active
+        		var t = d3.select(this);
+        		//gestion de l'encadrement
+        		if(d.active){ 			
+        			t.attr('style','border:0px;');
+        			d.active = false;
+        		}else{
+        			t.attr('style','border:3px;border-color: red; border-style: solid;');
+        			d.active = true;
+            		showNommerActeur(d);        			
+        		}
+        		})
+		.each(function(d, i) {
+			//gestion de la popup
+			getPopUpTof(d, this);		
+			})
+	
+	cards.append("img")
+			.attr('id',function(d) {return 'imgCard'+d['idOmk']})
+			.attr('class','card-img-top')
+			.attr('src',function(d) { 
+	    			return d['imgFull']; 
+	    		});
+	/*ajoute le corps de la carte
+    var cardBody = cards.append('div').attr('class','card-body').style('display','none');
+    cardBody.append('h4').attr('class','card-title')	  							
+    			.text(function(d) { 
+        			return d['label']; 
+    		    		});
+    //construction du layout pour les graphiques
+    var html = '<form>';
+    html += '<div class="form-group row">';
+    html += '<div class="col-sm-6"><input type="text" class="form-control" placeholder="Nom"></div>';
+    html += '<div class="col-sm-6"><input type="text" class="form-control" placeholder="Prénom"></div>';
+    html += '</div>';
+    html += '<div class="form-group row">';
+    html += '<div class="col-sm-12"><button type="submit" class="btn btn-primary">Enregistrer</button></div>';
+    html += '</div>';
+    html += '</form>';
+    cardBody.append('div').attr('class','card-text').attr('id',function(d, i) { return 'visaNum_'+i; })
+    	.html(function(d, i) { return html;});	  			
+    cards.append('div').attr('class','card-footer').style('display','none')		
+    	.append('small').attr('class','text-muted')
+    	.html(function(d, i) {
+        			return "<a href='"+d['original']+"' target='_blank' ><img src='"+d['original']+"' width='100px' /></a>"; 
+    		    		});	
+	*/	
+}
+
+function getPopUpTof(d, t){
+	var c = "<h4>"+d.label+"</h4>";
+	c += "<h5>"+d.temps+"</h5>";
+	c += '<div class="progress">';
+	c += '<div class="progress-bar bg-success" role="progressbar" style="width: '+emoPC(d.joie)+'%" aria-valuenow="'+emoPC(d.joie)+'" aria-valuemin="0" aria-valuemax="100">joie</div>';
+	c += '</div>';
+	c += '<div class="progress">';
+	c += '<div class="progress-bar bg-info" role="progressbar" style="width: '+emoPC(d.surprise)+'%" aria-valuenow="'+emoPC(d.surprise)+'" aria-valuemin="0" aria-valuemax="100">surprise</div>';
+	c += '</div>';
+	c += '<div class="progress">';
+	c += '<div class="progress-bar bg-warning" role="progressbar" style="width: '+emoPC(d.ennui)+'%" aria-valuenow="'+emoPC(d.ennui)+'" aria-valuemin="0" aria-valuemax="100">ennui</div>';
+	c += '</div>';
+	c += '<div class="progress">';
+	c += '<div class="progress-bar bg-danger" role="progressbar" style="width: '+emoPC(d.colere)+'%" aria-valuenow="'+emoPC(d.colere)+'" aria-valuemin="0" aria-valuemax="100">colere</div>';
+	c += '</div>';
+	if(t){
+        	c += "<br/><div><a href='"+d['original']+"' target='_blank' ><img src='"+d['original']+"' width='100%' /></a></div>"; 	
+        	var options = {'title':d.theme,'trigger':'hover','html':true,'content':c, 'placement':'auto'};		
+        	$(t).popover(options);	
+	}else{
+		c = "<h3 class='popover-header'>"+d.theme+"</h3><div class='popover-body'>"+c; 	
+		c += "<br/><div><img onclick='showPhotoOriginale()' class='imgFullPopUp' src='"+d['imgFull']+"' width='100%' /></div></div>"; 	
+		return c;
+	}
+}
+
 
 </script>
 	<script src="../js/popper.min.js"></script>
 	<script src="../js/bootstrap.min.js"></script>
-
+    <script src="../js/valarnum/flux.js"></script>
+    <script src="../js/valarnum/ui.js"></script>
 </body>
 </html>

@@ -100,6 +100,19 @@ class Flux_Site{
     
     }
 
+    /**
+     * fonction pour tester l'existance d'une URL
+     *
+     * @param string 	$url
+     * 
+     * @return  boolean
+     *
+     */
+    public function url_exists($url) {
+        if (!$fp = curl_init($url)) return false;
+        return true;
+    }
+    
 	/**
 	* fonction pour tracer l'éxécution du code
 	*

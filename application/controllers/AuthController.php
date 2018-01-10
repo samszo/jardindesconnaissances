@@ -99,6 +99,74 @@ class AuthController extends Zend_Controller_Action
 	   	}
     }
 
+    public function connexionAction()
+    {
+        $this->view->erreur = false;
+        $this->view->code = 1;
+        
+        $ssExi = new Zend_Session_Namespace('uti');
+        $this->view->idBase = $ssExi->dbNom;
+        if($this->_getParam('idBase',0)){
+            $ssExi->dbNom = $this->_getParam('idBase');
+            $this->view->idBase = $ssExi->dbNom;
+        }
+        $this->view->redir = $ssExi->redir;
+        if($this->_getParam('redir', 0)){
+            $ssExi->redir='/'.$this->_getParam('redir', 0);
+            $this->view->redir = $ssExi->redir;
+        }
+        
+        //instanciation du site pour les bases
+        $s = new Flux_Site($ssExi->dbNom);
+        
+        
+        // Obtention d'une référence de l'instance du Singleton de Zend_Auth
+        $auth = Zend_Auth::getInstance();
+        $auth->clearIdentity();
+        
+        if ($this->_getParam('login')) {
+            $adapter = new Zend_Auth_Adapter_DbTable(
+                $s->db,
+                'flux_uti',
+                'login',
+                'mdp'
+                );
+            $login = $this->_getParam('login');
+            $adapter->setIdentity($login);
+            $adapter->setCredential($this->_getParam('mdp'));
+            // Tentative d'authentification et stockage du résultat
+            $result = $auth->authenticate($adapter);
+            $this->view->erreur = "login calculé";
+        }else{
+            return;
+        }
+        
+        if ($result->isValid()) {
+            //met en sessions les informations de l'existence
+            $dbUti = new Model_DbTable_Flux_Uti($s->db);
+            $rs = $dbUti->findByLogin($login);
+            $ssExi->uti = $rs;
+            $ssExi->idUti = $rs["uti_id"];
+            $this->redirect($ssExi->redir);
+        }else{
+            $this->view->code = $result->getCode();
+            switch ($result->getCode()) {
+                case 0:
+                    $this->view->erreur = "Problème d'identification. Veuillez contacter le webmaster.";
+                    break;
+                case -1:
+                    $this->view->erreur = "Le login n'a pas été trouvé. Veillez vous inscrire.";
+                    break;
+                case -2:
+                    $this->view->erreur = "Le login est ambigue.";
+                    break;
+                case -3:
+                    $this->view->erreur = "Le login et/ou le mot de passe ne sont pas bons.";
+                    break;
+            }
+        }
+    }
+    
     public function inscriptionAction()
     {
         //paramètres par défaut
@@ -248,7 +316,7 @@ class AuthController extends Zend_Controller_Action
                 unset($_SESSION['upload_token']);
                 $redir = 'http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl().urldecode($ssGoogle->redir);
                 Zend_Session::namespaceUnset('google');
-                $this->_redirect($redir);
+                $this->redirect($redir);
             }else{
                 
                 /************************************************

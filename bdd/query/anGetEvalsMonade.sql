@@ -14,9 +14,9 @@ SELECT
     d.tronc,
     dp.doc_id,
     dp.url original,
+    dp.note pNote,
     dgp.doc_id,
-    dgp.titre label,
-    dgp.note dgpNote
+    dgp.titre label
 FROM
     flux_rapport r
         INNER JOIN
@@ -30,5 +30,5 @@ FROM
         INNER JOIN
     flux_tag t ON t.tag_id = r.dst_id
 WHERE
-    r.monade_id = 3 AND dgp.note != ""
+    r.monade_id = 5
 ORDER BY d.tronc

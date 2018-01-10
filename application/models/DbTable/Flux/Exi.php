@@ -195,7 +195,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     public function findByExiId($exi_id)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_exi"),array('nom', 'prenom', 'exi_id', 'recid'=>'exi_id','data','nait','mort','isni','data'))                           
+        ->from( array("f" => "flux_exi"),array('nom', 'prenom', 'exi_id', 'recid'=>'exi_id','data','nait','mort','isni','url','data'))                           
                     ->where( "f.exi_id = ?", $exi_id );
 		$rs = $this->fetchAll($query)->toArray();
         return  count($rs) ? $rs[0] : false;

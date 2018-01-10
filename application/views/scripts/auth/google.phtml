@@ -6,17 +6,56 @@
 	<meta name="Description" CONTENT="jardin connaissances login google"/>
 	<meta name="Keywords" CONTENT="jardin connaissances login google"/>
 	<meta name="Author" CONTENT="Samuel Szoniecky"/>
-  	
+  	<style type="text/css">
+	body{
+	    background-color:black;
+	}
+	.login {
+	   width:400px; 
+	   margin:0 auto; 
+	}
+    /* unvisited link */
+    a:link {
+        color: red;
+    }
+    /* visited link */
+    a:visited {
+        color: green;
+    }
+    
+    /* mouse over link */
+    a:hover {
+        color: hotpink;
+    }
+    
+    /* selected link */
+    a:active {
+        color: blue;
+    }
+	.request{
+		width:400px;
+		height:260px;
+		position:absolute;
+		left:50%;
+		top:50%;
+		margin:-100px 0 0 -200px;
+		text-align: center;
+	}	
+	.logo{
+	   height:50px;	
+	}
+  	</style>
 	
 </head>
 	<body>
 	  <div id="loadingScreen"></div>	
 	  <div class="request">
 	    <?php if (isset($this->authUrl)): ?>
-	      <a class='login' href='<?php echo $this->authUrl; ?>'>Connexion à Google !</a>
+          <img class="logo" src='../img/google.png' /><br/><br/>	    
+	      <a class='login' target="_parent" href='<?php echo $this->authUrl; ?>'>Connectez-vous à Google !</a>
 	    <?php else: ?>
 	    	<a class='logout' href='?logout=1'>Déconecter</a>
 	    <?php endif ?>
-
+	</div>	
   </body>
 </html>	

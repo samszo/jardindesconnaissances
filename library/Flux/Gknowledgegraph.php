@@ -45,6 +45,7 @@ class Flux_Gknowledgegraph extends Flux_Site{
     {
     		$this->trace("DEBUT ".__METHOD__);
 		$url = $this->service_url . '?' . http_build_query($params);
+		$this->trace($url);
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -90,7 +91,10 @@ class Flux_Gknowledgegraph extends Flux_Site{
     {
         $this->trace("DEBUT ".__METHOD__);
         // corrige l'id : kg:/m/02m0v = /m/02m0v
-        $id = substr($id, 3);
+        $this->trace('PREFIX = '.substr($id, 0, 3));
+        if(substr($id, 0, 3)=='kg:')
+            $id = substr($id, 3);
+            $this->trace('ID = '.$id);
         return $this->getReponse(array(
             'ids' => $id,
             'limit' => 10,

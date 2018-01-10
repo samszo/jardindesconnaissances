@@ -505,7 +505,7 @@ class GraphController extends Zend_Controller_Action {
 	    		case "valarnum":
 	    		    $this->view->titre =  "Evolution des explorations émotionnelles";
 	    		    $this->view->soustitre =  "Valorisation des archives numériques";
-	    		    $this->view->urlData = "../flux/an?q=getEvalsMonadeHistoTag&stream=1";
+	    		    $this->view->urlData = "../flux/an?q=getEvalsMonadeHistoTag&stream=1&idBase=".$this->_getParam('idBase', 0)."&idMonade=".$this->_getParam('idMonade', 0);
 	    		    $this->view->legendetitre =  "Emotions";
 	    		    $this->view->legende =  0;//pas de légende pour ce graph
 	    		    break;

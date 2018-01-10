@@ -357,7 +357,7 @@ class FluxController extends Zend_Controller_Action {
 
 	public function googlekgAction()
     {
-		$g = new Flux_Gknowledgegraph();
+        $g = new Flux_Gknowledgegraph($this->_getParam('idBase'),$this->_getParam('trace'));
         if($this->_getParam('q'))$this->view->reponse = $g->getQuery($this->_getParam('q'));
         elseif($this->_getParam('id'))$this->view->reponse = $g->getId($this->_getParam('id'));
         else $this->view->reponse = "Il manque un paramètre.";
@@ -366,8 +366,7 @@ class FluxController extends Zend_Controller_Action {
     
 	public function dbpediaAction()
     {
-        $dbp = new Flux_Dbpedia($this->_getParam('idBase'));
-	   	$dbp->bTrace = false;
+        $dbp = new Flux_Dbpedia($this->_getParam('idBase'),$this->_getParam('trace'));
 	   	switch ($this->_getParam('obj')) {
 	   		case 'bio':
 				$this->view->reponse = $dbp->getBio($this->_getParam('res'));
@@ -522,14 +521,24 @@ class FluxController extends Zend_Controller_Action {
     public function anAction()
     {
         $an = new Flux_An($this->_getParam('idBase','flux_an'),false,$this->_getParam('trace'));
-        $an->bTraceFlush = $this->_getParam('trace');
+        $an->bTraceFlush = $an->bTrace;
         $an->trace("DEBUT ".__METHOD__);        
         switch ($this->_getParam('q')) {
+            case "getActeursContexte":
+                $data = $an->getActeursContexte($this->_getParam('idDoc'),false,$this->_getParam('idTheme'),$this->_getParam('idVisage'));
+                $this->view->content = json_encode($data);
+                break;
+            case "getAleaTofs":
+                $an->iiif = new Flux_Iiif($this->_getParam('iif',"http://gapai.univ-paris8.fr/ValArNum/omks/iiif"),$an->idBase,$an->bTrace);
+                $an->iiif->bTraceFlush = $an->bTrace;
+                $data = $an->getAleaTofs($this->_getParam('nb',10));
+                $this->view->content = json_encode($data);                
+                break;
             case "getVisagesDatas":
                 //utiliser avec la base flux_valarnum
-                $data = $an->getVisagesDatas();
+                $data = $an->getVisagesDatas($this->_getParam('deb',""),$this->_getParam('nb',""),$this->_getParam('count',""));
                 $this->view->content = json_encode($data);
-                $an->sauveJson(ROOT_PATH."/data/AN/getVisageData.json", $data);                
+                if($this->_getParam('sauve'))$an->sauveJson(ROOT_PATH."/data/AN/getVisageData_".$this->_getParam('deb',"")."_".$this->_getParam('nb',"").".json", $data);                
                 break;
             case "getEvalsMonade":
                 $data = $an->getEvalsMonade($this->_getParam('idMonade',3));
@@ -573,9 +582,8 @@ class FluxController extends Zend_Controller_Action {
     
     public function iiifAction()
     {
-        $iiif = new Flux_Iiif();
+        $iiif = new Flux_Iiif($this->_getParam('iif',"http://gapai.univ-paris8.fr/ValArNum/omks/iiif"),$this->_getParam('idBase'));
         $iiif->bTrace=false;
-        $iiif->urlRoot = $this->_getParam('iif',"http://localhost/ValArNum/omk/iiif");
         switch ($this->_getParam('q')) {
             case "getOmkCollection":
                 $this->view->content = json_encode($iiif->getOmkCollection($this->_getParam('idCol',1572)));
