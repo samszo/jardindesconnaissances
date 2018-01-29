@@ -100,6 +100,8 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     		    $sql = 'SELECT MAX(rgt) lft FROM '.$this->_name;
     		    $stmt = $this->_db->query($sql);
     		    $arrP = $stmt->fetch();
+    		    //si la table est vide
+    		    if(!$arrP['lft'])!$arrP['lft']=0;
     		}
     		
     		//gestion des hiérarchies gauche droite

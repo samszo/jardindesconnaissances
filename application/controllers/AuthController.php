@@ -399,6 +399,8 @@ class AuthController extends Zend_Controller_Action
     	 * @link     https://wiki.jasig.org/display/CASC/phpCAS
     	 */    	 
         
+        $this->view->user = '';
+        
             	///////////////////////////////////////
             	// Basic Config of the phpCAS client //
             	///////////////////////////////////////
@@ -421,6 +423,7 @@ class AuthController extends Zend_Controller_Action
             	$client_secure = true;
             	$client_httpOnly = true;
             	$client_lifetime = 0;
+            	
             	
             	// Database config for PGT Storage
             	$db = 'pgsql:host=localhost;dbname=phpcas';

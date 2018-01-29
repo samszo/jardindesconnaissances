@@ -177,7 +177,7 @@ class Flux_An extends Flux_Site{
 					$rs = $cn->getElementsByTagName('unitid');				
 					foreach ($rs as $r) {
 						$refAn = $r->nodeValue;
-					}
+					}					
 					if(isset($refAn)){
 						//enregistre la série
 						$idDocSerie = $this->dbD->ajouter(array("url"=>'//*[@id="'.$id.']'
@@ -219,6 +219,21 @@ class Flux_An extends Flux_Site{
 							}				
 						}
 					}
+					//pour la gestion du nombre de photo quand ce n'est pas préciser autrement
+					$rs = $cn->getElementsByTagName('physdesc');
+					foreach ($rs as $r) {
+					    foreach($r->childNodes as $rcn){
+					        if ($rcn->nodeType == XML_ELEMENT_NODE) {					            
+					            if ($rcn->tagName == "extent") {
+					                $nbTof = $rcn->nodeValue;
+					                $nbTof = explode(" ",$nbTof);					                
+					                $nbTof = $nbTof[0]+0;
+					            }
+					        }
+					    }
+					}
+					
+					
 				}
 				//récupère les contenus
 				if ($cn->tagName == "scopecontent") {
@@ -232,12 +247,30 @@ class Flux_An extends Flux_Site{
 					}
 					$arrFicNum = explode("_",$ficnum);
 					if(count($this->arrItem)){
-					    //gestion des photo  à patir de la liste d'item
+					    //gestion des photo  à partir de la liste d'item
 					    for ($i = 0; $i < count($this->arrItem); $i++) {
 					        $numFic = str_pad($this->arrItem[$i]['num'], 4, "0", STR_PAD_LEFT);
 					        $this->arrItem[$i]['fic']=$arrFicNum[0]."_".$arrFicNum[1]."_".$numFic."_L-medium.jpg";
         						$this->arrItem[$i]['tronc']=$this->ss;
 					    }
+					}elseif ($arrFicNum[0]=="http://www.siv.archives-nationales.culture.gouv.fr/siv/media/FRAN"){
+					    //gestion des photos sans précision du nombre 
+					    //par exemple Charles De Gaulle : https://www.siv.archives-nationales.culture.gouv.fr/siv/IR/FRAN_IR_054722
+					    $arrPath = explode("/",$ficnum);
+					    $pathBase = $arrPath[count($arrFicNum)-1];
+					    $numZero = strlen($arrFicNum[4]);					    
+					    $deb = $arrFicNum[4]+0;
+					    $fin = $deb+$nbTof;
+					    $j=0;					    
+					    for ($i = $deb; $i <= $fin; $i++) {
+					        //ATTENTION le nombre de 0 varie suivant les collections
+					        $numFic = str_pad($i, $numZero, "0", STR_PAD_LEFT);
+					        $this->arrItem[$j]['fic']="FRAN_".$arrFicNum[3]."_".$numFic."_L-medium.jpg";
+					        $this->arrItem[$j]['text']="photo ".$numFic;
+					        $this->arrItem[$j]['tronc'] = $arrPath[5];
+					        $j++;
+					    }
+					    
 					}else{
 					    //gestion des photos directement par 
 					    //<daoloc href="FRAN_0138_2365_L.msp#FRAN_0138_2394_L.msp"/>
@@ -407,13 +440,23 @@ class Flux_An extends Flux_Site{
 	    $arrItem = array();
 
 	    //récupère l'arboressence des documents
-	    $arrH = $this->getPhotos();	    
+	    //$arrH = $this->getPhotos();	    
+
+	    $sql = "SELECT
+                d.doc_id,
+                d.titre,
+                d.url,
+                d.parent
+            FROM
+                flux_doc d
+            WHERE d.type = 1 AND d.maj > '2018-01-22'";
 	    
-	    //construction du tableau pour le csv
-	    $i=0;
+	    $arr = $this->dbD->exeQuery($sql);
+	    $nb = count($arr);
+	    
 	    //foreach ($arrH as $h) {
-	    for ($i = 0; $i < 10; $i++) {
-	        $h = $arrH[$i];
+	    for ($i = 0; $i < $nb; $i++) {
+	        $h = $arr[$i];
             //récupère l'item set du parent
             //$is = $this->dbIS->getByIdentifier($this->idBase."-flux_doc-doc_id-".$h["parent"]);	            
             $path_parts = pathinfo($h["url"]);
@@ -423,7 +466,6 @@ class Flux_An extends Flux_Site{
     	                ,"dcterms:identifier"=>$this->idBase."-flux_doc-doc_id-".$h["doc_id"]
     	                ,"file"=>$path_parts["basename"],"dcterms:type"=>"image");	        	        
             }
-        	    $pTitre = $h["titre"];
         	    //$i++;
 	    }
 	    //enregistre le csv dans un fichier
@@ -1027,7 +1069,7 @@ ORDER BY d.tronc
         	 *
         	 */
         	function getPhotos($where=""){
-        	    $sql = "SELECT * FROM `flux_doc` WHERE `url` LIKE '%medium.jpg%' ".$where." ORDER BY `doc_id`";        	    
+        	    $sql = "SELECT * FROM `flux_doc` WHERE d.type = 1 ".$where." ORDER BY `doc_id`";        	    
         	    $this->trace($sql);
         	    return $this->dbD->exeQuery($sql);
         	}
@@ -1041,13 +1083,21 @@ ORDER BY d.tronc
         	 * @return array
         	 *
         	 */
-        	function getNbPhoto($dateUnit="%Y-%m-%d",$q='par doc'){
+        	function getNbPhoto($dateUnit="%Y-%m-%d",$q='par doc',$w=""){
         	            	    
         	    
-        	    if($q='total'){
+        	    if($q=='total'){
         	        $sql = "SELECT COUNT(doc_id) nbTof
                 FROM flux_doc
                 WHERE type = 1";        	        
+        	    }elseif ($w){
+        	            $sql = "SELECT dp.doc_id, dp.titre,
+                    COUNT(de.doc_id) nbTof
+                    FROM flux_doc dp
+                        INNER JOIN
+                    flux_doc de ON de.parent = dp.doc_id AND de.type = 1 ".$w."
+                    GROUP BY dp.doc_id
+                    ";
         	    }else{        	    
             	    $sql = "SELECT 
                     dp.doc_id, dp.titre,
@@ -1063,7 +1113,7 @@ ORDER BY d.tronc
                     flux_doc dp
                         INNER JOIN
                     flux_doc de ON de.lft BETWEEN dp.lft AND dp.rgt
-                        AND SUBSTRING(de.url, - 4) = '.jpg'
+                        AND de.type = 1
                         INNER JOIN
                     flux_rapport dgprDeb ON dgprDeb.src_id = dp.doc_id
                         AND dgprDeb.src_obj = 'doc'
@@ -1379,6 +1429,7 @@ ORDER BY d.tronc
         	    //récupère les items
         	    if($query=="parent photo")$arr = $this->getNbPhoto();
         	    if($query=="titre photo")$arr = $this->getPhotos(" AND titre not like 'photo %' ");
+        	    if($query=="last import")$arr = $this->getNbPhoto("%Y-%m-%d",'par doc'," AND de.maj > '2018-01-22' ");
         	    //création de l'analyseur
         	    $gl = new Flux_Glanguage($this->idBase);
         	    $idTagSent = $this->dbT->ajouter(array('code'=>'sentiment','parent'=>$gl->idTagRoot));
@@ -1386,7 +1437,7 @@ ORDER BY d.tronc
         	    $numItem = 0;
         	    foreach ($arr as $item) {
         	        //pour gérer la reprise 
-        	        if($numItem > -1){
+        	        if($numItem >= -1 ){        	            
         	            $this->trace($numItem." ".$item["doc_id"]." ".$item[$champ]);
         	            //execute et sauve l'analyse uniquement sur les types possible en français
             	        $analyses = $gl->sauveAnalyseTexte($item[$champ], $item["doc_id"], array('analyzeEntities','analyzeSentiment','analyzeSyntax'));

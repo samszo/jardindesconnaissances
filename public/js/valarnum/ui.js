@@ -382,6 +382,7 @@ function modifActeurGoogle(dt){
 		if(!sltActeur.mort)sltActeur.mort = dt.mort ? dt.mort : "";
 		sltActeur.confiance = 0;
 	}else{
+		sltActeur = {};
 		sltActeur.recid = 0;
 		sltActeur.confiance = 0;
 		sltActeur.url = dt.data['@id'] ? dt.data['@id'].substring(3) : "";

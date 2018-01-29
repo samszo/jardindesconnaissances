@@ -120,6 +120,7 @@ class Flux_Gvision extends Flux_Site{
         
         $im = file_get_contents($url);
         $imdata = base64_encode($im);
+        //ATTENTION il y a un prix pour chaque type de détection cf. https://cloud.google.com/vision/pricing
         $json = '{
 		 "requests": [
 		  {

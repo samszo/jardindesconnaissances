@@ -649,10 +649,11 @@ try {
 	$b = $rs->all('<http://dbpedia.org/ontology/abstract>');
 	*/
 	
-	//$eu = new Flux_Eu("flux_eu",true);
+	$eu = new Flux_Eu("flux_eu_privacy",true);
 	//éthique robotique $eu->setDossierObsLegi("2015/2103(INL)");
-	//marché objet connecté 
-	//$eu->setDossierObsLegi("2012/0283(COD)");
+	//marché objet connecté $eu->setDossierObsLegi("2012/0283(COD)");
+	//Respect for private life and the protection of personal data in electronic communications
+	//$eu->setDossierObsLegi("2017/0003(COD)");
 	
 	//$okapi = new Flux_Okapi(OKAPI_LOGIN,OKAPI_PWD,"flux_okapi",true);	
 	//$c = $okapi->connexion();
@@ -671,28 +672,32 @@ try {
 	$an->bTraceFlush = $s->bTraceFlush;
 	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";
 	$url = "http://localhost/jdc/data/an/inventairesdesarchivesnationales/FRAN_IR_055457.xml";	
+	$url = "http://localhost/jdc/data/an/FRAN_IR_054722.xml";
+	
 	//$an->sauveXmlEad($url);
+	$an->idOwner = 2;
+	$an->owner = "communication.archives-nationales@culture.gouv.fr";	
+	//$an->getCsvToOmeka("/Library/WebServer/Documents/jdc/data/AN/importDeGaulle.csv");
+	
 	//$an->setItemSetFromTag();
 	//$an->setItemSetFromExi();
 	//$an->setItemSetFromGeo();
 	//$an->setItemSetFromDocRoot(3);
 	//$an->getAnalyseGoogle();
 	//$an->getAnalyseGoogle("titre", "titre photo");
+	//$an->getAnalyseGoogle("titre", "last import");
+	
 	//$an->getAnalyseGooglePhoto();
-	//$an->sauveJson("/Library/WebServer/Documents/jdc/data/AN/getPhotosDatasSansParentTot.json", $an->getPhotosDatas());
+	$an->sauveJson("/Library/WebServer/Documents/jdc/data/AN/getPhotosTot1.json", $an->getPhotosDatas());
 	//$an->exploseGoogleVisage();
 	/*
-	$an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/'
+	 $an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/'
 	   ,"/Library/WebServer/Documents/jdc/data/AN/importVisageFail.csv"
 	   ,"/Library/WebServer/Documents/jdc/data/AN/importFail.php");
-	   */
 	$an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/'
 	    ,"/Library/WebServer/Documents/jdc/data/AN/importVisagesManquant.csv","",true);
-	/*
-	$an->idOwner = 2;
-	$an->owner = "communication.archives-nationales@culture.gouv.fr";
-	//$an->getCsvToOmeka("/Library/WebServer/Documents/jdc/data/AN/import10.csv");
-    $sta = new Flux_Stats(false, true);
+	//
+	$sta = new Flux_Stats(false, true);
     $data = $an->getEvalsMonadeHistoByTag(3,'%Y-%m-%d %H:%i:%s');
     //calcul les données pour le stream
     $data = $sta->array_orderby($data, 'type', SORT_ASC, 'temps', SORT_ASC);
