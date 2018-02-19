@@ -679,8 +679,8 @@ class AlchemyAPI
 		$data = "apikey=".$this->_apiKey.$paramObj->getParameterString();
 		$paramObj->resetBaseParams();
 		$hostPrefix = $this->_hostPrefix;
-		$endpoint = "http://$hostPrefix.alchemyapi.com/calls/$callPrefix/$callMethod";
-
+		$endpoint = "https://gateway-a.watsonplatform.net/calls/$callPrefix/$callMethod";
+		
 		$handle = curl_init();
                 curl_setopt($handle, CURLOPT_URL, $endpoint);
                 curl_setopt($handle, CURLOPT_POST, 1);

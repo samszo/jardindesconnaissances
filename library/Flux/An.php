@@ -58,6 +58,111 @@ class Flux_An extends Flux_Site{
     }
     
     /**
+     * Enregistre les photos qui ne sont pas dans l'ordre d'extraction de l'inventaire 
+     * par exemple : 
+     * http://www.siv.archives-nationales.culture.gouv.fr/mm/media/download/FRAN_0023_00278_L-medium.jpg
+     * qui n'est pas mentionné dans l'inventaire FRAN_IR_055457
+   <c id="c-x2twmou2-1rvji4s7mvdoa">
+   <did>
+    <unitid type="identifiant">AG/5(2)/977/N1</unitid>
+     <unittitle>Reportage n° 2165 / Chasse déléguée à Marly : portrait de M. Bourges (23 octobre 1969).</unittitle>
+     <unitdate calendar="gregorian" era="ce" normal="1969-10-23">23 octobre 1969</unitdate>
+     <physdesc>
+     <extent>1 négatif 6 x 6</extent>
+     </physdesc>
+    </did>
+    <daogrp>
+     <daoloc href="FRAN_0023_00275_L.msp"/>
+    </daogrp>
+   </c>
+   <c id="c-xn77kaat-1m45su1l08e5">
+   <did>
+    <unitid type="identifiant">AG/5(2)/977/N1</unitid>
+     <unittitle>Reportage n° 2165 / Chasse déléguée à Marly : portrait de M. Lebel (23 octobre 1969).</unittitle>
+     <unitdate calendar="gregorian" era="ce" normal="1969-10-23">23 octobre 1969</unitdate>
+     <physdesc>
+     <extent>1 négatif 6 x 6</extent>
+     </physdesc>
+    </did>
+    <daogrp>
+     <daoloc href="FRAN_0023_00281_L.msp"/>
+    </daogrp>
+   </c>
+     * 
+     *
+     *
+     * @return array
+     */
+    public function sauvePhotosAbscentes()
+    {
+        $this->trace(__METHOD__." ".$fic);
+        
+        set_time_limit(0);
+        
+        $sql = "SELECT * FROM (
+                SELECT 
+                    COUNT(*) nb,
+                    GROUP_CONCAT(d.doc_id) ids,
+                    SUBSTRING(d.url,
+                        (LOCATE('_', d.url) + 1),
+                        LOCATE('_', d.url, LOCATE('_', d.url) + 1) - LOCATE('_', d.url) - 1) as prefixe,
+                    SUBSTRING(d.url,
+                        (LOCATE('_', d.url, LOCATE('_', d.url) + 1) + 1),
+                        LOCATE('_L', d.url)-(LOCATE('_', d.url, LOCATE('_', d.url) + 1) + 1)) as num,
+                    SUBSTRING(d.url,
+                        (LOCATE('_', d.url) + 1),
+                        LOCATE('_L', d.url) - LOCATE('_', d.url) - 1) court,
+                    d.url
+                FROM
+                    flux_doc d
+                WHERE
+                    d.type = 1
+                GROUP BY d.url
+                ) idx
+                ORDER BY prefixe, num";
+        $arr = $this->dbD->exeQuery($sql);
+        $c = count($arr);
+        for ($i = 0; $i < $c; $i++) {
+            if(!isset($arr[$i+1])) return;
+            $diff = $arr[$i+1]['num']-$arr[$i]['num'];
+            if($arr[$i]['prefixe']==$arr[$i+1]['prefixe'] && $diff > 1){
+                $ids = explode(',', $arr[$i]['ids']);
+                for ($j = 1; $j < $diff; $j++) {
+                    $numZero = strlen($arr[$i]['num']);                    
+                    $numFic = str_pad($arr[$i]['num']+$j, $numZero, "0", STR_PAD_LEFT);
+                    $fic = 'FRAN_'.$arr[$i]['prefixe'].'_'.$numFic.'_L-medium.jpg';
+                    $url = $this->urlBaseTof.$fic;                                        
+                    $this->trace('manque : '.$url);
+                    //vérifie si le fichier existe
+                    $doc = $this->dbD->findByUrl($url);
+                    if($doc){
+                        $this->trace("Le fichier existe",$doc);
+                    }else{
+                        //récupère le n° d'inventaire
+                        $idsParent = $this->dbD->getFullParent($ids[0]);
+                        //récupère le parent des abscents
+                        $idDocAbs = $this->dbD->ajouter(array("titre"=>'Manques'
+                            ,"parent"=>$idsParent[1]['doc_id']));
+                        //ajoute la photo
+                        $idDocTof = $this->dbD->ajouter(array("url"=>$url
+                            ,"titre"=>'Manque : '.$i.'_'.$j
+                            ,"type"=>1
+                            ,"tronc"=>$arr[$i]['prefixe'].'_'.$arr[$i]['num'].'/'.$arr[$i+1]['prefixe'].'_'.$arr[$i+1]['num']
+                            ,"parent"=>$idDocAbs));
+                        //enregistre l'image
+                        $img = ROOT_PATH.'/data/AN/photos/'.$fic;
+                        if (!file_exists($img)){
+                            $res = file_put_contents($img, file_get_contents($url));
+                            $this->trace($res." ko : Fichier créé ".$url." ".$img);
+                        }
+                        //on n'enregistre pas de rapport.
+                   }
+                }                    
+            }
+        }
+    }
+    
+    /**
      * Enregistre un fichier XML pour gérer les rapports 
      * et la gestion IIIF des photographies
      * 
@@ -70,7 +175,6 @@ class Flux_An extends Flux_Site{
     		$this->trace(__METHOD__." ".$fic);
     	 
     		set_time_limit(0);
-    		$this->initDbTables();
     		
     		$this->trace("//récupère les mots clefs");
     		$this->idTagAN = $this->dbT->ajouter(array("code"=>"mots clefs AN", "parent"=>$this->idTagRoot));
@@ -159,7 +263,7 @@ class Flux_An extends Flux_Site{
 		$id = $c->getAttribute('id');
 		//Flux_An::sauveSerie c-a57vz4drc-1pgslyhluxn5p |5951,431|0
 		
-		if($id=='c-a57vz4drc-1pgslyhluxn5p'){
+		if($id=='c-vsu391k0--y9g8wqbr3e83' || $id=='c-21r6uib53-1dypx4p4a5zd4'){
 			$to = 'toto';
 		}
 		//
@@ -180,7 +284,7 @@ class Flux_An extends Flux_Site{
 					}					
 					if(isset($refAn)){
 						//enregistre la série
-						$idDocSerie = $this->dbD->ajouter(array("url"=>'//*[@id="'.$id.']'
+						$idDocSerie = $this->dbD->ajouter(array("url"=>'//*[@id="'.$id.'"]'
 								,"titre"=>$titre
 								,"tronc"=>$refAn
 								,"parent"=>$idDoc));
@@ -226,8 +330,12 @@ class Flux_An extends Flux_Site{
 					        if ($rcn->nodeType == XML_ELEMENT_NODE) {					            
 					            if ($rcn->tagName == "extent") {
 					                $nbTof = $rcn->nodeValue;
-					                $nbTof = explode(" ",$nbTof);					                
-					                $nbTof = $nbTof[0]+0;
+					                $nbTof = explode(" ",$nbTof);
+					                //pour gérer les description physique sans chiffre
+					                if (is_numeric($nbTof[0]))
+    					                   $nbTof = $nbTof[0]+0;
+					                else
+					                    $nbTof = 1;
 					            }
 					        }
 					    }
@@ -242,79 +350,117 @@ class Flux_An extends Flux_Site{
 
 				if ($cn->tagName == "daogrp") {
 					$tofs = $cn->getElementsByTagName('daoloc');
+					$nbFic = 0; 
+					$ficnumArr = []; 
 					foreach($tofs as $tof){
-						$ficnum = $tof->getAttribute('href');
+				        $ficnumArr[] = $tof->getAttribute('href');
+				        $this->trace("nbFic=".$nbFic.":".$tof->getAttribute('href'));
+					    $nbFic ++;
 					}
-					$arrFicNum = explode("_",$ficnum);
-					if(count($this->arrItem)){
-					    //gestion des photo  à partir de la liste d'item
-					    for ($i = 0; $i < count($this->arrItem); $i++) {
-					        $numFic = str_pad($this->arrItem[$i]['num'], 4, "0", STR_PAD_LEFT);
-					        $this->arrItem[$i]['fic']=$arrFicNum[0]."_".$arrFicNum[1]."_".$numFic."_L-medium.jpg";
-        						$this->arrItem[$i]['tronc']=$this->ss;
-					    }
-					}elseif ($arrFicNum[0]=="http://www.siv.archives-nationales.culture.gouv.fr/siv/media/FRAN"){
-					    //gestion des photos sans précision du nombre 
-					    //par exemple Charles De Gaulle : https://www.siv.archives-nationales.culture.gouv.fr/siv/IR/FRAN_IR_054722
-					    $arrPath = explode("/",$ficnum);
-					    $pathBase = $arrPath[count($arrFicNum)-1];
-					    $numZero = strlen($arrFicNum[4]);					    
-					    $deb = $arrFicNum[4]+0;
-					    $fin = $deb+$nbTof;
-					    $j=0;					    
-					    for ($i = $deb; $i <= $fin; $i++) {
-					        //ATTENTION le nombre de 0 varie suivant les collections
-					        $numFic = str_pad($i, $numZero, "0", STR_PAD_LEFT);
-					        $this->arrItem[$j]['fic']="FRAN_".$arrFicNum[3]."_".$numFic."_L-medium.jpg";
-					        $this->arrItem[$j]['text']="photo ".$numFic;
-					        $this->arrItem[$j]['tronc'] = $arrPath[5];
-					        $j++;
-					    }
-					    
-					}else{
-					    //gestion des photos directement par 
-					    //<daoloc href="FRAN_0138_2365_L.msp#FRAN_0138_2394_L.msp"/>
-					    $j=0;
-					    //ATTENTION le nombre de 0 varie suivant les collections
-					    $numZero = strlen($arrFicNum[2]);
-					    $deb = $arrFicNum[2]+0;
-					    $fin = $arrFicNum[5]+0;
-					    for ($i = $deb; $i <= $fin; $i++) {
-					        //ATTENTION le nombre de 0 varie suivant les collections
-					        $numFic = str_pad($i, $numZero, "0", STR_PAD_LEFT);					        
-					        $this->arrItem[$j]['fic']=$arrFicNum[0]."_".$arrFicNum[1]."_".$numFic."_L-medium.jpg";		
-					        $this->arrItem[$j]['text']="photo ".$numFic;
-					        $this->arrItem[$j]['tronc'] = $arrFicNum[0]."_".$arrFicNum[1];
-					        $j++;
-					    }					        
+					if($nbFic > 1){
+					    $toto = 1;
 					}
-					//enregistre les documents
-					foreach ($this->arrItem as $item) {
-						$idDocTof = $this->dbD->ajouter(array("url"=>$this->urlBaseTof.$item['fic']
-								,"titre"=>$item['text']
-						        ,"type"=>1
-						        ,"tronc"=>$item['tronc']
-								,"parent"=>$idDocSerie));
-						//enregistre l'image						
-						$url = $this->urlBaseTof.$item['fic'];
-						$img = ROOT_PATH.'/data/AN/photos/'.$item['fic'];
-						if (!file_exists($img)){ 
-							$res = file_put_contents($img, file_get_contents($url));
-							$this->trace($res." ko : Fichier créé ".$url." ".$img);						
-						}
-						//création des rapports entre
-						// src = le document
-						// dst = la photo
-						// pre = le document root
-						$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-								,"src_id"=>$idDocSerie,"src_obj"=>"doc"
-								,"dst_id"=>$idDocTof,"dst_obj"=>"doc"
-								,"pre_id"=>$idDoc,"pre_obj"=>"doc"
-						));
-						
+					//boucle sur les localisation de media
+					foreach ($ficnumArr as $ficnum) {
+        					$arrFicNum = explode("_",$ficnum);
+        					if(count($this->arrItem)){
+        					    //gestion des photo  à partir de la liste d'item
+        					    for ($i = 0; $i < count($this->arrItem); $i++) {
+        					        $numFic = str_pad($this->arrItem[$i]['num'], 4, "0", STR_PAD_LEFT);
+        					        $this->arrItem[$i]['fic']=$arrFicNum[0]."_".$arrFicNum[1]."_".$numFic."_L-medium.jpg";
+        					        $this->arrItem[$i]['tronc']=$arrFicNum[0]."_".$arrFicNum[1];
+        					    }
+        					}elseif ($arrFicNum[0]=="http://www.siv.archives-nationales.culture.gouv.fr/siv/media/FRAN"){
+        					    //gestion des photos sans précision du nombre 
+        					    //par exemple Charles De Gaulle : https://www.siv.archives-nationales.culture.gouv.fr/siv/IR/FRAN_IR_054722
+        					    $arrPath = explode("/",$ficnum);
+        					    $pathBase = $arrPath[count($arrFicNum)-1];
+        					    $numZero = strlen($arrFicNum[4]);					    
+        					    $deb = $arrFicNum[4]+0;
+        					    //qaund la fin est précisée dans le deuxième fichier
+        					    if($ficnum1){
+        					        $arrFicNum1 = explode("_",$ficnum1);
+        					        $fin = $arrFicNum1[4]+0;
+        					    }else
+                					    $fin = $deb+$nbTof;
+        					    $j=0;					    
+        					    for ($i = $deb; $i < $fin; $i++) {
+        					        //ATTENTION le nombre de 0 varie suivant les collections
+        					        $numFic = str_pad($i, $numZero, "0", STR_PAD_LEFT);
+        					        $this->arrItem[$j]['fic']="FRAN_".$arrFicNum[3]."_".$numFic."_L-medium.jpg";
+        					        $this->arrItem[$j]['text']="photo ".$numFic;
+        					        $this->arrItem[$j]['tronc'] = $arrPath[5];
+        					        $j++;
+        					    }
+        					}elseif ($nbTof==1){
+        					    $this->arrItem[0]['fic']=$arrFicNum[0]."_".$arrFicNum[1]."_".$arrFicNum[2]."_L-medium.jpg";
+        					    $this->arrItem[0]['text']="photo ".$arrFicNum[2];
+        					    $this->arrItem[0]['tronc'] = $arrFicNum[0]."_".$arrFicNum[1];					    
+        					}else{
+        					    //gestion des photos directement par 
+        					    //<daoloc href="FRAN_0138_2365_L.msp#FRAN_0138_2394_L.msp"/>
+        					    //ATTENTION le nombre de 0 varie suivant les collections
+        					    $numZero = strlen($arrFicNum[2]);
+        					    $deb = $arrFicNum[2]+0;
+        					    //dans le cas où il n'y a qu'un fichier
+        					    if(isset($arrFicNum[5]))
+            					    $fin = $arrFicNum[5]+0;
+        					    else 
+        					        $fin = $deb;
+        					    for ($i = $deb; $i <= $fin; $i++) {
+        					        //ATTENTION le nombre de 0 varie suivant les collections
+        					        $numFic = str_pad($i, $numZero, "0", STR_PAD_LEFT);					        
+        					        $this->arrItem[]=array('fic'=>$arrFicNum[0]."_".$arrFicNum[1]."_".$numFic."_L-medium.jpg",
+            					           'text'=>"photo ".$numFic,
+        					               'tronc'=> $arrFicNum[0]."_".$arrFicNum[1]);
+        					        $this->trace($arrFicNum[0]."_".$arrFicNum[1]."_".$numFic."_L-medium.jpg");
+        					    }					        
+        					}
+        					//enregistre les documents
+        					foreach ($this->arrItem as $item) {
+        					    $url = $this->urlBaseTof.$item['fic'];
+        					    if($url=='http://www.siv.archives-nationales.culture.gouv.fr/mm/media/download/FRAN_0158_0387_L-medium.jpg'){
+                                    $toto = 1;					        
+        					    }
+        					    $idDocTof = $this->dbD->ajouter(array("url"=>$url
+        								,"titre"=>$item['text']
+        						        ,"type"=>1
+        						        ,"tronc"=>$item['tronc']
+        								,"parent"=>$idDocSerie));
+        						//enregistre l'image						
+        						$img = ROOT_PATH.'/data/AN/photos/'.$item['fic'];
+        						if (!file_exists($img)){ 
+        							$res = file_put_contents($img, file_get_contents($url));
+        							$this->trace($res." ko : Fichier créé ".$url." ".$img);						
+        						}						
+        						//création des rapports entre
+        						// src = le document
+        						// dst = la photo
+        						// pre = le document root
+        						//valeur = la date si elle est présente
+        						$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+        								,"src_id"=>$idDocSerie,"src_obj"=>"doc"
+        								,"dst_id"=>$idDocTof,"dst_obj"=>"doc"
+        								,"pre_id"=>$idDoc,"pre_obj"=>"doc"
+            						        ,"valeur"=>isset($item['date']) ? $item['date'] : ""
+        						));	
+        						//création de la geo si elle existe
+        						if(isset($item['geo'])){
+        						    $idGeo = $this->dbG->ajouter(array("adresse"=>$item['geo']));
+        						    //création des rapports entre
+        						    // src = le document
+        						    // dst = la géo
+        						    // pre = le document série
+        						    $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+        						        ,"src_id"=>$idDocTof,"src_obj"=>"doc"
+        						        ,"dst_id"=>$idGeo,"dst_obj"=>"geo"
+        						        ,"pre_id"=>$idDocSerie,"pre_obj"=>"doc"
+        						    ));						    
+        						}
+        					}
+        					$this->arrItem = array();
 					}
-					$this->arrItem = array();
-					$this->ss = "";						
+					$this->ss = "";					
 				}
 				
 				if ($cn->tagName == "controlaccess") {
@@ -395,10 +541,14 @@ class Flux_An extends Flux_Site{
 		
 		foreach($r->childNodes as $sc){
 			if ($sc->nodeType == XML_ELEMENT_NODE) {
-					
+			    $geo = "";
+			    $date = "";
 				if ($sc->tagName == "p") {
-					//récupère la sous série
-					$this->ss = $sc->nodeValue;
+					//récupère les infos plus précise
+				    $strP = trim($sc->nodeValue);
+				    $arrP = explode('.',$strP);
+				    $geo = $arrP[0];
+				    $date = isset($arrP[1]) ? $arrP[1] : "";
 				}
 				if ($sc->tagName == "list") {
 					//récupère les items
@@ -406,17 +556,18 @@ class Flux_An extends Flux_Site{
 						if ($s->nodeType == XML_ELEMENT_NODE) {
 							if ($s->tagName == "item") {
 								$strItem = $s->nodeValue;
+								$strItem = str_replace('*','',$strItem);
 								$arrStrItem = explode(":", $strItem);
 								$arrNum = explode("-", $arrStrItem[0]);
-								$deb = str_replace('n°','',$arrNum[0])+0;
-								$fin = isset($arrNum[1]) ? str_replace('n° ','',$arrNum[1]) : $deb+1;
+								$deb = trim(str_replace(' ','',str_replace('n°','',$arrNum[0])))+0;
+								$fin = isset($arrNum[1]) ? trim(str_replace(' ','',str_replace('n°','',$arrNum[1]))) : $deb;
 								$nb = $fin-$deb;
-								for ($i = 0; $i < $nb; $i++) {
+								for ($i = 0; $i <= $nb; $i++) {
 									$num = $deb+$i;
 									if($num==477){
 										$toto = 1;
 									}
-									$this->arrItem[] = array("ss"=>$this->ss,"text"=>$arrStrItem[1],"num"=>sprintf("%'.04d", $num));
+									$this->arrItem[] = array("date"=>$date,"geo"=>$geo,"text"=>$arrStrItem[1],"num"=>sprintf("%'.04d", $num));
 								}
 							}
 						}
@@ -1132,6 +1283,106 @@ ORDER BY d.tronc
         	}
         	
         	/**
+        	 * renvoit la hiérarchie des séries et le nombre de photo poru chaque série
+        	 * @param  string   $idDoc
+
+        	 * @return array
+        	 *
+        	 */
+        	function getTreemapPhoto($idDoc){
+        	    
+        	    $c = str_replace("::", "_", __METHOD__)."_".$idDoc;
+        	    $data = $this->cache->load($c);
+        	    if(!$data){
+        	        
+        	        $sql = "SELECT
+            	    d.doc_id,
+            	    d.titre,
+            	    de.niveau + 1 - d.niveau niv,
+            	    de.type,
+            	    de.titre tE,
+            	    de.doc_id tId,
+        	        COUNT(DISTINCT dpe.doc_id) nbEnf,
+        	        COUNT(DISTINCT dt.doc_id) nbTof
+        	    FROM
+        	    flux_doc d
+            	    INNER JOIN
+            	    flux_doc de ON de.lft BETWEEN d.lft AND d.rgt
+                LEFT JOIN
+                flux_doc dpe ON dpe.parent = de.doc_id
+            	    LEFT JOIN
+            	    flux_doc dt ON dt.parent = de.doc_id AND dt.type = 1
+        	    WHERE
+            	    d.doc_id = ".$idDoc." and de.type is null
+        	    GROUP BY niv , de.type, de.titre, de.doc_id
+        	    ORDER BY de.doc_id";
+        	        
+        	        $this->trace($sql);
+        	        $arr =  $this->dbD->exeQuery($sql);
+        	        
+        	        $this->fin = false;
+        	        $treemap = $this->getTreemapPhotoChildren($arr);
+        	        
+        	        $data = $treemap[0];
+            	    
+            	    $this->cache->save($data, $c);
+            	}
+            	return $data;
+        	    
+        	}
+        	   
+        
+        	
+        	/**
+        	 * fonction récursive pour les noeuds du treemap
+        	 * @param  array   $arr
+        	 * @param  array   $t
+        	 * @param  int     $i
+        	 * 
+        	 * @return array
+        	 *
+        	 */
+        	function getTreemapPhotoChildren($arr, $i=0){
+        	    while (isset($arr[$i+1]) && $arr[$i+1]["niv"] >= $arr[$i]["niv"] ){
+        	        $te = array("name"=>$arr[$i]['tE'],"i"=>$i,"idDoc"=>$arr[$i]['tId'],"niv"=>$arr[$i]['niv']);
+        	        if($arr[$i]["nbTof"]){
+        	            $te["size"]=$arr[$i]['nbTof'];
+        	        }elseif ($arr[$i]["nbEnf"]){ //on gère les séries qui n'on pas de photo
+        	            $arrC = $this->getTreemapPhotoChildren($arr, $i+1);
+        	            //ajoute les enfants
+        	            $te["children"]=$arrC;
+        	            
+        	            //calcule le nouveau $i
+        	            $nbC = count($te["children"]);
+        	            $te["i"] = $te["children"][$nbC-1]["i"];        	            
+        	            $i=$te["i"];
+        	            
+        	            //vérifie qu'il ne faut pas monter d'un niveau supplémentaire
+        	            if(isset($arr[$i+1]) && $arr[$i+1]["niv"] < $te["niv"]){
+        	                array_push($t,$te);
+        	                return $t;
+        	            }        	            
+        	        }
+        	        if(!isset($t))$t = array();
+        	        array_push($t,$te);
+        	        $i++;
+        	    }
+        	    //ajoute le dernier enfant 
+        	    if(isset($arr[$i]) ){
+        	        if($arr[$i]["nbTof"]){
+            	        if(!isset($t))$t = array();
+            	        array_push($t,array("name"=>$arr[$i]['tE'],"size"=>$arr[$i]['nbTof'],"i"=>$i,"idDoc"=>$arr[$i]['tId'],"niv"=>$arr[$i]['niv']));
+            	        if($arr[$i]['tId']=="4181"){
+            	            $toto = 1;
+            	        }
+        	        }
+        	    }else{
+        	        $this->fin = true;
+        	    }
+        	    return $t;
+        	}
+        	    
+        	/**
         	 * renvoit le nombre de visage
         	 *
         	 * @return array
@@ -1278,6 +1529,21 @@ ORDER BY d.tronc
             WHERE
                 d.tronc = 'visage' AND v.doc_id is null
             ORDER BY d.doc_id";
+        	    /*pour ensuite mettre à jour la table des visages avec les url
+        	     UPDATE flux_visage v
+                        INNER JOIN
+                    omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+                        AND SUBSTRING(ov.value, 31) = v.doc_id
+                        INNER JOIN
+                    omk_valarnum1.media om ON om.item_id = ov.resource_id 
+             SET 
+                    v.url = CONCAT('http://gapai.univ-paris8.fr/ValArNum/omks/files/original/',
+                            om.storage_id,
+                            '.',
+                            om.extension),
+                    v.source = om.source
+        	     */
+        	    
         	    
         	    $this->trace($sql);
         	    $arr = $this->dbD->exeQuery($sql);
@@ -1326,6 +1592,153 @@ ORDER BY d.tronc
         	    }
         	            	    
         	}
+        	
+        	/**
+        	 * migre les analyses de photo faite par google
+        	 *
+        	 * @param  $idBaseSrc    string
+        	 * @param  $idBaseDst    string
+        	 * 
+        	 * @return array
+        	 *
+        	 */
+        	function migreAnalyseGooglePhoto($idBaseSrc, $idBaseDst){
+        	    $this->trace(__METHOD__);
+        	    set_time_limit(0);
+
+        	    $dbDst = $this->getDb($idBaseDst);
+        	    $dbDocDst = new Model_DbTable_Flux_Doc($dbDst);
+        	    
+        	    $dbSrc = $this->getDb($idBaseSrc);
+        	    $dbDocSrc = new Model_DbTable_Flux_Doc($dbSrc);
+        	    
+        	    /* Problème de manque
+        	    $sql = "SELECT 
+                    d.doc_id,
+                    d.url,
+                    d.titre,
+                    COUNT(DISTINCT dv.doc_id) nbDv,
+                    GROUP_CONCAT(DISTINCT dv.doc_id) dvIds,
+                    COUNT(DISTINCT dp.doc_id) nbDp,
+                    GROUP_CONCAT(DISTINCT dp.doc_id) dpIds
+                FROM
+                    flux_doc d
+                        INNER JOIN
+                    flux_doc dv ON dv.parent = d.doc_id
+                        AND (dv.titre LIKE 'imagePropertiesAnnotation%'
+                        OR dv.titre LIKE 'faceAnnotations%'
+                        OR dv.titre LIKE 'landmarkAnnotations%'
+                        OR dv.titre LIKE 'logoAnnotations%')
+                        INNER JOIN
+                    ".$idBaseDst.".flux_doc dp ON dp.url = d.url
+                GROUP BY d.doc_id
+                ORDER BY d.doc_id";
+        	    $arr = $dbDocSrc->exeQuery($sql);
+        	    */
+        	    
+        	    $sql = "SELECT 
+                    d.doc_id,
+                    dpv.titre, dpv.tronc, dpv.note
+                FROM
+                    flux_doc d
+                        INNER JOIN
+                    ".$idBaseSrc.".flux_doc dp ON dp.url = d.url
+                        INNER JOIN
+                    ".$idBaseSrc.".flux_doc dpv ON dpv.parent = dp.doc_id
+                        AND (dpv.titre LIKE 'imagePropertiesAnnotation%'
+                        OR dpv.titre LIKE 'faceAnnotations%'
+                        OR dpv.titre LIKE 'landmarkAnnotations%'
+                        OR dpv.titre LIKE 'logoAnnotations%')
+                        LEFT JOIN
+                    flux_doc dv ON dv.parent = d.doc_id
+                        AND (dv.titre LIKE 'imagePropertiesAnnotation%'
+                        OR dv.titre LIKE 'faceAnnotations%'
+                        OR dv.titre LIKE 'landmarkAnnotations%'
+                        OR dv.titre LIKE 'logoAnnotations%')
+                WHERE
+                    d.type = 1 AND dv.doc_id IS NULL
+                ORDER BY d.doc_id";
+        	    $this->trace($sql);        	    
+        	    $arr = $dbDocDst->exeQuery($sql);
+        	    
+        	    foreach ($arr as $v) {
+        	        if($v['doc_id'] >= -1){
+    	                $id = $dbDocDst->ajouter(
+    	                    array("titre"=>$v['titre'],"parent"=>$v['doc_id']
+    	                       ,'tronc'=>$v['tronc'] ? $v['tronc'] : 'Google Vision'
+    	                       ,"note"=>$v['note'])
+    	                    ,false);
+    	                $this->trace('--- '.$id.' = '.$v['doc_id']." ".$v['titre']);
+    	            }
+        	    }
+        	
+        	}
+        	
+        	/**
+        	 * migre les mots clefs de photo faite par google
+        	 *
+        	 * @param  $idBaseSrc    string
+        	 * @param  $idBaseDst    string
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function migreAnalyseGooglePhotoMC($idBaseSrc, $idBaseDst){
+        	    $this->trace(__METHOD__);
+        	    set_time_limit(0);
+        	            	    
+        	    $dbSrc = $this->getDb($idBaseSrc);
+        	    $dbDocSrc = new Model_DbTable_Flux_Doc($dbSrc);
+        	    
+        	    $dbDst = $this->getDb($idBaseDst);
+        	    $dbDocDst = new Model_DbTable_Flux_Doc($dbDst);
+        	    
+        	    $g = new Flux_Gvision($idBaseDst);
+        	    
+        	    $arrTagP['labelAnnotations'] = $this->dbT->ajouter(array('code'=>'labelAnnotations','parent'=>$g->idTagRoot));
+        	    $arrTagP['webEntities'] = $this->dbT->ajouter(array('code'=>'webEntities','parent'=>$g->idTagRoot));
+        	    
+        	    $sql = "SELECT 
+                    r.pre_id,
+                    r.valeur,
+                    t.code,
+                    t.uri,
+                    tp.code TagP,
+                    dp.doc_id
+                FROM
+                    flux_doc d
+                        INNER JOIN
+                    ".$idBaseDst.".flux_doc dp ON dp.url = d.url
+                        INNER JOIN
+                    flux_rapport r ON r.src_id = d.doc_id
+                        AND r.src_obj = 'doc'
+                        AND r.dst_obj = 'tag'
+                        AND r.pre_obj = 'monade'
+                        INNER JOIN
+                    flux_tag t ON t.tag_id = r.dst_id
+                        INNER JOIN
+                    flux_tag tp ON tp.tag_id = t.parent
+                        AND tp.code IN ('webEntities' , 'labelAnnotations')
+                ORDER BY dp.doc_id";
+        	    $this->trace($sql);
+        	    $arr = $dbDocSrc->exeQuery($sql);
+        	    
+        	    foreach ($arr as $v) {
+        	        if($v['doc_id'] >= -1){
+        	            $idTag = $this->dbT->ajouter(array('code'=>$v['code'],'uri'=>$v['uri'],'parent'=>$arrTagP['TagP']));
+        	            $id = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+        	                ,"src_id"=>$v['doc_id'],"src_obj"=>"doc"
+        	                ,"dst_id"=>$idTag,"dst_obj"=>"tag"
+        	                ,"pre_id"=>$g->idMonade,"pre_obj"=>"monade"
+        	                ,"valeur"=>$v['valeur']
+        	            ),false);
+        	            $this->trace('--- '.$id.' = '.$v['doc_id']." ".$v['code']);
+        	        }
+        	    }
+        	    
+        	}
+        	
+        	
         	
         	/**
         	 * enregistre les analyses de photo faite par google
@@ -1413,6 +1826,37 @@ ORDER BY d.tronc
         	    $numItem++;
         	}
         	
+
+        	/**
+        	 * enregistre les extraction de mots clefs
+        	 *
+        	 * @param  string  $champ
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getMC($champ="titre"){
+        	    $this->trace(__METHOD__);
+    	        //pour optimiser le nombre d'appel
+    	        $sql = "SELECT
+                    COUNT(*) nb, ".$champ.", GROUP_CONCAT(doc_id) ids
+                FROM
+                    flux_doc
+                WHERE
+                    titre NOT LIKE 'Photo %'
+                GROUP BY ".$champ."
+                ORDER BY nb DESC";
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    $numItem = 0;
+        	    $mc = new Flux_MC($this->idBase);
+        	    foreach ($arr as $item) {
+        	        $ids = explode(',', $item['ids']);
+        	        $mc->saveForChaine($ids, $item[$champ],"","alchemy");
+        	    }
+        	    
+        	    
+        	}
+        	
         	/**
         	 * enregistre les analyses de language faite par google
         	 * 
@@ -1422,7 +1866,7 @@ ORDER BY d.tronc
         	 * @return array
         	 *
         	 */
-        	function getAnalyseGoogle($champ="titre", $query="parent photo"){
+        	function getAnalyseGoogle($champ="titre", $query="sans doublons"){
         	    $this->trace(__METHOD__);
         	    set_time_limit(0);
         	    //récupère les références
@@ -1430,102 +1874,180 @@ ORDER BY d.tronc
         	    if($query=="parent photo")$arr = $this->getNbPhoto();
         	    if($query=="titre photo")$arr = $this->getPhotos(" AND titre not like 'photo %' ");
         	    if($query=="last import")$arr = $this->getNbPhoto("%Y-%m-%d",'par doc'," AND de.maj > '2018-01-22' ");
+        	    if($query=="mini"){
+            	    //pour optimiser le nombre d'appel à Google        	    
+            	    $sql = "SELECT 
+                        COUNT(*) nb, ".$champ.", GROUP_CONCAT(doc_id) ids
+                    FROM
+                        flux_doc
+                    WHERE
+                        titre NOT LIKE 'Photo %'
+                    GROUP BY ".$champ."
+                    ORDER BY nb DESC";
+        	    }
+        	    if($query=="sans doublons"){
+        	        //pour optimiser le nombre d'appel à Google
+        	        $sql = "SELECT 
+                    COUNT(*) nb,
+                    GROUP_CONCAT(d.doc_id) ids,
+                    SUBSTRING(d.titre, (LOCATE('/',d.titre)+2)) titre
+                FROM
+                    flux_doc d
+                        LEFT JOIN
+                	flux_doc dg ON dg.parent = d.doc_id
+                        AND dg.titre = 'Flux_Glanguage::sauveAnalyseTexte'
+                WHERE
+                	dg.doc_id is null and
+                    d.titre NOT LIKE 'Photo %' AND d.titre NOT LIKE 'Flux_Glanguage::sauveAnalyseTexte' AND d.titre NOT LIKE 'analyzeSyntax %' AND d.titre != 'Flux_Glanguage' AND d.titre != 'Manques' AND d.titre NOT LIKE 'manque : %'
+                GROUP BY SUBSTRING(d.titre, (LOCATE('/',d.titre)+2))
+                ORDER BY titre";
+        	    }
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
         	    //création de l'analyseur
         	    $gl = new Flux_Glanguage($this->idBase);
-        	    $idTagSent = $this->dbT->ajouter(array('code'=>'sentiment','parent'=>$gl->idTagRoot));
-        	    $idTagSyntaxe = $this->dbT->ajouter(array('code'=>'syntaxe','parent'=>$gl->idTagRoot));
         	    $numItem = 0;
         	    foreach ($arr as $item) {
         	        //pour gérer la reprise 
         	        if($numItem >= -1 ){        	            
-        	            $this->trace($numItem." ".$item["doc_id"]." ".$item[$champ]);
+        	            $this->trace($numItem." ".$item["ids"]." ".$item[$champ]);
+        	            $arrIds = explode(',',$item["ids"]);        	            
         	            //execute et sauve l'analyse uniquement sur les types possible en français
-            	        $analyses = $gl->sauveAnalyseTexte($item[$champ], $item["doc_id"], array('analyzeEntities','analyzeSentiment','analyzeSyntax'));
-            	        //décompose l'analyse
-            	        $notes = json_decode($analyses["note"], true);
-        	            //enregistre les data
-        	            $i = 0;
-        	            foreach ($notes as $k => $prop) {
-        	                $this->trace($k);
-        	                switch ($k) {
-        	                    case 'analyzeSyntax':
-        	                        //enregistre l'analyse
-        	                        $this->dbD->ajouter(array("parent"=>$analyses["doc_id"],"titre"=>$k." ".$numItem,"note"=>json_encode($prop)));
-        	                    break;
-        	                    case 'analyzeEntities':
-        	                        foreach ($prop as $p => $v) {
-        	                            $desc = "";
-        	                            if (array_key_exists('wikipedia_url', $v['metadata'])) {
-        	                                $desc = $v['metadata']['wikipedia_url'];
-        	                            }
-        	                            $uri = "";
-        	                            if (array_key_exists('mid', $v['metadata'])) {
-        	                                $uri = $v['metadata']['mid'];
-        	                            }
-        	                            if($v['type']=="PERSON"){
-        	                                //enregistre une existence
-        	                                $id = $this->dbE->ajouter(array("nom"=>$v['name'],'url'=>$uri,'data'=>$desc));
-        	                                $obj = "exi";
-        	                            }elseif($v['type']=="LOCATION" && $desc != ""){
-        	                                //enregistre une géographie
-        	                                $id = $this->dbG->ajouter(array("adresse"=>$v['name'],'uri'=>$uri,'data'=>$desc));
-        	                                $obj = "geo";    	                                
-        	                            }else{
-            	                            //enregistre le tag
-            	                            $id = $this->dbT->ajouter(array('code'=>$v['name'],'type'=>$v['type'],'parent'=>$gl->idTagRoot,'desc'=>$desc,'uri'=>$uri));
-            	                            $obj = "tag";
-        	                            }
-            	                        //enregistre le rapport
-        	                            $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-        	                                ,"src_id"=>$analyses["doc_id"],"src_obj"=>"doc"
-        	                                ,"dst_id"=>$id,"dst_obj"=>$obj
-        	                                ,"pre_id"=>$gl->idMonade,"pre_obj"=>"monade"
-        	                                ,"niveau"=>$v['salience']
-        	                                ,"valeur"=>json_encode($v)
-        	                            ));    	                                
-        	                        }
-        	                    break;
-        	                    case 'analyzeSentiment':
-        	                        //sentiment global du document
-        	                        $idSent = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-        	                           ,"src_id"=>$analyses["doc_id"],"src_obj"=>"doc"
-        	                           ,"dst_id"=>$idTagSent,"dst_obj"=>"tag"
-        	                           ,"pre_id"=>$gl->idMonade,"pre_obj"=>"monade"
-        	                           ,"niveau"=>$prop['magnitude']
-        	                           ,"valeur"=>$prop['score']
-        	                                ));    	                       
-        	                        $numSent = 0;
-        	                        if(isset($prop->sentences)){
-            	                        foreach ($prop->sentences as $p => $v) {    	                            
-            	                            //création du document si le texte est différent.
-            	                            $cnt = $v["text"]["content"];
-            	                            if($cnt != $item[$champ]){
-            	                                $idDocSent = $this->dbD->ajouter(array("parent"=>$analyses["doc_id"], "tronc"=>$v["text"]["beginOffset"],"titre"=>"Phrase :".$idSent."_".$numSent,"note"=>json_encode($v)));    	                                
-            	                            }else{
-            	                                $idDocSent = $item["doc_id"];
-            	                            }
-            	                            //sentiment de la phrase
-            	                            $idSent = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-            	                                ,"src_id"=>$idDocSent,"src_obj"=>"doc"
-            	                                ,"dst_id"=>$idTagSent,"dst_obj"=>"tag"
-            	                                ,"pre_id"=>$gl->idMonade,"pre_obj"=>"monade"
-            	                                ,"niveau"=>$v["sentiment"]['magnitude']
-            	                                ,"valeur"=>$v["sentiment"]['score']
-            	                            ));  
-            	                        }
-        	                        }
-        	                    break;    	                        
-        	                }
-        	                $i++;
-        	            }
-        	            $this->trace('analyse sauvée');
+        	            $analyses = $gl->sauveAnalyseTexte($item[$champ], false, array('analyzeEntities','analyzeSentiment','analyzeSyntax'),$arrIds);
+        	            //décompose l'analyse
+        	            $this->exploseAnalyseGoogle($arrIds, json_decode($analyses["note"],true), $gl);
             	        //attend pour éviter de stresser google
             	        sleep(1);
         	        }
         	        $numItem ++;
         	    }
         	}
+
+        	
+        	/**
+        	 * actualise les analyses Google
+        	 *
+        	 *
+        	 * @return void
+        	 *
+        	 */
+        	function actualiseAnalyseGoogle(){
         	    
+        	    $this->trace(__METHOD__);
+        	    
+        	    $sql = "SELECT parent, note, doc_id FROM flux_doc WHERE titre LIKE 'Flux_Glanguage::sauveAnalyseTexte'";
+    	        $arr = $this->dbD->exeQuery($sql);
+    	        $this->trace($sql);
+    	        
+    	        //création de l'analyseur
+    	        $gl = new Flux_Glanguage($this->idBase);
+    	        $numItem = 0;
+    	        foreach ($arr as $a) {
+    	            $this->exploseAnalyseGoogle(array($a['doc_id']), json_decode($a["note"],true), $gl);    	            
+    	        }
+        	            
+    	        $this->trace(__METHOD__ ." FIN");
+    	        
+        	}
+        	
+        	
+        	 /**
+        	 * explose les analyses Google
+        	 *
+        	 * @param  array     $arrIds
+        	 * @param  object    $notes
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function exploseAnalyseGoogle($arrIds, $notes, $gl){
+
+        	    //décompose l'analyse
+        	    $i = 0;
+        	    foreach ($notes as $k => $prop) {
+        	        switch ($k) {
+        	            case 'analyzeSyntax':
+        	                //enregistre l'analyse pour chaque document
+        	                foreach ($arrIds as $idDoc) {
+        	                    $this->dbD->ajouter(array("parent"=>$idDoc,"titre"=>$k." ".$numItem,"note"=>json_encode($prop)));
+        	                }
+        	                break;
+        	            case 'analyzeEntities':
+        	                foreach ($prop as $p => $v) {
+        	                    $desc = "";
+        	                    if (array_key_exists('wikipedia_url', $v['metadata'])) {
+        	                        $desc = $v['metadata']['wikipedia_url'];
+        	                    }
+        	                    $uri = "";
+        	                    if (array_key_exists('mid', $v['metadata'])) {
+        	                        $uri = $v['metadata']['mid'];
+        	                    }
+        	                    if($v['type']=="PERSON"){
+        	                        //enregistre une existence
+        	                        $id = $this->dbE->ajouter(array("nom"=>$v['name'],'url'=>$uri,'data'=>$desc));
+        	                        $obj = "exi";
+        	                    }elseif($v['type']=="LOCATION" && $desc != ""){
+        	                        //enregistre une géographie
+        	                        $id = $this->dbG->ajouter(array("adresse"=>$v['name'],'uri'=>$uri,'data'=>$desc));
+        	                        $obj = "geo";
+        	                    }else{
+        	                        //enregistre le tag
+        	                        $id = $this->dbT->ajouter(array('code'=>$v['name'],'type'=>$v['type'],'parent'=>$gl->idTagRoot,'desc'=>$desc,'uri'=>$uri));
+        	                        $obj = "tag";
+        	                    }
+        	                    //enregistre le rapport
+        	                    foreach ($arrIds as $idDoc) {
+        	                        $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+        	                            ,"src_id"=>$idDoc,"src_obj"=>"doc"
+        	                            ,"dst_id"=>$id,"dst_obj"=>$obj
+        	                            ,"pre_id"=>$gl->idMonade,"pre_obj"=>"monade"
+        	                            ,"niveau"=>$v['salience']
+        	                            ,"valeur"=>json_encode($v)
+        	                        ));
+        	                    }
+        	                }
+        	                break;
+        	            case 'analyzeSentiment':
+        	                //sentiment global du document
+        	                foreach ($arrIds as $idDoc) {
+        	                    $idSent = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+        	                        ,"src_id"=>$idDoc,"src_obj"=>"doc"
+        	                        ,"dst_id"=>$gl->idTagSent,"dst_obj"=>"tag"
+        	                        ,"pre_id"=>$gl->idMonade,"pre_obj"=>"monade"
+        	                        ,"niveau"=>$prop['magnitude']
+        	                        ,"valeur"=>$prop['score']
+        	                    ));
+        	                    $numSent = 0;
+        	                    if(isset($prop->sentences)){
+        	                        foreach ($prop->sentences as $p => $v) {
+        	                            //création du document si le texte est différent.
+        	                            $cnt = $v["text"]["content"];
+        	                            if($cnt != $item[$champ]){
+        	                                $idDocSent = $this->dbD->ajouter(array("parent"=>$idDoc, "tronc"=>$v["text"]["beginOffset"],"titre"=>"Phrase :".$idSent."_".$numSent,"note"=>json_encode($v)));
+        	                            }else{
+        	                                $idDocSent = $item["doc_id"];
+        	                            }
+        	                            //sentiment de la phrase
+        	                            $idSent = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+        	                                ,"src_id"=>$idDocSent,"src_obj"=>"doc"
+        	                                ,"dst_id"=>$gl->idTagSent,"dst_obj"=>"tag"
+        	                                ,"pre_id"=>$gl->idMonade,"pre_obj"=>"monade"
+        	                                ,"niveau"=>$v["sentiment"]['magnitude']
+        	                                ,"valeur"=>$v["sentiment"]['score']
+        	                            ));
+        	                        }
+        	                    }
+        	                }
+        	                break;
+        	        }
+        	        $this->trace('analyse sauvée : '.$i." ".$k);
+        	        $i++;
+        	    }
+        	    
+        	}
+        	    
+        	    
+        	
         	/**
         	 * récupère les données pour chaque photo
         	 *
@@ -1932,6 +2454,759 @@ ORDER BY d.tronc
         	    
         	}
 
+
+        	/**
+        	 * calcule la complexité de l'écosystème
+        	 *
+        	 * @param  int         $idDoc
+        	 * @param  int         $idTag
+        	 * @param  int         $idExi
+        	 * @param  int         $idGeo
+        	 * @param  int         $idMonade
+        	 * @param  int         $idRapport
+        	 * @param  boolean     $cache
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getComplexEcosystem($idDoc=0, $idTag=0, $idExi=0, $idGeo=0, $idMonade=0, $idRapport=0, $cache=true){
+        	    
+        	    $result = false;
+        	    $c = str_replace("::", "_", __METHOD__)."_"
+        	        .$this->idBase.'_'.$idDoc.'_'.$idTag.'_'.$idExi.'_'.$idGeo.'_'.$idMonade.'_'.$idRapport;
+        	    if($cache){
+        	        $result = $this->cache->load($c);
+        	    }
+        	    if(!$result){        	    
+            	    $result = array("idBase"=>$this->idBase,"sumNiv"=>0,"sumEle"=>0,"sumComplex"=>0,"details"=>array());
+            	    //récupère la définition des niches si besoin
+            	    $niches = false;
+            	    if($idDoc){
+            	        $niches = $this->getNicheDoc($idDoc);
+            	        $d = $this->getComplexDoc($idDoc);
+            	        $t = $this->getComplexTag(implode(',',$niches['tag']));
+                	    $p = $this->getComplexActeurPersonne(implode(',',$niches['exi']));
+                	    $g = $this->getComplexActeurGeo(implode(',',$niches['geo']));
+                	    $m = $this->getComplexActeurAlgo(implode(',',$niches['monade']));
+                	    $r = $this->getComplexRapport(implode(',',$niches['rapport']));
+            	    } elseif ($idTag){
+            	        $niches = $this->getNicheTag($idTag);
+            	        $d = $this->getComplexDoc(implode(',',$niches['doc']));
+            	        $t = $this->getComplexTag($idTag);
+            	        $p = $this->getComplexActeurPersonne(implode(',',$niches['exi']));
+            	        $g = $this->getComplexActeurGeo(implode(',',$niches['geo']));
+            	        $m = $this->getComplexActeurAlgo(implode(',',$niches['monade']));
+            	        $r = $this->getComplexRapport(implode(',',$niches['rapport']));        	        
+            	    } elseif ($idExi){
+            	        $niches = $this->getNicheExi($idExi);
+            	        $d = $this->getComplexDoc(implode(',',$niches['doc']));
+            	        $t = $this->getComplexTag(implode(',',$niches['tag']));
+            	        $p = $this->getComplexActeurPersonne($idExi);
+            	        $g = $this->getComplexActeurGeo(implode(',',$niches['geo']));
+            	        $m = $this->getComplexActeurAlgo(implode(',',$niches['monade']));
+            	        $r = $this->getComplexRapport(implode(',',$niches['rapport']));
+            	    } elseif ($idGeo){
+            	        $niches = $this->getNicheGeo($idGeo);
+            	        $d = $this->getComplexDoc(implode(',',$niches['doc']));
+            	        $t = $this->getComplexTag(implode(',',$niches['tag']));
+            	        $p = $this->getComplexActeurPersonne(implode(',',$niches['exi']));
+            	        $g = $this->getComplexActeurGeo($idGeo);
+            	        $m = $this->getComplexActeurAlgo(implode(',',$niches['monade']));
+            	        $r = $this->getComplexRapport(implode(',',$niches['rapport']));        	        
+            	    } elseif ($idMonade){
+            	        $niches = $this->getNicheMonade($idMonade);
+            	        $d = $this->getComplexDoc(implode(',',$niches['doc']));
+            	        $t = $this->getComplexTag(implode(',',$niches['tag']));
+            	        $p = $this->getComplexActeurPersonne(implode(',',$niches['exi']));
+            	        $g = $this->getComplexActeurGeo(implode(',',$niches['geo']));
+            	        $m = $this->getComplexActeurAlgo($idMonade);
+            	        $r = $this->getComplexRapport(implode(',',$niches['rapport']));
+            	    } elseif ($idRapport){
+            	        $niches = $this->getNicheRapport($idRapport);
+            	        $d = $this->getComplexDoc(implode(',',$niches['doc']));
+            	        $t = $this->getComplexTag(implode(',',$niches['tag']));
+            	        $p = $this->getComplexActeurPersonne(implode(',',$niches['exi']));
+            	        $g = $this->getComplexActeurGeo(implode(',',$niches['geo']));
+            	        $m = $this->getComplexActeurAlgo(implode(',',$niches['monade']));
+            	        $r = $this->getComplexRapport($idRapport);
+            	    }else{
+            	        $d = $this->getComplexDoc();
+            	        $t = $this->getComplexTag();
+            	        $p = $this->getComplexActeurPersonne();
+            	        $g = $this->getComplexActeurGeo();
+            	        $m = $this->getComplexActeurAlgo();
+            	        $r = $this->getComplexRapport();        	        
+            	    }
+            	    
+            	    $result["sumNiv"]=$d["numNiv"]+$t["numNiv"]+$p["numNiv"]+$g["numNiv"]+$m["numNiv"]+$r["numNiv"];
+            	    $result["sumEle"]=$d["sumNb"]+$t["sumNb"]+$p["sumNb"]+$g["sumNb"]+$m["sumNb"]+$r["sumNb"];
+            	    $result["sumComplex"]=$d["sumComplex"]+$t["sumComplex"]+$p["sumComplex"]+$g["sumComplex"]+$m["sumComplex"]+$r["sumComplex"];
+            	    $result["details"]=array($d,$t,$p,$g,$m,$r);
+            	    
+            	    $this->cache->save($result, $c);
+            	    
+        	    }
+        	    
+        	    return $result;
+        	    
+        	}
+
+        	/**
+        	 * calcule la niche
+        	 *
+        	 * @param  int         $idDoc
+        	 * @param  string      $type
+        	 * @param  array       $arr
+        	 * @param  array       $result
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getNiche($id, $type, $arr){
+        	    
+        	    //calcul les regroupements
+        	    $result = array("doc"=>array(),"tag"=>array(),"exi"=>array(),"geo"=>array(),"monade"=>array(),"rapport"=>array());
+        	    //récupère les identifiants uniques pour chaque objet
+        	    foreach ($arr as $r) {
+        	        $result[$r["sdo"]][$r["sdid"]] = 1;
+        	        $result[$r["spo"]][$r["spid"]] = 1;
+        	        $result[$r["dso"]][$r["dsid"]] = 1;
+        	        $result[$r["dpo"]][$r["dpid"]] = 1;
+        	        $result[$r["pso"]][$r["psid"]] = 1;
+        	        $result[$r["pdo"]][$r["pdid"]] = 1;
+        	        $result["rapport"][$r["sid"]] = 1;
+        	        $result["rapport"][$r["did"]] = 1;
+        	        $result["rapport"][$r["pid"]] = 1;
+        	        $result["monade"][$r["sm"]] = 1;
+        	        $result["monade"][$r["dm"]] = 1;
+        	        $result["monade"][$r["pm"]] = 1;
+        	    }
+        	    //construction du tableau des objets
+        	    $rs = array("type"=>$type,"id"=>$id
+        	        ,"doc"=>array(),"tag"=>array(),"exi"=>array(),"geo"=>array(),"monade"=>array(),"rapport"=>array()
+        	        ,"details"=>$arr);
+        	    foreach ($result as $k => $vs){
+        	        if($k){
+        	            if(!count($vs))$rs[$k][]=-1;
+        	            foreach ($vs as $v=>$n) {
+        	                if($v) $rs[$k][]=$v;
+        	            }
+        	        }
+        	    }
+        	    
+        	    return $rs;
+        	    
+        	}
+        	    
+        	/**
+        	 * calcule la niche pour 1 document
+        	 *
+        	 * @param  int         $idDoc
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getNicheDoc($idDoc){
+        	    
+        	    $sql = "	SELECT
+                	    de.doc_id idE,
+                    de.titre titreE,
+                    de.niveau-d.niveau+1 niveauE,
+                    rS.rapport_id sid,
+                    rS.monade_id sm,
+                    rS.dst_id sdid,
+                    rS.dst_obj sdo,
+                    rS.pre_id spid,
+                    rS.pre_obj spo,
+                    rD.rapport_id did,
+                    rD.monade_id dm,
+                    rD.src_id dsid,
+                    rD.src_obj dso,
+                    rD.pre_id dpid,
+                    rD.pre_obj dpo,
+                    rP.rapport_id pid,
+                    rP.monade_id pm,
+                    rP.dst_id pdid,
+                    rP.dst_obj pdo,
+                    rP.src_id psid,
+                    rP.src_obj pso
+                	FROM flux_doc d
+                	INNER JOIN flux_doc de ON de.lft BETWEEN d.lft AND d.rgt
+                	LEFT JOIN
+                    	flux_rapport rS ON rS.src_id = de.doc_id
+                    	AND rS.src_obj = 'doc'
+            	    LEFT JOIN
+                	    flux_rapport rD ON rD.dst_id = de.doc_id
+                	    AND rD.dst_obj = 'doc'
+        	        LEFT JOIN
+            	        flux_rapport rP ON rP.pre_id = de.doc_id
+            	        AND rP.pre_obj = 'doc'
+        	        WHERE
+        	        d.doc_id = ".$idDoc."
+        	        ORDER BY de.lft";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    return $this->getNiche($idDoc, "document", $arr);
+        	    
+        	}
+        	
+        	/**
+        	 * calcule la niche pour 1 tag
+        	 *
+        	 * @param  int         $idTag
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getNicheTag($idTag){
+        	    
+        	    $sql = "	SELECT 
+                    te.tag_id idE,
+                    te.code titreE,
+                    te.niveau-t.niveau+1 niveauE,
+                    rS.rapport_id sid,
+                    rS.monade_id sm,
+                    rS.dst_id sdid,
+                    rS.dst_obj sdo,
+                    rS.pre_id spid,
+                    rS.pre_obj spo,
+                    rD.rapport_id did,
+                    rD.monade_id dm,
+                    rD.src_id dsid,
+                    rD.src_obj dso,
+                    rD.pre_id dpid,
+                    rD.pre_obj dpo,
+                    rP.rapport_id pid,
+                    rP.monade_id pm,
+                    rP.dst_id pdid,
+                    rP.dst_obj pdo,
+                    rP.src_id psid,
+                    rP.src_obj pso    
+                FROM
+                    flux_tag t
+                        INNER JOIN
+                    flux_tag te ON te.lft BETWEEN t.lft AND t.rgt
+                        LEFT JOIN
+                    flux_rapport rS ON rS.src_id = te.tag_id
+                        AND rS.src_obj = 'tag'
+                        LEFT JOIN
+                    flux_rapport rD ON rD.dst_id = te.tag_id
+                        AND rD.dst_obj = 'tag'
+                        LEFT JOIN
+                    flux_rapport rP ON rP.pre_id = te.tag_id
+                        AND rP.pre_obj = 'tag'
+                WHERE
+                    t.tag_id = ".$idTag."
+                ORDER BY te.lft";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    return $this->getNiche($idTag, "tag", $arr);
+
+        	}
+        	
+        	/**
+        	 * calcule la niche pour 1 exi
+        	 *
+        	 * @param  int         $idExi
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getNicheExi($idExi){
+        	    
+        	    $sql = "SELECT 
+                    ee.exi_id idE,
+                    CONCAT(ee.prenom, ' ', ee.nom) titreE,
+                    ee.niveau - e.niveau + 1 niveauE,
+                    rS.rapport_id sid,
+                    rS.monade_id sm,
+                    rS.dst_id sdid,
+                    rS.dst_obj sdo,
+                    rS.pre_id spid,
+                    rS.pre_obj spo,
+                    rD.rapport_id did,
+                    rD.monade_id dm,
+                    rD.src_id dsid,
+                    rD.src_obj dso,
+                    rD.pre_id dpid,
+                    rD.pre_obj dpo,
+                    rP.rapport_id pid,
+                    rP.monade_id pm,
+                    rP.dst_id pdid,
+                    rP.dst_obj pdo,
+                    rP.src_id psid,
+                    rP.src_obj pso
+                FROM
+                    flux_exi e
+                        INNER JOIN
+                    flux_exi ee ON ee.lft BETWEEN e.lft AND e.rgt
+                        LEFT JOIN
+                    flux_rapport rS ON rS.src_id = ee.exi_id
+                        AND rS.src_obj = 'exi'
+                        LEFT JOIN
+                    flux_rapport rD ON rD.dst_id = ee.exi_id
+                        AND rD.dst_obj = 'exi'
+                        LEFT JOIN
+                    flux_rapport rP ON rP.pre_id = ee.exi_id
+                        AND rP.pre_obj = 'exi'
+                WHERE
+                    e.exi_id = ".$idExi."
+                ORDER BY ee.lft";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    return $this->getNiche($idExi, "acteur-personne", $arr);
+        	    
+        	}
+        	        	
+        	/**
+        	 * calcule la niche pour 1 geo
+        	 *
+        	 * @param  int         $idGeo
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getNicheGeo($idGeo){
+        	    
+        	    $sql = "SELECT 
+                    g.geo_id idE,
+                    g.adresse titreE,
+                    1 niveauE,
+                    rS.rapport_id sid,
+                    rS.monade_id sm,
+                    rS.dst_id sdid,
+                    rS.dst_obj sdo,
+                    rS.pre_id spid,
+                    rS.pre_obj spo,
+                    rD.rapport_id did,
+                    rD.monade_id dm,
+                    rD.src_id dsid,
+                    rD.src_obj dso,
+                    rD.pre_id dpid,
+                    rD.pre_obj dpo,
+                    rP.rapport_id pid,
+                    rP.monade_id pm,
+                    rP.dst_id pdid,
+                    rP.dst_obj pdo,
+                    rP.src_id psid,
+                    rP.src_obj pso
+                FROM
+                    flux_geo g
+                        LEFT JOIN
+                    flux_rapport rS ON rS.src_id = g.geo_id
+                        AND rS.src_obj = 'geo'
+                        LEFT JOIN
+                    flux_rapport rD ON rD.dst_id = g.geo_id
+                        AND rD.dst_obj = 'geo'
+                        LEFT JOIN
+                    flux_rapport rP ON rP.pre_id = g.geo_id
+                        AND rP.pre_obj = 'geo'
+                WHERE
+                    g.geo_id = ".$idGeo."
+                ORDER BY g.geo_id";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    return $this->getNiche($idGeo, "acteur-geo", $arr);
+        	    
+        	}
+        	
+        	/**
+        	 * calcule la niche pour 1 monade
+        	 *
+        	 * @param  int         $idMonade
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getNicheMonade($idMonade){
+        	    
+        	    $sql = "SELECT 
+                    m.monade_id idE,
+                    m.titre titreE,
+                    1 niveauE,
+                    rS.rapport_id sid,
+                    rS.monade_id sm,
+                    rS.dst_id sdid,
+                    rS.dst_obj sdo,
+                    rS.pre_id spid,
+                    rS.pre_obj spo,
+                    rD.rapport_id did,
+                    rD.monade_id dm,
+                    rD.src_id dsid,
+                    rD.src_obj dso,
+                    rD.pre_id dpid,
+                    rD.pre_obj dpo,
+                    rP.rapport_id pid,
+                    rP.monade_id pm,
+                    rP.dst_id pdid,
+                    rP.dst_obj pdo,
+                    rP.src_id psid,
+                    rP.src_obj pso
+                FROM
+                    flux_monade m
+                        LEFT JOIN
+                    flux_rapport rS ON (rS.src_id = m.monade_id
+                        AND rS.src_obj = 'monade') OR rS.monade_id = m.monade_id
+                        LEFT JOIN
+                    flux_rapport rD ON (rD.dst_id = m.monade_id
+                        AND rD.dst_obj = 'monade') OR rS.monade_id = m.monade_id
+                        LEFT JOIN
+                    flux_rapport rP ON (rP.pre_id = m.monade_id
+                        AND rP.pre_obj = 'monade') OR rS.monade_id = m.monade_id
+                WHERE
+                    m.monade_id = ".$idMonade."
+                ORDER BY m.monade_id";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    return $this->getNiche($idMonade, "acteur-algo", $arr);
+        	    
+        	}
+
+        	/**
+        	 * calcule la niche pour 1 rapport
+        	 *
+        	 * @param  int         $idGeo
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getNicheRapport($idRapport){
+        	    
+        	    $sql = "SELECT 
+                    r.rapport_id idE,
+                    CONCAT(r.src_obj,
+                            '-',
+                            r.dst_obj,
+                            '-',
+                            r.pre_obj) titreE,
+                    1 niveauE,
+                    rS.rapport_id sid,
+                    rS.monade_id sm,
+                    rS.dst_id sdid,
+                    rS.dst_obj sdo,
+                    rS.pre_id spid,
+                    rS.pre_obj spo,
+                    rD.rapport_id did,
+                    rD.monade_id dm,
+                    rD.src_id dsid,
+                    rD.src_obj dso,
+                    rD.pre_id dpid,
+                    rD.pre_obj dpo,
+                    rP.rapport_id pid,
+                    rP.monade_id pm,
+                    rP.dst_id pdid,
+                    rP.dst_obj pdo,
+                    rP.src_id psid,
+                    rP.src_obj pso
+                FROM
+                    flux_rapport r
+                        LEFT JOIN
+                    flux_rapport rS ON (rS.src_id = r.rapport_id AND rS.src_obj = 'rapport') OR rS.rapport_id = r.rapport_id
+                        LEFT JOIN
+                    flux_rapport rD ON (rD.dst_id = r.rapport_id AND rD.dst_obj = 'rapport') OR rD.rapport_id = r.rapport_id
+                        LEFT JOIN
+                    flux_rapport rP ON (rP.pre_id = r.rapport_id AND rP.pre_obj = 'rapport') OR rP.rapport_id = r.rapport_id
+                WHERE
+                    r.rapport_id  = ".$idRapport."
+                ORDER BY r.rapport_id";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    return $this->getNiche($idRapport, "rapport", $arr);
+        	    
+        	}
+        	
+        	/**
+        	 * calcule la complexité des documents
+        	 *
+        	 * @param  string          $ids
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getComplexDoc($ids=""){
+        	    
+        	    $result = array("idBase"=>$this->idBase,"type"=>"document","ids"=>$ids,"sumNb"=>0,"numNiv"=>0,"sumNiv"=>0,"sumComplex"=>0,"details"=>array());
+        	    if($ids == "-1") return $result;
+        	    
+        	    if ($ids) $w = " WHERE d.doc_id IN (".$ids.") ";
+        	    else $w = "";
+        	    
+        	    $sql = "SELECT
+                    COUNT(DISTINCT de.doc_id) nb,
+                        de.niveau + 1 - d.niveau niv,
+                        COUNT(DISTINCT de.doc_id) * (de.niveau + 1 - d.niveau) complexite
+                FROM
+                    flux_doc d
+                INNER JOIN flux_doc de ON de.lft BETWEEN d.lft AND d.rgt
+                ".$w."
+                GROUP BY de.niveau + 1 - d.niveau";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    //calcul les sommes
+        	    foreach ($arr as $r) {
+        	        $result["sumNb"] += $r["nb"];
+        	        $result["sumNiv"] += $r["niv"];
+        	        $result["sumComplex"] += $r["complexite"];
+        	        if($result["numNiv"] < $r["niv"]) $result["numNiv"]=$r["niv"];
+        	        $result["details"][] = $r;
+        	    }
+        	    
+        	    return $result;
+        	}
+        	
+        	/**
+        	 * calcule la complexité des tags
+        	 *
+        	 * @param  string          $ids
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getComplexTag($ids=""){        	    
+        	    
+        	    $result = array("idBase"=>$this->idBase,"type"=>"concept","ids"=>$ids,"sumNb"=>0,"numNiv"=>0,"sumNiv"=>0,"sumComplex"=>0,"details"=>array());
+        	    if($ids == "-1") return $result;
+        	    
+        	    if ($ids) $w = " WHERE t.tag_id IN (".$ids.") ";        	    
+        	    else $w = "";
+        	    
+        	    $sql = "SELECT 
+                    count(distinct te.tag_id) nb,
+                	te.niveau + 1 - t.niveau niv,
+                    count(distinct te.tag_id)*(te.niveau + 1 - t.niveau) complexite
+                
+                FROM
+                    flux_tag t
+                        INNER JOIN
+                    flux_tag te ON te.lft between t.lft and t.rgt
+                ".$w."
+                group by te.niveau + 1 - t.niveau";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    //calcul les sommes
+        	    foreach ($arr as $r) {
+        	        $result["sumNb"] += $r["nb"];
+        	        $result["sumNiv"] += $r["niv"];
+        	        $result["sumComplex"] += $r["complexite"];
+        	        if($result["numNiv"] < $r["niv"]) $result["numNiv"]=$r["niv"];
+        	        $result["details"][] = $r;
+        	    }
+        	    
+        	    return $result;
+        	}
+        	
+        	/**
+        	 * calcule la complexité des acteurs - personne = exi
+        	 *
+        	 * @param  string          $ids
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getComplexActeurPersonne($ids=""){        	    
+        	    
+        	    $result = array("idBase"=>$this->idBase,"type"=>"acteur-personne","ids"=>$ids,"sumNb"=>0,"numNiv"=>0,"sumNiv"=>0,"sumComplex"=>0,"details"=>array());
+        	    if($ids == "-1") return $result;
+        	    
+        	    if ($ids) $w = " WHERE e.exi_id IN (".$ids.") ";
+        	    else $w = "";
+        	    //ATTENTION les exi anciens sont mal géré au niveau lft rgt
+        	    $sql = "SELECT 
+                    count(distinct ee.exi_id) nb,
+                	ee.niveau + 1 - e.niveau niv,
+                    count(distinct ee.exi_id)*(ee.niveau + 1 - e.niveau) complexite
+                
+                FROM
+                    flux_exi e
+                        INNER JOIN
+                    -- flux_exi ee ON ee.lft BETWEEN e.lft AND e.rgt
+                    flux_exi ee ON ee.exi_id = e.exi_id
+                ".$w."
+                    group by ee.niveau + 1 - e.niveau";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    //calcul les sommes
+        	    foreach ($arr as $r) {
+        	        $result["sumNb"] += $r["nb"];
+        	        $result["sumNiv"] += $r["niv"];
+        	        $result["sumComplex"] += $r["complexite"];
+        	        if($result["numNiv"] < $r["niv"]) $result["numNiv"]=$r["niv"];
+        	        $result["details"][] = $r;
+        	    }
+        	    
+        	    return $result;
+        	}
+        	
+        	/**
+        	 * calcule la complexité des acteurs - geo
+        	 *
+        	 * @param  string          $ids
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getComplexActeurGeo($ids=""){        	    
+        	    
+        	    $result = array("idBase"=>$this->idBase,"type"=>"acteur-geo","ids"=>$ids,"sumNb"=>0,"numNiv"=>0,"sumNiv"=>0,"sumComplex"=>0,"details"=>array());
+        	    if($ids == "-1") return $result;
+        	    
+        	    if ($ids) $w = " WHERE g.geo_id IN (".$ids.") ";
+        	    else $w = "";
+        	    
+        	    $sql = "SELECT 
+                    count(distinct g.geo_id) nb,
+                    	1 niv,
+                    count(distinct g.geo_id)*1 complexite
+                
+                FROM
+                    flux_geo g
+                ".$w." ";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    //calcul les sommes
+        	    foreach ($arr as $r) {
+        	        $result["sumNb"] += $r["nb"];
+        	        $result["sumNiv"] += $r["niv"];
+        	        $result["sumComplex"] += $r["complexite"];
+        	        if($result["numNiv"] < $r["niv"]) $result["numNiv"]=$r["niv"];
+        	        $result["details"][] = $r;
+        	    }
+        	    
+        	    return $result;
+        	}
+        	
+        	/**
+        	 * calcule la complexité des acteurs - algo
+        	 *
+        	 * @param  string          $ids
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getComplexActeurAlgo($ids=""){        	    
+        	    
+        	    $result = array("idBase"=>$this->idBase,"type"=>"acteur-algo","ids"=>$ids,"sumNb"=>0,"numNiv"=>0,"sumNiv"=>0,"sumComplex"=>0,"details"=>array()
+        	        ,"sumNbRapport"=>0,"sumSrc"=>0,"sumPre"=>0,"sumDst"=>0,"sumComplexRapport"=>0
+        	    );
+        	    if($ids == "-1") return $result;
+        	    
+        	    if ($ids) $w = " WHERE m.monade_id IN (".$ids.") ";
+        	    else $w = "";
+        	    
+        	    $sql = "SELECT 
+                    COUNT(DISTINCT m.monade_id) nb,
+                    1 niv,
+                    COUNT(DISTINCT m.monade_id) * 1 complexite,
+                    CONCAT(r.src_obj,
+                            '-',
+                            r.dst_obj,
+                            '-',
+                            r.pre_obj) obj,
+                    COUNT(DISTINCT r.rapport_id) nbRapport,
+                    COUNT(DISTINCT r.src_id) nbSrc,
+                    COUNT(DISTINCT r.dst_id) nbDst,
+                    COUNT(DISTINCT r.pre_id) nbPre,
+                    COUNT(DISTINCT r.rapport_id) + COUNT(DISTINCT r.src_id) + COUNT(DISTINCT r.dst_id) + COUNT(DISTINCT r.pre_id) complexiteRapport
+                FROM
+                    flux_monade m
+                        INNER JOIN
+                    flux_rapport r ON r.monade_id = m.monade_id
+                ".$w." 
+                    GROUP BY m.monade_id , CONCAT(r.src_obj,
+                        '-',
+                        r.dst_obj,
+                        '-',
+                        r.pre_obj)";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    //calcul les sommes
+        	    foreach ($arr as $r) {
+        	        $result["sumNb"] += $r["nb"];
+        	        $result["sumNiv"] += $r["niv"];
+        	        $result["sumComplex"] += $r["complexite"];
+        	        if($result["numNiv"] < $r["niv"]) $result["numNiv"]=$r["niv"];        	        
+        	        $result["sumNbRapport"] += $r["nbRapport"];
+        	        $result["sumSrc"] += $r["nbSrc"];
+        	        $result["sumDst"] += $r["nbDst"];
+        	        $result["sumPre"] += $r["nbPre"];
+        	        $result["sumComplexRapport"] += $r["complexiteRapport"];
+        	        $obj = explode("-", $r["obj"]);
+        	        $r["typeSrc"]=$obj[0];
+        	        $r["typeDst"]=$obj[1];
+        	        $r["typePre"]=$obj[2];        	        
+        	        $result["details"][] = $r;
+        	    }
+        	    
+        	    return $result;
+        	}
+        	/**
+        	 * calcule la complexité des rapport
+        	 *
+        	 * @param  string          $ids
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function getComplexRapport($ids=""){        	    
+        	    
+        	    $result = array("idBase"=>$this->idBase,"type"=>"rapport","ids"=>$ids,"sumNb"=>0,"sumSrc"=>0,"sumPre"=>0,"sumDst"=>0,"sumComplex"=>0,"details"=>array());
+        	    if($ids == "-1") return $result;
+        	    
+        	    if ($ids) $w = " WHERE r.rapport_id IN (".$ids.") ";
+        	    else $w = "";
+        	    
+        	    $sql = "SELECT 
+                    CONCAT(r.src_obj,
+                            '-',
+                            r.dst_obj,
+                            '-',
+                            r.pre_obj) obj,
+                    COUNT(DISTINCT r.rapport_id) nbRapport,
+                    COUNT(DISTINCT r.src_id) nbSrc,
+                    COUNT(DISTINCT r.dst_id) nbDst,
+                    COUNT(DISTINCT r.pre_id) nbPre,
+                    COUNT(DISTINCT r.rapport_id)+COUNT(DISTINCT r.src_id)+COUNT(DISTINCT r.dst_id)+COUNT(DISTINCT r.pre_id) complexite
+                FROM
+                    flux_rapport r
+                ".$w."
+                GROUP BY CONCAT(r.src_obj,
+                        '-',
+                        r.dst_obj,
+                        '-',
+                        r.pre_obj)";
+        	    $this->trace($sql);
+        	    $arr = $this->dbD->exeQuery($sql);
+        	    
+        	    //calcul les sommes
+        	    foreach ($arr as $r) {
+        	        $result["sumNb"] += $r["nbRapport"];
+        	        $result["sumSrc"] += $r["nbSrc"];
+        	        $result["sumDst"] += $r["nbDst"];
+        	        $result["sumPre"] += $r["nbPre"];
+        	        $result["sumComplex"] += $r["complexite"];
+        	        $obj = explode("-", $r["obj"]);
+        	        $r["typeSrc"]=$obj[0];
+        	        $r["typeDst"]=$obj[1];
+        	        $r["typePre"]=$obj[2];
+        	        
+        	        $result["details"][] = $r;        	        
+        	    }
+        	    $result["numNiv"]=count($arr);
+        	    
+        	    return $result;
+        	}
+        	
         	
         	/**
         	 * récupère les acteurs pour un contexte documentaire

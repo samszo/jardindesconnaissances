@@ -23,15 +23,6 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     protected $_primary = 'doc_id';
 
-    /*version 0
-	protected $_dependentTables = array(
-		'Model_DbTable_Flux_UtiDoc'
-		,'Model_DbTable_Flux_TagDoc'
-		,'Model_DbTable_Flux_UtiTagDoc'
-		,'Model_DbTable_Flux_ExiTagDoc'
-		,'Model_DbTable_Flux_Rapport'
-		);
-    */    
 	protected $_dependentTables = array(
 		'Model_DbTable_Flux_Rapport'
 		);
@@ -130,6 +121,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     public function updateHierarchie($data){
     	
+        $arr = [];
     		if(isset($data["parent"])){
     		    //récupère les information du parent
     		    $arrP = $this->findBydoc_id($data["parent"]);
@@ -142,7 +134,7 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     		    $stmt = $this->_db->query($sql);
     		    $arrP = $stmt->fetch();
     		    //si la table est vide
-    		    if(!$arrP['lft'])!$arrP['lft']=0;
+    		    if(!$arrP['lft'])!$arrP['lft']=1;
     		}
     		
     		//gestion des hiérarchies gauche droite
@@ -326,15 +318,19 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      * et retourne cette entrée.
      *
      * @param varchar $url
+     * @param boolean $like
+     * 
      */
-    public function findByUrl($url)
+    public function findByUrl($url,$like=false)
     {
         $query = $this->select()
-                    ->from( array("f" => "flux_doc") )                           
-                    ->where( "f.url = ?", $url );
+                    ->from( array("f" => "flux_doc") );                           
+        if($like)$query->where( "f.url LIKE ?","%".$url."%");
+        else $query->where( "f.url = ?", $url );
 
 		$arr = $this->fetchAll($query)->toArray();
-        return $arr[0]; 
+		if(count($arr)) return $arr[0]; 
+		else return null;
     }
     /**
      * Recherche une entrée flux_doc avec la valeur spécifiée
@@ -762,12 +758,30 @@ WHERE d.titre = 'axesEval'
                 'enf.lft BETWEEN d.lft AND d.rgt',array('titre', 'doc_id', 'url', 'niveau', 'parent'))
             ->where( "d.doc_id = ?", $idDoc)
            	->order("enf.".$order);        
-        $result = $this->fetchAll($query);
-        return $result->toArray(); 
+        return $this->fetchAll($query)->toArray();
     }    
+        
+    /**
+     * Recherche une entrée avec la valeur spécifiée
+     * et retourne la liste de tous ses enfants
+     *
+     * @param integer $idDoc
+     * @param string $order
+     * @return array
+     */
+    public function getFullParent($idDoc, $order="niveau")
+    {
+        $query = $this->select()
+        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+        ->from(array('e' => 'flux_doc'),array())
+        ->joinInner(array('p' => 'flux_doc'),
+            'e.lft BETWEEN p.lft AND p.rgt',array('titre', 'doc_id', 'url', 'niveau', 'parent'))
+            ->where( "e.doc_id = ?", $idDoc)
+            ->order("p.".$order);
+            return $this->fetchAll($query)->toArray();
+    }
     
-    
-     /**
+    /**
      * Copie un document et tous ses enfants
      *
      * @param integer $idDoc

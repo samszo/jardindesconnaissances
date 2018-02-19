@@ -168,21 +168,21 @@ class Flux_Site{
     /**
      * retourne une connexion à une base de donnée suivant son nom
     * @param string $idBase
-    * @return Zend_Db_Table
+    * @return Zend_Db_Adapter_Pdo_Mysql
     */
     public function getDb($idBase){
     	
  		$db = Zend_Db_Table::getDefaultAdapter();
-    	if($idBase){
-    		//change la connexion à la base
-    		$arr = $db->getConfig();
-			$arr['dbname']=$idBase;
-			$db = Zend_Db::factory('PDO_MYSQL', $arr);	
-    	}
-      	
-    	$this->db = $db;
-    	$this->idBase = $idBase;
-    	return $db;
+        	if($idBase){
+        		//change la connexion à la base
+        		$arr = $db->getConfig();
+    			$arr['dbname']=$idBase;
+    			$db = Zend_Db::factory('PDO_MYSQL', $arr);	
+        	}
+          	
+        	$this->db = $db;
+        	$this->idBase = $idBase;
+        	return $db;
     }
     
     /**
@@ -190,7 +190,7 @@ class Flux_Site{
      *
      */
     function initDbTables(){
-    		$this->trace("DEBUT ".__METHOD__);
+    		$this->trace("DEBUT ".__METHOD__." : ".$this->idBase);
     	 	/*construction des objets*/
 	    	if(!$this->dbD){
 	    	    $this->dbD = new Model_DbTable_Flux_Doc($this->db);

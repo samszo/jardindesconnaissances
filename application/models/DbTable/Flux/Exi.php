@@ -81,6 +81,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
      */
     public function updateHierarchie($data){
     	
+        $arr = [];
     		if(isset($data["parent"])){
     		    //récupère les information du parent
     		    $arrP = $this->findByexi_id($data["parent"]);
@@ -93,7 +94,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     		    $stmt = $this->_db->query($sql);
     		    $arrP = $stmt->fetch();
     		    //si la table est vide
-    		    if(!$arrP['lft'])!$arrP['lft']=0;
+    		    if(!$arrP['lft'])!$arrP['lft']=1;
     		}
     		
     		//gestion des hiérarchies gauche droite

@@ -89,7 +89,8 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
      */
     public function updateHierarchie($data){
     	
-    		if(isset($data["parent"])){
+        $arr = [];
+        if(isset($data["parent"])){
     		    //récupère les information du parent
     		    $arrP = $this->findBytag_id($data["parent"]);
     		    //récupère les information des enfants
@@ -101,7 +102,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
     		    $stmt = $this->_db->query($sql);
     		    $arrP = $stmt->fetch();
     		    //si la table est vide
-    		    if(!$arrP['lft'])!$arrP['lft']=0;
+    		    if(!$arrP['lft'])!$arrP['lft']=1;
     		}
     		
     		//gestion des hiérarchies gauche droite

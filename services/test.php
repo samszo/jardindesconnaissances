@@ -1,4 +1,6 @@
 <?php
+//use function GuzzleHttp\json_encode;
+
 require_once( "../application/configs/config.php" );
 
 
@@ -7,7 +9,7 @@ try {
 	$s = new Flux_Site(false);
 	$s->bTrace = true;
 	$s->trace("DEBUT TEST");		
-	$s->bTraceFlush = true;
+	$s->bTraceFlush = $s->bTrace;
 	
 	$user = "luckysemiosis";
 	$pwd = "samszo";
@@ -649,7 +651,7 @@ try {
 	$b = $rs->all('<http://dbpedia.org/ontology/abstract>');
 	*/
 	
-	$eu = new Flux_Eu("flux_eu_privacy",true);
+	//$eu = new Flux_Eu("flux_eu_privacy",true);
 	//éthique robotique $eu->setDossierObsLegi("2015/2103(INL)");
 	//marché objet connecté $eu->setDossierObsLegi("2012/0283(COD)");
 	//Respect for private life and the protection of personal data in electronic communications
@@ -668,15 +670,22 @@ try {
 	*/
 	
 	//
-	$an = new Flux_An('flux_valarnum','omk_valarnum1',$s->bTrace);
+	$an = new Flux_An('flux_valarnum_prod1_1','omk_valarnum1',$s->bTrace);
 	$an->bTraceFlush = $s->bTraceFlush;
-	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";
-	$url = "http://localhost/jdc/data/an/inventairesdesarchivesnationales/FRAN_IR_055457.xml";	
-	$url = "http://localhost/jdc/data/an/FRAN_IR_054722.xml";
 	
+	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";//Coty & co
+	$url = "http://localhost/jdc/data/an/FRAN_IR_055457.xml";	//Pompidou
+	$url = "http://localhost/jdc/data/an/FRAN_IR_054722.xml";//DE gaulle
+	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";//Coty & co
 	//$an->sauveXmlEad($url);
-	$an->idOwner = 2;
-	$an->owner = "communication.archives-nationales@culture.gouv.fr";	
+	//$an->sauvePhotosAbscentes();
+	//$complex = $an->getComplexEcosystem(0,524);
+	//$an->migreAnalyseGooglePhotoMC('flux_valarnum', 'flux_valarnum_prod1_1');
+	$an->actualiseAnalyseGoogle();
+	//echo json_encode($an->getTreemapPhoto(3));
+	
+	//$an->idOwner = 2;
+	//$an->owner = "communication.archives-nationales@culture.gouv.fr";	
 	//$an->getCsvToOmeka("/Library/WebServer/Documents/jdc/data/AN/importDeGaulle.csv");
 	
 	//$an->setItemSetFromTag();
@@ -684,11 +693,13 @@ try {
 	//$an->setItemSetFromGeo();
 	//$an->setItemSetFromDocRoot(3);
 	//$an->getAnalyseGoogle();
-	//$an->getAnalyseGoogle("titre", "titre photo");
+	//$an->getAnalyseGoogle("titre");
 	//$an->getAnalyseGoogle("titre", "last import");
 	
+	//$an->getMC();
+	
 	//$an->getAnalyseGooglePhoto();
-	$an->sauveJson("/Library/WebServer/Documents/jdc/data/AN/getPhotosTot1.json", $an->getPhotosDatas());
+	//$an->sauveJson("/Library/WebServer/Documents/jdc/data/AN/getPhotosTotProd.json", $an->getPhotosDatas());
 	//$an->exploseGoogleVisage();
 	/*
 	 $an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/'

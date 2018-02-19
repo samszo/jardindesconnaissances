@@ -524,6 +524,43 @@ class FluxController extends Zend_Controller_Action {
         $an->bTraceFlush = $an->bTrace;
         $an->trace("DEBUT ".__METHOD__);        
         switch ($this->_getParam('q')) {
+            case "compareComplexEcosystemUrl":
+                $idsBase = $this->_getParam('idsBase');
+                $rs = array();
+                foreach ($idsBase as $idBase) {
+                    $an = new Flux_An($idBase,false,$this->_getParam('trace'));
+                    //récupère l'identifiant du document
+                    $dbD = new Model_DbTable_Flux_Doc($an->db);
+                    $doc = $dbD->findByUrl($this->_getParam('url'),true);
+                    if($doc){
+                        $data = $an->getComplexEcosystem($doc['doc_id']
+                            ,$this->_getParam('idTag'),$this->_getParam('idExi')
+                            , $this->_getParam('idGeo'), $this->_getParam('idMonade'), $this->_getParam('idRapport'), $this->_getParam('cache',true));
+                        $rs = array_merge($rs, $data["details"]);
+                    }
+                }
+                $this->view->content = json_encode($rs);
+                break;
+            case "compareComplexEcosystem":
+                $idsBase = $this->_getParam('idsBase');
+                $rs = array();
+                foreach ($idsBase as $idBase) {
+                    $an = new Flux_An($idBase,false,$this->_getParam('trace'));
+                    $data = $an->getComplexEcosystem($this->_getParam('idDoc'),$this->_getParam('idTag'),$this->_getParam('idExi')
+                        , $this->_getParam('idGeo'), $this->_getParam('idMonade'), $this->_getParam('idRapport'), $this->_getParam('cache',true));
+                    $rs = array_merge($rs, $data["details"]);
+                }
+                $this->view->content = json_encode($rs);
+                break;
+            case "getComplexEcosystem":
+                $data = $an->getComplexEcosystem($this->_getParam('idDoc'),$this->_getParam('idTag'),$this->_getParam('idExi')
+                , $this->_getParam('idGeo'), $this->_getParam('idMonade'), $this->_getParam('idRapport'),  $this->_getParam('cache',true));
+                $this->view->content = json_encode($data);
+                break;
+            case "getTreemapPhoto":
+                $data = $an->getTreemapPhoto($this->_getParam('idDoc'));
+                $this->view->content = json_encode($data);
+                break;
             case "getActeursContexte":
                 $data = $an->getActeursContexte($this->_getParam('idDoc'),false,$this->_getParam('idTheme'),$this->_getParam('idVisage'));
                 $this->view->content = json_encode($data);

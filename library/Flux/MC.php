@@ -27,12 +27,13 @@ class Flux_MC extends Flux_Site{
     {
     		parent::__construct($idBase, $bTrace);    	
 
-    		//on récupère la racine des documents
-		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);	    	
-		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);	    	
-		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+    		//initialise les gestionnaires de base de données
+    		$this->initDbTables();
+    		
+    		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
 		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
-
+		$this->idTagRoot = $this->dbT->ajouter(array("titre"=>__CLASS__));
+		
 	}
     
     
@@ -391,37 +392,39 @@ class Flux_MC extends Flux_Site{
      * Sauvegarde d'un tag
      *
      * @param string/array 	$tag
-     * @param integer 		$idRap = identifiant du rapport
+     * @param integer 		$idDoc = identifiant du doc
      * @param integer 		$poids = poids de la relation
+     * @param string 		$methode = methode d'extraction
      *   
      * @return integer
      */
-	function save($tag, $idRap, $poids){
+	function save($tag, $idDoc, $poids, $methode){
 
 		//$this->trace(__METHOD__." DEBUT $tag, $idRap, $poids");
 		
-		//initialise les gestionnaires de base de données
-		$this->initDbTables();
 		//récupère l'action
-		$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+	    $idAct = $this->dbA->ajouter(array("code"=>__METHOD__.$methode));
 				
 		//on ajoute le tag
-		if(is_array($tag))
+		if(is_array($tag)){
+		    if(!isset($tag["parent"]))$tag["parent"]=$this->idTagRoot;
 			$idT = $this->dbT->ajouter($tag);
-		else
-			$idT = $this->dbT->ajouter(array("code"=>$tag));
+		}else
+			$idT = $this->dbT->ajouter(array("code"=>$tag,"parent"=>$this->idTagRoot));
 
 		//$this->trace(__METHOD__." enregistre le rapport");
-				
-		$idRapTag = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-			,"src_id"=>$idRap,"src_obj"=>"rapport"
-			,"pre_id"=>$idAct,"pre_obj"=>"acti"
-			,"dst_id"=>$idT,"dst_obj"=>"tag"
-			,"valeur"=>$poids
-			));					
-			
+		if(!is_array($idDoc))$idDoc = array($idDoc);
+		foreach ($idDoc as $id) {
+		    $idRapTag = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+		        ,"src_id"=>$id,"src_obj"=>"rapport"
+		        ,"pre_id"=>$idAct,"pre_obj"=>"acti"
+		        ,"dst_id"=>$idT,"dst_obj"=>"tag"
+		        ,"valeur"=>$poids
+		    ));
+		}	
+		
 		//$this->trace(__METHOD__." FIN");
-		return array("idTag"=>$idT,"idRap"=>$idRapTag);
+		return $idT;
 	}
 	
 	/**
@@ -452,32 +455,24 @@ class Flux_MC extends Flux_Site{
     /**
      * enregistre les mots clefs d'une chaine
      *
-     * @param int $idDoc
+     * @param int/array $idDoc
      * @param string $texte
      * @param string $html
      * @param string $class
-     * @param int $idRap
      *   
      * @return array
      */
-	function saveForChaine($idDoc, $texte, $html="", $class="all", $idRap=0){
+	function saveForChaine($idDoc, $texte, $html="", $class="all"){
 		
 		//$this->trace(__METHOD__." DEBUT :".$class." -> ".$idDoc);
 		
 		//initialise les gestionnaires de base de données
 		$this->initDbTables();
-		//récupère l'action
-		$idAct = $this->dbA->ajouter(array("code"=>__METHOD__."_".$class));
-		//enregistre le rapport entre le document et l'action
-		$this->idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-			,"src_id"=>$idRap,"src_obj"=>"rapport"
-			,"dst_id"=>$idDoc,"dst_obj"=>"doc"
-			,"pre_id"=>$idAct,"pre_obj"=>"acti"
-		));
+
 		if(!$this->bConnect)$class=="autokeyword";
 		if($class=="all"){
 			foreach ($this->kwe as $c) {
-				$result[$c] = $this->saveForChaine($idDoc, $texte, $html, $c, $idRap);
+				$result[$c] = $this->saveForChaine($idDoc, $texte, $html, $c);
 			}
 			//$this->trace(__METHOD__." FIN");
 			return $result;
@@ -496,19 +491,19 @@ class Flux_MC extends Flux_Site{
 			switch ($class) {
 				case "autokeyword":
 					foreach ($arrKW as $kw=>$nb){
-						$this->save($kw, $this->idRap, $nb);
+					    $this->save($kw, $idDoc, $nb, $class);
 						$i++;	    			
 				   	}
 					break;
 				case "alchemy":
 					if($arrKW->status=="OK"){
 						foreach ($arrKW->keywords as $kw){
-							$idT = $this->saveTag($kw->text, $idDoc, $kw->relevance, $d->get("c"), $idUdst);
+						    $idT = $this->save($kw->text, $idDoc, $kw->relevance, $class);
 							//enregistre le sentiment
 							if($kw->sentiment){
 								$poids=1;
 								if(isset($kw->sentiment->score))$poids=$kw->sentiment->score;
-								$this->saveTagTag("", $kw->sentiment->type, $poids, $d->get("c"), $idDoc, $idT, -1, $idUdst);								
+								$this->save(array("code"=>$kw->sentiment->type,"parent"=>$idT), $idDoc, $poids, $class);								
 							}
 							$i++;	    			
 					   	}

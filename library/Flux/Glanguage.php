@@ -44,6 +44,8 @@ class Flux_Glanguage extends Flux_Site{
     		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
     		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
     		
+    		$this->idTagSent = $this->dbT->ajouter(array('code'=>'sentiment','parent'=>$this->idTagRoot));
+    		$this->idTagSyntaxe = $this->dbT->ajouter(array('code'=>'syntaxe','parent'=>$this->idTagRoot));
     		
     		$this->config = [
     		    'projectId' => GOOGLE_PROJECT_ID,
@@ -302,11 +304,12 @@ class Flux_Glanguage extends Flux_Site{
      * @param  	string 		$text
      * @param  	int     		$idDoc
      * @param  	array 		$types
+     * @param  	array 		$ids
      *
      * @return	array
      *
      */
-    function sauveAnalyseTexte($text, $idDoc, $types=['analyzeEntities']){
+    function sauveAnalyseTexte($text, $idDoc, $types=['analyzeEntities'], $ids=false){
 
         $this->trace(__METHOD__." ".$text." ".$idDoc,$types);
                 
@@ -334,8 +337,13 @@ class Flux_Glanguage extends Flux_Site{
         }
         
         //création du document d'analyse
-        $rs = $this->dbD->ajouter(array("parent"=>$idDoc,"titre"=>__METHOD__,"note"=>json_encode($arrReponse)),true, true);
-        
+        if(!$ids){
+            $rs[] = $this->dbD->ajouter(array("parent"=>$idDoc,"titre"=>__METHOD__,"note"=>json_encode($arrReponse)),true, true);
+        }else{
+            foreach ($ids as $idDoc) {
+                $rs[] = $this->dbD->ajouter(array("parent"=>$idDoc,"titre"=>__METHOD__,"note"=>json_encode($arrReponse)),true, true);
+            }
+        }
         return $rs;
     }
         

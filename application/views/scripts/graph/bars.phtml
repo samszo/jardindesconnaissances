@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title><?php echo $this->titre; ?></title>
+  	<script type="text/javascript" src="../js/d3.v3.min.js"></script>
+	<script type="text/javascript" src="../js/dimple.v2.1.0.min.js"></script>
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/w2ui.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="../css/w2ui.css" />
+      
+  <style>
+    body { margin:0 auto;}
+    h1,h2,p {
+      margin:0px;
+    }
+    svg {
+	  margin-left:auto; margin-right:auto; display:block;
+    }
+    
+    .axis {
+	  font: 10px sans-serif;
+		}
+    
+    .axis path,
+	  .axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+    .tooltip {
+	  position: absolute;
+	  width: 300px;
+	  height: 35px;
+	  pointer-events: none;
+	}
+    #legende {
+        padding:30px;
+    }
+  </style>
+  </head>
+  
+  <body >
+  <div id='titresViz'>
+	  <h1 align="center"><?php echo $this->titre;?></h1>
+	  <h2 align="center"><?php echo $this->soustitre;?></h2>
+	  <div id="legende"></div>
+  </div>
+  <p align="center" id="chartContainer">
+  </p>
+  
+  <script type="text/javascript">
+
+	//affiche le message de chargement
+  w2popup.open({
+      width: 500,
+      height: 300,
+      title: 'Chargement des données',
+      body: '<div class="w2ui-centered"></div>',
+      showMax: false,
+      showClose: false
+  });
+	w2popup.lock("Merci de patienter...", true);	
+	var urlData = '<?php echo $this->urlData;?>', legData=[];
+	var divTitreHeight = document.getElementById('titresViz').clientHeight;	
+	var margin = {top: 20, right: 30, bottom: 30, left: 30};
+	var width = window.innerWidth - margin.left - margin.right;
+	var height = window.innerHeight - margin.top - margin.bottom - divTitreHeight;
+
+  
+    var svg = dimple.newSvg("#chartContainer", width, height);
+    //d3.tsv("../data/example_data.tsv", function (data) {
+    var urlData = '<?php echo $this->urlData;?>';
+    d3.json(urlData, function (data) {    
+      var myChart = new dimple.chart(svg, data);
+      myChart.setBounds(60, 30, 780, 505)
+      var x = myChart.addCategoryAxis("x", "<?php echo $this->catX;?>");
+      //x.addOrderRule("Date");
+      myChart.addMeasureAxis("y", "<?php echo $this->catY;?>");
+      myChart.addSeries("<?php echo $this->serie;?>", dimple.plot.bar);
+      myChart.addLegend(60, 10, 780, 20, "left");
+
+      myChart.defaultColors = [
+    	  	new dimple.color("#3366cc"),
+    	  	new dimple.color("#dc3912"),
+    	  	new dimple.color("#ff9900"),
+    	  	new dimple.color("#109618"),
+    	  	new dimple.color("#990099"),
+    	  	new dimple.color("#0099c6"),
+    	  	new dimple.color("#dd4477"),
+    	  	new dimple.color("#66aa00"),
+    	  	new dimple.color("#b82e2e"),
+    	  	new dimple.color("#316395"),
+    	  	new dimple.color("#994499"),
+    	  	new dimple.color("#22aa99"),
+    	  	new dimple.color("#aaaa11"),
+    	  	new dimple.color("#6633cc"),
+    	  	new dimple.color("#e67300"),
+    	  	new dimple.color("#8b0707"),
+    	  	new dimple.color("#651067"),
+    	  	new dimple.color("#329262"),
+    	  	new dimple.color("#5574a6"),
+    	  	new dimple.color("#3b3eac"),
+	    	]; 
+      myChart.draw();
+
+      //supprime le message de chargement	
+      w2popup.unlock();
+      w2popup.close();
+      
+    });
+  </script>
+</div>
+				
+	</body>
+</html>

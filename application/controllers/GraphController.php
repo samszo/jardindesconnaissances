@@ -78,6 +78,7 @@ class GraphController extends Zend_Controller_Action {
 
     public function tagcloudAction()
     {
+        //column[@name='an']
 	    $request = $this->getRequest();
 		$url = $request->getRequestUri();
 		$arrUrl = explode("?",$url);
@@ -270,6 +271,24 @@ class GraphController extends Zend_Controller_Action {
     	
     }
 
+    public function barsAction(){
+        switch ($this->_getParam('q','compareEco')) {
+            case 'compareUrl':
+                //../flux/an?q=compareComplexEcosystemUrl&idsBase[]=flux_valarnum&idsBase[]=flux_valarnum_prod&idsBase[]=flux_valarnum_prod1&idsBase[]=flux_valarnum_prod1_1&url=http://www.siv.archives-nationales.culture.gouv.fr/mm/media/download/FRAN_0133_0027_L-medium.jpg
+                $url = urldecode($this->_getParam('url', 'http%3A%2F%2Fwww.siv.archives-nationales.culture.gouv.fr%2Fmm%2Fmedia%2Fdownload%2FFRAN_0133_0027_L-medium.jpg'));
+                $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fflux%2Fan%3Fq%3DcompareComplexEcosystemUrl%26idsBase%5B%5D%3Dflux_valarnum%26idsBase%5B%5D%3Dflux_valarnum_prod%26idsBase%5B%5D%3Dflux_valarnum_prod1%26idsBase%5B%5D%3Dflux_valarnum_prod1_1%26url%3D".$url));
+                break;
+            case 'compareEco':
+                //../flux/an?q=compareComplexEcosystem&idsBase[]=flux_valarnum&idsBase[]=flux_valarnum_prod&idsBase[]=flux_valarnum_prod1&idsBase[]=flux_valarnum_prod1_1
+                $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fflux%2Fan%3Fq%3DcompareComplexEcosystem%26idsBase%5B%5D%3Dflux_valarnum%26idsBase%5B%5D%3Dflux_valarnum_prod%26idsBase%5B%5D%3Dflux_valarnum_prod1%26idsBase%5B%5D%3Dflux_valarnum_prod1_1"));
+                break;
+        }
+        $this->view->catX =  $this->_getParam('catX', "idBase");
+        $this->view->catY =  $this->_getParam('catY', "sumComplex");
+        $this->view->serie =  $this->_getParam('serie', "type");
+        
+    }
+    
     public function radarAction(){
 
     		$dt = '[]';
@@ -513,6 +532,20 @@ class GraphController extends Zend_Controller_Action {
     	 
     }
     
+    public function treemapAction(){
+        $this->view->titre =  $this->_getParam('titre', "Tree Map");
+        $this->view->soustitre =  $this->_getParam('soustitre', "Fragmenter les documents");
+        $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fdata%2Fflare.json"));
+        switch ($this->_getParam('type')) {
+            case "valarnum":
+                $this->view->titre =  "Valorisation des archives numériques";
+                $this->view->soustitre =  "Répartition des séries";
+                $this->view->urlData = "../flux/an?q=getTreemapPhoto&idBase=".$this->_getParam('idBase', 'flux_valarnum_prod')."&idDoc=".$this->_getParam('idDoc', 3);
+                break;
+        }
+        
+    }
+    
     public function imagegridAction(){
     
     }
@@ -538,11 +571,12 @@ class GraphController extends Zend_Controller_Action {
     
     public function multilignesAction(){
     	
-    		/*pour les performance diigo
+    		//pour les performance diigo
     		$url ="../flux/diigo?q=performance&csv=1&deb=2017-01-01&fin=2017-31-01";
     		$this->view->formatTemps =  "%Y-%m-%d %H:%M:%S";
     		$this->view->champTemps =  "temps";
-    		//pour l'historique complet d'un tag
+    		
+    		/*pour l'historique complet d'un tag
     		$url ="../flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&for=multiligne&csv=1&tags[]=27";
     		$this->view->formatTemps =  "%Y-%m-%d";
     		$this->view->champTemps =  "DateTimeId";
@@ -554,10 +588,10 @@ class GraphController extends Zend_Controller_Action {
     		$url ="../flux/diigo?q=getStatutUrl&csv=1";//&statuts[]=404&statuts[]=200";
     		$this->view->formatTemps =  "%Y";
     		$this->view->champTemps =  "DateTimeId";
-    		*/
 
 	    	$this->view->formatTemps =  $this->_getParam('formatTemps', "%Y-%m-%d %H:%M:%S");
 	    	$this->view->champTemps =  $this->_getParam('champTemps', "temps");;
+    		*/
     	 
     		$this->view->urlData =  urldecode($this->_getParam('urlData', $url));
     
