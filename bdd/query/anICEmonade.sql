@@ -16,6 +16,7 @@ FROM
     flux_monade m
         INNER JOIN
     flux_rapport r ON r.monade_id = m.monade_id
+WHERE m.monade_id IN (1,3,4) 
 GROUP BY m.monade_id , CONCAT(r.src_obj,
         '-',
         r.dst_obj,

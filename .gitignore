@@ -421,3 +421,4 @@ bdd/flux_valarnum_prod1_6.sql
 bdd/flux_valarnum_visage.sql
 data/critiquesdart/Notices_critiques.csv
 data/critiquesdart/resultats_articles_revues.json
+bdd/query/angetPhotosDatas.sql

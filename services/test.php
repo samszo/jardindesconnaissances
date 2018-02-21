@@ -681,7 +681,7 @@ try {
 	//$an->sauvePhotosAbscentes();
 	//$complex = $an->getComplexEcosystem(0,524);
 	//$an->migreAnalyseGooglePhotoMC('flux_valarnum', 'flux_valarnum_prod1_1');
-	$an->actualiseAnalyseGoogle();
+	//$an->actualiseAnalyseGoogle();
 	//echo json_encode($an->getTreemapPhoto(3));
 	
 	//$an->idOwner = 2;
@@ -699,7 +699,7 @@ try {
 	//$an->getMC();
 	
 	//$an->getAnalyseGooglePhoto();
-	//$an->sauveJson("/Library/WebServer/Documents/jdc/data/AN/getPhotosTotProd.json", $an->getPhotosDatas());
+	$an->sauveJson("/Library/WebServer/Documents/jdc/data/AN/getPhotosTotProd1_1.json", $an->getPhotosDatas());
 	//$an->exploseGoogleVisage();
 	/*
 	 $an->getCsvGoogleVisageToOmk('http://gapai.univ-paris8.fr/ValArNum/omks/iiif-img/'

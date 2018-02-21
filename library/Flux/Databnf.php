@@ -332,7 +332,7 @@ ORDER BY ASC (?label_a)
 			} ';	   	
 		$result = $this->query($query);
 		
-		//construction de la réponse
+		//construction de la réponse 
 		$obj = json_decode($result);		
 		/*construction de la réponse pour un affichage réseau
 		 * {"nodes":[{"name":"Agricultural 'waste'"},...],

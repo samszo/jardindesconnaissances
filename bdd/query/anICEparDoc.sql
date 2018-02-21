@@ -40,5 +40,5 @@ FROM
     flux_rapport rP ON rP.pre_id = de.doc_id
         AND rP.pre_obj = 'doc'
 WHERE
-    d.doc_id = 5042
+    d.doc_id = 5978
 ORDER BY de.lft
