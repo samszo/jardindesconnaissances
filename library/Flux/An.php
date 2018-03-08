@@ -1719,6 +1719,7 @@ ORDER BY d.tronc
                         INNER JOIN
                     flux_tag tp ON tp.tag_id = t.parent
                         AND tp.code IN ('webEntities' , 'labelAnnotations')
+                WHERE dp.type = 1
                 ORDER BY dp.doc_id";
         	    $this->trace($sql);
         	    $arr = $dbDocSrc->exeQuery($sql);
