@@ -120,7 +120,6 @@ d3.json(urlData, function(stats) {
 	    .attr("class", "overlay")
 	    .attr("width", w)
 	    .attr("height", h);	
-
 	sankey = d3.sankey()
 		.nodeWidth(15)
 		.nodePadding(10)
@@ -152,17 +151,13 @@ d3.json(urlData, function(stats) {
       .data(stats.nodes)
     .enter().append("g")
       .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+      /*
     .call(d3.behavior.drag()
       .origin(function(d) { return d; })
       .on("dragstart", function() { this.parentNode.appendChild(this); })
       .on("drag", dragmove))
-      .on("click", function(d) {
-    	  			window.location.replace(window.location.pathname+"?idBNF="+d.recid);
-    	  			if(window.parent.setSelectTag){
-    	  				window.parent.setSelectTag({"label":d.name,"value":d.uri,"parent":window.parent.idTagRameau});
-    	  			}        	  			
-          });
+      */
 
   node.append("text")
       .attr("x", -6)
@@ -195,7 +190,13 @@ d3.json(urlData, function(stats) {
 	  .style("fill", function(d) { return d.color = color(d.name.replace(/ .*/, "")); })
 	  .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
 	.append("title")
-	  .text(function(d) { return d.name + " : "+d.uri; });
+	  .text(function(d) { return d.name + " : "+d.uri; })
+	  .on("click", function(d) {
+    	  			window.location.replace(window.location.pathname+"?idBNF="+d.recid);
+    	  			if(window.parent.setSelectTag){
+    	  				window.parent.setSelectTag({"label":d.name,"value":d.uri,"parent":window.parent.idTagRameau});
+    	  			}        	  			
+          });
  
 	//met le graphique au format de l'écran
 	d3.select("svg").transition().duration(2000)

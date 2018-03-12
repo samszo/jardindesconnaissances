@@ -422,3 +422,6 @@ bdd/flux_valarnum_visage.sql
 data/critiquesdart/Notices_critiques.csv
 data/critiquesdart/resultats_articles_revues.json
 bdd/query/angetPhotosDatas.sql
+bdd/flux_eu.sql
+bdd/flux_eu_privacy.sql
+bdd/flux_proverbes_2016-11-28.sql

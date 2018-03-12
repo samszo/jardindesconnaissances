@@ -40,15 +40,15 @@ class Flux_Databnf extends Flux_Site{
     }
 
     /**
-     * Execute une resuète sur databnf
+     * Execute une requète sur databnf
      *
      * @param  	string 	$query
      * @param	boolean	$sru = false
-     * @param	boolean	$cache = false
+     * @param	boolean	$cache = true
      *
      * @return string
      */
-    public function query($query, $sru, $cache=false)
+    public function query($query, $sru=false, $cache=true)
     {
     		$this->trace("DEBUT ".__METHOD__);
     	 	if($sru)
@@ -330,7 +330,11 @@ ORDER BY ASC (?label_a)
 			    skos:prefLabel ?lPrecis.
 			  }
 			} ';	   	
+		$this->trace($query);
+
 		$result = $this->query($query);
+
+		$this->trace("OK");
 		
 		//construction de la réponse 
 		$obj = json_decode($result);		

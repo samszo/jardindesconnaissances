@@ -428,7 +428,6 @@ class GraphController extends Zend_Controller_Action {
 		$this->view->titre =  $this->_getParam('titre', "Roue des émotions");    	
 		
     }   
-
     
     public function emostatAction(){
 		$dt = "[

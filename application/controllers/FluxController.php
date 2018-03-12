@@ -232,7 +232,7 @@ class FluxController extends Zend_Controller_Action {
 
 	public function databnfAction()
     {
-        $bnf = new Flux_Databnf($this->_getParam('idBase'));
+        $bnf = new Flux_Databnf($this->_getParam('idBase'),$this->_getParam('trace'));
 	   	
 	   	switch ($this->_getParam('obj')) {
 	   		case 'term':

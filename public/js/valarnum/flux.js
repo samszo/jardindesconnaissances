@@ -23,6 +23,7 @@ function findActeurGoogle(nom){
 			dtActeurFind = false;
 			if(data){
 		 		dtActeurFind = data.itemListElement.filter(function(d){
+		 			if(!d.result["@type"])return false;
 			 		var types = d.result["@type"].filter(function(t){
 			 			return t=="Person" || t=="Organization";
 			 			});
