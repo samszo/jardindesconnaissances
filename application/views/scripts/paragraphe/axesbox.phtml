@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.box {
+  font: 10px sans-serif;
+}
+
+.box line,
+.box rect,
+.box circle {
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.box .center {
+  stroke-dasharray: 3,3;
+}
+
+.box .outlier {
+  stroke: #ccc;
+}
+
+</style>
+<body>
+<h1 id="titreBox"></h1>
+<h2 id="filtreBoxChamp"></h2>
+<button id="btnStartStop" type="button">STOP</button><button id="btnVide" type="button">VIDE</button>
+<div id="svgBox"></div>
+<h3 id="selectAxe"></h3>
+<div id="commentAxe"></div>
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/d3.box.js"></script>
+<script>
+
+var stop = false, btnStSp = d3.select("#btnStartStop")
+    .on("click",function(){
+        var str;
+        if(stop){
+            str = "STOP";
+            stop = false
+        }else{
+            str = "START";
+            stop = true
+        }
+		d3.select(this).text(str);    	
+    }),
+    btnStSp = d3.select("#btnVide")
+    .on("click",function(){
+		d3.select("#selectAxe").text();    	
+		d3.select("#commentAxe").text();    	
+    });
+
+
+var margin = {top: 10, right: 50, bottom: 20, left: 50},
+    width = 120 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var min = Infinity,
+    max = -Infinity;
+
+var svg, oCSV, nCSV, data = [], labels = [], filtres = [], champFiltre = ['Disciplines scientifiques'], fc=0, fv=0,
+	chart = d3.box()
+        .whiskers(iqr(1.5))
+        .width(width)
+        .height(height),
+    type = '<?php echo $this->type; ?>',
+    filtreC = "<?php echo $this->filtreC; ?>",
+    filtreV = "<?php echo $this->filtreV; ?>",
+    urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRURbj6DiOchuUikXgdLz6JES29gu2w1w_ZW6eQXwT-2hF4DDo3rpguAzzCuPJAPjGFYhetUm3zH3gn/pub?gid=1864878831&single=true&output=csv';
+    //urlCSV = '../data/morley.csv';
+	//urlCSV = '../../data/paragraphe/AxesThemes2018.csv';
+
+d3.csv(urlCSV, function(error, csv) {
+  if (error) throw error;  
+  oCSV = csv;
+	//récupère les filtres
+	var arrDoublons = [];
+	oCSV.forEach(function(d){
+		champFiltre.forEach(function(f){
+			if(!filtres[f])filtres[f]=[];
+			var arr = d[f].split(', ');	
+			arr.forEach(function(a){
+				if(!arrDoublons[a]) {
+					arrDoublons[a] = 1; 
+        			filtres[f].push(a);
+				}
+			}) 			
+		})
+	});
+  
+  //prépare les données
+  /*exemple
+  csv.forEach(function(x) {
+    var e = Math.floor(x.Expt - 1),
+        r = Math.floor(x.Run - 1),
+        s = Math.floor(x.Speed),
+        d = data[e];
+    if (!d) d = data[e] = [s];
+    else d.push(s);
+    if (s > max) max = s;
+    if (s < min) min = s;
+  });
+  */
+
+  if(filtreC && filtreV){
+	  csv = oCSV.filter(function(d){ 
+		  return d[filtreC].indexOf(filtreV);
+		  });  
+  }
+  
+
+  setData(csv);
+
+  setBox();
+  
+  setInterval(function() {
+    //svg.datum(randomize).call(chart.duration(1000));
+    if(stop)return;
+    if(fv >= filtres[champFiltre[fc]].length){
+		fv=0;
+    	fc++;
+        if(fc >= champFiltre.length){
+        	fc=0;
+        	setData(oCSV);	  
+        	setBox();
+        	return;    	
+        }        	
+    }
+	filtreData(champFiltre[fc], filtres[champFiltre[fc]][fv]);
+	d3.select("#filtreBoxChamp").text(champFiltre[fc]+" : "+filtres[champFiltre[fc]][fv]);
+	
+	fv++;
+  }, 4000);
+});
+
+function setBox() {
+	d3.select("#svgBox").remove();
+	d3.select("body").append("div").attr("id","svgBox");
+
+	d3.select("#titreBox").text("Importance des "+type)
+	d3.select("#filtreBoxChamp").text(champFiltre[fc]+" : toutes");
+	
+	
+	svg = d3.select("#svgBox").selectAll("svg")
+      .data(data)
+    .enter().append("svg")
+      .attr("class", "box")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.bottom + margin.top)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .call(chart);
+}
+
+
+function setData(csv) {
+
+	nCSV = csv;
+	data = [];
+	labels = [];
+		
+	//pour les AXEs
+	  if(type=='axes'){
+		  labels= [
+			  'Créations, innovation, médiations, usages en environnement hybride',
+			  'Intelligence et nouveaux dispositifs de gestion de l’information et des connaissances',
+			  'De nouveaux territoires et différentes formes de l’apprentissage et de l’éducation',
+			  'Humanités numériques : développement humain à l’ère du numérique'
+			  ];
+		  csv.forEach(function(x) {
+			  for (var i = 0; i < 4; i++) {
+				    var e = "importance de l'AXE "+(i+1),
+				    s = Math.floor(x[e])
+			        d = data[i];
+				    if (!d) d = data[i] = [s];
+				    else d.push(s);			
+				    if (s > max) max = s;
+				    if (s < min) min = s;
+				}
+			  });
+		  }
+		//pour les THEMES
+	  	if(type=='themes'){
+			//compilation des thèmes
+			var prop = [], key = [], ik = 0;
+			for (var p in csv[0]) {
+				var arr = p.split(' ');
+				if(parseInt(arr[0])){
+					arr[0]=""
+					prop[p]=arr.join(' ').substr(1);
+					if(!key[prop[p]]){
+						key[prop[p]]=ik;
+						labels.push(prop[p]);
+						ik++;
+					}
+				}
+			}
+			//création des DATA
+			csv.forEach(function(x) {
+				for (var p in prop) {
+				    var e = prop[p],
+				    s = Math.floor(x[p])
+				    ik = key[e];
+			        d = data[ik];
+				    if (!d) d = data[ik] = [s];
+				    else d.push(s);			
+				    if (s > max) max = s;
+				    if (s < min) min = s;
+				}
+			  });
+		}
+	  
+	  chart.domain([min, max]);
+	  chart.color(d3.scale.linear()
+		  .domain([min, max])
+		  .interpolate(d3.interpolateHcl)
+		  .range([d3.rgb("#f80202"), d3.rgb('#32ae09')]));
+	  chart.labels(labels);
+
+}
+
+function filtreData(c, v) {
+	var newdata = oCSV.filter(function(d){ 
+    		var arr = d[c].split(', '), r=false;	
+    		arr.forEach(function(a){
+    			if(a == v) r=true;
+    		})	
+		  	return r;
+		  });	
+	setData(newdata);	  
+	svg.data(data).call(chart.duration(1000));
+}
+
+function txtClick(d,i) {
+	console.log(d)
+	d3.select("#filtreBoxValeur").html("");
+	if(type!='axes')return;
+	var txtMC = "<h4>Thèmes nouveaux : </h4>";
+	var txtRem = "<h4>Remarque : </h4>";
+	nCSV.forEach(function(d){
+		if(d['Nouveau THEME '+(i+1)+'.1'])txtMC += " - "+d['Nouveau THEME '+(i+1)+'.1']+"<br/>";
+		if(d['Nouveau THEME '+(i+1)+'.2'])txtMC += " - "+d['Nouveau THEME '+(i+1)+'.2']+"<br/>";
+		if(d['Nouveau THEME '+(i+1)+'.3'])txtMC += " - "+d['Nouveau THEME '+(i+1)+'.3']+"<br/>";
+		if(d['Nouveau THEME '+(i+1)+'.4'])txtMC += " - "+d['Nouveau THEME '+(i+1)+'.4']+"<br/>";
+		if(d["Vos commentaires sur l'AXE "+(i+1)])txtRem += " - "+d["Vos commentaires sur l'AXE "+(i+1)]+"<br/>";
+	});
+	d3.select("#selectAxe").text(d);
+	d3.select("#commentAxe").html(txtMC+txtRem);
+}
+
+// Returns a function to compute the interquartile range.
+function iqr(k) {
+  return function(d, i) {
+    var q1 = d.quartiles[0],
+        q3 = d.quartiles[2],
+        iqr = (q3 - q1) * k,
+        i = -1,
+        j = d.length;
+    while (d[++i] < q1 - iqr);
+    while (d[--j] > q3 + iqr);
+    return [i, j];
+  };
+}
+
+</script>
+
+
+</body>
+</html>

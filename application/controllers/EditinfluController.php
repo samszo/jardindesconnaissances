@@ -46,6 +46,7 @@ class EditinfluController extends Zend_Controller_Action {
     		$this->view->label = $this->_getParam('label');
     		$this->view->fontSize = $this->_getParam('fontSize',48);
     		$this->view->nivMax = $this->_getParam('nivMax',1);
+    		$this->view->urlData = $this->_getParam('urlData',"../flux/databnf?obj=rameau&nivMax=".$this->view->nivMax);
     }	    
         
     	public function importAction()

@@ -59,17 +59,17 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
      */
     public function ajouter($data, $existe=true, $rs=false)
     {
-	    	$id=false;
-	    	if($existe)$id = $this->existe($data);	    		
-	    	if(!$id){
-	    		$data = $this->updateHierarchie($data);
-	    		if(!isset($data["maj"]))$data["maj"]= new Zend_Db_Expr('NOW()');
-	    	 	$id = $this->insert($data);
-	    	}
-	    	if($rs)
-	    		return $this->findByExiId($id);
+    	$id=false;
+    	if($existe)$id = $this->existe($data);	    		
+    	if(!$id){
+    		$data = $this->updateHierarchie($data);
+    		if(!isset($data["maj"]))$data["maj"]= new Zend_Db_Expr('NOW()');
+    	 	$id = $this->insert($data);
+    	}
+    	if($rs)
+    		return $this->findByExiId($id);
 	    else
-		    	return $id;
+		    return $id;
     } 
     
 	/**
@@ -240,7 +240,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
      * Recherche une entrée Flux_exi avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param varchar $nom
+     * @param string $nom
      */
     public function findByNom($nom)
     {
@@ -269,7 +269,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
      * Recherche une entrée Flux_exi avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param varchar $maj
+     * @param string $maj
      */
     public function findByMaj($maj)
     {

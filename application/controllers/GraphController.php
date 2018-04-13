@@ -130,7 +130,7 @@ class GraphController extends Zend_Controller_Action {
 
     public function sankeyAction()
     {
-    		$this->view->urlStats = $this->_getParam('urlStats');
+    		$this->view->urlStats = $this->_getParam('urlStats',"../../data/paragraphe/paragrapheThemeMC.json");
     }	
         
     public function conceptmapAction()
@@ -281,6 +281,7 @@ class GraphController extends Zend_Controller_Action {
             case 'compareEco':
                 //../flux/an?q=compareComplexEcosystem&idsBase[]=flux_valarnum&idsBase[]=flux_valarnum_prod&idsBase[]=flux_valarnum_prod1&idsBase[]=flux_valarnum_prod1_1
                 $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fflux%2Fan%3Fq%3DcompareComplexEcosystem%26idsBase%5B%5D%3Dflux_valarnum%26idsBase%5B%5D%3Dflux_valarnum_prod%26idsBase%5B%5D%3Dflux_valarnum_prod1%26idsBase%5B%5D%3Dflux_valarnum_prod1_1"));
+                $this->view->urlData =  "../flux/an?q=compareComplexEcosystem&idsBase[]=flux_valarnum_prod1&idsBase[]=flux_valarnum_prod1_1";
                 break;
         }
         $this->view->catX =  $this->_getParam('catX', "idBase");

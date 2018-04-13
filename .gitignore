@@ -425,3 +425,4 @@ bdd/query/angetPhotosDatas.sql
 bdd/flux_eu.sql
 bdd/flux_eu_privacy.sql
 bdd/flux_proverbes_2016-11-28.sql
+bdd/flux_valarnum_prodFinal.sql

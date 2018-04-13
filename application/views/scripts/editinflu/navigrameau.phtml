@@ -96,7 +96,7 @@ function resize(){
 		.attr("viewBox","0 0 "+w+" "+h);	
     }
 
-var urlData = "../flux/databnf?obj=rameau&nivMax=<?php echo $this->nivMax;?>"
+var urlData = "<?php echo $this->urlData;?>"
 	, idBNF='<?php echo $this->idBNF;?>'
 	, label="<?php echo $this->label;?>";
 if(idBNF)urlData+='&idBNF=<?php echo $this->idBNF;?>';
@@ -180,7 +180,7 @@ d3.json(urlData, function(stats) {
     	  				window.parent.setSelectTag({"label":d.name,"value":d.uri,"parent":window.parent.idTagRameau});
     	  			}        	  			
           })          
-    .filter(function(d) { return d.x < w / 2; })
+    .filter(function(d) { return d.x < w / 3; })
       .attr("x", 6 + sankey.nodeWidth())
       .attr("text-anchor", "start");
 

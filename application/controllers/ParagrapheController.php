@@ -50,5 +50,14 @@ class ParagrapheController extends Zend_Controller_Action {
 		$this->view->json = 	$cm["note"];	
 			
 	}
+
+	/**
+	 * affiche les Axes et les Thème sous forme de Box
+	 */
+	public function axesboxAction() {
+	    $this->view->type = $this->_getParam('type', 'axes');
+	    $this->view->filtreC = $this->_getParam('filtreC');
+	    $this->view->filtreV = $this->_getParam('filtreV');
+	}
 	
 }

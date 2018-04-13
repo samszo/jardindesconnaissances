@@ -33,7 +33,7 @@ class AuthController extends Zend_Controller_Action
 		$s = new Flux_Site($ssExi->dbNom);
 		
 		
-    		// Obtention d'une référence de l'instance du Singleton de Zend_Auth
+    	// Obtention d'une référence de l'instance du Singleton de Zend_Auth
 		$auth = Zend_Auth::getInstance();
 		$auth->clearIdentity();
 
