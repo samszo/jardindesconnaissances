@@ -91,7 +91,7 @@ class Flux_Site{
         
         //vérifie la connexion extérieur
         try {        
-	        $g = fopen("http:\\www.google.com", "r") ? true : false;
+	        $g = fopen("http://www.google.com", "r") ? true : false;
 	        $this->bConnect = true;
         }catch (Zend_Exception $e) {
             	$this->bConnect = false;

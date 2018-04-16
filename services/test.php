@@ -680,7 +680,7 @@ try {
 	//$an->sauveXmlEad($url);
 	//$an->sauvePhotosAbscentes();
 	//$complex = $an->getComplexEcosystem(0,524);
-	$an->migreAnalyseGooglePhotoMC('flux_valarnum', 'flux_valarnum_prod1_1');
+	//$an->migreAnalyseGooglePhotoMC('flux_valarnum', 'flux_valarnum_prod1_1');
 	//$an->actualiseAnalyseGoogle();
 	//echo json_encode($an->getTreemapPhoto(3));
 	
@@ -734,6 +734,12 @@ try {
 	//$sym->importOnto();
 	$sym->importTree();
 	*/
+	
+	$fe = new Flux_Flickemo("flux_flickemo");
+	
+	//$fe->setObjetForUti(1,"63394961@N00","group");//3070672@N22
+	$fe->getPhotosFromDoc(217);
+	
 	
 	$s->trace("FIN TEST");			
 	

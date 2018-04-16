@@ -84,7 +84,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
         $arr = [];
     		if(isset($data["parent"])){
     		    //récupère les information du parent
-    		    $arrP = $this->findByexi_id($data["parent"]);
+    		    $arrP = $this->findByExiId($data["parent"]);
     		    //récupère les information des enfants
     		    $arr = $this->findByParent($data["parent"]);
 	    		$data['niveau'] = $arrP['niveau']+1;
@@ -101,6 +101,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
 		if(count($arr)>0){
     			//met à jour les niveaux 
+    			print_r($arr);
     			$sql = 'UPDATE '.$this->_name.' SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];
     			$stmt = $this->_db->query($sql);
     			$sql = 'UPDATE '.$this->_name.' SET lft = lft + 2 WHERE lft >'.$arr[0]['rgt'];
@@ -110,7 +111,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     			$data['rgt'] = $arr[0]['rgt']+2;
     		}else{
     			//met à jour les niveaux 
-    			$sql = 'UPDATE '.$this->_name.' SET rgt = rgt + 2 WHERE rgt >'.$arrP['lft'];
+    			$sql = 'UPDATE '.$this->_name.' SET rgt = rgt + 2 where rgt >'.$arrP['lft'];
     			$stmt = $this->_db->query($sql);
     			$sql = 'UPDATE '.$this->_name.' SET lft = lft + 2 WHERE lft >'.$arrP['lft'];
     			$stmt = $this->_db->query($sql);
@@ -198,7 +199,7 @@ class Model_DbTable_Flux_Exi extends Zend_Db_Table_Abstract
     public function findByExiId($exi_id)
     {
         $query = $this->select()
-        ->from( array("f" => "flux_exi"),array('nom', 'prenom', 'exi_id', 'recid'=>'exi_id','data','nait','mort','isni','url','data'))                           
+        ->from( array("f" => "flux_exi"),array('nom', 'prenom', 'exi_id', 'recid'=>'exi_id','lft','rgt','niveau','data','nait','mort','isni','url','data'))                           
                     ->where( "f.exi_id = ?", $exi_id );
 		$rs = $this->fetchAll($query)->toArray();
         return  count($rs) ? $rs[0] : false;

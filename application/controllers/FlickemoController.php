@@ -19,36 +19,50 @@ class FlickemoController extends Zend_Controller_Action
                 
     }
 
+    /**
+     * action pour récupérer les informations d'un utilisateur
+     *
+     * @param  	int 		$idUti = l'identifiant de l'utilisateur
+     * @param  	int  		$idGallerie = identifiant de la gallerie
+     * @param  	int  		$idGroupe = identifiant du groupe
+     *
+     */
     public function utiAction()
     {
         $this->initInstance();
-        $this->view->uti = $this->s->getUti($login, $flux);
-        
+        $this->view->uti = $this->s->getUti($this->_getParam('login'), $this->_getParam('flux'));        
+        $this->view->objets = $this->s->getObjetsForUti($this->view->uti["idUti"]);
     }
     
     /**
-     * action pour afficher un explorateur d'emotion
+     * action pour enregistrer un objet flickR pour un utilisateur
      *
-     * @param  	string 		$q = pour afficher un type de collection
-     * @example 'getOmkCollection' = une collection à partir d'un ItemSet d'Omeka S + IIIF
-     * @example 'getCollectionFaces' = une collection de visage à partir d'un ItemSet d'Omeka S + IIIF + Google Vision
-     *
-     * @param  	int  		$idCol = identifiant de l'ItemSet Omeka
+     * @param  	int 		$idUti = l'identifiant de l'utilisateur
+     * @param  	int  		$idObjet = identifiant de l'objet 
+     * @param  	string  	$objet = type d'objet : gallerie, groupe
      *
      */
-    public function exploemoAction(){
-        
+    public function setobjutiAction()
+    {
         $this->initInstance();
-        
-        $this->view->q =  $this->_getParam('q', "getOmkCollection");
-        $this->view->idCol =  $this->_getParam('idCol', 1572);
-        $this->view->nb =  $this->_getParam('nb', 100);//nombre de photo récupérée de la base de données
-        $this->view->nbTof =  $this->_getParam('nbTof', 10);//nombre de photo dans la mosaïque
-        $s = new Flux_Site($this->idBase);
-        $s->dbM = new Model_DbTable_Flux_Monade($s->db);        
-        $this->view->idMonade = $s->dbM->ajouter(array("titre"=>"valarnum"),true,false);
-        
-        
+        $this->view->data = $this->s->setObjetForUti($this->_getParam('idUti'),$this->_getParam('id'),$this->_getParam('objet'));
+    }
+    
+
+    /**
+     * action pour récupérer la définition d'une source
+     *
+     * @param  	int  		$id = identifiant de la source
+     *
+     */
+    public function getsourceAction()
+    {
+        if($this->_getParam('id')){
+            $this->initInstance();        
+            $this->view->data = $this->s->getPhotosFromDoc($this->_getParam('id'));
+        }else{
+            $this->view->data = array("error"=>"Aucun identfiant de source");
+        }
     }
     
     public function evalacteursAction(){
@@ -71,16 +85,6 @@ class FlickemoController extends Zend_Controller_Action
         
     }
     
-    public function photofacettesAction(){
-        
-        $this->initInstance();
-        
-    }
-
-    public function visagefacettesAction(){
-        
-        
-    }
     
     public function sauveAction() {
         $this->initInstance();
