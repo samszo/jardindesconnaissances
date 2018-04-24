@@ -69,7 +69,7 @@ class Flux_Flickemo extends Flux_Site{
         //enregistre l'existence        
         $idExi = $this->dbE->ajouter(array('nom'=>$login,'uti_id'=>$idUti,'parent'=>$this->idExiRoot));  
         
-        return array('idUti'=>$idUti,'idExi'=>$idExi);
+        return array('idUti'=>$idUti,'idExi'=>$idExi,'idBase'=>$this->idBase);
     }            
 
     /**
@@ -110,6 +110,7 @@ class Flux_Flickemo extends Flux_Site{
     public function setObjetForUti($idUti,$idObj,$typeObj)
     {
         $idActi = $this->dbA->ajouter(array('code'=>__METHOD__."_".$typeObj));
+        $this->trace(__METHOD__."_".$typeObj);
         
         //récupère les infos
         switch ($typeObj) {
@@ -124,7 +125,6 @@ class Flux_Flickemo extends Flux_Site{
                 break;
                 
         }
-        
         //creation de l'objet
         $arr =  $this->dbD->ajouter(array("titre"=>$data[$typeObj]['name']['_content']
             ,"url"=>$data[$typeObj]['id']
@@ -219,58 +219,110 @@ class Flux_Flickemo extends Flux_Site{
         }
         $arr = array();
         foreach ($arrTofs as $p) {
-            //creation de la photo
-            $arrTof =  $this->dbD->ajouter(array("titre"=>$p['title']
-                ,"url"=>$p['url_o']
-                ,"parent"=>$idDoc
-                ,"tronc"=>"photo"
-                ,"note"=>$p['tags']
-                ,"data"=>json_encode($p)
-            ),true, true);
-            //création du propriétaire
-            $idExi = $this->dbE->ajouter(array("nom"=>$p['ownername'],"url"=>$p['owner']));
-            $arrTof["idExi"]=$idExi;
-            //lien entre propriétaire et photo
-            // src = le propriétaire
-            // dst = la photo
-            // pre = propriétaire
-            $idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-                ,"src_id"=>$idExi,"src_obj"=>"exi"
-                ,"dst_id"=>$arrTof["doc_id"],"dst_obj"=>"doc"
-                ,"pre_id"=>$this->idTagProp,"pre_obj"=>"tag"
-            ));
-            $arr[] = $arrTof;  
-            //création des tags du propriétaire
-            $arrTags = explode(" ",$p['tags']);
-            foreach ($arrTags as $t) {
-                $idT = $this->dbT->ajouter(array("code"=>$t,"parent"=>$this->idTagOwner));
-                //lien entre le propriétaire, le tag et la photo
-                // src = le propriétaire
-                // dst = la photo
-                // pre = propriétaire
-                $idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-                    ,"src_id"=>$idExi,"src_obj"=>"exi"
-                    ,"dst_id"=>$idT,"dst_obj"=>"tag"
-                    ,"pre_id"=>$arrTof["doc_id"],"pre_obj"=>"doc"
-                ));
-            }
-            //création des tags de la machine
-            $arrTags = explode(" ",$p['machine_tags']);
-            foreach ($arrTags as $t) {
-                $idT = $this->dbT->ajouter(array("code"=>$t,"parent"=>$this->idTagMachine));
-                //lien entre le propriétaire, le tag et la photo
-                // src = le propriétaire
-                // dst = la photo
-                // pre = propriétaire
-                $idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-                    ,"src_id"=>$idExi,"src_obj"=>"exi"
-                    ,"dst_id"=>$idT,"dst_obj"=>"tag"
-                    ,"pre_id"=>$arrTof["doc_id"],"pre_obj"=>"doc"
-                ));
-            }            
+            $arr[] = $this->savePhoto($p, $idDoc);       
         }
         
         return $arr;
     }
     
+    /**
+     * Enregistre les émotions pour une photo
+     *
+     * @param array     $doc
+     * @param array     $e
+     * @param array     $idUti
+     *
+     * @return array
+     *
+     */
+    public function saveEmo($doc, $e, $idUti){
+        
+        //enregistre la photo
+        $arrT =  $this->savePhoto($doc['data'], $doc['idSource']);
+
+        //récupère le document du fragment
+        $idDocFrag = $this->dbD->ajouter(array("titre"=>'fragment',"tronc"=>$doc['data']['id'],"parent"=>$arrT['doc_id']
+            ,"url"=>$e['img'], 'note'=>json_encode(array("x"=>$e['x'],"y"=>$e['y'],"w"=>$e['w'],"h"=>$e['h']))));
+        //Traitement de l'évaluation
+        //récupère le tag
+        $idTagParent = $this->dbT->ajouter(array("code"=>"Roue des émotions","parent"=>$this->idTagRoot));
+        $idTag = $this->dbT->ajouter(array("code"=>$e["d"],"parent"=>$idTagParent,"type"=>$e["color"]));
+        //récupère l'action
+        //$idAct = $s->dbA->ajouter(array("code"=>'évaluation émotionnelle'));
+        //enregistre le rapport entre le document, l'utilisateur et son évaluation
+        $idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+            ,"src_id"=>$idDocFrag,"src_obj"=>"doc"
+            ,"pre_id"=>$idUti,"pre_obj"=>"uti"
+            ,"dst_id"=>$idTag,"dst_obj"=>"tag"
+            ,"niveau"=>$e['r']
+            ,"valeur"=>json_encode(array("cx"=>$e['cx'],"cy"=>$e['cy'],"r"=>$e['r'],"d"=>$e['d'],"color"=>$e['color']))
+        ));
+        return $arrT;
+    }
+    
+    /**
+     * Enregistre les émotions pour une photo
+     *
+     * @param array     $p
+     * @param int       $idDoc
+     *
+     * @return array
+     *
+     */
+    public function savePhoto($p, $idDoc){
+                
+        //creation de la photo
+        $arrTof =  $this->dbD->ajouter(array("titre"=>$p['title']
+            ,"url"=>$p['url_o']
+            ,"parent"=>$idDoc
+            ,"tronc"=>"photo"
+            ,"note"=>$p['tags']
+            ,"data"=>json_encode($p)
+        ),true, true);
+        //création du propriétaire
+        $idExi = $this->dbE->ajouter(array("nom"=>$p['ownername'],"url"=>$p['owner']));
+        $arrTof["idExi"]=$idExi;
+        //lien entre propriétaire et photo
+        // src = le propriétaire
+        // dst = la photo
+        // pre = propriétaire
+        $idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+            ,"src_id"=>$idExi,"src_obj"=>"exi"
+            ,"dst_id"=>$arrTof["doc_id"],"dst_obj"=>"doc"
+            ,"pre_id"=>$this->idTagProp,"pre_obj"=>"tag"
+        ));
+        //création des tags du propriétaire
+        $arrTof["tags"]=[];
+        $arrTags = explode(" ",$p['tags']);
+        foreach ($arrTags as $t) {
+            $arrT = $this->dbT->ajouter(array("code"=>$t,"parent"=>$this->idTagOwner), true, true);
+            //lien entre le propriétaire, le tag et la photo
+            // src = le propriétaire
+            // dst = la photo
+            // pre = propriétaire
+            $idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+                ,"src_id"=>$idExi,"src_obj"=>"exi"
+                ,"dst_id"=>$arrT['tag_id'],"dst_obj"=>"tag"
+                ,"pre_id"=>$arrTof["doc_id"],"pre_obj"=>"doc"
+            ));
+            $arrTof["tags"][]=$arrT;
+        }
+        //création des tags de la machine
+        $arrTags = explode(" ",$p['machine_tags']);
+        foreach ($arrTags as $t) {
+            $arrT = $idT = $this->dbT->ajouter(array("code"=>$t,"parent"=>$this->idTagMachine), true, true);
+            //lien entre le propriétaire, le tag et la photo
+            // src = le propriétaire
+            // dst = la photo
+            // pre = propriétaire
+            $idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+                ,"src_id"=>$idExi,"src_obj"=>"exi"
+                ,"dst_id"=>$arrT['tag_id'],"dst_obj"=>"tag"
+                ,"pre_id"=>$arrTof["doc_id"],"pre_obj"=>"doc"
+            ));
+            $arrTof["tags"][]=$arrT;
+        }      
+        return $arrTof;        
+    }
+
 }
