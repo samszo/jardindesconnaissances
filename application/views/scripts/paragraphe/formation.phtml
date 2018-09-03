@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Observatoire des formations</title>
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap-treeview.min.css" >
+    <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
+    <link rel="stylesheet" type="text/css" href="../css/font-awesome.css">
+
+    <script type="text/javascript" src="../js/d3.v4.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/popper.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap-treeview.js"></script>    
+    <script type="text/javascript" src="../js/w2ui.min.js"></script>
+  
+    <style>
+
+#sidebar {
+    position: relative;
+    bottom: 600px;
+    width: 86px
+}
+
+#sequence {
+  width: 600px;
+  height: 70px;
+}
+
+#legend {
+  padding: 10px 0 0 3px;
+}
+
+#sequence text, #legend text {
+  font-weight: 600;
+  fill: #fff;
+}
+
+#chart {
+  position: relative;
+}
+
+#chart path {
+  stroke: #fff;
+}
+
+#explanation {
+  position: absolute;
+  top: 200px;
+  left: 280px;
+  width: 200px;
+  text-align: center;
+  color: #666;
+  z-index: -1;
+}   
+
+.treeview .list-group-item {
+    cursor: pointer; 
+    font-size: 0.6em;
+    padding: .1rem .2rem;
+}
+
+.treeview span.indent {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+span.modalTitle {
+    font-weight: bold;
+    margin-left: 4px;
+    margin-right: 4px;
+} 
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid" >
+        <nav id="nbMain" class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+            <a class="navbar-brand" href="#">
+                <h1 class="text-center" >Observatoire des formations</h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarTogglerDemo02"
+                aria-controls="navbarTogglerDemo02" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                <form class="form-inline my-2 my-lg-0">
+                    <button id="btnExport" class="btn btn-outline-primary " type="button">Exporter</button>
+                    <button id="btnImport" class="btn btn-outline-primary " type="button">Importer</button>
+                    <!--
+                    <button id="uti" class="btn btn-outline-success my-2 my-sm-0" type="button"><?php echo $this->login; ?></button>
+                    <button class="btn btn-outline-danger my-2 my-sm-0" onclick="deconnexion()" type="button">déconnexion</button>
+                    -->
+                </form>
+            </div>
+        </nav>	
+
+        <div class="row">
+            <div class="col-6">        
+                    <h2>Hiérarchie des cours</h2>
+                    <form class="form-inline">
+                        <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Valeur du calcul</label>
+                        <select class="custom-select my-1 mr-sm-2" id="sltValCalcul">
+                            <option selected value="VH EC">VH EC</option>
+                            <option value="Coût HTD">Coût HTD</option>
+                            <option value="Seuil">Seuil</option>
+                        </select>
+                        <button type="button" id="btnRemoveUE" class="btn btn-outline-danger">Supprimer l'UE</button>
+                        <button type="button" id="btnRemoveEC" class="btn btn-outline-danger">Supprimer l'EC</button>
+                        <button type="button" id="btnAjouterUE" class="btn btn-outline-warning">Ajouter une UE</button>
+                        <button type="button" id="btnAjouterEC" class="btn btn-outline-warning">Ajouter une EC</button>
+                        <button type="button" id="btnModifUE" class="btn btn-outline-success">Modifier l'UE</button>
+                        <button type="button" id="btnModifEC" class="btn btn-outline-success">Modifier l'EC</button>
+                    </form>            
+                    <div id="main">
+                    <div id="sequence"></div>
+                    <div id="chart">
+                        <div id="explanation" style="visibility: hidden;">
+                        <h5 id="key"></h5>
+                        <h3 id="valeur"></h3>
+                        <h2 id="percentage"></h2>
+                        <h5 id="calcul"></h5>
+                        </div>
+                    </div>
+                </div>
+                <div id="sidebar">
+                    <div id="legend" ></div>
+                </div>
+            </div>
+            <div class="col-6">        
+                <div class="row">
+                    <h2>Liste des intervenants</h2>
+                </div>
+                <div class="row" id="frmSetCourToInt" style="margin:3px;display:none" >
+                        <label>Sélectioner le(s) intervenant(s) :</label>
+                        <div class="w2ui-field" ></div>
+                                <div style="width: 100%;"> <input style="width: 100%;" id="selectInt" </div>
+                        </div>
+                        <button type="button" id="btnSetCourToInt" class="btn btn-outline-primary">Attribuer le cours</button>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">        
+                        <div class="card-columns" id="cardInter"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Fenêtre modale pour l'augmentation des heures -->
+    <div class="modal fade" id="modChangeHeure" tabindex="-1" role="dialog" aria-labelledby="modChangeHeureLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modChangeHeureLabel">Modifier les heures de<span class="modalTitle" id="modChangeHeureInt"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="rngHeureNb"><span class="modalTitle" id="modChangeHeureNb"></span>heure(s) pour<span class="modalTitle" id="modChangeHeureCour"></span></label>
+                        <input type="range" class="form-control-range" id="rngHeureNb" min="1" max="150" style="width:100%" >
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary">Valider</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre modale pour le choix d'un fichier -->
+    <div class="modal fade" id="modGetFic" tabindex="-1" role="dialog" aria-labelledby="modGetFicLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modGetFicLabel">Importer le fichier des données<span class="modalTitle" id="modGetFicInt"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w2ui-field">
+                    <div style="margin-left: 0px;" > <input style="width:100%;" id="fileImport"> </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button id="btnValidImport" type="button" class="btn btn-primary">Valider</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre modale pour l'ajout d'une UE -->
+    <div class="modal fade" id="modAjoutUE" tabindex="-1" role="dialog" aria-labelledby="modAjoutUELabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modAjoutUELabel">Ajouter une UE<span class="modalTitle" id="modAjoutUEInt"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="inptUEHelp">Nom de l'UE</label>
+                    <input type="text" class="form-control" id="inptUE" aria-describedby="inptUEHelp" placeholder="saisir le nom">
+                    <small id="inptUEHelp" class="form-text text-muted">Merci de ne pas être trop long.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button id="btnValidAjoutUE" type="button" class="btn btn-primary">Valider</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre modale pour l'ajout ou la modication d'une EC -->
+    <div class="modal fade" id="modAjoutEC" tabindex="-1" role="dialog" aria-labelledby="modAjoutECLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modAjoutECLabel">Ajouter une UE<span class="modalTitle" id="modAjoutECInt"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="gridEC" style="width: 100%; height:500px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button id="btnValidAjoutEC" type="button" class="btn btn-primary">Valider</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+//variables thématiques
+var nodesCour,rootCour, treeCour, dataCour, colCour, urlCour = "<?php echo $this->urlCour; ?>",
+dataInt, urlInt = "<?php echo $this->urlInt; ?>",
+dataIntCour, urlIntCour = "<?php echo $this->urlIntCour; ?>",
+colorsKey = <?php echo $this->colorsKey; ?>,
+groupKey = <?php echo $this->groupKey; ?>,
+lblCalcul = "<?php echo $this->lblCalcul; ?>";
+//variable intéractivité
+var bClick = false, display = "none", selectCour, selectUE, selectParc;
+
+//variables affichage
+var maxHeureStat = 192, sclHeureStat = d3.scaleLinear().range([0, 100]).domain([0, maxHeureStat]),
+    sclHeureComp = d3.scaleLinear().range([0, 100]).domain([0, maxHeureStat*2]);
+;
+
+//écouteurs intéractivité
+
+$('#btnExport').click(function(){
+    var jsonData = {"IntCour":dataIntCour, "cours":dataCour,"intervenants":dataInt};
+    exportJson(JSON.stringify(jsonData), 'paragrapheFormations.json', 'text/plain');
+})
+
+$('#btnImport').click(function(){
+    $('#modGetFic').modal('show');
+})
+//initialise le champ d'import des fichiers
+$('#fileImport').w2field('file', {max:1});
+
+$('#btnValidImport').click(function(){
+    var f = $('#fileImport').data('selected');
+    fr = new FileReader();
+    fr.onload = receivedText;
+    fr.readAsText(f[0].file);
+    function receivedText(e) {
+        let lines = e.target.result;
+        try {
+            var data = JSON.parse(lines); 
+            dataIntCour = data.IntCour;
+            dataCour = data.cours
+            dataInt = data.intervenants;
+            buildPage();
+            $('#modGetFic').modal('hide');
+        }catch(error) {
+            w2alert('Les données ne sont pas au bon format.');
+        }
+        $('#fileImport').w2field('file', {max:1});
+    }
+})
+    
+
+$('#sltValCalcul').change(function(){
+    lblCalcul = $(this).val();
+    buildViz();
+})
+
+$('#btnSetCourToInt').click(function(){
+    var arrSelect = $('#selectInt').data('selected');
+    arrSelect.forEach(function(s){
+        dataIntCour.push({'idInt':s.id,'IdEC':selectCour.data.id,'NbHeure':selectCour.data.dt['Coût HTD']});
+        var intv = calculHeure(s);
+        for (var k = 0; k < dataInt.length; k++) {
+            if(dataInt[k].id==intv.id){
+                dataInt[k]=intv;
+                k = dataInt.length
+            }
+        }
+    });
+    buildInterCard();
+    afficheInter(selectCour);
+})
+//gestion du CRUD
+$('#btnRemoveUE').click(function(){
+    var arrEC = []
+    //récupère les ec à supprimer
+    dataCour.forEach(function(d,i){
+        if(d[groupKey[2]]==selectUE.data.name){
+            arrEC.push(d.id);
+        }    
+    });  
+    //supprime les ec et les liens avec els intervenants 
+    arrEC.forEach(function(d){
+        dataCour.forEach(function(ec,i){
+            if(ec.id == d) dataCour.splice(i, 1);
+        });  
+        dataIntCour.forEach(function(ic,i){
+            if(ic.IdEC == d) dataIntCour.splice(i, 1);
+        });
+    })
+    finCrud();  
+})
+$('#btnRemoveEC').click(function(){
+    dataIntCour.forEach(function(d,i){
+        if(d.IdEC==selectCour.data.id)
+            dataIntCour.splice(i, 1);
+    });
+    dataCour.forEach(function(d,i){
+        if(d.id==selectCour.data.id)
+            dataCour.splice(i, 1);
+    });
+    finCrud();
+});
+$('#btnAjouterUE').click(function(){
+    $('#modAjoutUE').modal('show');
+});
+$('#btnValidAjoutUE').click(function(){
+    
+    var v = document.getElementById('inptUE').value;
+    if(!v){
+        w2alert("Merci de donner un nom à l'UE");
+        return false;
+    }
+    var defEC = getDefEC(1,selectParc.data.dt);
+    defEC[groupKey[2]]=v;
+    dataCour.push(defEC);
+
+    //reconstruction du graphique
+    $('#modAjoutUE').modal('hide');
+    buildPage();
+});
+$('#btnAjouterEC').click(function(){
+    $('#modAjoutEC').modal('show');
+});
+$('#modAjoutEC').on('shown.bs.modal', function (e) {
+    //création du formumlaire pour une ligne du CSV
+
+    /*
+    var g = w2ui['grid_EC'];
+    if(!g){
+        $('#gridEC').w2grid(gridECparam);
+        g = w2ui['grid_EC'];
+    }
+
+    //création d'une ec par défaut
+    var defEC= getDefEC(2,selectUE.data.name);
+
+    g.clear();
+    colCour.forEach(function(d, i){
+        g.add({ recid: i, name: d, value: defEC[d] });               
+    });
+    */
+    var g = w2ui['form_EC'];
+    if(!g){
+        $('#gridEC').w2form(formECparam);
+    }
+
+});
+$('#btnValidAjoutEC').click(function(){
+    
+    var g = w2ui['grid_EC'];
+    var changes = g.getChanges();
+    changes.forEach(function(d){
+        if(d.recid!="url"){
+                data[arrDetail[d.recid].value] = d.value;
+                itemSelect[arrDetail[d.recid].value] = d.value;
+        }
+    });				
+
+    dataCour.push(defEC);
+
+    //reconstruction du graphique
+    $('#modAjoutEC').modal('hide');
+    buildPage();
+});
+
+function getDefEC(groupe,dt){
+    var defEC={};
+    for (const k in dt) {
+        defEC[k]=dt[k];
+    }
+    //modification de l'ec
+    defEC["id"]=dataCour.length;
+    if(groupe!=2)defEC[groupKey[2]]="UE a définir";
+    defEC[groupKey[3]]="EC a définir";
+
+    return defEC;
+}
+
+//formulaire d'ajout des EC
+//sous forme de grid
+var gridECparam = {
+    header: 'Données sur les EC',
+    show: {toolbar		: true,
+            toolbarReload   : false,
+            toolbarColumns  : false,
+            toolbarSearch   : false,
+            toolbarAdd      : false,
+            toolbarDelete   : false,
+            toolbarSave		: true,
+            header: true, 
+            columnHeaders: false},
+    name: 'grid_EC', 
+    columns: [                
+        { field: 'name', caption: 'Name', size: '140px', style: 'background-color: #efefef; border-bottom: 1px solid white; padding-right: 5px;', attr: "align=right" },
+        { field: 'value', caption: 'Value', size: '100%', editable: { type: 'text' } }
+    ],
+    onSave: function(event) {
+        var data = {'recid':itemSelect.recid,'obj':'auteur'};
+        var changes = w2ui['grid_<?php echo $idPage;?>_detail1'].getChanges();
+        changes.forEach(function(d){
+            if(d.recid!="url"){
+                    data[arrDetail[d.recid].value] = d.value;
+                    itemSelect[arrDetail[d.recid].value] = d.value;
+            }
+        });				
+        updateBdd('<?php if(!$this->ajax) echo '../'; ?>crud/update', data);
+    }
+}	    
+//sous forme de formulaire
+formECparam = { 
+        name     : 'form_EC',
+        header   : "Paramêtre d'une EC",
+        fields: [
+            { field: 'niveau', type: 'text', required: true },
+            { field: 'parcours', type: 'text', required: true },
+            { field: 'Semestre', type: 'int', required: true },
+            { field: 'Intitulés des UE ', type: 'text', required: true },
+            { field: 'UE nom court', type: 'text', required: true },
+            { field: 'Coeff', type: 'int', required: true },
+            { field: 'ECTS', type: 'int', required: true },
+            { field: 'Intitulés des EC de chaque UE ', type: 'text', required: true },
+            { field: 'EC nom court', type: 'text', required: true },
+            { field: 'Statut', type: 'text', required: false },
+            { field: '%CM', type: 'text', required: false },
+            { field: 'field_float', type: 'float', required: true },
+            { field: 'field_date', type: 'date' },
+            { field: 'field_list', type: 'list', required: true, 
+                options: { items: ['Adams, John', 'Johnson, Peter', 'Lewis, Frank', 'Cruz, Steve', 'Donnun, Nick'] } },
+            { field: 'field_enum', type: 'enum', required: true, 
+                options: { items: ['Adams, John', 'Johnson, Peter', 'Lewis, Frank', 'Cruz, Steve', 'Donnun, Nick'] } },
+            { field: 'field_textarea', type: 'text'},
+            { field: 'field_select', type: 'select', required: false, options: { items: ['fist', 'second'] } },
+            { field: 'field_check', type: 'checkbox', required: false },
+            { field: 'field_radio', type: 'radio', required: false }
+        ],
+        "Statut", "%CM", "%TD", "%TP", "VH EC", "Seuil", "EC Libre", "Mutualisation Hors EC Libre", "Commentaires", "Nbs de groupes ", "Coût HTD", "VH CM", "VH TD", "VH TP", "Mutualisation destination", "Mutualisation source", "Coût HTD formation"]0: "id"1: "niveau"2: "parcours"3: "Semestre"4: "Intitulés des UE "5: "UE nom court"6: "Coeff"7: "ECTS"8: "Intitulés des EC de chaque UE "9: "EC nom court"10: "Statut"11: "%CM"12: "%TD"13: "%TP"14: "VH EC"15: "Seuil"16: "EC Libre"17: "Mutualisation Hors EC Libre"18: "Commentaires"19: "Nbs de groupes "20: "Coût HTD"21: "VH CM"22: "VH TD"23: "VH TP"24: "Mutualisation destination"25: "Mutualisation source"26: "Coût HTD formation"length: 27__proto__: Array(0)
+
+        actions: {
+            reset: function () {
+                this.clear();
+            },
+            save: function () {
+                var obj = this;
+                this.save({}, function (data) { 
+                    if (data.status == 'error') {
+                        console.log('ERROR: '+ data.message);
+                        return;
+                    }
+                    obj.clear();
+                });
+            }
+        }
+    };
+
+
+function finCrud(){
+    selectCour = false;
+    bClick = false;
+    cacheButtonCours();
+    mouseleave(null);
+    buildPage();
+}
+
+// when the input range changes update the circle 
+d3.select("#rngHeureNb").on("input", function() {
+    d3.select("#modChangeHeureNb").text(this.value);
+    d3.select("#rngHeureNb").property("value", this.value);
+});
+
+// Dimensions of sunburst.
+var width = 750;
+var height = 600;
+var radius = Math.min(width, height) / 2;
+
+// Breadcrumb dimensions: width, height, spacing, width of tip/tail.
+var b = {
+  w: 75, h: 30, s: 3, t: 10
+};
+
+// Mapping of step names to colors.
+var colorsScale =  d3.scaleSequential(d3["interpolateRainbow"]).domain([0, colorsKey.length]);
+var colors = {};
+colorsKey.forEach(function(k,i){
+    colors[k]=colorsScale(i);
+});
+
+// Total size of all segments; we set this later, after loading the data.
+var totalSize = 0; 
+
+var vis;
+var partition = d3.partition()
+    .size([2 * Math.PI, radius * radius]);
+
+var arc = d3.arc()
+    .startAngle(function(d) { return d.x0; })
+    .endAngle(function(d) { return d.x1; })
+    .innerRadius(function(d) { return Math.sqrt(d.y0); })
+    .outerRadius(function(d) { return Math.sqrt(d.y1); });
+
+// Use d3.text and d3.csvParseRows so that we do not need to have a header
+/* row, and can receive the csv as an array of arrays.
+d3.text("../data/visit-sequences.csv", function(text) {
+  var csv = d3.csvParseRows(text);
+  var json = buildHierarchy(csv,'-');
+  createVisualization(json);
+});
+*/
+
+
+//chargement des données
+cacheButtonCours();
+d3.json("<?php echo $this->urlJson;?>",function(error,data){
+    dataIntCour = data.IntCour;
+    dataCour = data.cours
+    dataInt = data.intervenants;
+    //définitiion de la liste des colonnes pour une EC
+    colCour = [];
+    for (const prop in dataCour[0]) {
+        colCour.push(prop);
+    }
+    console.log(colCour);
+    // Basic setup of page elements.
+    initializeBreadcrumbTrail();
+    drawLegend();
+    buildPage();
+});
+
+function buildPage(){
+    buildViz();
+
+    var dataSelectInt = [];
+    //calcul les données
+    dataInt.forEach(function(int){
+        calculHeure(int);
+        int.text=int.Prénom+" "+int.Nom;
+    });
+    //initialise le champ pour la sélection des intervenants
+    $('#selectInt').w2field('enum', { 
+        items: dataInt,
+        openOnFocus: true,
+        selected: []
+    });
+
+    buildInterCard();
+
+}
+
+function exportJson(content, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([content], {type: contentType});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}
+
+function buildInterCard(){
+
+    d3.select("#cardInter").selectAll("div").remove();
+    var cards = d3.select("#cardInter").selectAll(".card")
+        .data(dataInt)
+        .enter().append("div")
+        .attr("id", function(d) { return "intCard"+d.id; })
+        .attr("class", function(d) { 
+            var c = "card";
+            if(d.Type=="Titulaires P8"){
+                if(d.Statut=="ATER")c+=" border-success";
+                if(d.Statut=="PROF")c+=" border-danger";
+                if(d.Statut=="MCF")c+=" border-warning";
+            }
+            if(d.Type=="Professionnel")c+=" border-primary";
+            if(d.Type=="Aucun")c+=" border-dark";
+            c +=" p-1";
+            return c; 
+        });
+    cards.append("img")
+        .attr("class", "card-img-top")
+        .attr("src", function(d) { 
+            var url = "http://www.samszo.univ-paris8.fr/ChaoticumPapillonae/CreaPapiDynaAnim.php?anim=0&larg=60&haut=60&id=svgPapiLogo"+d.id;//"../"+d.photo; 
+            return url;
+        });
+    var cBody = cards.append("div")
+        .attr("class", "card-body");
+    cBody.append("h5")
+        .attr("class", "card-title")
+        .text(function(d) { return d.Civilité+" "+d.Prénom+" "+d.Nom; });
+    cBody.append("p")
+        .attr("class", "card-text")
+        .text(function(d) { return d.Type+" "+d.Statut; });
+    
+    //ajoute les cours
+    cBody.append("div")
+        .attr("class", "treeCourt")
+        .attr("id", function(d){return "tree"+d.id;})
+        .each(function(d) {
+            buildTreeCour(d);
+        });
+
+    //niveau des heures
+    var prgb = cards.append("div")
+        .attr("class", "card-footer")
+        .append("div")
+        .attr("class", "progress");
+    //heures statutaires
+    prgb.append("div")
+        .attr("class", "progress-bar-striped bg-info")
+        .attr("role", "progressbar")
+        .style("width", function(d) { return d.prctHstat+"%"; })
+        .attr("aria-valuenow", function(d) { 
+            return d.prctHstat; 
+        })
+        .attr("aria-valuemin", "0")
+        .attr("aria-valuemax", "100")
+        .attr("id", function(d) { return "intHeureStat"+d.id; })
+        .text(function(d) { return d.nbHstat; });
+
+    //heures complémentaires
+    prgb.append("div")
+        .attr("class", "progress-bar-striped bg-danger")
+        .attr("role", "progressbar")
+        .style("width", function(d) { return d.prctHcomp+"%"; })
+        .attr("aria-valuenow", function(d) { return d.prctHcomp; })
+        .attr("aria-valuemin", "0")
+        .attr("aria-valuemax", "100")
+        .attr("id", function(d) { return "intHeureComp"+d.id; })
+        .text(function(d) { return d.nbHcomp; });
+}
+
+function buildTreeCour(d){
+    var n, dt = [];
+    d.ec.forEach(function(ec){
+        groupKey.forEach(function(g,i){
+            if(i==0)
+                n=getNodeCour(dt,ec.ec[g],ec.ec[g]);
+            else if (i==groupKey.length-1) 
+                n.nodes.push({text:ec.ec[g]
+                    ,tags:['<span id="'+d.id+'_'+ec.ec.id+'" onclick="changeHeure('+d.id+','+ec.ec.id+');" class="badge badge-light" style="font-size: 110%">'+ec.NbHeure+'</span>'
+                        ,'<i class="icon fa fa-2x fa-trash" />']
+                    ,color:'white',backColor:getColorCour(ec.ec.id)});
+            else
+                n=getNodeCour(n.nodes,ec.ec[g],n.text+"_"+ec.ec[g]);
+        });
+        //var par = getNodeCour(niv.nodes,ec[groupKey[1]],1);
+        //var ue = getNodeCour(par.nodes,ec[groupKey[2]],3);
+    });
+    //console.log(JSON.stringify(dt));
+    $('#tree'+d.id).treeview({data: dt,levels: 4,showTags:true});    
+}
+
+function changeHeure(idInt, idEC){
+    //console.log(int+', '+ec);
+    var objInt = dataInt.filter(function(d){
+        return d.id == idInt;
+    })[0];
+    var objEC = objInt.ec.filter(function(e){
+        return e.ec.id == idEC;
+    })[0];
+
+    d3.select("#modChangeHeureCour").text(objEC.ec['EC nom court']);
+    d3.select("#modChangeHeureInt").text(objInt.text);
+    d3.select("#modChangeHeureNb").text(objEC.NbHeure);
+    d3.select("#rngHeureNb").attr('max',objEC.ec['VH EC']).property("value", objEC.NbHeure);
+    $('#modChangeHeure').modal('show');
+}
+
+function getNodeCour(np,nom,id){
+
+    var n = np.filter(function(u){
+        return u.text == nom;
+    })
+    if(!n.length){
+        n={text:nom,color:'white',backColor:getColorCour(id),nodes:[]}
+        np.push(n);
+    }else{
+        n = n[0];
+    } 
+    return n;
+}
+
+function getColorCour(id){
+    var nc = nodesCour.filter(function(nc){
+        return id==nc.data.id;
+        /*
+        if(id && nc.data.name!='root' && nc.data.dt)
+            return id== nc.data.dt.id; 
+        else
+            return nom == nc.data.name; 
+        */
+    })
+    if(!nc.length)
+        return "black";
+    else
+        return nc[0].data.color;
+}
+function buildViz(){
+    //formate les données
+    var dataForma = [];
+    dataCour.forEach(function(d){
+        var gk = "";
+        groupKey.forEach(function(g){
+            gk += d[g]+'_';
+        });
+        gk = gk.substr(0,gk.length-1);
+        dataForma.push([gk,d[lblCalcul].replace(",", "."),d]);
+    });
+    treeCour = buildHierarchy(dataForma,'_');
+    
+    d3.select("#svgMain").remove();
+    vis = d3.select("#chart").append("svg:svg")
+        .attr("id", "svgMain")
+        .attr("width", width)
+        .attr("height", height)
+        .append("svg:g")
+        .attr("id", "container")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    createVisualization(treeCour);
+}
+
+
+
+// Main function to draw and set up the visualization, once we have the data.
+function createVisualization(json) {
+
+  // Bounding circle underneath the sunburst, to make it easier to detect
+  // when the mouse leaves the parent g.
+  vis.append("svg:circle")
+      .attr("r", radius)
+      .style("opacity", 0);
+
+  // Turn the data into a d3 hierarchy and calculate the sums.
+  rootCour = d3.hierarchy(json)
+      .sum(function(d) { return d.size; })
+      .sort(function(a, b) { return b.value - a.value; });
+  
+  // For efficiency, filter nodes to keep only those large enough to see.
+  nodesCour = partition(rootCour).descendants()
+      .filter(function(d) {
+          return (d.x1 - d.x0 > 0.005); // 0.005 radians = 0.29 degrees
+      });
+
+  var path = vis.data([json]).selectAll("path")
+      .data(nodesCour)
+      .enter().append("svg:path")
+      .attr("display", function(d) { return d.depth ? null : "none"; })
+      .attr("d", arc)
+      .attr("fill-rule", "evenodd")
+      .style("fill", function(d) { 
+          return d.data.color; 
+        })
+      .style("opacity", 1)
+      .on("mouseover", mouseover)
+      .on("click", clickCour);
+
+  // Add the mouseleave handler to the bounding circle.
+  d3.select("#container").on("mouseleave", mouseleave);
+
+  // Get total size of the tree = value of root node from partition.
+  totalSize = path.datum().value;
+ };
+
+//affiche les intervenants
+function afficheInter(d){
+
+    //affiche les intervenants correspondants
+    var sequenceArray = [];
+    if(d.name!="root"){
+        sequenceArray = d.descendants().reverse();
+        var dpt = sequenceArray[0].depth;
+    }else display = "";    
+    var div = d3.select("#cardInter").selectAll("div").style("display",display);
+    sequenceArray.forEach(function(s){
+        if(dpt == s.depth){
+            dataIntCour.forEach(function(ic){
+                if(ic.IdEC==s.data.dt.id){
+                    var c = d3.select("#intCard"+ic.idInt).style("display","").selectAll("div").style("display","");
+                } 
+            }) 
+        }
+    });
+
+}
+
+function clickCour(d){
+    cacheButtonCours();
+
+    if(bClick)bClick=false;
+    else bClick = true;
+    display = bClick ? "none" : "";
+    
+    if(d.depth==4 && selectCour!=d){
+        d3.select('#frmSetCourToInt').style("display",'');
+        selectCour = d;
+        selectParc = false;
+        selectUE = false;
+    }else{
+        selectCour = false;
+        d3.select('#frmSetCourToInt').style("display",'none');
+    } 
+    if(bClick){
+        //affiche les boutons correspondant au niveau
+        if(d.depth==2){
+            d3.select('#btnAjouterUE').style("display",'');
+            selectParc = d;
+        }
+        if(d.depth==3){
+            d3.select('#btnRemoveUE').style("display",'');
+            d3.select('#btnModifUE').style("display",'');
+            d3.select('#btnAjouterEC').style("display",'');
+            selectUE = d;
+        }
+        if(d.depth==4){
+            d3.select('#btnRemoveEC').style("display",'');
+            d3.select('#btnModifEC').style("display",'');
+        }
+    }
+
+
+    afficheInter(d);
+}
+
+function cacheButtonCours(){
+    d3.select('#btnRemoveUE').style("display",'none');
+    d3.select('#btnRemoveEC').style("display",'none');
+    d3.select('#btnAjouterUE').style("display",'none');
+    d3.select('#btnAjouterEC').style("display",'none');
+    d3.select('#btnModifUE').style("display",'none');
+    d3.select('#btnModifEC').style("display",'none');
+}
+
+// Fade all but the current sequence, and show it in the breadcrumb trail.
+function mouseover(d) {
+
+  if(bClick)return;
+  
+  display = "none";
+  afficheInter(d);
+
+  var percentage = (100 * d.value / totalSize).toPrecision(3);
+  var percentageString = d.value+" "+lblCalcul+" = "+percentage + "%";
+  if (percentage < 0.1) {
+    percentageString = "< 0.1%";
+  }
+
+
+  d3.select("#key")
+        .text(groupKey[d.depth-1]);
+
+  d3.select("#valeur")
+      .text(d.data.name);
+
+  d3.select("#percentage")
+      .text(percentageString);
+  
+  /*
+  d3.select("#calcul")
+      .text("du "+lblCalcul);
+  */
+  d3.select("#explanation")  
+      .style("visibility", "");
+
+  var sequenceArray = d.ancestors().reverse();
+  sequenceArray.shift(); // remove root node from the array
+  updateBreadcrumbs(sequenceArray, percentageString);
+
+  // Fade all the segments.
+  d3.selectAll("path")
+      .style("opacity", 0.3);
+
+  // Then highlight only those that are an ancestor of the current segment.
+  vis.selectAll("path")
+      .filter(function(node) {
+                return (sequenceArray.indexOf(node) >= 0);
+              })
+      .style("opacity", 1);
+}
+
+// Restore everything to full opacity when moving off the visualization.
+function mouseleave(d) {
+    if(bClick)return;
+
+  display = "";
+  //afficheInter(d);
+
+  // Hide the breadcrumb trail
+  d3.select("#trail")
+      .style("visibility", "hidden");
+
+  // Deactivate all segments during transition.
+  d3.selectAll("path").on("mouseover", null);
+
+  // Transition each segment to full opacity and then reactivate it.
+  d3.selectAll("path")
+      .transition()
+      .duration(1000)
+      .style("opacity", 1)
+      .on("end", function() {
+              d3.select(this).on("mouseover", mouseover);
+            });
+
+  d3.select("#explanation")
+      .style("visibility", "hidden");
+}
+
+function initializeBreadcrumbTrail() {
+  // Add the svg area.
+  var trail = d3.select("#sequence").append("svg:svg")
+      .attr("width", width)
+      .attr("height", 50)
+      .attr("id", "trail");
+  // Add the label at the end, for the percentage.
+  trail.append("svg:text")
+    .attr("id", "endlabel")
+    .style("fill", "#000");
+}
+
+// Generate a string that describes the points of a breadcrumb polygon.
+function breadcrumbPoints(d, i, w) {
+  var points = [];
+  points.push("0,0");
+  points.push(w + ",0");
+  points.push(w + b.t + "," + (b.h / 2));
+  points.push(w + "," + b.h);
+  points.push("0," + b.h);
+  if (i > 0) { // Leftmost breadcrumb; don't include 6th vertex.
+    points.push(b.t + "," + (b.h / 2));
+  }
+  return points.join(" ");
+}
+
+// Update the breadcrumb trail to show the current sequence and percentage.
+function updateBreadcrumbs(nodeArray, percentageString) {
+
+  // Data join; key function combines name and depth (= position in sequence).
+  var trail = d3.select("#trail")
+      .selectAll("g")
+      .data(nodeArray, function(d) { return d.data.name + d.depth; });
+
+  // Remove exiting nodes.
+  trail.exit().remove();
+
+  // Add breadcrumb and label for entering nodes.
+  var entering = trail.enter().append("svg:g");
+
+  /*création de rectangle qui s'adapte au texte
+  entering.append("svg:rect")
+    .attr("id", function(d, i) { return 'recBC_'+i; })
+    .attr("x", 0)
+    .attr("width", 10)
+    .attr("height", b.h)
+    .style("fill", function(d) { return colors[d.data.name]; });
+  */
+  //création du polygon qui s'adapte au texte
+  entering.append("svg:polygon")
+      .attr("id", function(d, i) { return 'polyBC_'+i; })
+      .style("fill", function(d) { return d.data.color; });
+
+
+
+  entering.append("svg:text")
+      .attr("id", function(d, i) { return 'txtBC_'+i; })
+      .attr("x", b.s+b.t)
+      .attr("y", b.h / 2)      
+      .attr("dy", "0.35em")
+      .text(function(d) { return d.data.name; });
+
+  // Merge enter and update selections; set position for all nodes.
+  var xBC = 0, xOld;
+  entering.merge(trail).attr("transform", function(d, i) {
+    //récupère la taille du texte
+    var l = d3.select("#txtBC_"+i).node().getComputedTextLength();
+    //modifie la taille du rectangle
+    var recW = l + b.s + b.t;
+    //d3.select("#recBC_"+i).attr("width", recW);
+    //modifie le tracer du polygon
+    d3.select("#polyBC_"+i).attr("points", breadcrumbPoints(d,i,recW));
+
+    //calcule le déplacement du graphique
+    if(i>0) xBC += xOld;
+    xOld = recW+(b.t / 2);    
+
+    return "translate(" + xBC + ", 0)";
+  });
+
+  // Now move and update the percentage at the end.
+  d3.select("#trail").select("#endlabel")
+      .attr("x", xBC+xOld+b.t)
+      .attr("y", b.h / 2)
+      .attr("dy", "0.35em")
+      .text(percentageString);
+
+  // Make the breadcrumb trail visible, if it's hidden.
+  d3.select("#trail")
+      .style("visibility", "");
+
+}
+
+function drawLegend() {
+
+  // Dimensions of legend item: width, height, spacing, radius of rounded rect.
+  var li = {
+    w: 50, h: 30, s: 3, r: 3
+  };
+
+  var legend = d3.select("#legend").append("svg:svg")
+      .attr("width", li.w)
+      .attr("height", d3.keys(colors).length * (li.h + li.s));
+
+  var g = legend.selectAll("g")
+      .data(d3.entries(colors))
+      .enter().append("svg:g")
+      .attr("transform", function(d, i) {
+              return "translate(0," + i * (li.h + li.s) + ")";
+           });
+
+  g.append("svg:rect")
+      .attr("rx", li.r)
+      .attr("ry", li.r)
+      .attr("width", li.w)
+      .attr("height", li.h)
+      .style("fill", function(d) { return d.value; });
+
+  g.append("svg:text")
+      .attr("x", li.w / 2)
+      .attr("y", li.h / 2)
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.key; });
+}
+
+
+// Take a 2-column CSV and transform it into a hierarchical structure suitable
+// for a partition layout. The first column is a sequence of step names, from
+// root to leaf, separated by hyphens. The second column is a count of how 
+// often that sequence occurred.
+function buildHierarchy(csv,sep) {
+  var root = {"name": "root", "id": "_", "children": []};
+  for (var i = 0; i < csv.length; i++) {
+    var sequence = csv[i][0];
+    var size = +csv[i][1];
+    var dt = csv[i][2];
+    if (isNaN(size)) { // e.g. if this is a header row
+      continue;
+    }
+    var parts = sequence.split(sep);
+    var currentNode = root;
+    for (var j = 0; j < parts.length; j++) {
+      var children = currentNode["children"];
+      var nodeName = parts[j];
+      var childNode;
+        if (j + 1 < parts.length) {
+            // Not yet at the end of the sequence; move down the tree.
+            var foundChild = false;
+            for (var k = 0; k < children.length; k++) {
+                if (children[k]["name"] == nodeName) {
+                    childNode = children[k];
+                    foundChild = true;
+                    break;
+                }
+            }
+            // If we don't already have a child node for this branch, create it.
+            if (!foundChild) {
+                var id = nodeName;
+                if(j>0)id = parts[j-1]+"_"+nodeName;
+                dt["id_"+j]=id;
+                childNode = {"id":id, "color": getAutoColor(nodeName, currentNode.color), "dt":dt, "name": nodeName, "children": []};
+                children.push(childNode);
+            }
+            currentNode = childNode;
+        } else {
+            // Reached the end of the sequence; create a leaf node.
+            childNode = {"id":dt.id, "name": nodeName, "size": size, "dt":dt, "color": getAutoColor(nodeName, currentNode.color)};
+            children.push(childNode);
+        }
+    }
+  }
+  return root;
+};    
+
+function getNumlText(txt){
+    var num = 0
+    for (i = 0; i < txt.length; i++) {
+        num += txt.charCodeAt(0);
+    }
+    //console.log('getNumlText: '+txt+' = '+num);
+    return num;
+}
+
+function getAutoColor(name, pColor){
+    var c = 0;
+    if(colors[name])c=colors[name];
+    else c= d3.color(pColor).darker();//.brighter();
+    return c;
+}
+
+function calculHeure(int){
+    var nbH = 0;
+    int.ec = [];
+    dataIntCour.forEach(function(d){
+        if(d.idInt==int.id){
+            dataCour.forEach(function(ec){
+                if(ec.id == d.IdEC){
+                    nbH+=Number(d.NbHeure.replace(",", "."));
+                    int.ec.push({'ec':ec,'NbHeure':d.NbHeure});
+                }
+            })
+        }
+    });
+    int.nbH = nbH;
+    if(int.Type=="Titulaires P8"){
+        if(int.nbH > maxHeureStat){
+            int.nbHstat = maxHeureStat;
+            int.prctHstat = 100;
+            int.nbHcomp = int.nbH-maxHeureStat;
+            int.prctHcomp = sclHeureComp(int.nbHcomp);
+        }else{
+            int.nbHstat = int.nbH;
+            int.prctHstat = sclHeureStat(int.nbHstat);
+            int.nbHcomp = 0;
+            int.prctHcomp = 0;
+        }
+    }else{
+        int.nbHstat = int.nbH;
+        int.prctHstat = sclHeureComp(int.nbHstat);
+        int.nbHcomp = 0;
+        int.prctHcomp = 0;
+    }
+
+    //console.log("calculHeure="+nbH);
+    return int;
+}
+
+    </script>
+  </body>
+</html>

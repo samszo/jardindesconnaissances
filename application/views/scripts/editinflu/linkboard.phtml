@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Link Board</title>
+<style>
+html, body {
+	height: 100%;
+}
+/* merci à https://github.com/basilebong/bootstrap4-fullscreen-modal */
+.modal.modal-fullscreen .modal-dialog {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  max-width: none; }
+
+.modal.modal-fullscreen .modal-content {
+  height: auto;
+  min-height: 100%;
+  border-radius: 0;
+  border: none; }
+
+</style>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+<script type="text/javascript">
+var prefUrl = "";
+var uti = <?php echo $this->uti; ?>;
+</script>
+<script type="text/javascript" src="../js/d3.min.js"></script>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script type="text/javascript" src="../js/editinflu/flux.js"></script>
+
+
+</head>
+
+<body>
+
+<div class="modal fade" id="modalAjoutObjet" tabindex="-1" role="dialog" aria-labelledby="modalAjoutObjet" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="ajoutObjetLabel">Ajouter une source</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        <form id="frmAjoutSource" class="needs-validation" novalidate>
+	          <div class="form-group">	        
+	            <label for="ajoutIdObjet" class="col-form-label">Type de source :</label>
+				<div class="custom-control custom-radio custom-control-inline">
+				  <input type="radio" id="validationRbGallerie" value="photosets"  name="rbTypeObjet" class="custom-control-input" required>
+				  <label class="custom-control-label" for="validationRbGallerie">Album</label>
+				</div>
+				<div class="custom-control custom-radio custom-control-inline">
+				  <input type="radio" id="validationRbGroupe" value="group" name="rbTypeObjet" class="custom-control-input" required>
+				  <label class="custom-control-label" for="validationRbGroupe">Groupe</label>
+				</div>	        
+	          </div>
+	          <div class="form-group">
+	            <label for="validationajoutIdObjet" class="col-form-label">identifiant de la source :</label>
+	            <input type="text" class="form-control" id="validationAjoutIdObjet" placeholder="3070672@N22" required>
+				<div class="invalid-feedback">Merci de saisir l'identifiant de la source.</div>
+              </div>
+	        </form>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+	        <button type="button" type="submit" id="modalAjoutBtn" class="btn btn-primary">Ajouter</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>  
+	<div class="modal fade" id="modalWait" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true">
+	  <div class="modal-dialog" role="document" >
+	    <div class="modal-content" style="width: 330px;">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="ajoutObjetLabel">Merci de patienter...</h5>
+	      </div>
+	      <div class="modal-body">
+  <!-- merci beaucoup à https://codepen.io/madetoday/pen/MYxYeo -->
+<svg id="wrap" width="300" height="300">
+  <!-- background  -->
+  <svg>
+    <circle cx="150" cy="150" r="130" style="stroke: lightblue; stroke-width:18; fill:transparent"/>
+    <circle cx="150" cy="150" r="115" style="fill:#2c3e50"/>
+    <path style="stroke: #2c3e50; stroke-dasharray:820; stroke-dashoffset:820; stroke-width:18; fill:transparent" d="M150,150 m0,-130 a 130,130 0 0,1 0,260 a 130,130 0 0,1 0,-260">
+      <animate attributeName="stroke-dashoffset" dur="6s" to="-820" repeatCount="indefinite"/>
+    </path>
+  </svg>
+  
+  <!-- image -->
+  <svg>
+    <path id="hourglass" d="M150,150 C60,85 240,85 150,150 C60,215 240,215 150,150 Z" style="stroke: white; stroke-width:5; fill:white;" />
+    
+    <path id="frame" d="M100,97 L200, 97 M100,203 L200,203 M110,97 L110,142 M110,158 L110,200 M190,97 L190,142 M190,158 L190,200 M110,150 L110,150 M190,150 L190,150" style="stroke:lightblue; stroke-width:6; stroke-linecap:round" />
+    
+    <animateTransform xlink:href="#frame" attributeName="transform" type="rotate" begin="0s" dur="3s" values="0 150 150; 0 150 150; 180 150 150" keyTimes="0; 0.8; 1" repeatCount="indefinite" />
+    <animateTransform xlink:href="#hourglass" attributeName="transform" type="rotate" begin="0s" dur="3s" values="0 150 150; 0 150 150; 180 150 150" keyTimes="0; 0.8; 1" repeatCount="indefinite" />
+  </svg>
+  
+  <!-- sand -->
+  <svg>
+    <!-- upper part -->
+    <polygon id="upper" points="120,125 180,125 150,147" style="fill:#2c3e50;">
+      <animate attributeName="points" dur="3s" keyTimes="0; 0.8; 1" values="120,125 180,125 150,147; 150,150 150,150 150,150; 150,150 150,150 150,150" repeatCount="indefinite"/>
+    </polygon>
+    
+    <!-- falling sand -->
+    <path id="line" stroke-linecap="round" stroke-dasharray="1,4" stroke-dashoffset="200.00" stroke="#2c3e50" stroke-width="2" d="M150,150 L150,198">
+      <!-- running sand -->
+      <animate attributeName="stroke-dashoffset" dur="3s" to="1.00" repeatCount="indefinite"/>
+      <!-- emptied upper -->
+      <animate attributeName="d" dur="3s" to="M150,195 L150,195" values="M150,150 L150,198; M150,150 L150,198; M150,198 L150,198; M150,195 L150,195" keyTimes="0; 0.65; 0.9; 1" repeatCount="indefinite"/>
+      <!-- last drop -->
+      <animate attributeName="stroke" dur="3s" keyTimes="0; 0.65; 0.8; 1" values="#2c3e50;#2c3e50;transparent;transparent" to="transparent" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- lower part -->
+    <g id="lower">
+      <path d="M150,180 L180,190 A28,10 0 1,1 120,190 L150,180 Z" style="stroke: transparent; stroke-width:5; fill:#2c3e50;">
+        <animateTransform attributeName="transform" type="translate" keyTimes="0; 0.65; 1" values="0 15; 0 0; 0 0" dur="3s" repeatCount="indefinite" />
+      </path>
+      <animateTransform xlink:href="#lower" attributeName="transform"
+                    type="rotate"
+                    begin="0s" dur="3s"
+                    values="0 150 150; 0 150 150; 180 150 150"
+                    keyTimes="0; 0.8; 1"
+                    repeatCount="indefinite"/>
+    </g>
+    
+    <!-- lower overlay - hourglass -->
+    <path d="M150,150 C60,85 240,85 150,150 C60,215 240,215 150,150 Z" style="stroke: white; stroke-width:5; fill:transparent;">
+      <animateTransform attributeName="transform"
+                    type="rotate"
+                    begin="0s" dur="3s"
+                    values="0 150 150; 0 150 150; 180 150 150"
+                    keyTimes="0; 0.8; 1"
+                    repeatCount="indefinite"/>
+    </path>
+    
+    <!-- lower overlay - frame -->
+    <path id="frame" d="M100,97 L200, 97 M100,203 L200,203" style="stroke:lightblue; stroke-width:6; stroke-linecap:round">
+      <animateTransform attributeName="transform"
+                    type="rotate"
+                    begin="0s" dur="3s"
+                    values="0 150 150; 0 150 150; 180 150 150"
+                    keyTimes="0; 0.8; 1"
+                    repeatCount="indefinite"/>
+    </path>
+  </svg>
+  
+</svg>	      
+	      </div>
+	      <div class="modal-footer">
+	      </div>
+	    </div>
+	  </div>
+	</div>  
+	
+	<div class="container-fluid">	  
+		<nav id="nbMain" class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+			<a class="navbar-brand" href="#">
+				<h4 class="text-center" >Link Board</h4>
+			</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse"
+				data-target="#navbarTogglerDemo02"
+				aria-controls="navbarTogglerDemo02" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link active" id="corpus-tab" data-toggle="tab" href="#corpus" role="tab" aria-controls="corpus" aria-selected="true">CORPUS</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="stimulation-tab" data-toggle="tab" href="#stimulation" role="tab" aria-controls="stimulation" aria-selected="false">STIMULATION</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="discussion-tab" data-toggle="tab" href="#discussion" role="tab" aria-controls="discussion" aria-selected="false">DISCUSSION</a>
+					</li>
+				</ul>
+				<form class="form-inline my-2 my-lg-0">
+					<button id="uti" class="btn btn-outline-success my-2 my-sm-0" type="button"><?php echo $this->login; ?></button>
+					<button class="btn btn-outline-danger my-2 my-sm-0" onclick="deconnexion()" type="button">déconnexion</button>
+				</form>
+			</div>
+		</nav>	  
+		<div class="tab-content" id="myTabContent">
+			<div class="tab-pane fade show active" id="corpus" role="tabpanel" aria-labelledby="corpus-tab">
+				<h4 class="text-center">Modélisation du corpus</h4>
+				<div class="card-deck">
+					<div class="card" id="card-corpus-accueil">
+						<div class="card-body">
+							<h5 class="card-title">Choix es sources</h5>
+							<form>
+								<div class="form-group">
+									<label for="iptQuery">Requête</label>
+									<input type="text" class="form-control" id="iptQuery" placeholder="...">
+								</div>
+								<div class="form-group">
+									<label for="sltSource">Sources</label>
+									<select class="form-control" id="sltSource">
+									<option>Isidore</option>
+									<option>ISTEX</option>
+									<option>ArchiveSIC</option>
+									</select>
+								</div>
+								<button type="submit" class="btn btn-primary">Charger</button>
+							</form>
+						</div>
+					</div>
+  <div class="card" id="list-item-1">
+    <div class="card-body">
+      <h5 class="card-title">Selection des disciplines</h5>
+      <p class="card-text">Toutes</p>
+	  <!-- Modal -->
+		<div class="modal fade modal-fullscreen" id="modalDiscipline" tabindex="-1" role="dialog" aria-labelledby="modalDisciplineTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-body" id="modalDiscipline-body">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+		</div>
+    </div>
+    <div class="card-footer">
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalDiscipline">Sélectionner</button>
+    </div>
+  </div>
+  <div class="card" id="list-item-2">
+    <img class="card-img-top" src=".../100px180/" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+    </div>
+    <div class="card-footer">
+      <small class="text-muted">Last updated 3 mins ago</small>
+    </div>
+  </div>
+  <div class="card" id="list-item-3">
+    <img class="card-img-top" src=".../100px180/" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+    </div>
+    <div class="card-footer">
+      <small class="text-muted">Last updated 3 mins ago</small>
+    </div>
+  </div>
+</div>
+			
+
+					</div>
+			</div>
+			<div class="tab-pane fade" id="stimulation" role="tabpanel" aria-labelledby="stimulation-tab">
+			</div>
+			<div class="tab-pane fade" id="discussion" role="tabpanel" aria-labelledby="discussion-tab">
+			</div>
+		</div>
+				
+	</div>
+
+	<script src="../js/popper.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script>
+	//gestion des événements
+	$('#modalDiscipline').on('shown.bs.modal', function () {
+		var h = this.clientHeight-90;
+		d3.select('#modalDiscipline-iframe').remove();
+		d3.select('#modalDiscipline-body')
+			.append('iframe')
+			.attr('id',"modalDiscipline-iframe")
+			.attr('width',"100%")
+			.attr('height',h)
+			.style('margin',0)
+			.style('padding',0)
+			.style('border','none')
+			.attr('src',"http://localhost/jdc/public/graph/streamv?type=getHistoDiscipline&q=jean-Max%20Noyer&legende=0");
+	})
+	
+	</script>
+</body>
+</html>

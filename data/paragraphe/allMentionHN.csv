@@ -1,0 +1,196 @@
+id,niveau,parcours,Semestre,Intitulés des UE ,UE nom court,Coeff,ECTS,Intitulés des EC de chaque UE ,EC nom court,Statut,Coeff,ECTS,%CM,%TD,%TP,VH EC,Seuil,EC Libre,Mutualisation Hors EC Libre,Commentaires,Nbs de groupes ,Coût HTD,VH CM,VH TD,VH TP,Mutualisation destination,Mutualisation source,Coût HTD formation
+0,M1,commun,1,Théorie du numérique,Théorie du numérique,1,7,Approches transversales des médias numériques (socle commun),Approches transversales,O,3,3,"0,7","0,3",,30,150,Non Ouvert,Non,,1,"40,5",21,9,0,,,0
+1,M1,commun,1,Théorie du numérique,Théorie du numérique,1,,Economie et droit du numérique (socle commun),Economie et droit,O,4,4,"0,7","0,3",,30,150,Non Ouvert,Non,,1,"40,5",21,9,0,,,0
+2,M1,commun,1,Pratiques numériques,Pratiques numériques,1,8,Langages web (socle commun),Langages web,O,4,4,"0,5","0,5",,30,30,Non Ouvert,Non,,5,"187,5",15,15,0,,,0
+3,M1,commun,1,Pratiques numériques,Pratiques numériques,1,,Bases de données relationnelles (socle commun),Bases de données,O,4,4,"0,5","0,5",,30,30,Non Ouvert,Non,,5,"187,5",15,15,0,,,0
+4,M1,CEN,1,Ateliers Média,Ateliers Média,1,6,Atelier image  illustrator - photoshop,Atelier image,X,3,3,,1,,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,30,0,30,0,M1-NET,,0
+5,M1,CEN,1,Ateliers Média,Ateliers Média,1,,Atelier 3D : modélisation,Atelier 3D,X,3,3,,1,,30,30,Non Ouvert,"Offert, sur P9",Offert à NET,1,30,0,30,0,M1-NET,,0
+6,M1,CEN,1,Ateliers Média,Ateliers Média,1,,EC Libre,EC Libre,X,3,3,,,,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,0,0,0,0,M1-NET,,0
+7,M1,CEN,1,Ateliers Média,Ateliers Média,1,,Atelier son ,Atelier son ,X,3,3,,1,,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,30,0,30,0,M1-NET,,0
+8,M1,CEN,1,Ateliers Média,Ateliers Média,1,,Atelier vidéo  enrichie et compositing,Atelier Vidéo,X,3,3,,1,,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,30,0,30,0,M1-NET,,0
+9,M1,CEN,1,Production Numérique,Production Numérique,1,9,Interaction 3D,Interaction 3D,X,3,3,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+10,M1,CEN,1,Production Numérique,Production Numérique,1,,Editorialisation et strategie de contenu,Editorialisation,X,3,3,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+11,M1,CEN,1,Production Numérique,Production Numérique,1,,intégration : HTML / CSS ,HTML / CSS,X,3,3,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+12,M1,CEN,1,Production Numérique,Production Numérique,1,,Graphisme et ergonomie d'interfaces,Graphisme et ergonomie,X,3,3,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+13,M1,CEN,2,Langages et Méthodes,Langages et Méthodes,1,3,Interactions gestuelles ,Interactions gestuelles ,X,3,3,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+14,M1,CEN,2,Langages et Méthodes,Langages et Méthodes,1,,Conception et gestion de projet numérique,Conception et gestion de projet,X,3,3,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+15,M1,CEN,2,Langages et Méthodes,Langages et Méthodes,1,,développement tactile,développement tactile,X,3,3,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+16,M1,CEN,2,Journées crossmédias  I,Journées crossmédias  I,1,8,Rencontres crossmédias I,Rencontres crossmédias I,O,4,4,1,,,30,30,Ouvert,"Offert, sur P8",Offert à NET,1,45,30,0,0,M1-NET,,0
+17,M1,CEN,2,Journées crossmédias  I,Journées crossmédias  I,1,,Atelier Crossmédias I,Atelier Crossmédias I,O,4,4,,1,,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,30,0,30,0,M1-NET,,0
+18,M1,CEN,2,Réalisation projet,Réalisation projet,3,19,Suivi développement et intégration ,Suivi développement,O,4,4,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+19,M1,CEN,2,Réalisation projet,Réalisation projet,3,,Direction artistique ,Direction artistique ,O,4,4,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+20,M1,CEN,2,Réalisation projet,Réalisation projet,3,,Interaction appliquée,Interaction appliquée,O,4,4,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+21,M1,CEN,2,Réalisation projet,Réalisation projet,3,,animation 2D et vidéo,animation 2D vidéo,O,3,3,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+22,M1,CEN,2,Réalisation projet,Réalisation projet,3,,Aspects éditoriaux de la réalisation multimédia ,Aspects éditoriaux,O,4,4,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert à NET,1,"40,5",21,9,0,M1-NET,,0
+23,M1,NET,1,Ateliers Média,Ateliers Média,1,6,Atelier image  illustrator - photoshop,Atelier image,X,3,3,,1,,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,30,0,30,0,,M1-CEN,30
+24,M1,NET,1,Ateliers Média,Ateliers Média,1,,Atelier 3D : modélisation,Atelier 3D,X,3,3,,1,,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,30,0,30,0,,M1-CEN,30
+25,M1,NET,1,Ateliers Média,Ateliers Média,1,,EC Libre,EC Libre,X,3,3,,,,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,0,0,0,0,,M1-CEN,0
+26,M1,NET,1,Ateliers Média,Ateliers Média,1,,Atelier son ,Atelier son ,X,3,3,,1,,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,30,0,30,0,,M1-CEN,30
+27,M1,NET,1,Ateliers Média,Ateliers Média,1,,Atelier vidéo  enrichie et compositing,Atelier Vidéo,X,3,3,,1,,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,30,0,30,0,,M1-CEN,30
+28,M1,NET,1,Production Numérique,Production Numérique,1,9,Interaction 3D,Interaction 3D,X,3,3,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+29,M1,NET,1,Production Numérique,Production Numérique,1,,Editorialisation et strategie de contenu,Editorialisation,X,3,3,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+30,M1,NET,1,Production Numérique,Production Numérique,1,,intégration : HTML / CSS ,HTML / CSS,X,3,3,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+31,M1,NET,1,Production Numérique,Production Numérique,1,,Graphisme et ergonomie d'interfaces,Graphisme et ergonomie,X,3,3,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+32,M1,NET,2,Langages et Méthodes,Langages et Méthodes,1,3,Interactions gestuelles ,Interactions gestuelles ,X,3,3,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+33,M1,NET,2,Langages et Méthodes,Langages et Méthodes,1,,Conception et gestion de projet numérique,Conception et gestion de projet,X,3,3,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+34,M1,NET,2,Langages et Méthodes,Langages et Méthodes,1,,développement tactile,développement tactile,X,3,3,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+35,M1,NET,2,Journées crossmédias  I,Journées crossmédias  I,1,8,Rencontres crossmédias I,Rencontres crossmédias I,O,4,4,1,,,30,30,Ouvert,Pris sur P8,Pris à CEN,1,45,30,0,0,,M1-CEN,45
+36,M1,NET,2,Journées crossmédias  I,Journées crossmédias  I,1,,Atelier Crossmédias I,Atelier Crossmédias I,O,4,4,,1,,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,30,0,30,0,,M1-CEN,30
+37,M1,NET,2,Réalisation projet,Réalisation projet,3,19,Suivi développement et intégration ,Suivi développement,O,4,4,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+38,M1,NET,2,Réalisation projet,Réalisation projet,3,,Direction artistique ,Direction artistique ,O,4,4,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+39,M1,NET,2,Réalisation projet,Réalisation projet,3,,Interaction appliquée,Interaction appliquée,O,4,4,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+40,M1,NET,2,Réalisation projet,Réalisation projet,3,,animation 2D et vidéo,animation 2D vidéo,O,3,3,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+41,M1,NET,3,Réalisation projet,Réalisation projet,3,,Aspects éditoriaux de la réalisation multimédia ,Aspects éditoriaux,O,4,4,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à CEN,1,"40,5",21,9,0,,M1-CEN,"40,5"
+42,M1,GIS,1,Information - communication - langage,Info – com - langage,1,8,Introduction aux sciences de l'information et de la communication (SIC),Introduction SIC,O,2,2,"0,7","0,3",,15,30,Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,"21,5",11,5,0,"M1-AVUN,M1-PTN",,0
+43,M1,GIS,1,Information - communication - langage,Info – com - langage,1,,Sciences du langage et pragmatique de la communication,Sciences du langage et pragmatique,O,4,4,"0,7","0,3",,30,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,"40,5",21,9,0,"M1-AVUN,M1-PTN",,0
+44,M1,GIS,1,Information - communication - langage,Info – com - langage,1,,Bases de l'anglais professionnel,Anglais,X,2,2,,1,,15,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,15,0,15,0,"M1-AVUN,M1-PTN",,0
+45,M1,GIS,1,Information - communication - langage,Info – com - langage,1,,EC Libre,EC Libre,X,,,,,,,30,,"Offert, sur P8",Offert. AVUN/PTN,,,,,,"M1-AVUN,M1-PTN",,0
+46,M1,GIS,1,Fondamentaux en information-documentation 1,Fondamentaux info-doc 1,1,7,Description des documents et métadonnées,Description et métadonnées,O,3,3,"0,5","0,5",,20,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,25,10,10,0,"M1-AVUN,M1-PTN",,0
+47,M1,GIS,1,Fondamentaux en information-documentation 2,Fondamentaux info-doc 2,1,,Langages documentaires et classifications,Langages documentaires,O,4,4,"0,5","0,5",,30,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,"37,5",15,15,0,"M1-AVUN,M1-PTN",,0
+48,M1,GIS,2,Management de la fonction information,Management fonction info,1,7,Gestion d’un service info-documentaire,Gestion service info-doc,O,4,4,"0,5","0,5",,30,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,"37,5",15,15,0,"M1-AVUN,M1-PTN",,0
+49,M1,GIS,2,Management de la fonction information,Management fonction info,1,,Etude des besoins et cahier des charges ,Etude des besoins,O,3,3,"0,3","0,7",,30,30,Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,"34,5",9,21,0,"M1-AVUN,M1-PTN",,0
+50,M1,GIS,2,Informatique documentaire,Informatique documentaire,1,7,Systèmes de recherche d'information (SRI),SRI,O,3,3,"0,5","0,5",,20,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,25,10,10,0,"M1-AVUN,M1-PTN",,0
+51,M1,GIS,2,Informatique documentaire,Informatique documentaire,1,,"Logiciels documentaires (GED, SIGB)",GED – SIGB,O,4,4,"0,5","0,5",,30,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,"37,5",15,15,0,"M1-AVUN,M1-PTN",,0
+52,M1,GIS,2,Fondamentaux en information-documentation 2,Fondamentaux info-doc 2,1,8,Sources et méthodes en recherche d’information,Sources et méthodes en recherche,O,4,4,"0,3","0,7",,30,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,"34,5",9,21,0,"M1-AVUN,M1-PTN",,0
+53,M1,GIS,2,Fondamentaux en information-documentation 3,Fondamentaux info-doc 3,1,,Indexation des documents,Indexation documents,O,2,2,"0,3","0,7",,15,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,"18,5",5,11,0,"M1-AVUN,M1-PTN",,0
+54,M1,GIS,2,Fondamentaux en information-documentation 4,Fondamentaux info-doc 4,1,,Traitement du document audiovisuel,Traitement document audiovisuel,O,2,2,"0,3","0,7",,15,30,Non Ouvert,"Offert, sur P8",Offert. AVUN/PTN,1,"18,5",5,11,0,"M1-AVUN,M1-PTN",,0
+55,M1,GIS,2,Stage et rapport,Stage,1,8,Stage et rapport,Stage,O,8,8,,,,,,,,,0,0,0,0,0,,,0
+56,M1,AVUN,1,Information - communication - langage,Info – com - langage,1,8,Introduction aux sciences de l'information et de la communication (SIC),Introduction SIC,O,2,2,"0,7","0,3",,15,30,Ouvert,Pris sur P8,Pris à GSI,1,"21,5",11,5,0,,M1-GSI,"21,5"
+57,M1,AVUN,1,Information - communication - langage,Info – com - langage,1,,Sciences du langage et pragmatique de la communication,Sciences du langage et pragmatique,O,4,4,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"40,5",21,9,0,,M1-GSI,"40,5"
+58,M1,AVUN,1,Information - communication - langage,Info – com - langage,1,,Bases de l'anglais professionnel,Anglais,X,2,2,,1,,15,30,Non Ouvert,Pris sur P8,Pris à GSI,1,15,0,15,0,,M1-GSI,15
+59,M1,AVUN,1,Information - communication - langage,Info – com - langage,1,,EC Libre,EC Libre,X,,,,,,,30,,Pris sur P8,Pris à GSI,,,,,,,M1-GSI,0
+60,M1,AVUN,1,Fondamentaux en information-documentation 1,Fondamentaux info-doc 1,1,7,Description des documents et métadonnées,Description et métadonnées,O,3,3,"0,5","0,5",,20,30,Non Ouvert,Pris sur P8,Pris à GSI,1,25,10,10,0,,M1-GSI,25
+61,M1,AVUN,1,Fondamentaux en information-documentation 2,Fondamentaux info-doc 2,1,,Langages documentaires et classifications,Langages documentaires,O,4,4,"0,5","0,5",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"37,5",15,15,0,,M1-GSI,"37,5"
+62,M1,AVUN,2,Management de la fonction information,Management fonction info,1,7,Gestion d’un service info-documentaire,Gestion service info-doc,O,4,4,"0,5","0,5",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"37,5",15,15,0,,M1-GSI,"37,5"
+63,M1,AVUN,2,Management de la fonction information,Management fonction info,1,,Etude des besoins et cahier des charges ,Etude des besoins,O,3,3,"0,3","0,7",,30,30,Ouvert,Pris sur P8,Pris à GSI,1,"34,5",9,21,0,,M1-GSI,"34,5"
+64,M1,AVUN,2,Informatique documentaire,Informatique documentaire,1,7,Systèmes de recherche d'information (SRI),SRI,O,3,3,"0,5","0,5",,20,30,Non Ouvert,Pris sur P8,Pris à GSI,1,25,10,10,0,,M1-GSI,25
+65,M1,AVUN,2,Informatique documentaire,Informatique documentaire,1,,"Logiciels documentaires (GED, SIGB)",GED – SIGB,O,4,4,"0,5","0,5",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"37,5",15,15,0,,M1-GSI,"37,5"
+66,M1,AVUN,2,Fondamentaux en information-documentation 2,Fondamentaux info-doc 2,1,8,Sources et méthodes en recherche d’information,Sources et méthodes en recherche,O,4,4,"0,3","0,7",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"34,5",9,21,0,,M1-GSI,"34,5"
+67,M1,AVUN,2,Fondamentaux en information-documentation 3,Fondamentaux info-doc 3,1,,Indexation des documents,Indexation documents,O,2,2,"0,3","0,7",,15,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"18,5",5,11,0,,M1-GSI,"18,5"
+68,M1,AVUN,2,Fondamentaux en information-documentation 4,Fondamentaux info-doc 4,1,,Traitement du document audiovisuel,Traitement document audiovisuel,O,2,2,"0,3","0,7",,15,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"18,5",5,11,0,,M1-GSI,"18,5"
+69,M1,AVUN,2,Stage et rapport,Stage,1,8,Stage et rapport,Stage,O,8,8,,,,,,,,,0,0,0,0,0,,,0
+70,M1,PTN,1,Information - communication - langage,Info – com - langage,1,8,Introduction aux sciences de l'information et de la communication (SIC),Introduction SIC,O,2,2,"0,7","0,3",,15,30,Ouvert,Pris sur P8,Pris à GSI,1,"21,5",11,5,0,,M1-GSI,"21,5"
+71,M1,PTN,1,Information - communication - langage,Info – com - langage,1,,Sciences du langage et pragmatique de la communication,Sciences du langage et pragmatique,O,4,4,"0,7","0,3",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"40,5",21,9,0,,M1-GSI,"40,5"
+72,M1,PTN,1,Information - communication - langage,Info – com - langage,1,,Bases de l'anglais professionnel,Anglais,X,2,2,,1,,15,30,Non Ouvert,Pris sur P8,Pris à GSI,1,15,0,15,0,,M1-GSI,15
+73,M1,PTN,1,Information - communication - langage,Info – com - langage,1,,EC Libre,EC Libre,X,,,,,,,30,,Pris sur P8,Pris à GSI,,,,,,,M1-GSI,0
+74,M1,PTN,1,Fondamentaux en information-documentation 1,Fondamentaux info-doc 1,1,7,Description des documents et métadonnées,Description et métadonnées,O,3,3,"0,5","0,5",,20,30,Non Ouvert,Pris sur P8,Pris à GSI,1,25,10,10,0,,M1-GSI,25
+75,M1,PTN,1,Fondamentaux en information-documentation 2,Fondamentaux info-doc 2,1,,Langages documentaires et classifications,Langages documentaires,O,4,4,"0,5","0,5",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"37,5",15,15,0,,M1-GSI,"37,5"
+76,M1,PTN,2,Management de la fonction information,Management fonction info,1,7,Gestion d’un service info-documentaire,Gestion service info-doc,O,4,4,"0,5","0,5",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"37,5",15,15,0,,M1-GSI,"37,5"
+77,M1,PTN,2,Management de la fonction information,Management fonction info,1,,Etude des besoins et cahier des charges ,Etude des besoins,O,3,3,"0,3","0,7",,30,30,Ouvert,Pris sur P8,Pris à GSI,1,"34,5",9,21,0,,M1-GSI,"34,5"
+78,M1,PTN,2,Informatique documentaire,Informatique documentaire,1,7,Systèmes de recherche d'information (SRI),SRI,O,3,3,"0,5","0,5",,20,30,Non Ouvert,Pris sur P8,Pris à GSI,1,25,10,10,0,,M1-GSI,25
+79,M1,PTN,2,Informatique documentaire,Informatique documentaire,1,,"Logiciels documentaires (GED, SIGB)",GED – SIGB,O,4,4,"0,5","0,5",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"37,5",15,15,0,,M1-GSI,"37,5"
+80,M1,PTN,2,Fondamentaux en information-documentation 2,Fondamentaux info-doc 2,1,8,Sources et méthodes en recherche d’information,Sources et méthodes en recherche,O,4,4,"0,3","0,7",,30,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"34,5",9,21,0,,M1-GSI,"34,5"
+81,M1,PTN,2,Fondamentaux en information-documentation 3,Fondamentaux info-doc 3,1,,Indexation des documents,Indexation documents,O,2,2,"0,3","0,7",,15,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"18,5",5,11,0,,M1-GSI,"18,5"
+82,M1,PTN,2,Fondamentaux en information-documentation 4,Fondamentaux info-doc 4,1,,Traitement du document audiovisuel,Traitement document audiovisuel,O,2,2,"0,3","0,7",,15,30,Non Ouvert,Pris sur P8,Pris à GSI,1,"18,5",5,11,0,,M1-GSI,"18,5"
+83,M1,PTN,2,Stage et rapport,Stage,1,8,Stage et rapport,Stage,O,8,8,,,,,,,,,0,0,0,0,0,,,0
+84,M2,PTN,3,Théories du texte numérique en contexte,Théories du texte numérique,1,16,Sémiotique générale du texte et de l’image,Sémiotique générale du texte,O,3,3,"0,5","0,5",,30,20,Non Ouvert,,,2,75,15,15,0,,,0
+85,M2,PTN,3,Théories du texte numérique en contexte,Théories du texte numérique,1,,Sémiotique des interfaces,Sémiotique des interfaces,O,3,4,"0,7","0,3",,30,30,Ouvert,"Offert, sur P8",,1,"40,5",21,9,0,P8,,0
+86,M2,PTN,3,Théories du texte numérique en contexte,Théories du texte numérique,1,,Littérature numérique,Littérature numérique,O,3,3,"0,7","0,3",,30,30,Non Ouvert,,,1,"40,5",21,9,0,,,0
+87,M2,PTN,3,Théories du texte numérique en contexte,Théories du texte numérique,1,,Textualité augmentée ( IDEFI CréaTIC),Textualité augmentée,O,3,3,"0,5","0,5",,30,30,Non Ouvert,Offert CréaTIC,,1,"37,5",15,15,0,CréaTIC,,0
+88,M2,PTN,3,Théories du texte numérique en contexte,Théories du texte numérique,1,,EC à choisir dans l'offre IDEFI CréaTIC,EC CréaTIC,O,3,3,,,,30,30,Non Ouvert,Pris CréaTIC,,1,0,0,0,0,,CréaTIC,0
+89,M2,PTN,3,Le texte numérique en atelier,Atelier texte numérique,1,13,Atelier d'écriture numérique,Atelier écriture numérique,O,3,3,"0,3","0,7",,30,30,Non Ouvert,,,1,"34,5",9,21,0,,,0
+90,M2,PTN,3,Le texte numérique en atelier,Atelier texte numérique,1,,Atelier d'écriture papier,Atelier écriture papier,O,3,3,,1,,30,30,Non Ouvert,,,1,30,0,30,0,,,0
+91,M2,PTN,3,Le texte numérique en atelier,Atelier texte numérique,1,,Humanités numériques,Humanités numériques,O,4,4,"0,5","0,5",,30,30,Non Ouvert,,,1,"37,5",15,15,0,,,0
+92,M2,PTN,3,Le texte numérique en atelier,Atelier texte numérique,1,,Publication en réseau,Publication en réseau,O,3,3,"0,5","0,5",,30,30,Non Ouvert,,,1,"37,5",15,15,0,,,0
+93,M2,PTN,4,Pratiques du texte numérique et scénarisation,Pratiques texte numérique,1,6,Introduction aux aspects programmés du texte numérique,Introduction programmer texte,O,3,3,"0,5","0,5",,20,30,Non Ouvert,,,1,25,10,10,0,,,0
+94,M2,PTN,4,Pratiques du texte numérique et scénarisation,Pratiques texte numérique,1,,Gestion des contenus,Gestion des contenus,O,3,3,"0,7","0,3",,30,30,Non Ouvert,,,1,"40,5",21,9,0,,,0
+95,M2,PTN,4,Conduite d'un projet éditorial,Conduite projet éditorial,1,25,Conduite de projets,Conduite de projets,O,3,3,"0,5","0,5",,20,30,Non Ouvert,,,1,25,10,10,0,,,0
+96,M2,PTN,4,Conduite d'un projet éditorial,Conduite projet éditorial,1,,Propriété intellectuelle du texte numérique,Propriété intellectuelle,O,2,2,"0,5","0,5",,20,30,Non Ouvert,,,1,25,10,10,0,,,0
+97,M2,PTN,4,Conduite d'un projet éditorial,Conduite projet éditorial,1,,Anglais,Anglais,O,2,2,"0,5","0,5",,20,30,Non Ouvert,,,1,25,10,10,0,,,0
+98,M2,PTN,4,Conduite d'un projet éditorial,Conduite projet éditorial,1,,Stage et rapport de stage OU travail de recherche-création (réalisation + mémoire),Stage,O,18,18,,,,,,,,,0,0,0,0,0,,,0
+99,M2,AVUN,3,Sociotechniques,Sociotechniques,1,13,Méthodes et outils d’analyses statistiques et de fouille de données,Méthodes analyses statistiques,O,5,5,"0,5","0,3","0,2",30,30,Non Ouvert,Non,,1,"35,5",15,9,6,,,0
+100,M2,AVUN,3,Sociotechniques,Sociotechniques,1,,Datavisualisation (Atelier-Laboratoire CréaTIC),Datavisualisation,O,4,4,"0,5","0,3","0,2",30,35,Ouvert,"Offert, sur P8",Ouvert pour CréaTIC,1,"35,5",15,9,6,CréaTIC,,0
+101,M2,AVUN,3,Sociotechniques,Sociotechniques,1,,Ergonomie du web et des interfaces,Ergonomie du web,O,4,4,"0,5","0,3","0,2",21,30,Non Ouvert,Non,,1,25,11,6,4,,,0
+102,M2,AVUN,3,Méthodologies de recherche,Méthodologies recherche,1,11,Méthodes d'enquête et d'analyse des données qualitatives,Méthodes enquête,O,5,5,"0,5","0,3","0,2",21,30,Non Ouvert,Non,,1,25,11,6,4,,,0
+103,M2,AVUN,3,Méthodologies de recherche,Méthodologies recherche,1,,Créativité et travail collaboratif assistés par les TIC,Créativité et travail collaboratif,O,4,4,"0,5","0,3","0,2",30,35,Ouvert,"Offert, sur P8",Projet d'atelier laboratoire CréaTIC,1,"35,5",15,9,6,,CréaTIC,"35,5"
+104,M2,AVUN,3,Méthodologies de recherche,Méthodologies recherche,1,,EC Libre,EC Libre,O,2,2,,,,30,35,Non Ouvert,Pris sur P8,Sur l'offre de Paris 8,1,0,0,0,0,,P8,0
+105,M2,AVUN,3,Formation et recherche,Formation et recherche,1,6,Anglais scientifique et technique,Anglais,O,2,2,"0,5","0,5",,30,30,Non Ouvert,Non,,1,"37,5",15,15,0,,,0
+106,M2,AVUN,3,Formation et recherche,Formation et recherche,1,,Projet collaboratif tutoré,Projet collaboratif tutoré,O,2,2,,1,,4,3,Non Ouvert,Non,4H par groupe de 3 étudiants,10,40,0,4,0,,,0
+107,M2,AVUN,3,Formation et recherche,Formation et recherche,1,,EC à choisir dans l'offre IDEFI CréaTIC,EC CréaTIC,O,2,2,,,,30,30,Non Ouvert,Pris CréaTIC,A choisir dans l'offre CréaTIC,1,0,0,0,0,,CréaTIC,0
+108,M2,AVUN,4,Modélisation,Modélisation,1,9,Modélisation des données et des processus,Modélisation données et processus,O,3,3,"0,5","0,5",,30,30,Non Ouvert,"Offert, sur P8",Offert à M2GSI (mention humanités numériques),1,"37,5",15,15,0,M2-GIS,,0
+109,M2,AVUN,4,Modélisation,Modélisation,1,,Standards et modèles du Web de données,Standards Web de données,O,3,3,,,,30,30,Non Ouvert,Pris sur P8,Pris à M2GSI (mention humanités numériques),1,0,0,0,0,,M2-GIS,0
+110,M2,AVUN,4,Modélisation,Modélisation,1,,Ethnographie des pratiques,Ethnographie des pratiques,O,3,3,"0,5","0,5",,30,35,Ouvert,"Offert, sur P8",Offert à M2NET (mention humanités numériques),1,"37,5",15,15,0,M2-NET,,0
+111,M2,AVUN,4,Référentiels de connaissances,Référentiels de connaissances,1,11,Référentiels de gestion de projet,Référentiels de gestion,O,5,5,"0,5","0,3","0,2",21,30,Non Ouvert,Non,,1,25,11,6,4,,,0
+112,M2,AVUN,4,Référentiels de connaissances,Référentiels de connaissances,1,,Gestion de l'innovation et des connaissances,Gestion innovation,O,3,3,"0,5","0,3","0,2",30,30,Non Ouvert,Non,,1,"35,5",15,9,6,,,0
+113,M2,AVUN,4,Référentiels de connaissances,Référentiels de connaissances,1,,Ethique du web et écosystèmes d'information,Ethique du web,O,3,3,1,,,30,35,Ouvert,"Offert, sur P8",,1,45,30,0,0,P8,,0
+114,M2,AVUN,4,Professionnalisation et recherche,Professionnalisation et recherche,1,10,Mémoire de Stage professionnel ou de Recherche appliquée,mémoire de stage,O,10,10,,,,,,Non Ouvert,Non,"Avec la Formation permanente, contrat pro. Et alternance. VH EC à prendre en compte dans le total VH",0,0,0,0,0,,,0
+115,M2,AVUN,4,Professionnalisation et recherche,Professionnalisation et recherche,1,,Encadrement mémoire,Encadrement mémoire,O,,,,,,,,Non Ouvert,Non,Vérifier la bonne notation des heures : ici c'est 2H par étudiant,0,0,0,0,0,,,0
+116,M2,NET,3,Enjeux du numérique,Enjeux du numérique,1,22,Documents numériques et design d'information,Design d'information,O,1,4,"0,5","0,5",,30,30,Non Ouvert,,,1,"37,5",15,15,0,,,0
+117,M2,NET,3,Enjeux du numérique,Enjeux du numérique,1,,Ethnométhodologie et SIC - Epistémologie,Ethnométhodologie - Epistémologie,O,1,4,"0,5","0,5",,30,30,Non Ouvert,,,1,"37,5",15,15,0,,,0
+118,M2,NET,3,Enjeux du numérique,Enjeux du numérique,1,,"De l'idée à l'objet publié 1 (CréaTIC)  - EC annuelle""
+La note de cet EC est équivalente à la note de l'EC""de l'idée à l'objet publié"" 2 du Sem 4",Idée à l'objet publié 1,O,1,3,"0,5","0,5",,25,30,Non Ouvert,Offert CréaTIC,,1,"32,5",13,13,0,CréaTIC,,0
+119,M2,NET,3,Enjeux du numérique,Enjeux du numérique,1,,Mémoire : problématique d'étude,Mémoire : problématique,O,4,11,,,,,,,,,,,,,,,,0
+120,M2,NET,4,Technologies du numérique,Technologies numérique,1,22,Prospectives numériques,Prospectives numériques,O,1,4,"0,5","0,5",,30,30,Non Ouvert,,,1,"37,5",15,15,0,,,0
+121,M2,NET,4,Technologies du numérique,Technologies numérique,1,,Ethnométhodologie et SIC - Méthodes,Ethnométhodologie - Méthodes,O,1,4,"0,5","0,5",,30,30,Non Ouvert,,,1,"37,5",15,15,0,,,0
+122,M2,NET,4,Technologies du numérique,Technologies numérique,1,,"De l'idée à l'objet publié 2  (CréaTIC) - EC annuelle
+La note de cet EC est équivalente à la note de l'EC""De l'idée à l'objet publié"" 1 Sem 3",Idée à l'objet publié 2,O,1,3,"0,5","0,5",,25,30,Non Ouvert,Offert CréaTIC,,1,"32,5",13,13,0,CréaTIC,,0
+123,M2,NET,4,Technologies du numérique,Technologies numérique,1,,Mémoire : rédaction / publications,Mémoire : rédaction,O,6,11,,,,,,,,,,,,,,,,0
+124,M2,NET,3,Hyperurbain,Hyperurbain,1,8,1 EC obligatoire : Conception collaborative ergonomique,Conception ergonomique,O,2,5,"0,5","0,5",,30,30,Non Ouvert,Offert CréaTIC,,1,"37,5",15,15,0,CréaTIC,,0
+125,M2,NET,3,Hyperurbain,Hyperurbain,1,,Une EC à choix,EC à choix,,1,3,,,,,30,,,,,,,,,,,0
+126,M2,NET,3,Hyperurbain,Hyperurbain,1,,Ville numérique/Ville média,Ville numérique/Ville média,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+127,M2,NET,3,Hyperurbain,Hyperurbain,1,,Interactions humaines médiatisées,Interactions humaines médiatisées,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+128,M2,NET,3,Hyperurbain,Hyperurbain,1,,Méthodologie de conception d'objets communicants,Méthodologie conception objets communicants,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+129,M2,NET,3,Conduite d'études et de recherches,Conduite recherches,1,,"1 EC libre (obligatoire) : EC sém. de recherche, colloques  ou anglais (dép. Anglais).",EC Libre,O,1,5,,,,30,30,Non Ouvert,Pris sur P8,"En accord avec la  ""direction scientifique"" et la ""direction des études""",1,0,0,0,0,,P8,0
+130,M2,NET,3,Conduite d'études et de recherches,Conduite recherches,1,,Une EC à choix,EC à choix,,1,3,,,,,,,,,,,,,,,,0
+131,M2,NET,3,Conduite d'études et de recherches,Conduite recherches,1,,Sciences humaines et sociales appliquées,Sciences humaines et sociales,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+132,M2,NET,3,Conduite d'études et de recherches,Conduite recherches,1,,Etat de la recjerche et veille documentaire,Veille documentaire,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+133,M2,NET,3,Conduite d'études et de recherches,Conduite recherches,1,,Droit de l'information-communication,Droit de l'info-com,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+134,M2,NET,4,Design numérique,Design numérique,1,8,EC à choisir dans l'offre IDEFI CréaTIC,EC CréaTIC,O,2,5,,,,30,30,Non Ouvert,Pris CréaTIC,"En accord avec la  ""direction scientifique"" et la ""direction des études""",1,0,0,0,0,,P8,0
+135,M2,NET,4,Design numérique,Design numérique,1,,Une EC à choix,EC à choix,,1,3,,,,,,,,,,,,,,,,0
+136,M2,NET,4,Design numérique,Design numérique,1,,"Hypermédia, web sémantique et web social","Hypermédia, web socio-sémantique",X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+137,M2,NET,4,Design numérique,Design numérique,1,,Culture et patrimoine augmentés,Culture et patrimoine augmentés,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+138,M2,NET,4,Design numérique,Design numérique,1,,Analyse des produits hypermédiatiques,Analyse des produits,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+139,M2,NET,4,Anthropologie de la communication et ethnomethodologie,Ethnomethodologie,1,,Une EC obligatoire : Anthropologie de la communication,Anthropologie de la communication,O,2,5,"0,5","0,5",,30,30,Non Ouvert,Non,,1,"37,5",15,15,0,,,0
+140,M2,NET,4,Anthropologie de la communication et ethnomethodologie,Ethnomethodologie,1,,Une EC à choix,EC à choix,,1,3,,,,,30,,,,,,,,,,,0
+141,M2,NET,4,Anthropologie de la communication et ethnomethodologie,Ethnomethodologie,1,,Ethnographie des pratiques,Ethnographie des pratiques,X,,,,,,30,30,Ouvert,Pris sur P8,Pris AVUN et offert MIASH/MITSIC (sélection*),1,0,0,0,0,M2-MIASH,M2-AVUN,30
+142,M2,NET,4,Anthropologie de la communication et ethnomethodologie,Ethnomethodologie,1,,Modèlisation de l'expérience,Modélisation expérience,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+143,M2,NET,4,Anthropologie de la communication et ethnomethodologie,Ethnomethodologie,1,,Méthodes qualitatives informatisées,Méthodes qualitatives informatisées,X,,,"0,5","0,5",,30,30,Ouvert,"Offert, sur P8",Offert MIASH/MITSIC (sélection*),1,"37,5",15,15,0,M2-MIASH,,0
+144,M2,NET,4,"Stage de 4 mois ou recherche-action (validation par EC ""mémoire"" des 1er et 2ème semestres)",Stage,1,,Stage,Stage,O,,,,,,,,,,"En accord avec la  ""direction scientifique"" et la ""direction des études""",,,,,,,P8,0
+145,M2,GIS,3,"Réflexions, épistémologie, cognition","Réflexions, épistémologie, cognition",1,8,Méthodes empiriques de recherche (Atelier CREATIC),Méthodes empiriques,O,3,3,"0,7","0,3",,30,25,Non Ouvert,Offert CréaTIC,,2,81,21,9,0,CréaTIC,,0
+146,M2,GIS,3,"Réflexions, épistémologie, cognition","Réflexions, épistémologie, cognition",1,,EC à choisir dans l'offre IDEFI CréaTIC,EC CréaTIC,O,3,3,,,,30,30,Non Ouvert,Pris CréaTIC,,1,0,0,0,0,,CréaTIC,0
+147,M2,GIS,3,"Réflexions, épistémologie, cognition","Réflexions, épistémologie, cognition",1,,Sciences cognitives,Sciences cognitives,O,2,2,"0,7","0,3",,15,35,Ouvert,"Offert, sur P8",,1,"21,5",11,5,0,P8,,0
+148,M2,GIS,4,Analyse des dispositifs informationnels,Analyse dispositifs,1,4,Organisation des connaissances,Organisation connaissances,O,2,2,"0,7","0,3",,20,35,Ouvert,"Offert, sur P8",,1,27,14,6,0,P8,,0
+149,M2,GIS,4,Analyse des dispositifs informationnels,Analyse dispositifs,1,,Pratiques info-communicationnelles,Pratiques info-com,O,2,2,"0,5","0,5",,15,30,Non Ouvert,,,1,20,8,8,0,,,0
+150,M2,GIS,3,Fonctions info-documentaires spécialisées 1,Fonctions info-doc 1,1,9,Techniques et outils de veille,Techniques veille,O,4,4,"0,5","0,5",,30,30,Non Ouvert,,,1,"37,5",15,15,0,,,0
+151,M2,GIS,3,Fonctions info-documentaires spécialisées 2,Fonctions info-doc 2,1,,Archives et records management,Archives et records management,O,3,3,"0,5","0,5",,20,30,Non Ouvert,,,1,25,10,10,0,,,0
+152,M2,GIS,3,Fonctions info-documentaires spécialisées 3,Fonctions info-doc 3,1,,Gestion de la documentation technique,Gestion documentation technique,,2,2,"0,5","0,5",,15,30,Non Ouvert,,,1,20,8,8,0,,,0
+153,M2,GIS,4,Fonctions info-documentaires spécialisées 2,Fonctions info-doc 2,1,6,Gestion des connaissances,Gestion des connaissances,O,4,4,"0,5","0,5",,30,30,Non Ouvert,,,1,"37,5",15,15,0,,,0
+154,M2,GIS,4,Fonctions info-documentaires spécialisées 3,Fonctions info-doc 3,1,,Gestion des contenus et curation,Gestion des contenus,O,2,2,"0,5","0,5",,20,30,Non Ouvert,,,1,25,10,10,0,,,0
+155,M2,GIS,4,Architecture des systèmes d'information documentaire,Architecture documentaire,1,8,Compréhension de l'offre logicielle,Compréhension offre logicielle,O,2,2,0,1,,15,30,Non Ouvert,,,1,15,0,15,0,,,0
+156,M2,GIS,4,Architecture des systèmes d'information documentaire,Architecture documentaire,1,,Standards et modèles du Web de données,Standards Web de données,O,3,3,"0,5","0,5",,30,30,Non Ouvert,"Offert, sur P8",Offert à M2AVUN (mention humanités numériques),1,"37,5",15,15,0,M2-AVUN,,0
+157,M2,GIS,4,Architecture des systèmes d'information documentaire,Architecture documentaire,1,,Modélisation des données et des processus,Modélisation données et processus,O,3,3,,,,30,30,Non Ouvert,Pris sur P8,Pris à M2AVUN (mention huménités numériques),1,0,0,0,0,,M2-AVUN,30
+158,M2,GIS,3,Conduite du changement ,Conduite changement ,1,7,Management de projet,Management de projet,O,4,4,0,1,,30,30,Non Ouvert,,,1,30,0,30,0,,,0
+159,M2,GIS,3,Conduite du changement ,Conduite changement ,1,,Expression professionnelle et argumentation,Expression et argumentation,,3,3,"0,5","0,5",,25,30,,,,,,13,13,0,,,0
+160,M2,GIS,3,Gouvernance de l'informaion,Gouvernance information,1,6,Gestion stratégique de l'information,Gestion stratégique,O,4,4,"0,5","0,5",,30,30,Non Ouvert,,,1,"37,5",15,15,0,,,0
+161,M2,GIS,3,Gouvernance de l'informaion,Gouvernance information,1,,Droit des contrats,Droit des contrats,O,2,2,"0,7","0,3",,15,30,Non Ouvert,,,1,"21,5",11,5,0,,,0
+162,M2,CEN,3,Outils & Méthodes (3 parmi 4),Outils & Méthodes,1,15,développement multi-plateformes ,développement multi-plateformes ,X,5,5,"0,7","0,3",,30,30,Non Ouvert,,,1,"40,5",21,9,0,,,0
+163,M2,CEN,3,Outils & Méthodes (3 parmi 4),Outils & Méthodes,1,,EC CréaTIC à choix,EC CréaTIC,X,5,5,,,,30,35,Ouvert,Pris CréaTIC,,,,,,,,CréaTIC,0
+164,M2,CEN,3,Outils & Méthodes (3 parmi 4),Outils & Méthodes,1,,Veille et techniques d'interaction,Veille et techniques,X,5,5,"0,7","0,3",,30,30,Ouvert,"Offert, sur P8",,1,"40,5",21,9,0,P8,,0
+165,M2,CEN,3,Outils & Méthodes (3 parmi 4),Outils & Méthodes,1,,Veille innovation prospectives,Veille innovation,X,5,5,"0,7","0,3",,30,30,Non Ouvert,,,1,"40,5",21,9,0,,,0
+166,M2,CEN,3,Réalisation de prototypes crossmédias,Réalisation de prototypes,1,15,traitement éditorial et création numérique ,traitement éditorial création numérique ,O,5,5,1,,,30,30,Non Ouvert,,,1,45,30,0,0,,,0
+167,M2,CEN,3,Réalisation de prototypes crossmédias,Réalisation de prototypes,1,,création et direction artistique crossmedias,création et direction artistique,O,5,5,"0,7","0,3",,30,30,Non Ouvert,,,1,"40,5",21,9,0,,,0
+168,M2,CEN,3,Réalisation de prototypes crossmédias,Réalisation de prototypes,1,,Développement de prototypes crossmédias,Développement de prototypes,O,5,5,,1,,30,30,Non Ouvert,,,1,30,0,30,0,,,0
+169,M2,CEN,4,Journées crossmédias  II,Journées crossmédias  II,1,9,Rencontres crossmédias II   (mutualisé CIIN - CréaTIC),Rencontres crossmédias II,X,3,5,1,,,30,30,Non Ouvert,Offert CréaTIC et hors P8,Pour IDEFI-CréaTIC et CIIN P13 = 30h,1,45,30,0,0,"CréaTIC, P13-CIIN-30",,0
+170,M2,CEN,4,Journées crossmédias  II,Journées crossmédias  II,1,,Atelier Crossmédias II,Atelier Crossmédias II,X,3,4,,1,,30,30,Non Ouvert,,,1,30,0,30,0,,,0
+171,M2,CEN,4,Langue étrangère (1 parmi 2),Langue étrangère,1,3,Expression professionnelle en langue anglaise,Anglais,X,3,3,,1,,30,30,Non Ouvert,,,1,30,0,30,0,,,0
+172,M2,CEN,4,Langue étrangère (1 parmi 2),Langue étrangère,1,,FLE (emprunté au Département FLE),FLE,X,,,,,,30,30,Non Ouvert,Pris sur P8,,1,0,0,0,0,,P8,0
+173,M2,CEN,4,Stage  & rapport de stage,Stage,1,18,Stage de 4 à 6 mois,Stage,O,18,18,,,,,,,,,,,0,0,0,,,0
+174,M2,CEN,4,Stage  & rapport de stage,Stage,1,,mémoire de stage,mémoire de stage,O,,,,1,,15,5,Non Ouvert,,,6,90,0,15,0,,,0
+175,LP,DWM,1, Apports théoriques,Apports théoriques,1,5,Rencontres Médias - Théoriciens et chercheurs,Rencontres Médias – Théo,,1,5,"0,5","0,5",,30,20,Ouvert,,,,"37,5",,,,,,"37,5"
+176,LP,DWM,1, Apports théoriques,Apports théoriques,1,5,Rencontres Médias - Professionnels et Actualités,Rencontres Médias – Pro,,1,5,"0,5","0,5",,30,20,Ouvert,,,,"37,5",,,,,,"37,5"
+177,LP,DWM,1,Apports méthodologiques,Apports méthodologiques,1,5,Techniques de conception et design,Techniques de conception,,1,5,"0,5","0,3","0,2",30,20,Ouvert,,,,30,,,,,,30
+178,LP,DWM,1,Apports méthodologiques,Apports méthodologiques,1,5,Technologies du Développement,Technologies Développement,,1,5,"0,5","0,3","0,2",30,20,Ouvert,,,,30,,,,,,30
+179,LP,DWM,1,Apports méthodologiques,Apports méthodologiques,1,4,Anglais - techniques et pratiques,Anglais,,1,4,,"0,8","0,2",30,20,Ouvert,,,,30,,,,,,30
+180,LP,DWM,2,Projet de création tutoré,Projet de création tutoré,1,4,Atelier de réalisation Web et Vidéo,Atelier Vidéo,,1,4,,"0,5","0,5",30,20,Ouvert,,,,30,,,,,,30
+181,LP,DWM,2,Projet de création tutoré,Projet de création tutoré,1,4,Perfectionnement outils et langages de base,Perfectionnement outils,,1,4,,"0,5","0,5",30,20,Ouvert,,,,30,,,,,,30
+182,LP,DWM,2,Projet de création tutoré,Projet de création tutoré,1,12,Atelier de projets collaboratifs,Atelier de projets collaboratifs,,1,12,,"0,5","0,5",90,20,Ouvert,,,,90,,,,,,90
+183,LP,DWM,2,Stage en entreprise (10 ˆ 16 semaines),Stage,1,2,Participation aux projets de l'entreprise,Participation entreprise,,1,2,,,1,30,20,,,,,0,,,,,,0
+184,LP,DWM,2,Stage en entreprise (10 ˆ 16 semaines),Stage,1,2,Communication en entreprise,Communication en entreprise,,1,2,,,1,30,20,,,,,0,,,,,,0
+185,LP,DWM,2,Parcours Développement,Parcours Développement,1,3,Suivi technique de projet,Suivi technique,,1,3,,"0,5","0,5",30,20,Ouvert,,,,30,,,,,,30
+186,LP,DWM,1,Parcours Développement,Parcours Développement,1,3,Approfondissement des technologies de développement,Technologies de développement,,1,3,,"0,8","0,2",30,20,Ouvert,,,,30,,,,,,30
+187,LP,DWM,1,Parcours Développement,Parcours Développement,1,3,Approfondissement outils de développement,Outils de développement,,1,3,,"0,5","0,5",30,20,Ouvert,,,,30,,,,,,30
+188,LP,DWM,2,Parcours Développement,Parcours Développement,1,3,Réalisation avancée en développement,Réalisation avancée,,1,3,,"0,5","0,5",30,20,Ouvert,,,,30,,,,,,30
+189,LP,DWM,2,Parcours Design,Parcours Design,1,3,Suivi artistique de projet,Suivi artistique,,1,3,,"0,5","0,5",30,20,Non Ouvert,,,,30,,,,,,30
+190,LP,DWM,1,Parcours Design,Parcours Design,1,3,Approfondissement technique du design,Technique du design,,1,3,,"0,5","0,5",30,20,Non Ouvert,,,,30,,,,,,30
+191,LP,DWM,1,Parcours Design,Parcours Design,1,3,Approfondissement outils infographie et vidéo,Outils infographie et vidéo,,1,3,,"0,5","0,5",30,20,Non Ouvert,,,,30,,,,,,30
+192,LP,DWM,2,Parcours Design,Parcours Design,1,3,Réalisation avancée en design,Réalisation avancée,,1,3,,"0,5","0,5",30,20,Non Ouvert,,,,30,,,,,,30

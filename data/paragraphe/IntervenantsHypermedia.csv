@@ -1,0 +1,45 @@
+id,Civilité,Nom,Prénom,Mail,Téléphone,Adresse,Type,Roles,Statut,Section,Lieu,photo
+1,?,?,?,,,,Aucun,Intervenants,,,,img/logop8-3.jpg
+2,Mr,Andro,Mathieu,mathieu.andro@versailles.inra.fr,,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+3,Mr,ATER,,,,,Titulaires P8,Intervenants,ATER,Info-Com,P8 UFR MITSIC,img/logop8-3.jpg
+4,Mr,Ater,Dumoment,,,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,ATER,Hypermedia,P8 UFR MITSIC,img/logop8-3.jpg
+5,,Aucun,?,,,,Aucun,Aucun,,,,img/logop8-3.jpg
+6,Mr,Audoux,Thierry,thaudoux@gmail.com,06 82 46 35 13,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+7,Mme,Azemard,Ghislaine,ghislaine.azemard@wanadoo.fr,01 49 40 67 58,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,PROF,Hypermedia,P8 UFR MITSIC,img/logop8-3.jpg
+8,Mr,Barbier,Benjamin,barbierbenji@gmail.com,,,Titulaires P8,Intervenants,ATER,Info-Com,P8 UFR MITSIC,img/logop8-3.jpg
+9,Mr,Besacier,Guillaume,guillaume@pointg.net,07 52 64 22 52,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,MCF,Hypermedia,P8 UFR MITSIC,img/logop8-3.jpg
+10,Mr,Bootz,Philippe,philippe.bootz@univ-paris8.fr,07 44 85 05 47,,Titulaires P8,Intervenants,MCF,Hypermedia,P8 UFR MITSIC,img/logop8-3.jpg
+11,Mr,Bouhai,Nasser,nasreddine.bouhai@univ-paris8.fr,06 21 82 90 51,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,MCF,Hypermedia,P8 UFR MITSIC,img/logop8-3.jpg
+12,Mr,Colin,Frederic,amakersband@gmail.com,06 72 65 49 20,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+13,Mr,Correia,Hernani,hernanicorreia@free.fr,,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+14,Mr,Coslin,Frédéric,amakersband@gmail.com,,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+15,Mr,Darquie,Gaetan,gaetan.darquie@gmail.com,,,Professionnel,Intervenants,ATER,,IUT Montreuil,img/logop8-3.jpg
+16,Mr,Dégremont,Jean-François,jfdegremont@gmail.com,06 34 08 70 51,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,PROF,Informatique,P8 UFR MITSIC,img/logop8-3.jpg
+17,Mr,Delfanti,Samuel,samuel.delfanti@hotmail.fr,06 25 73 07 17,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+18,,Entreprise,,,,,Professionnel,Aucun,,,,img/logop8-3.jpg
+19,Mr,Hachour,Hakim,hhachour@gmail.com,06 26 21 10 86,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,MCF,Info-Com,P8 UFR MITSIC,img/logop8-3.jpg
+20,Mr,Ihadjadene,Madjid,madjid.ihadjadene@univ-paris8.fr,,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,PROF,Info-Com,P8 UFR MITSIC,img/logop8-3.jpg
+21,Mr,Kahtane,Mehdi,medhi@mundigo.com,06 60 86 14 96,"2b rue Jules Ferry, 93100 Montreuil",Professionnel,Intervenants,,,,img/logop8-3.jpg
+22,Mme,Nyeki,Catherine,catherine@nyeki.com,06 88 49 36 87,61 rue Olivier Métra 75020 Paris,Professionnel,Intervenants,,,,img/logop8-3.jpg
+23,Mr,Perconte,Jacques,jacques.perconte@gmail.com,06 60 61 54 08,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+24,Mme,Poitevin,Christine,poitevin@hymedia.univ-paris8.fr,06 23 34 72 19,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,MCF,Info-Com,P8 UFR MITSIC,img/logop8-3.jpg
+25,Mr,Quettier,Pierre,pierre.quettier@univ-paris8.fr,06 73 47 98 07,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,MCF,Hypermedia,P8 UFR MITSIC,img/logop8-3.jpg
+26,Mme,Renault,Cécile,cecile@lesrasqas.com,,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+27,Mr,Reyes,Everardo,eve.reyes@gmail.com,07 87 86 41 57,"99 Avenue Jean Baptiste Clément, 93430 Villetaneuse",Titulaires P8,Intervenants,MCF,Info-Com,P8 UFR MITSIC,img/logop8-3.jpg
+28,Mr,Saleh,Imad,idsaleh@orange.fr,06 18 19 10 84,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,PROF,Hypermedia,P8 UFR MITSIC,img/logop8-3.jpg
+29,Mr,Szoniecky,Samuel,samuel.szoniecky@univ-paris8.fr,06 62 43 87 56,Bois de Bretonne 14140 Le Mesnil Simon,Titulaires P8,Intervenants,MCF,Hypermedia,P8 UFR MITSIC,img/logop8-3.jpg
+30,Mr,Vernhes,Eric,e.vernhes@gmail.com,,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+31,Mme,Vincent-Genod,Valérie,valerie@cbleu.com,,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+32,Mr,Virginie,Bernard,b.virginie@free.fr,,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+33,Mme,Wertel-Fournier,Isabelle,iwfournier@bbox.fr,06 64 78 28 28,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,MCF,Info-Com,P8 UFR MITSIC,img/logop8-3.jpg
+34,Mr,Yacoub,Claude,claude.yacoub@gmail.com,06 31 17 78 95,55 bd Charonne 75011 PARIS,Professionnel,Intervenants,,,,img/logop8-3.jpg
+35,Mme,Zivancevic,Nina,zivancevicn65@gmail.com,,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+36,Mr,Zreik,Khaldoun,zreik@univ-paris8.fr,06 86 00 86 67,"2, rue de la Liberté - 93526 St Denis Cedex",Titulaires P8,Intervenants,PROF,Hypermedia,P8 UFR MITSIC,img/logop8-3.jpg
+37,Mr,Jannot,Joan,j.jannot@lonsdale.fr,01.70.23.94.26,26 boulevard Malsherbes 75008 Paris,Professionnel,Intervenants,,,,img/logop8-3.jpg
+38,Mr,Serain,Clément,clement.serain@gmail.com,,,Titulaires P8,Intervenants,ATER,Info-Com,P8 UFR MITSIC,img/logop8-3.jpg
+39,Mme,Damala,Areti,areti.damala@gmail.com,,,Titulaires P8,Intervenants,ATER,Info-Com,P8 UFR MITSIC,img/logop8-3.jpg
+40,Mr,Bourgeois,Mehdi,mehdi.bourgeois04@univ-paris8.fr,,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+41,Mme,Boisadan,Andréa,andrea.boisadan@hotmail.fr,06 09 68 77 75,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+42,Mme,Avril,Caroline,avrilcaroline@yahoo.fr ,06 51 37 77 45,,Professionnel,Intervenants,,,,img/logop8-3.jpg
+43,Mr,Toumia,Amri,toumia.amri@gmail.com,06 42 01 00 18,,Professionnel,Intervenants,Doctorant,,,img/logop8-3.jpg
+44,Mme,Godin,Gabrielle,gabrielle.godin@hotmail.com,06 80 94 85 43,,Professionnel,Intervenants,,,,img/logop8-3.jpg

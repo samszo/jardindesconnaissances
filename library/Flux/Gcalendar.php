@@ -33,7 +33,7 @@ class Flux_Gcalendar extends Flux_Site{
 	
     public function getListeCalendar()
     {
-    		$this->trace("DEBUT ".__METHOD__);
+    	$this->trace("DEBUT ".__METHOD__);
 		$c = str_replace("::", "_", __METHOD__)."_".md5($this->token); 
 		$calendars = $this->cache->load($c);
     	
@@ -59,7 +59,7 @@ class Flux_Gcalendar extends Flux_Site{
 
 	public function getListeAcl($idCal)
 	{
-    	$acls ="";
+    	$acls = array();
 		$acl = $this->service->acl->listAcl($idCal);		
 		foreach ($acl->getItems() as $rule) {
 		  $acls[]=$this->getAclInfo($rule);

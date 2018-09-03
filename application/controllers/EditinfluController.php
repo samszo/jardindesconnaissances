@@ -274,26 +274,46 @@ class EditinfluController extends Zend_Controller_Action {
     	$this->initInstance();
     	$this->view->connect =  $this->_getParam('connect', 0);
     }
-    
-    function initInstance(){
-		$this->view->ajax = $this->_getParam('ajax');
-    		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
-		
-		$auth = Zend_Auth::getInstance();
-		$this->ssUti = new Zend_Session_Namespace('uti');
-		if ($auth->hasIdentity()) {						
-			// l'identité existe ; on la récupère
-		    $this->view->identite = $auth->getIdentity();
-		    $this->view->uti = json_encode($this->ssUti->uti);
-		}else{			
-		    //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
-		    $this->ssUti->redir = "/editinflu";
-		    $this->ssUti->dbNom = $this->idBase;
-		    if($this->view->ajax)$this->redirect('/auth/finsession');		    
-		    else $this->redirect('/auth/login');
-		}
-		    	
+
+    public function linkboardAction()
+    {
+		$this->idBase = 'flux_linkboard';
+    	$this->initInstance("/linkboard");
     }
+	
+
+    function initInstance($redir=""){
+        $this->view->ajax = $this->_getParam('ajax');
+        $this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
+        
+        $auth = Zend_Auth::getInstance();
+        $this->ssUti = new Zend_Session_Namespace('uti');
+        $ssGoogle = new Zend_Session_Namespace('google');
+        
+        if ($auth->hasIdentity() || isset($this->ssUti->uti)) {
+            //utilisateur authentifier
+            $this->ssUti->uti['mdp'] = '***';
+            $this->view->login = $this->ssUti->uti['login'];
+            $this->view->uti = json_encode($this->ssUti->uti);
+        }elseif($this->_getParam('idUti') ){
+            //authentification CAS ou google
+            $s = new Flux_Site($this->idBase);
+            $dbUti = new Model_DbTable_Flux_Uti($s->db);
+            $uti = $dbUti->findByuti_id($this->_getParam('idUti'));
+            $this->ssUti->uti = $uti;
+            $this->ssUti->uti['mdp'] = '***';
+            $this->view->login = $this->ssUti->uti['login'];
+            $this->view->uti = json_encode($uti);                        
+        }else{
+            //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
+            $this->ssUti->redir = "/editinflu".$redir;
+            $this->ssUti->dbNom = $this->idBase;
+            if($this->view->ajax)$this->redirect('/auth/finsession');
+            else $this->redirect('/auth/connexion');
+        }
+        
+    }
+
     
     function cleanParamZend($params){
     		//enlève les paramètres Zend

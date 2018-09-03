@@ -45,7 +45,12 @@
 	  <h2 align="center"><?php echo $this->soustitre;?></h2>
 	  <p align="center" id="major">-</p>
   </div>
-  <p align="center" id="viz">-</p>
+  <div class="w2ui-field">
+    <label>Sélection:</label>
+    <div> <input id="selectPoint" style="width: 90%;" > </div>
+  </div>
+
+  <p align="center" id="viz"></p>
   <script>
 	//affiche le message de chargement
     w2popup.open({
@@ -57,13 +62,23 @@
         showClose: false
     });
 	w2popup.lock("Merci de patienter...", true);	
+
+	//initialialisation de la sélection
+	$('#selectPoint').w2field('enum', { 
+		items: [],
+		openOnFocus: true,
+		selected: []
+	});
   
 	//merci à http://bl.ocks.org/f94f/5554bf0a6874a64f46deacf3448ee5c8    
     var refData=[],refKey=[],refTag=[],legData={colors:[],labels:[]}, nbTotal=0, refTotal=[];
 	var formatJour = d3.timeFormat("%d %B %Y"), formatAn = d3.timeFormat("%Y"), formatMois = d3.timeFormat("%Y %B");
 	var formatTemps;
-	
-	
+	var bLegende = true;
+	if(getParamUrl('legende')=="0"){
+		bLegende=false;
+		d3.select('#titresViz').style('display','none');
+	}
 	/*
 	var color = d3.scaleLinear()
 	    .range(["#51D0D7", "#31B5BB"]);
@@ -71,6 +86,21 @@
 	*/
 	var color = d3.interpolateRainbow;//d3.interpolateRdYlBu;
 	var colorInit = "";
+
+	function getParamUrl(param) {
+		var vars = {};
+		window.location.href.replace( location.hash, '' ).replace( 
+			/[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+			function( m, key, value ) { // callback
+				vars[key] = value !== undefined ? value : '';
+			}
+		);
+
+		if ( param ) {
+			return vars[param] ? vars[param] : null;	
+		}
+		return vars;
+	}	
 	
 	function tempsToDate(temps, type) {
 	  	var dRef, arrTemps = temps.split('-')
@@ -109,6 +139,7 @@
 	//var url = "http://localhost/jdc/public/flux/diigo?q=getTagHisto&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&dates[]=1456669433&dates[]=1489415262&arrTags[]=ecosysteminfo";
 	//var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&arrTags[]=ecosysteminfo";//&dates[]=1456669433&dates[]=1489415262";
 	//var url = "http://localhost/jdc/public/flux/isidore?q=getHistoDiscipline&req=%C3%A9cosyst%C3%A8me";
+	var q = '<?php echo $this->q;?>';
 	var url = '<?php echo $this->urlData;?>';
 	d3.json(url, function(err, data){
 
@@ -204,7 +235,7 @@
 	  
 	  buildStreamGraph(mqpdata);
 
-	  buildLegend();
+	  if(bLegende)buildLegend();
 
 	  //supprime le message de chargement	
 	  w2popup.unlock();
@@ -275,7 +306,7 @@ function buildStreamGraph(mqpdata) {
 		    //return color(Math.random()); 
 		    })	    
 	    .on('mouseover', function(d){
-	    		colorInit = d3.select(this).style("fill");      
+	    	colorInit = d3.select(this).style("fill");      
 		    d3.select(this).style('fill',d3.rgb(colorInit).brighter());
 			d3.select("#major").text(refTag[d.key].type);
 			tooltip.transition()
@@ -285,10 +316,7 @@ function buildStreamGraph(mqpdata) {
 	    .on('mousemove', function(d){      
 			//console.log(d);
 			//récupère les datas liés à la position de la souris
-		    	var mouse = d3.mouse(this);		    		
-		    	var dRef = dateToTemps(y.invert(mouse[1]));	    
-			var k = d.key+'-'+dRef;
-			var dt = refData[k];
+			var dt = getRef(d3.mouse(this),y,d);
 			//récupère les datas liés au path
 			//dt = refData[d[d.index].data.k];
 			if(refTotal[dt.temps]==0)refTotal[dt.temps] = 0.1;			
@@ -307,6 +335,15 @@ function buildStreamGraph(mqpdata) {
 	               .duration(500)
 	               .style("opacity", 0);
 		})
+	    .on('click', function(d){      
+			//récupère les datas liés à la position de la souris
+			var dt = getRef(d3.mouse(this),y,d);
+			var arrSelect = $('#selectPoint').data('selected');
+			arrSelect.push({ id: arrSelect.length, text: dt.desc+' ('+dt.temps+')',color:refTag[d.key].color});
+			$('#selectPoint').w2field().set(arrSelect);
+
+			getDoc(dt);
+		})
 	//construction de l'axe y
 	svg.append("g")
             .attr("class", "axis axis--y")
@@ -320,6 +357,26 @@ function buildStreamGraph(mqpdata) {
 	    .call(xAxis);    
     */
 }
+
+	function getDoc(dt){
+		var url = "../flux/isidore";
+		$.ajax({
+			dataType: "json",
+			url: url,
+			data: {'q':'getDoc','req':q,'params':{'after':dt.temps+'-01-01','before':dt.temps+'-12-31','discipline':dt.key}}
+		}).done(function( data ) {
+			console.log(data);	
+		});
+	}
+
+
+	function getRef(mouse,y,d){
+			//récupère les datas liés à la position de la souris
+		    var dRef = dateToTemps(y.invert(mouse[1]));	    
+			var k = d.key+'-'+dRef;
+			var dt = refData[k];
+			return dt
+	}
 
 	function buildLegend(){
 

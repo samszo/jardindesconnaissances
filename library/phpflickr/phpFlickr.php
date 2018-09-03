@@ -18,9 +18,12 @@
  *
  */
 if ( !class_exists('phpFlickr') ) {
+	/**MODIF SAMSZO
+	 * problème avec les sessions de Zend
 	if (session_id() == "") {
 		@session_start();
 	}
+	 */
 
 	class phpFlickr {
 		var $api_key;

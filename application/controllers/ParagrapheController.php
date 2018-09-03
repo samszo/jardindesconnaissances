@@ -59,5 +59,17 @@ class ParagrapheController extends Zend_Controller_Action {
 	    $this->view->filtreC = $this->_getParam('filtreC');
 	    $this->view->filtreV = $this->_getParam('filtreV');
 	}
+
+	/**
+	 * affiche les données des formations
+	 */
+	public function formationAction() {
+		$this->view->urlJson = "../../data/paragraphe/HumaNumMentionAll.json";
+		$this->view->colorsKey = '["LP","M1","M2","AVUN","CEN","DWM","GIS","NET","PTN"]';
+		$this->view->groupKey = "['niveau','parcours','UE nom court','EC nom court']";
+		$this->view->lblCalcul = "VH EC";
+
+	}
 	
+
 }

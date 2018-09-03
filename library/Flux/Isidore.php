@@ -49,7 +49,30 @@ class Flux_Isidore extends Flux_Site{
 	    $url = $this->searchUrl."output=".$this->output.$query;
 		return $this->getUrlBodyContent($url,false);
     }
-    
+
+    /**
+     * Construction du tableau des disciplines par date
+     *
+     * @param  	string	$req
+     * @param  	string	$params
+     *
+     * @return array
+     */
+    public function getDoc($req, $params=[])
+    {
+		$this->trace(__METHOD__." DEBUT ".$req);
+		
+		//récupère la liste des documents pour une requete
+		//pour une requête donnée
+		$req = "&q=".urlencode($req);
+		foreach ($params as $k => $v) {
+			$req .= "&".$k."=".urlencode($v);
+		}
+		$json = $this->query($req);
+		return json_decode($json);
+
+	}
+	
     /**
      * Construction du tableau des disciplines par date
      *

@@ -128,6 +128,12 @@ class FluxController extends Zend_Controller_Action {
 		}
 	}    
 
+		
+	public function csvtojsonAction() {
+		$s = new Flux_Site();
+		$this->view->result = $s->csvToJson($this->_getParam('url'));
+	}    
+
 	public function showshorturlAction() {
 			$o = new Flux_Gurl(null, null, "flux_urlcourtes");
 			$this->view->docs = $o->getUrlSave();
@@ -512,6 +518,10 @@ class FluxController extends Zend_Controller_Action {
 	    	switch ($this->_getParam('q')) {
 	    		case "getHistoDiscipline":
 	    			$data = $isidore->getHistoDiscipline($this->_getParam('req'),"stream");
+	    			$this->view->content = json_encode($data);
+	    			break;
+				case "getDoc":
+	    			$data = $isidore->getDoc($this->_getParam('req'),$this->_getParam('params'));
 	    			$this->view->content = json_encode($data);
 	    			break;
 	    	}

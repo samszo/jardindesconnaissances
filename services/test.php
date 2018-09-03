@@ -1,6 +1,8 @@
 <?php
 //use function GuzzleHttp\json_encode;
 
+echo 'toto';
+
 require_once( "../application/configs/config.php" );
 
 

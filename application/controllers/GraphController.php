@@ -119,6 +119,15 @@ class GraphController extends Zend_Controller_Action {
     {
     		$this->view->urlStats = $this->_getParam('urlStats',"../data/flare.json");
     }
+	
+	public function sunburstinteractifAction()
+    {
+		$this->view->urlCSV = "../../data/paragraphe/allMentionHN.csv";
+		$this->view->colorsKey = '["LP","M1","M2","AVUN","CEN","PTN","GIS","DWM","NET"]';
+		$this->view->groupKey = "['niveau','parcours','UE nom court','EC nom court']";
+		$this->view->lblCalcul = "VH EC";
+
+    }
 
     public function dendrochronologieAction()
     {
@@ -505,6 +514,7 @@ class GraphController extends Zend_Controller_Action {
 	    	$this->view->legendetitre =  $this->_getParam('legendetitre', "Catégories");
 	    	$this->view->nbMin = $this->_getParam('nbMin', 0);
 	    	$this->view->legende =  1;//par défaut la légende apparait     
+	    	$this->view->q =  $this->_getParam('q');   
 	    	switch ($this->_getParam('type')) {
 	    		case "diigo":
 	    			//var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&arrTags[]=ecosysteminfo";//&dates[]=1456669433&dates[]=1489415262";

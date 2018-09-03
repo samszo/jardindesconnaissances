@@ -86,8 +86,8 @@
 				<?php endforeach; ?>		
 			</select>		
 	    <?php endif ?>
-	    Date de début: <input type="text" id="datepickerMin" value="01/09/2017" />
-	    Date de fin: <input type="text" id="datepickerMax" value="30/09/2018" />
+	    Date de début: <input type="text" id="datepickerMin" value="01/09/2018" />
+	    Date de fin: <input type="text" id="datepickerMax" value="30/09/2019" />
 	  </div>
 	  <div>
 		<label for="cours">Cours :</label>
@@ -408,6 +408,9 @@
 				var iC;
 				gDataCal.forEach(function(d) {
 					if(d.summary){
+						if(d.id=="05vhh70eg9ji2j6f72lemrj3kj_20190110T090000Z"){
+							var toto=1;
+						}
 						//récupère le code du cours
 						var arrCours = d.summary.split(":")
 						if(arrCours.length >= 3){

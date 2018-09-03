@@ -360,7 +360,47 @@ class Flux_Site{
 	
 		return implode( $delimiter, $output );
 	}
+
 	
+	/**
+	 * Converts CSV to JSON
+	 * Example uses Google Spreadsheet CSV feed
+	 * csvToArray function I think I found on php.net
+	 * merci à chttps://gist.github.com/robflaherty/1185299
+     *
+     * @param string $feed = adresse du fichier
+	 * @param string $delimiter = caractère de séparation
+	 * 
+	 * @return json
+     */
+    function csvToJson($feed, $delimiter=","){
+		// Arrays we'll use later
+		$keys = array();
+		$newArray = array();
+		// Do it
+		$data = $this->csvToArray($feed, 0, $delimiter);
+		// Set number of elements (minus 1 because we shift off the first row)
+		$count = count($data) - 1;
+		
+		//Use first row for names  
+		$labels = array_shift($data);  
+		foreach ($labels as $label) {
+		$keys[] = $label;
+		}
+		// Add Ids, just in case we want them later
+		$keys[] = 'id';
+		for ($i = 0; $i < $count; $i++) {
+		$data[$i][] = $i;
+		}
+		
+		// Bring it all together
+		for ($j = 0; $j < $count; $j++) {
+		$d = array_combine($keys, $data[$j]);
+		$newArray[$j] = $d;
+		}
+		// Print it out as JSON
+		return json_encode($newArray);		
+	}
 	/**
      * création d'un tableau à partir d'un csv
      *

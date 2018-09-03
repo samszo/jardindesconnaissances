@@ -29,11 +29,11 @@
 
 	<script>
 	//merci à https://github.com/dankogai/js-combinatorics
-    //cp = Combinatorics.cartesianProduct(['source', 'destination', 'prédicat'],['physique', 'acteur', 'concept', 'rapport']);
+    cp = Combinatorics.cartesianProduct(['source', 'destination', 'prédicat'],['physique', 'acteur', 'concept', 'rapport']);
     //cp = Combinatorics.combination(['physique', 'acteur', 'concept', 'rapport'], 3);
     //cp = Combinatorics.permutationCombination(['physique', 'acteur', 'concept', 'rapport'],3);
     //cp = Combinatorics.baseN(['physique', 'acteur', 'concept', 'rapport', 'vide'], 3);
-    cp = Combinatorics.power(['physique', 'acteur', 'concept', 'rapport']);
+    //cp = Combinatorics.power(['physique', 'acteur', 'concept', 'rapport']);
         
     var myData = cp.toArray();
     var hLigne = 20;

@@ -76,14 +76,14 @@
                                 }
                             },
 			        fields: [
-			            { field: "login", type: "text", required: true },
-			            { field: "mdp", type: "password", required: true }
+			            { field: "log", type: "text", required: true },
+			            { field: "pwd", type: "password", required: true }
 			        ],
 			        actions: {
 			            save: function () {
 			                var errors = this.validate();
 			                if (errors.length > 0) return;
-			                window.location.assign("login?login="+this.record.login+"&mdp="+this.record.mdp+"&idBase="+"'.$this->idBase.'");
+			                window.location.assign("login?login="+this.record.log+"&mdp="+this.record.pwd+"&idBase="+"'.$this->idBase.'");
 			            }
 					},
 			    		})
