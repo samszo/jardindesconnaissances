@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../css/bootstrap-treeview.min.css" >
     <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
     <link rel="stylesheet" type="text/css" href="../css/font-awesome.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.css" />
 
     <script type="text/javascript" src="../js/d3.v4.js"></script>
     <script type="text/javascript" src="../js/jquery.min.js"></script>
@@ -16,6 +17,7 @@
     <script type="text/javascript" src="../js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../js/bootstrap-treeview.js"></script>    
     <script type="text/javascript" src="../js/w2ui.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js"></script>
   
     <style>
 
@@ -131,23 +133,60 @@ span.modalTitle {
                     <div id="legend" ></div>
                 </div>
             </div>
-            <div class="col-6">        
-                <div class="row">
-                    <h2>Liste des intervenants</h2>
-                </div>
-                <div class="row" id="frmSetCourToInt" style="margin:3px;display:none" >
-                        <label>Sélectioner le(s) intervenant(s) :</label>
-                        <div class="w2ui-field" ></div>
-                                <div style="width: 100%;"> <input style="width: 100%;" id="selectInt" </div>
-                        </div>
-                        <button type="button" id="btnSetCourToInt" class="btn btn-outline-primary">Attribuer le cours</button>
-                </div>
+            <div class="col-6">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="interv-tab" data-toggle="tab" href="#interv" role="tab" aria-controls="interv" aria-selected="true">Intervenants</a>
+                    </li>
+                    <li class="nav-item">
+                            <a class="nav-link" id="etudiant-tab" data-toggle="tab" href="#etudiant" role="tab" aria-controls="etudiant" aria-selected="true">Etudiants</a>
+                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="planning-tab" data-toggle="tab" href="#planning" role="tab" aria-controls="planning" aria-selected="false">Plannings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="salle-tab" data-toggle="tab" href="#salle" role="tab" aria-controls="salle" aria-selected="false">Salles</a>
+                    </li>
+                    <li class="nav-item">
+                            <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="stats" aria-selected="false">Statistiques</a>
+                        </li>
+                    </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="interv" role="tabpanel" aria-labelledby="interv-tab">
 
-                <div class="row">
-                    <div class="col-12">        
-                        <div class="card-columns" id="cardInter"></div>
+                                    <div class="row" id="frmSetCourToInt" style="margin:3px;display:none" >
+                                            <label>Sélectioner le(s) intervenant(s) :</label>
+                                            <div class="w2ui-field" ></div>
+                                                    <div style="width: 100%;"> <input style="width: 100%;" id="selectInt" </div>
+                                            </div>
+                                            <button type="button" id="btnSetCourToInt" class="btn btn-outline-primary">Attribuer le cours</button>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12">        
+                                            <div class="card-columns" id="cardInter"></div>
+                                        </div>
+                                    </div>
                     </div>
+                <div class="tab-pane fade" id="planning" role="tabpanel" aria-labelledby="planning-tab">
+                        <iframe src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=44h1cj5bduhf0v5r56anot5vhk%40group.calendar.google.com&amp;color=%232952A3&amp;src=cpfjqr9f2qq3ekgvh44mqp84ds%40group.calendar.google.com&amp;color=%238C500B&amp;src=9u04g62in88c8vohorsgnbtc28%40group.calendar.google.com&amp;color=%2323164E&amp;src=vbigr9ahcli5jgfpsqus042cio%40group.calendar.google.com&amp;color=%23853104&amp;src=numenjeutech%40gmail.com&amp;color=%23182C57&amp;src=nrte7f4onq3hutms9vgb6ac1rg%40group.calendar.google.com&amp;color=%232952A3&amp;src=thyp1213%40gmail.com&amp;color=%2329527A&amp;ctz=Europe%2FParis" style="border-width:0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
                 </div>
+                <div class="tab-pane fade" id="stats" role="tabpanel" aria-labelledby="stat-tab">
+                    <div class="w2ui-field">
+                        <label>Période :</label>
+                        <div> <input type="dateDeb"> - <input type="dateFin"> </div>
+                    </div>
+                    <div id="cal-heatmap" ></div>
+                    
+                </div>
+                <div class="tab-pane fade" id="etudiant" role="tabpanel" aria-labelledby="etudiant-tab">
+                    <iframe src="../planning/trombino" style="border-width:0" width="100%" height="800px" frameborder="0" scrolling="yes"></iframe>
+                </div>
+                <div class="tab-pane fade" id="salle" role="tabpanel" aria-labelledby="salle-tab">
+                    <iframe src="../planning/trombino" style="border-width:0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+                </div>
+                
+                </div>                        
             </div>
         </div>
 
@@ -263,6 +302,30 @@ var bClick = false, display = "none", selectCour, selectUE, selectParc;
 var maxHeureStat = 192, sclHeureStat = d3.scaleLinear().range([0, 100]).domain([0, maxHeureStat]),
     sclHeureComp = d3.scaleLinear().range([0, 100]).domain([0, maxHeureStat*2]);
 ;
+
+
+//initialise les champs pour définir la période
+$('input[type=dateDeb]').w2field('date', { format: 'yyyy-m-d', end: $('input[type=dateFin]'), required: true });
+$('input[type=dateFin]').w2field('date', { format: 'yyyy-m-d', start: $('input[type=dateDeb]'), required: true})
+    .on('change',function(e){
+        var dates = {
+                    'dateDeb': $('input[type=dateDeb]').w2field().get()
+                    ,'dateFin':$('input[type=dateFin]').w2field().get()
+                        };
+        //vérifie la présence du taux de réduction
+        $.ajax({
+                data: dates,
+                url: urlP+'import/verifdevise',
+                success: function (result) {
+                    if (result.length < 1){
+                        w2alert("Il manque des taux de réduction pour la période définie.<br/>Merci de les renseigner dans l'onglet paramètres.");
+                        return false;
+                    }
+                },
+                dataType:'json',
+                async: false
+            });
+    });	
 
 //écouteurs intéractivité
 
@@ -483,7 +546,7 @@ formECparam = {
             { field: 'field_check', type: 'checkbox', required: false },
             { field: 'field_radio', type: 'radio', required: false }
         ],
-        "Statut", "%CM", "%TD", "%TP", "VH EC", "Seuil", "EC Libre", "Mutualisation Hors EC Libre", "Commentaires", "Nbs de groupes ", "Coût HTD", "VH CM", "VH TD", "VH TP", "Mutualisation destination", "Mutualisation source", "Coût HTD formation"]0: "id"1: "niveau"2: "parcours"3: "Semestre"4: "Intitulés des UE "5: "UE nom court"6: "Coeff"7: "ECTS"8: "Intitulés des EC de chaque UE "9: "EC nom court"10: "Statut"11: "%CM"12: "%TD"13: "%TP"14: "VH EC"15: "Seuil"16: "EC Libre"17: "Mutualisation Hors EC Libre"18: "Commentaires"19: "Nbs de groupes "20: "Coût HTD"21: "VH CM"22: "VH TD"23: "VH TP"24: "Mutualisation destination"25: "Mutualisation source"26: "Coût HTD formation"length: 27__proto__: Array(0)
+//        "Statut", "%CM", "%TD", "%TP", "VH EC", "Seuil", "EC Libre", "Mutualisation Hors EC Libre", "Commentaires", "Nbs de groupes ", "Coût HTD", "VH CM", "VH TD", "VH TP", "Mutualisation destination", "Mutualisation source", "Coût HTD formation"]0: "id"1: "niveau"2: "parcours"3: "Semestre"4: "Intitulés des UE "5: "UE nom court"6: "Coeff"7: "ECTS"8: "Intitulés des EC de chaque UE "9: "EC nom court"10: "Statut"11: "%CM"12: "%TD"13: "%TP"14: "VH EC"15: "Seuil"16: "EC Libre"17: "Mutualisation Hors EC Libre"18: "Commentaires"19: "Nbs de groupes "20: "Coût HTD"21: "VH CM"22: "VH TD"23: "VH TP"24: "Mutualisation destination"25: "Mutualisation source"26: "Coût HTD formation"length: 27__proto__: Array(0)
 
         actions: {
             reset: function () {
@@ -1177,6 +1240,55 @@ function calculHeure(int){
 
     //console.log("calculHeure="+nbH);
     return int;
+}
+
+
+function dateDiff(date1, date2){
+    var diff = {};                          // Initialisation du retour
+    var tmp = date2 - date1;
+    
+    tmp = Math.floor(tmp/1000);             // Nombre de secondes entre les 2 dates
+    diff.sec = tmp % 60;                    // Extraction du nombre de secondes
+    
+    tmp = Math.floor((tmp-diff.sec)/60);    // Nombre de minutes (partie entière)
+    diff.min = tmp % 60;                    // Extraction du nombre de minutes
+    
+    tmp = Math.floor((tmp-diff.min)/60);    // Nombre d'heures (entières)
+    diff.hour = tmp % 24;                   // Extraction du nombre d'heures
+        
+    tmp = Math.floor((tmp-diff.hour)/24);   // Nombre de jours restants
+    diff.day = tmp;
+        
+    return diff;
+}			
+function creaPlanning(idCal){
+
+    var dtMin = $("#datepickerMin").datepicker("getDate");
+    var dtMax = $("#datepickerMax").datepicker("getDate");
+    var diffDate = dateDiff(dtMin, dtMax); 
+    var nbMois = parseInt(diffDate.day/30);
+    if(!calY){
+        calY = new CalHeatMap();				
+        calY.init({
+            domain:"month", subDomain: "day",cellSize: sizeCell, subDomainTextFormat: "%d", cellPadding: 4, domainMargin: 6
+            ,range:nbMois
+            ,legend: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            ,start: dtMin
+            ,data:"planning/events?idCal="+idCal+"&timeMax="+dtMax.toISOString()+"&timeMin="+dtMin.toISOString()
+            ,onClick: function(date, nb) {
+                //récupère les datas correspondant à la date
+                var rs = getData(date);
+                //affiche les datas
+                showData(rs);
+            }
+            ,afterLoadData: parser
+            ,displayLegend: false, tooltip:false
+            ,previousSelector: "#btnPrev"
+            ,nextSelector: "#btnNext"											
+            });				
+    }else{
+        calY.update("planning/events?idCal="+idCal+"&timeMax="+dtMax.toISOString()+"&timeMin="+dtMin.toISOString());
+    }
 }
 
     </script>

@@ -1,0 +1,132 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Badge nominal pour conférence</title>
+	<script type="text/javascript" src="../js/d3.v4.js"></script>
+	<script type="text/javascript">
+	function chargeCSV(){
+		//chargement des données depuis les fichiers csv
+		var url = "../../data/paragraphe/Listing-DTU.csv";
+		url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQtvnFZ_vJmQNou56LaPzuv__1Cd2s2uXhB4WfizxLRGMx_mkb9J0D297GsoTIPloaWMwJhu8obVp7V/pub?gid=0&single=true&output=csv";
+		d3.csv(url, function(data) {
+			creaSvg(data);
+		});
+	}
+	//définition des dimensions
+	var margin = {top: 40, right: 40, bottom: 40, left: 40, inter: 10}
+		, wP = 793.701, hP = 1122.520 //210mm X 297 mm
+		, wB = 321.260, hB= 207.874 //85mm X 55 mm
+		, nbBw = Math.round(wP/wB), nbBh = Math.round(hP/hB), nbBP = nbBh*nbBw
+		, arrColor = {'organisation':'#000000ff','chair':'#ef6973ff','Keynote':'#0000ffff','Author3':'#ce2121ff','Author4':'#0090cfff','Author5':'#4a9100','Committee':'#18003857','Enterprise':'#e500e3a4','General':'#e3ee1ba4','Student':'#e8491ba4'};
+	function creaSvg(data){
+		//calcul le nombre de page et la position des badges
+		var nbP = Math.round(data.length/nbBP);
+		var arrP = [],iData=0;
+		for (i = 0; i < nbP; i++) {
+			arrP[i] = {data:[]};
+			var ligne = 0;
+			for (j = iData; j < (nbBP+iData); j++) {
+				if(data[j]){
+					data[j].col = j % nbBw;
+					data[j].ligne = ligne;
+					if((data[j].col+1) == nbBw)ligne ++;
+					arrP[i].data.push(data[j]);							
+				}
+			}
+			iData+=nbBP;
+		}
+		var svg = d3.select("body").selectAll("svg")
+			.data(arrP)
+			.enter().append("svg")
+				.attr("width", wP)
+				.attr("height", hP)
+				.attr("id", function(d,i){
+					return "svg"+i;
+					})
+				.attr("x", function(d,i){
+					return wP*i;
+					})
+				.attr("y", function(d,i){
+					return hP*i;
+					})
+				;
+		var g = svg.selectAll("g")	
+			.data(function(d, i){
+				return d.data;
+				}).enter()
+				.append("g")
+				.attr("transform",function(d,i){
+					//console.log(d);
+					return "translate(" + (wB*d.col) + "," + (hB*d.ligne) + ")"
+				});
+    	var rect = g.append("rect")
+			.style("fill","none")
+			.style("stroke","black")
+			.attr("width", wB)
+			.attr("height", hB);
+    	var txtPersonne = g.append("text")
+			.attr("style", "font-size:18px;fill:#000000;fill-opacity:1;stroke:none;text-align:center;text-anchor:middle;")
+			.attr("x", wB/2)
+			.attr("y", hB/2)
+			.text(function(d) { 
+				var n = d['Prénom'].toUpperCase()+" "+d['Nom'].toUpperCase();
+                return n; 
+			});
+		var txtAffiliation = g.append("text")
+			.attr("style", "font-size:12px;fill:#000000;fill-opacity:1;stroke:none;text-align:center;text-anchor:middle;")
+			.attr("x", wB/2)
+			.attr("y", hB/2+margin.top)
+			.text(function(d) { 
+                return d['Affiliation'] 
+			});
+		var img = g.append("image")
+			.attr("xlink:href", '../img/DTU-logoHaut.png')
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", wB)
+			.attr("height", margin.top)
+			.attr('preserveAspectRatio','xMidYMin slice');
+		var rectBas = g.append("rect")
+			.style("fill",function(d){
+				if(d.Role=='Author')
+					return arrColor[d.Role+d.Jour];
+				else
+					return arrColor[d.Role];
+			})
+			.style("stroke","none")
+			.attr("x", 0)
+			.attr("y", hB-margin.bottom)
+			.attr("width", wB)
+			.attr("height", margin.bottom);
+		var txtTitre = g.append("text")
+			.attr("style", "font-size:14px;fill:#000000;fill-opacity:1;stroke:none;text-align:center;text-anchor:middle;")
+			.attr("x", wB/2)
+			.attr("y", hB-(margin.bottom/2))
+			.style("fill",function(d){
+				if(d['Role']=='organisation' || d.Role+d.Jour=='Author3' || d.Role=='Keynote')
+					return 'white';
+				else
+					return "black";
+			})
+			.text(function(d) { 
+				var n = "DIGITAL TOOLS & USES - 2018";
+                return n; 
+			});
+
+	}
+	
+	</script>
+	<style>
+		body {
+			width:"210mm";
+			height:"297mm";
+		}
+	
+	</style>
+</head>
+
+<body onload="chargeCSV()">
+
+
+</body>
+</html>

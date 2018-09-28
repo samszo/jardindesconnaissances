@@ -27,6 +27,11 @@ class CartoController extends Zend_Controller_Action {
     {
     }	
 
+    public function worldtourAction()
+    {
+        $toto = 'OK';
+    }
+
     public function iiifAction()
     {
 	    	$config = Zend_Controller_Front::getInstance()->getParam('bootstrap');

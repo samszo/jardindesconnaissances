@@ -177,4 +177,28 @@ class PlanningController extends Zend_Controller_Action {
 		}				
 		return $sPlan;						
 	}
+
+	/**
+	 * affiche les données des formations
+	 */
+	public function formationAction() {
+		$this->view->urlJson = "../../data/paragraphe/HumaNumMentionAll.json";
+		$this->view->colorsKey = '["LP","M1","M2","AVUN","CEN","DWM","GIS","NET","PTN"]';
+		$this->view->groupKey = "['niveau','parcours','UE nom court','EC nom court']";
+		$this->view->lblCalcul = "VH EC";
+	}
+
+	/**
+	 * le tromnbinoscope des étudiants
+	 */
+	public function trombinoAction() {
+	}
+
+	/**
+	 * un calendrier avec niveau de chaleur
+	 */
+	public function calheatmapAction() {
+	}
+
+
 }

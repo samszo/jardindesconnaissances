@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Pupitre nominal pour conférence</title>
+	<script type="text/javascript" src="../js/d3.js"></script>
+	<script type="text/javascript">
+	function chargeCSV(){
+		//chargement des données depuis les fichiers csv
+		var url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSsybV4KQk7bWv5jsu6h6jQRZnWbNNI9ATcX0bNPMmYZzyimfrRv_vXDprpU8h6-ubBzPTuoDrPVWot/pub?gid=699364261&single=true&output=csv";
+		d3.csv(url, function(data) {
+			creaSvg(data);
+		});
+	}
+	
+	function creaSvg(data){
+		var g = d3.select("body")
+			.data(data)
+			.enter().append("svg")
+				.attr("width", "210mm")
+    	        .attr("height", "297mm")
+    	        .append("g");
+    	var rectR = g.append("rect")
+		.attr("style", "stroke:1;")
+		.attr("width", "210mm")
+    	    .attr("height", "297mm")
+		.attr("x", "0")
+		.attr("y", "0")
+		.attr("transform", "matrix(0,1,-1,0,0,0)");
+    	var txtR = g.append("text")
+    	        		.attr("style", "font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans")
+    	        		.attr("x", "530.90936")
+    	        		.attr("y", "-196.76744")
+    	        		.attr("transform", "matrix(0,1,-1,0,0,0)");
+		txtR.append("tspan")
+			.attr("x", "530.90936")
+			.attr("y", "-196.76744")
+			.attr("style", "font-size:64px;text-align:center;text-anchor:middle")
+			.text(function(d) { 
+				var n = d['First Name']+" "+d['Last Name'];
+                return n; 
+            });
+		txtR.append("tspan")
+			.attr("x", "530.90936")
+			.attr("y", "-140.68942")
+			.attr("style", "text-align:center;text-anchor:middle")
+			.text(function(d) { 
+				return d['Affiliation and Country'];
+	        });
+		
+    	var txtV = g.append("text")
+			.attr("style", "font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans")
+			.attr("x", "-532.08124")
+			.attr("y", "518.13696")
+			.attr("transform", "matrix(0,-1,1,0,0,0)");
+		txtV.append("tspan")
+			.attr("x", "-532.08124")
+			.attr("y", "518.13696")
+			.attr("style", "font-size:64px;text-align:center;text-anchor:middle")
+			.text(function(d) { 
+				var n = d['First Name']+" "+d['Last Name'];
+				return n; 
+			});
+		txtV.append("tspan")
+			.attr("x", "-532.08124")
+			.attr("y", "574.21497")
+			.attr("style", "text-align:center;text-anchor:middle")
+			.text(function(d) { 
+				return d['Affiliation and Country'];
+			});		
+
+	}
+	
+	</script>
+</head>
+<body onload="chargeCSV()">
+<svg
+	width="210mm"
+    height="297mm"
+   class="main"
+   >
+  <g
+     id="layer1">
+    <text
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="530.90936"
+       y="-196.76744"
+       id="text3003"
+       transform="matrix(0,1,-1,0,0,0)"><tspan
+         id="nom"
+         x="530.90936"
+         y="-196.76744"
+         style="font-size:64px;text-align:center;text-anchor:middle">Mr Samuel Szoniecky</tspan><tspan
+         x="530.90936"
+         y="-140.68942"
+         id="affiliation"
+         style="text-align:center;text-anchor:middle">Laboratoire Paragraphe Université Paris 8</tspan></text>
+    <text
+       transform="matrix(0,-1,1,0,0,0)"
+       id="text3861"
+       y="518.13696"
+       x="-532.08124"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       ><tspan
+         style="font-size:64px;text-align:center;text-anchor:middle"
+         y="518.13696"
+         x="-532.08124"
+         id="nomR"
+         >Mr Samuel Szoniecky</tspan><tspan
+         style="text-align:center;text-anchor:middle"
+         id="affiliationR"
+         y="574.21497"
+         x="-532.08124"
+         >Laboratoire Paragraphe Université Paris 8</tspan></text>
+  </g>
+</svg>
+
+</body>
+</html>
