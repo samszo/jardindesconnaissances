@@ -48,14 +48,15 @@ class Model_DbTable_Spip_articles extends Zend_Db_Table_Abstract
     	$txt = str_replace("'", " ", $txt);
         $query = $this->select()
             ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("a" => "spip_articles"), array("score"=>"MATCH(a.texte) AGAINST('".$txt."')", "titre", "texte", "id_article", "id_rubrique") )                           
+            ->from( array("a" => "spip_articles"), array("score"=>new Zend_Db_Expr("MATCH(a.fulltxt) AGAINST('".$txt."')")
+                , "titre", "texte", "id_article", "id_rubrique") )                           
             ->joinInner(array('r' => 'spip_rubriques'),
                 'r.id_rubrique = a.id_rubrique',array('rubTitre'=>'titre', 'id_parent'))
             ->joinLeft(array('da' => 'spip_documents_articles'),
                 'da.id_article = a.id_article',array())
             ->joinLeft(array('d' => 'spip_documents'),
                 'd.id_document = da.id_document',array('docTitre'=>'titre', 'fichier', 'id_type'))
-            ->where("MATCH(a.texte) AGAINST('".$txt."')")
+            ->where("MATCH(a.fulltxt) AGAINST('".$txt."')")
         	->order("r.id_rubrique")
 			;
 		

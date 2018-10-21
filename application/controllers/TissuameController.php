@@ -31,5 +31,9 @@ class TissuameController extends Zend_Controller_Action {
     public function fullereneAction()
     {
     }	
+
+	public function hexaAction()
+    {
+    }	
     
 }

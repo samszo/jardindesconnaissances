@@ -1,5 +1,280 @@
-<?php
-	foreach($this->stats as $s){
-		echo $s."<br/>"; 
-	}
-	
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - materials - transparency</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+
+				margin: 0px;
+				overflow: hidden;
+			}
+			a { color: #eee }
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<script src="js/3D/three.js"></script>
+		<script src="js/3D/controls/OrbitControls.js"></script>
+
+		<script src="js/3D/WebGL.js"></script>
+		<script src="js/3D/libs/stats.min.js"></script>
+
+		<script src="js/3D/libs/dat.gui.min.js"></script>
+        <script src="js/3D/hexasphere.js"></script>
+		<script src="js/jquery.min.js"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var container, stats,
+			bulbLight, bulbMat,
+			camera, scene, renderer, controls;
+
+			// ref for lumens: http://www.power-sure.com/lumens.htm
+			var bulbLuminousPowers = {
+				"110000 lm (1000W)": 110000,
+				"3500 lm (300W)": 3500,
+				"1700 lm (100W)": 1700,
+				"800 lm (60W)": 800,
+				"400 lm (40W)": 400,
+				"180 lm (25W)": 180,
+				"20 lm (4W)": 20,
+				"Off": 0
+			};
+
+			// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
+			var hemiLuminousIrradiances = {
+				"0.0001 lx (Moonless Night)": 0.0001,
+				"0.002 lx (Night Airglow)": 0.002,
+				"0.5 lx (Full Moon)": 0.5,
+				"3.4 lx (City Twilight)": 3.4,
+				"50 lx (Living Room)": 50,
+				"100 lx (Very Overcast)": 100,
+				"350 lx (Office Room)": 350,
+				"400 lx (Sunrise/Sunset)": 400,
+				"1000 lx (Overcast)": 1000,
+				"18000 lx (Daylight)": 18000,
+				"50000 lx (Direct Sun)": 50000
+			};
+
+			var params = {
+				opacity: 0.3,
+				shadows: true,
+				exposure: 0.68,
+				bulbPower: Object.keys( bulbLuminousPowers )[0],
+				hemiIrradiance: Object.keys( hemiLuminousIrradiances )[8]
+			};
+
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, 40, 40 * 3.5 );
+
+				scene = new THREE.Scene();
+
+				/* Lights
+
+				var spotLight = new THREE.SpotLight( 0xff8888 );
+				spotLight.position.set( 100, 200, 100 );
+				spotLight.angle = Math.PI / 6;
+				spotLight.penumbra = 0.9;
+				scene.add( spotLight );
+
+				var spotLight = new THREE.SpotLight( 0x8888ff );
+				spotLight.position.set( - 100, - 200, - 100 );
+				spotLight.angle = Math.PI / 6;
+				spotLight.penumbra = 0.9;
+				scene.add( spotLight );
+				*/
+
+
+				var bulbGeometry = new THREE.SphereBufferGeometry(3, 16, 8 );
+				bulbLight = new THREE.PointLight( 0xffee88, 1, 0, 2 );
+
+				bulbMat = new THREE.MeshStandardMaterial( {
+					emissive: 0xffffee,
+					emissiveIntensity: 1,
+					color: 0x000000
+				});
+				bulbLight.add( new THREE.Mesh( bulbGeometry, bulbMat ) );
+				bulbLight.position.set( 0, 0, 0 );
+				bulbLight.castShadow = true;
+				scene.add( bulbLight );
+
+				/*création des sphères
+				getSphere(30, 25, .95);
+				getSphere(35, 10, .6);
+				getSphere(40, 25, .95);
+				*/
+				for (let i = 1; i <= 10; i++) {
+					getSphere(1*i, 1, 0.9);					
+				}
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.physicallyCorrectLights = true;
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				var gui = new dat.GUI();
+				gui.add( params, 'hemiIrradiance', Object.keys( hemiLuminousIrradiances ) );
+				gui.add( params, 'bulbPower', Object.keys( bulbLuminousPowers ) );
+				gui.add( params, 'exposure', 0, 1 );
+				gui.add( params, 'shadows' );
+
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			var previousShadowMap = false;
+
+			function render() {
+
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+					var object = scene.children[ i ];
+
+					if ( object.geometry instanceof THREE.SphereBufferGeometry ) {
+
+						object.rotation.x = performance.now() * 0.0002;
+						object.rotation.y = - performance.now() * 0.0002;
+
+					}
+
+				}
+
+				renderer.toneMappingExposure = Math.pow( params.exposure, 5.0 ); // to allow for very bright scenes.
+				renderer.shadowMap.enabled = params.shadows;
+				bulbLight.castShadow = params.shadows;
+				if( params.shadows !== previousShadowMap ) {
+					previousShadowMap = params.shadows;
+				}
+				bulbLight.power = bulbLuminousPowers[ params.bulbPower ];
+				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
+				
+				var time = Date.now() * 0.0005;
+
+				//bulbLight.position.y = Math.cos( time ) * 0.75 + 1.25;
+
+
+				renderer.render( scene, camera );
+
+			}
+			function getSphere(radius, divisions, tileSize){
+				var hexasphere = new Hexasphere(radius, divisions, tileSize);
+				for(var i = 0; i< hexasphere.tiles.length; i++){
+
+					//choix aléatoire de faces
+					if(Math.floor(Math.random() * 10)>5){
+
+						var t = hexasphere.tiles[i];
+						var latLon = t.getLatLon(hexasphere.radius);
+
+						var geometry = new THREE.Geometry();
+
+						for(var j = 0; j< t.boundary.length; j++){
+							var bp = t.boundary[j];
+							geometry.vertices.push(new THREE.Vector3(bp.x, bp.y, bp.z));
+						}
+
+						geometry.faces.push(new THREE.Face3(0,1,2));
+						geometry.faces.push(new THREE.Face3(0,2,3));
+						geometry.faces.push(new THREE.Face3(0,3,4));
+						if(geometry.vertices.length > 5){
+							geometry.faces.push(new THREE.Face3(0,4,5));
+						}
+						//calcule des couleurs aléatoires
+						var r = Math.floor(Math.random() * 255);
+						var g = Math.floor(Math.random() * 255);
+						var b = Math.floor(Math.random() * 255);
+						var color = new THREE.Color("rgb("+r+", "+g+", "+b+")");
+						//force la culeur
+						//color = new THREE.Color("rgb(0, 0, 255)");
+						//affiche des vides aléatoires
+						if(Math.floor(Math.random() * 10)>5)color = THREE.NoColors;
+						//affiche des noirs aléatoires
+						//if(Math.floor(Math.random() * 10)>2)color = new THREE.Color("rgb(0, 0, 0)");
+						var mat = new THREE.MeshBasicMaterial({
+							color: color
+							, opacity: params.opacity
+							, transparent: true
+							, side : THREE.DoubleSide
+							});
+
+						var mesh = new THREE.Mesh(geometry, mat.clone());
+						scene.add(mesh);
+						hexasphere.tiles[i].mesh = mesh;
+					}
+				}				
+			}
+		</script>
+	</body>
+</html>

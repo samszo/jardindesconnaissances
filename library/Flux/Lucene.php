@@ -212,10 +212,10 @@ bsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
 	function getSegments($html, $texte){
 		
 	    	//vérification des requêtes complexes and
-	    	$arrQ = split(" and ", $texte);
+	    	$arrQ = explode(" and ", $texte);
 	    	
 	    	//vérification des requêtes complexes or
-	    	if(count($arrQ)==1) $arrQ = split(" or ", $texte);
+	    	if(count($arrQ)==1) $arrQ = explode(" or ", $texte);
 	    	
 	    	$result = array();
 	    	

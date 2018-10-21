@@ -239,5 +239,7 @@ class DeleuzeController extends Zend_Controller_Action {
 			$this->view->data = $oD->cherche($this->_getParam('term'));		
 	    }
 	}
+	public function framesAction() {
+	}
 	
 }

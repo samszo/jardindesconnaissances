@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Générateur</title>
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap-treeview.min.css" >
+    <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
+    <link rel="stylesheet" type="text/css" href="../css/font-awesome.css">
+
+    <script type="text/javascript" src="../js/d3.V5.min.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/popper.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap-treeview.js"></script>    
+    <script type="text/javascript" src="../js/w2ui.min.js"></script>
+  
+    <style>
+
+#sidebar {
+    position: relative;
+    bottom: 600px;
+    width: 86px
+}
+
+#sequence {
+  width: 600px;
+  height: 70px;
+}
+
+#legend {
+  padding: 10px 0 0 3px;
+}
+
+#sequence text, #legend text {
+  font-weight: 600;
+  fill: #fff;
+}
+
+#chart {
+  position: relative;
+}
+
+#chart path {
+  stroke: #fff;
+}
+
+#explanation {
+  position: absolute;
+  top: 200px;
+  left: 280px;
+  width: 200px;
+  text-align: center;
+  color: #666;
+  z-index: -1;
+}   
+
+.treeview .list-group-item {
+    cursor: pointer; 
+    font-size: 0.6em;
+    padding: .1rem .2rem;
+}
+
+.treeview span.indent {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+span.modalTitle {
+    font-weight: bold;
+    margin-left: 4px;
+    margin-right: 4px;
+} 
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid" >
+        <nav id="nbMain" class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+            <a class="navbar-brand" href="#">
+                <h1 class="text-center" >Générateur - Création d'import</h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarTogglerDemo02"
+                aria-controls="navbarTogglerDemo02" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="ddOeuvre" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sources</a>
+                        <div class="dropdown-menu" aria-labelledby="ddOeuvre">
+                            <a class="dropdown-item" href="#">Créer</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="ddUti" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Modèles</a>
+                        <div class="dropdown-menu" aria-labelledby="ddUti">
+                            <a class="dropdown-item" href="#">Ajouter</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>	
+
+        <div class="row">
+            <div class="col-12">
+            <form>
+                <div class="form-group">
+                    <button class="btn btn-outline-danger my-2 my-sm-0" onclick="generer(1)" type="button">générer</button>
+                    <label id="titreImport_1" for="fileImport_1">Concertation #Habitat en Métropole</label>
+                    <input type="url" class="form-control" id="fileImport_1" placeholder="http:///" value="http://localhost/jdc/data/generateur/concertation-habitat-en-metropole.csv">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-outline-danger my-2 my-sm-0" onclick="generer(2)" type="button">générer</button>
+                    <label id="titreImport_2" for="fileImport_2">Liste des prénoms des nouveaux-nés entre 2014 et 2017 - Ville de Tourcoing</label>
+                    <input type="url" class="form-control" id="fileImport_2" placeholder="http:///" value="http://localhost/jdc/data/generateur/prenoms-nouveaux-nes-tourcoing.csv">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-outline-danger my-2 my-sm-0" onclick="generer(3)" type="button">générer</button>
+                    <label id="titreImport_3" for="fileImport_3">Passages piétons</label>
+                    <input type="url" class="form-control" id="fileImport_3" placeholder="http:///" value="http://localhost/jdc/data/generateur/passages-pietons.csv">
+                </div>
+                
+                <button class="btn btn-outline-danger my-2 my-sm-0" onclick="exporter()" type="button">exporter</button>
+                <div class="form-group">
+                    <label for="resultImport">Résultat</label>
+                    <textarea class="form-control" id="resultImport" rows="10"></textarea>
+                  </div>
+            </form>                        
+            </div>
+        </div>
+
+    </div>
+
+
+    <script type="text/javascript">
+
+        var ligne = '\r\n', txtGen;
+        function generer(nb)
+        {
+            var fic = d3.select("#fileImport_"+nb).node().value, base  = "base"+nb, titre = d3.select("#titreImport_"+nb).text();
+            /*
+            d3.csv(fic, function(error, data) {
+                if (error) throw error;
+                console.log(data);
+            });
+            */
+
+            d3.dsv(";", fic, function(d) {
+                return d;
+                /*
+                return {
+                    year: new Date(+d.Year, 0, 1), // convert "Year" column to Date
+                    make: d.Make,
+                    model: d.Model,
+                    length: +d.Length // convert "Length" column to number
+                };
+                */
+            }).then(function(data) {
+                txtGen = 'concept,type,valeur'+ligne;
+                if(nb==1)txtGen=modele1(data, base, titre);
+                if(nb==2)txtGen=modele2(data, base, titre);
+                if(nb==3)txtGen=modele3(data, base, titre);
+                d3.select("#resultImport").text(txtGen);
+
+            });
+
+        }
+        function modele3(data, base, titre){
+            //formate le csv d'importation
+            txtGen += 'textePatron01,'+base+','+titre+ligne
+            data.forEach(function(g, i){
+                var txt = i+' Geo Point '+g['Geo Point']+' Geo Shape '+g['Geo Shape']+' crossing '+g['crossing']+' @id '+g['@id']+' highway '+g['highway'];
+                txt = txt.replace(/"/g, "'");
+                txt = txt.replace(/,/g, "§");
+                txtGen += 'textePatron02,'+base+',"'+txt+'"'+ligne;
+            });
+            txtGen += 'textePatron,'+base+',['+base+'-textePatron01]%['+base+'-textePatron02]'+ligne;
+            return txtGen;            
+            
+        }
+        function modele2(data, base, titre){
+            //récupère les prénoms
+            var prenoms = [], personnes = [], pronom = {'Masculin':'Il','Féminin':'Elle'};
+            data.forEach(function(d){
+                var p = d['Prénom'];
+                if(prenoms[p])prenoms[p] ++;
+                else prenoms[p] = 1;
+                personnes.push({'p':p,'sexe':d['Sexe'],'nait':d['Naissance']});
+            });
+            //formate le csv d'importation
+            txtGen += 'textePatron01,'+base+','+titre+ligne
+            personnes.forEach(function(p){
+                var txt = p.p+' est de sexe '+p.sexe+'. '+pronom[p.sexe]+' est né en '+p.nait;
+                txt += '%'+prenoms[p.p]+' personnes portant ce prénom sont nées entre 2014 et 2017 dans la ville de Tourcoing.';
+                txtGen += 'textePatron02,'+base+',"'+txt+'"'+ligne;
+            });
+            txtGen += 'textePatron,'+base+',['+base+'-textePatron01]%['+base+'-textePatron02]'+ligne;
+            return txtGen;            
+            
+        }
+        function modele1(data, base, titre){
+            var questions=[]
+            //récupère les questions
+            var i = 0;
+            for (var k in data[1]){
+                //supprime les num.
+                var q = k.substr((k.indexOf('. ')+2));
+                //suprime les caractère après ?
+                q = q.substr(0,q.indexOf('?')+1);
+                questions.push({'id':i,'k':k,'q':q,'r':{}});
+                i++;
+            }
+            //récupère les réponses
+            data.forEach(function(d){
+                questions.forEach(function(q){
+                    var arrR = d[q.k].split(',');
+                    arrR.forEach(function(v){
+                        v = v.replace(/\n|\r/g,'§');
+                        var arrL = v.split('§');
+                        arrL.forEach(function(r){                                
+                            if(q.r[r])q.r[r].nb ++;
+                            else q.r[r] = {'r':r,'nb':1};
+                        });
+                    })                        
+                })
+            });
+            //formate le csv d'importation
+            txtGen += 'textePatron01,'+base+','+titre+ligne
+            questions.forEach(function(q){
+                txtGen += 'question'+q.id+','+base+',"'+q.q+'"'+ligne;
+                for (var k in q.r){
+                    var r = q.r[k];
+                    if(r.nb==1)
+                        txtGen += 'reponses'+q.id+','+base+',"'+r.nb+' personne a répondu : '+r.r+'"'+ligne;
+                    else
+                        txtGen += 'reponses'+q.id+','+base+',"'+r.nb+' personnes ont répondu : '+r.r+'"'+ligne;
+                }
+                txtGen += 'textePatron02,'+base+',['+base+'-question'+q.id+'] : ['+base+'-reponses'+q.id+']'+ligne;
+            });
+            txtGen += 'textePatron,'+base+',['+base+'-textePatron01]%['+base+'-textePatron02]'+ligne;
+            return txtGen;            
+        }
+        function exporter(){
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += d3.select("#resultImport").text();
+            var encodedUri = encodeURI(csvContent);
+            window.open(encodedUri);
+        }
+    </script>
+  </body>
+</html>
