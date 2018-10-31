@@ -10,7 +10,7 @@
 
 class SvgElement
 {
-    var $mElements = ""; // Initialize so warnings aren't issued when not used.
+    var $mElements = []; // Initialize so warnings aren't issued when not used.
     var $mStyle;
     var $mTransform;
     var $mJs;
@@ -39,9 +39,9 @@ class SvgElement
     }
    
     // This method adds an object reference to the mElements array.
-    function addChild(&$element)
+    function addChild($element)
     {
-        $this->mElements[] =& $element;
+        $this->mElements[] = $element;
     }
     
     // This method sends a message to the passed element requesting to be

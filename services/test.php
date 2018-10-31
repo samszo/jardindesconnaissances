@@ -653,11 +653,11 @@ try {
 	$b = $rs->all('<http://dbpedia.org/ontology/abstract>');
 	*/
 	
-	//$eu = new Flux_Eu("flux_eu_privacy",true);
+	$eu = new Flux_Eu("flux_eu_privacy",true);
 	//éthique robotique $eu->setDossierObsLegi("2015/2103(INL)");
 	//marché objet connecté $eu->setDossierObsLegi("2012/0283(COD)");
 	//Respect for private life and the protection of personal data in electronic communications
-	//$eu->setDossierObsLegi("2017/0003(COD)");
+	$eu->setDossierObsLegi("2017/0003(COD)");
 	
 	//$okapi = new Flux_Okapi(OKAPI_LOGIN,OKAPI_PWD,"flux_okapi",true);	
 	//$c = $okapi->connexion();
@@ -671,7 +671,7 @@ try {
 	$s->trace($reponse);
 	*/
 	
-	//
+	/*
 	$an = new Flux_An('flux_valarnum_prod1_1','omk_valarnum1',$s->bTrace);
 	$an->bTraceFlush = $s->bTraceFlush;
 	
@@ -679,6 +679,7 @@ try {
 	$url = "http://localhost/jdc/data/an/FRAN_IR_055457.xml";	//Pompidou
 	$url = "http://localhost/jdc/data/an/FRAN_IR_054722.xml";//DE gaulle
 	$url = "http://localhost/jdc/data/an/FRAN_IR_050658.xml";//Coty & co
+	*/
 	//$an->sauveXmlEad($url);
 	//$an->sauvePhotosAbscentes();
 	//$complex = $an->getComplexEcosystem(0,524);
@@ -737,11 +738,11 @@ try {
 	$sym->importTree();
 	*/
 	
-	$fe = new Flux_Flickemo("flux_flickemo");
-	
+	/*
+	$fe = new Flux_Flickemo("flux_flickemo");	
 	//$fe->setObjetForUti(1,"63394961@N00","group");//3070672@N22
 	$fe->getPhotosFromDoc(217);
-	
+	*/
 	
 	$s->trace("FIN TEST");			
 	

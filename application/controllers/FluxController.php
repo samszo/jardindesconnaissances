@@ -475,6 +475,30 @@ class FluxController extends Zend_Controller_Action {
 				$this->view->content = json_encode($data);
 					
     }
+
+	public function euAction()
+    {
+		$eu = new Flux_Eu($this->_getParam('idBase', 'flux_eu'),$this->_getParam('trace'));
+		$eu->bTraceFlush = $this->_getParam('trace');    	 
+		switch ($this->_getParam('f')) {
+			case "setDossierObsLegi":
+				$eu->setDossierObsLegi($this->_getParam('idDossier'));
+				break;
+			case "getParlTrackResult":
+				$data = $eu->getParlTrackResult($this->_getParam('q'));				
+				if($this->_getParam('set')){
+					foreach ($data['procedures'] as $r => $p) {
+						$eu->setDossierObsLegi($r);
+					}
+					foreach ($data['liens'] as $r) {
+						$eu->setDossierObsLegi($r);
+					}
+				}
+				break;
+		}		
+		$this->view->content = json_encode($data);
+
+	}
     
     public function ensuprefrAction()
     {

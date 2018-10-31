@@ -11,10 +11,12 @@
  * @version  $Id:$
  */
 
-class Flux_Ieml extends Flux_Site{
+ class Flux_Ieml extends Flux_Site{
 
-  	var $PATH_STAR_PARSER = 'http://starparser.ieml.org/cgi-bin/star2xml.cgi?iemlExpression=';
-  	var $XPATH_BINARY = '//@binary';
+	//var $PATH_STAR_PARSER = 'http://starparser.ieml.org/cgi-bin/star2xml.cgi?iemlExpression=';
+	//var $PATH_STAR_PARSER = 'http://localhost/ieml/parser/star2xml.php?iemlExpression=';
+	var $PATH_STAR_PARSER = 'http://gapai.univ-paris8.fr/ieml/parser/star2xml.php?iemlExpression=';
+	var $XPATH_BINARY = '//@binary';
   	var $XPATH_PRIMITIVE = '//@primitiveSet';
   	var $PRIMITIVE_VALUE = array("E"=>1,"U"=>2,"A"=>4,"S"=>8,"B"=>16,"T"=>32);
   	var $LAYER_PONCT = array(":",".","-","'",",","_",";");
@@ -46,10 +48,8 @@ class Flux_Ieml extends Flux_Site{
 			
 		//nettoie le résultat du parser
 		$sResult = str_replace("<XMP>","",$sResult);
-	    $sResult = str_replace("</XMP>","",$sResult);
-	    if(eregi('<(.*)>(.*)<(.*)>',$sResult)){
-	    	$xml = str_replace('<?xml version="1.0" encoding="UTF-8"?>'," ",$sResult);
-	    }
+		$sResult = str_replace("</XMP>","",$sResult);
+		$xml = str_replace('<?xml version="1.0" encoding="UTF-8"?>'," ",$sResult);
 		
 		if(strstr($xml,"ERROR:")){
 			return $xml;

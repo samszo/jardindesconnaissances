@@ -122,59 +122,51 @@ class SpipController extends Zend_Controller_Action
 		if($this->_getParam('idBase')) $this->dbNom = $this->_getParam('idBase');
 		
 		$s = new Flux_Site($this->dbNom);
-		$arrRubStat = array("Membre"=>576,"Doctorant"=>578,"Associé"=>577, "Historique"=>579);
+		$idRub = $this->_getParam('idRub',6);
 		$dbArt = new Model_DbTable_Spip_articles($s->db);
 		$dbAut = new Model_DbTable_Spip_auteurs($s->db);
 		$dbR = new Model_DbTable_Spip_rubriques($s->db);
-		$dbAutR = new Model_DbTable_Spip_auteursrubriques($s->db);
+		$dbAutL = new Model_DbTable_Spip_auteursliens($s->db);
 		
-		//charge la liste des membres
-		$membres = $s->csvToArray("../data/paragraphe/membresCITU.csv",0,","); 					
+		//récupère la liste des auteurs
+		$membres = $dbAut->getAll();
 		$nbM = count($membres);
 		for ($i = 0; $i < $nbM; $i++) {
-			//récupère l'identifiant de l'auteur
-			$arrAuteur = $dbAut->findByLogin(utf8_encode($membres[$i][0]));
-			$idAuteur = count($arrAuteur["id_auteur"]) ? $arrAuteur["id_auteur"] : 0; 
-			if($idAuteur){
-				$membres[$i]["idAuteur"] = $idAuteur;
-				
-				//construction du numéro d'ordre
-				$num = $i."00";
-				/*
-				if($i<10)$num = "0".$i;
-				else $num = "".$i;
-				if(!isset($arrRubStat[$membres[3]]))
-					$idRubStat = $dbR->findByTitre($membres[3]);
-				*/ 
-				$idRubStat = $arrRubStat[$membres[$i][1]];
-				$membres[$i]["idRubStat"] = $idRubStat;
-				//vérifie si la rubrique de l'auteur existe
-				$titreRubAuteur = $num.". ".$arrAuteur["nom"];
-				$membres[$i]["titreRubAuteur"] = $titreRubAuteur;
-				$arrRubAut = $dbR->findByTitre($titreRubAuteur);
-				$idRubAuteur = count($arrRubAut) ? $arrRubAut[0]["id_rubrique"] : 0;
-				$membres[$i]["idRubAuteur"] = $idRubAuteur;
-				if($idRubAuteur==0){
-					//création de la rubrique de l'auteur
-					$idRubAuteur = $dbR->ajouter(array("id_parent"=>$idRubStat, "titre"=>$titreRubAuteur, "statut"=>'publie'));
-				}
-				//vérifie le statut
-				switch ($membres[$i][2]) {
-					case "admin":
-						$dbAut->edit($idAuteur, array("statut"=>"0minirezo"));
-					break;
-					case "restreint":
-						$dbAut->edit($idAuteur, array("statut"=>"0minirezo"));
-						$dbAutR->ajouter(array("id_auteur"=>$idAuteur, "id_rubrique"=>$idRubAuteur));
-					break;
-				}
-				//création des articles
-				$dbArt->ajouter(array("id_rubrique"=>$idRubAuteur, "titre"=>"01. Profil", "texte"=>utf8_encode("A compléter..."), "statut"=>"publie"));
-				$dbArt->ajouter(array("id_rubrique"=>$idRubAuteur, "titre"=>utf8_encode("02. Enseignements et responsabilités administratives"), "texte"=>utf8_encode("A compléter..."), "statut"=>"publie"));
-				$dbArt->ajouter(array("id_rubrique"=>$idRubAuteur, "titre"=>"03. Publications", "texte"=>utf8_encode("A compléter..."), "statut"=>"publie"));
-				$dbArt->ajouter(array("id_rubrique"=>$idRubAuteur, "titre"=>utf8_encode("04. Conférences"), "texte"=>utf8_encode("A compléter..."), "statut"=>"publie"));
-				
+			$m = $membres[$i]; 				
+			//construction du numéro d'ordre
+			$num = $i."00";
+			//vérifie si la rubrique de l'auteur existe
+			$titreRubAuteur = $num.". ".$m["nom"];
+			$arrRubAut = $dbR->findByTitre($titreRubAuteur);
+			$idRubAuteur = count($arrRubAut) ? $arrRubAut[0]["id_rubrique"] : 0;
+			if($idRubAuteur==0){
+				//création de la rubrique de l'auteur
+				$idRubAuteur = $dbR->ajouter(array("id_parent"=>$idRub, "titre"=>$titreRubAuteur
+				,'lang'=>'fr','langue_choisie'=>'oui','texte'=>'','descriptif'=>'', "statut"=>'publie'));
 			}
+			//vérifie le statut
+			if($m['statut']=='1comite') {
+				$dbAut->edit($m["id_auteur"], array("statut"=>"0minirezo"));
+				$dbAutL->ajouter(array("id_auteur"=>$m["id_auteur"], "id_objet"=>$idRubAuteur, "objet"=>'rubrique'));
+			}
+			//création des articles
+			$idArt = $dbArt->ajouter(array("id_rubrique"=>$idRubAuteur, "titre"=>"01. Profil", "texte"=>"A compléter..."
+				, "statut"=>"publie",'lang'=>'fr','langue_choisie'=>'oui','surtitre'=>'','soustitre'=>'','descriptif'=>''
+				,'chapo'=>'','ps'=>'','nom_site'=>'','url_site'=>'','virtuel'=>''));
+			$dbAutL->ajouter(array("id_auteur"=>$m["id_auteur"], "id_objet"=>$idArt, "objet"=>'article'));
+			$idArt = $dbArt->ajouter(array("id_rubrique"=>$idRubAuteur, "titre"=>"02. Enseignements et responsabilités administratives", "texte"=>"A compléter..."
+				, "statut"=>"publie",'lang'=>'fr','langue_choisie'=>'oui','surtitre'=>'','soustitre'=>''
+				,'descriptif'=>'','chapo'=>'','ps'=>'','nom_site'=>'','url_site'=>'','virtuel'=>''));
+			$dbAutL->ajouter(array("id_auteur"=>$m["id_auteur"], "id_objet"=>$idArt, "objet"=>'article'));
+			$idArt = $dbArt->ajouter(array("id_rubrique"=>$idRubAuteur, "titre"=>"03. Publications", "texte"=>"A compléter..."
+				, "statut"=>"publie",'lang'=>'fr','langue_choisie'=>'oui','surtitre'=>'','soustitre'=>'','descriptif'=>''
+				,'chapo'=>'','ps'=>'','nom_site'=>'','url_site'=>'','virtuel'=>''));
+			$dbAutL->ajouter(array("id_auteur"=>$m["id_auteur"], "id_objet"=>$idArt, "objet"=>'article'));
+			$idArt = $dbArt->ajouter(array("id_rubrique"=>$idRubAuteur, "titre"=>"04. Conférences", "texte"=>"A compléter..."
+				, "statut"=>"publie",'lang'=>'fr','langue_choisie'=>'oui','surtitre'=>'','soustitre'=>'','descriptif'=>''
+				,'chapo'=>'','ps'=>'','nom_site'=>'','url_site'=>'','virtuel'=>''));
+			$dbAutL->ajouter(array("id_auteur"=>$m["id_auteur"], "id_objet"=>$idArt, "objet"=>'article'));
+
 		}
 		
 		$this->view->data = $membres;

@@ -36,6 +36,7 @@
 		<script src="js/3D/libs/stats.min.js"></script>
 
 		<script src="js/3D/libs/dat.gui.min.js"></script>
+		<script src="js/3D/renderers/Projector.js"></script>
         <script src="js/3D/hexasphere.js"></script>
 		<script src="js/jquery.min.js"></script>
 
@@ -49,7 +50,10 @@
 
 			var container, stats,
 			bulbLight, bulbMat,
-			camera, scene, renderer, controls;
+			camera, scene, renderer, controls, tissus=[],
+			raycaster = new THREE.Raycaster(),
+			mouse = new THREE.Vector2(),
+			projector, targetList=[];
 
 			// ref for lumens: http://www.power-sure.com/lumens.htm
 			var bulbLuminousPowers = {
@@ -79,11 +83,11 @@
 			};
 
 			var params = {
-				opacity: 0.3,
+				opacity: 0.2,
 				shadows: true,
-				exposure: 0.68,
+				exposure: 1,
 				bulbPower: Object.keys( bulbLuminousPowers )[0],
-				hemiIrradiance: Object.keys( hemiLuminousIrradiances )[8]
+				hemiIrradiance: Object.keys( hemiLuminousIrradiances )[0]
 			};
 
 
@@ -102,23 +106,24 @@
 
 				scene = new THREE.Scene();
 
-				/* Lights
-
-				var spotLight = new THREE.SpotLight( 0xff8888 );
-				spotLight.position.set( 100, 200, 100 );
-				spotLight.angle = Math.PI / 6;
-				spotLight.penumbra = 0.9;
-				scene.add( spotLight );
-
-				var spotLight = new THREE.SpotLight( 0x8888ff );
-				spotLight.position.set( - 100, - 200, - 100 );
-				spotLight.angle = Math.PI / 6;
-				spotLight.penumbra = 0.9;
-				scene.add( spotLight );
+				/*lights
+				var sphere = new THREE.SphereBufferGeometry( 0.3, 16, 8 );
+				light1 = new THREE.PointLight( 0xff0040, 2, 0 );
+				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) ) );
+				scene.add( light1 );
+				light2 = new THREE.PointLight( 0x0040ff, 2, 0 );
+				light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) ) );
+				scene.add( light2 );
+				light3 = new THREE.PointLight( 0x80ff80, 2, 50 );
+				light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) ) );
+				scene.add( light3 );
+				light4 = new THREE.PointLight( 0xffaa00, 2, 50 );
+				light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) ) );
+				scene.add( light4 );
 				*/
 
-
-				var bulbGeometry = new THREE.SphereBufferGeometry(3, 16, 8 );
+				/*lumière centrale
+				var bulbGeometry = new THREE.SphereBufferGeometry(0.5, 16, 8 );
 				bulbLight = new THREE.PointLight( 0xffee88, 1, 0, 2 );
 
 				bulbMat = new THREE.MeshStandardMaterial( {
@@ -130,6 +135,23 @@
 				bulbLight.position.set( 0, 0, 0 );
 				bulbLight.castShadow = true;
 				scene.add( bulbLight );
+				*/
+
+
+				/*spotligh
+				var spotLight = new THREE.SpotLight(0xffffff);
+				spotLight.position.set(10, 10, 10);
+				spotLight.castShadow = true;
+				spotLight.shadow.mapSize.width = 100;
+				spotLight.shadow.mapSize.height = 100;
+				spotLight.shadow.camera.near = 0;
+				spotLight.shadow.camera.far = 100;
+				spotLight.shadow.camera.fov = 30;
+				scene.add( spotLight );
+				var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+				scene.add( spotLightHelper );
+				*/
+
 
 				/*création des sphères
 				getSphere(30, 25, .95);
@@ -137,7 +159,7 @@
 				getSphere(40, 25, .95);
 				*/
 				for (let i = 1; i <= 10; i++) {
-					getSphere(1*i, 1, 0.9);					
+					tissus.push(getSphere(1*i, 1, 0.9));					
 				}
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -160,13 +182,20 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				// initialize object to perform world/screen calculations
+				projector = new THREE.Projector();
+				
+				// when the mouse moves, call the given function
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+				/*
 				var gui = new dat.GUI();
 				gui.add( params, 'hemiIrradiance', Object.keys( hemiLuminousIrradiances ) );
 				gui.add( params, 'bulbPower', Object.keys( bulbLuminousPowers ) );
 				gui.add( params, 'exposure', 0, 1 );
 				gui.add( params, 'shadows' );
-
 				gui.open();
+				*/
 
 			}
 
@@ -198,6 +227,7 @@
 
 			function render() {
 
+				/*
 				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
 					var object = scene.children[ i ];
@@ -210,7 +240,9 @@
 					}
 
 				}
+				*/
 
+				/*Lumière centrale
 				renderer.toneMappingExposure = Math.pow( params.exposure, 5.0 ); // to allow for very bright scenes.
 				renderer.shadowMap.enabled = params.shadows;
 				bulbLight.castShadow = params.shadows;
@@ -219,38 +251,39 @@
 				}
 				bulbLight.power = bulbLuminousPowers[ params.bulbPower ];
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
-				
+				*/
+
 				var time = Date.now() * 0.0005;
 
 				//bulbLight.position.y = Math.cos( time ) * 0.75 + 1.25;
 
+				/*bouge la lumière
+				tissus.forEach(function(exa){
+					exa.tiles.forEach(function(t){
+						if(t.light){
+							
+							t.light.position.z = Math.sin( time) * 0.75 + 0.7;
+						}
+					})
+				})
+				*/
 
 				renderer.render( scene, camera );
 
 			}
+
+
 			function getSphere(radius, divisions, tileSize){
 				var hexasphere = new Hexasphere(radius, divisions, tileSize);
 				for(var i = 0; i< hexasphere.tiles.length; i++){
 
 					//choix aléatoire de faces
-					if(Math.floor(Math.random() * 10)>5){
+					//if(Math.floor(Math.random() * 10)>5){
+					if(true){
 
 						var t = hexasphere.tiles[i];
 						var latLon = t.getLatLon(hexasphere.radius);
 
-						var geometry = new THREE.Geometry();
-
-						for(var j = 0; j< t.boundary.length; j++){
-							var bp = t.boundary[j];
-							geometry.vertices.push(new THREE.Vector3(bp.x, bp.y, bp.z));
-						}
-
-						geometry.faces.push(new THREE.Face3(0,1,2));
-						geometry.faces.push(new THREE.Face3(0,2,3));
-						geometry.faces.push(new THREE.Face3(0,3,4));
-						if(geometry.vertices.length > 5){
-							geometry.faces.push(new THREE.Face3(0,4,5));
-						}
 						//calcule des couleurs aléatoires
 						var r = Math.floor(Math.random() * 255);
 						var g = Math.floor(Math.random() * 255);
@@ -259,22 +292,111 @@
 						//force la culeur
 						//color = new THREE.Color("rgb(0, 0, 255)");
 						//affiche des vides aléatoires
-						if(Math.floor(Math.random() * 10)>5)color = THREE.NoColors;
+						//if(Math.floor(Math.random() * 10)>5)color = THREE.NoColors;
 						//affiche des noirs aléatoires
 						//if(Math.floor(Math.random() * 10)>2)color = new THREE.Color("rgb(0, 0, 0)");
+						
+						//création du material
 						var mat = new THREE.MeshBasicMaterial({
 							color: color
 							, opacity: params.opacity
 							, transparent: true
 							, side : THREE.DoubleSide
 							});
+						
+						//création des sphères de position lumineuse
+						var sphere = new THREE.SphereBufferGeometry( 0.2, 16, 8);
 
+
+						var geometry = new THREE.Geometry();
+
+						for(var j = 0; j< t.boundary.length; j++){
+							var bp = t.boundary[j];
+							geometry.vertices.push(new THREE.Vector3(bp.x, bp.y, bp.z));
+							//ajoute des sphères pour chaque point
+							var m = new THREE.Mesh( sphere, mat);
+							scene.add(m);
+							m.position.set(bp.x, bp.y, bp.z); 
+						}
+						//création des faces	
+						geometry.faces.push(new THREE.Face3(0,1,2));
+						geometry.faces.push(new THREE.Face3(0,2,3));
+						geometry.faces.push(new THREE.Face3(0,3,4));
+						if(geometry.vertices.length > 5){
+							geometry.faces.push(new THREE.Face3(0,4,5));
+						}						
 						var mesh = new THREE.Mesh(geometry, mat.clone());
 						scene.add(mesh);
-						hexasphere.tiles[i].mesh = mesh;
+						targetList.push(mesh);						
+
+
+						/*DirectionalLight
+						var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+						//directionalLight.target = 
+						scene.add( directionalLight );
+						*/
+
+						/*PointLight
+						light1 = new THREE.PointLight( color, 2, 0 );
+						light1.position.set(t.centerPoint.x, t.centerPoint.y, t.centerPoint.z);
+						light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: color } ) ) );
+						scene.add( light1 );
+						hexasphere.tiles[i].light = light1;
+						*/
+
+						/*spotligh
+						var spotLight = new THREE.SpotLight(color);
+						spotLight.position.set(centroid.x, centroid.y, centroid.z);
+						spotLight.castShadow = true;
+						spotLight.shadow.mapSize.width = 10;
+						spotLight.shadow.mapSize.height = 10;
+						spotLight.shadow.camera.near = 50;
+						spotLight.shadow.camera.far = 4000;
+						spotLight.shadow.camera.fov = 30;
+						scene.add( spotLight );
+						var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+						scene.add( spotLightHelper );
+						*/
 					}
-				}				
+				}
+				return hexasphere;				
 			}
+
+			
+			function onDocumentMouseDown( event ) 
+			{
+				// the following line would stop any other event handler from firing
+				// (such as the mouse's TrackballControls)
+				// event.preventDefault();
+				
+				console.log("Click.");
+				
+				// update the mouse variable
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				
+				// find intersections
+
+				// create a Ray with origin at the mouse position
+				//   and direction into the scene (camera direction)
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+				projector.unprojectVector( vector, camera );
+				var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+				// create an array containing all objects in the scene with which the ray intersects
+				var intersects = ray.intersectObjects( targetList );
+				
+				// if there is one (or more) intersections
+				if ( intersects.length > 0 )
+				{
+					console.log("Hit @ " + toString( intersects[0].point ) );
+					// change the color of the closest face.
+					intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 ); 
+					intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
+				}
+
+			}
+			function toString(v) { return "[ " + v.x + ", " + v.y + ", " + v.z + " ]"; }
 		</script>
 	</body>
 </html>

@@ -65,10 +65,122 @@ class Flux_Eu extends Flux_Site{
     		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
     		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
     		
-    		$this->mc = new Flux_MC($idBase, $bTrace);
+    		$this->uriBase = "http://parltrack.euwiki.org/";
+    		$this->idDocRootParlTrack = $this->dbD->ajouter(array("url"=>$this->uriBase
+    				,"titre"=>"parltrack"
+    				,"parent"=>$this->idDocRoot));
+
+			$this->mc = new Flux_MC($idBase, $bTrace);			
+			
+			
+
+	}
+	
+   	/**
+     * Récupère le résultat d'une recherche sur ParlTrack
+     * version JSON http://parltrack.euwiki.org/
+     * 
+     * @param  string 	$q = requête de la recherche
+     *
+     * @return array
+     */
+	public function getParlTrackResult($q){
+
+
+        $this->trace(__METHOD__." ".$q);
+    	 
+		set_time_limit(0);
     		
-    }
-    
+	    //initialise les variables
+	    $idAct = $this->dbA->ajouter(array("code"=>__METHOD__)); 
+	    	
+	    //récupère le document
+	    $url = $this->uriBase."search?s_meps=checked&s_dossiers=checked&format=json&q=".$q;
+	    $json = $this->getUrlBodyContent($url);
+		$idDoc = $this->dbD->ajouter(array(
+			'titre'=>__METHOD__." ".$q,'parent'=>$this->idDocRootParlTrack
+			,'url'=>$url, 'note'=>$json
+			) 
+		);
+		//traitement de la réponse
+		$obj = json_decode($json);
+		$sujets = [];
+		$procedures = [];
+		foreach ($obj->items as $i) {
+			$p = $i->procedure;
+			if($procedures[$p->reference])$procedures[$p->reference]['nb']++;
+			else $procedures[$p->reference]=array('titre'=>$p->title,'niveau'=>1,'nb'=>1,'reference'=>$p->reference,'sujets'=>$p->subject,'etape'=>$p->stage_reached);
+			foreach ($p->subject as $s) {
+				$arrS = explode(' ',$s);
+				$num = $arrS[0];
+				$titre = substr($s,strlen($num)+1);
+				if($sujets[$num])$sujets[$num]['nb']++;
+				else $sujets[$num]=array('titre'=>$titre, 'reference'=>$num,'niveau'=>1,'nb'=>1);
+			}
+		}
+		//recherche les procédure liées au sujets trouvés
+		$liens = [];
+		foreach ($sujets as $num => $s) {
+			$arrS = $this->getParlTrackDossierBySujet($num);
+			$sujets[$num]['procedures']=$arrS; 
+			foreach ($arrS as $p) {
+				if($procedures[$p])$procedures[$p]['nb']++;
+				else{
+					if($liens[$p])$liens[$p]['nb']++;
+					else $liens[$p] = array('reference'=>$p,'niveau'=>2,'nb'=>1);
+				}
+			}
+		}
+		$rs = array('procedures'=>$procedures,'sujets'=>$sujets,'liens'=>$liens);
+		//met à jour du document dans la base
+		$this->dbD->edit($idDoc,array('data'=>json_encode($rs)));
+		return $rs;	
+	}
+	
+	
+   	/**
+     * Récupère les dossiers dans un sujet sur ParlTrack
+     * exemple http://parltrack.euwiki.org/dossiers?sub=1.20.09
+     * 
+     * @param  string 	$sujet = identifiant du sujet
+     *
+     * @return array
+     */
+	public function getParlTrackDossierBySujet($sujet){
+
+        $this->trace(__METHOD__." ".$q);
+    	 
+		set_time_limit(0);
+    		    					    	
+	    //récupère le document
+	    $url = $this->uriBase."dossiers?sub=".$sujet;
+		$html = $this->getUrlBodyContent($url);
+		$idDoc = $this->dbD->ajouter(array(
+				'titre'=>__METHOD__." ".$q,'parent'=>$this->idDocRootParlTrack
+				,'url'=>$url, 'note'=>$html
+				) 
+			);
+		$dom = new Zend_Dom_Query($html);	    
+		//récupère la couverture
+		$xPath = '//*[@id="sortedlist"]/tbody/tr';
+		$results = $dom->queryXpath($xPath);
+		$procedures = [];
+		foreach ($results as $result) {
+			$p = false;
+			foreach($result->childNodes as $cn){
+				if (!$p && $cn->nodeType == XML_ELEMENT_NODE) {
+					$p = trim(str_replace("\n","",$cn->nodeValue));
+					//récupère l'identifiant de la procédure
+					$procedures[]=$p;
+				}
+			}
+		}	    
+		//met à jour du document dans la base
+		$this->dbD->edit($idDoc,array('data'=>json_encode($procedures)));
+		return $procedures;	
+	}
+
+
     /**
      * Enregistre un dossier procédure de l'observatoire législatif
      * version Web http://www.europarl.europa.eu/oeil/info/info2.do
@@ -82,22 +194,10 @@ class Flux_Eu extends Flux_Site{
     {    	
         $this->trace(__METHOD__." ".$idDossier);
     	 
-    		set_time_limit(0);
-    		$this->initDbTables();
-    		
-    		/*pas besoin de paser par le site, car il y a un json
-    		$idDocObsLegi = $this->dbD->ajouter(array("url"=>"http://www.europarl.europa.eu/oeil?lang=fr"
-    				,"titre"=>"Observatoire législatif"
-    				,"parent"=>$this->idDocRoot));
-    		*/
-    		$this->uriBase = "http://parltrack.euwiki.org/";
-    		$idDocObsLegi = $this->dbD->ajouter(array("url"=>$this->uriBase
-    				,"titre"=>"parltrack"
-    				,"parent"=>$this->idDocRoot));
-    		
+    	set_time_limit(0);    		
     	 
 	    //initialise les variables
-	    	$idAct = $this->dbA->ajouter(array("code"=>__METHOD__)); 
+	    $idAct = $this->dbA->ajouter(array("code"=>__METHOD__)); 
 	    	
 	    	//récupère le document
 	    $url = $this->uriBase."dossier/".$idDossier."?format=json";
@@ -110,7 +210,7 @@ class Flux_Eu extends Flux_Site{
 	    	$this->trace("//enregistre le document = ".$obj->procedure->title);
 	    	$this->idDocDossier = $this->dbD->ajouter(array("url"=>$url
 	    			,"titre"=>$obj->procedure->title, "tronc"=>$obj->procedure->type
-	    			,"parent"=>$idDocObsLegi,"data"=>$json
+	    			,"parent"=>$this->idDocRootParlTrack,"data"=>$json
 	    		));
 	    	$this->idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 	    			,"src_id"=>	$this->idDocDossier,"src_obj"=>"doc"
@@ -146,8 +246,20 @@ class Flux_Eu extends Flux_Site{
 	    	$this->idTagVoteAbs = $this->dbT->ajouter(array("code"=>"abstention","parent"=>$this->idTagVote));
 	    	$this->idTagVoteCtr = $this->dbT->ajouter(array("code"=>"contre","parent"=>$this->idTagVote));
 	    	$this->idTagVotePour = $this->dbT->ajouter(array("code"=>"pour","parent"=>$this->idTagVote));
+			$this->idTagReponse = $this->dbT->ajouter(array("code"=>"réponse","parent"=>$this->idTagRoot));
+			$this->idTagActeur = $this->dbT->ajouter(array("code"=>'acteur', "parent"=>$this->idTagRoot));
+			$this->idTagActOpi = $this->dbT->ajouter(array("code"=>'opinions', "parent"=>$this->idTagActeur));
+			$this->idTagActRes = $this->dbT->ajouter(array("code"=>'responsable', "parent"=>$this->idTagActeur));
+			$this->idTagActRap = $this->dbT->ajouter(array("code"=>'rapporteur', "parent"=>$this->idTagActeur));
+			$this->idTagDate = $this->dbT->ajouter(array("code"=>'date', "parent"=>$this->idTagRoot));
+			$this->idTagDatePrevDeb = $this->dbT->ajouter(array("code"=>'début prévisionnel', "parent"=>$this->idTagDate));
+			$this->idTagDatePrevFin = $this->dbT->ajouter(array("code"=>'début prévisionnelle', "parent"=>$this->idTagDate));
+			$this->idTagDateDeb = $this->dbT->ajouter(array("code"=>'début', "parent"=>$this->idTagDate));
+			$this->idTagDateFin = $this->dbT->ajouter(array("code"=>'fin', "parent"=>$this->idTagDate));
+			$this->idTagList = $this->dbT->ajouter(array("code"=>'liste', "parent"=>$this->idTagRoot));
+			
 	    	
-	    //enregistre les activités
+		    //enregistre les activités
 	    	foreach ($obj->activities as $a) {
 	    		$this->getActivite($a);
 	    	}
@@ -155,8 +267,13 @@ class Flux_Eu extends Flux_Site{
 	    	//enregistre les amendements
 	    	foreach ($obj->amendments as $a) {
 	    		$this->getAmendement($a);
+			}
+			//
+
+			//enregistre les comeets
+	    	foreach ($obj->comeets as $c) {
+	    		$this->getComeet($c);
 	    	}
-	    	//TODO:enregistrer les comeets
 	    	
 	    	//enregistre les votes
 	    	foreach ($obj->votes as $v) {
@@ -281,7 +398,7 @@ class Flux_Eu extends Flux_Site{
 	    	else
 	    		$loc = "";
 	    	if(isset($a->orig_lang))$l=$a->orig_lang; else $l="no"; 
-	    $idTagLang = $this->dbT->ajouter(array("code"=>$l,"parent"=>$this->idTagLang));
+	    	$idTagLang = $this->dbT->ajouter(array("code"=>$l,"parent"=>$this->idTagLang));
 	    	$idDoc = $this->dbD->ajouter(array(
 	    			"titre"=>"Amendement : ".$loc." - ".$a->seq, "url"=>$a->src, "tronc"=>$loc, "data"=>json_encode($a)
 	    			,"pubDate"=>$a->date, "parent"=>$this->idDocDossier, "poids"=>$a->seq
@@ -338,7 +455,161 @@ class Flux_Eu extends Flux_Site{
 	    	}
 	    	
     }
-    
+	
+    /**
+     * création d'un comeets
+     *
+     * @param  objet		$c
+     *
+     * @return void
+     */
+    function getComeet($c){
+		$this->trace(__METHOD__." ".$c->type." ".$c->title);
+
+		//récupération de la géolocalistion
+		$idGeo = $this->dbG->ajouter(array('adresse'=>$c->room,'ville'=>$c->city));
+
+		//enregistre le document
+		$idDoc = $this->dbD->ajouter(array(
+			"url"=>$c->src, "titre"=>$c->seq_no.'. '.$c->title, "tronc"=>$c->type, "data"=>json_encode($c)
+			,"note"=>$c->docid,"pubDate"=>$c->date, "parent"=>$this->idDocDossier
+		));
+
+		//création des rapports entre
+		// src = le doc
+		// dst = le tag date prévisionnnelle debut
+		// valeur = la date prévisionnelle de début
+		$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+				,"src_id"=>$idDoc,"src_obj"=>"doc"
+				,"dst_id"=>$this->idTagDatePrevDeb,"dst_obj"=>"tag"
+				,"valeur"=>$c->time->date
+		));
+		//création des rapports entre
+		// src = le doc
+		// dst = le tag date prévisionnnelle fin
+		// valeur = la date prévisionnelle de fin
+		$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+				,"src_id"=>$idDoc,"src_obj"=>"doc"
+				,"dst_id"=>$this->idTagDatePrevFin,"dst_obj"=>"tag"
+				,"valeur"=>$c->time->end
+		));
+		//création des rapports entre
+		// src = le doc
+		// dst = le tag date de debut
+		// valeur = la date de debut
+		$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+				,"src_id"=>$idDoc,"src_obj"=>"doc"
+				,"dst_id"=>$this->idTagDateDeb,"dst_obj"=>"tag"
+				,"valeur"=>$c->date
+		));
+		//création des rapports entre
+		// src = le doc
+		// dst = le tag date de fin
+		// valeur = la date de fin
+		$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+				,"src_id"=>$idDoc,"src_obj"=>"doc"
+				,"dst_id"=>$this->idTagDateFin,"dst_obj"=>"tag"
+				,"valeur"=>$c->end
+		));
+
+		//enregistre les acteurs
+		foreach ($c->actors->Opinions as $a) {
+			$this->setActeur($a, $this->idTagActOpi, $idDoc, $idGeo);
+		}
+		foreach ($c->actors->Responsible as $a) {
+			$this->setActeur($a, $this->idTagActRes, $idDoc, $idGeo);
+		}
+		foreach ($c->actors->Rapporteur as $a) {
+			$this->setActeur($a, $this->idTagActRap, $idDoc, $idGeo);
+		}
+		
+		//enregistre les list
+		foreach ($c->list as $l) {
+			$idTag = $this->dbT->ajouter(array("code"=>$l,'parent'=>$this->idTagList));
+			$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+				,"src_id"=>$idDoc,"src_obj"=>"doc"
+				,"dst_id"=>$idTag,"dst_obj"=>"tag"
+			));
+		}
+		
+	}
+	
+	/**
+	 * création d'un acteur
+	 *
+	 * @param  objet		$a
+	 * @param  int			$idTagActeur
+	 * @param  int			$idDoc
+	 * @param  int			$idGeo
+	 *
+	 */
+	function setActeur($a, $idTagActeur, $idDoc, $idGeo){
+		$this->trace(__METHOD__." ".$d->title);
+		if($a->comid){
+			$idTagC = $this->dbT->ajouter(array("uri"=>$this->uriBase."committee/".$a->comid[0]));
+			//création des rapports entre
+			// src = le doc
+			// dst = le comite
+			// pre = opinions
+			$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+					,"src_id"=>$idDoc,"src_obj"=>"doc"
+					,"dst_id"=>$idTagC,"dst_obj"=>"tag"
+					,"pre_id"=>$this->idTagActeur,"pre_obj"=>"tag"
+			));
+		}
+		if($a->group){
+			$idExiGr = $this->dbE->ajouter(array("url"=>$this->uriBase."meps/".$g->group[0]));
+			//création des rapports entre
+			// src = le doc
+			// dst = le group
+			// pre = opinions
+			$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+					,"src_id"=>$idDoc,"src_obj"=>"doc"
+					,"dst_id"=>$idExiGr,"dst_obj"=>"exi"
+					,"pre_id"=>$this->idTagActeur,"pre_obj"=>"tag"
+			));
+		}
+		if($a->name){
+			$idExiRap = $this->dbE->ajouter(array("nom"=>$r->name[0],"url"=>$this->uriBase."mep/".$r->name[0]));
+			//création des rapports entre
+			// src = le doc
+			// dst = la personne
+			// pre = opinions
+			$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+					,"src_id"=>$idDoc,"src_obj"=>"doc"
+					,"dst_id"=>$idExiRap,"dst_obj"=>"exi"
+					,"pre_id"=>$this->idTagActeur,"pre_obj"=>"tag"
+			));
+		}
+		if($a->response){
+			$idTagR = $this->dbT->ajouter(array("code"=>$a->response[0],"parent"=>$this->idTagReponse));
+			//création des rapports entre
+			// src = le doc
+			// dst = la réponse
+			// pre = opinions
+			$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+					,"src_id"=>$idDoc,"src_obj"=>"doc"
+					,"dst_id"=>$idTagR,"dst_obj"=>"tag"
+					,"pre_id"=>$this->idTagActeur,"pre_obj"=>"tag"
+			));
+		}			
+		if(isset($a->docs)){
+			foreach ($a->docs as $d) {
+				$idD = $this->getDoc($d, $idDoc);
+				//création des rapports entre
+				// src = le doc
+				// dst = le doc
+				// pre = opinions
+				$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+						,"src_id"=>$idDoc,"src_obj"=>"doc"
+						,"dst_id"=>$idD,"dst_obj"=>"doc"
+						,"pre_id"=>$this->idTagActeur,"pre_obj"=>"tag"
+					));
+			}    		
+		}
+	}
+
+
     /**
      * création d'une activité
      *
