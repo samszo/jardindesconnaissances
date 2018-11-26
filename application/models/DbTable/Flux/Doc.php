@@ -122,23 +122,23 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
     public function updateHierarchie($data){
     	
         $arr = [];
-    		if(isset($data["parent"])){
-    		    //récupère les information du parent
-    		    $arrP = $this->findBydoc_id($data["parent"]);
-    		    //récupère les information des enfants
-    		    $arr = $this->findByParent($data["parent"]);
-	    		$data['niveau'] = $arrP['niveau']+1;
-    		}else{
-    		    //récupère l'extrémité gauche
-    		    $sql = 'SELECT MAX(rgt) lft FROM '.$this->_name;
-    		    $stmt = $this->_db->query($sql);
-    		    $arrP = $stmt->fetch();
-    		    //si la table est vide
-    		    if(!$arrP['lft'])!$arrP['lft']=1;
-    		}
-    		
-    		//gestion des hiérarchies gauche droite
-    		//http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
+        if(isset($data["parent"])){
+            //récupère les information du parent
+            $arrP = $this->findBydoc_id($data["parent"]);
+            //récupère les information des enfants
+            $arr = $this->findByParent($data["parent"]);
+            $data['niveau'] = $arrP['niveau']+1;
+        }else{
+            //récupère l'extrémité gauche
+            $sql = 'SELECT MAX(rgt) lft FROM '.$this->_name;
+            $stmt = $this->_db->query($sql);
+            $arrP = $stmt->fetch();
+            //si la table est vide
+            if(!$arrP['lft'])!$arrP['lft']=1;
+        }
+        
+        //gestion des hiérarchies gauche droite
+        //http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
 		if(count($arr)>0){
     			//met à jour les niveaux 
     			$sql = 'UPDATE '.$this->_name.' SET rgt = rgt + 2 WHERE rgt >'.$arr[0]['rgt'];

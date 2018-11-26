@@ -22,10 +22,15 @@
   	var $LAYER_PONCT = array(":",".","-","'",",","_",";");
 	var $COLORS = array('E'=>"rgb(0,0,0)",'U'=>"rgb(0,255,255)",'A'=>"rgb(255,0,0)",'S'=>"rgb(0,255,0)",'B'=>"rgb(0,0,255)",'T'=>"rgb(255,255,0)");
 	//var $COLORS = array('E'=>"rgb(20,0,0)",'U'=>"rgb(0,40,0)",'A'=>"rgb(0,0,60)",'S'=>"rgb(80,80,0)",'B'=>"rgb(0,100,100)",'T'=>"rgb(120,0,120)");
+	var $PATH_DICO_TABLE = 'https://dictionary.ieml.io/api/scripts/tables';
+	var $PATH_DICO_RELA = 'https://dictionary.ieml.io/api/relations';
+	var $PATH_DICO_RANK = 'https://dictionary.ieml.io/api/terms/ranking';
+	var $PATH_DICO = 'https://dictionary.ieml.io/api/all?version=';
+	var $VERSION_DICO = 'dictionary_2018-09-03_20:39:39';
 	
-  	public function __construct($idBase=false)
+  	public function __construct($idBase=false,$bTrace=false,$bCache=true)
     {
-    	parent::__construct($idBase);
+    	parent::__construct($idBase,$bTrace,$bCache);
     	
     }
 
@@ -443,6 +448,46 @@
     	$this->trace("FIN ".__METHOD__);
     	
     }
-    
+	
+	/**
+	 * récupère les informations d'une item du dictionnaire
+	 * 
+	 * @param string $code
+	 * 
+	 */
+    function getDicoItem($code){
+
+    	$this->trace("DEBUT ".__METHOD__." = ".$code);
+    	
+    	//récupère les élements de l'item
+		$jsonTable = $this->getUrlBodyContent($this->PATH_DICO_TABLE
+			,array('version'=>$this->VERSION_DICO,'ieml'=>$code),$this->bCache);
+		$jsonRela = $this->getUrlBodyContent($this->PATH_DICO_RELA
+			,array('version'=>$this->VERSION_DICO,'ieml'=>$code),$this->bCache);
+		$jsonRank = $this->getUrlBodyContent($this->PATH_DICO_RANK
+			,array('version'=>$this->VERSION_DICO,'ieml'=>$code),$this->bCache);
+		
+		$this->trace("FIN ".__METHOD__);
+		
+		return array('table'=>json_decode($jsonTable),'rela'=>json_decode($jsonRela),'rank'=>json_decode($jsonRank));
+    }	
+	/**
+	 * récupère les items d'une version de dictionnaire
+	 * 
+	 * @param string $version
+	 * 
+	 */
+    function getDico($version=false){
+		if($version)$this->VERSION_DICO=$version; 
+    	$this->trace("DEBUT ".__METHOD__." = ".$this->VERSION_DICO);
+    	
+    	//récupère le dictionnaire
+		$json = $this->getUrlBodyContent($this->PATH_DICO
+			,array('version'=>$this->VERSION_DICO,'ieml'=>$code),$this->bCache);
+
+		$this->trace("FIN ".__METHOD__);
+		
+		return json_decode($json);
+    }	
     
 }

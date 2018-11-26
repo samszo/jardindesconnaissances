@@ -105,9 +105,17 @@
 	var tags, matrice;
 	
 	d3.json("<?php echo $this->urlStats; ?>", function(donnees) {
+		
+		//dans le cas où les données ne sont pas des array
+		tags = [];
+		for (const i in donnees.tags) {
+			tags.push(donnees.tags[i]);
+		}
+		/*
 		allData = donnees;
 		tags = donnees.tags;
 		matrice = donnees.matrice;     
+		*/
 
 		//calcule les dimensions
 		var arrNbDoc = tags.map(function(x) { return parseInt(x.nbDoc); });

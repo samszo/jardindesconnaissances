@@ -31,7 +31,22 @@ class GraphController extends Zend_Controller_Action {
 		}
 	}
 
-    public function bullesAction()
+    public function testAction()
+    {
+	}
+
+    public function vennAction()
+    {
+    	$this->view->urlData = $this->_getParam('urlData',"../flux/ieml?f=getDicoItem&ieml=M:M:.a.-M:M:.a.-f.o.-%27");
+	}
+
+	public function vennmatriceAction()
+    {
+    	$this->view->urlData = $this->_getParam('urlData',"../flux/ieml?f=getDicoItem&ieml=M:M:.a.-M:M:.a.-f.o.-%27");
+	}
+
+
+	public function bullesAction()
     {
 	    $this->view->stats = "";
 	    

@@ -13,7 +13,7 @@
 class Flux_Site{
     
     var $cache;
-    var $bCache=true;
+    var $bCache;
     var $idBase;
     var $idExi;
 	var $login;
@@ -65,11 +65,13 @@ class Flux_Site{
 	var $bconnect = false;
 	
     
-    function __construct($idBase=false, $bTrace=false){    	
-    	
+    function __construct($idBase=false, $bTrace=false, $bCache=true){    	
+		
+			$this->bCache = $bCache;
+
     		if($bTrace){
-			$this->bTrace = true;		
-			$this->temps_debut = microtime(true);
+				$this->bTrace = true;		
+				$this->temps_debut = microtime(true);
     		}
     		
     		$this->getDb($idBase);
@@ -316,6 +318,30 @@ class Flux_Site{
 		return $html;
 	}
 
+
+	/**
+	 * Function: sanitize
+	 * Returns a sanitized string, typically for URLs.
+	 *
+	 * Parameters:
+	 *     $string - The string to sanitize.
+	 *     $force_lowercase - Force the string to lowercase?
+	 *     $anal - If set to *true*, will remove all non-alphanumeric characters.
+	 */
+	function sanitize($string, $force_lowercase = true, $anal = false) {
+		$strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "{", "]",
+					"}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
+					"â€”", "â€“", ",", "<", ".", ">", "/", "?");
+		$clean = trim(str_replace($strip, "", strip_tags($string)));
+		$clean = preg_replace('/\s+/', "-", $clean);
+		$clean = ($anal) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean ;
+		return ($force_lowercase) ?
+			(function_exists('mb_strtolower')) ?
+				mb_strtolower($clean, 'UTF-8') :
+				strtolower($clean) :
+			$clean;
+	}
+
 	/**
 	 * récupère le code XML d'un domNode
 	 * pour par exemple faire un Xpath dessus
@@ -502,7 +528,7 @@ class Flux_Site{
 		$s="";
 		foreach ($params as $k=>$v){
 			if($md5) $s .= "_".md5($v);
-			else $s .= "_".str_replace(",","_",$v);
+			else $s .= "_".$this->sanitize($v);
 		}
 		return $s;	
 	}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script type="text/javascript" src="../js/d3.js"></script>
+<script type="text/javascript" src="../js/svg_slides.js"></script>
+<script type="text/javascript" src="../js/svg_animation.js"></script>
+
+<script type="text/javascript">
+    
+    var svgAnimation;
+    d3.xml("<?php echo $this->urlSVG;?>", "image/svg+xml", function(xml) {
+        d3.select("body").node().appendChild(xml.documentElement);
+        
+        svg=d3.select("body").select("svg")
+            .attr("height","96%")
+            .attr("width","100%");
+        svgAnimation = new svg_animation();      
+        slides = svg_slides(svg,1500);
+    });
+
+</script>
+</head>
+<body></body>
+</html>

@@ -478,7 +478,7 @@ class FluxController extends Zend_Controller_Action {
 
 	public function euAction()
     {
-		$eu = new Flux_Eu($this->_getParam('idBase', 'flux_eu'),$this->_getParam('trace'));
+		$eu = new Flux_Eu($this->_getParam('idBase', 'flux_eu'),$this->_getParam('trace'),$this->_getParam('cache',true));
 		$eu->bTraceFlush = $this->_getParam('trace');    	 
 		switch ($this->_getParam('f')) {
 			case "setDossierObsLegi":
@@ -487,11 +487,21 @@ class FluxController extends Zend_Controller_Action {
 			case "getParlTrackResult":
 				$data = $eu->getParlTrackResult($this->_getParam('q'));				
 				if($this->_getParam('set')){
+					$repriseProcedure = $this->_getParam('reproc',0);
+					$i=0;
 					foreach ($data['procedures'] as $r => $p) {
-						$eu->setDossierObsLegi($r);
+						if($i >= $repriseProcedure)
+							$eu->setDossierObsLegi($r);
+						$i++;
 					}
+					$repriseLiens = $this->_getParam('relien',0);
+					$i=0;
 					foreach ($data['liens'] as $r) {
-						$eu->setDossierObsLegi($r);
+						if($i >= $repriseLiens){
+							$eu->setDossierObsLegi($r['reference']
+								, array('sujets'=>true,'activities'=>true,'amendements'=>false,'comeets'=>true,'votes'=>true));
+						}
+						$i++;
 					}
 				}
 				break;
@@ -499,7 +509,23 @@ class FluxController extends Zend_Controller_Action {
 		$this->view->content = json_encode($data);
 
 	}
-    
+	
+	public function iemlAction()
+    {
+		$ieml = new Flux_Ieml($this->_getParam('idBase', 'flux_ieml'),$this->_getParam('trace'),$this->_getParam('cache',true));
+		$ieml->bTraceFlush = $this->_getParam('trace');    	 
+		switch ($this->_getParam('f')) {
+			case "getDicoItem":
+				$data = $ieml->getDicoItem($this->_getParam('ieml'));
+				break;
+			case "getDico":
+				$data = $ieml->getDico($this->_getParam('version'));
+				break;
+		}		
+		$this->view->content = json_encode($data);
+
+	}	
+
     public function ensuprefrAction()
     {
 	    	$ensuprefr = new Flux_Ensuprefr($this->_getParam('idBase', 'flux_ecosystem'),$this->_getParam('trace'));

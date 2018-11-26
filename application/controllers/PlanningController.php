@@ -189,6 +189,25 @@ class PlanningController extends Zend_Controller_Action {
 	}
 
 	/**
+	 * affiche les stats des formations
+	 */
+	public function statsAction() {
+		$this->view->urlJson = "../../data/paragraphe/ParagrapheFormations.json";
+		//$this->view->urlJson = "../../data/paragraphe/HumaNumMentionAll.json";
+		$this->view->colorsKey = '["LP","M1","M2","AVUN","CEN","DWM","GIS","NET","PTN","THYP"]';
+		$this->view->parcours = '["commun","AVUN","CEN","DWM","GIS","NET","PTN","THYP"]';
+		$this->view->niveaux = '["LP","M1","M2"]';
+		$this->view->groupKey = "['niveau','parcours','UE nom court','EC nom court']";
+		$this->view->lblCalcul = "VH EC";
+	}
+
+	/**
+	 * ajoute les fenêtres modales
+	 */
+	public function modalAction() {
+	}
+
+	/**
 	 * le tromnbinoscope des étudiants
 	 */
 	public function trombinoAction() {

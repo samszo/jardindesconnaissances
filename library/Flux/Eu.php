@@ -55,16 +55,48 @@ class Flux_Eu extends Flux_Site{
      * @param  string $idBase
      * 
      */
-	public function __construct($idBase=false, $bTrace=false)
+	public function __construct($idBase=false, $bTrace=false, $bCache=true)
     {
     		parent::__construct($idBase, $bTrace);    	
-    		
+			
+			$this->bCache = $bCache;
+
     		//on récupère la racine des documents
     		$this->initDbTables();
     		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
     		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
     		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
-    		
+			
+			
+	    	$this->trace("//récupère les mots clefs");
+	    	$this->idTagCom = $this->dbT->ajouter(array("code"=>"commission", "parent"=>$this->idTagRoot));
+	    	$this->idTagRoleCom = $this->dbT->ajouter(array("code"=>"rôle de la commission", "parent"=>$this->idTagRoot));
+	    	$this->idTagRoleComFond = $this->dbT->ajouter(array("code"=>"au fond", "parent"=>$this->idTagRoleCom));
+	    	$this->idTagRoleComAvis = $this->dbT->ajouter(array("code"=>"pour avis", "parent"=>$this->idTagRoleCom));
+	    	$this->idTagRoleRap = $this->dbT->ajouter(array("code"=>"rôle du rapporteur", "parent"=>$this->idTagRoot));
+	    	$this->idTagRap = $this->dbT->ajouter(array("code"=>"rapporteur","parent"=>$this->idTagRoleRap));
+	    	$this->idTagRapFic = $this->dbT->ajouter(array("code"=>"fictif","parent"=>$this->idTagRoleRap));
+	    	$this->idTagRapAvis = $this->dbT->ajouter(array("code"=>"avis","parent"=>$this->idTagRoleRap));
+	    	$this->idTagActi = $this->dbT->ajouter(array("code"=>"activité", "parent"=>$this->idTagRoot));
+	    	$this->idTagActiNomi = $this->dbT->ajouter(array("code"=>"nomination","parent"=>$this->idTagActi));
+	    	$this->idTagLang = $this->dbT->ajouter(array("code"=>"langue", "parent"=>$this->idTagRoot));
+	    	$this->idTagVote = $this->dbT->ajouter(array("code"=>"vote", "parent"=>$this->idTagRoot));
+	    	$this->idTagVoteAbs = $this->dbT->ajouter(array("code"=>"abstention","parent"=>$this->idTagVote));
+	    	$this->idTagVoteCtr = $this->dbT->ajouter(array("code"=>"contre","parent"=>$this->idTagVote));
+	    	$this->idTagVotePour = $this->dbT->ajouter(array("code"=>"pour","parent"=>$this->idTagVote));
+			$this->idTagReponse = $this->dbT->ajouter(array("code"=>"réponse","parent"=>$this->idTagRoot));
+			$this->idTagActeur = $this->dbT->ajouter(array("code"=>'acteur', "parent"=>$this->idTagRoot));
+			$this->idTagActOpi = $this->dbT->ajouter(array("code"=>'opinions', "parent"=>$this->idTagActeur));
+			$this->idTagActRes = $this->dbT->ajouter(array("code"=>'responsable', "parent"=>$this->idTagActeur));
+			$this->idTagActRap = $this->dbT->ajouter(array("code"=>'rapporteur', "parent"=>$this->idTagActeur));
+			$this->idTagDate = $this->dbT->ajouter(array("code"=>'date', "parent"=>$this->idTagRoot));
+			$this->idTagDatePrevDeb = $this->dbT->ajouter(array("code"=>'début prévisionnel', "parent"=>$this->idTagDate));
+			$this->idTagDatePrevFin = $this->dbT->ajouter(array("code"=>'début prévisionnelle', "parent"=>$this->idTagDate));
+			$this->idTagDateDeb = $this->dbT->ajouter(array("code"=>'début', "parent"=>$this->idTagDate));
+			$this->idTagDateFin = $this->dbT->ajouter(array("code"=>'fin', "parent"=>$this->idTagDate));
+			$this->idTagList = $this->dbT->ajouter(array("code"=>'liste', "parent"=>$this->idTagRoot));
+			$this->idTagRequete = $this->dbT->ajouter(array("code"=>'requête', "parent"=>$this->idTagRoot));
+
     		$this->uriBase = "http://parltrack.euwiki.org/";
     		$this->idDocRootParlTrack = $this->dbD->ajouter(array("url"=>$this->uriBase
     				,"titre"=>"parltrack"
@@ -75,6 +107,22 @@ class Flux_Eu extends Flux_Site{
 			
 
 	}
+
+   	/**
+     * Récupère les sujets d'une recherche sur ParlTrack
+     * pour les dossiers de 1er et deuxième niveau
+	 * 
+     * @param  string 	$q = requête de la recherche
+     *
+     * @return array
+     */
+	public function getResultSujets($q){
+
+		$data = $this->getParlTrackResult($q);				
+		$sujets = [];
+
+	}
+
 	
    	/**
      * Récupère le résultat d'une recherche sur ParlTrack
@@ -93,33 +141,55 @@ class Flux_Eu extends Flux_Site{
     		
 	    //initialise les variables
 	    $idAct = $this->dbA->ajouter(array("code"=>__METHOD__)); 
-	    	
+
+		//création du tag 
+		$idTagQ = $this->dbT->ajouter(array("code"=>$q, "parent"=>$this->idTagRequete));
+		
 	    //récupère le document
 	    $url = $this->uriBase."search?s_meps=checked&s_dossiers=checked&format=json&q=".$q;
-	    $json = $this->getUrlBodyContent($url);
+	    $json = $this->getUrlBodyContent($url,false,$this->bCache);
 		$idDoc = $this->dbD->ajouter(array(
 			'titre'=>__METHOD__." ".$q,'parent'=>$this->idDocRootParlTrack
-			,'url'=>$url, 'note'=>$json
-			) 
+			,'url'=>$url
+			, 'data'=>$json
+			),true,false,false 
 		);
+
+		//création des rapports entre
+		// src = la requête
+		// pre = l'action
+		// dst = le doc
+		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+				,"src_id"=>$idTagQ,"src_obj"=>"tag"
+				,"dst_id"=>$idDoc,"dst_obj"=>"doc"
+				,"pre_id"=>$idAct,"pre_obj"=>"acti"
+		));						
+
 		//traitement de la réponse
 		$obj = json_decode($json);
 		$sujets = [];
 		$procedures = [];
+		$k=0;$j=0;
 		foreach ($obj->items as $i) {
 			$p = $i->procedure;
 			if($procedures[$p->reference])$procedures[$p->reference]['nb']++;
-			else $procedures[$p->reference]=array('titre'=>$p->title,'niveau'=>1,'nb'=>1,'reference'=>$p->reference,'sujets'=>$p->subject,'etape'=>$p->stage_reached);
+			else {
+				$procedures[$p->reference]=array('num'=>$k,'titre'=>$p->title,'niveau'=>1,'nb'=>1,'reference'=>$p->reference,'sujets'=>$p->subject,'etape'=>$p->stage_reached);
+				$k++;
+			}
 			foreach ($p->subject as $s) {
 				$arrS = explode(' ',$s);
 				$num = $arrS[0];
 				$titre = substr($s,strlen($num)+1);
 				if($sujets[$num])$sujets[$num]['nb']++;
-				else $sujets[$num]=array('titre'=>$titre, 'reference'=>$num,'niveau'=>1,'nb'=>1);
+				else{
+					$sujets[$num]=array('num'=>$j, 'titre'=>$titre, 'reference'=>$num,'niveau'=>1,'nb'=>1);
+					$j++;
+				} 
 			}
 		}
 		//recherche les procédure liées au sujets trouvés
-		$liens = [];
+		$liens = [];$i=0;
 		foreach ($sujets as $num => $s) {
 			$arrS = $this->getParlTrackDossierBySujet($num);
 			$sujets[$num]['procedures']=$arrS; 
@@ -127,13 +197,16 @@ class Flux_Eu extends Flux_Site{
 				if($procedures[$p])$procedures[$p]['nb']++;
 				else{
 					if($liens[$p])$liens[$p]['nb']++;
-					else $liens[$p] = array('reference'=>$p,'niveau'=>2,'nb'=>1);
+					else{
+						$liens[$p] = array('num'=>$i,'reference'=>$p,'niveau'=>2,'nb'=>1);
+						$i++;
+					} 
 				}
 			}
 		}
-		$rs = array('procedures'=>$procedures,'sujets'=>$sujets,'liens'=>$liens);
+		$rs = array('idRapport'=>$idRap,'procedures'=>$procedures,'sujets'=>$sujets,'liens'=>$liens);
 		//met à jour du document dans la base
-		$this->dbD->edit($idDoc,array('data'=>json_encode($rs)));
+		$this->dbD->edit($idDoc,array('note'=>json_encode($rs)));
 		return $rs;	
 	}
 	
@@ -154,7 +227,7 @@ class Flux_Eu extends Flux_Site{
     		    					    	
 	    //récupère le document
 	    $url = $this->uriBase."dossiers?sub=".$sujet;
-		$html = $this->getUrlBodyContent($url);
+		$html = $this->getUrlBodyContent($url,false,$this->bCache);
 		$idDoc = $this->dbD->ajouter(array(
 				'titre'=>__METHOD__." ".$q,'parent'=>$this->idDocRootParlTrack
 				,'url'=>$url, 'note'=>$html
@@ -187,10 +260,12 @@ class Flux_Eu extends Flux_Site{
      * version JSON http://parltrack.euwiki.org/
      * 
      * @param  string 	$idDossier
+     * @param  array 	$calculs
      *
      * @return array
      */
-    public function setDossierObsLegi($idDossier)
+	public function setDossierObsLegi($idDossier
+		,$calculs=array('sujets'=>true,'activities'=>true,'amendements'=>true,'comeets'=>true,'votes'=>true))
     {    	
         $this->trace(__METHOD__." ".$idDossier);
     	 
@@ -201,7 +276,7 @@ class Flux_Eu extends Flux_Site{
 	    	
 	    	//récupère le document
 	    $url = $this->uriBase."dossier/".$idDossier."?format=json";
-	    $json = $this->getUrlBodyContent($url);
+	    $json = $this->getUrlBodyContent($url,false,$this->bCache);
 	    //	$urlL = "http://localhost/jdc/data/eu/2103(INL).json";
 	    //	$json = $this->getUrlBodyContent($urlL);
 	    	$obj = json_decode($json);
@@ -217,68 +292,49 @@ class Flux_Eu extends Flux_Site{
 	    			,"dst_id"=>$idAct,"dst_obj"=>"acti"	    			
 	    	));
 	    	
-	    	//enregistre les sujets
-	    	$idTagSujet = $this->dbT->ajouter(array("code"=>"sujet", "parent"=>$this->idTagRoot));	    	
-	    	foreach ($obj->procedure->subject as $s) {
-	    		$idTag = $this->dbT->ajouter(array("code"=>$s, "parent"=>$idTagSujet));	    		 
-    			$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-    					,"src_id"=>$idTag,"src_obj"=>"tag"
-    					,"dst_id"=>	$this->idDocDossier,"dst_obj"=>"doc"
-    					,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
-    			));
-    			$this->trace("//enregistre le sujet = ".$s);
-    			 
-	    	}
+			//enregistre les sujets
+			if($calculs['sujets']){
+				$idTagSujet = $this->dbT->ajouter(array("code"=>"sujet", "parent"=>$this->idTagRoot));	    	
+				foreach ($obj->procedure->subject as $s) {
+					$idTag = $this->dbT->ajouter(array("code"=>$s, "parent"=>$idTagSujet));	    		 
+					$this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+							,"src_id"=>$idTag,"src_obj"=>"tag"
+							,"dst_id"=>	$this->idDocDossier,"dst_obj"=>"doc"
+							,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
+					));
+					$this->trace("//enregistre le sujet = ".$s);
+					 
+				}	
+			}	    				
 	    	
-	    	$this->trace("//récupère les mots clefs");
-	    	$this->idTagCom = $this->dbT->ajouter(array("code"=>"commission", "parent"=>$this->idTagRoot));
-	    	$this->idTagRoleCom = $this->dbT->ajouter(array("code"=>"rôle de la commission", "parent"=>$this->idTagRoot));
-	    	$this->idTagRoleComFond = $this->dbT->ajouter(array("code"=>"au fond", "parent"=>$this->idTagRoleCom));
-	    	$this->idTagRoleComAvis = $this->dbT->ajouter(array("code"=>"pour avis", "parent"=>$this->idTagRoleCom));
-	    	$this->idTagRoleRap = $this->dbT->ajouter(array("code"=>"rôle du rapporteur", "parent"=>$this->idTagRoot));
-	    	$this->idTagRap = $this->dbT->ajouter(array("code"=>"rapporteur","parent"=>$this->idTagRoleRap));
-	    	$this->idTagRapFic = $this->dbT->ajouter(array("code"=>"fictif","parent"=>$this->idTagRoleRap));
-	    	$this->idTagRapAvis = $this->dbT->ajouter(array("code"=>"avis","parent"=>$this->idTagRoleRap));
-	    	$this->idTagActi = $this->dbT->ajouter(array("code"=>"activité", "parent"=>$this->idTagRoot));
-	    	$this->idTagActiNomi = $this->dbT->ajouter(array("code"=>"nomination","parent"=>$this->idTagActi));
-	    	$this->idTagLang = $this->dbT->ajouter(array("code"=>"langue", "parent"=>$this->idTagRoot));
-	    	$this->idTagVote = $this->dbT->ajouter(array("code"=>"vote", "parent"=>$this->idTagRoot));
-	    	$this->idTagVoteAbs = $this->dbT->ajouter(array("code"=>"abstention","parent"=>$this->idTagVote));
-	    	$this->idTagVoteCtr = $this->dbT->ajouter(array("code"=>"contre","parent"=>$this->idTagVote));
-	    	$this->idTagVotePour = $this->dbT->ajouter(array("code"=>"pour","parent"=>$this->idTagVote));
-			$this->idTagReponse = $this->dbT->ajouter(array("code"=>"réponse","parent"=>$this->idTagRoot));
-			$this->idTagActeur = $this->dbT->ajouter(array("code"=>'acteur', "parent"=>$this->idTagRoot));
-			$this->idTagActOpi = $this->dbT->ajouter(array("code"=>'opinions', "parent"=>$this->idTagActeur));
-			$this->idTagActRes = $this->dbT->ajouter(array("code"=>'responsable', "parent"=>$this->idTagActeur));
-			$this->idTagActRap = $this->dbT->ajouter(array("code"=>'rapporteur', "parent"=>$this->idTagActeur));
-			$this->idTagDate = $this->dbT->ajouter(array("code"=>'date', "parent"=>$this->idTagRoot));
-			$this->idTagDatePrevDeb = $this->dbT->ajouter(array("code"=>'début prévisionnel', "parent"=>$this->idTagDate));
-			$this->idTagDatePrevFin = $this->dbT->ajouter(array("code"=>'début prévisionnelle', "parent"=>$this->idTagDate));
-			$this->idTagDateDeb = $this->dbT->ajouter(array("code"=>'début', "parent"=>$this->idTagDate));
-			$this->idTagDateFin = $this->dbT->ajouter(array("code"=>'fin', "parent"=>$this->idTagDate));
-			$this->idTagList = $this->dbT->ajouter(array("code"=>'liste', "parent"=>$this->idTagRoot));
-			
-	    	
-		    //enregistre les activités
-	    	foreach ($obj->activities as $a) {
-	    		$this->getActivite($a);
-	    	}
+			//enregistre les activités
+			if($calculs['activities']){
+				foreach ($obj->activities as $a) {
+					$this->getActivite($a);
+				}
+			}
 	    	//	    	
 	    	//enregistre les amendements
-	    	foreach ($obj->amendments as $a) {
-	    		$this->getAmendement($a);
+			if($calculs['amendements']){
+				foreach ($obj->amendments as $a) {
+					$this->getAmendement($a);
+				}
 			}
 			//
 
 			//enregistre les comeets
-	    	foreach ($obj->comeets as $c) {
-	    		$this->getComeet($c);
-	    	}
-	    	
+			if($calculs['comeets']){
+				foreach ($obj->comeets as $c) {
+					$this->getComeet($c);
+				}
+			}
+
 	    	//enregistre les votes
-	    	foreach ($obj->votes as $v) {
-	    		$this->getVote($v);
-	    	}
+			if($calculs['votes']){
+				foreach ($obj->votes as $v) {
+					$this->getVote($v);
+				}
+			}
 	    	//
 	}    
     
@@ -291,7 +347,11 @@ class Flux_Eu extends Flux_Site{
 	 */
 	function getVote($v){
 		$this->trace(__METHOD__." ".$v->title);
-		
+		if(!$v->title)$v->title='inconnu';
+		if(!$v->url)$v->url='inconnu';
+		if(!$v->issue_type)$v->issue_type='inconnu';
+		if(!$v->ts)$v->ts='inconnu';
+		if(!$v->voteid)$v->voteid='inconnu';
 		$idDoc = $this->dbD->ajouter(array(
 				"titre"=>$v->title, "url"=>$v->url, "tronc"=>$v->issue_type, "data"=>json_encode($v)
 				,"pubDate"=>$v->ts, "parent"=>$this->idDocDossier, "poids"=>$v->voteid
@@ -467,32 +527,40 @@ class Flux_Eu extends Flux_Site{
 		$this->trace(__METHOD__." ".$c->type." ".$c->title);
 
 		//récupération de la géolocalistion
+		if(!$c->room)$c->room='inconnu';
+		if(!$c->city)$c->city='inconnu';
 		$idGeo = $this->dbG->ajouter(array('adresse'=>$c->room,'ville'=>$c->city));
 
 		//enregistre le document
+		if(!$c->seq_no)$c->seq_no='0';
+		if(!$c->title)$c->title='inconnu';
+		if(!$c->type)$c->type='inconnu';
+		if(!$c->docid)$c->docid='inconnu';
 		$idDoc = $this->dbD->ajouter(array(
 			"url"=>$c->src, "titre"=>$c->seq_no.'. '.$c->title, "tronc"=>$c->type, "data"=>json_encode($c)
 			,"note"=>$c->docid,"pubDate"=>$c->date, "parent"=>$this->idDocDossier
 		));
 
-		//création des rapports entre
-		// src = le doc
-		// dst = le tag date prévisionnnelle debut
-		// valeur = la date prévisionnelle de début
-		$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
-				,"src_id"=>$idDoc,"src_obj"=>"doc"
-				,"dst_id"=>$this->idTagDatePrevDeb,"dst_obj"=>"tag"
-				,"valeur"=>$c->time->date
-		));
-		//création des rapports entre
-		// src = le doc
-		// dst = le tag date prévisionnnelle fin
-		// valeur = la date prévisionnelle de fin
-		$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
-				,"src_id"=>$idDoc,"src_obj"=>"doc"
-				,"dst_id"=>$this->idTagDatePrevFin,"dst_obj"=>"tag"
-				,"valeur"=>$c->time->end
-		));
+		if($c->time && $c->time->date && $c->time->end){
+			//création des rapports entre
+			// src = le doc
+			// dst = le tag date prévisionnnelle debut
+			// valeur = la date prévisionnelle de début
+			$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+					,"src_id"=>$idDoc,"src_obj"=>"doc"
+					,"dst_id"=>$this->idTagDatePrevDeb,"dst_obj"=>"tag"
+					,"valeur"=>$c->time->date.""
+			));
+			//création des rapports entre
+			// src = le doc
+			// dst = le tag date prévisionnnelle fin
+			// valeur = la date prévisionnelle de fin
+			$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
+					,"src_id"=>$idDoc,"src_obj"=>"doc"
+					,"dst_id"=>$this->idTagDatePrevFin,"dst_obj"=>"tag"
+					,"valeur"=>$c->time->end.""
+			));
+		}
 		//création des rapports entre
 		// src = le doc
 		// dst = le tag date de debut
@@ -500,7 +568,7 @@ class Flux_Eu extends Flux_Site{
 		$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
 				,"src_id"=>$idDoc,"src_obj"=>"doc"
 				,"dst_id"=>$this->idTagDateDeb,"dst_obj"=>"tag"
-				,"valeur"=>$c->date
+				,"valeur"=>$c->date.""
 		));
 		//création des rapports entre
 		// src = le doc
@@ -509,7 +577,7 @@ class Flux_Eu extends Flux_Site{
 		$idRapCR = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$idGeo
 				,"src_id"=>$idDoc,"src_obj"=>"doc"
 				,"dst_id"=>$this->idTagDateFin,"dst_obj"=>"tag"
-				,"valeur"=>$c->end
+				,"valeur"=>$c->end.""
 		));
 
 		//enregistre les acteurs
@@ -669,6 +737,7 @@ class Flux_Eu extends Flux_Site{
     	function getDoc($d, $parent=0){
     		$this->trace(__METHOD__." ".$d->title);
     		if(!isset($d->type))$d->type='inconnu';
+    		if(!isset($d->url))$d->url='inconnu';
     		$data = array("titre"=>$d->title, "url"=>$d->url, "tronc"=>$d->type);
     		if($parent)$data["parent"]=$parent;
     		if(isset($d->text))$data["note"]=implode(".", $d->text);
@@ -693,8 +762,9 @@ class Flux_Eu extends Flux_Site{
 	    	$idTagC = $this->dbT->ajouter(array("code"=>$c->committee_full, "uri"=>$this->uriBase."committee/".$c->committee, "parent"=>$this->idTagCom));
 	    	 
 	    	//enregistre le rapporteur
-	    	$r = $this->getRapporteur($c->rapporteur[0]);
-	    	 
+	    	if($c->rapporteur)$r = $this->getRapporteur($c->rapporteur[0]);
+			else $r = false;
+			 
 	    	//vérifie le type de commission pour
 	    	//création des rapports entre
 	    	// pre = cette importation
@@ -708,13 +778,15 @@ class Flux_Eu extends Flux_Site{
 	    				,"dst_id"=>$this->idTagRoleComFond,"dst_obj"=>"tag"
 	    				,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
 	    				,"niveau"=>$this->idTagActiNomi
-	    		));
-	    		$idRapRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-	    				,"src_id"=>$r[2],"src_obj"=>"rapport"
-	    				,"dst_id"=>$this->idTagRap,"dst_obj"=>"tag"
-	    				,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
-	    				,"niveau"=>$idRapCR,"valeur"=>$c->date
-	    		));
+				));
+				if($r){
+					$idRapRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+					,"src_id"=>$r[2],"src_obj"=>"rapport"
+					,"dst_id"=>$this->idTagRap,"dst_obj"=>"tag"
+					,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
+					,"niveau"=>$idRapCR,"valeur"=>$c->date.""
+					));
+				}
 	    		//enregistrement des fictifs
 	    		foreach ($c->shadows as $f) {
 	    			$rf = $this->getRapporteur($f);
@@ -722,7 +794,7 @@ class Flux_Eu extends Flux_Site{
 	    					,"src_id"=>$rf[2],"src_obj"=>"rapport"
 	    					,"dst_id"=>$this->idTagRapFic,"dst_obj"=>"tag"
 	    					,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
-	    					,"niveau"=>$idRapCR,"valeur"=>$c->date
+	    					,"niveau"=>$idRapCR,"valeur"=>$c->date.""
 	    			));
 	    		}
 	    	}else{
@@ -731,15 +803,17 @@ class Flux_Eu extends Flux_Site{
 	    				,"dst_id"=>$this->idTagRoleComAvis,"dst_obj"=>"tag"
 	    				,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
 	    				,"niveau"=>$this->idTagActiNomi
-	    		));
-	    		$idRapRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-	    				,"src_id"=>$r[2],"src_obj"=>"rapport"
-	    				,"dst_id"=>$this->idTagRapAvis,"dst_obj"=>"tag"
-	    				,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
-	    				,"niveau"=>$idRapCR //,"valeur"=>$c->date
-	    		));
+				));
+				if($r){
+					$idRapRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+							,"src_id"=>$r[2],"src_obj"=>"rapport"
+							,"dst_id"=>$this->idTagRapAvis,"dst_obj"=>"tag"
+							,"pre_id"=>$this->idRap,"pre_obj"=>"rapport"
+							,"niveau"=>$idRapCR //,"valeur"=>$c->date
+					));
+				}
 	    	}
-    		return $idRapRap;
+    		return $idRapCR;
     }
     
     /**

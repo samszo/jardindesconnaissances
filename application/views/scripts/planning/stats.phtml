@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Statistiques des formations</title>
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap-treeview.min.css" >
+    <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
+    <link rel="stylesheet" type="text/css" href="../css/font-awesome.css">
+
+    <script type="text/javascript" src="../js/d3.v4.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/popper.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap-treeview.js"></script>    
+    <script type="text/javascript" src="../js/w2ui.min.js"></script>
+  
+    <style>
+
+#sidebar {
+    position: relative;
+    bottom: 600px;
+    width: 86px
+}
+
+#sequence {
+  width: 600px;
+  height: 70px;
+}
+
+#legend {
+  padding: 10px 0 0 3px;
+}
+
+#sequence text, #legend text {
+  font-weight: 600;
+  fill: #fff;
+}
+
+#chart {
+  position: relative;
+}
+
+#chart path {
+  stroke: #fff;
+}
+
+#explanation {
+  position: absolute;
+  top: 200px;
+  left: 280px;
+  width: 200px;
+  text-align: center;
+  color: #666;
+  z-index: -1;
+}   
+
+.treeview .list-group-item {
+    cursor: pointer; 
+    font-size: 0.6em;
+    padding: .1rem .2rem;
+}
+
+.treeview span.indent {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+span.modalTitle {
+    font-weight: bold;
+    margin-left: 4px;
+    margin-right: 4px;
+} 
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid" >
+        <nav id="nbMain" class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+            <a class="navbar-brand" href="#">
+                <h1 class="text-center" >Statistiques des formations</h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarTogglerDemo02"
+                aria-controls="navbarTogglerDemo02" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                <form class="form-inline my-2 my-lg-0">
+                    <label class="my-1 mr-2 text-white" for="sltStats">Calculs disponibles</label>
+                    <select class="custom-select my-1 mr-sm-2" id="sltStats">
+                        <option selected value="NbH">Bilan global</option>
+                        <option value="NbEnseignants">Nb Enseignants nécéssaires</option>
+                    </select>
+                    <button id="btnCalcStat" type="button" class="btn btn-secondary" data-dismiss="modal">Calculer</button>
+                    <!-- <button id="btnExportCSV" class="btn btn-outline-primary " type="button">Exporter CSV</button> -->
+                    <button id="btnExport" class="btn btn-outline-primary " type="button">Exporter</button>
+                    <button id="btnImport" class="btn btn-outline-primary " type="button">Importer</button>
+                </form>
+            </div>
+        </nav>	
+
+        <div class="row">
+            <div class="col-10">        
+                    <h2>Données des formations</h2>
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link" id="interv-tab" data-toggle="tab" href="#interv" role="tab" aria-controls="interv" aria-selected="true">Intervenants</a>
+                        </li>
+                        <li class="nav-item">
+                                <a class="nav-link active" id="cours-tab" data-toggle="tab" href="#cours" role="tab" aria-controls="cours" aria-selected="true">Cours</a>
+                        </li>
+                    </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade" id="interv" role="tabpanel" aria-labelledby="interv-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="interv-grid" style="width: 100%; height: 400px;" ></div>
+                            </div>        
+                        </div>
+                    </div>
+                    <div class="tab-pane fade show active" id="cours" role="tabpanel" aria-labelledby="cours-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="cours-grid" style="width: 100%; height: 400px;" ></div>
+                            </div>
+                        </div>
+                    </div>                
+                </div>                                            
+            </div>
+            <div class="col-2">
+                <h2>Résultat du calcul</h2>
+                <div class="row">
+                    <div id="rsltCalc" class="col-12"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 
+        Ajout des fenêtre modales
+    -->
+    <?=$this->partial('planning/modal.phtml', array());?>
+
+    <script type="text/javascript">
+var urlCour = "<?php echo $this->urlCour; ?>",
+dataInt, urlInt = "<?php echo $this->urlInt; ?>",
+dataIntCour, urlIntCour = "<?php echo $this->urlIntCour; ?>",
+colorsKey = <?php echo $this->colorsKey; ?>,
+groupKey = <?php echo $this->groupKey; ?>,
+parcours = <?php echo $this->parcours; ?>,
+niveaux = <?php echo $this->niveaux; ?>,
+lblCalcul = "<?php echo $this->lblCalcul; ?>";
+
+/** Fonction de génération de la page  */
+function buildPage(){
+    //formate les données pour grille des cours
+    dataCour.forEach(function(c){
+        c.recid = c.id;
+        //formate les données
+        if(c['VH EC'])c['VH EC'] =  (c['VH EC'] instanceof String) ? parseFloat(c['VH EC'].replace(/,/g, '.')) : c['VH EC'];
+        else c['VH EC'] = 0;
+        if(c['Nbs de groupes'])c['Nbs de groupes'] = (c['Nbs de groupes'] instanceof String) ? parseFloat(c['Nbs de groupes'].replace(/,/g, '.')) : c['Nbs de groupes'];
+        else c['Nbs de groupes'] = 1;
+        /*
+        if(c['Statut'])c['Statut'] =  (c['Statut'] == 'X') ? 'Fermé' : 'Ouvert';
+        else c['Statut'] =  'Ouvert';
+        */
+        c = calculeTauxHoraire(c);
+    })
+    gridEC.records = dataCour;
+    
+    //formate les données pour grille des intervenants
+    dataInt.forEach(function(i){
+        i.recid = i.id;
+    })
+
+    //formate les données pour grille des intervenants par cours
+    gridInt.records = dataInt;
+
+    //initialise le grid actif par défaut
+    initGrid("cours-grid",gridEC);
+
+    //définitiion de la liste des colonnes
+    cols = [];
+    for (const prop in dataInt[0]) {
+        cols.push(prop);
+    }
+    console.log(cols);
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        if(e.target.id=='cours-tab')initGrid('cours-grid', gridEC);
+        if(e.target.id=='interv-tab')initGrid('interv-grid', gridInt);
+    })
+
+}
+
+function calculeTauxHoraire(c){
+    //recalcul les coûts horaires
+    c['VH HTD']=0;
+    ['CM','TD','TP'].forEach(function(t){
+        if(c['%'+t]){
+            c['%'+t] = (c['%'+t] instanceof String) ? parseFloat(c['%'+t].replace(/,/g, '.')) :c['%'+t];
+            if(t=='CM')
+                c['VH '+t] =  parseFloat(c['VH EC']*(c['%'+t]/100)*1.5).toFixed(2)*c['Nbs de groupes'];
+            else
+                c['VH '+t] =  parseFloat(c['VH EC']*(c['%'+t]/100)).toFixed(2)*c['Nbs de groupes'];
+        }else{
+            c['%'+t] = 0;
+            c['VH '+t] = 0;
+        }
+        c['VH HTD']=parseFloat(c['VH HTD'])+(parseFloat(c['VH '+t])*c['Nbs de groupes']);
+    });
+    return c;
+}
+
+
+$('#btnCalcStat').click(function(){
+    var idStat = $('#sltStats').val();
+    var txtStat = $( "#sltStats option:selected" ).text();
+    var arrStat, rsltStat;
+    var rsltHTML = '<h4>'+txtStat+'</h4>';
+    console.log(idStat+' : '+txtStat);
+    if(idStat=="NbH"){//Nb. Heures TD
+        arrStat = w2ui.grid_EC.getSelection();
+        if(!arrStat.length)w2alert('Veuillez sélectionner des cours');
+        else{
+            $('#rsltCalc').text("");
+            rsltStat = calculeSommeCours(arrStat);
+            rsltStat.forEach(function(r){
+                rsltHTML += r['lib']+' = '+r['nb']+'<br/>';
+            });
+            var coutReel = Number(parseFloat(rsltStat[4]['nb'])-parseFloat(rsltStat[5]['nb'])).toFixed(2);
+            rsltHTML += 'Coût HTD réel (coût HTD TOTAL - HTD Mutualisées) = '
+                +coutReel
+                +'<br/>';
+            rsltHTML += 'Nb enseignement à 192 H = '+parseFloat(coutReel/192).toFixed(2)+'<br/>';
+            $('#rsltCalc').append(rsltHTML);
+        }
+    }
+    if(idStat=='NbEnseignants'){
+        arrStat = w2ui.grid_EC.getSelection();
+        if(!arrStat.length)w2alert('Veuillez sélectionner des cours');
+        else{
+            $('#rsltCalc').text("");
+            rsltStat = 0;
+            arrStat.forEach(function(d){
+                rsltStat = Number(parseFloat(rsltStat)+parseFloat(dataCour[d]["VH HTD"])).toFixed(2);
+            });
+            rsltHTML += 'Charge enseignement TOTAL'+' = '+rsltStat+'<br/>';
+            rsltHTML += 'Nb enseignement à 192 H '+' = '+parseFloat(rsltStat/192).toFixed(2)+'<br/>';
+            $('#rsltCalc').append(rsltHTML);
+        }
+
+    }
+    /*
+    <option value="NbHM">Nb Heures Magistral</option>
+    <option value="NbHTP">Nb Heures Travaux pratiques</option>
+    <option value="NbEnseignnats">Nb Enseignants</option>
+    */
+})
+
+function calculeSommeCours(arrStat){
+
+    var rsltStat = [{'lib':"Heures CM",'nb':0},{'lib':"Heures TD",'nb':0},{'lib':"Heures TP",'nb':0}
+        ,{'lib':"Charge enseignement TOTAL",'nb':0},{'lib':"Coût HTD TOTAL",'nb':0}
+        ,{'lib':"HTD Mutualisées",'nb':0}];
+    arrStat.forEach(function(d){
+        if(dataCour[d]['Statut']=='Ouvert'){
+            rsltStat[0]['nb'] = Number(parseFloat(rsltStat[0]['nb'])+parseFloat(dataCour[d]['VH CM'])).toFixed(2);
+            rsltStat[1]['nb'] = Number(parseFloat(rsltStat[1]['nb'])+parseFloat(dataCour[d]['VH TD'])).toFixed(2);
+            rsltStat[2]['nb'] = Number(parseFloat(rsltStat[2]['nb'])+parseFloat(dataCour[d]['VH TP'])).toFixed(2);
+            rsltStat[3]['nb'] = Number(parseFloat(rsltStat[3]['nb'])+parseFloat(dataCour[d]["VH EC"])).toFixed(2);
+            rsltStat[4]['nb'] = Number(parseFloat(rsltStat[4]['nb'])+parseFloat(dataCour[d]["VH HTD"])).toFixed(2);
+            if(dataCour[d]['Mutualisation source'])
+                rsltStat[5]['nb'] = Number(parseFloat(rsltStat[5]['nb'])+parseFloat(dataCour[d]["VH HTD"])).toFixed(2);
+        }
+    });
+
+    return rsltStat;
+    
+}
+
+//formulaire d'ajout des EC
+//sous forme de grid
+var gridEC = {
+    header: 'Données sur les EC',
+    show: {toolbar		: true,
+            toolbarReload   : false,
+            toolbarColumns  : true,
+            toolbarSearch   : true,
+            toolbarAdd      : true,
+            toolbarDelete   : true,
+            toolbarSave		: true,
+            header: true, 
+            selectColumn: true,
+            columnHeaders: true},
+    name: 'grid_EC', 
+    multiSearch: true,
+    searches: [
+        { field: 'niveau', caption: 'niveau', type: 'text' },
+        { field: 'parcours', caption: 'parcours', type: 'text' },
+        { field: 'Semestre', caption: 'Semestre', type: 'text' },
+        { field: 'Intitulés des UE', caption: 'Intitulés des UE', type: 'text'},
+        { field: 'UE nom court', caption: 'UE nom court', type: 'text'},
+        { field: 'Intitulés des EC de chaque UE', caption: 'Intitulés des EC de chaque UE', type: 'text'},
+        { field: 'EC nom court', caption: 'EC nom court', type: 'text'},
+        { field: 'VH EC', caption: 'VH EC', render: 'int', type:'int'},
+        { field: '%CM', caption: '%CM', render: 'float:2', type:'float'},
+        { field: '%TD', caption: '%TD', render: 'float:2', type:'float'},
+        { field: '%TP', caption: '%TP', render: 'float:2', type:'float'},
+        { field: 'Nbs de groupes', caption: 'Nbs de groupes', render: 'float:2', type:'float'},
+
+        { field: 'Mutualisation destination', caption: 'Mutualisation destination', type: 'text'},
+        { field: 'Mutualisation source', caption: 'Mutualisation source', type: 'text'},
+
+    ],
+    toolbar: {
+        items: [
+            { id: 'exportCSV', type: 'button', caption: 'Exporter CSV', icon: 'fa-file'}
+        ],
+        onClick: function (event) {
+            if (event.target == 'exportCSV') {
+                var s = w2ui['grid_EC'].getSelection();
+                if(!s.length)w2alert('Veuillez sélectionner des cours');
+                else{
+                    var data=[];
+                    s.forEach(function(i){
+                        data.push(dataCour[i]);
+                    });
+                    JSONToCSVConvertor(data,'EC',true);
+                }
+            }
+        }
+    },			    
+
+    columns: [       
+        { field: 'recid', caption: 'ID', hidden:true, size: '100px', sortable: true },
+        { field: 'niveau', caption: 'niveau', type: 'text', size: '40px', sortable: true,
+            editable: { type: 'list', items: niveaux, showAll: true },
+		                render: function (record, index, col_index) {
+		                    var html = this.getCellValue(index, col_index);
+		                    return html.text ? html.text : html;
+		                }        
+        },
+        { field: 'parcours', caption: 'parcours', type: 'text', size: '60px', sortable: true,
+            editable: { type: 'list', items: parcours, showAll: true },
+		                render: function (record, index, col_index) {
+		                    var html = this.getCellValue(index, col_index);
+		                    return html.text ? html.text : html;
+		                }        
+        },
+        { field: 'Semestre', caption: 'Semestre', render: 'int',size: '60px', sortable: true,
+            editable: { type: 'int', min: 1, max: 4}            
+        },
+        { field: 'Intitulés des UE', hidden:true, caption: 'Intitulés des UE', editable:{type:'text'}, size: '100px', sortable: true },
+        { field: 'UE nom court', caption: 'UE nom court', editable:{type:'text'}, size: '100px', sortable: true},
+        { field: 'Coeff', hidden:true, caption: 'Coeff', type: 'int', size: '100px', sortable: true },
+        { field: 'ECTS', hidden:true, caption: 'ECTS', type: 'int', size: '100px', sortable: true },
+        { field: 'Intitulés des EC de chaque UE', hidden:true, caption: 'Intitulés des EC de chaque UE', type: 'text', size: '100px', sortable: true },
+        { field: 'EC nom court', caption: 'EC nom court', editable:{type:'text'}, size: '100px', sortable: true },
+        { field: 'Statut', caption: 'Statut', size: '100px', sortable: true,
+            editable: { type: 'list', items: ['Ouvert','Fermé'], showAll: true },
+		                render: function (record, index, col_index) {
+		                    var html = this.getCellValue(index, col_index);
+		                    return html.text ? html.text : html;
+		                }          
+        },
+        { field: 'VH EC', caption: 'VH EC', render: 'int',editable:{type:'int'}, size: '60px', sortable: true},
+        { field: '%CM', caption: '%CM', render: 'float:2',editable:{type:'percent'}, size: '60px', sortable: true},
+        { field: '%TD', caption: '%TD', render: 'float:2',editable:{type:'percent'}, size: '60px', sortable: true},
+        { field: '%TP', caption: '%TP', render: 'float:2',editable:{type:'percent'}, size: '60px', sortable: true},
+        { field: 'Nbs de groupes', caption: 'Nbs de groupes', editable:{type:'float:2'}, size: '100px', sortable: true},
+        { field: 'VH HTD', caption: 'Coût HTD', render: 'float:2', size: '60px', sortable: true},
+        { field: 'VH CM', caption: 'VH CM', render: 'float:2',size: '60px', sortable: true},
+        { field: 'VH TD', caption: 'VH TD', render: 'float:2', size: '60px', sortable: true},
+        { field: 'VH TP', caption: 'VH TP', render: 'float:2', size: '60px', sortable: true},
+        { field: 'Seuil', caption: 'Seuil', editable:{type:'int'}, size: '60px', sortable: true},
+        { field: 'EC Libre', caption: 'EC Libre', size: '60px', sortable: true,
+            editable: { type: 'list', items: ['Ouvert','Non ouvert'], showAll: true },
+		                render: function (record, index, col_index) {
+		                    var html = this.getCellValue(index, col_index);
+		                    return html.text ? html.text : html;
+		                }          
+        },
+        { field: 'Mutualisation Hors EC Libre', caption: 'Mutualisation Hors EC Libre', type: 'text', size: '100px', sortable: true},
+        { field: 'Commentaires', caption: 'Commentaires', type: 'text', size: '100px', sortable: true},
+        { field: 'Mutualisation destination', caption: 'Mutua. dst.', type: 'text', size: '100px', sortable: true},
+        { field: 'Mutualisation source', caption: 'Mutua. src', type: 'text', size: '100px', sortable: true},
+        { field: 'Coût HTD formation', hidden:true, caption: 'Coût HTD formation', type: 'text', size: '100px', sortable: true}
+    ],
+    onSave: function(event) {
+        var changes = w2ui['grid_EC'].getChanges();
+        //enregistre les données sources
+        dataCour = w2ui['grid_EC'].records;		            
+    },
+    onDelete: function(event) {            
+        if(event.force){
+            //enregistre les données sources
+            dataCour = w2ui['grid_EC'].records;		            
+        }
+    },
+    onChange: function(event) {
+        console.log(event);
+        //calcule la coohérence du pourcentage
+        var pc = 100;
+        var c = w2ui['grid_EC'].columns[event.column];
+        var s = w2ui['grid_EC'].getSelection()[0];
+        var d = w2ui['grid_EC'].get(s);
+        if(c.field=='%CM') pc = d['%TD']+d['%TP']+event.value_new;
+        if(c.field=='%TD') pc = d['%CM']+d['%TP']+event.value_new;
+        if(c.field=='%TP') pc = d['%CM']+d['%TD']+event.value_new;
+        if(pc>100)w2alert('Le pourcentage est supérieur à 100.<br/>Merci de vérifier.');
+        if(pc<100)w2alert('Le pourcentage est inférieur à 100.<br/>Merci de vérifier.');
+        //met à jour les données liées
+        event.onComplete = function () {
+            d[c.field]=event.value_new;
+            var nd = calculeTauxHoraire(d);
+            w2ui['grid_EC'].set(s, nd);
+        };
+    }      
+}	    
+
+var gridInt = {
+    header: 'Données sur les intervenants',
+    show: {toolbar		: true,
+            toolbarReload   : false,
+            toolbarColumns  : true,
+            toolbarSearch   : true,
+            toolbarAdd      : true,
+            toolbarDelete   : true,
+            toolbarSave		: true,
+            header: true, 
+            selectColumn: true,
+            columnHeaders: true},
+    name: 'grid_int', 
+    columns: [       
+
+        { field: 'recid', caption: 'ID', type: 'text', size: '100px', sortable: true },
+        { field: 'Civilité', caption: 'Civilité', type: 'text', size: '100px', sortable: true },
+        { field: 'Nom', caption: 'Nom', type: 'text', size: '100px', sortable: true },
+        { field: 'Prénom', caption: 'Prénom', type: 'int', size: '100px', sortable: true },
+        { field: 'Mail', caption: 'Mail', type: 'text', size: '100px', sortable: true },
+        { field: 'Téléphone', caption: 'Téléphone', type: 'text', size: '100px', sortable: true},
+        { field: 'Adresse', caption: 'Adresse', type: 'text', size: '100px', sortable: true },
+        { field: 'Type', caption: 'Type', type: 'text', size: '100px', sortable: true },
+        { field: 'Roles', caption: 'Roles', type: 'text', size: '100px', sortable: true },
+        { field: 'Statut', caption: 'Statut', type: 'text', size: '100px', sortable: true},
+        { field: 'Section', caption: 'Section', type: 'text', size: '100px', sortable: true},
+        { field: 'Lieu', caption: 'Lieu', type: 'text', size: '100px', sortable: true},
+        { field: 'photo', caption: 'photo', type: 'text', size: '100px', sortable: true},
+    ],
+}	    
+
+//chargement des données
+d3.json("<?php echo $this->urlJson;?>",function(error,data){
+    dataIntCour = data.IntCour;
+    dataCour = data.cours;
+    dataInt = data.intervenants;
+    buildPage();
+});
+
+    </script>
+
+    <script type="text/javascript" src="../js/formation.js"></script>
+
+
+  </body>
+</html>

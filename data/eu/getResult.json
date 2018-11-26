@@ -1,0 +1,781 @@
+{
+    "procedures": {
+        "2018\/2667(RSP)": {
+            "num": 0,
+            "titre": "Cambridge Analytica and Facebook: data protection and citizens' privacy as a line of defence against election manipulation",
+            "niveau": 1,
+            "nb": 1,
+            "reference": "2018\/2667(RSP)",
+            "sujets": ["1.20.09 Protection of privacy and data protection", "3.30.16 Ethical information policy", "3.30.25 International information networks and society, internet"],
+            "etape": "Procedure completed"
+        },
+        "2005\/0095(CNS)": {
+            "num": 1,
+            "titre": "EC\/Canada agreement: air transport and right to privacy, processing of advance passenger information API and passenger name record PNR data",
+            "niveau": 1,
+            "nb": 2,
+            "reference": "2005\/0095(CNS)",
+            "sujets": ["1.20.09 Protection of privacy and data protection", "3.20.15.02 Air transport agreements and cooperation"],
+            "etape": "Procedure completed"
+        },
+        "2000\/0189(COD)": {
+            "num": 2,
+            "titre": "Electronic communications: processing of personal data, protection of privacy",
+            "niveau": 1,
+            "nb": 2,
+            "reference": "2000\/0189(COD)",
+            "sujets": ["1.20.09 Protection of privacy and data protection", "3.30.05 Electronic and mobile communications, personal communications"],
+            "etape": "Procedure completed"
+        },
+        "2007\/0248(COD)": {
+            "num": 3,
+            "titre": "Electronic communications: universal service, users' rights relating to networks and services, processing of personal data, protection of privacy, consumer protection cooperation ['Telecoms Package'\u00a0(amend.\u00a0Directives 2002\/22\/EC, 2002\/58\/EC and Regulation (EC)\u00a0No 2006\/2004)]",
+            "niveau": 1,
+            "nb": 2,
+            "reference": "2007\/0248(COD)",
+            "sujets": ["1.20.09 Protection of privacy and data protection", "2.40.02 Public services, of general interest, universal service", "3.30.05 Electronic and mobile communications, personal communications", "4.60.06 Consumers' economic and legal interests", "7.30 Police, judicial and customs cooperation in general"],
+            "etape": "Procedure completed"
+        },
+        "2016\/2225(INI)": {
+            "num": 4,
+            "titre": "Fundamental rights implications of Big Data: privacy, data protection, non-discrimination, security and law-enforcement",
+            "niveau": 1,
+            "nb": 1,
+            "reference": "2016\/2225(INI)",
+            "sujets": ["1.10 Fundamental rights in the EU, Charter", "1.20.09 Protection of privacy and data protection", "3.30.06 Information and communication technologies"],
+            "etape": "Procedure completed"
+        },
+        "1990\/0288(COD)": {
+            "num": 5,
+            "titre": "Processing of personnal data and protection of privacy in the telecommunications sector, ISDN",
+            "niveau": 1,
+            "nb": 2,
+            "reference": "1990\/0288(COD)",
+            "sujets": ["1.20.09 Protection of privacy and data protection", "3.30.03.04 Telecommunication and voice telephony networks (ONP, ISDN)"],
+            "etape": "Procedure completed"
+        },
+        "2000\/2144(COS)": {
+            "num": 6,
+            "titre": "Protection of personal data: adequacy of the US safe harbor privacy principles",
+            "niveau": 1,
+            "nb": 2,
+            "reference": "2000\/2144(COS)",
+            "sujets": ["1.20.09 Protection of privacy and data protection"],
+            "etape": "Procedure completed"
+        },
+        "2013\/2682(RSP)": {
+            "num": 7,
+            "titre": "Resolution on the US National Security Agency surveillance programme, surveillance bodies in various Member States and their impact on EU citizens' privacy",
+            "niveau": 1,
+            "nb": 2,
+            "reference": "2013\/2682(RSP)",
+            "sujets": ["1.20.09 Protection of privacy and data protection", "6.40.11 Relations with industrialised countries"],
+            "etape": "Procedure completed"
+        },
+        "2016\/3018(RSP)": {
+            "num": 8,
+            "titre": "Resolution on the adequacy of the protection afforded by the EU-US Privacy Shield",
+            "niveau": 1,
+            "nb": 1,
+            "reference": "2016\/3018(RSP)",
+            "sujets": ["1.20.09 Protection of privacy and data protection"],
+            "etape": "Procedure completed"
+        },
+        "2018\/2645(RSP)": {
+            "num": 9,
+            "titre": "Resolution on the adequacy of the protection afforded by the EU-US Privacy Shield",
+            "niveau": 1,
+            "nb": 1,
+            "reference": "2018\/2645(RSP)",
+            "sujets": ["1.20.09 Protection of privacy and data protection"],
+            "etape": "Procedure completed"
+        },
+        "2008\/2651(RSP)": {
+            "num": 10,
+            "titre": "Resolution on the impact of aviation security measures and body scanners on human rights, privacy, personal dignity and data protection",
+            "niveau": 1,
+            "nb": 2,
+            "reference": "2008\/2651(RSP)",
+            "sujets": ["1.10 Fundamental rights in the Union, Charter", "1.20.09 Protection of privacy and data protection", "7.10.04 External borders crossing and controls, visas"],
+            "etape": "Procedure completed"
+        }
+    },
+    "sujets": {
+        "1.20.09": {
+            "num": 0,
+            "titre": "Protection of privacy and data protection",
+            "reference": "1.20.09",
+            "niveau": 1,
+            "nb": 18,
+            "procedures": ["2018\/2855(RSP)", "2017\/0002(COD)", "2017\/0003(COD)", "2017\/0228(COD)", "2009\/0190(NLE)", "2017\/0821(CNS)", "2017\/0801(CNS)", "2016\/0823(CNS)", "2009\/0190(NLE)", "2018\/0238(NLE)"]
+        },
+        "3.30.16": {
+            "num": 1,
+            "titre": "Ethical information policy",
+            "reference": "3.30.16",
+            "niveau": 1,
+            "nb": 1,
+            "procedures": ["2018\/2855(RSP)"]
+        },
+        "3.30.25": {
+            "num": 2,
+            "titre": "International information networks and society, internet",
+            "reference": "3.30.25",
+            "niveau": 1,
+            "nb": 1,
+            "procedures": ["2018\/2855(RSP)", "2016\/0280(COD)", "2016\/0151(COD)", "2015\/0287(COD)", "2016\/0284(COD)", "2017\/0228(COD)"]
+        },
+        "3.20.15.02": {
+            "num": 3,
+            "titre": "Air transport agreements and cooperation",
+            "reference": "3.20.15.02",
+            "niveau": 1,
+            "nb": 2,
+            "procedures": ["2013\/0186(COD)", "2009\/0018(NLE)", "2014\/0023(NLE)", "2009\/0018(NLE)", "2018\/0009(NLE)", "2007\/0181(CNS)", "2014\/0134(NLE)", "2006\/0048(NLE)", "2010\/0180(NLE)", "2010\/0112(NLE)", "2010\/0180(NLE)", "2006\/0058(NLE)", "2014\/0187(NLE)", "2010\/0186(NLE)", "2010\/0112(NLE)", "2006\/0058(NLE)", "2010\/0186(NLE)", "2008\/0040(NLE)", "2011\/0109(NLE)", "2015\/0035(NLE)", "2011\/0109(NLE)", "2014\/0007(NLE)", "2013\/0197(NLE)", "2016\/0343(NLE)", "2010\/0388(NLE)", "2010\/0225(NLE)", "2010\/0142(NLE)", "2009\/0019(NLE)", "2015\/0188(NLE)", "2016\/0156(NLE)", "2010\/0142(NLE)", "2008\/0040(NLE)", "2010\/0388(NLE)", "2010\/0225(NLE)", "2009\/0019(NLE)", "2018\/0155(NLE)", "2018\/0147(NLE)", "2012\/0015(NLE)", "2009\/0115(NLE)", "2009\/0115(NLE)", "2012\/0015(NLE)"]
+        },
+        "3.30.05": {
+            "num": 4,
+            "titre": "Electronic and mobile communications, personal communications",
+            "reference": "3.30.05",
+            "niveau": 1,
+            "nb": 4,
+            "procedures": ["2016\/0288(COD)", "2016\/0286(COD)", "2017\/0003(COD)"]
+        },
+        "2.40.02": {
+            "num": 5,
+            "titre": "Public services, of general interest, universal service",
+            "reference": "2.40.02",
+            "niveau": 1,
+            "nb": 2,
+            "procedures": []
+        },
+        "4.60.06": {
+            "num": 6,
+            "titre": "Consumers' economic and legal interests",
+            "reference": "4.60.06",
+            "niveau": 1,
+            "nb": 2,
+            "procedures": ["2011\/0284(COD)", "2013\/0072(COD)", "2011\/0284(COD)", "2017\/0143(COD)", "2015\/0287(COD)", "2015\/0288(COD)"]
+        },
+        "7.30": {
+            "num": 7,
+            "titre": "Police, judicial and customs cooperation in general",
+            "reference": "7.30",
+            "niveau": 1,
+            "nb": 2,
+            "procedures": ["2013\/0432(COD)", "2013\/0305(COD)", "2017\/0352(COD)", "2017\/0226(COD)", "2018\/2869(RSP)", "2018\/2900(RSP)", "2016\/0002(COD)", "2016\/0409(COD)", "2012\/2899(RSP)", "2014\/3015(RSP)", "2015\/2594(RSP)", "2016\/0132(COD)", "2013\/0256(COD)", "2018\/0118(NLE)", "2016\/0414(COD)", "2016\/0413(COD)", "2015\/0809(CNS)", "2016\/0808(CNS)", "2009\/0190(NLE)", "2017\/0821(CNS)", "2017\/0801(CNS)", "2016\/0801(CNS)", "2017\/0803(CNS)", "2016\/0811(CNS)", "2016\/0823(CNS)", "2009\/0190(NLE)", "2008\/0234(NLE)", "2018\/0219(APP)", "2008\/0234(NLE)", "2016\/0062(NLE)", "2018\/0116(NLE)", "2016\/0810(CNS)"]
+        },
+        "1.10": {
+            "num": 8,
+            "titre": "Fundamental rights in the EU, Charter",
+            "reference": "1.10",
+            "niveau": 1,
+            "nb": 3,
+            "procedures": ["2017\/2131(INL)"]
+        },
+        "3.30.06": {
+            "num": 9,
+            "titre": "Information and communication technologies",
+            "reference": "3.30.06",
+            "niveau": 1,
+            "nb": 1,
+            "procedures": ["2017\/2772(RSP)", "2016\/0280(COD)", "2016\/0151(COD)", "2015\/0287(COD)", "2016\/0288(COD)", "2016\/0286(COD)", "2016\/0284(COD)", "2017\/0228(COD)", "2018\/2028(INI)", "2018\/0003(NLE)"]
+        },
+        "3.30.03.04": {
+            "num": 10,
+            "titre": "Telecommunication and voice telephony networks (ONP, ISDN)",
+            "reference": "3.30.03.04",
+            "niveau": 1,
+            "nb": 2,
+            "procedures": []
+        },
+        "6.40.11": {
+            "num": 11,
+            "titre": "Relations with industrialised countries",
+            "reference": "6.40.11",
+            "niveau": 1,
+            "nb": 2,
+            "procedures": ["2017\/2271(INI)", "2016\/0366(NLE)", "2016\/0373(NLE)", "2016\/0367(NLE)", "2018\/0122(NLE)"]
+        },
+        "7.10.04": {
+            "num": 12,
+            "titre": "External borders crossing and controls, visas",
+            "reference": "7.10.04",
+            "niveau": 1,
+            "nb": 2,
+            "procedures": ["2016\/0407(COD)", "2016\/0409(COD)", "2016\/0408(COD)", "2016\/0139(COD)", "2016\/0176(COD)", "2017\/0011(NLE)", "2015\/0807(CNS)", "2010\/0820(NLE)", "2010\/0820(NLE)", "2018\/0084(NLE)", "2018\/0086(NLE)", "2016\/0141(COD)", "2018\/0318(NLE)", "2018\/0316(NLE)", "2018\/0241(NLE)"]
+        }
+    },
+    "liens": {
+        "2018\/2855(RSP)": {
+            "num": 0,
+            "reference": "2018\/2855(RSP)",
+            "niveau": 2,
+            "nb": 3
+        },
+        "2017\/0002(COD)": {
+            "num": 1,
+            "reference": "2017\/0002(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2017\/0003(COD)": {
+            "num": 2,
+            "reference": "2017\/0003(COD)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2017\/0228(COD)": {
+            "num": 3,
+            "reference": "2017\/0228(COD)",
+            "niveau": 2,
+            "nb": 3
+        },
+        "2009\/0190(NLE)": {
+            "num": 4,
+            "reference": "2009\/0190(NLE)",
+            "niveau": 2,
+            "nb": 4
+        },
+        "2017\/0821(CNS)": {
+            "num": 5,
+            "reference": "2017\/0821(CNS)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2017\/0801(CNS)": {
+            "num": 6,
+            "reference": "2017\/0801(CNS)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2016\/0823(CNS)": {
+            "num": 7,
+            "reference": "2016\/0823(CNS)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2018\/0238(NLE)": {
+            "num": 8,
+            "reference": "2018\/0238(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0280(COD)": {
+            "num": 9,
+            "reference": "2016\/0280(COD)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2016\/0151(COD)": {
+            "num": 10,
+            "reference": "2016\/0151(COD)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2015\/0287(COD)": {
+            "num": 11,
+            "reference": "2015\/0287(COD)",
+            "niveau": 2,
+            "nb": 3
+        },
+        "2016\/0284(COD)": {
+            "num": 12,
+            "reference": "2016\/0284(COD)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2013\/0186(COD)": {
+            "num": 13,
+            "reference": "2013\/0186(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2009\/0018(NLE)": {
+            "num": 14,
+            "reference": "2009\/0018(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2014\/0023(NLE)": {
+            "num": 15,
+            "reference": "2014\/0023(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0009(NLE)": {
+            "num": 16,
+            "reference": "2018\/0009(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2007\/0181(CNS)": {
+            "num": 17,
+            "reference": "2007\/0181(CNS)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2014\/0134(NLE)": {
+            "num": 18,
+            "reference": "2014\/0134(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2006\/0048(NLE)": {
+            "num": 19,
+            "reference": "2006\/0048(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2010\/0180(NLE)": {
+            "num": 20,
+            "reference": "2010\/0180(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2010\/0112(NLE)": {
+            "num": 21,
+            "reference": "2010\/0112(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2006\/0058(NLE)": {
+            "num": 22,
+            "reference": "2006\/0058(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2014\/0187(NLE)": {
+            "num": 23,
+            "reference": "2014\/0187(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2010\/0186(NLE)": {
+            "num": 24,
+            "reference": "2010\/0186(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2008\/0040(NLE)": {
+            "num": 25,
+            "reference": "2008\/0040(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2011\/0109(NLE)": {
+            "num": 26,
+            "reference": "2011\/0109(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2015\/0035(NLE)": {
+            "num": 27,
+            "reference": "2015\/0035(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2014\/0007(NLE)": {
+            "num": 28,
+            "reference": "2014\/0007(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2013\/0197(NLE)": {
+            "num": 29,
+            "reference": "2013\/0197(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0343(NLE)": {
+            "num": 30,
+            "reference": "2016\/0343(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2010\/0388(NLE)": {
+            "num": 31,
+            "reference": "2010\/0388(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2010\/0225(NLE)": {
+            "num": 32,
+            "reference": "2010\/0225(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2010\/0142(NLE)": {
+            "num": 33,
+            "reference": "2010\/0142(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2009\/0019(NLE)": {
+            "num": 34,
+            "reference": "2009\/0019(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2015\/0188(NLE)": {
+            "num": 35,
+            "reference": "2015\/0188(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0156(NLE)": {
+            "num": 36,
+            "reference": "2016\/0156(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0155(NLE)": {
+            "num": 37,
+            "reference": "2018\/0155(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0147(NLE)": {
+            "num": 38,
+            "reference": "2018\/0147(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2012\/0015(NLE)": {
+            "num": 39,
+            "reference": "2012\/0015(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2009\/0115(NLE)": {
+            "num": 40,
+            "reference": "2009\/0115(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2016\/0288(COD)": {
+            "num": 41,
+            "reference": "2016\/0288(COD)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2016\/0286(COD)": {
+            "num": 42,
+            "reference": "2016\/0286(COD)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2011\/0284(COD)": {
+            "num": 43,
+            "reference": "2011\/0284(COD)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2013\/0072(COD)": {
+            "num": 44,
+            "reference": "2013\/0072(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2017\/0143(COD)": {
+            "num": 45,
+            "reference": "2017\/0143(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2015\/0288(COD)": {
+            "num": 46,
+            "reference": "2015\/0288(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2013\/0432(COD)": {
+            "num": 47,
+            "reference": "2013\/0432(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2013\/0305(COD)": {
+            "num": 48,
+            "reference": "2013\/0305(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2017\/0352(COD)": {
+            "num": 49,
+            "reference": "2017\/0352(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2017\/0226(COD)": {
+            "num": 50,
+            "reference": "2017\/0226(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/2869(RSP)": {
+            "num": 51,
+            "reference": "2018\/2869(RSP)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/2900(RSP)": {
+            "num": 52,
+            "reference": "2018\/2900(RSP)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0002(COD)": {
+            "num": 53,
+            "reference": "2016\/0002(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0409(COD)": {
+            "num": 54,
+            "reference": "2016\/0409(COD)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2012\/2899(RSP)": {
+            "num": 55,
+            "reference": "2012\/2899(RSP)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2014\/3015(RSP)": {
+            "num": 56,
+            "reference": "2014\/3015(RSP)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2015\/2594(RSP)": {
+            "num": 57,
+            "reference": "2015\/2594(RSP)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0132(COD)": {
+            "num": 58,
+            "reference": "2016\/0132(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2013\/0256(COD)": {
+            "num": 59,
+            "reference": "2013\/0256(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0118(NLE)": {
+            "num": 60,
+            "reference": "2018\/0118(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0414(COD)": {
+            "num": 61,
+            "reference": "2016\/0414(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0413(COD)": {
+            "num": 62,
+            "reference": "2016\/0413(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2015\/0809(CNS)": {
+            "num": 63,
+            "reference": "2015\/0809(CNS)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0808(CNS)": {
+            "num": 64,
+            "reference": "2016\/0808(CNS)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0801(CNS)": {
+            "num": 65,
+            "reference": "2016\/0801(CNS)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2017\/0803(CNS)": {
+            "num": 66,
+            "reference": "2017\/0803(CNS)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0811(CNS)": {
+            "num": 67,
+            "reference": "2016\/0811(CNS)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2008\/0234(NLE)": {
+            "num": 68,
+            "reference": "2008\/0234(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2018\/0219(APP)": {
+            "num": 69,
+            "reference": "2018\/0219(APP)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0062(NLE)": {
+            "num": 70,
+            "reference": "2016\/0062(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0116(NLE)": {
+            "num": 71,
+            "reference": "2018\/0116(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0810(CNS)": {
+            "num": 72,
+            "reference": "2016\/0810(CNS)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2017\/2131(INL)": {
+            "num": 73,
+            "reference": "2017\/2131(INL)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2017\/2772(RSP)": {
+            "num": 74,
+            "reference": "2017\/2772(RSP)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/2028(INI)": {
+            "num": 75,
+            "reference": "2018\/2028(INI)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0003(NLE)": {
+            "num": 76,
+            "reference": "2018\/0003(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2017\/2271(INI)": {
+            "num": 77,
+            "reference": "2017\/2271(INI)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0366(NLE)": {
+            "num": 78,
+            "reference": "2016\/0366(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0373(NLE)": {
+            "num": 79,
+            "reference": "2016\/0373(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0367(NLE)": {
+            "num": 80,
+            "reference": "2016\/0367(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0122(NLE)": {
+            "num": 81,
+            "reference": "2018\/0122(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0407(COD)": {
+            "num": 82,
+            "reference": "2016\/0407(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0408(COD)": {
+            "num": 83,
+            "reference": "2016\/0408(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0139(COD)": {
+            "num": 84,
+            "reference": "2016\/0139(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0176(COD)": {
+            "num": 85,
+            "reference": "2016\/0176(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2017\/0011(NLE)": {
+            "num": 86,
+            "reference": "2017\/0011(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2015\/0807(CNS)": {
+            "num": 87,
+            "reference": "2015\/0807(CNS)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2010\/0820(NLE)": {
+            "num": 88,
+            "reference": "2010\/0820(NLE)",
+            "niveau": 2,
+            "nb": 2
+        },
+        "2018\/0084(NLE)": {
+            "num": 89,
+            "reference": "2018\/0084(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0086(NLE)": {
+            "num": 90,
+            "reference": "2018\/0086(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2016\/0141(COD)": {
+            "num": 91,
+            "reference": "2016\/0141(COD)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0318(NLE)": {
+            "num": 92,
+            "reference": "2018\/0318(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0316(NLE)": {
+            "num": 93,
+            "reference": "2018\/0316(NLE)",
+            "niveau": 2,
+            "nb": 1
+        },
+        "2018\/0241(NLE)": {
+            "num": 94,
+            "reference": "2018\/0241(NLE)",
+            "niveau": 2,
+            "nb": 1
+        }
+    }
+}

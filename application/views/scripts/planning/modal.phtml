@@ -1,0 +1,96 @@
+
+
+    <!-- Fenêtre modale pour l'augmentation des heures -->
+    <div class="modal fade" id="modChangeHeure" tabindex="-1" role="dialog" aria-labelledby="modChangeHeureLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modChangeHeureLabel">Modifier les heures de<span class="modalTitle" id="modChangeHeureInt"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="rngHeureNb"><span class="modalTitle" id="modChangeHeureNb"></span>heure(s) pour<span class="modalTitle" id="modChangeHeureCour"></span></label>
+                        <input type="range" class="form-control-range" id="rngHeureNb" min="1" max="150" style="width:100%" >
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary">Valider</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre modale pour le choix d'un fichier -->
+    <div class="modal fade" id="modGetFic" tabindex="-1" role="dialog" aria-labelledby="modGetFicLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modGetFicLabel">Importer le fichier des données<span class="modalTitle" id="modGetFicInt"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w2ui-field">
+                    <div style="margin-left: 0px;" > <input style="width:100%;" id="fileImport"> </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button id="btnValidImport" type="button" class="btn btn-primary">Valider</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre modale pour l'ajout d'une UE -->
+    <div class="modal fade" id="modAjoutUE" tabindex="-1" role="dialog" aria-labelledby="modAjoutUELabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modAjoutUELabel">Ajouter une UE<span class="modalTitle" id="modAjoutUEInt"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="inptUEHelp">Nom de l'UE</label>
+                    <input type="text" class="form-control" id="inptUE" aria-describedby="inptUEHelp" placeholder="saisir le nom">
+                    <small id="inptUEHelp" class="form-text text-muted">Merci de ne pas être trop long.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button id="btnValidAjoutUE" type="button" class="btn btn-primary">Valider</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre modale pour l'ajout ou la modication d'une EC -->
+    <div class="modal fade" id="modAjoutEC" tabindex="-1" role="dialog" aria-labelledby="modAjoutECLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modAjoutECLabel">Ajouter une UE<span class="modalTitle" id="modAjoutECInt"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="gridEC" style="width: 100%; height:500px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button id="btnValidAjoutEC" type="button" class="btn btn-primary">Valider</button>
+            </div>
+            </div>
+        </div>
+    </div>

@@ -135,6 +135,11 @@ class ICEController extends Zend_Controller_Action {
 		}
 	} 	
 	
+
+	public function animationAction() {
+		$this->view->urlSVG = $this->_getParam('urlSVG','../svg/modeleAlgo.svg');
+	}
+
     function initInstance(){
 		$this->view->ajax = $this->_getParam('ajax');
     		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
