@@ -47,6 +47,28 @@ class SvgRadialGradient extends SvgElement
         } // end else
         
     }
+
+    function getElement()
+    {
+        $e = "<radialGradient id=\"$this->mId\" spreadMethod=\"pad\" gradientUnits=\"objectBoundingBox\" cx=\"50%\" cy=\"50%\" r=\"50%\" fx=\"50%\" fy=\"50%\" >\n";
+        if (is_array($this->mColor)) { // Print children, start and end tag.
+            $ct = count($this->mColor)-1;
+			for ($i = 0; $i <= $ct; $i++) {
+				$os = $this->mOffset[$i];
+				$co = $this->mColor[$i];
+                $e .= "<stop offset=\"" .$os ."\" stop-color=\"" .$co ."\" />\n";
+			}
+            $e .= "\n";
+            $e .= "</radialGradient>\n";
+            
+        } else { // Print short tag.
+			$e .= "<stop offset=\"$this->mOffset%\" stop-color=\"$this->mColor\" />\n";
+            $e .= ">\n";           
+            $e .= "</radialGradient>\n";            
+        } // end else
+        
+    }
+
     function setShape($id, $offset, $color)
     {
         $this->mId = $id;

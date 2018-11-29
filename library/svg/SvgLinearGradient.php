@@ -2,7 +2,7 @@
 /** 
  *  SvgLinearGradient.php
  *
- *  class pour créer des dégradés linéaires
+ *  class pour crï¿½er des dï¿½gradï¿½s linï¿½aires
  *
  * lucky semiosis 29/08/04
  */
@@ -46,6 +46,28 @@ class SvgLinearGradient extends SvgElement
         } // end else
         
     }
+
+    function getElement()
+    {
+        $e ="<linearGradient id=\"$this->mId\">\n";
+        
+        if (is_array($this->mColor)) { // Print children, start and end tag.
+            $ct = count($this->mColor)-1;
+			for ($i = 0; $i <= $ct; $i++) {
+				$os = $this->mOffset[$i];
+				$co = $this->mColor[$i];
+                $e .= "<stop offset=\"" .$os ."\" stop-color=\"" .$co ."\" />\n";
+			}
+            $e .= "\n";
+            $e .= "</linearGradient>\n";            
+        } else { // Print short tag.
+			$e .= "<stop offset=\"$this->mOffset%\" stop-color=\"$this->mColor\" />\n";
+            $e .= ">\n";           
+            $e .= "</linearGradient>\n";            
+        } // end else
+        
+    }
+
     function setShape($id, $offset, $color)
     {
         $this->mId = $id;

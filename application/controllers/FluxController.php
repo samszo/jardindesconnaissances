@@ -521,6 +521,9 @@ class FluxController extends Zend_Controller_Action {
 			case "getDico":
 				$data = $ieml->getDico($this->_getParam('version'));
 				break;
+			case "getDicoPlus":
+				$data = $ieml->getDicoPlus($this->_getParam('version'));
+				break;
 		}		
 		$this->view->content = json_encode($data);
 

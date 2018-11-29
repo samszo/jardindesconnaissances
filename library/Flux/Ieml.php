@@ -14,8 +14,8 @@
  class Flux_Ieml extends Flux_Site{
 
 	//var $PATH_STAR_PARSER = 'http://starparser.ieml.org/cgi-bin/star2xml.cgi?iemlExpression=';
-	//var $PATH_STAR_PARSER = 'http://localhost/ieml/parser/star2xml.php?iemlExpression=';
-	var $PATH_STAR_PARSER = 'http://gapai.univ-paris8.fr/ieml/parser/star2xml.php?iemlExpression=';
+	var $PATH_STAR_PARSER = 'http://localhost/ieml/parser/star2xml.php?iemlExpression=';
+	//var $PATH_STAR_PARSER = 'http://gapai.univ-paris8.fr/ieml/parser/star2xml.php?iemlExpression=';
 	var $XPATH_BINARY = '//@binary';
   	var $XPATH_PRIMITIVE = '//@primitiveSet';
   	var $PRIMITIVE_VALUE = array("E"=>1,"U"=>2,"A"=>4,"S"=>8,"B"=>16,"T"=>32);
@@ -306,36 +306,46 @@
 		
 		return $svg;
     	
-    }	
+	}	
+	
+	/**
+	 * Récupère le détail d'un code IEML
+	 * 
+	 * @param string $code
+	 * 
+	 * @return xml
+	 */
+    function getDetail($code){
+
+		$db = new Model_DbTable_Flux_Ieml($this->db);
+
+		//récupère le détail de l'adresse
+		$arr = $db->findByCode($code);    	
+		if(count($arr)==0){
+			$xml = $this->getParse($code, true);
+			$parse = $xml->asXML();
+			$ieml_id = $db->ajouter(array("code"=>$code,"parse"=>$parse));	
+		}else{
+			if($arr[0]['parse']==""){
+				$xml = $this->getParse($arr[0]['code'], true);
+				$arr[0]['parse'] = $xml->asXML();
+				$db->edit($arr[0]['ieml_id'], array("parse"=>$arr[0]['parse']));
+			}
+			$xml = simplexml_load_string($arr[0]['parse']);
+		}
+		return $xml;
+	}
 
 	/**
-	 * Génération d'un plan svg d'une adresse IEML
+	 * Récupère la liste des primitives
 	 * 
-	 * @param array $ieml
+	 * @param xml $xml
 	 * 
-	 * @return SvgDocument
+	 * @return array
 	 */
-    function genereSvgAdresse($ieml){
-		
-    	require_once("svg/Svg.php");
-    	
-    	$db = new Model_DbTable_Flux_Ieml($this->db);
+    function getPrimitives($xml){
 
-    	//récupère le détail de l'adresse
-    	$arr = $db->findByCode($ieml['code']);    	
-    	if(count($arr)==0){
-    		$xml = $this->getParse($ieml['code'], true);
-    		$ieml['parse'] = $xml->asXML();
-    		$arr[0]['ieml_id'] = $db->ajouter($ieml);	
-    	}else{
-    		if($arr[0]['parse']==""){
-	    		$xml = $this->getParse($arr[0]['code'], true);
-	    		$arr[0]['parse'] = $xml->asXML();
-    			$db->edit($arr[0]['ieml_id'], array("parse"=>$arr[0]['parse']));
-    		}
-    		$xml = simplexml_load_string($arr[0]['parse']);
-    	}
-	    $result = $xml->xpath('//@primitiveSet');
+	    $result = $xml->xpath($this->XPATH_PRIMITIVE);
     	//arsort($result);
     	
 	    //construction de la liste des primitives
@@ -346,6 +356,29 @@
 				$prims .= str_replace("'", "", trim($p)).":";				
 			}
 		}
+		//récupère la valeur binaire
+		$bin = $xml->xpath($this->XPATH_BINARY); 
+
+		return array($result, $prims, $bin[0]['binary']->__toString());
+	}	
+	/**
+	 * Génération d'un plan svg d'une adresse IEML
+	 * 
+	 * @param array $ieml
+	 * 
+	 * @return SvgDocument
+	 */
+    function genereSvgAdresse($ieml){
+		
+    	require_once("svg/Svg.php");		
+
+		//récupère le détail de l'adresse
+		$xml = $this->getDetail($ieml['code']);
+		//récupère les primitives
+		$r = $this->getPrimitives($xml);
+		$result = $r[0];
+		$prims = $r[1];
+		
 		//construction du svg
 		$taille = 6*count($result);
 		$marge = 10;
@@ -488,6 +521,53 @@
 		$this->trace("FIN ".__METHOD__);
 		
 		return json_decode($json);
+    }	
+	/**
+	 * récupère les items d'une version de dictionnaire et les enrichie
+	 * 
+	 * @param string $version
+	 * 
+	 */
+    function getDicoPlus($version=false){
+		if($version)$this->VERSION_DICO=$version; 
+		set_time_limit(0);
+    	$this->trace("DEBUT ".__METHOD__." = ".$this->VERSION_DICO);
+    	
+		if($this->bCache){
+			$c = str_replace("::", "_", __METHOD__)."_".md5($version); 
+			if($param)$c .= "_".$this->getParamString($param);
+			   $arr = $this->cache->load($c);
+		}
+		if(!$arr){
+			//récupère le dictionnaire
+			$arr = $this->getDico($version);
+			$nb = count($json);
+			$i = 0;
+			foreach ($arr as $ieml) {
+				//pour le débugage $i>=4733 && 
+				/** ATTENTION on ne peut pas prendre en compte les valeurs composée avec + */
+				if(!strrpos($ieml->IEML,"+")){
+					//récupère le détail de l'adresse
+					$this->trace($i." : ".$ieml->IEML);
+					$xml = $this->getDetail($ieml->IEML);
+					//récupère les primitives
+					$r = $this->getPrimitives($xml);
+					//met à jour les infos
+					$ieml->primitives = $r[1]; 
+					$this->trace($ieml->primitives);
+					$ieml->binary = $r[2]; 
+					$this->trace($ieml->binary);
+				}
+				$i++;
+			}
+
+			if($this->bCache)$this->cache->save($arr, $c);
+		}
+
+
+		$this->trace("FIN ".__METHOD__);
+		
+		return $arr;
     }	
     
 }
