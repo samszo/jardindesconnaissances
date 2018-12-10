@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Editeur d'Interface Existentielle">
+    <meta name="author" content="Samuel Szoniecky">
+
+    <title>Editeur d'Interface Existentielle</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
+    <!-- Custom styles for this template -->
+    <link href="../css/sticky-footer-navbar.css" rel="stylesheet">
+
+    <script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js" integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0" crossorigin="anonymous"></script>
+
+    <style>
+        iframe{
+            width:  100%;
+        }
+    </style>
+  </head>
+
+  <body>
+
+    <header>
+      <!-- Fixed navbar -->
+      <nav id="mainNav" class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#">Editeur d'Interface Existentielle</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <form class="form-inline mt-2 mt-md-0">
+            <button id="btnExport" class="btn btn-outline-primary " type="button">Exporter</button>
+            <button id="btnImport" class="btn btn-outline-primary " type="button">Importer</button>
+          </form>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Begin page content -->
+    <main role="main" class="container">
+
+        <div class="row">
+            <div class="col-12">        
+                <ul id="nbGauche" class="nav nav-tabs">
+                    <li id="sltMatrices" class="nav-item dropdown">
+                        <a id="mnuMatricesSelect" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Matrices IEML</a>
+                        <div id="mnuMatrices" class="dropdown-menu">
+                        </div>
+                    </li>
+                    <li id="sltAffichage" class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle disabled" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Affichage</a>
+                        <div id="mnuAffichage" class="dropdown-menu">
+                        </div>
+                    </li>
+                </ul>
+                <div class="row">
+                    <div class="col-12">
+                        <iframe id="ifMatriceIEML" title="Matrice IEML" src=""></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-zero"></i>Samuel Szoniecky - Laboratoire Paragraphe
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="../js/d3.v4.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/popper.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap-treeview.js"></script>    
+    <script type="text/javascript" src="../js/w2ui.min.js"></script>
+
+
+    <script>
+
+        var arrMatrices = [{code:"M:M:.A.-M:M:.A.-F.O.-'", lib:"rôles sociaux"}
+            ,{code:"M:M:.-M:.O:.-'", lib:"qualités"}],
+            arrMnuAffichage = [{fct:showHideTexte, lib:"Affiche / Masque les textes"}
+            ,{fct:showHideLimite, lib:"Affiche / Masque les limites"}]
+            urlMatriceIeml = "../ice/ieml?code=",
+            ifIeml = document.getElementById("ifMatriceIEML").contentWindow;
+
+
+
+        d3.select("#mnuMatrices").selectAll("a").data(arrMatrices).enter().append("a")
+            .attr("class","dropdown-item" )
+            .attr("href","#" )
+            .text(function(d){return d.lib})
+            .on('click',function(d){
+                //modifie la source de l'iframe
+                d3.select('#ifMatriceIEML').attr('src',urlMatriceIeml+d.code); 
+                //affiche les menus
+                d3.select('#sltAffichage a').attr('class',"nav-link dropdown-toggle")                
+            });
+        d3.select("#mnuAffichage").selectAll("a").data(arrMnuAffichage).enter().append("a")
+            .attr("class","dropdown-item" )
+            .attr("href","#" )
+            .text(function(d){return d.lib})
+            .on('click',function(d){
+                //execute la function définie
+                d.fct(d);
+            });
+
+        $('#btnCalcStat').click(function(){
+            var idEML = $('#sltMatrices').val();
+            var txtStat = $( "#sltMatrices option:selected" ).text();
+        });
+
+        function showHideTexte(d){
+            ifIeml.iemlMatrice.showHideText();
+        }
+        function showHideLimite(d){
+            ifIeml.iemlMatrice.showHideLimite();
+        }
+
+    
+    // Fluid layout doesn't seem to support 100% height; manually set it
+    $(window).resize(function(){
+        $('#ifMatriceIEML').height( $(window).height() 
+                        - $("header .navbar").height() 
+                        - $(".footer").height()
+                        - $("#nbGauche").height() 
+                        - 20
+                        );  
+    })
+    $(window).resize();
+
+    </script>
+
+    </body>
+</html>

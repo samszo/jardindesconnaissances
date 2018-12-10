@@ -345,8 +345,8 @@ ORDER BY ASC (?label_a)
 		 */
 		//ajoute les noeuds "plus large" et "plus précis" 
 		if(!$this->rs)$this->rs = (object) array("nodes" => array(
-									array("name"=>"Plus générique","uri"=>"","recid"=>0)
-									,array("name"=>"Plus spécifique","uri"=>"","recid"=>1)
+									array("name"=>"Plus générique","uri"=>"","recid"=>0,"num"=>0)
+									,array("name"=>"Plus spécifique","uri"=>"","recid"=>1,"num"=>1)
 									), 
 									"links" => array());
 		if(!$this->doublons)$this->doublons = array();
@@ -1114,6 +1114,18 @@ OPTIONAL{?edition dcterms:date ?date}
 OPTIONAL{?edition dcterms:title ?title}
 OPTIONAL{?edition dcterms:publisher ?editeur}
 }
+
+SELECT DISTINCT ?nom ?prenom ?jour ?date1 ?date2
+WHERE {
+  ?person isni:identifierValid "0000000078338213" ;
+    foaf:focus ?identity.
+  ?identity foaf:familyName ?nom;
+    foaf:givenName ?prenom.
+   ?identity  foaf:birthday ?jour.
+  ?identity bio:birth ?date1.
+  ?identity bio:death ?date2. 
+}
+
  */ 
     
     

@@ -209,7 +209,7 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
     }
 
     
-    	/**
+    /**
      * Recherche une entrée Flux_rapport avec la valeur spécifiée
      * et retourne cette entrée.
      *
@@ -225,6 +225,26 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+
+
+    /**
+     * Recherche une entrée Flux_rapport avec la valeur spécifiée
+     * et retourne cette entrée.
+     *
+     * @param string $ids
+     *
+     * @return array
+     */
+    public function findByIdsRapport($ids)
+    {
+        $query = $this->select()
+                    ->from( array("f" => "flux_rapport") )                           
+                    ->where( "f.rapport_id IN (".$ids.")");
+
+        return $this->fetchAll($query)->toArray(); 
+    }
+
+
     	/**
      * Recherche une entrée Flux_rapport avec la valeur spécifiée
      * et retourne cette entrée.

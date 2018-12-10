@@ -1,18 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8">
     <title>IEML concept map</title>
+    <script src="../font/font-awesome/all.min.js"></script>
 <style>
 body {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 14px;
+    background-color: black;
+    width: 100%;
+    height: 100%
 }
 ellipse{
     fill:#00c40025;opacity:0.8;stroke:#d50000;stroke-width:1.88111544;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;    
 }
 rect {
-    opacity:1;fill:#ffffff;fill-opacity:1;stroke:#d524dd;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1    
+    opacity:1;fill:#ffffff;fill-opacity:1;stroke:white;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1    
+}
+text {
+    font-style:normal;font-weight:normal;font-size:3.17499995px;line-height:0%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:white;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;
 }
 .matrice{
     fill:#0b6ef45c;
@@ -30,22 +37,24 @@ rect {
 </head>
 
 <body>
-    <div id="venn"></div>
 </body>
 
 <script src="../js/d3.v4.js"></script>
 <script src="../js/vennMatrice.js"></script>
 <script>
-var urlData = '<?php echo $this->urlData;?>',
-urlDico = '<?php echo $this->urlDico;?>',
-arrDico;
+var urlData = "<?php echo $this->urlData;?>",
+    urlDico = "<?php echo $this->urlDico;?>",
+    arrDico, iemlMatrice;
+//récupération des data du dictionnaire
 d3.json(urlDico, function(err, data){
     arrDico = data;
+    //récupération des data du concept
     d3.json(urlData, function(err, data){
         matrice = [];
         var head, nbCol = data.table.tree.Tables[0].Col
         ,items = data.table.tree.Tables[0].table[0].slice
         ,mat=[];
+        //construction des items
         items.forEach(function(n, i){
             var a = ((i-1) % nbCol)-1;
             getIemlDico(n);
@@ -76,21 +85,19 @@ d3.json(urlDico, function(err, data){
                 mat.push(n);
             }
         });
-
-        var chart = vennMatrice();
-        d3.select("#venn")
+        //construction de la matrice Venn
+        iemlMatrice = vennMatrice();
+        d3.select("body")
             .datum(mat)
-            .call(chart);
+            .call(iemlMatrice);
     });
 });
 
 function getIemlDico(n){
-    var num=0;
-    arrDico.some(function(d,i){
-        num++;
+    var items = arrDico.filter(function(d,i){
         return d.IEML == n.value;
     });
-    n.dico = arrDico[num];
+    n.dico = items[0];
 }
 
 </script>

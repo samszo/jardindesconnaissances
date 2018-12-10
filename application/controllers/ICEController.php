@@ -140,8 +140,12 @@ class ICEController extends Zend_Controller_Action {
 	}
 
 	public function iemlAction(){
-    	$this->view->urlData = $this->_getParam('urlData',"../flux/ieml?f=getDicoItem&ieml=M:M:.a.-M:M:.a.-f.o.-%27");
+		//M:M:.A.-M:M:.A.-F.O.-'
+    	$this->view->urlData = $this->_getParam('urlData',"../flux/ieml?f=getDicoItem&ieml=".$this->_getParam('code', "M:M:.a.-M:M:.a.-f.o.-%27"));
     	$this->view->urlDico = $this->_getParam('urlDico',"../flux/ieml?f=getDicoPlus");
+	}
+
+	public function editeurAction(){
 	}
 
     function initInstance(){
