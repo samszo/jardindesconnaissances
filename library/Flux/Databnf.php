@@ -27,7 +27,7 @@ class Flux_Databnf extends Flux_Site{
      * @param  string $idBase
      * 
      */
-	public function __construct($idBase=false, $bTrace=false)
+	public function __construct($idBase=false, $bTrace=false, $bCache=true)
     {
     		parent::__construct($idBase, $bTrace);    	
     		
@@ -296,6 +296,17 @@ ORDER BY ASC (?label_a)
      * @return string
      */
     public function getRameau($idBnf, $label, $niv=0, $nivMax=1){	   	
+
+
+    	$this->trace("DEBUT ".__METHOD__." = ".$idBnf." : ".$label);
+    	
+		if($this->bCache){
+			$c = str_replace("::", "_", __METHOD__)."_".$idBnf; 
+			$arr = $this->cache->load($c);
+		}
+		if(!$arr){
+
+
 	   	//récupère les infos de data bnf
 		$query = 'SELECT DISTINCT ?iSujet ?uSujet ?lSujet ?uLarge ?iLarge ?lLarge ?uLien ?iLien ?lLien ?uPrecis ?iPrecis ?lPrecis ';
 		if($label){
@@ -383,7 +394,15 @@ ORDER BY ASC (?label_a)
 				$this->ajoutLien(0, $s);			
 			}		
 		}
-		return $this->rs;
+		$arr = $this->rs;
+		if($this->bCache)$this->cache->save($arr, $c);
+	}
+
+
+	$this->trace("FIN ".__METHOD__);
+	
+	return $arr;
+
     }    
 
 	/**
