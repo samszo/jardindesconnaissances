@@ -581,6 +581,20 @@ class FluxController extends Zend_Controller_Action {
     
     }
 
+    public function smelAction()
+    {
+		$s = new Flux_Smel(false,intval($this->_getParam('trace',true)));
+		$s->trace("DEBUT ".__METHOD__);
+		switch ($this->_getParam('f')) {
+			case 'saveMcCordSearch':
+				$s->saveMcCordSearch($this->_getParam('q','houdini'),$this->_getParam('c',1));
+				break;
+			case 'getGoogleVisionAnalyse':
+				$s->getGoogleVisionAnalyse($this->_getParam('idDoc',0), $this->_getParam('all',0));
+				break;
+		}        
+	}
+
     public function anAction()
     {
         $an = new Flux_An($this->_getParam('idBase','flux_an'),false,$this->_getParam('trace'));

@@ -17,6 +17,8 @@ application/configs/configP8-Paragraphe.php
 
 tmp/
 
+data/SMEL/
+
 phpDoc/
 
 data/audios

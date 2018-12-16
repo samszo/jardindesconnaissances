@@ -71,8 +71,11 @@ class Flux_Site{
 
     		if($bTrace){
 				$this->bTrace = true;		
+				$this->bTraceFlush = true;
 				$this->temps_debut = microtime(true);
-    		}
+			}else 			
+				$this->bTrace = false;		
+
     		
     		$this->getDb($idBase);
     	
@@ -310,6 +313,7 @@ class Flux_Site{
 					$response = $client->request($method);
 					$html = $response->getBody();
 				}catch (Zend_Exception $e) {
+					echo "URL: " . $url . "\n";
 					echo "Récupère exception: " . get_class($e) . "\n";
 				    echo "Message: " . $e->getMessage() . "\n";
 				}				

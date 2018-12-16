@@ -372,16 +372,16 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     public function findByTronc($tronc, $avecUti=false, $rows=false)
     {
-    		if($rows){
-    			$query = $this->select()
-            		->from( array("f" => "flux_doc"), $rows)                           
-            		->where( "f.tronc = ?", $tronc );
-    		}else{
-    			$query = $this->select()
-            		->from( array("f" => "flux_doc"))                           
+        if($rows){
+            $query = $this->select()
+                ->from( array("f" => "flux_doc"), $rows)                           
                 ->where( "f.tronc = ?", $tronc );
-    		}
-    			
+        }else{
+            $query = $this->select()
+                ->from( array("f" => "flux_doc"))                           
+            ->where( "f.tronc = ?", $tronc );
+        }
+    	$query->order(array('doc_id'));		
         if($avecUti){
             $query->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
             		->joinInner(array('ud' => 'flux_utidoc'),'ud.doc_id = f.doc_id',array('maj', 'poids'))

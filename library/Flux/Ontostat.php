@@ -32,7 +32,7 @@ class Flux_Ontostat extends Flux_Site{
     	$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
     	$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
     	        	
-    $this->mc = new Flux_MC($idBase, $bTrace);
+	    $this->mc = new Flux_MC($idBase, $bTrace);
        	
     }   
     

@@ -13,7 +13,9 @@ class Flux_Gvision extends Flux_Site{
 
 	var $client;
 	var $service;
-	
+    var $idTagLA;
+    var $idTagWE;
+
 	/*
     Likelihood Enums https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#Likelihood
     UNKNOWN	Unknown likelihood.
@@ -101,7 +103,12 @@ class Flux_Gvision extends Flux_Site{
     		$this->initDbTables();
     		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
     		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
-    		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
+            $this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
+            
+            //récupération des tags utiles
+            $this->idTagLA = $this->dbT->ajouter(array('code'=>'labelAnnotations','parent'=>$this->idTagRoot));
+            $this->idTagWE = $this->dbT->ajouter(array('code'=>'webEntities','parent'=>$this->idTagRoot));
+
     		
     		
     }
@@ -151,8 +158,111 @@ class Flux_Gvision extends Flux_Site{
             $response = $this->getUrlBodyContent($url,false,false,Zend_Http_Client::POST,array("value"=>$json, "type"=>'application/json'));
             $this->cache->save($response, $uMd5);
         }
-        $this->trace("reponse de google = ".$response);	
+        //$this->trace("reponse de google = ".$response);	
         return $response;      	    	
-	}
+    }
+    
+    /**
+     * enregistre les analyses de photo faite par google
+     * @param   array   $arr - la liste des photos
+     * @param   string  $champ
+     * 
+     * @return array
+     *
+     */
+    function saveAnalyses($arr, $champ='url'){
+        $this->trace(__METHOD__);
+        set_time_limit(0);
+        
+        $numItem = 0;
+        foreach ($arr as $item) {
+            if($item["doc_id"]>=299){
+                $this->trace('doc_id='.$item["doc_id"]);
+                $c = json_decode($this->analyseImage($item[$champ]), true);
+                foreach ($c['responses'][0] as $k => $r) {
+                    $this->trace($numItem.' '.$k);            	            
+                    switch ($k) {        	                
+                        case 'textAnnotations':
+                            $i=0;
+                            foreach ($r as $ta) {
+                                //création d'un document pour les annotations
+                                $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$ta['description'], 'tronc'=>$k." ".$numItem." ".$i,"note"=>json_encode($ta)));
+                                $i++;
+                            }
+                            break;
+                        case 'fullTextAnnotation':
+                            $i=0;
+                            foreach ($r as $fta) {
+                                //création d'un document pour l'analyse OCR
+                                if($fta['text'])$txt=utf8_encode($fta['text']);
+                                else $txt = 'inconnu';
+                                $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$txt, 'tronc'=>$k." ".$numItem." ".$i,"note"=>json_encode($fta)));
+                                $i++;
+                            }
+                            break;                            
+                        case 'logoAnnotations':
+                            $i=0;
+                            foreach ($r as $fa) {
+                                //création d'un document par visage
+                                $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$k." ".$numItem." ".$i, 'tronc'=>'logo',"note"=>json_encode($fa)));
+                                $i++;
+                            }
+                            break;
+                        case 'landmarkAnnotations':
+                            $i=0;
+                            foreach ($r as $fa) {
+                                //création d'un document par visage
+                                $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$k." ".$numItem." ".$i, 'tronc'=>'paysage',"note"=>json_encode($fa)));
+                                $i++;
+                            }
+                            break;
+                        case 'faceAnnotations':
+                            $i=0;
+                            foreach ($r as $fa) {
+                                //création d'un document par visage
+                                $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$k." ".$numItem." ".$i, 'tronc'=>'visage',"note"=>json_encode($fa)));
+                                $i++;
+                            }        	                    
+                            break;
+                        case 'labelAnnotations':
+                            foreach ($r as $la) {
+                                $idTag = $this->dbT->ajouter(array('code'=>$la['description'],'uri'=>$la['mid'],'parent'=>$this->idTagLA));
+                                $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+                                    ,"src_id"=>$item["doc_id"],"src_obj"=>"doc"
+                                    ,"dst_id"=>$idTag,"dst_obj"=>"tag"
+                                    ,"pre_id"=>$this->idMonade,"pre_obj"=>"monade"
+                                    ,"valeur"=>$la['score']
+                                ));        	  
+                            }
+                            break;
+                        case 'imagePropertiesAnnotation':
+                            //enregistre l'analyse
+                            $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$k." ".$numItem,"note"=>json_encode($r)));
+                            break;
+                        case 'cropHintsAnnotations':
+                            $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$k." ".$numItem,"note"=>json_encode($r)));
+                            break;
+                        case 'webDetection':
+                            foreach ($r['webEntities'] as $we) {
+                                if(isset($we['description'])){
+                                    $idTag = $this->dbT->ajouter(array('code'=>$we['description'],'uri'=>$we['entityId'],'parent'=>$this->idTagWE));
+                                    if($we['score'])$score = $we['score']; 
+                                    else $score = 0; 
+                                    $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+                                        ,"src_id"=>$item["doc_id"],"src_obj"=>"doc"
+                                        ,"dst_id"=>$idTag,"dst_obj"=>"tag"
+                                        ,"pre_id"=>$this->idMonade,"pre_obj"=>"monade"
+                                        ,"valeur"=>$score
+                                    ));
+                                }            	                        
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+        $numItem++;
+    }
+
     
 }
