@@ -30,13 +30,15 @@ class Flux_Databnf extends Flux_Site{
 	public function __construct($idBase=false, $bTrace=false, $bCache=true)
     {
     		parent::__construct($idBase, $bTrace);    	
-    		
+			
+			$this->trace($this->idBase);
+
     		//on récupère la racine des documents
     		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
     		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
     		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
     		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
-    		
+			
     }
 
     /**

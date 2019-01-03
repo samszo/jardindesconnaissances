@@ -63,6 +63,7 @@ class Flux_Site{
 	var $rs;
 	var $rsVerifGroup = array();
 	var $bconnect = false;
+	var $ice;
 	
     
     function __construct($idBase=false, $bTrace=false, $bCache=true){    	
@@ -75,8 +76,7 @@ class Flux_Site{
 				$this->temps_debut = microtime(true);
 			}else 			
 				$this->bTrace = false;		
-
-    		
+				
     		$this->getDb($idBase);
     	
         $frontendOptions = array(
@@ -102,7 +102,6 @@ class Flux_Site{
             	$this->bConnect = false;
         }
         
-    
     }
 
     /**
@@ -299,9 +298,9 @@ class Flux_Site{
 		/*pas d'encodage explicite
 		if(substr($url, 0, 7)!="http://")$url = urldecode($url);
 		*/
+		$c = str_replace("::", "_", __METHOD__)."_".md5($url); 
+		if($param)$c .= "_".$this->getParamString($param);
 		if($cache){
-			$c = str_replace("::", "_", __METHOD__)."_".md5($url); 
-			if($param)$c .= "_".$this->getParamString($param);
 		   	$html = $this->cache->load($c);
 		}
         if(!$html){
@@ -317,7 +316,7 @@ class Flux_Site{
 					echo "Récupère exception: " . get_class($e) . "\n";
 				    echo "Message: " . $e->getMessage() . "\n";
 				}				
-	        	if($cache)$this->cache->save($html, $c);
+	        	$this->cache->save($html, $c);
         }
 		return $html;
 	}

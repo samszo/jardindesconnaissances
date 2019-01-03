@@ -239,7 +239,6 @@ class FluxController extends Zend_Controller_Action {
 	public function databnfAction()
     {
         $bnf = new Flux_Databnf($this->_getParam('idBase'),$this->_getParam('trace'));
-	   	
 	   	switch ($this->_getParam('obj')) {
 	   		case 'term':
 				$this->view->reponse = $bnf->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
@@ -592,7 +591,13 @@ class FluxController extends Zend_Controller_Action {
 			case 'getGoogleVisionAnalyse':
 				$s->getGoogleVisionAnalyse($this->_getParam('idDoc',0), $this->_getParam('all',0));
 				break;
-		}        
+			case 'supprimeDoublons':
+				$s->supprimeDoublons();
+				break;
+			case 'getCsvToOmeka':
+				$s->getCsvToOmeka('/Users/samszo/Sites/jdc/data/SMEL/importMcCord.csv');
+				break;
+	}        
 	}
 
     public function anAction()

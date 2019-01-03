@@ -147,7 +147,7 @@ class Flux_Gvision extends Flux_Site{
 		  }
 		 ]
 		}';
-        $this->trace("requête envoyée = ".$json);
+        //$this->trace("requête envoyée = ".$json);
         
         //gestion du cache
         $uMd5 = md5($url);
@@ -172,11 +172,16 @@ class Flux_Gvision extends Flux_Site{
      */
     function saveAnalyses($arr, $champ='url'){
         $this->trace(__METHOD__);
-        set_time_limit(0);
-        
+        /** ATTENTION il faut vérifier les bin log car il sont trop nombreux
+         * sudo du -a -h /usr/local/mysql-8.0.12-macos10.13-x86_64/data 
+         * pour supprimer les logs executer dans mysql workbench
+         * purge binary logs before '2019-10-01 12:00:00';
+         * avant l'execution changer le paramètre du server dans phpmyadmin
+         * sql log off  = ON
+         */
         $numItem = 0;
         foreach ($arr as $item) {
-            if($item["doc_id"]>=299){
+            if($item["doc_id"]>=1160){
                 $this->trace('doc_id='.$item["doc_id"]);
                 $c = json_decode($this->analyseImage($item[$champ]), true);
                 foreach ($c['responses'][0] as $k => $r) {
@@ -185,8 +190,10 @@ class Flux_Gvision extends Flux_Site{
                         case 'textAnnotations':
                             $i=0;
                             foreach ($r as $ta) {
-                                //création d'un document pour les annotations
-                                $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$ta['description'], 'tronc'=>$k." ".$numItem." ".$i,"note"=>json_encode($ta)));
+                                //création d'un document pour les annotation
+                                $titre = $ta['description'];
+                                if(strlen($titre)>5000)$titre=substr($ta['description'],0,4000).'[...]';
+                                $this->dbD->ajouter(array("parent"=>$item["doc_id"],"titre"=>$titre, 'tronc'=>$k." ".$numItem." ".$i,"note"=>json_encode($ta)));
                                 $i++;
                             }
                             break;
@@ -264,5 +271,243 @@ class Flux_Gvision extends Flux_Site{
         $numItem++;
     }
 
+		/**
+		 * décompose l'analyse des visages de google
+		 *
+		 *
+		 * @return array
+		 *
+		 */
+		function exploseGoogleVisage(){
+			$this->trace(__METHOD__);
+			set_time_limit(0);
+			
+			$dbVisage = new Model_DbTable_Flux_Visage($this->db);
+			$dbRepere = new Model_DbTable_Flux_Repere($this->db);
+			
+			$sql = "SELECT
+			d.doc_id,
+			d.titre,
+			d.note,
+			d.parent
+		FROM
+			flux_doc d
+				INNER JOIN
+			flux_doc dp ON dp.doc_id = d.parent
+				LEFT JOIN
+			flux_visage v ON v.doc_id = d.doc_id
+		WHERE
+			d.tronc = 'visage' AND v.doc_id is null
+		ORDER BY d.doc_id";
+			/*pour ensuite mettre à jour la table des visages avec les url
+				UPDATE flux_visage v
+					INNER JOIN
+				omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+					AND SUBSTRING(ov.value, 31) = v.doc_id
+					INNER JOIN
+				omk_valarnum1.media om ON om.item_id = ov.resource_id 
+			SET 
+				v.url = CONCAT('http://gapai.univ-paris8.fr/ValArNum/omks/files/original/',
+						om.storage_id,
+						'.',
+						om.extension),
+				v.source = om.source
+				*/
+			
+			
+			$this->trace($sql);
+			$arr = $this->dbD->exeQuery($sql);
+			//foreach ($arr as $h) {
+			$nb = count($arr);
+			$arrItem = array();
+			for ($i = 0; $i < $nb; $i++) {
+				$this->trace($i." ".$h["doc_id"]." ".$h["titre"]);
+				$h = $arr[$i];
+				$data = json_decode($h["note"]);
+				$v = $data->boundingPoly->vertices;
+				for ($j = 0; $j < 4; $j++) {
+					if(!isset($v[$j]->x)) $v[$j]->x=0;
+					if(!isset($v[$j]->y)) $v[$j]->y=0;
+				}
+				$r = array("doc_id"=>$h["doc_id"],
+				"rollAngle"=>$data->rollAngle,
+					"panAngle"=>$data->panAngle,
+					"tiltAngle"=>$data->tiltAngle,
+					"detectionConfidence"=>$data->detectionConfidence,
+					"landmarkingConfidence"=>$data->landmarkingConfidence,
+					"joy"=>$data->joyLikelihood,
+					"sorrow"=>$data->sorrowLikelihood,
+					"anger"=>$data->angerLikelihood,
+					"surprise"=>$data->surpriseLikelihood,
+					"underExposed"=>$data->underExposedLikelihood,
+					"blurred"=>$data->blurredLikelihood,
+					"headwear"=>$data->headwearLikelihood,
+					"v0x"=>$v[0]->x,
+					"v0y"=>$v[0]->y,
+					"v1x"=>$v[1]->x,
+					"v1y"=>$v[1]->y,
+					"v2x"=>$v[2]->x,
+					"v2y"=>$v[2]->y,
+					"v3x"=>$v[3]->x,
+					"v3y"=>$v[3]->y);        	            
+				$dbVisage->ajouter($r);
+				foreach ($data->landmarks as $l) {
+					$p = $l->position;
+					if(!isset($p->x)) $p->x=0;
+					if(!isset($p->y)) $p->y=0;
+					if(!isset($p->z)) $p->z=0;        	            
+					$dbRepere->ajouter(array("doc_id"=>$h["doc_id"],"type"=>$l->type,"x"=>$p->x, "y"=>$p->y, "z"=>$p->z));
+				}
+				
+			}
+							
+		}
+        	
+        	/**
+        	 * migre les analyses de photo faite par google
+        	 *
+        	 * @param  $idBaseSrc    string
+        	 * @param  $idBaseDst    string
+        	 * 
+        	 * @return array
+        	 *
+        	 */
+        	function migreAnalyseGooglePhoto($idBaseSrc, $idBaseDst){
+        	    $this->trace(__METHOD__);
+        	    set_time_limit(0);
+
+        	    $dbDst = $this->getDb($idBaseDst);
+        	    $dbDocDst = new Model_DbTable_Flux_Doc($dbDst);
+        	    
+        	    $dbSrc = $this->getDb($idBaseSrc);
+        	    $dbDocSrc = new Model_DbTable_Flux_Doc($dbSrc);
+        	    
+        	    /* Problème de manque
+        	    $sql = "SELECT 
+                    d.doc_id,
+                    d.url,
+                    d.titre,
+                    COUNT(DISTINCT dv.doc_id) nbDv,
+                    GROUP_CONCAT(DISTINCT dv.doc_id) dvIds,
+                    COUNT(DISTINCT dp.doc_id) nbDp,
+                    GROUP_CONCAT(DISTINCT dp.doc_id) dpIds
+                FROM
+                    flux_doc d
+                        INNER JOIN
+                    flux_doc dv ON dv.parent = d.doc_id
+                        AND (dv.titre LIKE 'imagePropertiesAnnotation%'
+                        OR dv.titre LIKE 'faceAnnotations%'
+                        OR dv.titre LIKE 'landmarkAnnotations%'
+                        OR dv.titre LIKE 'logoAnnotations%')
+                        INNER JOIN
+                    ".$idBaseDst.".flux_doc dp ON dp.url = d.url
+                GROUP BY d.doc_id
+                ORDER BY d.doc_id";
+        	    $arr = $dbDocSrc->exeQuery($sql);
+        	    */
+        	    
+        	    $sql = "SELECT 
+                    d.doc_id,
+                    dpv.titre, dpv.tronc, dpv.note
+                FROM
+                    flux_doc d
+                        INNER JOIN
+                    ".$idBaseSrc.".flux_doc dp ON dp.url = d.url
+                        INNER JOIN
+                    ".$idBaseSrc.".flux_doc dpv ON dpv.parent = dp.doc_id
+                        AND (dpv.titre LIKE 'imagePropertiesAnnotation%'
+                        OR dpv.titre LIKE 'faceAnnotations%'
+                        OR dpv.titre LIKE 'landmarkAnnotations%'
+                        OR dpv.titre LIKE 'logoAnnotations%')
+                        LEFT JOIN
+                    flux_doc dv ON dv.parent = d.doc_id
+                        AND (dv.titre LIKE 'imagePropertiesAnnotation%'
+                        OR dv.titre LIKE 'faceAnnotations%'
+                        OR dv.titre LIKE 'landmarkAnnotations%'
+                        OR dv.titre LIKE 'logoAnnotations%')
+                WHERE
+                    d.type = 1 AND dv.doc_id IS NULL
+                ORDER BY d.doc_id";
+        	    $this->trace($sql);        	    
+        	    $arr = $dbDocDst->exeQuery($sql);
+        	    
+        	    foreach ($arr as $v) {
+        	        if($v['doc_id'] >= -1){
+    	                $id = $dbDocDst->ajouter(
+    	                    array("titre"=>$v['titre'],"parent"=>$v['doc_id']
+    	                       ,'tronc'=>$v['tronc'] ? $v['tronc'] : 'Google Vision'
+    	                       ,"note"=>$v['note'])
+    	                    ,false);
+    	                $this->trace('--- '.$id.' = '.$v['doc_id']." ".$v['titre']);
+    	            }
+        	    }
+        	
+        	}
+        	
+        	/**
+        	 * migre les mots clefs de photo faite par google
+        	 *
+        	 * @param  $idBaseSrc    string
+        	 * @param  $idBaseDst    string
+        	 *
+        	 * @return array
+        	 *
+        	 */
+        	function migreAnalyseGooglePhotoMC($idBaseSrc, $idBaseDst){
+        	    $this->trace(__METHOD__);
+        	    set_time_limit(0);
+        	            	    
+        	    $dbSrc = $this->getDb($idBaseSrc);
+        	    $dbDocSrc = new Model_DbTable_Flux_Doc($dbSrc);
+        	    
+        	    $dbDst = $this->getDb($idBaseDst);
+        	    $dbDocDst = new Model_DbTable_Flux_Doc($dbDst);
+        	    
+        	    $g = new Flux_Gvision($idBaseDst);
+        	    
+        	    $arrTagP['labelAnnotations'] = $this->dbT->ajouter(array('code'=>'labelAnnotations','parent'=>$g->idTagRoot));
+        	    $arrTagP['webEntities'] = $this->dbT->ajouter(array('code'=>'webEntities','parent'=>$g->idTagRoot));
+        	    
+        	    $sql = "SELECT 
+                    r.pre_id,
+                    r.valeur,
+                    t.code,
+                    t.uri,
+                    tp.code TagP,
+                    dp.doc_id
+                FROM
+                    flux_doc d
+                        INNER JOIN
+                    ".$idBaseDst.".flux_doc dp ON dp.url = d.url
+                        INNER JOIN
+                    flux_rapport r ON r.src_id = d.doc_id
+                        AND r.src_obj = 'doc'
+                        AND r.dst_obj = 'tag'
+                        AND r.pre_obj = 'monade'
+                        INNER JOIN
+                    flux_tag t ON t.tag_id = r.dst_id
+                        INNER JOIN
+                    flux_tag tp ON tp.tag_id = t.parent
+                        AND tp.code IN ('webEntities' , 'labelAnnotations')
+                WHERE dp.type = 1
+                ORDER BY dp.doc_id";
+        	    $this->trace($sql);
+        	    $arr = $dbDocSrc->exeQuery($sql);
+        	    
+        	    foreach ($arr as $v) {
+        	        if($v['doc_id'] >= -1){
+        	            $idTag = $this->dbT->ajouter(array('code'=>$v['code'],'uri'=>$v['uri'],'parent'=>$arrTagP['TagP']));
+        	            $id = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+        	                ,"src_id"=>$v['doc_id'],"src_obj"=>"doc"
+        	                ,"dst_id"=>$idTag,"dst_obj"=>"tag"
+        	                ,"pre_id"=>$g->idMonade,"pre_obj"=>"monade"
+        	                ,"valeur"=>$v['valeur']
+        	            ),false);
+        	            $this->trace('--- '.$id.' = '.$v['doc_id']." ".$v['code']);
+        	        }
+        	    }
+        	    
+        	}
     
+
 }

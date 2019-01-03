@@ -49,11 +49,13 @@ function vennMatrice() {
           ,{fct:'showHideLimite', lib:"Affiche / Masque les limites", icon:"fas fa-route"}
         ]
         //zoom = d3.zoom().on("zoom", zoomFunction)
+        , me = this;
+
         ;
 
     function chart(selection) {
 
-      //création de la bar d'outil
+      //création de la barre d'outil
       toolBar.selectAll("i").data(arrFctToolBar).enter().append("button")
         .on("click",function(d){
             if(d.fct=='showHideText')chart.showHideText();  
@@ -204,6 +206,8 @@ function vennMatrice() {
                   var couleur = ad.select ? "url(#grad"+ad.d.dico.INDEX+")" : colorNeutre;  
                   return couleur;               
                 })
+              //renvoie le concept
+              chart.addIemlCode(d);  
               /*zoom ou dezoom
               if(d.select){
                 var bb = cpt.node().getBBox(); 
@@ -410,6 +414,9 @@ function vennMatrice() {
     chart.showHideLimite= function() {
       voisLimite = voisLimite == 1 ? 0 : 1
       svg.selectAll('rect').style('stroke-width',voisLimite);
+    } 
+    chart.addIemlCode= function(d) {
+      if(parent.addIemlCode)parent.addIemlCode(d);
     } 
     
     chart.margin = function(_) {

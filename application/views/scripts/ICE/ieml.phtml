@@ -41,6 +41,7 @@ text {
 
 <script src="../js/d3.v4.js"></script>
 <script src="../js/vennMatrice.js"></script>
+<script src="../js/ieml.js"></script>
 <script>
 var urlData = "<?php echo $this->urlData;?>",
     urlDico = "<?php echo $this->urlDico;?>",
@@ -50,54 +51,18 @@ d3.json(urlDico, function(err, data){
     arrDico = data;
     //récupération des data du concept
     d3.json(urlData, function(err, data){
-        matrice = [];
-        var head, nbCol = data.table.tree.Tables[0].Col
-        ,items = data.table.tree.Tables[0].table[0].slice
-        ,mat=[];
-        //construction des items
-        items.forEach(function(n, i){
-            var a = ((i-1) % nbCol)-1;
-            getIemlDico(n);
-            if(n.background == "header-noun"){
-                if(i==0){
-                    n.type = 'matrice';
-                    head = n;
-                    head.abs=[];head.ord=[];head.items=[];
-                }else{
-                    if(i <= nbCol){
-                        n.type = 'abs';
-                        n.abs=a;
-                        head.abs.push(n.value);
-                    }else{
-                        n.type = 'ord';
-                        head.ord.push(n.value);
-                        n.ord=head.ord.length-1
-                    }
-                }
-                mat.push(n);
-            } else if (n.background == "noun"){
-                n.type = 'item';
-                n.numabs=a;
-                n.numord=head.ord.length-1
-                n.abs=head.abs[a];
-                n.ord=head.ord[n.numord];
-                head.items.push(n.value);
-                mat.push(n);
-            }
-        });
-        //construction de la matrice Venn
-        iemlMatrice = vennMatrice();
-        d3.select("body")
-            .datum(mat)
-            .call(iemlMatrice);
+        makeMatrice(getIemlItems(data));
     });
 });
 
-function getIemlDico(n){
-    var items = arrDico.filter(function(d,i){
-        return d.IEML == n.value;
-    });
-    n.dico = items[0];
+function makeMatrice(mat){
+
+    //construction de la matrice Venn
+    var iemlMatrice = vennMatrice();
+    d3.select("body")
+        .datum(mat)
+        .call(iemlMatrice);
+
 }
 
 </script>

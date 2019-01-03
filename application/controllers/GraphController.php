@@ -57,7 +57,19 @@ class GraphController extends Zend_Controller_Action {
 		$this->view->urlStats = "../stat/tagassos?".$arrUrl[1];	    
     }	
 
-    public function chordAction()
+    public function forceclusterAction()
+    {
+	}
+
+    public function forcelabelAction()
+    {
+	}
+
+    public function forceradialAction()
+    {
+	}
+
+	public function chordAction()
     {
 	    
 	    $request = $this->getRequest();

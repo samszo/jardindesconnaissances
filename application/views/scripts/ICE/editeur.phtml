@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Editeur d'Interface Existentielle">
+    <meta name="description" content="Editeur de formulaires sémantiques">
     <meta name="author" content="Samuel Szoniecky">
 
-    <title>Editeur d'Interface Existentielle</title>
+    <title>Editeur de formulaires sémantiques</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../css/bootstrap.min.css" rel="stylesheet">
@@ -20,6 +20,36 @@
         iframe{
             width:  100%;
         }
+
+        /* merci à https://github.com/basilebong/bootstrap4-fullscreen-modal */
+        .modal.modal-fullscreen .modal-dialog {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        max-width: none; }
+
+        .modal.modal-fullscreen .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+        border: none; }
+
+        .links line {
+        stroke: #999;
+        stroke-opacity: 0.6;
+        }
+
+        .nodes circle {
+        stroke: #fff;
+        stroke-width: 1.5px;
+        }
+
+        text {
+        font-family: sans-serif;
+        font-size: 10px;
+        }
+
     </style>
   </head>
 
@@ -28,7 +58,7 @@
     <header>
       <!-- Fixed navbar -->
       <nav id="mainNav" class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="#">Editeur d'Interface Existentielle</a>
+        <a class="navbar-brand" href="#">Editeur de formulaires sémantiques</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -45,34 +75,163 @@
     <main role="main" class="container">
 
         <div class="row">
-            <div class="col-12">        
-                <ul id="nbGauche" class="nav nav-tabs">
-                    <li id="sltMatrices" class="nav-item dropdown">
-                        <a id="mnuMatricesSelect" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Matrices IEML</a>
-                        <div id="mnuMatrices" class="dropdown-menu">
+            <div class="col-12">
+
+                <ul class="nav nav-tabs" id="tabForm" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="formParam-tab" data-toggle="tab" href="#formParam" role="tab" aria-controls="formParam" aria-selected="true">Paramètres</a>
+                        </li>
+                        <li class="nav-item">
+                                <a class="nav-link" id="formTest-tab" data-toggle="tab" href="#formTest" role="tab" aria-controls="formTest" aria-selected="true">Tests</a>
+                        </li>
+                    </ul>
+                <div class="tab-content" id="tabFormContent">
+                    <div class="tab-pane fade show active" id="formParam" role="tabpanel" aria-labelledby="formParam-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <form id='paramsForm' role="form" >
+                                    <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="iptForm">Nom du formulaire</label>
+                                            <input type="text" class="form-control" id="iptForm" aria-describedby="hlpQ" placeholder="Saisissez le nom">
+                                            <small id="hlpQ" class="form-text text-muted">Privilégier un nom court</small>
+                                        </div>
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" checked='true' class="form-check-input" id="chkGeo">
+                                            <label class="form-check-label" for="chkGeo">Prendre en compte la position géographique ? </label>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="iptFormIeml">code IEML du formulaire</label>
+                                            <input type="text" class="form-control" id="iptFormIeml" aria-describedby="hlpQIeml" placeholder="code IEML">
+                                            <small id="hlpQIeml" class="form-text text-muted">Saississez le code IEML correspond au formulaire</small>
+                                        </div>
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" checked='true' class="form-check-input" id="chkTime">
+                                            <label class="form-check-label" for="chkTime">Prendre en compte le temps de réponse ? </label>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </form>
+                                <div id="gridQuestions" style="width: 100%; height: 200px;"></div>                                                                
+                                <div id="gridReponses" style="width: 100%; height: 200px;"></div>                                                                
+                            </div>        
                         </div>
-                    </li>
-                    <li id="sltAffichage" class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle disabled" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Affichage</a>
-                        <div id="mnuAffichage" class="dropdown-menu">
-                        </div>
-                    </li>
-                </ul>
-                <div class="row">
-                    <div class="col-12">
-                        <iframe id="ifMatriceIEML" title="Matrice IEML" src=""></iframe>
                     </div>
-                </div>
-            </div>
+                    <div class="tab-pane fade" id="formTest" role="tabpanel" aria-labelledby="formTest-tab">
+                        <div class="row">
+                            <div class="col-4" id="formTest-form">
+                                <nav class="navbar navbar-light bg-light">
+                                    <form class="form-inline">
+                                        <button id="btnGenForm" class="btn btn-sm btn-outline-success" type="button">Générer un formulaire</button>
+                                        <button id="btnClearRep" class="btn btn-sm btn-outline-danger" type="button">Supprimer les réponses</button>
+                                    </form>
+                                </nav>
+                            </div>
+                            <div class="col-8" id="formTest-result">                                
+                                <nav id='navViz' class="navbar navbar-light bg-light">
+                                    <form class="form-inline">
+                                        <button id="btnVizRepo" class="btn btn-sm btn-outline-success" type="button">Visualiser les réponses</button>
+                                    </form>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>                
+                </div>                                            
+
+
+            </div>        
+
         </div>
 
     </main>
 
     <footer class="footer">
       <div class="container">
-      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-zero"></i>Samuel Szoniecky - Laboratoire Paragraphe
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-zero"></i> Samuel Szoniecky <img 
+      src="../svg/logo-paragraphe.svg" 
+      alt="logo-paragraphe"
+      height="auto"
+      width="100px" />
       </div>
     </footer>
+
+
+    <!-- Modal pour le choix des concepts dans les matrices IEML-->
+    <div class="modal fade modal-fullscreen" id="modalIemlMatrice" tabindex="-1" role="dialog" aria-labelledby="modalIemlMatriceLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="modalIemlMatriceLabel">Choississez les concepts dans les matrices IEML</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nbAddIEML" aria-controls="nbAddIEML" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nbAddIEML">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="nbddMatricesIEML" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Matrices IEML
+                        </a>
+                        <div id="mnuMatrices" class="dropdown-menu" aria-labelledby="nbddMatricesIEML">
+                        </div>
+                    </li>
+                    <form class="form-inline">
+                        <div id="btnCptLigne" class="btn-group btn-group-toggle" data-toggle="buttons">
+                            <label class="btn btn-sm btn-outline-success active">
+                                <input type="radio" name="options" id="cptLigne" autocomplete="off" checked> Une réponse par concept
+                            </label>
+                            <label class="btn  btn-sm btn-outline-success">
+                                <input type="radio" name="options" id="cptCumul" autocomplete="off"> Cumuler les concepts
+                            </label>
+                        </div> 
+                    </form>
+                </ul>
+            </div>
+        </nav>
+            <div class="row">
+                <div class="col-12">
+                    <iframe id="ifMatriceIEML" title="Matrice IEML" src=""></iframe>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Fenêtre modale pour le choix d'un fichier -->
+    <div class="modal fade" id="modGetFic" tabindex="-1" role="dialog" aria-labelledby="modGetFicLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modGetFicLabel">Importer les paramètres du formulaire<span class="modalTitle" id="modGetFicInt"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w2ui-field">
+                    <div style="margin-left: 0px;" > <input style="width:100%;" id="fileImport"> </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button id="btnValidImport" type="button" class="btn btn-primary">Valider</button>
+            </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -83,19 +242,33 @@
     <script type="text/javascript" src="../js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../js/bootstrap-treeview.js"></script>    
     <script type="text/javascript" src="../js/w2ui.min.js"></script>
+    <script type="text/javascript" src="../js/ieml.js"></script>
+    <script type="text/javascript" src="../js/iemlForce.js"></script>
+    <script type="text/javascript" src="../js/geo.js"></script>
+    <script type="text/javascript" src="../js/d3-hexbin0.2.2.min.js"></script>
+    
+
+    <script type="text/javascript" src="https://d3js.org/d3-force.v2.min.js"></script>
 
 
     <script>
 
-        var arrMatrices = [{code:"M:M:.A.-M:M:.A.-F.O.-'", lib:"rôles sociaux"}
-            ,{code:"M:M:.-M:.O:.-'", lib:"qualités"}],
+        var arrMatrices = [{code:"M:M:.a.-M:M:.a.-f.o.-'", lib:"rôles sociaux"}
+                ,{code:"M:M:.-M:.O:.-'", lib:"qualités"},{code:"O:O:.O:M:.-", lib:"cycle de travail"}],
             arrMnuAffichage = [{fct:showHideTexte, lib:"Affiche / Masque les textes"}
-            ,{fct:showHideLimite, lib:"Affiche / Masque les limites"}]
+                ,{fct:showHideLimite, lib:"Affiche / Masque les limites"}]
             urlMatriceIeml = "../ice/ieml?code=",
-            ifIeml = document.getElementById("ifMatriceIEML").contentWindow;
+            ifIeml = document.getElementById("ifMatriceIEML").contentWindow, 
+            cptLigne = true, evtCellIEML=false,arrQR = [],
+            urlIeml = "<?php echo $this->urlIeml;?>",urlDico = "<?php echo $this->urlDico;?>", arrDico=[], iemlMatrice=[],
+            arrReponses=[];
 
+        //chargement du dico IEML
+        d3.json(urlDico, function(err, data){
+            arrDico = data;
+        });
 
-
+        //création des menus
         d3.select("#mnuMatrices").selectAll("a").data(arrMatrices).enter().append("a")
             .attr("class","dropdown-item" )
             .attr("href","#" )
@@ -114,12 +287,100 @@
                 //execute la function définie
                 d.fct(d);
             });
-
-        $('#btnCalcStat').click(function(){
+        //gestion des boutons
+        $('#btnCreerForm').click(function(){
             var idEML = $('#sltMatrices').val();
             var txtStat = $( "#sltMatrices option:selected" ).text();
         });
+        $("#btnCptLigne input:radio").on('change', function() {
+            cptLigne = $(this).attr('id') == 'cptCumul' ? false : true;
+            console.log("cptLigne="+cptLigne);
+        })
+        $('#btnExport').click(function(){
 
+            if(w2ui.gQuestions.getChanges().length>0){
+                w2alert('Veuillez enregistrer les questions.');
+                return;
+            }
+            if(w2ui.gReponse.getChanges().length>0){
+                w2alert('Veuillez enregistrer les réponses.');
+                return;
+            }
+
+
+            var params = getParamsForm();
+            var jsonData = {"questions":arrQR, "params":params, "reponses":arrReponses};
+            exportJson(JSON.stringify(jsonData), 'formulaireSemantique.json', 'text/plain');
+        })
+        function getParamsForm(){
+            var params = {
+                'iptForm':$('#iptForm').val()
+                ,'iptFormIeml':$('#iptFormIeml').val()
+                ,'chkGeo':$('#chkGeo').val()
+                ,'chkTime':$('#chkTime').val()
+            };
+            return params;
+        }
+
+        function exportJson(content, fileName, contentType) {
+            var a = document.createElement("a");
+            var file = new Blob([content], {type: contentType});
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+        }
+
+        $('#btnImport').click(function(){
+
+            w2confirm('ATTENTION les paramètres actuels seront supprimés.')
+                .yes(function () { $('#modGetFic').modal('show');})
+                .no(function () { console.log('NO'); });                        
+        })
+        //initialise le champ d'import des fichiers
+        $('#fileImport').w2field('file', {max:1});
+
+        $('#btnValidImport').click(function(){
+            var f = $('#fileImport').data('selected');
+            fr = new FileReader();
+            fr.onload = receivedText;
+            fr.readAsText(f[0].file);
+            function receivedText(e) {
+                let lines = e.target.result;
+                try {
+                    var data = JSON.parse(lines); 
+                    //charge les grids
+                    arrQR = data.questions;
+                    w2ui.gQuestions.records = arrQR;
+                    w2ui.gQuestions.refresh();
+                    //charge les paramètres de formulaire
+                    for (const k in data.params) {
+                        $('#'+k).val(data.params[k]);
+                    }
+                    //charge les réponses
+                    arrReponses = data.reponses;
+                    $('#modGetFic').modal('hide');
+                }catch(error) {
+                    w2alert('Les données ne sont pas au bon format.');
+                }
+                $('#fileImport').w2field('file', {max:1});
+            }
+        })
+        $('#btnGenForm').click(function(){
+            creaForm();
+        })
+        $('#btnClearRep').click(function(){
+            w2confirm('ATTENTION toutes les réponses seront supprimées.')
+                .yes(function () {  arrReponses=[];})
+                .no(function () { console.log('NO'); });                                   
+        })
+        $('#btnVizRepo').click(function(){
+            //creaHexaCarto();
+            creaForceCarto();
+        })
+        
+
+
+        //gestion des fonction de menus
         function showHideTexte(d){
             ifIeml.iemlMatrice.showHideText();
         }
@@ -128,6 +389,435 @@
         }
 
     
+    //création des grids
+    $('#gridQuestions').w2grid({ 
+        name: 'gQuestions', 
+        header: 'Liste des questions',
+        show: { 
+            toolbar: true,
+            footer: true,
+            header:true,
+            toolbarSave: true,
+            toolbarDelete:true,
+            selectColumn: false,
+            multiSelect: false,
+        },
+        columns: [                
+            { field: 'recid', caption: 'ID', size: '50px', sortable: true, resizable: true },
+            { field: 'txtQ', caption: 'Question', size: '50%', sortable: true, resizable: true, 
+                editable: { type: 'text' }
+            },
+            { field: 'txtQieml', caption: 'Code IEML', size: '50%', sortable: true, resizable: true, 
+                editable: { type: 'text' }
+            },
+            { field: 'nbProp', caption: 'Nb. proposition', size: '100px', sortable: true, resizable: true, render: 'int',
+                editable: { type: 'int', min: 1, max: 100}
+            },
+         ],
+        onClick: function (event) {
+            if(w2ui.gReponse.getChanges().length>0){
+                w2alert('Veuillez enregistrer les réponses.');
+                return;
+            }
+            w2ui['gReponse'].clear();
+            var record = this.get(event.recid);
+            w2ui.gReponse.records = record.reponses;
+            w2ui.gReponse.refresh();
+        },
+        onDelete:function(event){
+            if(event.force){
+                w2ui.gReponse.clear();
+                w2ui.gReponse.refresh();
+            }		        	    
+        },
+        toolbar: {
+            items: [
+                { id: 'add', type: 'button', caption: 'Ajouter', icon: 'w2ui-icon-plus' }
+            ],
+            onClick: function (event) {
+                if (event.target == 'add') {
+                    var max = d3.max(w2ui.gQuestions.records.map(function(d){return d.recid}));
+                    var i = max ? max+1 : 1;
+                    arrQR.push({ recid: i, reponses:[] , nbProp:6 });
+                    w2ui.gQuestions.records = arrQR;
+                    w2ui.gQuestions.refresh();
+                }
+            }
+        },
+        records: arrQR
+    });    
+    $('#gridReponses').w2grid({ 
+        name: 'gReponse', 
+        header: 'Liste des réponses',
+        show: { 
+            toolbar: true,
+            footer: true,
+            header:true,
+            toolbarSave: true,
+            toolbarDelete: true,
+        },
+        columns: [                
+            { field: 'recid', caption: 'ID', size: '50px', sortable: true, resizable: true },
+            { field: 'recidQuest', caption: 'IDQ', size: '50px',hidden:true, sortable: true, resizable: true,  },
+            { field: 'txtR', caption: 'Réponse', size: '30%', sortable: true, resizable: true, 
+                editable: { type: 'text' }
+            },
+            { field: 'iemlR', caption: 'Code IEML', size: '200px', sortable: true, resizable: true, 
+                editable: { type: 'text' },
+            },
+            { field: 'isValide', caption: 'Valide', size: '60px', sortable: true, resizable: true, style: 'text-align: center',
+                editable: { type: 'checkbox', style: 'text-align: center' } 
+            },
+            { field: 'isMasque', caption: 'Masquer', size: '80px', sortable: true, resizable: true, style: 'text-align: center',
+                editable: { type: 'checkbox', style: 'text-align: center' } 
+            },
+            { field: 'isGen', caption: 'Génératif', size: '80px', sortable: true, resizable: true, style: 'text-align: center',
+                editable: { type: 'checkbox', style: 'text-align: center' } 
+            },
+            { field: 'recidParent', caption: 'Généré par', size: '100px',hidden:true, sortable: true, resizable: true, style: 'text-align: center'                
+            },
+            { field: 'iemlRParent', caption: 'Généré par', size: '120px', sortable: true, resizable: true                
+            },
+            { field: 'iemlRelaType', caption: 'Relation', size: '130px', sortable: true, resizable: true                
+            }
+
+         ],
+        toolbar: {
+            items: [
+                { id: 'add', type: 'button', caption: 'Ajouter', icon: 'w2ui-icon-plus' }
+            ],
+            onClick: function (event) {
+                if (event.target == 'add') {
+                    //récupère l'identifiant de la question
+                    var s = w2ui.gQuestions.getSelection();
+                    if(s.length==0){
+                        w2alert('Veuillez sélectionner une question.');
+                        return;
+                    }
+                    if(w2ui.gQuestions.getChanges().length>0){
+                        w2alert('Veuillez enregistrer la question.');
+                        return;
+                    }
+                    var r = w2ui.gQuestions.get(s[0]);
+                    var max = d3.max(w2ui.gReponse.records.map(function(d){return d.recid}));
+                    var i = max ? max+1 : 1;
+                    evtCellIEML = {'target':'gReponse','index':i,'value':true,'recidQuest': r['recid']};
+                    w2ui.gReponse.header = "Réponse(s) à la question : "+r['txtQ'];
+                    $('#modalIemlMatrice').modal('show');
+                    //w2ui.gReponse.add({ recid: w2ui.gReponse.records.length + 1,recidQuest: r['recid']});
+                }
+            }
+        },
+        records: [],
+        onEditField: function(event) {
+            console.log('value', event.value);
+            /*
+            if(event.column==3){
+                evtCellIEML = event;
+                $('#modalIemlMatrice').modal('show');
+            }else evtCellIEML=false;
+            */
+        },
+        onDelete:function(event){
+            if(event.force){
+                var s = w2ui[event.target].getSelection();
+                //supprime les concept généré
+                s.forEach(function(id){
+                    var r = w2ui[event.target].get(id);
+                    deleteCptGen(r);
+                });
+            }		        	    
+        },
+        onSave:function(event){
+            w2ui.gReponse.getChanges().forEach(function(c){
+                if('isGen' in c){
+                    var r = w2ui[event.target].get(c.recid);
+                    if(c.isGen){
+                        //récupère la définition du concept génératif
+                        getCptDefinition(r);
+                    }else{
+                        //suppression des concept généré
+                        deleteCptGen(r);
+                    }
+                }
+            });
+        }  
+    });        
+
+
+    function getCptDefinition(r){
+
+        patienter('Génération des concepts...');
+        //récupère la définition du concept génératif
+        d3.json(urlIeml+r.iemlR, function(err, data){
+            var gen = getIemlRela(data);
+            gen.forEach(function(g){
+                if(g.dico){
+                    var nr = { recid: w2ui.gReponse.records.length + 1, 'recidQuest':r.recidQuest
+                    , 'txtR': g.dico.FR, 'iemlR': g.value, 'cpt':g, 'iemlRelaType':g.reltype
+                    , 'recidParent':r.recid, 'iemlRParent':r.iemlR};
+                    //vérifie les doublons
+                    w2ui.gReponse.add(nr);
+                }
+                first=false;
+            })
+            patienter('',true);
+        });
+        
+    }
+
+    function deleteCptGen(r){
+        if(r){
+            patienter('Suppression des concepts générés...');
+            var arrG = w2ui.gReponse.records.filter(function(g){
+                return g.recidParent == r.recid;
+            })
+            arrG.forEach(function(g){
+                w2ui.gReponse.remove(g.recid);
+            })
+            patienter('',true);
+        }
+    }
+
+    function addIemlCode(cpt){
+        console.log(cpt);
+        var cellVal = evtCellIEML.value;
+        //vérifie s'il faut ajouter des lignes
+        if(cptLigne){
+            if(!cellVal){
+                w2ui[evtCellIEML.target].get((evtCellIEML.index+1)).txtR = cpt.d.dico.FR;
+                w2ui[evtCellIEML.target].refreshCell((evtCellIEML.index+1), 'txtR');
+                w2ui[evtCellIEML.target].get((evtCellIEML.index+1)).iemlR = cpt.d.value;
+                w2ui[evtCellIEML.target].refreshCell((evtCellIEML.index+1), 'iemlR');
+            }else{
+                var ieml = cpt.d.value;
+                /*
+                cpt.dico=cpt.d.dico;
+                var r = { recid: w2ui.gReponse.records.length + 1, 'recidQuest':evtCellIEML.recidQuest
+                    , 'txtR': cpt.dico.FR, 'iemlR': ieml, 'cpt':cpt};
+                w2ui[evtCellIEML.target].add(r);
+                */
+                var r = { recid: w2ui.gReponse.records.length + 1, 'recidQuest':evtCellIEML.recidQuest
+                    ,'iemlR': ieml,'isGen':true};
+                getCptDefinition(r);
+
+            }
+        }else{
+            //cumul les concepts
+        }
+
+    }
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        // newly activated tab
+        if(e.target.id=='formTest-tab'){
+            creaForm();
+            //creaHexaCarto();
+            creaForceCarto();
+        } 
+        e.relatedTarget // previous active tab
+    })
+
+    function calculeReponseDistance(){
+
+        //pour chaque question
+        arrQR.forEach(function(q){
+            //récupère les réponses valides
+            var arrValide = q.reponses.filter(function(r){
+                return r.isValide;});
+            //pour chaque réponse valide
+            arrValide.forEach(function(rv){
+                //calcule les liens avec les autres réponses
+                rv.liens=[];
+                q.reponses.forEach(function(ra){
+                    if(rv.iemlR!=ra.iemlR && !ra.isMasque){
+                        rv.liens.push({'levenshtein':levenshteinDistance(rv.cpt.dico.IEML,ra.cpt.dico.IEML)
+                            ,'target':ra.iemlR
+                            ,'source':ra.iemlRParent
+                            ,'value':ra.cpt.dico.TAILLE
+                            ,'reltype':ra.cpt.reltype
+                        });
+                    }
+                })
+            })
+        });
+
+    }
+
+
+    function creaForceCarto(data, div){
+
+        calculeReponseDistance();
+
+        var height = $('#ifMatriceIEML').height()-$('#navViz').height(),
+            width = $('#formTest-result').width(),
+            carto = creaTitleCarto(); 
+
+        //construction de la cartographie
+        var iemlCartoForce = iemlForce();
+        iemlCartoForce.height(height);
+        iemlCartoForce.width(width);
+        carto.call(iemlCartoForce);
+
+
+    }
+
+
+    function creaTitleCarto(){
+
+        //création des cartes
+        d3.select("#formTest-result").selectAll(".row").remove();
+        var carto = d3.select("#formTest-result").selectAll(".row").data(arrQR).enter().append("div")
+            .attr('class','row');
+        //création des titres
+        carto.append('h4').text(function(d){return d.txtQ;});
+
+        return carto;
+        
+    }
+
+
+    //merci beaucoup à  https://bl.ocks.org/mbostock/7833311
+    function creaHexaCarto(){
+
+        calculeReponseDistance();
+
+        var height = $('#ifMatriceIEML').height()-$('#navViz').height(),
+            width = $('#formTest-result').width(), radius = 10, 
+            margin = ({top: 20, right: 20, bottom: 20, left: 20}),
+            carto = creaTitleCarto();
+        //création des svg
+        var svg = carto.append("svg")
+                .attr('height',height)
+                .attr('width',width);
+
+            var delta = 0.001,
+            i = 0, j,
+            n = 2000, // Total number of points.
+            rx = d3.randomNormal(width / 2, 80),
+            ry = d3.randomNormal(height / 2, 80),
+            //points = d3.range(n).map(function() { return [rx(), ry()]; });
+            points = d3.range(n).map(function(d,i) { return [d, height / 2]; });
+
+        var color = d3.scaleSequential(d3.interpolateLab("white", "steelblue"))
+            .domain([0, 20]);
+
+        var hexbin = d3.hexbin()
+            .radius(radius)
+            .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]]);
+
+        var hexagon = svg.selectAll("path")
+        .data(hexbin(points))
+        .enter().append("path")
+            .attr("d", hexbin.hexagon(radius-0.5))
+            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+            .attr("fill", function(d) { return color(d.length); });                
+
+    }
+
+    function creaForm(){
+        var p = getParamsForm();
+        var arrProcess = [];
+        /*
+        'iptForm':$('#iptForm').val()
+        ,'iptFormIeml':$('#iptFormIeml').val()
+        ,'chkGeo':$('#chkGeo').val()
+        ,'chkTime':$('#chkTime').val()
+        */
+        d3.select("#genForm").remove();
+        var c = d3.select("#formTest-form").append('div').attr('id','genForm');
+        c.append('h1').text(p.iptForm);
+        var f = c.append('form');
+        //création des questions
+        var q = f.selectAll('.form-group').data(arrQR)
+            .enter().append("div").attr('class','form-group')
+            .attr("id", function(d, i) { return "formQ"+i; });
+
+        //création du label
+        q.append("h2")
+                .text(function(d){ return d.txtQ});
+        //création des réponses
+        var r = q.selectAll('.form-check form-check-inline')
+            .data(function(d){
+                return getAleaReponse(d.reponses, d.nbProp);
+            })
+            .enter().append("div").attr('class','form-check form-check-inline');
+        //ajoute le bouton de sélection    
+        r.append("input")
+            .attr("id", function(d) { 
+                return "rQ"+d.recidQuest; })
+            .attr("class", "form-check-input")
+            .attr("type", "checkbox")
+            .attr("value", function(d) { 
+                return "r"+d.recid; })
+            .on("click",function(d){
+                arrProcess.push({'v':this.checked,'t':Date.now(),'g':getGeoInfos(),'d':d});
+                });
+        //ajoute le label de la réponse    
+        r.append("label")
+            .attr("for", function(d) { return "rQ"+d.recidQuest; })
+            .attr("class", "form-check-label")
+            .text(function(d) { 
+                return d.txtR; });
+
+        //ajoute le bouton d'enregistrement
+        f.append("button").attr('class','btn btn-primary')
+            .text("Enregistrer")
+            .on("click",function(d){
+                //récupère les réponses
+                var n = d3.selectAll( "#formTest-form input:checked").data();
+                arrReponses.push({'t':Date.now(),'g':getGeoInfos(),'p':arrProcess,'r':n});
+                creaForm();
+                //creaHexaCarto();
+                creaForceCarto();
+                });        
+    }
+
+    function getAleaReponse(arrR, nb){
+        var r = [];
+        //sélectionne les réponses valides
+        var v = arrR.filter(function(d){
+            return d.isValide;
+        })
+        //ajoute au hasard une des réponses valides
+        //r.push(v[d3.randomUniform(v.length-1)()]);
+        //ajoute les réponses valides
+        v = d3.shuffle(v);
+        r = r.concat(v);
+
+        //sélectionne les réponses nonvalides
+        var nv = arrR.filter(function(d){
+            return !d.isValide && !d.isMasque;
+        })
+        //ajoute au hasard le nombre des réponses nonvalides
+        nv = d3.shuffle(nv);
+        r = r.concat(nv.slice(0, (nb-r.length)));
+ 
+        //renvoie la liste des réponses
+        return d3.shuffle(r);
+
+    }
+
+    function patienter(message, fin){
+
+        if(fin){
+            w2popup.unlock();
+            w2popup.close();
+        }else{
+            w2popup.open({
+                width: 500,
+                height: 300,
+                title: message,
+                body: '<div class="w2ui-centered"></div>',
+                showMax: false,
+                showClose: false
+            });
+            w2popup.lock("Merci de patienter...", true);	
+        }
+
+
+    }
+
     // Fluid layout doesn't seem to support 100% height; manually set it
     $(window).resize(function(){
         $('#ifMatriceIEML').height( $(window).height() 
