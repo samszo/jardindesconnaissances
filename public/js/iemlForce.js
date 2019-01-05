@@ -19,9 +19,35 @@ function iemlForce() {
             svg = d3.select(this).append('svg')
                 .attr("width", width)
                 .attr("height", height)
-                .append('g').attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+                .append('g').attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-                ;
+            /*ajoute la définition des flèches*/
+            var def = svg.append('defs')
+            def.append('marker')
+                .attr('id','ArrowEnd')
+                .attr('refX',0.0)
+                .attr('refY',0.0)
+                .attr('orient','auto')
+                .style('overflow','visible')
+                .append('svg:path')
+                .attr('d', 'M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z ')
+                .attr('fill', 'black')
+                .attr('transform', 'scale(0.8) rotate(180) translate(10,0)') 
+                .style('stroke','none');
+            def.append('marker')
+                  .attr('id', 'BulleDeb')
+                  .attr('markerHeight', 10)
+                  .attr('markerWidth', 10)
+                  .attr('markerUnits', 'strokeWidth')
+                  .attr('orient', 'auto')
+                  .attr('refX', 0)
+                  .attr('refY', 0)
+                  .attr('viewBox', '-6 -6 12 12')
+                  .append('svg:path')
+                    .attr('d', 'M 0, 0  m -5, 0  a 5,5 0 1,0 10,0  a 5,5 0 1,0 -10,0')
+                    .attr('fill', 'red');                
+
+            //
             var nodes = d3.nest()
                 .key(function(d){
                     return d.iemlR;
@@ -45,15 +71,46 @@ function iemlForce() {
                     .range([0, (height/2) - (margin.top) - (margin.bottom)]);
             color.domain(extentTaille);
 
+
             //ajoute les liens
             var link = svg.append("g")
                 .attr("class", "links")
-                //.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-            .selectAll("line")
-            .data(links)
-            .enter().append("line")
-                .attr("stroke-width", function(d) { 
-                    return 1; });//d.value
+                .selectAll("line")
+                .data(links)
+                .enter().append("line")
+                    .attr('marker-end','url(#ArrowEnd)')
+                    .attr('marker-start','url(#BulleDeb)')
+                    .attr("stroke-width", function(d) { 
+                        return 1; });//d.value
+
+            //ajoute le type de lien
+            edgepaths = svg.append("g")
+                .attr("class", "edges").selectAll(".edgepath")
+                .data(links)
+                .enter()
+                .append('path')
+                .attr('class','edgepath')
+                .attr('d','M 0,0 m -1,-5 L 1,-5 L 1,5 L -1,5 Z')
+                .attr('fill-opacity',0)
+                .attr('stroke-opacity',0)
+                .attr('id',function (d, i) {return 'edgepath' + i})
+                .style("pointer-events", "none");
+            edgelabels = svg.selectAll(".edgelabel")
+                .data(links)
+                .enter()
+                .append('text')
+                .style("pointer-events", "none")
+                .attr('class','edgelabel')
+                .attr('id',function (d, i) {return 'edgelabel' + i})
+                .attr('font-size',10)
+                .attr('fill','#aaa');    
+            edgelabels.append('textPath')
+                .attr('xlink:href', function (d, i) {return '#edgepath' + i})
+                .style("text-anchor", "middle")
+                .style("pointer-events", "none")
+                .attr("startOffset", "50%")
+                .text(function (d) {
+                    return d.reltype});        
 
             //ajoute les couches
             var layer = svg.append("g")
@@ -67,20 +124,20 @@ function iemlForce() {
                     .attr('stroke',"black")
                     .attr('stroke-opacity',"0.5")
                     .attr('fill',"none");
-            
-            //ejoute les noeuds
+
+            //ajoute les noeuds
             var node = svg.append("g")
                 .attr("class", "nodes")
                 //.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
                 .selectAll("g")
                 .data(nodes)
                 .enter().append("g");
-
             
             var circles = node.append("circle")
                 .attr("r", function(d) { 
-                    return 10; })//d.cpt.dico.TAILLE/2;
+                    return 20; })//d.cpt.dico.TAILLE/2;
                 .attr("fill-opacity",0.4)
+                .attr("stroke",'none')
                 .attr("fill", function(d) { 
                     return color(d.values[0].cpt.dico.TAILLE); })
                 .call(d3.drag()
@@ -127,8 +184,28 @@ function iemlForce() {
                         return d.source.x; })
                     .attr("y1", function(d) { 
                         return d.source.y; })
-                    .attr("x2", function(d) { return d.target.x; })
-                    .attr("y2", function(d) { return d.target.y; });
+                    .attr("x2", function(d) { 
+                        return d.target.x; })
+                    .attr("y2", function(d) { 
+                        return d.target.y; });
+
+                edgepaths.attr('d', function (d) {
+                    return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y;
+                });
+        
+                edgelabels.attr('transform', function (d) {
+                        console.log(d);
+                    if (d.target.x < d.source.x) {
+                        var bbox = this.getBBox();
+                                        console.log(bbox);
+                        rx = bbox.x + bbox.width / 2;
+                        ry = bbox.y + bbox.height / 2;
+                        return 'rotate(180 ' + rx + ' ' + ry + ')';
+                    }
+                    else {
+                        return 'rotate(0)';
+                    }
+                });
 
             }
             
