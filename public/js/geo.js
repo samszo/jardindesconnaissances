@@ -16,10 +16,14 @@ var optionsGeo = {
   
   function errorGeo(err) {
     console.warn(`ERREUR (${err.code}): ${err.message}`);
+    geoPosi=false;
   }
   
 function getGeoInfos(){
-    return {'lat':geoPosi.coords.latitude,'lng':geoPosi.coords.longitude,'pre':geoPosi.coords.accuracy,'t':geoPosi.timestamp};
+    if(geoPosi)
+        return {'lat':geoPosi.coords.latitude,'lng':geoPosi.coords.longitude,'pre':geoPosi.coords.accuracy,'t':geoPosi.timestamp};
+    else
+        return {};
 }
 
 navigator.geolocation.getCurrentPosition(successGeo, errorGeo, optionsGeo);

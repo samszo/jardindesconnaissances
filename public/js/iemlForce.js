@@ -50,23 +50,23 @@ function iemlForce() {
             //
             var nodes = d3.nest()
                 .key(function(d){
-                    return d.iemlR;
+                    return d.cpt.dico.INDEX;
                 })
                 .entries(data.reponses),
-                arrValide = data.reponses.filter(function(r){
+            arrValide = data.reponses.filter(function(r){
                     return r.isValide;}),
-                links = [];
-                arrValide.forEach(function(d){
+            links = [];
+            arrValide.forEach(function(d){
                     links = links.concat(d.liens);
                 });
-                var maxLayers = d3.max(data.reponses.map(function(d)  {
+            var maxLayers = d3.max(data.reponses.map(function(d)  {
                     return d.cpt.dico.LAYER;
                     })),
-                extentTaille = d3.extent(data.reponses.map(function(d)  {
+            extentTaille = d3.extent(data.reponses.map(function(d)  {
                         return d.cpt.dico.TAILLE;
                         })),
-                    layers = d3.range(0, maxLayers+1, 1),               
-                cyScale = d3.scaleBand()
+            layers = d3.range(0, maxLayers+1, 1),               
+            cyScale = d3.scaleBand()
                     .domain(layers)
                     .range([0, (height/2) - (margin.top) - (margin.bottom)]);
             color.domain(extentTaille);
@@ -84,8 +84,9 @@ function iemlForce() {
                         return 1; });//d.value
 
             //ajoute le type de lien
-            edgepaths = svg.append("g")
-                .attr("class", "edges").selectAll(".edgepath")
+            var edge = svg.append("g")
+                .attr("class", "edges")
+            var edgepaths = edge.selectAll(".edgepath")
                 .data(links)
                 .enter()
                 .append('path')
@@ -93,9 +94,10 @@ function iemlForce() {
                 .attr('d','M 0,0 m -1,-5 L 1,-5 L 1,5 L -1,5 Z')
                 .attr('fill-opacity',0)
                 .attr('stroke-opacity',0)
-                .attr('id',function (d, i) {return 'edgepath' + i})
+                .attr('id',function (d, i) {
+                    return 'edgepath' + d.idEdge})
                 .style("pointer-events", "none");
-            edgelabels = svg.selectAll(".edgelabel")
+            var edgelabels = edge.selectAll(".edgelabel")
                 .data(links)
                 .enter()
                 .append('text')
@@ -105,7 +107,8 @@ function iemlForce() {
                 .attr('font-size',10)
                 .attr('fill','#aaa');    
             edgelabels.append('textPath')
-                .attr('xlink:href', function (d, i) {return '#edgepath' + i})
+                .attr('xlink:href', function (d, i) {
+                    return '#edgepath' + d.idEdge})
                 .style("text-anchor", "middle")
                 .style("pointer-events", "none")
                 .attr("startOffset", "50%")
@@ -128,14 +131,15 @@ function iemlForce() {
             //ajoute les noeuds
             var node = svg.append("g")
                 .attr("class", "nodes")
-                //.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
                 .selectAll("g")
                 .data(nodes)
                 .enter().append("g");
             
             var circles = node.append("circle")
+                .attr("id", function(d) { 
+                    return 'c_'+d.values[0].recidQuest+'_'+d.key; })
                 .attr("r", function(d) { 
-                    return 20; })//d.cpt.dico.TAILLE/2;
+                    return 1; })
                 .attr("fill-opacity",0.4)
                 .attr("stroke",'none')
                 .attr("fill", function(d) { 
@@ -194,10 +198,10 @@ function iemlForce() {
                 });
         
                 edgelabels.attr('transform', function (d) {
-                        console.log(d);
+                    //console.log(d);
                     if (d.target.x < d.source.x) {
                         var bbox = this.getBBox();
-                                        console.log(bbox);
+                        //console.log(bbox);
                         rx = bbox.x + bbox.width / 2;
                         ry = bbox.y + bbox.height / 2;
                         return 'rotate(180 ' + rx + ' ' + ry + ')';

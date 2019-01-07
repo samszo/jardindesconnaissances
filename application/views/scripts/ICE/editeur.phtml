@@ -632,10 +632,11 @@
                 q.reponses.forEach(function(ra){
                     if(rv.iemlR!=ra.iemlR && !ra.isMasque){
                         rv.liens.push({'levenshtein':levenshteinDistance(rv.cpt.dico.IEML,ra.cpt.dico.IEML)
-                            ,'target':ra.iemlR
-                            ,'source':ra.iemlRParent
+                            ,'target':ra.cpt.dico.INDEX+""
+                            ,'source':rv.cpt.dico.INDEX+""
                             ,'value':ra.cpt.dico.TAILLE
                             ,'reltype':ra.cpt.reltype
+                            ,'idEdge':ra.recidQuest+'_'+ra.recidParent+'_'+ra.recid
                         });
                     }
                 })
@@ -752,6 +753,8 @@
                 return "r"+d.recid; })
             .on("click",function(d){
                 arrProcess.push({'v':this.checked,'t':Date.now(),'g':getGeoInfos(),'d':d});
+                var n = d3.select('#c_'+d.recidQuest+'_'+d.cpt.dico.INDEX);
+                n.attr('r',n.attr('r')+1);
                 });
         //ajoute le label de la réponse    
         r.append("label")
