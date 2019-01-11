@@ -150,9 +150,21 @@ class ICEController extends Zend_Controller_Action {
     	$this->view->urlDico = $this->_getParam('urlDico',"../flux/ieml?f=getDicoPlus");
 	}
 
+	public function sauveformAction(){
+		//$this->initInstance();
+		$p = $this->_request->getParams();
+		print_r($p);
+		if($this->_getParam('idBase')) $this->dbNom = $this->_getParam('idBase');
+		$this->view->idBase = $this->dbNom;
+
+		//$ice = new Flux_Ice($this->view->idBase,$this->_getParam('trace',false));
+		//$ice->sauveFormSem($this->_getParam('questions'),$this->_getParam('params'),$this->_getParam('reponses'));
+
+	}
+
     function initInstance(){
 		$this->view->ajax = $this->_getParam('ajax');
-    		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
+    	$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
 		
 		$auth = Zend_Auth::getInstance();
 		$ssUti = new Zend_Session_Namespace('uti');
@@ -162,7 +174,7 @@ class ICEController extends Zend_Controller_Action {
 		    $this->view->uti = json_encode($ssUti->uti);
 		}else{			
 		    //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
-		    $ssUti->redir = "/biolographes";
+		    $ssUti->redir = "/ice";
 		    $ssUti->dbNom = $this->idBase;
 		    if($this->view->ajax)$this->_redirect('/auth/finsession');		    
 		    else $this->_redirect('/auth/login');

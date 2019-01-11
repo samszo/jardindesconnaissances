@@ -20,13 +20,32 @@ class Flux_Ice extends Flux_Site{
      * @param  boolean  $bCache
      * 
      */
-	public function __construct($idBase=false, $bTrace=true, $bCache=true)
+	public function __construct($idBase=false, $bTrace=false, $bCache=true)
     {
     		parent::__construct($idBase, $bTrace, $bCache);    	
-	    	
+
+    		//on récupère la racine des documents
+    		$this->initDbTables();
+    		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+    		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
+    		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
+            
     }
 
-     	/**
+
+    /**
+	 * enregistre les informations d'un formulaire sémantique
+	 * @param  array $arrQR
+	 * @param  array $params
+	 * @param  array $arrReponses
+     * 
+     * return array
+	 */
+	function sauveFormSem($arrQR, $params, $arrReponses ){
+        $this->dbD->ajouter($params);
+    }
+
+    /**
 	 * renvoit les évaluation d'une monade
 	 * @param  int $idMonade
 	 *

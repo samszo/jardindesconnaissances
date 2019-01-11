@@ -2,7 +2,10 @@ function iemlForce() {
     var margin = {top: 3, right: 20, bottom: 3, left: 20},
         width = 1200,
         height = 600,
+        maxRep = 100,
         color = d3.scaleSequential().interpolator(d3['interpolateWarm']),
+        rayon = d3.scaleLinear().domain([0, maxRep]).range([1, 100]),
+        cyScale,
         simulation,
         svg,
         tooltip = d3.select("body").append("div")
@@ -47,29 +50,27 @@ function iemlForce() {
                     .attr('d', 'M 0, 0  m -5, 0  a 5,5 0 1,0 10,0  a 5,5 0 1,0 -10,0')
                     .attr('fill', 'red');                
 
-            //
+            //récupère les noeuds ieml
             var nodes = d3.nest()
                 .key(function(d){
                     return d.cpt.dico.INDEX;
                 })
                 .entries(data.reponses),
+            //récupère les parents
             arrValide = data.reponses.filter(function(r){
                     return r.isValide;}),
-            links = [];
-            arrValide.forEach(function(d){
-                    links = links.concat(d.liens);
-                });
+            links = data.liens;
             var maxLayers = d3.max(data.reponses.map(function(d)  {
                     return d.cpt.dico.LAYER;
                     })),
             extentTaille = d3.extent(data.reponses.map(function(d)  {
                         return d.cpt.dico.TAILLE;
                         })),
-            layers = d3.range(0, maxLayers+1, 1),               
+            layers = d3.range(0, maxLayers+1, 1);               
+            color.domain(extentTaille);
             cyScale = d3.scaleBand()
                     .domain(layers)
                     .range([0, (height/2) - (margin.top) - (margin.bottom)]);
-            color.domain(extentTaille);
 
 
             //ajoute les liens
@@ -273,6 +274,22 @@ function iemlForce() {
         height = _;
         return chart;
       };
+
+    chart.maxRep = function(_) {
+        if (!arguments.length) return maxRep;
+        maxRep = _;
+        let maxRange = cyScale ? cyScale.bandwidth() : 100;
+        rayon = d3.scaleLinear().domain([0, maxRep]).range([1, maxRange]);
+        return chart;
+    };
+      
+    
+    chart.changeRayonNoeud = function(d,v) {
+
+        d3.select('#c_'+d.recidQuest+'_'+d.cpt.dico.INDEX)
+            .attr('r',rayon(v));
+
+    } 
 
     return chart;
 }
