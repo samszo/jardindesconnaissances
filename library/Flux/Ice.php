@@ -35,14 +35,67 @@ class Flux_Ice extends Flux_Site{
 
     /**
 	 * enregistre les informations d'un formulaire sémantique
-	 * @param  array $arrQR
 	 * @param  array $params
-	 * @param  array $arrReponses
      * 
-     * return array
+     * @return array
 	 */
-	function sauveFormSem($arrQR, $params, $arrReponses ){
-        $this->dbD->ajouter($params);
+	function sauveFormSem($params){
+        //enregistre le formulaire
+        return $this->dbD->ajouter(array('titre'=>$params['iptForm'],'parent'=>$this->idDocRoot
+            ,'tronc'=>'formSem','note'=>json_encode($params))
+            ,true,true);
+    }
+
+    /**
+	 * enregistre les informations d'une question d'un formulaire sémantique
+	 * @param  array $q
+     * 
+     * @return array
+	 */
+	function sauveQuestionFormSem($q){
+        //enregistre la question
+        return $this->dbD->ajouter(array('titre'=>$q['txtQ'],'parent'=>$q['idForm']
+            ,'tronc'=>'formSemQuest','note'=>json_encode($q))
+            ,true,true);
+    }
+
+    /**
+	 * enregistre les liens entre réponses d'une question d'un formulaire sémantique
+	 * @param  array $l
+     * 
+     * @return array
+	 */
+	function sauveLiensFormSem($l){
+        //enregistre le lien
+        return $this->dbD->ajouter(array('titre'=>$l['reltype'],'parent'=>$l['idQuest']
+            ,'tronc'=>'lienSemQuest_'.$l['idEdge'],'note'=>json_encode($l))
+            ,true,true);
+    }
+
+    /**
+	 * enregistre les informations d'une réponse à une question d'un formulaire sémantique
+	 * @param  array $r
+     * 
+     * @return array
+	 */
+	function sauveReponseFormSem($r){
+        //enregistre la reponse
+        $idGeo = $this->dbG->ajouter(array('lat'=>$r['g']['lat'],'lng'=>$r['g']['lng'],'pre'=>$r['g']['pre']
+            ,'maj'=>$r['g']['t']));
+        //récupèretation du mot clef
+        //$idTag = $this->dbT->ajouter(array('code'=>'réponse', 'parent'=>$this->idTagRoot));
+        //création du document
+        $idDoc = $this->dbD->ajouter(array('titre'=>'Réponse :'.$r['t'],'parent'=>$r['idForm']
+            ,'tronc'=>'formSemRep','note'=>json_encode($r),'pubDate'=>$r['t'])
+            ,true,true);
+        /*création du rapport
+        $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$idGeo
+            ,"src_id"=>$r['idDocParent'],"src_obj"=>"doc"
+            ,"dst_id"=>$idDoc,"dst_obj"=>"doc"
+            ,"pre_id"=>$idTag,"pre_obj"=>"tag"
+            ));
+        */
+        return $idDoc;
     }
 
     /**

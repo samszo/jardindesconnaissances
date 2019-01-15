@@ -153,13 +153,24 @@ class ICEController extends Zend_Controller_Action {
 	public function sauveformAction(){
 		//$this->initInstance();
 		$p = $this->_request->getParams();
-		print_r($p);
-		if($this->_getParam('idBase')) $this->dbNom = $this->_getParam('idBase');
-		$this->view->idBase = $this->dbNom;
+		$this->view->idBase = $this->dbNom = $this->_getParam('idBase');
+		$this->view->data = array('idBase' => $this->dbNom, 'erreur'=>0);
+		$ice = new Flux_Ice($this->dbNom,$this->_getParam('trace',false));
 
-		//$ice = new Flux_Ice($this->view->idBase,$this->_getParam('trace',false));
-		//$ice->sauveFormSem($this->_getParam('questions'),$this->_getParam('params'),$this->_getParam('reponses'));
-
+		switch ($this->_getParam('query')) {
+			case 'form':
+				$this->view->data['rs'] = $ice->sauveFormSem($p['params']);
+				break;
+			case 'question':
+				$this->view->data['rs'] = $ice->sauveQuestionFormSem($p);
+				break;
+			case 'lien':
+				$this->view->data['rs'] = $ice->sauveLiensFormSem($p);
+				break;
+			case 'reponse':
+				$this->view->data['rs'] = $ice->sauveReponseFormSem($p);
+				break;
+		}
 	}
 
     function initInstance(){

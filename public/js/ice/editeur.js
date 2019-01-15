@@ -61,24 +61,128 @@ $("#btnCptLigne input:radio").on('change', function () {
 $('#btnSauver').click(function () {
 
     if(verifForm()){
-        var params = getParamsForm();
-        var jsonData = {
-            //"questions": arrQR,
-            "params": params,
-            //"reponses": arrReponses,
-            "idBase": params.iptBddID
-        };
+        patienter('Enregistrement du formulaire...');
 
-        $.post("../ice/sauveform", jsonData,
-                function(data){
-                    if(data.erreur){
-                        w2alert(data.erreur);
-                    }else{
-                        w2alert('Le formulaire est enregistré.')
-                    }					 		
-                }, "json");
+        var params = getParamsForm(),
+            pb = d3.select('#ppPatienter')
+            .append('div')
+            .attr('id',"pbPatienter")                
+            .attr('class',"progress")                
+            .style('top',"200px")                
+            .append('div')
+            .attr('class',"progress-bar progress-bar-striped progress-bar-animated")                
+            .attr('role',"progressbar")                
+            .attr('aria-valuenow',"1")                
+            .attr('aria-valuemin',"0")                
+            .attr('aria-valuemax',"100")                
+            .style('width', "1%"),                
+            jsonData = {
+                "params": params,
+                "idBase": params.iptBddID,
+                "query":"form"
+            };
+        //enregistre les paramètres du formulaire
+        var result = sauveForm(jsonData, arrQR, arrReponses, pb);
+
     }
 })
+
+function sauveForm(form, questions, reponses, pb){
+
+    //compte les liens
+    //on ajoute les liens
+    var nbLiens = 0;
+    questions.forEach(function(q){
+        nbLiens += q.liens.length;
+    });
+    var pcProgress = 100/(questions.length+reponses.length+nbLiens), i = 1;
+    $.post("../ice/sauveform", form,
+        function(data){
+            if(data.erreur){
+                w2alert(data.erreur);
+            }else{
+                //enregistre les questions
+                questions.forEach(function(q){
+                    q.idBase = form.idBase;
+                    q.idForm = data.rs.doc_id;
+                    q.query = 'question'; 
+                    var liens = q.liens;
+                    //pour gérer le problème de l'enregistrement complet du formulaire
+                    delete q.liens;
+                    $.ajax({
+                        type: 'POST',
+                        url: "../ice/sauveform",
+                        data: q,
+                        success: function(d){
+                            if(d){
+                                //enregistre les liens
+                                liens.forEach(function(l){
+                                    l.idBase = form.idBase;
+                                    l.idQuest = d.rs.doc_id;
+                                    l.query = 'lien'; 
+                                    sauveFormValue(l,false);
+                                    i++;
+                                    pb.style('width', pcProgress*i + '%');                
+                                })
+                                //met à jour les réponse avec l'identifiant de la question
+                                reponses.forEach(function(r){
+                                    r.idForm = data.rs.doc_id;
+                                    r.r.forEach(function(v){
+                                        if(v['recidQuest']==v['recid'])v['idDocParent']=d.rs.doc_id;
+                                    })
+                                });            
+                            }
+                        },
+                        dataType: "json",
+                        async:false,
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            console.log(thrownError);
+                        }
+                      });
+                    q.liens = liens;
+                    i++;
+                    pb.style('width', pcProgress*i + '%');
+                });
+                //enregistre les réponses
+                reponses.forEach(function(r){
+                    r.idBase = form.idBase;
+                    r.idForm = data.rs.doc_id;
+                    r.query = 'reponse'; 
+                    sauveFormValue(r,false);
+                    i++;
+                    pb.style('width', pcProgress*i + '%');
+                });
+        
+                w2alert('Le formulaire est enregistré.')
+                return data;
+            }					 		
+        }, "json")
+    .fail(function(e) {
+        w2alert( "erreur" );
+    })
+    .always(function() {
+        d3.select('#pbPatienter').remove();
+        patienter('',true);    
+    });
+}
+
+function sauveFormValue(q, sync){
+
+    $.ajax({
+        type: 'POST',
+        url: "../ice/sauveform",
+        data: q,
+        success: function(result){
+            return result;
+        },
+        dataType: "json",
+        async:sync,
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(thrownError);
+        }
+      });
+
+}
 
 $('#btnExport').click(function () {
 
@@ -761,7 +865,7 @@ function creaForm() {
         .on("click", function (d) {
             arrProcess.push({
                 'v': this.checked,
-                't': Date.now(),
+                't': new Date().toISOString().slice(0, 19).replace('T', ' '),
                 'g': getGeoInfos(),
                 'd': d
             });
@@ -784,10 +888,10 @@ function creaForm() {
             //récupère les réponses
             var n = d3.selectAll("#formTest-form input:checked").data();
             arrReponses.push({
-                't': Date.now(),
+                't': new Date().toISOString().slice(0, 19).replace('T', ' '),
                 'g': getGeoInfos(),
                 'p': arrProcess,
-                'r': n
+                'r': n,
             });
             creaForm();
             //creaHexaCarto();
@@ -830,7 +934,7 @@ function patienter(message, fin) {
             width: 500,
             height: 300,
             title: message,
-            body: '<div class="w2ui-centered"></div>',
+            body: '<div id="ppPatienter" class="w2ui-centered"></div>',
             showMax: false,
             showClose: false
         });

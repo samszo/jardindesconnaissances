@@ -20,8 +20,11 @@ var optionsGeo = {
   }
   
 function getGeoInfos(){
-    if(geoPosi)
-        return {'lat':geoPosi.coords.latitude,'lng':geoPosi.coords.longitude,'pre':geoPosi.coords.accuracy,'t':geoPosi.timestamp};
+    if(geoPosi){
+      var t = new Date(geoPosi.timestamp).toISOString().slice(0, 19).replace('T', ' ')
+      return {'lat':geoPosi.coords.latitude,'lng':geoPosi.coords.longitude
+      ,'pre':geoPosi.coords.accuracy,'t':t};
+  }
     else
         return {};
 }
