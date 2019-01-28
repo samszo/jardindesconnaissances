@@ -9,11 +9,11 @@ SELECT
 --     GROUP_CONCAT(dgv4.titre) gv4titre,
 --     GROUP_CONCAT(dgv4.note) gv4note,
 --     GROUP_CONCAT(dgv5.note) gv5note
-    COUNT(dgv1.doc_id) gv1nb,
-    COUNT(dgv2.doc_id) gv2nb,
-    COUNT(dgv3.doc_id) gv3nb,
-    COUNT(dgv4.doc_id) gv4nb,
-    COUNT(dgv5.doc_id) gv5nb
+    COUNT(DISTINCT dgv1.doc_id) gv1nb,
+    COUNT(DISTINCT dgv2.doc_id) gv2nb,
+    COUNT(DISTINCT dgv3.doc_id) gv3nb,
+    COUNT(DISTINCT dgv4.doc_id) gv4nb,
+    COUNT(DISTINCT dgv5.doc_id) gv5nb
 
 FROM
     flux_doc dI

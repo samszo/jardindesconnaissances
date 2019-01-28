@@ -29,6 +29,9 @@ class Flux_Ice extends Flux_Site{
     		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
     		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
     		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
+    		$this->idTagRela = $this->dbT->ajouter(array("code"=>'type relation','parent'=>$this->idTagRoot));
+            $this->idTagRep = $this->dbT->ajouter(array('code'=>'réponse', 'parent'=>$this->idTagRoot));
+            $this->idTagProc = $this->dbT->ajouter(array('code'=>'processus', 'parent'=>$this->idTagRoot));
             
     }
 
@@ -40,10 +43,15 @@ class Flux_Ice extends Flux_Site{
      * @return array
 	 */
 	function sauveFormSem($params){
-        //enregistre le formulaire
-        return $this->dbD->ajouter(array('titre'=>$params['iptForm'],'parent'=>$this->idDocRoot
-            ,'tronc'=>'formSem','note'=>json_encode($params))
-            ,true,true);
+        if($params['iptIdForm']){
+            $idForm = $params['iptIdForm'];
+            $this->dbD->edit($idForm,array('titre'=>$params['iptForm'],'note'=>json_encode($params)));
+        }else{
+            //enregistre le formulaire
+            $idForm = $this->dbD->ajouter(array('titre'=>$params['iptForm'],'parent'=>$this->idDocRoot
+                ,'tronc'=>'formSem','note'=>json_encode($params)),false);
+        }
+        return $idForm;
     }
 
     /**
@@ -53,10 +61,15 @@ class Flux_Ice extends Flux_Site{
      * @return array
 	 */
 	function sauveQuestionFormSem($q){
-        //enregistre la question
-        return $this->dbD->ajouter(array('titre'=>$q['txtQ'],'parent'=>$q['idForm']
-            ,'tronc'=>'formSemQuest','note'=>json_encode($q))
-            ,true,true);
+        if($q['iptIdForm']){
+            $idQ = $q['idQ'];
+            $this->dbD->edit($idQ,array('titre'=>$q['iptForm'],'note'=>json_encode($q)));
+        }else{
+            //enregistre la question
+                $idQ = $this->dbD->ajouter(array('titre'=>$q['txtQ'],'parent'=>$q['idForm']
+                ,'tronc'=>'formSemQuest','note'=>json_encode($q)),false);
+        }
+        return $idQ;
     }
 
     /**
@@ -66,10 +79,41 @@ class Flux_Ice extends Flux_Site{
      * @return array
 	 */
 	function sauveLiensFormSem($l){
-        //enregistre le lien
-        return $this->dbD->ajouter(array('titre'=>$l['reltype'],'parent'=>$l['idQuest']
-            ,'tronc'=>'lienSemQuest_'.$l['idEdge'],'note'=>json_encode($l))
-            ,true,true);
+        if($l['idL']){
+            $idRapport = $l['idL'];
+        }else{            
+            //récupèretation du mot clef
+            $idTag = $this->dbT->ajouter(array('code'=>$l['reltype'], 'parent'=>$this->idTagRela));
+            //création du rapport
+            $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
+                ,"src_id"=>$l['idRPS'],"src_obj"=>"doc"
+                ,"dst_id"=>$l['idRPT'],"dst_obj"=>"doc"
+                ,"pre_id"=>$idTag,"pre_obj"=>"tag"
+                ,"valeur"=>json_encode($l)
+                ));
+        }
+        return $idRapport;
+    }
+
+    /**
+	 * enregistre les informations d'une réponse proposée à une question d'un formulaire sémantique
+	 * @param  array $r
+     * 
+     * @return array
+	 */
+	function sauveReponseProposeeFormSem($r){
+        if($r['idRp']){
+            $idDoc = $r['idRp'];
+        }else{
+            //création du document
+            $idDoc = $this->dbD->ajouter(array('titre'=>'Réponse proposée :'.$r['recid'],'parent'=>$r['idQ']
+                ,'tronc'=>'formSemRepProp','note'=>json_encode($r)));
+            //mise à jour des références
+            $r['idRP']=$idDoc;
+        }
+        $this->dbD->edit($idDoc,array('note'=>json_encode($r)));
+
+        return $idDoc;
     }
 
     /**
@@ -79,24 +123,48 @@ class Flux_Ice extends Flux_Site{
      * @return array
 	 */
 	function sauveReponseFormSem($r){
-        //enregistre la reponse
-        $idGeo = $this->dbG->ajouter(array('lat'=>$r['g']['lat'],'lng'=>$r['g']['lng'],'pre'=>$r['g']['pre']
-            ,'maj'=>$r['g']['t']));
-        //récupèretation du mot clef
-        //$idTag = $this->dbT->ajouter(array('code'=>'réponse', 'parent'=>$this->idTagRoot));
-        //création du document
-        $idDoc = $this->dbD->ajouter(array('titre'=>'Réponse :'.$r['t'],'parent'=>$r['idForm']
-            ,'tronc'=>'formSemRep','note'=>json_encode($r),'pubDate'=>$r['t'])
-            ,true,true);
-        /*création du rapport
-        $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$idGeo
-            ,"src_id"=>$r['idDocParent'],"src_obj"=>"doc"
-            ,"dst_id"=>$idDoc,"dst_obj"=>"doc"
-            ,"pre_id"=>$idTag,"pre_obj"=>"tag"
-            ));
-        */
-        return $idDoc;
+        if($r['idR']){
+            $idRapport = $r['idR'];
+        }else{
+            //enregistre la reponse
+            $arr = array('lat'=>$r['lat'],'lng'=>$r['lng'],'pre'=>$r['pre'],'maj'=>$r['t']);
+            $this->idGeo = $this->dbG->ajouter($arr);
+            //création du rapport
+            $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
+                ,"src_id"=>$r['idQ'],"src_obj"=>"doc"
+                ,"dst_id"=>$r['idRP'],"dst_obj"=>"doc"
+                ,"pre_id"=>$this->idTagRep,"pre_obj"=>"tag"
+                ,"valeur"=>json_encode($r)
+                ));
+        }
+
+        return $idRapport;
     }
+
+    /**
+	 * enregistre les informations d'un processus de réponse à une question d'un formulaire sémantique
+	 * @param  array $p
+     * 
+     * @return array
+	 */
+	function sauveProcessusReponseFormSem($p){
+        if($p['idPR']){
+            $idRapport = $p['idPR'];
+        }else{
+            //création du rapport
+            $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
+                ,"src_id"=>$p['idR'],"src_obj"=>"rapport"
+                ,"dst_id"=>$p['idRP'],"dst_obj"=>"doc"
+                ,"pre_id"=>$this->idTagProc,"pre_obj"=>"tag"
+                ,"valeur"=>$p['v']
+                ,"maj"=>$p['t']
+                ));
+        }
+
+        return $idRapport;
+    }    
+
+
 
     /**
 	 * renvoit les évaluation d'une monade

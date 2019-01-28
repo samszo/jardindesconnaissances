@@ -81,8 +81,63 @@ $('#btnSauver').click(function () {
                 "idBase": params.iptBddID,
                 "query":"form"
             };
+        //simplifie la définition des liens
+        var arrQuestionSimples = [];    
+        arrQR.forEach(function(q){
+            var rs = {
+                'recid':q.recid,
+                'idForm':q.idForm,
+                'nbProp':q.nbProp,
+                'txtQ':q.txtQ,
+                'txtQIeml':q.txtQieml,
+                'liens':[],
+                'reponses':q.reponses
+            }
+            q.liens.forEach(function(l){
+                rs.liens.push({
+                    'source':l.source.key ? l.source.key : l.source,
+                    'target':l.target.key ? l.target.key : l.target,
+                    'recidS':l.recidS,
+                    'recidT':l.recidT,
+                    'idEdge':l.idEdge,
+                    'idQuest':l.idQuest,
+                    'index':l.index,
+                    'levenshtein':l.levenshtein,
+                    'reltype':l.reltype,
+                    'value':l.value
+                });
+            });
+            arrQuestionSimples.push(rs);            
+        });
+        //simplifie les réponses
+        var arrReponsesSimples = [];    
+        arrReponses.forEach(function(q){
+            //construction de la réponse finale
+            var rs = {
+                'recidQuest':0,
+                'idsDico':'',
+                'idForm':q.idForm,
+                't':q.t,
+                'lat':q.g.lat,
+                'lng':q.g.lng,
+                'pre':q.g.pre
+            }
+            q.r.forEach(function(r){
+                rs.recidQuest = r.recidQuest;
+                rs.idsDico += r.idDico+',';
+            });
+            rs.idsDico = rs.idsDico.substring(0,rs.idsDico.length-1);
+            //contrustion du processus
+            rs.p = [];
+            q.p.forEach(function(p){
+                rs.p.push({'t':p.t,'v':p.v,'idDico':p.d.idDico});
+            });            
+            arrReponsesSimples.push(rs);
+
+        });
+
         //enregistre les paramètres du formulaire
-        var result = sauveForm(jsonData, arrQR, arrReponses, pb);
+        var result = sauveForm(jsonData, arrQuestionSimples, arrReponsesSimples, pb);
 
     }
 })
@@ -96,7 +151,7 @@ function sauveForm(form, questions, reponses, pb){
         nbLiens += q.liens.length;
     });
     var pcProgress = 100/(questions.length+reponses.length+nbLiens), i = 1;
-    $.post("../ice/sauveform", form,
+    $.post("../ice/sauveform", {'idBase':form.idBase,'form':form,'questions':questions,'reponses':reponses},
         function(data){
             if(data.erreur){
                 w2alert(data.erreur);
@@ -322,6 +377,12 @@ $('#gridQuestions').w2grid({
         multiSelect: false,
     },
     columns: [{
+        field: 'idQ',
+        caption: 'IDQ',
+        size: '50px',
+        sortable: true,
+        resizable: true
+        },{
             field: 'recid',
             caption: 'ID',
             size: '50px',
@@ -374,6 +435,8 @@ $('#gridQuestions').w2grid({
     },
     onDelete: function (event) {
         if (event.force) {
+            //verifie si des réponses sont déjà donnée
+
             w2ui.gReponse.clear();
             w2ui.gReponse.refresh();
         }
@@ -558,6 +621,8 @@ $('#gridReponses').w2grid({
     onDelete: function (event) {
         if (event.force) {
             var s = w2ui[event.target].getSelection();
+            //TODO:érifie si le formulaire a déjà été utilisé
+
             //supprime les concept généré
             s.forEach(function (id) {
                 var r = w2ui[event.target].get(id);
@@ -602,9 +667,12 @@ function getCptDefinition(r) {
                     'recidQuest': r.recidQuest,
                     'txtR': g.dico.FR,
                     'iemlR': g.value,
-                    'cpt': g,
                     'iemlRelaType': g.reltype,
                     'recidParent': r.recid,
+                    'iemlRParent': r.iemlR,
+                    'taille': g.dico.TAILLE,
+                    'layer': g.dico.LAYER,
+                    'idDico': g.dico.INDEX,
                     'iemlRParent': r.iemlR,
                     'isGen': isGen
                 };
@@ -613,7 +681,8 @@ function getCptDefinition(r) {
                 i++;
                 first = false;
             }
-        })
+        });
+        calculeReponseLiens();
         patienter('', true);
     });
 
@@ -698,11 +767,13 @@ function calculeReponseLiens() {
             q.reponses.forEach(function (ra) {
                 if (rp.iemlR != ra.iemlR && !ra.isMasque) {
                     q.liens.push({
-                        'levenshtein': levenshteinDistance(rp.cpt.dico.IEML, ra.cpt.dico.IEML),
-                        'target': ra.cpt.dico.INDEX + "",
-                        'source': rp.cpt.dico.INDEX + "",
-                        'value': ra.cpt.dico.TAILLE,
-                        'reltype': ra.cpt.reltype,
+                        'levenshtein': levenshteinDistance(rp.iemlR, ra.iemlR),
+                        'recidS': rp.recid,
+                        'recidT': ra.recid,
+                        'source': rp.iemlR + "",
+                        'target': ra.iemlR + "",
+                        'value': 1,
+                        'reltype': ra.iemlRelaType,
                         'idEdge': ra.recidQuest + '_' + ra.recidParent + '_' + ra.recid
                     });
                 }
@@ -728,28 +799,33 @@ function creaForceCarto(data, div) {
     carto.call(iemlCartoForce);
 
     //calcule les réponses
-    arrRepTot = [];
-    max = 1;
-    arrReponses.forEach(function (d) {
-        d.r.forEach(function (r) {
-            var k = r.recidQuest + '_' + r.cpt.dico.INDEX;
-            if (arrRepTot[k]) arrRepTot[k].nb++;
-            else arrRepTot[k] = {
-                nb: 1,
-                d: r
-            };
-            max = max < arrRepTot[k].nb ? arrRepTot[k].nb : max;
-        })
-    });
+    var cr = calculeReponse();    
+
     //mis à jour avec des rayons
-    iemlCartoForce.maxRep(max);
-    for (var prop in arrRepTot) {
-        rt = arrRepTot[prop];
-        iemlCartoForce.changeRayonNoeud(rt.d, rt.nb);
+    iemlCartoForce.maxRep(cr.m);
+    for (var prop in cr.r) {
+        rt = cr.r[prop];
+        iemlCartoForce.changeRayonNoeud(rt.id, rt.nb);
     }
 
 }
 
+function calculeReponse(){
+    //calcule les réponses
+    var arrRepTot = [], max = 1;
+    arrReponses.forEach(function (d) {
+        d.r.forEach(function (r) {
+            var k = r.recidQuest + '_' + r.idDico;
+            if (arrRepTot[k]) arrRepTot[k].nb++;
+            else arrRepTot[k] = {
+                nb: 1,
+                id: k
+            };
+            max = max < arrRepTot[k].nb ? arrRepTot[k].nb : max;
+        })
+    });
+    return {'m':max,'r':arrRepTot};
+}
 
 function creaTitleCarto() {
 

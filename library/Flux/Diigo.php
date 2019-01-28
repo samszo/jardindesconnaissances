@@ -75,28 +75,166 @@ class Flux_Diigo extends Flux_Site{
 	
 	public function __construct($login="", $pwd="", $idBase=false, $bTrace=false)
     {
-	    	parent::__construct($idBase,$bTrace);
-	
-	    	$this->LUCENE_INDEX = ROOT_PATH.'/data/diigo-index';
+		parent::__construct($idBase,$bTrace);
+
+		$this->LUCENE_INDEX = ROOT_PATH.'/data/diigo-index';
 	    	
-	    	//on récupère la racine des documents
-	    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-	    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
-	    	$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
-	    	$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);    	 
+	    //on récupère la racine des documents
+		//initialise les gestionnaires de base de données
+		$this->initDbTables();
+		$this->trace("Tables initialisées");
+		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);    	 
+		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__),true,false);    	 
     	
 		$this->login = $login;
-    		if($login && $pwd){
-		    	$this->pwd = $pwd;
-	    		$this->rest = new Zend_Rest_Client();
-	        $this->rest->getHttpClient()->setAuth($login, $pwd);
-	        $this->rest->setUri(self::API_URI);
+		if($login && $pwd){
+			$this->pwd = $pwd;
+			$this->rest = new Zend_Rest_Client();
+			$this->rest->getHttpClient()->setAuth($login, $pwd);
+			$this->rest->setUri(self::API_URI);
        	}
        	
        	$this->mc = new Flux_MC($idBase, $bTrace);
        	
     }
-    
+	
+
+	/**
+	 * récupére les informations des images
+	 *
+     * @param   string $separateur
+	 *
+	 * @return array
+	 */
+    public function getImageInfos($separateur='#'){
+
+        /**
+         * ATTENTION le group_concat limit la taille du texte
+         * pour corriger : SET group_concat_max_len = <int>
+         * merci à https://stackoverflow.com/questions/529105/trouble-with-group-concat-and-longtext-in-mysql/529123#529123
+         */
+        $sql = "SELECT 
+				d.titre,
+				d.url,
+				d.doc_id,
+				d.pubDate,
+				di.doc_id idI,
+				di.url urlI,
+				di.tronc,
+				SUBSTRING(di.data, 1) ref,
+				GROUP_CONCAT(DISTINCT t.code SEPARATOR '".$separateur."' ) tags
+			FROM
+				flux_doc d
+					INNER JOIN
+				flux_doc di ON di.parent = d.doc_id
+					INNER JOIN
+				flux_rapport r ON r.src_id = d.doc_id
+					AND r.src_obj = 'doc'
+					INNER JOIN
+				flux_rapport rt ON rt.src_id = r.rapport_id
+					AND rt.src_obj = 'rapport'
+					AND rt.dst_obj = 'tag'
+					INNER JOIN
+				flux_tag t ON t.tag_id = rt.dst_id
+			WHERE
+				d.parent = 1
+			GROUP BY d.doc_id, di.doc_id ";
+        return $this->dbD->exeQuery($sql);
+    }	
+
+	/**
+	 * créer un csv pour importer des photos dans Omeka
+	 *
+	 *
+	 * @return void
+	 */
+	function getImages(){
+
+	    $this->trace(__METHOD__);
+
+	    //récupère les infos 	    
+	    $arr = $this->getImageInfos();
+
+		return $arr;
+
+	}
+
+	/**
+	 * créer un csv pour importer des photos dans Omeka
+	 *
+	 * @param  string  $fic
+	 *
+	 * @return void
+	 */
+	function getCsvToOmeka($fic){
+	    
+	    $this->trace(__METHOD__." ".$fic);
+	    $arrItemParent = array();
+	    $arrItem = array();
+
+	    //récupère les infos 	    
+	    $arr = $this->getImageInfos();
+	    $nb = count($arr);
+	    $idDocOld = 0;
+	    //foreach ($arrH as $h) {
+	    for ($i = 0; $i < $nb; $i++) {
+			$h = $arr[$i];
+			if($idDocOld!=$h['doc_id']){
+				$arrItemParent[] = array("itemSet"=>1,"owner"=>"samuel.szoniecky@univ-paris8.fr"
+						,"dcterms:title"=>$h["titre"]
+						,"dcterms:isReferencedBy"=>$h["url"]
+						,"dcterms:identifier"=>$this->idBase."-flux_doc-doc_id-".$h["doc_id"]
+						,"dcterms:date"=>$h["pubDate"]
+						,"dcterms:creator"=>$this->login
+						,"dcterms:subject"=>$h["tags"]
+						,"dcterms:provenance"=>"diigo"
+				);
+				$idDocOld=$h['doc_id'];
+			}
+            //récupère l'item set du parent
+            //$is = $this->dbIS->getByIdentifier($this->idBase."-flux_doc-doc_id-".$h["parent"]);	            
+            $path_parts = pathinfo($h["urlI"]);
+            if(substr($h["url"],0,4)=="http"){ 
+				$arrItem[] = array("itemSet"=>63,"owner"=>'samuel.szoniecky@univ-paris8.fr'
+						,"dcterms:title"=>"annotation ".$h["tronc"]
+    	                ,"dcterms:isReferencedBy"=>$h["ref"]
+    	                ,"dcterms:identifier"=>$this->idBase."-flux_doc-doc_id-".$h["idI"]
+                        ,"file"=>$path_parts["basename"]
+						,"dcterms:creator"=>$this->login
+						,"dcterms:subject"=>$h["tags"]
+						,"dcterms:provenance"=>"diigo"
+						,"dcterms:isPartOf"=>$this->idBase."-flux_doc-doc_id-".$h["doc_id"]					
+                );
+                //$this->trace("faceAnnotations=".$h["gv2note"]);	        	        
+            }
+        }
+        
+	    //enregistre le csv des parents dans un fichier
+	    $fp = fopen(str_replace('.csv','_parent.csv',$fic), 'w');
+	    $first = true;
+	    foreach ($arrItemParent as $v) {	        
+	        if($first)fputcsv($fp, array_keys($v));
+	        $first=false;
+	        fputcsv($fp, $v);
+	    }
+		fclose($fp);        	    
+		
+
+	    //enregistre le csv des images dans un fichier
+	    $fp = fopen($fic, 'w');
+	    $first = true;
+	    foreach ($arrItem as $v) {	        
+	        if($first)fputcsv($fp, array_keys($v));
+	        $first=false;
+	        fputcsv($fp, $v);
+	    }
+        fclose($fp);        	    
+		
+	    $this->trace("FIN ".__METHOD__);
+        
+    }
+
     /**
      * Fonction pour effectuer une requête sur l'API
      *
@@ -118,7 +256,8 @@ class Flux_Diigo extends Flux_Site{
 	        		//throw new Zend_Service_Exception("Http client reported an error: '{$response->getMessage()}'");
 	        		return false;
 	        }	        
-	        $json = $response->getBody();
+			$json = $response->getBody();
+			//$this->trace($json);
 		    $arr = json_decode($json);
 	        //le decode de zend est beaucoup trop long
 	        //$arr = Zend_Json_Decoder::decode($json);
@@ -129,15 +268,82 @@ class Flux_Diigo extends Flux_Site{
     	
     }
     
-    
+
+	/**
+	 * enegistre les images récupère dans le outliner
+	 *
+	 * @param string 	$fic
+	 *
+	 * @return array
+	 */
+    function saveOutlinerImage($fic){
+		$this->trace("DEBUT ".__METHOD__);				
+		$html = $this->getUrlBodyContent($fic);
+		$dom = new Zend_Dom_Query($html);	    
+
+		//récupère le titre du doc
+		$xPath = '//*[@id="diigoLibrary"]/div[2]/div';
+		$results = $dom->queryXpath($xPath);
+		foreach ($results as $result) {
+			//récupère l'annotations correspondant à l'image
+			$ref = $result->getAttribute('data-id');
+			if($ref){
+				$this->trace("ref = ".$ref);
+				$sql = "SELECT doc_id FROM flux_doc WHERE data LIKE '%".$ref."%' ";
+				//$this->trace($sql);
+				$doc = $this->dbD->exeQuery($sql);
+				$this->trace("nbDoc = ".count($doc));
+				if(count($doc)){
+					$idDoc = $doc[0]['doc_id'];
+					//récupère l'adresse de l'image
+					$imgs = $result->getElementsByTagName('img');
+					foreach($imgs as $img){
+						$src = $img->getAttribute('src');
+						$src = str_replace('image_size=160','image_size=0',$src);
+						//enregistre la photo
+						$img = ROOT_PATH.'/data/diigo/photos/'.$idDoc."_".$ref.".jpg";
+						if (!file_exists($img)){
+							$client = new Zend_Http_Client($src,array('timeout' => 30));
+							$client->setCookie('gcc_cookie_id','3477d5c247e572cdc3aa7073b295cebc');
+							$client->setCookie('diigoandlogincookie','f1-.-luckysemiosis-.-20-.-0');
+							$client->setCookie('CHKIO','7e58e62b93c12022e31eb3df8fb691ce');
+							$client->setCookie('ditem_sort','updated');
+							$client->setCookie('_smasher_session','1e67c34d3e85ab13b2fdd1513f0b41a8');
+							$client->setCookie('outliner.sid','s%3A-dAe3XZThqsf1CSGjG8JeuwMP4EnZQGX.6gS1L6icv%2FiVxgs3RiwKM4PA2tKmm4DqGOy2IM5ZWto');
+							$client->setCookie('_ga','GA1.2.273677479.1539250002');
+							$client->setCookie('count','96');
+							$client->setCookie('_gid','GA1.2.1428775098.1547539861');
+							$client->setCookie('CACHE_TIP','true');
+							$client->setCookie('__utma','45878075.273677479.1539250002.1547623534.1547623534.1');
+							$client->setCookie('__utmc','45878075');
+							$client->setCookie('__utmz','45878075.1547623534.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)');
+							$response = $client->request();
+							$raw = $response->getRawBody();		
+							$res = file_put_contents($img, $raw);
+							$this->trace($res." ko : Fichier créé ".$src." ".$img);
+						}
+						//met à jour les infos de l'annotation
+						$this->dbD->edit($idDoc,array('url'=>$img,'note'=>$src));
+					}					
+				}
+				//$titre = $result->nodeValue;
+				//$this->trace($titre);
+	
+			}
+		}
+
+		$this->trace("FIN ".__METHOD__);				
+	}	
+
 	/**
 	 * enegistre le bookmark d'un compte
 	 *
 	 * @param string 	$login
+	 * @param string 	$tags
 	 *
 	 * @return array
 	 */
-    function saveAll($login=false){
+    function saveAll($login=false, $tags=""){
     	
 		$this->trace("DEBUT ".__METHOD__);				
 		
@@ -147,11 +353,7 @@ class Flux_Diigo extends Flux_Site{
     		$this->getUser(array("login"=>$login,"flux"=>"diigo"));
     		
 		$this->trace("LOGIN ".$login." : ".$this->user);				
-    		
-		//initialise les gestionnaires de base de données
-		$this->initDbTables();
-		$this->trace("Tables initialisées");
-		
+    				
 		//initialise le moteur d'indexation
 		if($this->setLucene && !$this->lucene){
 			$this->lucene = new Flux_Lucene($this->login, $this->pwd, $this->idBase, false, $this->LUCENE_INDEX);
@@ -163,31 +365,36 @@ class Flux_Diigo extends Flux_Site{
 		//
 		$i = 1;
 		$count = 100;
+		$paramQuery = array("user"=>$login,"count"=>$count);
+		if($tags) $paramQuery["tags"]=urlencode($tags);
 		while ($i>0) {
-	    		$arr = $this->getRequest(array("user"=>$login,"count"=>$count, "start"=>$i),false);
-	    		if(!$arr){
-		    		$i=-1;	
-	    		}else{				
-	    			$j = 0;
-	    			$this->trace("getRequest   ".$i." : ".count($arr));
-	    			foreach ($arr as $item){
+			$paramQuery["start"]=$i;
+			$arr = $this->getRequest($paramQuery,false);
+			if(!$arr){
+				$i=-1;	
+			}else{				
+				$j = 0;
+				$this->trace("getRequest   ".$i." : ".count($arr));
+				foreach ($arr as $item){
 					$this->trace($i."   ".$j." : ".$item->url);
-					//vérifie l'existence de l'url
-					$idD = $this->dbD->existe(array("url"=>$item->url,"titre"=>$item->title, "parent"=>$this->idDocRoot,"tronc"=>0,"pubDate"=>$item->created_at));
+					/*vérifie l'existence de l'url
+					$idD = $this->dbD->existe(array("url"=>$item->url));
 					if($idD){
 						$this->trace("EXISTE = ".$idD);
 					}else{
 						$this->trace("ABSCENT",$item);						
-			    			$this->saveItem($item);
+						$this->saveItem($item);
 					}
-		    			$j++;
-		    		}
-				if(count($arr)==0)$i=-1;
+					*/
+					$this->saveItem($item);
+					$j++;
+				}
+				if(count($arr) <= 1)$i=-1;
 				else $i = $i+$j-1;
-	    		}
-	    	}
-	    	if($this->setLucene)$this->lucene->index->optimize();
-		    //
+			}
+		}
+		if($this->setLucene)$this->lucene->index->optimize();
+		//
 		
 		$this->trace("FIN ".__METHOD__);				
     }    
@@ -207,9 +414,6 @@ class Flux_Diigo extends Flux_Site{
     
     	$this->trace("LOGIN ".$login." : ".$this->user);
     
-    	//initialise les gestionnaires de base de données
-    	$this->initDbTables();
-    	$this->trace("Tables initialisées");
     
     	//initialise le moteur d'indexation
     	if($this->setLucene && !$this->lucene){
@@ -254,12 +458,12 @@ class Flux_Diigo extends Flux_Site{
 
     	
     	//récupère l'action
-    	$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+		$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
     	
 		//transforme l'objet en tableau dans le cas ou on n'utilise pas le json decode de Zen
 	    $item['url'] = $i->url;
 	    $item['title'] = $i->title;
-	    $item['created_at'] = $i->created_at;
+	    $item['created_at'] = strpos($i->created_at, '+') ? substr($i->created_at,0,-6) : $i->created_at;//supprime ' +0000'
 	    $item['annotations'] = $i->annotations;
 	    $item['tags'] = $i->tags;
 
@@ -278,21 +482,23 @@ class Flux_Diigo extends Flux_Site{
 		//$this->trace("enregistre le rapport entre le document et l'action = ".$idRap);
 		
 		
-		$i = 0;
 		//$this->trace("traitement des annotations");
 		if(count($item['annotations'])>0){
+			$z = 0;
 			foreach ($item['annotations'] as $note){
+				$j = array();
+				$j['i'] = $z;
 				$j['content'] = $note->content;
 				$j['created_at'] = $note->created_at;
 				$this->saveContent($j, $idD, $idRap);
+				$z++;
 			}
 		}		
 		//traitement des mots clefs		
 		if($item['tags']!=""){
 			$arrTags = explode(",", $item['tags']);
 			foreach ($arrTags as $tag){
-				$this->mc->save($tag, $idRap, 1);	    			
-				$i++;
+				$this->mc->save($tag, $idRap, 1,'diigo');	    			
 			}						
 		}				
 		
@@ -300,19 +506,20 @@ class Flux_Diigo extends Flux_Site{
 
 	function saveContent($item, $idD, $idRap){
 	   	
-		//récupère l'action
-		$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));		
-		$id = $this->dbD->ajouter(array("parent"=>$idD,"tronc"=>$idRap,"data"=>$item['content'],"pubDate"=>$item['created_at']));
+		$pd = strpos($item['created_at'], '+') ? substr($item['created_at'],0,-6) : $item['created_at'];	
+		$id = $this->dbD->ajouter(array("parent"=>$idD,"tronc"=>$item['i'],"data"=>$item['content'],"pubDate"=>$pd));
 		//$this->trace(__METHOD__." enregistre le document = ".$id);
 
+		/*récupère l'action
+		$idAct = $this->dbA->ajouter(array("code"=>__METHOD__));	
 		$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 				,"src_id"=>$idRap,"src_obj"=>"rapport"
 				,"dst_id"=>$id,"dst_obj"=>"doc"
 				,"pre_id"=>$idAct,"pre_obj"=>"acti"
 		));
-		
+		*/
 		//récupère les mot clefs
-	   	$arrKW = $this->mc->saveForChaine($idD, $item['content'],$idRap);
+	   	//$arrKW = $this->mc->saveForChaine($idD, $item['content'],$idRap);
 
 	   	/*enregistre les mots clefs
 	   	$i=0; 
@@ -891,7 +1098,6 @@ class Flux_Diigo extends Flux_Site{
     function verifAllUrl(){
     
 	    	$this->trace("DEBUT ".__METHOD__);
-	    	$this->initDbTables();
 	    	set_time_limit(0);
 	    	
 	    	//récupère l'action

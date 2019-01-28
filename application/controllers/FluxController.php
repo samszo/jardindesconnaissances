@@ -207,24 +207,50 @@ class FluxController extends Zend_Controller_Action {
     
 	public function getdocsAction()
     {
-    		$auth = Zend_Auth::getInstance();
-		if ($auth->hasIdentity()) {
-			$s = new Flux_Site($this->_getParam('idBase'));
-		    	$dbDoc = new Model_DbTable_Flux_Doc($s->db);			
-			//recherche par tronc
-			if($this->_getParam('tronc')){
-				$this->view->rs = $dbDoc->findByTronc($this->_getParam('tronc'),true);
-		    	}
-			//recherche par utilisateur
-		    	if($this->_getParam('idUti')){
-				$this->view->rs = $dbDoc->findByUti($this->_getParam('idDoc'),true);
-	    		}		    		
-		    	if(!$this->view->rs){
-	    		    $this->view->erreur = "Il manque des paramètres.";				
-			}						
-		}else{			
-		    $this->view->erreur = "aucun utilisateur connecté";
-		}   	        
+		switch ($this->_getParam('q')) {
+			case 'getFolderImg':
+				$path = '/Users/samszo/Sites/jdc/public/img/rethofalla/';
+				$url = 'http://localhost/jdc/public/img/rethofalla/';
+				$files=scandir($path);
+				$i = 0;
+				$rs = array();
+				foreach ($files as $f) {
+					if (!in_array($f,array(".",".."))) {
+						$rs[]= array('src'=>$url.$f, 'id'=>$i);
+						$i++;
+					}
+				}
+				if($this->_getParam('csv')){
+					$s = new Flux_Site();
+					foreach ($rs as $v) {
+						if(!$this->view->rs)$this->view->rs = $s->arrayToCsv(array_keys($v),",").PHP_EOL;
+						$this->view->rs .= $s->arrayToCsv($v,",").PHP_EOL;
+					}
+				}else
+					$this->view->rs = json_encode($rs);		
+				break;			
+			default:
+				$auth = Zend_Auth::getInstance();
+				if ($auth->hasIdentity()) {
+					$s = new Flux_Site($this->_getParam('idBase'));
+						$dbDoc = new Model_DbTable_Flux_Doc($s->db);			
+					//recherche par tronc
+					if($this->_getParam('tronc')){
+					$this->view->rs = $dbDoc->findByTronc($this->_getParam('tronc'),true);
+					}
+					//recherche par utilisateur
+					if($this->_getParam('idUti')){
+						$this->view->rs = $dbDoc->findByUti($this->_getParam('idDoc'),true);
+					}		    		
+					if(!$this->view->rs)
+						$this->view->erreur = "Il manque des paramètres.";	
+					else
+						$this->view->rs = json_encode($this->view->rs);			
+				}else{			
+					$this->view->erreur = "aucun utilisateur connecté";
+				}   	        				
+				break;
+		}
     }    
     
 	public function sudocAction()
@@ -420,23 +446,28 @@ class FluxController extends Zend_Controller_Action {
 
     public function diigoAction()
     {
-    		switch ($this->_getParam('q')) {
-    			case "saveRecent":
-	    			$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
-	    			$diigo->bTraceFlush = false;
-	    			$diigo->saveRecent($this->_getParam('login'));
-	    			 break;    		
+		$diigo = new Flux_Diigo($this->_getParam('login',""),$this->_getParam('mdp',""),$this->_getParam('idBase', "flux_diigo"),$this->_getParam('trace', true));
+		$diigo->bTraceFlush = $this->_getParam('trace', true);
+		switch ($this->_getParam('q')) {
+			case 'getImages':
+				$data = $diigo->getImages();
+				break;
+			case 'getCsvToOmeka':
+				$diigo->getCsvToOmeka('/Users/samszo/Sites/jdc/data/diigo/importBookmark.csv');
+				break;
+			case "saveOutlinerImage":
+				$diigo->saveOutlinerImage('http://localhost/jdc/data/diigo/imageTheseTot.html');
+				break;    		
+			case "saveRecent":
+				$diigo->saveRecent($this->_getParam('login'));
+				break;    		
 			case "saveAll":
-				$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
-				$diigo->bTraceFlush = true;
-				$diigo->saveAll($this->_getParam('login'));
+				$diigo->saveAll($this->_getParam('login'),$this->_getParam('tags'));
 				break;
 			case "performance":
-					$diigo = new Flux_Diigo($this->_getParam('login'),$this->_getParam('mdp'),$this->_getParam('idBase', "flux_diigo"),true);
 					$data = $diigo->getPerformance($this->_getParam('deb',''),$this->_getParam('fin',''));
-					break;
+				break;
 			case "getTagHisto":
-				$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);				
 				$data = $diigo->getTagHisto($this->_getParam("dateUnit", '%Y-%m')
 						, $this->_getParam("idUti"), $this->_getParam("idMonade")
 						, $this->_getParam("idActi"), $this->_getParam("idParent")
@@ -444,7 +475,6 @@ class FluxController extends Zend_Controller_Action {
 						, $this->_getParam("dates"), $this->_getParam("for"));
 				break;
 			case "getHistoTagLies":
-				$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);
 				$data = $diigo->getHistoTagLies($this->_getParam("idTag")
 						, $this->_getParam("dateUnit", '%Y-%m')
 						, $this->_getParam("idUti"), $this->_getParam("idMonade")
@@ -453,25 +483,23 @@ class FluxController extends Zend_Controller_Action {
 						, $this->_getParam("tags"), $this->_getParam("nbLimit",1), $this->_getParam("nbMin",0));
 				break;				
 			case "getStatutUrl":
-				$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);
 				$data = $diigo->getStatutUrl($this->_getParam("dateUnit", '%Y')
 						, $this->_getParam("idActi",7)
 						, $this->_getParam("deb"), $this->_getParam("fin")
 						, $this->_getParam("for","multiligne")
 						, $this->_getParam("statuts",false));
-					break;
-				case "getHistoUti":
-						$diigo = new Flux_Diigo("","",$this->_getParam('idBase', "flux_diigo"),true);
-						$data = $diigo->getHistoUti();
-						break;					
-			}    	 
-			if($this->_getParam('csv')){
-				foreach ($data as $v) {
-					if(!$this->view->content)$this->view->content = $diigo->arrayToCsv(array_keys($v),",").PHP_EOL;
-					$this->view->content .= $diigo->arrayToCsv($v,",").PHP_EOL;
-				}
-			}else
-				$this->view->content = json_encode($data);
+				break;
+			case "getHistoUti":
+					$data = $diigo->getHistoUti();
+				break;					
+		}    	 
+		if($this->_getParam('csv')){
+			foreach ($data as $v) {
+				if(!$this->view->content)$this->view->content = $diigo->arrayToCsv(array_keys($v),",").PHP_EOL;
+				$this->view->content .= $diigo->arrayToCsv($v,",").PHP_EOL;
+			}
+		}else
+			$this->view->content = json_encode($data);
 					
     }
 

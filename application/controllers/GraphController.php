@@ -584,7 +584,12 @@ class GraphController extends Zend_Controller_Action {
     }
     
     public function imagegridAction(){
-    
+	
+		$this->view->kSrc = $this->_getParam('kSrc', 'src');
+		$this->view->kId = $this->_getParam('kId', 'id');
+		
+        $this->view->urlData =  $this->_getParam('urlData', '../data/googleApi.csv');
+		
     }
 
     /**

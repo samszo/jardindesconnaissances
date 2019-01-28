@@ -53,7 +53,7 @@ function iemlForce() {
             //récupère les noeuds ieml
             var nodes = d3.nest()
                 .key(function(d){
-                    return d.cpt.dico.INDEX;
+                    return d.iemlR;
                 })
                 .entries(data.reponses),
             //récupère les parents
@@ -61,10 +61,10 @@ function iemlForce() {
                     return r.isValide;}),
             links = data.liens;
             var maxLayers = d3.max(data.reponses.map(function(d)  {
-                    return d.cpt.dico.LAYER;
+                    return d.layer;
                     })),
             extentTaille = d3.extent(data.reponses.map(function(d)  {
-                        return d.cpt.dico.TAILLE;
+                        return d.taille;
                         })),
             layers = d3.range(0, maxLayers+1, 1);               
             color.domain(extentTaille);
@@ -138,13 +138,13 @@ function iemlForce() {
             
             var circles = node.append("circle")
                 .attr("id", function(d) { 
-                    return 'c_'+d.values[0].recidQuest+'_'+d.key; })
+                    return 'c_'+d.values[0].recidQuest+'_'+d.values[0].idDico; })
                 .attr("r", function(d) { 
                     return 1; })
                 .attr("fill-opacity",0.4)
                 .attr("stroke",'none')
                 .attr("fill", function(d) { 
-                    return color(d.values[0].cpt.dico.TAILLE); })
+                    return color(d.values[0].taille); })
                 .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
@@ -175,10 +175,12 @@ function iemlForce() {
                 .force("link", d3.forceLink(links).id(function(d) { 
                     return d.key; }).strength(0))        
                 .force("r", d3.forceRadial(function(d) { 
-                        console.log(d.values[0].cpt);
-                        return cyScale(d.values[0].cpt.dico.LAYER); 
+                        //console.log(d.values[0]);
+                        return cyScale(d.values[0].layer); 
                         }))
                     .on("tick", ticked);
+
+            //mise en forme continu du diagramme        
             function ticked() {
                 node
                     .attr("transform", function(d) {
@@ -284,9 +286,9 @@ function iemlForce() {
     };
       
     
-    chart.changeRayonNoeud = function(d,v) {
+    chart.changeRayonNoeud = function(id,v) {
 
-        d3.select('#c_'+d.recidQuest+'_'+d.cpt.dico.INDEX)
+        d3.select('#c_'+id)
             .attr('r',rayon(v));
 
     } 

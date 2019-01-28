@@ -725,7 +725,7 @@ WHERE d.titre = 'axesEval'
     	$txt = str_replace("'", " ", $txt);
         $query = $this->select()
             ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        	->from( array("d" => "flux_doc"), array("score"=>"MATCH(d.note) AGAINST('".$txt."')", "titre", "texte"=>"note", "doc_id", "tronc", "url") )                           
+        	->from( array("d" => "flux_doc"), array("score"=>new Zend_Db_Expr("MATCH(d.note) AGAINST('".$txt."')"), "titre", "texte"=>"note", "doc_id", "tronc", "url") )                           
             ->where("MATCH(d.note) AGAINST('".$txt."')")
         	->order($order)
 			;

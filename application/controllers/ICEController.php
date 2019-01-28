@@ -154,23 +154,56 @@ class ICEController extends Zend_Controller_Action {
 		//$this->initInstance();
 		$p = $this->_request->getParams();
 		$this->view->idBase = $this->dbNom = $this->_getParam('idBase');
-		$this->view->data = array('idBase' => $this->dbNom, 'erreur'=>0);
+		$rs = array('idBase' => $this->dbNom, 'erreur'=>0);
 		$ice = new Flux_Ice($this->dbNom,$this->_getParam('trace',false));
 
-		switch ($this->_getParam('query')) {
-			case 'form':
-				$this->view->data['rs'] = $ice->sauveFormSem($p['params']);
-				break;
-			case 'question':
-				$this->view->data['rs'] = $ice->sauveQuestionFormSem($p);
-				break;
-			case 'lien':
-				$this->view->data['rs'] = $ice->sauveLiensFormSem($p);
-				break;
-			case 'reponse':
-				$this->view->data['rs'] = $ice->sauveReponseFormSem($p);
-				break;
+		$idForm = $ice->sauveFormSem($p['params']);
+		$rs['idForm']=$idForm;
+		$rs['q']=array();
+		$refs = array();
+		foreach ($p['questions'] as $q) {
+			if(!$q['idForm'])$q['idForm']=$idForm;
+			//enregistre la question			
+			$idQ = $ice->sauveQuestionFormSem($q);
+			$rs['q'][$idQ]=array('idQ'=>$idQ,'recid'=>$q['recid'],'rp'=>array());
+			$refs['q'.$q['recid']]=$idQ;
+			//enregistre les reponses proposées
+			foreach ($q['reponses'] as $rp) {
+				if(!$rp['idQ'])$rp['idQ']=$idQ;
+				$rs['q'][$idQ]['rp'][$rp['recid']] = array('idDico'=>$rp['idDico'],'recid'=>$rp['recid'],'idRP'=>$ice->sauveReponseProposeeFormSem($rp));
+				$refs['rp'.$rp['idDico']]=$rs['q'][$idQ]['rp'][$rp['recid']]['idRP'];
+			}			
+			//enregistre les liens calculés
+			foreach ($q['liens'] as $l) {
+				//mise des références
+				if(!$l['idRPS'])$l['idRPS']=$rs['q'][$idQ]['rp'][$l['recidS']]['idRP'];
+				if(!$l['idRPT'])$l['idRPT']=$rs['q'][$idQ]['rp'][$l['recidT']]['idRP'];
+				$rs['q'][$idQ]['liens'][] = array('idEdge'=>$l['idEdge'],'idL'=>$ice->sauveLiensFormSem($l));
+			}
+
 		}
+		$rs['r']=array();
+		$rs['p']=array();
+		//enregistre les réponses des utilisateurs
+		foreach ($p['reponses'] as $r) {
+			$arrR = explode(',',$r['idsDico']);
+			foreach ($arrR as $idDico) {
+				//récupère les références
+				$r['idQ'] = $refs['q'.$r['recidQuest']];
+				$r['idRP'] = $refs['rp'.$idDico];
+				$idR = $ice->sauveReponseFormSem($r);				
+				$rs['r'][]= array('idDico'=>$r['idDico'],'idQ'=>$r['idQ'],'idRP'=>$r['idRP'],'idR'=>$idR);
+				//enregistre le processus
+				foreach ($r['p'] as $p) {
+					//récupère les références
+					$p['idR'] = $idR;
+					$p['idRP'] = $r['idRP'];
+					$rs['p'][]= array('idR'=>$p['idR'],'idQ'=>$r['idQ'],'idRP'=>$r['idRP'],'idP'=>$ice->sauveProcessusReponseFormSem($p));					
+				}
+			}
+		}
+		$this->view->data = $rs;
+		
 	}
 
     function initInstance(){
