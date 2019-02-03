@@ -61,11 +61,13 @@ function iemlForce() {
                     return r.isValide;}),
             links = data.liens;
             var maxLayers = d3.max(data.reponses.map(function(d)  {
-                    return d.layer;
-                    })),
+                d.layer = parseInt(d.layer);
+                return d.layer;
+                })),
             extentTaille = d3.extent(data.reponses.map(function(d)  {
-                        return d.taille;
-                        })),
+                d.taille = parseInt(d.taille);
+                return d.taille;
+                })),
             layers = d3.range(0, maxLayers+1, 1);               
             color.domain(extentTaille);
             cyScale = d3.scaleBand()

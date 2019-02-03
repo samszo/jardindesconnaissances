@@ -31,10 +31,70 @@ class Flux_Ice extends Flux_Site{
     		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
     		$this->idTagRela = $this->dbT->ajouter(array("code"=>'type relation','parent'=>$this->idTagRoot));
             $this->idTagRep = $this->dbT->ajouter(array('code'=>'réponse', 'parent'=>$this->idTagRoot));
+            $this->idTagChoixRep = $this->dbT->ajouter(array('code'=>'choix', 'parent'=>$this->idTagRoot));
+            $this->idTagNonChoixRep = $this->dbT->ajouter(array('code'=>'non choix', 'parent'=>$this->idTagRoot));
+            $this->idTagPosChoixRep = $this->dbT->ajouter(array('code'=>'possibilité de choix', 'parent'=>$this->idTagRoot));
+            
             $this->idTagProc = $this->dbT->ajouter(array('code'=>'processus', 'parent'=>$this->idTagRoot));
             
     }
+        
+    /**
+	 * récupère la liste des formulaires
+     * 
+     * @return array
+	 */
+	function getListeForm(){
+        return $this->dbD->findByTronc('formSem');
+    }
 
+    /**
+	 * récupère les données d'un formulaire
+     * 
+	 * @param  array    $idForm
+	 * @param  boolean  $reponse
+     * 
+     * @return array
+	 */
+	function getForm($idForm, $reponse=false){
+        $arrF = $this->dbD->findBydoc_id($idForm);
+        $rs = array('questions'=>array(),'params'=>json_decode($arrF['note']));
+        $arrQ = $this->dbD->findByParent($idForm);
+        foreach ($arrQ as $q) {
+            $rs['questions'][] = json_decode($q['note']);
+        }
+        if($reponse){
+            $arrR = $this->getFormReponse($idForm);
+            foreach ($arrR as $r) {
+                $rs['reponses'][] = json_decode($r['valeur']);
+            }            
+        }
+
+        return $rs;
+    }
+
+    /**
+	 * récupère les réponse pour un formulaire
+     * 
+	 * @param  array    $idForm
+     * 
+     * @return array
+	 */
+	function getFormReponse($idForm){
+        $sql = "SELECT 
+            rf.*
+        FROM
+            flux_doc dq
+                INNER JOIN
+            flux_rapport rf ON rf.src_id = dq.doc_id
+                AND rf.src_obj = 'doc'
+                AND rf.dst_obj = 'tag'
+                AND rf.dst_id = 3
+                AND rf.pre_obj = 'uti'
+        WHERE
+            dq.parent = ".$idForm;
+        return $this->dbD->exeQuery($sql);
+    }
 
     /**
 	 * enregistre les informations d'un formulaire sémantique
@@ -45,12 +105,15 @@ class Flux_Ice extends Flux_Site{
 	function sauveFormSem($params){
         if($params['iptIdForm']){
             $idForm = $params['iptIdForm'];
-            $this->dbD->edit($idForm,array('titre'=>$params['iptForm'],'note'=>json_encode($params)));
         }else{
             //enregistre le formulaire
             $idForm = $this->dbD->ajouter(array('titre'=>$params['iptForm'],'parent'=>$this->idDocRoot
-                ,'tronc'=>'formSem','note'=>json_encode($params)),false);
+                ,'tronc'=>'formSem'),false);                
+            //enregistre le json avec l'identifiant;
+            $params['iptIdForm']=$idForm;
         }
+        $this->dbD->edit($idForm,array('titre'=>$params['iptForm'],'note'=>json_encode($params)));
+
         return $idForm;
     }
 
@@ -61,14 +124,16 @@ class Flux_Ice extends Flux_Site{
      * @return array
 	 */
 	function sauveQuestionFormSem($q){
-        if($q['iptIdForm']){
+        if($q['idQ']){
             $idQ = $q['idQ'];
-            $this->dbD->edit($idQ,array('titre'=>$q['iptForm'],'note'=>json_encode($q)));
         }else{
             //enregistre la question
-                $idQ = $this->dbD->ajouter(array('titre'=>$q['txtQ'],'parent'=>$q['idForm']
-                ,'tronc'=>'formSemQuest','note'=>json_encode($q)),false);
+            $idQ = $this->dbD->ajouter(array('titre'=>$q['txtQ'],'parent'=>$q['idForm']
+            ,'tronc'=>'formSemQuest'),false);
+            //enregistre le json avec l'identifiant;
+            $q['idQ']=$idQ;
         }
+        $this->dbD->edit($idQ,array('titre'=>$q['txtQ'],'note'=>json_encode($q)));
         return $idQ;
     }
 
@@ -89,9 +154,10 @@ class Flux_Ice extends Flux_Site{
                 ,"src_id"=>$l['idRPS'],"src_obj"=>"doc"
                 ,"dst_id"=>$l['idRPT'],"dst_obj"=>"doc"
                 ,"pre_id"=>$idTag,"pre_obj"=>"tag"
-                ,"valeur"=>json_encode($l)
                 ));
+            $l['idL']=$idRapport;
         }
+        $this->dbR->edit($idRapport,array("valeur"=>json_encode($l)));
         return $idRapport;
     }
 
@@ -132,11 +198,37 @@ class Flux_Ice extends Flux_Site{
             //création du rapport
             $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
                 ,"src_id"=>$r['idQ'],"src_obj"=>"doc"
-                ,"dst_id"=>$r['idRP'],"dst_obj"=>"doc"
-                ,"pre_id"=>$this->idTagRep,"pre_obj"=>"tag"
-                ,"valeur"=>json_encode($r)
+                ,"dst_id"=>$this->idTagRep,"dst_obj"=>"tag"
+                ,"pre_id"=>$r['idUti'],"pre_obj"=>"uti"
                 ));
+            $r['idR']=$idRapport;
         }
+        $this->dbR->edit($idRapport,array("valeur"=>json_encode($r)));
+    
+        return $idRapport;
+    }
+
+    /**
+	 * enregistre les informations d'une réponse à une question d'un formulaire sémantique
+	 * @param  array $c
+	 * @param  boolean $pc
+     * 
+     * @return array
+	 */
+	function sauveChoixReponseFormSem($c, $pc=false){
+        if($c['idC']){
+            $idRapport = $c['idC'];
+        }else{
+            $idTag = $pc ? $this->idTagPosChoixRep : $this->idTagChoixRep;
+            //création du rapport
+            $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
+                ,"src_id"=>$c['idR'],"src_obj"=>"rapport"
+                ,"dst_id"=>$c['idRP'],"dst_obj"=>"doc"
+                ,"pre_id"=>$idTag,"pre_obj"=>"tag"
+                ));
+                $c['idC']=$idRapport;
+            }
+        $this->dbR->edit($idRapport,array("valeur"=>json_encode($c)));
 
         return $idRapport;
     }
@@ -156,10 +248,11 @@ class Flux_Ice extends Flux_Site{
                 ,"src_id"=>$p['idR'],"src_obj"=>"rapport"
                 ,"dst_id"=>$p['idRP'],"dst_obj"=>"doc"
                 ,"pre_id"=>$this->idTagProc,"pre_obj"=>"tag"
-                ,"valeur"=>$p['v']
                 ,"maj"=>$p['t']
                 ));
+            $p['idPR']=$idRapport;
         }
+        $this->dbR->edit($idRapport,array("valeur"=>json_encode($p)));
 
         return $idRapport;
     }    

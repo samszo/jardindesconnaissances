@@ -113,16 +113,19 @@
                                 <form id='paramsForm' role="form">
                                     <div class="row">
                                         <div class="col">
-                                            <div class="form-group">
-                                                <label for="iptIdForm">ID</label>
-                                                <input type="text" class="form-control" id="iptIdForm" aria-describedby="hlpIdForm">
-                                            </div>
-                                            <div class="form-group">
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-2">
+                                               <label for="iptIdForm">ID</label>
+                                                <input type="text" type="text" readonly class="form-control-plaintext" id="iptIdForm" aria-describedby="hlpIdForm">
+                                             </div>
+                                            <div class="form-group col-md-10">
                                                 <label for="iptForm">Nom du formulaire</label>
                                                 <input type="text" class="form-control" id="iptForm" aria-describedby="hlpQ"
                                                     placeholder="Saisissez le nom">
                                                 <small id="hlpQ" class="form-text text-muted">Privilégier un nom court</small>
                                             </div>
+                                        </div>
                                             <div class="form-group form-check">
                                                 <input type="checkbox" checked='true' class="form-check-input" id="chkGeo">
                                                 <label class="form-check-label" for="chkGeo">Prendre en compte la
@@ -240,6 +243,7 @@
                         </button>
                         <div class="collapse navbar-collapse" id="nbAddIEML">
                             <ul class="navbar-nav">
+                                <!--
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="nbddMatricesIEML" role="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -248,7 +252,16 @@
                                     <div id="mnuMatrices" class="dropdown-menu" aria-labelledby="nbddMatricesIEML">
                                     </div>
                                 </li>
+                                -->
                                 <form class="form-inline">
+                                    <div class="w2ui-field" >
+                                        <label class="text-white bg-dark" >Matrices IEML :</label>
+                                        <div > <input  id="enum-matriceIeml"> </div>
+                                    </div>            
+                                    <div class="w2ui-field" >
+                                        <label class="text-white bg-dark" >Dico IEML :</label>
+                                        <div > <input  id="enum-itemIeml"> </div>
+                                    </div>            
                                     <div id="btnCptLigne" class="btn-group btn-group-toggle" data-toggle="buttons">
                                         <label class="btn btn-sm btn-outline-success active">
                                             <input type="radio" name="options" id="cptLigne" autocomplete="off" checked>

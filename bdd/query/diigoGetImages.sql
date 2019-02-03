@@ -2,7 +2,7 @@ SELECT
     d.titre,
     d.url,
     di.doc_id,
-    di.url,
+    di.url urlI,
     di.tronc,
     SUBSTRING(di.data, 1) ref,
     GROUP_CONCAT(DISTINCT t.code SEPARATOR '#' ) tags
