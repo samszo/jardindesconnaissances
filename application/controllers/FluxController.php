@@ -449,6 +449,9 @@ class FluxController extends Zend_Controller_Action {
 		$diigo = new Flux_Diigo($this->_getParam('login',""),$this->_getParam('mdp',""),$this->_getParam('idBase', "flux_diigo"),$this->_getParam('trace', true));
 		$diigo->bTraceFlush = $this->_getParam('trace', true);
 		switch ($this->_getParam('q')) {
+			case 'evalActi':
+				$data = $diigo->evalActi($this->_getParam('user'));
+				break;
 			case 'getImages':
 				$data = $diigo->getImages();
 				break;

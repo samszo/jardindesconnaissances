@@ -78,7 +78,7 @@ class Flux_Diigo extends Flux_Site{
 		parent::__construct($idBase,$bTrace);
 
 		$this->LUCENE_INDEX = ROOT_PATH.'/data/diigo-index';
-	    	
+			
 	    //on récupère la racine des documents
 		//initialise les gestionnaires de base de données
 		$this->initDbTables();
@@ -87,7 +87,11 @@ class Flux_Diigo extends Flux_Site{
 		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);    	 
 		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__),true,false);    	 
     	
+		if(!$login)$login = LOGIN_DIIGO_API;
+		if(!$pwd)$pwd = MDP_DIIGO_API;
+
 		$this->login = $login;
+		
 		if($login && $pwd){
 			$this->pwd = $pwd;
 			$this->rest = new Zend_Rest_Client();
@@ -398,6 +402,24 @@ class Flux_Diigo extends Flux_Site{
 		
 		$this->trace("FIN ".__METHOD__);				
     }    
+
+    /**
+     * évalue l'activité d'un compte
+     *
+     * @param string 	$user
+     *
+     * @return array
+     */
+    function evalActi($user=false){
+    	$this->trace("DEBUT ".__METHOD__);
+		$count = 10;
+		$i = 1;
+		$arr = $this->getRequest(array("user"=>$user,"count"=>$count, "start"=>$i),false);		
+		//$result = array();
+
+		return $arr;
+	}
+
 
     /**
      * enegistre les derniers bookmarks d'un compte
