@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Générateur d'oralités croisées">
+    <meta name="author" content="Samuel Szoniecky">
+
+    <title>Générateur d'oralités croisées</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" type="text/css" href="../css/sticky-footer-navbar.css" />
+    <!-- autres styles -->
+    <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
+
+    <script type="text/javascript" src="../js/d3.v4.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/popper.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/fontawesome.v5.5.0.all.js" ></script>
+    <script type="text/javascript" src="../js/oralite.js" ></script>
+    <script type="text/javascript" src="../js/w2ui.min.js"></script>
+
+    <style>
+
+        #mainSVG {
+            position: absolute;
+        }
+
+    </style>
+  </head>
+
+  <body>
+
+    <header>
+      <!-- Fixed navbar -->
+      <nav id="mainNav" class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#"><img 
+                style="background-color:white"
+                src="../img/logo-paragraphe.svg" 
+                alt="logo-paragraphe"
+                height="auto"
+                width="100px" /> Générateur d'oralités croisées                
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarCollapse">
+            <form class="form-inline mt-2 mt-md-0">
+                <button id="btnExport" class="btn btn-outline-primary " type="button">Exporter</button>
+                <button id="btnImport" class="btn btn-outline-primary " type="button">Importer</button>
+                <div class="input-group-prepend p-1">
+                    <label class="input-group-text" id="nbAuteurLbl" for="nbAuteur">4 auteurs</label>
+                    <input type="range" value="6" min="2" max="32" class="custom-range" id="nbAuteur">
+                </div>
+                <div class="input-group-prepend p-1">
+                    <label class="input-group-text" id="nbSequenceLbl" for="nbSequence">10 séquences</label>
+                    <input type="range" value="10" min="6" max="32" class="custom-range" id="nbSequence">
+                </div>
+                <button id="btnGenerer" class="btn btn-outline-danger" type="button">Générer</button>
+                <button id="btnTester" class="btn btn-outline-warning" type="button">Tester</button>      
+            </form>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Begin page content -->
+    <main role="main" class="container">
+
+        <div class="row">
+            <div class="col-12 p-2" id='conteneurSVG' >       
+                    <svg id="mainSVG"></svg> 
+            </div>
+        </div>
+    </main>
+
+
+    <!-- Fenêtre modale pour le choix d'un fichier -->
+    <div class="modal fade" id="modGetFic" tabindex="-1" role="dialog" aria-labelledby="modGetFicLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modGetFicLabel">Importer des croisements d'oralités (.svg)<span class="modalTitle"
+                            id="modGetFicInt"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="w2ui-field">
+                        <div style="margin-left: 0px;"> <input style="width:100%;" id="fileImport"> </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button id="btnValidImport" type="button" class="btn btn-primary">Valider</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        var nbAut=4, nbSeq=10, maxAut=26, maxSeq=32;
+        d3.select('#nbAuteur').attr('max',maxAut);
+        d3.select('#nbSequence').attr('max',maxSeq);
+
+        $('#btnExport').click(function(e) {
+            
+            var svgData = $("#mainSVG")[0].outerHTML;
+            var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+            var svgUrl = URL.createObjectURL(svgBlob);
+            var downloadLink = document.createElement("a");
+            downloadLink.href = svgUrl;
+            downloadLink.download = "oralite.svg";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+
+        });
+
+        $('#btnImport').click(function(e) { 
+            $('#modGetFic').modal('show');
+        });
+        //initialise le champ d'import des fichiers
+        $('#fileImport').w2field('file', {
+            max: 1
+        });
+
+        $('#btnValidImport').click(function () {
+            var f = $('#fileImport').data('selected');
+            fr = new FileReader();
+
+            fr.onload = receivedText;
+            fr.readAsText(f[0].file);
+
+            function receivedText(e) {
+                clearSlide()
+                try {
+                    document.getElementById('conteneurSVG').innerHTML = e.target.result;
+                    $('#modGetFic').modal('hide');
+                } catch (error) {
+                    w2alert('Les données ne sont pas au bon format.');
+                }
+                $('#fileImport').w2field('file', {
+                    max: 1
+                });
+            }
+        })
+
+        $('#nbAuteur').change(function(e) {
+            d3.select("#nbAuteurLbl").text(e.currentTarget.value+' auteurs');
+            nbAut=e.currentTarget.value;
+        });
+
+        $('#nbSequence').change(function(e) {
+            d3.select("#nbSequenceLbl").text(e.currentTarget.value+' séquences');
+            nbSeq=e.currentTarget.value;
+        });
+
+        $('#btnGenerer').click(function(e) {
+            //Générer le tableau des slides
+            var arrSlide=[];
+            for (let i = 0; i < nbAut; i++) {
+                for (let j = 0; j < nbSeq; j++) {
+                    arrSlide.push({'aut':i,'seq':j});
+                }                
+            }
+
+            //dimensionne le svg principal dans toute la fenêtre
+            var w = 400, h = 300, margin = {'top':10,'left':10,'rigth':10,'bottom':10,'interH':h,'interW':w}
+                ,hGlobal=h*nbAut+margin.top+margin.bottom+((nbAut-1)*margin.interH)
+                ,wGlobal=w*nbSeq+margin.left+margin.rigth+((nbSeq-1)*margin.interW)
+                ,colorAut=d3.scaleSequential(d3["interpolateWarm"]).domain([0, nbAut-1]) 
+                ,colorSeq=d3.scaleSequential(d3["interpolateCool"]).domain([0, nbSeq-1]);  
+            
+            d3.select('#mainSVG')
+                .attr('preserveAspectRatio', null)
+                .attr('viewBox', null)
+                .attr('height',hGlobal)
+                .attr('width',wGlobal); 
+
+            clearSlide();
+
+            //Générer les slides
+            var slides = d3.select("#mainSVG").selectAll(".slide").data(arrSlide).enter()
+                .append('g')
+                .attr('class',"slide")
+            slides.append('rect')
+                .attr('height',h)
+                .attr('width',w)
+                .attr('id',function(d){
+                    d.w = w;
+                    d.h = h;
+                    d.id = "slide_"+d.aut+"."+d.seq+".0";
+                    return d.id;})
+                .attr('style','fill-opacity:0.3;stroke-width:4')
+                .style('fill',function(d){
+                    var c = colorSeq(d.seq);
+                    return c;
+                })
+                .style('stroke',function(d){
+                    var c = colorAut(d.aut);
+                    return c;
+                })
+                .attr('x',function(d){
+                    d.x = d.seq == 0 ? margin.left : margin.left+(d.seq*w)+(d.seq*margin.interW);
+                    return d.x;
+                })
+                .attr('y',function(d){
+                    d.y = d.aut == 0 ? margin.top : margin.top+(d.aut*h)+(d.aut*margin.interH);
+                    return d.y;
+                });
+            slides.append('text')
+                .attr("x", function(d) { return d.x + w/2; })
+                .attr("y", function(d) { return d.y + h/2; })
+                .attr("text-anchor", "middle")
+                .text(function(d) { return "auteur = "+String.fromCharCode(65+d.aut).toLowerCase(); });                    
+            slides.append('text')
+                .attr("x", function(d) { return d.x + w/2; })
+                .attr("y", function(d) { return d.y + h/2 + 20; })
+                .attr("text-anchor", "middle")
+                .text(function(d) { return "séquence = "+d.seq; });                    
+
+        });
+
+        
+        $('#btnTester').click(function(e) {
+            clearSlide();
+            var svg=d3.select("#mainSVG")
+                .attr("height","96%")
+                .attr("width","100%");
+            var h = window.innerHeight-d3.select('#mainNav').node().clientHeight;
+            var w = svg.node().parentNode.clientWidth;
+            var scenes = oralite(svg,{'delay':1500,'height':h,'width':w});
+        });
+
+        function clearSlide(){
+            //supprime les slides
+            d3.selectAll(".slide").remove();
+            //supprime les élément de navigation
+            d3.select("#navig").remove();
+            d3.select("#divSon").remove();
+        }
+
+    </script>
+
+    </body>
+</html>

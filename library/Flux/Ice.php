@@ -151,8 +151,8 @@ class Flux_Ice extends Flux_Site{
             $idTag = $this->dbT->ajouter(array('code'=>$l['reltype'], 'parent'=>$this->idTagRela));
             //création du rapport
             $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
-                ,"src_id"=>$l['idRPS'],"src_obj"=>"doc"
-                ,"dst_id"=>$l['idRPT'],"dst_obj"=>"doc"
+                ,"src_id"=>$l['idPS'],"src_obj"=>"doc"
+                ,"dst_id"=>$l['idPT'],"dst_obj"=>"doc"
                 ,"pre_id"=>$idTag,"pre_obj"=>"tag"
                 ));
             $l['idL']=$idRapport;
@@ -162,20 +162,20 @@ class Flux_Ice extends Flux_Site{
     }
 
     /**
-	 * enregistre les informations d'une réponse proposée à une question d'un formulaire sémantique
+	 * enregistre les informations d'une proposition à une question d'un formulaire sémantique
 	 * @param  array $r
      * 
      * @return array
 	 */
-	function sauveReponseProposeeFormSem($r){
-        if($r['idRp']){
-            $idDoc = $r['idRp'];
+	function sauvePropositionFormSem($r){
+        if($r['idP']){
+            $idDoc = $r['idP'];
         }else{
             //création du document
-            $idDoc = $this->dbD->ajouter(array('titre'=>'Réponse proposée :'.$r['recid'],'parent'=>$r['idQ']
-                ,'tronc'=>'formSemRepProp','note'=>json_encode($r)));
+            $idDoc = $this->dbD->ajouter(array('titre'=>'Proposition :'.$r['recid'],'parent'=>$r['idQ']
+                ,'tronc'=>'formSemProp','note'=>json_encode($r)));
             //mise à jour des références
-            $r['idRP']=$idDoc;
+            $r['idP']=$idDoc;
         }
         $this->dbD->edit($idDoc,array('note'=>json_encode($r)));
 
@@ -223,7 +223,7 @@ class Flux_Ice extends Flux_Site{
             //création du rapport
             $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
                 ,"src_id"=>$c['idR'],"src_obj"=>"rapport"
-                ,"dst_id"=>$c['idRP'],"dst_obj"=>"doc"
+                ,"dst_id"=>$c['idP'],"dst_obj"=>"doc"
                 ,"pre_id"=>$idTag,"pre_obj"=>"tag"
                 ));
                 $c['idC']=$idRapport;
@@ -246,7 +246,7 @@ class Flux_Ice extends Flux_Site{
             //création du rapport
             $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
                 ,"src_id"=>$p['idR'],"src_obj"=>"rapport"
-                ,"dst_id"=>$p['idRP'],"dst_obj"=>"doc"
+                ,"dst_id"=>$p['idP'],"dst_obj"=>"doc"
                 ,"pre_id"=>$this->idTagProc,"pre_obj"=>"tag"
                 ,"maj"=>$p['t']
                 ));

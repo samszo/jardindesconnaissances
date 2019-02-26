@@ -24,15 +24,16 @@
     ziggy.jonsson.nyc@gmail.com
 */
   
-var son, pSon, slides={},
-    slide = 0,
-    delay = delay ? delay : 5000;
+var svg, son, pSon, slides={},
+    slide = 0, delay, gH, gW;
 
-function svg_slides(svg,delay) {
-	
-	//style du body
-	d3.select("body")
-		.style("margin",0);
+function oralite(s,options) {
+    svg = s;
+    delay = options.delay ? options.delay : 5000;
+    gH  = options.height ? options.height : 600;
+    gW  = options.width ? options.width : 800;
+
+    svgParent = svg.node().parentNode;
 	
 	//AJOUT du navigateur
 	var nav = d3.select("body").append("div")
@@ -64,8 +65,8 @@ function svg_slides(svg,delay) {
 	son = d3.select("body").append("div")
 		.attr("id",'divSon')
 		.style("position",'absolute')
-		.style("left",(window.innerWidth/2)+'px')
-		.style("bottom",(window.innerHeight/2)+'px')
+		.style("left",(gW/2)+'px')
+		.style("bottom",(gH/2)+'px')
 		.style('display','none')
 		.style('border-style','solid');
 	son.append("div")
@@ -82,21 +83,19 @@ function svg_slides(svg,delay) {
 			.attr("autoplay",false)	
 			.attr("controls",true);
 
-			svg.attr("preserveAspectRatio","xMidYMid meet");
-			svg.attr("width",window.innerWidth);
-			svg.attr("height",window.innerHeight-10);
+    svg.attr("preserveAspectRatio","xMidYMid meet");
+    svg.attr("width",gW);
+    svg.attr("height",gH-10);
 
-    rects = svg.selectAll("rect")[0];
-
+    rects = svg.selectAll("rect")._groups[0];
     for (i=0;i<rects.length;i++) {
         id = rects[i].id;
         if (id.slice(0,6)=='slide_') { 
-            console.log(id);
             slides[id.slice(6)]=rects[i] ;
-            rects[i].scale_x = d3.scale.linear().range([rects[i].x.baseVal.value,rects[i].x.baseVal.value+rects[i].width.baseVal.value]).domain([0,1000]);
-            rects[i].scale_y = d3.scale.linear().range([rects[i].y.baseVal.value,rects[i].y.baseVal.value+rects[i].height.baseVal.value]).domain([0,1000]);
-            }
-        
+            rects[i].scale_x = d3.scaleLinear().range([rects[i].x.baseVal.value,rects[i].x.baseVal.value+rects[i].width.baseVal.value]).domain([0,1000]);
+            rects[i].scale_y = d3.scaleLinear().range([rects[i].y.baseVal.value,rects[i].y.baseVal.value+rects[i].height.baseVal.value]).domain([0,1000]);
+        }
+
     }
 
     keys = Object.keys(slides).sort();
@@ -104,43 +103,31 @@ function svg_slides(svg,delay) {
     
     //ajoute un curseur sur les images avec un onclick
     var imgs = svg.selectAll("image")
-    	.on({
-	      "mouseover": function(d) {
+    	.on("mouseover",function(d) {
 	        if(this.getAttribute("onclick"))d3.select(this).style("cursor", "pointer");
-	      },
-	      "mouseout": function(d) {
+	      })
+        .on("mouseout",function(d) {
 	    	  if(this.getAttribute("onclick"))d3.select(this).style("cursor", "default");
-	      }
-	    });    		
+	      });    		
     //ajoute un curseur sur les textes avec un onclick
     svg.selectAll("text")
-    	.on({
-	      "mouseover": function(d) {
+    	.on("mouseover",function(d) {
 	        if(this.getAttribute("onclick"))d3.select(this).style("cursor", "pointer");
-	      },
-	      "mouseout": function(d) {
+	      })
+	    .on("mouseout",function(d) {
 	    	  if(this.getAttribute("onclick"))d3.select(this).style("cursor", "default");
-	      }
-	    });    		
+	      });    		
     //ajoute un curseur sur les g avec un onclick
     svg.selectAll("g")
-    	.on({
-	      "mouseover": function(d) {
+    	.on("mouseover",function(d) {
 	        if(this.getAttribute("onclick"))d3.select(this).style("cursor", "pointer");
-	      },
-	      "mouseout": function(d) {
+	      })
+	    .on("mouseout", function(d) {
 	    	  if(this.getAttribute("onclick"))d3.select(this).style("cursor", "default");
-	      }
-	    });    		
+	      });    		
     
     //cache les éléments à cacher
-    var gs = svg.selectAll(".cache")[0];
-    for (i=0; i < gs.length;i++) {
-        id = gs[i].id;
-        //console.log(id);
-        d3.select("#"+id).style("opacity", 0);	
-    }
-    
+    var gs = svg.selectAll(".cache").style("opacity", 0);	    
  
     //met à jour le navigateur d'image s'il existe
 	d3.select("#numSlide")
@@ -151,8 +138,24 @@ function svg_slides(svg,delay) {
     d3.select("body").on("touchmove", function() { if(slide<keys.length-1) {slide++; console.log(slide);}});
 
     d3.select(window).on("keydown", function() {
-		//console.log(slide+" : "+keys[slide]);
-    	
+		console.log(d3.event.keyCode+" = "+slide+" : "+keys[slide]);
+        
+        //vérifie le changement d'auteur
+        if(d3.event.keyCode > 64 && d3.event.keyCode < 92){
+            //récupère le nouveau slide
+            var idAut = d3.event.keyCode-65;
+            var curSlide = keys[slide].split('.');
+            var autSlide = idAut+'.'+curSlide[1]+'.'+curSlide[2];
+            for (let index = 0; index < keys.length; index++) {
+                if(autSlide==keys[index]){
+                    slide=index; 
+                    console.log(slide);
+                    next_slide()
+                    return;
+                }  
+            }
+        }    
+
         switch (d3.event.keyCode) {
           case 37: {if (slide>0) {
         	  slide=slide-1; 
@@ -179,7 +182,7 @@ function svg_slides(svg,delay) {
 
     // Start with the first slide
     next_slide();
-	  changeImage(0);
+	changeImage(0);
 
     return slides
 }

@@ -50,21 +50,22 @@ function iemlForce() {
                     .attr('d', 'M 0, 0  m -5, 0  a 5,5 0 1,0 10,0  a 5,5 0 1,0 -10,0')
                     .attr('fill', 'red');                
 
-            //récupère les noeuds ieml
+            //récupère les noeuds ieml qui ne sont pas cachés
             var nodes = d3.nest()
                 .key(function(d){
                     return d.iemlR;
                 })
-                .entries(data.reponses),
+                .entries(data.propositions.filter(function(r){
+                    return !r.isMasque;})),
             //récupère les parents
-            arrValide = data.reponses.filter(function(r){
+            arrValide = data.propositions.filter(function(r){
                     return r.isValide;}),
             links = data.liens;
-            var maxLayers = d3.max(data.reponses.map(function(d)  {
+            var maxLayers = d3.max(data.propositions.map(function(d)  {
                 d.layer = parseInt(d.layer);
                 return d.layer;
                 })),
-            extentTaille = d3.extent(data.reponses.map(function(d)  {
+            extentTaille = d3.extent(data.propositions.map(function(d)  {
                 d.taille = parseInt(d.taille);
                 return d.taille;
                 })),

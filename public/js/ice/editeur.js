@@ -16,9 +16,9 @@ var idUti=0, arrIEMLitem, arrIEMLmatrices = [{
         fct: showHideLimite,
         lib: "Affiche / Masque les limites"
     }]
-urlMatriceIeml = "../ice/ieml?code=",
+urlMatriceIeml = "../ice/ieml?code=", bddNom = 'flux_formsem',
     ifIeml = document.getElementById("ifMatriceIEML").contentWindow,
-    cptLigne = true, evtCellIEML = false, arrQR = [],
+    cptLigne = true, evtCellIEML = false, arrForms = [], arrQR = [],
     arrDico = [], iemlMatrice = [],
     arrReponses = [], iemlCartoForce = false;
 
@@ -129,22 +129,32 @@ d3.json(urlDico, function (err, data) {
 
 });
 
-//récupère la liste de formulaire enregistré
-d3.json('../ice/getlisteform?idBase=flux_formsem', function (err, data) {
-    d3.select("#mnuFormDispo").selectAll("a").data(data).enter().append("a")
-        .attr("class", "dropdown-item")
-        .attr("href", "#")
-        .text(function (d) {
-            return d.doc_id+' - '+d.titre;
-        })
-        .on('click', function (d) {
-            //execute la function définie
-            d3.json('../ice/getform?idBase=flux_formsem&reponse=1&idForm='+d.doc_id, function (err, dataF){
-                chargeDataForm(dataF);
-            }); 
-        });
+function getForms(){
 
-})
+    //récupère la liste de formulaire enregistré
+    d3.json('../ice/getlisteform?idBase='+bddNom, function (err, data) {
+        data.forEach(function(d){
+            var f = JSON.parse(d.note);
+            arrForms.push(f);
+        })
+        w2ui.gForms.records = arrForms;
+        w2ui.gForms.refresh();
+        /*
+        d3.select("#mnuFormDispo").selectAll("a").data(data).enter().append("a")
+            .attr("class", "dropdown-item")
+            .attr("href", "#")
+            .text(function (d) {
+                return d.doc_id+' - '+d.titre;
+            })
+            .on('click', function (d) {
+                //execute la function définie
+                d3.json('../ice/getform?idBase=flux_formsem&reponse=1&idForm='+d.doc_id, function (err, dataF){
+                    chargeDataForm(dataF);
+                }); 
+            });
+        */
+    })
+}
 
 //gestion des boutons
 $('#btnCreerForm').click(function () {
@@ -175,7 +185,7 @@ $('#btnSauver').click(function () {
                 'txtQ':q.txtQ,
                 'txtQIeml':q.txtQieml,
                 'liens':[],
-                'reponses':q.reponses
+                'propositions':q.propositions
             }
             q.liens.forEach(function(l){
                 rs.liens.push({
@@ -217,10 +227,10 @@ $('#btnSauver').click(function () {
             r.pc.forEach(function(pc){
                 rsR.pc.push({'recidQuest':pc.recidQuest,'idDico': pc.idDico});
             });
-            //contrustion du processus
+            //construction du processus
             rsR.p = [];
             r.p.forEach(function(p){
-                rsR.p.push({'t':p.t,'v':p.v,'idDico':p.d.idDico});
+                rsR.p.push({'t':p.t,'v':p.v,'idDico':p.idDico});
             });            
             arrReponsesSimples.push(rsR);
 
@@ -244,9 +254,9 @@ function sauveForm(form, questions, reponses){
                 data.q.forEach(function(bddQ){
                     arrQR.forEach(function(q){
                         if(q.recid==bddQ.recid)q.idQ = bddQ.idQ;
-                        q.reponses.forEach(function(rp){
-                            bddQ.rp.forEach(function(bddRP){
-                                if(rp.recid==bddRP.recid)rp.idRP = bddRP.idRP;
+                        q.propositions.forEach(function(p){
+                            bddQ.p.forEach(function(bddP){
+                                if(p.recid==bddP.recid)p.idP = bddP.idP;
                             });
                         })
                         q.liens.forEach(function(l){
@@ -312,7 +322,7 @@ function verifForm(){
         w2alert('Veuillez enregistrer les questions.');
         rep = false;
     }
-    if (w2ui.gReponse.getChanges().length > 0) {
+    if (w2ui.gProposition.getChanges().length > 0) {
         w2alert('Veuillez enregistrer les réponses.');
         rep = false;
     }
@@ -382,9 +392,11 @@ function chargeDataForm(data){
 
     //corrige les boolean
     data.questions.forEach(function(q){
-        q.reponses.forEach(function(r){
-            r.isGen = r.isGen == typeof "boolean" ? r.isGen : r.isGen == 'false' ? false : true;
-            r.isMasque = r.isMasque == typeof "boolean" ? r.isMasque : r.isMasque == 'false' ? false : true;
+        q.propositions.forEach(function(p){
+            if(p.isGen != typeof "boolean" && p.isGen == 'false')
+                p.isGen = false;
+            if(p.isMasque != typeof "boolean" && p.isMasque == 'false')
+                p.isMasque = false;
         });
     });
 
@@ -431,6 +443,147 @@ function showHideLimite(d) {
 
 
 //création des grids
+$('#gridForms').w2grid({
+    name: 'gForms',
+    header: 'Liste des formulaires',
+    show: {
+        toolbar: true,
+        footer: true,
+        header: true,
+        toolbarSave: true,
+        toolbarDelete: true,
+        selectColumn: false,
+        multiSelect: false,
+    },
+    columns: [{
+        field: 'IdForm',
+        caption: 'IDF',
+        size: '50px',
+        sortable: true,
+        resizable: true
+        },{
+            field: 'recid',
+            caption: 'ID',
+            size: '50px',
+            sortable: true,
+            resizable: true
+        },
+        {
+            field: 'txtForm',
+            caption: 'Nom du formulaire',
+            size: '50%',
+            sortable: true,
+            resizable: true,
+            editable: {
+                type: 'text'
+            }
+        },
+        {
+            field: 'iemlForm',
+            caption: 'Code IEML',
+            size: '50%',
+            sortable: true,
+            resizable: true,
+            editable: {
+                type: 'text'
+            }
+        },
+        {
+            field: 'bTemps',
+            caption: 'Temps de réponse',
+            size: '120px',
+            sortable: true,
+            resizable: true,
+            style: 'text-align: center',
+            editable: {
+                type: 'checkbox',
+                style: 'text-align: center'
+            }
+        },
+        {
+            field: 'bGeo',
+            caption: 'Position Géo',
+            size: '100px',
+            sortable: true,
+            resizable: true,
+            style: 'text-align: center',
+            editable: {
+                type: 'checkbox',
+                style: 'text-align: center'
+            }
+        },
+        {
+            field: 'bdd',
+            caption: 'Base de données',
+            size: '110px',
+            sortable: true,
+            resizable: true
+        },
+    ],
+    onClick: function (event) {
+        if (w2ui.gProposition.getChanges().length > 0) {
+            w2alert('Veuillez enregistrer les propositions.');
+            return;
+        }
+        w2ui['gProposition'].clear();
+        if (w2ui.gQuestions.getChanges().length > 0) {
+            w2alert('Veuillez enregistrer les questions.');
+            return;
+        }
+        w2ui['gQuestions'].clear();
+        var record = this.get(event.recid);
+        //récupère les données du formulaire
+        if(record.idForm){
+            d3.json('../ice/getform?idBase='+bddNom+'&reponse=1&idForm='+record.idForm, function (err, dataF){
+                chargeDataForm(dataF);
+            });     
+        }else{
+            w2ui.gQuestions.records = arrQR = record.questions;
+            w2ui.gQuestions.refresh();
+            w2ui.gProposition.clear();
+            w2ui.gProposition.refresh();            
+        }
+    },
+    onDelete: function (event) {
+        if (event.force) {
+            /** TODO:verifie si des réponses sont déjà donnée*/
+            w2ui.gQuestions.clear();
+            w2ui.gQuestions.refresh();
+            w2ui.gProposition.clear();
+            w2ui.gProposition.refresh();
+        }
+    },
+    toolbar: {
+        items: [{
+            id: 'add',
+            type: 'button',
+            caption: 'Ajouter',
+            icon: 'w2ui-icon-plus'
+        }],
+        onClick: function (event) {
+            if (event.target == 'add') {
+                var max = d3.max(w2ui.gForms.records.map(function (d) {
+                    return d.recid
+                }));
+                var i = max ? max + 1 : 1;
+                arrForms.push({
+                    idForm: '',
+                    recid: i,
+                    txtForm:'Nouveau formulaire',
+                    iemlForm:'',
+                    bTemps: true,
+                    bGeo:true,
+                    bdd:bddNom,
+                    questions:[]
+                });
+                w2ui.gForms.records=arrForms;
+                w2ui.gForms.refresh();
+            }
+        }
+    },
+    records: arrQR
+});
+getForms();
 $('#gridQuestions').w2grid({
     name: 'gQuestions',
     header: 'Liste des questions',
@@ -491,21 +644,24 @@ $('#gridQuestions').w2grid({
         },
     ],
     onClick: function (event) {
-        if (w2ui.gReponse.getChanges().length > 0) {
-            w2alert('Veuillez enregistrer les réponses.');
+        if (w2ui.gProposition.getChanges().length > 0) {
+            w2alert('Veuillez enregistrer les propositions.');
             return;
         }
-        w2ui['gReponse'].clear();
+        w2ui['gProposition'].clear();
         var record = this.get(event.recid);
-        w2ui.gReponse.records = record.reponses;
-        w2ui.gReponse.refresh();
+        w2ui.gProposition.records = record.propositions;
+        w2ui.gProposition.refresh();
     },
     onDelete: function (event) {
         if (event.force) {
-            //verifie si des réponses sont déjà donnée
+            //verifie si des réponses sont déjà données
 
-            w2ui.gReponse.clear();
-            w2ui.gReponse.refresh();
+            w2ui.gProposition.clear();
+            w2ui.gProposition.refresh();
+            var f = w2ui.gForms.get(s[0]);        
+            f.questions=arrQR;
+
         }
     },
     toolbar: {
@@ -517,15 +673,31 @@ $('#gridQuestions').w2grid({
         }],
         onClick: function (event) {
             if (event.target == 'add') {
+                var s = w2ui.gForms.getSelection();
+                if (s.length == 0) {
+                    w2alert('Veuillez sélectionner un formulaire.');
+                    return;
+                }
+                if (w2ui.gForms.getChanges().length > 0) {
+                    w2alert('Veuillez enregistrer les formulaires.');
+                    return;
+                }
+                var f = w2ui.gForms.get(s[0]);        
+
                 var max = d3.max(w2ui.gQuestions.records.map(function (d) {
                     return d.recid
                 }));
                 var i = max ? max + 1 : 1;
-                arrQR.push({
+                var q = {
                     recid: i,
-                    reponses: [],
+                    txtQ:'nouvelle question ?',
+                    propositions: [],
+                    recidForm: f.recid,
+                    idForm: f.idForm,
                     nbProp: 6
-                });
+                };
+                arrQR.push(q);
+                f.questions=arrQR;
                 w2ui.gQuestions.records = arrQR;
                 w2ui.gQuestions.refresh();
             }
@@ -533,9 +705,9 @@ $('#gridQuestions').w2grid({
     },
     records: arrQR
 });
-$('#gridReponses').w2grid({
-    name: 'gReponse',
-    header: 'Liste des réponses',
+$('#gridPropositions').w2grid({
+    name: 'gProposition',
+    header: 'Liste des propositions',
     show: {
         toolbar: true,
         footer: true,
@@ -560,7 +732,7 @@ $('#gridReponses').w2grid({
         },
         {
             field: 'txtR',
-            caption: 'Réponse',
+            caption: 'Proposition',
             size: '30%',
             sortable: true,
             resizable: true,
@@ -659,7 +831,7 @@ $('#gridReponses').w2grid({
                     return;
                 }
                 var r = w2ui.gQuestions.get(s[0]);
-                var max = d3.max(w2ui.gReponse.records.map(function (d) {
+                var max = d3.max(w2ui.gProposition.records.map(function (d) {
                     return d.recid
                 }));
                 var i = max ? max + 1 : 1;
@@ -669,7 +841,7 @@ $('#gridReponses').w2grid({
                     'value': true,
                     'recidQuest': r['recid']
                 };
-                w2ui.gReponse.header = "Réponse(s) à la question : " + r['txtQ'];
+                w2ui.gProposition.header = "Proposition(s) pour la question : " + r['txtQ'];
                 $('#modalIemlMatrice').modal('show');
                 //w2ui.gReponse.add({ recid: w2ui.gReponse.records.length + 1,recidQuest: r['recid']});
             }
@@ -698,7 +870,7 @@ $('#gridReponses').w2grid({
         }
     },
     onSave: function (event) {
-        w2ui.gReponse.getChanges().forEach(function (c) {
+        w2ui.gProposition.getChanges().forEach(function (c) {
             if ('isGen' in c) {
                 var r = w2ui[event.target].get(c.recid);
                 if (c.isGen) {
@@ -721,7 +893,7 @@ function getCptDefinition(r) {
     d3.json(urlIeml + r.iemlR, function (err, data) {
         var gen = getIemlRela(data);
         var first = true;
-        var max = d3.max(w2ui.gReponse.records.map(function (d) {
+        var max = d3.max(w2ui.gProposition.records.map(function (d) {
             return d.recid
         }));
         var i = max ? max + 1 : 1;
@@ -741,15 +913,17 @@ function getCptDefinition(r) {
                     'layer': g.dico.LAYER,
                     'idDico': g.dico.INDEX,
                     'iemlRParent': r.iemlR,
-                    'isGen': isGen
+                    'isGen': isGen,
+                    'isMasque': false,
+                    'isValid': isGen
                 };
                 //vérifie les doublons
-                w2ui.gReponse.add(nr);
+                w2ui.gProposition.add(nr);
                 i++;
                 first = false;
             }
         });
-        calculeReponseLiens();
+        calculePropositionLiens();
         patienter('', true);
     });
 
@@ -758,11 +932,11 @@ function getCptDefinition(r) {
 function deleteCptGen(r) {
     if (r) {
         patienter('Suppression des concepts générés...');
-        var arrG = w2ui.gReponse.records.filter(function (g) {
+        var arrG = w2ui.gProposition.records.filter(function (g) {
             return g.recidParent == r.recid;
         })
         arrG.forEach(function (g) {
-            w2ui.gReponse.remove(g.recid);
+            w2ui.gProposition.remove(g.recid);
         })
         patienter('', true);
     }
@@ -787,7 +961,7 @@ function addIemlCode(cpt) {
             w2ui[evtCellIEML.target].add(r);
             */
             var r = {
-                recid: w2ui.gReponse.records.length + 1,
+                recid: w2ui.gProposition.records.length + 1,
                 'recidQuest': evtCellIEML.recidQuest,
                 'iemlR': ieml,
                 'isGen': true
@@ -819,20 +993,20 @@ function calculeReponseNombre() {
     })
 }
 
-function calculeReponseLiens() {
+function calculePropositionLiens() {
 
     //pour chaque question
     arrQR.forEach(function (q) {
         //récupère les parents des réponses
-        var arrParent = q.reponses.filter(function (r) {
+        var arrParent = q.propositions.filter(function (r) {
             return r.isGen;
         });
         //pour chaque parent
         q.liens = [];
         arrParent.forEach(function (rp) {
             //calcule les liens avec les autres réponses
-            q.reponses.forEach(function (ra) {
-                if (rp.iemlR != ra.iemlR && !ra.isMasque) {
+            q.propositions.forEach(function (ra) {
+                if (rp.iemlR != ra.iemlR && !ra.isMasque && !rp.isMasque) {
                     q.liens.push({
                         'levenshtein': levenshteinDistance(rp.iemlR, ra.iemlR),
                         'recidS': rp.recid,
@@ -853,7 +1027,7 @@ function calculeReponseLiens() {
 
 function creaForceCarto(data, div) {
 
-    calculeReponseLiens();
+    calculePropositionLiens();
 
     var height = $('#ifMatriceIEML').height() - $('#navViz').height(),
         width = $('#formTest-result').width(),
@@ -913,7 +1087,7 @@ function creaTitleCarto() {
 //merci beaucoup à  https://bl.ocks.org/mbostock/7833311
 function creaHexaCarto() {
 
-    calculeReponseLiens();
+    calculePropositionLiens();
 
     var height = $('#ifMatriceIEML').height() - $('#navViz').height(),
         width = $('#formTest-result').width(),
@@ -992,7 +1166,7 @@ function creaForm() {
     //création des réponses
     var r = q.selectAll('.form-check form-check-inline')
         .data(function (d) {
-            return getAleaReponse(d.reponses, d.nbProp);
+            return getAleaProposition(d.propositions, d.nbProp);
         })
         .enter().append("div").attr('class', 'form-check form-check-inline');
     //ajoute le bouton de sélection    
@@ -1010,7 +1184,7 @@ function creaForm() {
                 'v': this.checked,
                 't': new Date().toISOString().slice(0, 19).replace('T', ' '),
                 'g': getGeoInfos(),
-                'd': d
+                'idDico': d.idDico
             });
             //iemlCartoForce.changeRayonNoeud(d,this.checked ? 1 : -1);            
         });
@@ -1045,7 +1219,7 @@ function creaForm() {
         });
 }
 
-function getAleaReponse(arrR, nb) {
+function getAleaProposition(arrR, nb) {
     var r = [];
     //sélectionne les réponses valides
     var v = arrR.filter(function (d) {

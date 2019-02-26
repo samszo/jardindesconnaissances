@@ -49,6 +49,11 @@ class PlisagesController extends Zend_Controller_Action
     	
     }
 
+    public function oraliteAction()
+    {
+    	 
+    }
+    
     public function liemotsAction()
     {
     	 
