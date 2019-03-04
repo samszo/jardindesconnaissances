@@ -33,8 +33,10 @@ function oralite(s,options) {
     gH  = options.height ? options.height : 600;
     gW  = options.width ? options.width : 800;
 
-    svgParent = svg.node().parentNode;
-	
+    //supprime les élément de navigation
+    d3.select("#navig").remove();
+    d3.select("#divSon").remove();
+    
 	//AJOUT du navigateur
 	var nav = d3.select("body").append("div")
     		.attr("id",'navig')
@@ -88,6 +90,7 @@ function oralite(s,options) {
     svg.attr("height",gH-10);
 
     rects = svg.selectAll("rect")._groups[0];
+    slides = [];
     for (i=0;i<rects.length;i++) {
         id = rects[i].id;
         if (id.slice(0,6)=='slide_') { 
@@ -138,7 +141,7 @@ function oralite(s,options) {
     d3.select("body").on("touchmove", function() { if(slide<keys.length-1) {slide++; console.log(slide);}});
 
     d3.select(window).on("keydown", function() {
-		console.log(d3.event.keyCode+" = "+slide+" : "+keys[slide]);
+		console.log("Touche DEB : "+d3.event.keyCode+" = "+slide+" : "+keys[slide]);
         
         //vérifie le changement d'auteur
         if(d3.event.keyCode > 64 && d3.event.keyCode < 92){
@@ -146,12 +149,11 @@ function oralite(s,options) {
             var idAut = d3.event.keyCode-65;
             var curSlide = keys[slide].split('.');
             var autSlide = idAut+'.'+curSlide[1]+'.'+curSlide[2];
+            console.log("autSlide : "+autSlide);
             for (let index = 0; index < keys.length; index++) {
                 if(autSlide==keys[index]){
                     slide=index; 
-                    console.log(slide);
                     next_slide()
-                    return;
                 }  
             }
         }    
@@ -159,7 +161,6 @@ function oralite(s,options) {
         switch (d3.event.keyCode) {
           case 37: {if (slide>0) {
         	  slide=slide-1; 
-        	  console.log(slide);
         	  next_slide()};
         	  break}
           case 39: {
@@ -177,6 +178,7 @@ function oralite(s,options) {
         	  next_slide();
         	  break}
         }
+		console.log("Touche FIN : "+d3.event.keyCode+" = "+slide+" : "+keys[slide]);
         
      });
 
@@ -188,8 +190,9 @@ function oralite(s,options) {
 }
 
 function next_slide()  {
-	console.log(slide+" : "+keys[slide]);	
-    svg.transition().duration(delay).attr("viewBox",slides[keys[slide]].x.baseVal.value+" "+slides[keys[slide]].y.baseVal.value+" "+slides[keys[slide]].width.baseVal.value+" "+slides[keys[slide]].height.baseVal.value);
+    let vb = slides[keys[slide]].x.baseVal.value+" "+slides[keys[slide]].y.baseVal.value+" "+slides[keys[slide]].width.baseVal.value+" "+slides[keys[slide]].height.baseVal.value;
+    svg.transition().duration(delay).attr("viewBox",vb);
+	console.log("vb : "+vb);	
     changeNavig(slide);
 }
 

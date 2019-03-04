@@ -137,7 +137,7 @@
             fr.readAsText(f[0].file);
 
             function receivedText(e) {
-                clearSlide()
+                clearSlide();
                 try {
                     document.getElementById('conteneurSVG').innerHTML = e.target.result;
                     $('#modGetFic').modal('hide');
@@ -228,7 +228,6 @@
 
         
         $('#btnTester').click(function(e) {
-            clearSlide();
             var svg=d3.select("#mainSVG")
                 .attr("height","96%")
                 .attr("width","100%");
@@ -244,6 +243,20 @@
             d3.select("#navig").remove();
             d3.select("#divSon").remove();
         }
+
+        var connection = new WebSocket('ws://localhost:8001/websocket');
+        
+        connection.onmessage = function(event) {
+            var newData = JSON.parse(event.data);
+            var updateObject =[{
+                "Name": newData.Name,
+                "Year": newData.Year,
+                "Spent": newData.Spent,
+                "payType": newData.payType
+            }]
+            //console.log(updateObject);
+            //resetData(ndx, [yearDim, spendDim, nameDim]);
+        }        
 
     </script>
 
