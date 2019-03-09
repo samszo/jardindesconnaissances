@@ -466,3 +466,4 @@ application/views/scripts/ICE/editeurO.phtml
 bdd/flux_smel.sql
 bdd/omk_adacemu.sql
 data/diigo/importBookmark.csv
+application/configs/.DS_Store
