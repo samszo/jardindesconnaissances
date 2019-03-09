@@ -58,10 +58,13 @@ class Flux_Ice extends Flux_Site{
 	 */
 	function getForm($idForm, $reponse=false){
         $arrF = $this->dbD->findBydoc_id($idForm);
-        $rs = array('questions'=>array(),'params'=>json_decode($arrF['note']));
+        $f= json_decode($arrF['note']);
+        $f->questions = array();        
+        $rs = array('forms'=>[]);
+        $rs['forms'][0]=$f;
         $arrQ = $this->dbD->findByParent($idForm);
         foreach ($arrQ as $q) {
-            $rs['questions'][] = json_decode($q['note']);
+            $rs['forms'][0]->questions[] = json_decode($q['note']);
         }
         if($reponse){
             $arrR = $this->getFormReponse($idForm);
@@ -103,16 +106,16 @@ class Flux_Ice extends Flux_Site{
      * @return array
 	 */
 	function sauveFormSem($params){
-        if($params['iptIdForm']){
-            $idForm = $params['iptIdForm'];
+        if($params['idForm']){
+            $idForm = $params['idForm'];
         }else{
             //enregistre le formulaire
-            $idForm = $this->dbD->ajouter(array('titre'=>$params['iptForm'],'parent'=>$this->idDocRoot
+            $idForm = $this->dbD->ajouter(array('titre'=>$params['txtForm'],'parent'=>$this->idDocRoot
                 ,'tronc'=>'formSem'),false);                
             //enregistre le json avec l'identifiant;
-            $params['iptIdForm']=$idForm;
+            $params['idForm']=$idForm;
         }
-        $this->dbD->edit($idForm,array('titre'=>$params['iptForm'],'note'=>json_encode($params)));
+        $this->dbD->edit($idForm,array('titre'=>$params['txtForm'],'note'=>json_encode($params)));
 
         return $idForm;
     }
@@ -193,8 +196,10 @@ class Flux_Ice extends Flux_Site{
             $idRapport = $r['idR'];
         }else{
             //enregistre la reponse
-            $arr = array('lat'=>$r['lat'],'lng'=>$r['lng'],'pre'=>$r['pre'],'maj'=>$r['t']);
-            $this->idGeo = $this->dbG->ajouter($arr);
+            if($r['lat']){
+                $arr = array('lat'=>$r['lat'],'lng'=>$r['lng'],'pre'=>$r['pre'],'maj'=>$r['t']);
+                $this->idGeo = $this->dbG->ajouter($arr);    
+            }
             //création du rapport
             $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
                 ,"src_id"=>$r['idQ'],"src_obj"=>"doc"

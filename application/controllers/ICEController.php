@@ -166,12 +166,12 @@ class ICEController extends Zend_Controller_Action {
 	public function sauveformAction(){
 		//$this->initInstance();
 		$p = $this->_request->getParams();
-		$this->view->idBase = $this->dbNom = $this->_getParam('idBase');
+		$this->view->idBase = $this->dbNom = $p['form']['bdd'];
 		$rs = array('idBase' => $this->dbNom, 'erreur'=>0);
 		$ice = new Flux_Ice($this->dbNom,$this->_getParam('trace',false));
 
-		$idForm = $ice->sauveFormSem($p['form']['params']);
-		$rs['idForm']=$idForm;
+		$idForm = $ice->sauveFormSem($p['form']);
+		$rs['f']=array('idForm'=>$idForm,'recid'=>$p['form']['recid']);
 		$rs['q']=array();
 		$refs = array();
 		foreach ($p['questions'] as $q) {

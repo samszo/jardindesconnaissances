@@ -68,19 +68,12 @@
                 
                 <ul class="navbar-nav">
                     <form class="form-inline mt-2 mt-md-0">
+                        <!--
                         <button id="btnSauver" class="btn btn-outline-primary " type="button">Enregistrer</button>
+                        -->
                         <button id="btnExport" class="btn btn-outline-primary " type="button">Exporter</button>
                         <button id="btnImport" class="btn btn-outline-primary " type="button">Importer</button>
                     </form>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="nbddFormDispo" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Formulaires disponibles
-                        </a>
-                        <div id="mnuFormDispo" class="dropdown-menu" aria-labelledby="nbddFormDispo">
-                        </div>
-                    </li>
-
                 </ul>
             </div>
         </nav>
@@ -109,66 +102,14 @@
                 <div class="tab-content" id="tabFormContent">
                     <div class="tab-pane fade show active" id="formParam" role="tabpanel" aria-labelledby="formParam-tab">
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-6">
                                 <div id="gridForms" style="width: 100%; height: 200px;"></div>
-<!--
-                                <form id='paramsForm' role="form">
-                                    <div class="row">
-                                        <div class="col">
-
-                                        <div class="form-row">
-                                            <div class="form-group col-md-2">
-                                               <label for="iptIdForm">ID</label>
-                                                <input type="text" type="text" readonly class="form-control-plaintext" id="iptIdForm" aria-describedby="hlpIdForm">
-                                             </div>
-                                            <div class="form-group col-md-10">
-                                                <label for="iptForm">Nom du formulaire</label>
-                                                <input type="text" class="form-control" id="iptForm" aria-describedby="hlpQ"
-                                                    placeholder="Saisissez le nom">
-                                                <small id="hlpQ" class="form-text text-muted">Privilégier un nom court</small>
-                                            </div>
-                                        </div>
-                                            <div class="form-group form-check">
-                                                <input type="checkbox" checked='true' class="form-check-input" id="chkGeo">
-                                                <label class="form-check-label" for="chkGeo">Prendre en compte la
-                                                    position géographique</label>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-group">
-                                                <label for="iptFormIeml">code IEML du formulaire</label>
-                                                <input type="text" class="form-control" id="iptFormIeml"
-                                                    aria-describedby="hlpQIeml" placeholder="code IEML">
-                                                <small id="hlpQIeml" class="form-text text-muted">Saississez le code
-                                                    IEML correspond au formulaire</small>
-                                            </div>
-                                            <div class="form-group form-check">
-                                                <input type="checkbox" checked='true' class="form-check-input" id="chkTime">
-                                                <label class="form-check-label" for="chkTime">Prendre en compte le
-                                                    temps de réponse</label>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-group form-check">
-                                                <input type="checkbox" checked='true' class="form-check-input" id="chkBDD">
-                                                <label class="form-check-label" for="chkBDD">Enregistrer les réponses dans la BDD</label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="iptBddID">Nom de la BDD</label>
-                                                <input type="text" class="form-control" id="iptBddID"
-                                                    aria-describedby="hlpBddID" value="flux_formsem" readonly>
-                                                <small id="hlpBddID" class="form-text text-muted">Contacter l'administrateur pour changer cette valeur</small>
-                                            </div>
-
-
-                                        </div>
-
-                                    </div>
-                                </form>
-    -->
                                 <div id="gridQuestions" style="width: 100%; height: 200px;"></div>
-                                <div id="gridPropositions" style="width: 100%; height: 200px;"></div>
                             </div>
+                            <div class="col-6">
+                                <div id="gridPropositions" style="width: 100%; height:100%;"></div>
+                            </div>
+
                         </div>
                     </div>
                     <div class="tab-pane fade" id="formTest" role="tabpanel" aria-labelledby="formTest-tab">

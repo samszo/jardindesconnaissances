@@ -1,26 +1,16 @@
 
-var idUti=0, arrIEMLitem, arrIEMLmatrices = [{
-        IEML: "M:M:.a.-M:M:.a.-f.o.-'",
-        FR: "rôles sociaux"
-    }, {
-        IEML: "M:M:.-M:.O:.-'",
-        FR: "qualités"
-    }, {
-        IEML: "O:O:.O:M:.-",
-        FR: "cycle de travail"
-    }],
+var idUti=0, arrIEMLitem, 
     arrMnuAffichage = [{
         fct: showHideTexte,
         lib: "Affiche / Masque les textes"
     }, {
         fct: showHideLimite,
         lib: "Affiche / Masque les limites"
-    }]
-urlMatriceIeml = "../ice/ieml?code=", bddNom = 'flux_formsem',
+    }],
+    urlMatriceIeml = "../ice/ieml?code=", bddNom = 'flux_formsem',
     ifIeml = document.getElementById("ifMatriceIEML").contentWindow,
-    cptLigne = true, evtCellIEML = false, arrForms = [], arrQR = [],
-    arrDico = [], iemlMatrice = [],
-    arrReponses = [], iemlCartoForce = false;
+    cptLigne = true, evtCellIEML = false, arrForms = [], sltForms,
+    arrDico = [], iemlMatrice = [], iemlCartoForce = false;
 
 
 
@@ -133,26 +123,15 @@ function getForms(){
 
     //récupère la liste de formulaire enregistré
     d3.json('../ice/getlisteform?idBase='+bddNom, function (err, data) {
+        var i = 1;
         data.forEach(function(d){
             var f = JSON.parse(d.note);
+            f.recid = i;
             arrForms.push(f);
+            i++;
         })
         w2ui.gForms.records = arrForms;
         w2ui.gForms.refresh();
-        /*
-        d3.select("#mnuFormDispo").selectAll("a").data(data).enter().append("a")
-            .attr("class", "dropdown-item")
-            .attr("href", "#")
-            .text(function (d) {
-                return d.doc_id+' - '+d.titre;
-            })
-            .on('click', function (d) {
-                //execute la function définie
-                d3.json('../ice/getform?idBase=flux_formsem&reponse=1&idForm='+d.doc_id, function (err, dataF){
-                    chargeDataForm(dataF);
-                }); 
-            });
-        */
     })
 }
 
@@ -166,18 +145,21 @@ $("#btnCptLigne input:radio").on('change', function () {
     console.log("cptLigne=" + cptLigne);
 })
 $('#btnSauver').click(function () {
+    saveForm();
+})
 
+function saveForm(dF){
     if(verifForm()){
+
         patienter('Enregistrement du formulaire...');
 
-        var params = getParamsForm(),                
-            jsonData = {
-                "params": params,
-                "idBase": params.iptBddID
-            };
+        var arrFormSimple = {'bGeo':dF.bGeo,'bTemps':dF.bTemps,'bdd':dF.bdd,
+                    'idForm':dF.idForm,'iemlForm':dF.iemlForm,
+                    'recid': dF.recid,'txtForm':dF.txtForm
+                };
         //simplifie la définition des liens
         var arrQuestionSimples = [];    
-        arrQR.forEach(function(q){
+        dF.questions.forEach(function(q){
             var rs = {
                 'recid':q.recid,
                 'idForm':q.idForm,
@@ -187,90 +169,110 @@ $('#btnSauver').click(function () {
                 'liens':[],
                 'propositions':q.propositions
             }
-            q.liens.forEach(function(l){
-                rs.liens.push({
-                    'source':l.source.key ? l.source.key : l.source,
-                    'target':l.target.key ? l.target.key : l.target,
-                    'recidS':l.recidS,
-                    'recidT':l.recidT,
-                    'idEdge':l.idEdge,
-                    'idQuest':l.idQuest,
-                    'index':l.index,
-                    'levenshtein':l.levenshtein,
-                    'reltype':l.reltype,
-                    'value':l.value
-                });
-            });
+            if(q.liens){
+                q.liens.forEach(function(l){
+                    rs.liens.push({
+                        'source':l.source.key ? l.source.key : l.source,
+                        'target':l.target.key ? l.target.key : l.target,
+                        'recidS':l.recidS,
+                        'recidT':l.recidT,
+                        'idEdge':l.idEdge,
+                        'idQuest':l.idQuest,
+                        'index':l.index,
+                        'levenshtein':l.levenshtein,
+                        'reltype':l.reltype,
+                        'value':l.value
+                    });
+                });    
+            }
             arrQuestionSimples.push(rs);            
         });
         //simplifie les réponses
-        var arrReponsesSimples = [];    
-        arrReponses.forEach(function(r){
-            //construction de la réponse finale
-            var rsR = {
-                'recidQuest':r.pc[0].recidQuest,
-                'idsDico':'',
-                'idForm':r.idForm,
-                'idUti':r.idUti,
-                't':r.t,
-                'lat':r.g ? r.g.lat : 0,
-                'lng':r.g ? r.g.lng : 0,
-                'pre':r.g ? r.g.pre : 0
-            }
-            //construction des choix
-            rsR.c = [];
-            r.c.forEach(function(c){
-                rsR.c.push({'recidQuest':c.recidQuest,'idDico': c.idDico});
-            });
-            //construction des possibilités de choix
-            rsR.pc = [];
-            r.pc.forEach(function(pc){
-                rsR.pc.push({'recidQuest':pc.recidQuest,'idDico': pc.idDico});
-            });
-            //construction du processus
-            rsR.p = [];
-            r.p.forEach(function(p){
-                rsR.p.push({'t':p.t,'v':p.v,'idDico':p.idDico});
-            });            
-            arrReponsesSimples.push(rsR);
+        var arrReponsesSimples = [];
+        if(sltForms.reponses){
+            sltForms.reponses.forEach(function(r){
+                //construction de la réponse finale
+                var rsR = {
+                    'recidQuest':r.pc[0].recidQuest,
+                    'idsDico':'',
+                    'idForm':r.idForm,
+                    'idUti':r.idUti,
+                    't':r.t,
+                    'lat':r.g ? r.g.lat : 0,
+                    'lng':r.g ? r.g.lng : 0,
+                    'pre':r.g ? r.g.pre : 0
+                }
+                //construction des choix
+                rsR.c = [];
+                r.c.forEach(function(c){
+                    rsR.c.push({'recidQuest':c.recidQuest,'idDico': c.idDico});
+                });
+                //construction des possibilités de choix
+                rsR.pc = [];
+                r.pc.forEach(function(pc){
+                    rsR.pc.push({'recidQuest':pc.recidQuest,'idDico': pc.idDico});
+                });
+                //construction du processus
+                rsR.p = [];
+                r.p.forEach(function(p){
+                    rsR.p.push({'t':p.t,'v':p.v,'idDico':p.idDico});
+                });            
+                arrReponsesSimples.push(rsR);
 
-        });
+            });
+        }    
 
         //enregistre les paramètres du formulaire
-        var result = sauveForm(jsonData, arrQuestionSimples, arrReponsesSimples);
+        var result = saveFormToBDD(arrFormSimple, arrQuestionSimples, arrReponsesSimples);
 
-    }
-})
+    }    
+}
 
-function sauveForm(form, questions, reponses){
+function saveFormToBDD(form, questions, reponses){
 
-    $.post("../ice/sauveform", {'idBase':form.idBase,'form':form,'questions':questions,'reponses':reponses},
+    $.post("../ice/sauveform", {'form':form,'questions':questions,'reponses':reponses},
         function(data){
             if(data.erreur){
                 w2alert(data.erreur);
             }else{
                 //mise à jour des identifiant avec les données enregistrées
-                $('#iptIdForm').val(data.idForm);
-                data.q.forEach(function(bddQ){
-                    arrQR.forEach(function(q){
-                        if(q.recid==bddQ.recid)q.idQ = bddQ.idQ;
-                        q.propositions.forEach(function(p){
-                            bddQ.p.forEach(function(bddP){
-                                if(p.recid==bddP.recid)p.idP = bddP.idP;
+                arrForms.forEach(function(f){
+                    if(f.recid==data.f.recid){
+                        f.idForm=data.f.idForm;
+                        if(f.questions){
+                            data.f.q.forEach(function(bddQ){
+                                f.questions.forEach(function(q){
+                                    if(q.recid==bddQ.recid)q.idQ = bddQ.idQ;
+                                    if(q.propositions){
+                                        q.propositions.forEach(function(p){
+                                            bddQ.p.forEach(function(bddP){
+                                                if(p.recid==bddP.recid)p.idP = bddP.idP;
+                                            });
+                                        })
+                                    }
+                                    if(q.liens){
+                                        q.liens.forEach(function(l){
+                                            bddQ.liens.forEach(function(bddL){
+                                                if(l.idEdge==bddL.idEdge)l.idL = bddL.idL;
+                                            });
+                                        });    
+                                    }
+                                });                        
                             });
-                        })
-                        q.liens.forEach(function(l){
-                            bddQ.liens.forEach(function(bddL){
-                                if(l.idEdge==bddL.idEdge)l.idL = bddL.idL;
+                        }
+                        if(f.reponses){
+                            data.f.r.forEach(function(bddR){
+                                f.reponses.forEach(function(r){
+                                    if(r.t==bddR.t && r.idUti == bddR.idUti)r.idR = bddR.idR;
+                                });                    
                             });
-                        });
-                    });                    
-                });
-                data.r.forEach(function(bddR){
-                    arrReponses.forEach(function(r){
-                        if(r.t==bddR.t && r.idUti == bddR.idUti)r.idR = bddR.idR;
-                    });                    
-                });
+    
+                        }
+        
+                    }
+                })
+                w2ui.gForms.refresh();
+                w2ui.gProposition.refresh();
 
                 w2alert('Le formulaire est enregistré.')
             }					 		
@@ -305,11 +307,11 @@ function sauveFormValue(q, sync){
 $('#btnExport').click(function () {
 
     if(verifForm()){
-        var params = getParamsForm();
+        var df = getParamsForm();
+        if(!df)return;
         var jsonData = {
-            "questions": arrQR,
-            "params": params,
-            "reponses": arrReponses
+            "forms": df,
+            "reponses": df.reponses
         };
         exportJson(JSON.stringify(jsonData), 'formulaireSemantique.json', 'text/plain');    
     }
@@ -318,6 +320,10 @@ $('#btnExport').click(function () {
 
 function verifForm(){
     let rep = true;
+    if (w2ui.gForms.getChanges().length > 0) {
+        w2alert('Veuillez enregistrer le formulaire.');
+        rep = false;
+    }
     if (w2ui.gQuestions.getChanges().length > 0) {
         w2alert('Veuillez enregistrer les questions.');
         rep = false;
@@ -329,18 +335,6 @@ function verifForm(){
 
     return rep;
 
-}
-
-function getParamsForm() {
-    var params = {
-        'iptForm': $('#iptForm').val(),
-        'iptFormIeml': $('#iptFormIeml').val(),
-        'chkGeo': $('#chkGeo').val(),
-        'chkTime': $('#chkTime').val(),
-        'chkBDD': $('#chkBDD').val(),
-        'iptBddID': $('#iptBddID').val()
-    };
-    return params;
 }
 
 function exportJson(content, fileName, contentType) {
@@ -388,28 +382,39 @@ $('#btnValidImport').click(function () {
         });
     }
 })
-function chargeDataForm(data){
+function chargeDataForm(data,bdd){
 
-    //corrige les boolean
-    data.questions.forEach(function(q){
-        q.propositions.forEach(function(p){
-            if(p.isGen != typeof "boolean" && p.isGen == 'false')
-                p.isGen = false;
-            if(p.isMasque != typeof "boolean" && p.isMasque == 'false')
-                p.isMasque = false;
+    //corrige les boolean et les recid
+    data.forms.forEach(function(f){
+        var i = 1;
+        f.questions.forEach(function(q){
+            q.recid = i;
+            if(q.propositions){
+                q.propositions.forEach(function(p){
+                    if(p.isGen != typeof "boolean" && p.isGen == 'false')
+                        p.isGen = false;
+                    if(p.isMasque != typeof "boolean" && p.isMasque == 'false')
+                        p.isMasque = false;
+                });    
+            }
+            i++;
         });
     });
 
     //charge les grids
-    arrQR = data.questions;
-    w2ui.gQuestions.records = arrQR;
-    w2ui.gQuestions.refresh();
-    //charge les paramètres de formulaire
-    for (const k in data.params) {
-        $('#' + k).val(data.params[k]);
+    if(!bdd){
+        data.forms[0].recid = arrForms.length+1;
+        arrForms.push(data.forms);
+        w2ui.gForms.add(arrForms);
+        w2ui.gForms.refresh();    
+    }else{
+        w2ui.gQuestions.records = sltForms.questions = data.forms[0].questions;
+        w2ui.gQuestions.refresh();
+        w2ui.gProposition.clear();
+        w2ui.gProposition.refresh();            
     }
     //charge les réponses
-    arrReponses = data.reponses;
+    sltForms.reponses = data.reponses;
 }
 
 
@@ -419,7 +424,7 @@ $('#btnGenForm').click(function () {
 $('#btnClearRep').click(function () {
     w2confirm('ATTENTION toutes les réponses seront supprimées.')
         .yes(function () {
-            arrReponses = [];
+            sltForms.reponses = [];
         })
         .no(function () {
             console.log('NO');
@@ -456,15 +461,17 @@ $('#gridForms').w2grid({
         multiSelect: false,
     },
     columns: [{
-        field: 'IdForm',
+        field: 'idForm',
         caption: 'IDF',
         size: '50px',
+        hidden: true,
         sortable: true,
         resizable: true
         },{
             field: 'recid',
             caption: 'ID',
             size: '50px',
+            hidden: true,
             sortable: true,
             resizable: true
         },
@@ -531,14 +538,14 @@ $('#gridForms').w2grid({
             return;
         }
         w2ui['gQuestions'].clear();
-        var record = this.get(event.recid);
+        sltForms = this.get(event.recid);
         //récupère les données du formulaire
-        if(record.idForm){
-            d3.json('../ice/getform?idBase='+bddNom+'&reponse=1&idForm='+record.idForm, function (err, dataF){
-                chargeDataForm(dataF);
+        if(sltForms.idForm){
+            d3.json('../ice/getform?idBase='+bddNom+'&reponse=1&idForm='+sltForms.idForm, function (err, dataF){
+                chargeDataForm(dataF,true);
             });     
         }else{
-            w2ui.gQuestions.records = arrQR = record.questions;
+            w2ui.gQuestions.records = sltForms.questions;
             w2ui.gQuestions.refresh();
             w2ui.gProposition.clear();
             w2ui.gProposition.refresh();            
@@ -551,6 +558,15 @@ $('#gridForms').w2grid({
             w2ui.gQuestions.refresh();
             w2ui.gProposition.clear();
             w2ui.gProposition.refresh();
+        }
+    },
+    onSave: function (event) {
+        var slt = w2ui.gForms.getChanges();        
+        event.onComplete = function() {
+            slt.forEach(function(s){
+                var dF = w2ui.gForms.get(s.recid);
+                saveForm(dF);    
+            })
         }
     },
     toolbar: {
@@ -581,7 +597,7 @@ $('#gridForms').w2grid({
             }
         }
     },
-    records: arrQR
+    records: arrForms
 });
 getForms();
 $('#gridQuestions').w2grid({
@@ -648,10 +664,21 @@ $('#gridQuestions').w2grid({
             w2alert('Veuillez enregistrer les propositions.');
             return;
         }
-        w2ui['gProposition'].clear();
+        w2ui.gProposition.clear();
         var record = this.get(event.recid);
-        w2ui.gProposition.records = record.propositions;
-        w2ui.gProposition.refresh();
+        if(record.propositions){
+            w2ui.gProposition.records = record.propositions;            
+            w2ui.gProposition.refresh();
+        }
+    },
+    onSave: function (event) {
+        event.onComplete = function() {
+            var slt = w2ui.gForms.getSelection();
+            slt.forEach(function(s){
+                var dF = w2ui.gForms.get(s);
+                saveForm(dF);    
+            })
+        }
     },
     onDelete: function (event) {
         if (event.force) {
@@ -660,7 +687,6 @@ $('#gridQuestions').w2grid({
             w2ui.gProposition.clear();
             w2ui.gProposition.refresh();
             var f = w2ui.gForms.get(s[0]);        
-            f.questions=arrQR;
 
         }
     },
@@ -673,16 +699,8 @@ $('#gridQuestions').w2grid({
         }],
         onClick: function (event) {
             if (event.target == 'add') {
-                var s = w2ui.gForms.getSelection();
-                if (s.length == 0) {
-                    w2alert('Veuillez sélectionner un formulaire.');
-                    return;
-                }
-                if (w2ui.gForms.getChanges().length > 0) {
-                    w2alert('Veuillez enregistrer les formulaires.');
-                    return;
-                }
-                var f = w2ui.gForms.get(s[0]);        
+                var f = getParamsForm();
+                if(!f) return;        
 
                 var max = d3.max(w2ui.gQuestions.records.map(function (d) {
                     return d.recid
@@ -696,14 +714,12 @@ $('#gridQuestions').w2grid({
                     idForm: f.idForm,
                     nbProp: 6
                 };
-                arrQR.push(q);
-                f.questions=arrQR;
-                w2ui.gQuestions.records = arrQR;
+                sltForms.questions.push(q);
+                w2ui.gQuestions.records = sltForms.questions;
                 w2ui.gQuestions.refresh();
             }
         }
     },
-    records: arrQR
 });
 $('#gridPropositions').w2grid({
     name: 'gProposition',
@@ -718,7 +734,8 @@ $('#gridPropositions').w2grid({
     columns: [{
             field: 'recid',
             caption: 'ID',
-            size: '50px',
+            size: '30px',
+            hidden: true,
             sortable: true,
             resizable: true
         },
@@ -733,7 +750,7 @@ $('#gridPropositions').w2grid({
         {
             field: 'txtR',
             caption: 'Proposition',
-            size: '30%',
+            size: '100px',
             sortable: true,
             resizable: true,
             editable: {
@@ -743,7 +760,7 @@ $('#gridPropositions').w2grid({
         {
             field: 'iemlR',
             caption: 'Code IEML',
-            size: '200px',
+            size: '100px',
             sortable: true,
             resizable: true,
             editable: {
@@ -881,6 +898,7 @@ $('#gridPropositions').w2grid({
                     deleteCptGen(r);
                 }
             }
+            saveForm();        
         });
     }
 });
@@ -924,6 +942,7 @@ function getCptDefinition(r) {
             }
         });
         calculePropositionLiens();
+        saveForm();        
         patienter('', true);
     });
 
@@ -988,7 +1007,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 
 function calculeReponseNombre() {
 
-    arrReponses.forEach(function (d) {
+    sltForms.reponses.forEach(function (d) {
 
     })
 }
@@ -996,30 +1015,32 @@ function calculeReponseNombre() {
 function calculePropositionLiens() {
 
     //pour chaque question
-    arrQR.forEach(function (q) {
-        //récupère les parents des réponses
-        var arrParent = q.propositions.filter(function (r) {
-            return r.isGen;
-        });
-        //pour chaque parent
-        q.liens = [];
-        arrParent.forEach(function (rp) {
-            //calcule les liens avec les autres réponses
-            q.propositions.forEach(function (ra) {
-                if (rp.iemlR != ra.iemlR && !ra.isMasque && !rp.isMasque) {
-                    q.liens.push({
-                        'levenshtein': levenshteinDistance(rp.iemlR, ra.iemlR),
-                        'recidS': rp.recid,
-                        'recidT': ra.recid,
-                        'source': rp.iemlR + "",
-                        'target': ra.iemlR + "",
-                        'value': 1,
-                        'reltype': ra.iemlRelaType,
-                        'idEdge': ra.recidQuest + '_' + ra.recidParent + '_' + ra.recid
-                    });
-                }
+    sltForms.questions.forEach(function (q) {
+        if(q.propositions){
+            //récupère les parents des réponses        
+            var arrParent = q.propositions.filter(function (r) {
+                return r.isGen;
+            });
+            //pour chaque parent
+            q.liens = [];
+            arrParent.forEach(function (rp) {
+                //calcule les liens avec les autres réponses
+                q.propositions.forEach(function (ra) {
+                    if (rp.iemlR != ra.iemlR && !ra.isMasque && !rp.isMasque) {
+                        q.liens.push({
+                            'levenshtein': levenshteinDistance(rp.iemlR, ra.iemlR),
+                            'recidS': rp.recid,
+                            'recidT': ra.recid,
+                            'source': rp.iemlR + "",
+                            'target': ra.iemlR + "",
+                            'value': 1,
+                            'reltype': ra.iemlRelaType,
+                            'idEdge': ra.recidQuest + '_' + ra.recidParent + '_' + ra.recid
+                        });
+                    }
+                })
             })
-        })
+        }
     });
 
 }
@@ -1054,7 +1075,7 @@ function creaForceCarto(data, div) {
 function calculeReponse(){
     //calcule les réponses
     var arrRepTot = [], max = 1;
-    arrReponses.forEach(function (d) {
+    sltForms.reponses.forEach(function (d) {
         d.c.forEach(function (c) {
             var k = c.recidQuest + '_' + c.idDico;
             if (arrRepTot[k]) arrRepTot[k].nb++;
@@ -1072,7 +1093,7 @@ function creaTitleCarto() {
 
     //création des cartes
     d3.select("#formTest-result").selectAll(".row").remove();
-    var carto = d3.select("#formTest-result").selectAll(".row").data(arrQR).enter().append("div")
+    var carto = d3.select("#formTest-result").selectAll(".row").data(sltForms.questions).enter().append("div")
         .attr('class', 'row');
     //création des titres
     carto.append('h4').text(function (d) {
@@ -1138,21 +1159,32 @@ function creaHexaCarto() {
 
 }
 
+function getParamsForm(){
+
+    var s = w2ui.gForms.getSelection();
+    if (s.length == 0) {
+        w2alert('Veuillez sélectionner un formulaire.');
+        return;
+    }
+    if (w2ui.gForms.getChanges().length > 0) {
+        w2alert('Veuillez enregistrer les formulaires.');
+        return;
+    }
+    return w2ui.gForms.get(s[0]);        
+
+}
+
 function creaForm() {
-    var p = getParamsForm();
+    var dF = getParamsForm();
+    if(!dF) return;
     var arrProcess = [];
-    /*
-    'iptForm':$('#iptForm').val()
-    ,'iptFormIeml':$('#iptFormIeml').val()
-    ,'chkGeo':$('#chkGeo').val()
-    ,'chkTime':$('#chkTime').val()
-    */
+
     d3.select("#genForm").remove();
     var c = d3.select("#formTest-form").append('div').attr('id', 'genForm');
-    c.append('h1').text(p.iptForm);
+    c.append('h1').text(dF.txtForm);
     var f = c.append('form');
     //création des questions
-    var q = f.selectAll('.form-group').data(arrQR)
+    var q = f.selectAll('.form-group').data(dF.questions)
         .enter().append("div").attr('class', 'form-group')
         .attr("id", function (d, i) {
             return "formQ" + i;
@@ -1205,7 +1237,7 @@ function creaForm() {
             //récupère les réponses
             var c = d3.selectAll("#formTest-form input:checked").data();
             var pc = d3.selectAll("#formTest-form input").data();
-            arrReponses.push({
+            sltForms.reponses.push({
                 't': new Date().toISOString().slice(0, 19).replace('T', ' '),
                 'g': getGeoInfos(),
                 'p': arrProcess,
@@ -1220,6 +1252,7 @@ function creaForm() {
 }
 
 function getAleaProposition(arrR, nb) {
+    if(!arrR)return [];
     var r = [];
     //sélectionne les réponses valides
     var v = arrR.filter(function (d) {
