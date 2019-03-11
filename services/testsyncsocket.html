@@ -52,8 +52,8 @@
                 plus = document.querySelector('.plus'),
                 value = document.querySelector('.value'),
                 users = document.querySelector('.users'),
-                websocket = new WebSocket("ws://localhost:6789/");
-                //websocket = new WebSocket("ws://gapai.univ-paris8.fr:7272/");
+                //websocket = new WebSocket("ws://localhost:6789/");
+                websocket = new WebSocket("ws://gapai.univ-paris8.fr/pysocket/");
             minus.onclick = function (event) {
                 websocket.send(JSON.stringify({action: 'minus'}));
             }

@@ -25,7 +25,7 @@
 */
   
 var svg, son, pSon, slides={},
-    slide = 0, delay, gH, gW;
+    slide, delay, gH, gW, idAut;
 
 function oralite(s,options) {
     svg = s;
@@ -146,53 +146,65 @@ function oralite(s,options) {
         //vérifie le changement d'auteur
         if(d3.event.keyCode > 64 && d3.event.keyCode < 92){
             //récupère le nouveau slide
-            var idAut = d3.event.keyCode-65;
+            idAut = d3.event.keyCode-65;
             var curSlide = keys[slide].split('.');
             var autSlide = idAut+'.'+curSlide[1]+'.'+curSlide[2];
             console.log("autSlide : "+autSlide);
             for (let index = 0; index < keys.length; index++) {
                 if(autSlide==keys[index]){
-                    slide=index; 
-                    next_slide()
+										//gestion du websocket
+										slide=index; 
+										gereSocket({action: 'auteur',s:slide,a:idAut});
                 }  
             }
         }    
 
         switch (d3.event.keyCode) {
-          case 37: {if (slide>0) {
-        	  slide=slide-1; 
-        	  next_slide()};
+          case 37: {
+						if (slide>0) {
+							slide=slide-1; 
+							gereSocket({action: 'navigue',s: slide});
+						};
         	  break}
           case 39: {
         	  if(slide<keys.length-1) {
         		  slide++; 
-        		  next_slide()
+							gereSocket({action: 'navigue',s: slide});
         	  };
         	  break}
           case 36: {
         	  slide = 0;
-        	  next_slide();
+						gereSocket({action: 'navigue',s: slide});
         	  break}
           case 35: {
         	  slide = keys.length -1; 
-        	  next_slide();
+						gereSocket({action: 'navigue',s: slide});
         	  break}
         }
-		console.log("Touche FIN : "+d3.event.keyCode+" = "+slide+" : "+keys[slide]);
+				console.log("Touche FIN : "+d3.event.keyCode+" = "+slide+" : "+keys[slide]);
         
      });
 
     // Start with the first slide
-    next_slide();
-	changeImage(0);
+		gereSocket({action: 'navigue',s: slide});
+
+		changeImage(0);
 
     return slides
+}
+
+function gereSocket(params){
+		if(websocket){
+			websocket.send(JSON.stringify(params));
+		}else{
+			next_slide()
+		}			
 }
 
 function next_slide()  {
     let vb = slides[keys[slide]].x.baseVal.value+" "+slides[keys[slide]].y.baseVal.value+" "+slides[keys[slide]].width.baseVal.value+" "+slides[keys[slide]].height.baseVal.value;
     svg.transition().duration(delay).attr("viewBox",vb);
-	console.log("vb : "+vb);	
+		console.log("vb : "+vb);	
     changeNavig(slide);
 }
 

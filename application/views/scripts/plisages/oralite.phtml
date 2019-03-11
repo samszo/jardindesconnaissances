@@ -103,7 +103,7 @@
 
 
     <script>
-        var nbAut=4, nbSeq=10, maxAut=26, maxSeq=32;
+        var nbAut=4, nbSeq=10, maxAut=26, maxSeq=32, scenes;
         d3.select('#nbAuteur').attr('max',maxAut);
         d3.select('#nbSequence').attr('max',maxSeq);
 
@@ -233,7 +233,7 @@
                 .attr("width","100%");
             var h = window.innerHeight-d3.select('#mainNav').node().clientHeight;
             var w = svg.node().parentNode.clientWidth;
-            var scenes = oralite(svg,{'delay':1500,'height':h,'width':w});
+            scenes = oralite(svg,{'delay':1500,'height':h,'width':w});
         });
 
         function clearSlide(){
@@ -244,18 +244,37 @@
             d3.select("#divSon").remove();
         }
 
-        var connection = new WebSocket('ws://localhost:8001/websocket');
+        /*
+        ATTENTION paramétrage des websockets
+        merci 
+        pour tutorial python websocket : https://blog.crystalyx.net/utiliser-socket-io-et-les-websockets-avec-apache/
+        pour paramétrage websocket apache : https://blog.crystalyx.net/utiliser-socket-io-et-les-websockets-avec-apache/
+        pour mise à jour libtool : https://www.unix.com/unix-for-dummies-questions-and-answers/244302-trying-install-libtool-source-newbie.html
+        pour la configuration du virtual host
+        ProxyPass "/pyskOralite/" ws://gapai.univ-paris8.fr:7272
+        ProxyPassReverse "/pyskOralite/" ws://gapai.univ-paris8.fr:7272        
+        */
+        var websocket = new WebSocket('ws://gapai.univ-paris8.fr/pyskOralite/');
         
-        connection.onmessage = function(event) {
+        websocket.onmessage = function(event) {
             var newData = JSON.parse(event.data);
-            var updateObject =[{
-                "Name": newData.Name,
-                "Year": newData.Year,
-                "Spent": newData.Spent,
-                "payType": newData.payType
-            }]
-            //console.log(updateObject);
-            //resetData(ndx, [yearDim, spendDim, nameDim]);
+            websocket.onmessage = function (event) {
+                data = JSON.parse(event.data);
+                switch (data.type) {
+                    case 'state':
+                        if(scenes){
+                            slide = data.slide;
+                            idAut = data.auteur;
+                            next_slide();
+                        }
+                        break;
+                    case 'users':
+                        break;
+                    default:
+                        console.error(
+                            "unsupported event", data);
+                }
+            };
         }        
 
     </script>
