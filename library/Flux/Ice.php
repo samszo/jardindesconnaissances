@@ -77,6 +77,73 @@ class Flux_Ice extends Flux_Site{
     }
 
     /**
+	 * récupère les données d'une question
+     * 
+	 * @param  array    $idQ
+     * 
+     * @return array
+	 */
+	function getQuest($idQ){
+        $arr = $this->dbD->findBydoc_id($idQ);
+        $q= json_decode($arr['note']);
+        $q->propositions = $this->getQuestProps($idQ);        
+        return $q;
+    }
+
+    /**
+	 * récupère les propositions d'une question
+     * 
+	 * @param  array    $idQ
+     * 
+     * @return array
+	 */
+	function getQuestProps($idQ){
+        $sql = "SELECT 
+        p.doc_id, p.note, l.valeur
+    FROM
+        flux_doc q
+            INNER JOIN
+        flux_doc p ON p.parent = q.doc_id
+            LEFT JOIN
+        flux_rapport l ON l.src_id = p.doc_id
+            AND l.src_obj = 'doc'
+    WHERE
+        q.doc_id = ".$idQ;
+        $arr = $this->dbD->exeQuery($sql);
+        $oIdP = 0;
+        $rs = array();
+        foreach ($arr as $p) {
+            if($p['doc_id']!=$oIdP){
+                if($oIdP>0)$rs[]=$pq;
+                $pq = json_decode($p['note']);
+                $pq->liens = array();    
+                $oIdP=$p['doc_id'];    
+            }
+            $pq->liens[]=json_decode($p['valeur']);      
+        }
+        if($pq)$rs[]=$pq;
+        return $rs;
+    }
+
+    /**
+	 * récupère les données d'une proposition
+     * 
+	 * @param  array    $idP
+     * 
+     * @return array
+	 */
+	function getProp($idP){
+        $arr = $this->dbD->findBydoc_id($idP);
+        $p= json_decode($arr['note']);
+        $p->liens = array();        
+        $arrL = $this->dbR->findBySource($idQ, 'doc');
+        foreach ($arrl as $l) {           
+            $p->liens[] = json_decode($l['valeur']);
+        }
+        return $p;
+    }
+
+    /**
 	 * récupère les réponse pour un formulaire
      * 
 	 * @param  array    $idForm
@@ -100,20 +167,77 @@ class Flux_Ice extends Flux_Site{
     }
 
     /**
-	 * enregistre les informations d'un formulaire sémantique
-	 * @param  array $params
+	 * supprime les informations d'un formulaire sémantique
+	 * @param  int $idForm
      * 
      * @return array
 	 */
-	function sauveFormSem($params){
+	function deleteFormSem($idForm){
+
+        //supprime toute les questions
+        $nbSup = $this->dbD->remove($idForm);
+        
+        return $nbSup;
+    }
+
+    /**
+	 * supprime les informations d'une question
+	 * @param  int $idQuest
+     * 
+     * @return array
+	 */
+	function deleteQuestSem($idQuest){
+
+        //supprime toute les questions
+        $nbSup = $this->dbD->remove($idQuest);
+        
+        return $nbSup;
+    }
+
+    /**
+	 * supprime les informations d'une proposition
+	 * @param  int $idProp
+     * 
+     * @return array
+	 */
+	function deletePropSem($idProp){
+
+        //supprime toute les questions
+        $nbSup = $this->dbD->remove($idProp);
+        
+        return $nbSup;
+    }
+
+    /**
+	 * enregistre les informations d'un formulaire sémantique
+	 * @param  array    $params
+	 * @param  boolean  $update
+     * 
+     * @return array
+	 */
+	function sauveFormSem($params, $update=false){
         if($params['idForm']){
             $idForm = $params['idForm'];
+        }elseif ($update) {
+            foreach ($params as $p) {
+                $rsForm = $this->dbD->findBydoc_id($p['recid']);
+                if($rsForm){
+                    $note = json_decode($rsForm['note'],JSON_OBJECT_AS_ARRAY);
+                    foreach ($p as $k => $v) {
+                        $note[$k]=$v;
+                    }
+                    if(!$p['txtForm'])$note['txtForm']=$rsForm['titre'];
+                    $this->dbD->edit($p['recid'],array('titre'=>$note['txtForm'],'note'=>json_encode($note)));    
+                }
+            }
+            return;
         }else{
             //enregistre le formulaire
             $idForm = $this->dbD->ajouter(array('titre'=>$params['txtForm'],'parent'=>$this->idDocRoot
                 ,'tronc'=>'formSem'),false);                
             //enregistre le json avec l'identifiant;
             $params['idForm']=$idForm;
+            $params['recid']=$idForm;
         }
         $this->dbD->edit($idForm,array('titre'=>$params['txtForm'],'note'=>json_encode($params)));
 
@@ -123,18 +247,33 @@ class Flux_Ice extends Flux_Site{
     /**
 	 * enregistre les informations d'une question d'un formulaire sémantique
 	 * @param  array $q
+	 * @param  boolean  $update
      * 
      * @return array
 	 */
-	function sauveQuestionFormSem($q){
+	function sauveQuestionFormSem($q, $update=false){
         if($q['idQ']){
             $idQ = $q['idQ'];
+        }elseif ($update) {
+            foreach ($q as $p) {
+                $rsQuest = $this->dbD->findBydoc_id($p['recid']);
+                if($rsQuest){
+                    $note = json_decode($rsQuest['note'],JSON_OBJECT_AS_ARRAY);
+                    foreach ($p as $k => $v) {
+                        $note[$k]=$v;
+                    }
+                    if(!$p['txtQ'])$note['txtQ']=$rsQuest['titre'];
+                    $this->dbD->edit($p['recid'],array('titre'=>$note['txtQ'],'note'=>json_encode($note)));    
+                }
+            }
+            return;
         }else{
             //enregistre la question
             $idQ = $this->dbD->ajouter(array('titre'=>$q['txtQ'],'parent'=>$q['idForm']
             ,'tronc'=>'formSemQuest'),false);
             //enregistre le json avec l'identifiant;
             $q['idQ']=$idQ;
+            $q['recid']=$idQ;
         }
         $this->dbD->edit($idQ,array('titre'=>$q['txtQ'],'note'=>json_encode($q)));
         return $idQ;
@@ -154,8 +293,8 @@ class Flux_Ice extends Flux_Site{
             $idTag = $this->dbT->ajouter(array('code'=>$l['reltype'], 'parent'=>$this->idTagRela));
             //création du rapport
             $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
-                ,"src_id"=>$l['idPS'],"src_obj"=>"doc"
-                ,"dst_id"=>$l['idPT'],"dst_obj"=>"doc"
+                ,"src_id"=>$l['idPsource'],"src_obj"=>"doc"
+                ,"dst_id"=>$l['idPtarget'],"dst_obj"=>"doc"
                 ,"pre_id"=>$idTag,"pre_obj"=>"tag"
                 ));
             $l['idL']=$idRapport;
@@ -167,22 +306,42 @@ class Flux_Ice extends Flux_Site{
     /**
 	 * enregistre les informations d'une proposition à une question d'un formulaire sémantique
 	 * @param  array $r
+	 * @param  boolean $rs
+	 * @param  boolean  $update
      * 
      * @return array
 	 */
-	function sauvePropositionFormSem($r){
+	function sauvePropositionFormSem($r,$rs=false,$update=false){
         if($r['idP']){
             $idDoc = $r['idP'];
+        }elseif ($update) {
+            foreach ($r as $p) {
+                $rsProp = $this->dbD->findBydoc_id($p['recid']);
+                if($rsProp){
+                    $note = json_decode($rsProp['note'],JSON_OBJECT_AS_ARRAY);
+                    foreach ($p as $k => $v) {
+                        $note[$k]=$v;
+                    }
+                    if(!$p['iemlR'])$note['iemlR']=$rsProp['titre'];
+                    $this->dbD->edit($p['recid'],array('titre'=>$note['iemlR'],'note'=>json_encode($note)));    
+                }
+            }
+            return;
         }else{
             //création du document
-            $idDoc = $this->dbD->ajouter(array('titre'=>'Proposition :'.$r['recid'],'parent'=>$r['idQ']
-                ,'tronc'=>'formSemProp','note'=>json_encode($r)));
+            $idDoc = $this->dbD->ajouter(array('titre'=>$r['iemlR'],'parent'=>$r['idQ']
+                ,'tronc'=>'formSemProp_'.$r['iemlRelaType'],'note'=>json_encode($r)));
             //mise à jour des références
             $r['idP']=$idDoc;
+            $r['recid']=$idDoc;
         }
+        $r['idParent']=$r['idQ'];
         $this->dbD->edit($idDoc,array('note'=>json_encode($r)));
 
-        return $idDoc;
+        if($rs)
+            return $r;
+        else
+            return $idDoc;
     }
 
     /**

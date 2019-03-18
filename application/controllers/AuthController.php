@@ -32,70 +32,69 @@ class AuthController extends Zend_Controller_Action
 		//instanciation du site pour les bases
 		$s = new Flux_Site($ssExi->dbNom);
 		
-		
     	// Obtention d'une référence de l'instance du Singleton de Zend_Auth
 		$auth = Zend_Auth::getInstance();
 		$auth->clearIdentity();
 
-    		if($this->_getParam('ajax', 0)){
-    			$this->view->ajax = true;
-            $adapter = new Zend_Auth_Adapter_DbTable(
-                $s->db,
-                'flux_uti',
-                'login',
-                'mdp'
-                );		                
-            $adapter->setIdentity($this->_getParam('login'));
-            $adapter->setCredential($this->_getParam('mdp'));
-            $login = $this->_getParam('login');
-            // Tentative d'authentification et stockage du résultat
+		if($this->_getParam('ajax', 0)){
+			$this->view->ajax = true;
+			$adapter = new Zend_Auth_Adapter_DbTable(
+				$s->db,
+				'flux_uti',
+				'login',
+				'mdp'
+				);		                
+			$adapter->setIdentity($this->_getParam('login'));
+			$adapter->setCredential($this->_getParam('mdp'));
+			$login = $this->_getParam('login');
+			// Tentative d'authentification et stockage du résultat
 			if($login)$result = $auth->authenticate($adapter);
-    		}elseif ($this->_getParam('login')) {
-	    		$adapter = new Zend_Auth_Adapter_DbTable(
-	                $s->db,
-	                'flux_uti',
-	                'login',
-	                'mdp'
-	                );		                
-	        $login = $this->_getParam('login');
-	        $adapter->setIdentity($login);
-	        $adapter->setCredential($this->_getParam('mdp'));
-	        // Tentative d'authentification et stockage du résultat
+		} elseif ($this->_getParam('login')) {
+			$adapter = new Zend_Auth_Adapter_DbTable(
+				$s->db,
+				'flux_uti',
+				'login',
+				'mdp'
+				);		                
+			$login = $this->_getParam('login');
+			$adapter->setIdentity($login);
+			$adapter->setCredential($this->_getParam('mdp'));
+			// Tentative d'authentification et stockage du résultat
 			$result = $auth->authenticate($adapter);			
 			$this->view->erreur = "login calculé";			
-    		}else{
-    			return;
-    		}     		
+		}else{
+			return;
+		}     		
     		
-    		if ($result->isValid()) {		            	
+    	if ($result->isValid()) {		            	
 			//met en sessions les informations de l'existence
 			$dbUti = new Model_DbTable_Flux_Uti($s->db);
 			$rs = $dbUti->findByLogin($login);
-    			$ssExi->uti = $rs;
+			$ssExi->uti = $rs;
 			$ssExi->idUti = $rs["uti_id"];		            	
 	        	
 			if($this->view->ajax){
 				$this->view->rs = $ssExi->uti;
 	        }else{
-		    		$this->redirect($ssExi->redir);
-		    		return;
+				$this->redirect($ssExi->redir);
+				return;
 	        }
 	    }else{
-		    	$this->view->code = $result->getCode();
-	    		switch ($result->getCode()) {
-            		case 0:
-						$this->view->erreur = "Problème d'identification. Veuillez contacter le webmaster.";		            	
-	            		break;		            		
-            		case -1:
-						$this->view->erreur = "Le login n'a pas été trouvé. Veillez vous inscrire.";		            	
-	            		break;		            		
-            		case -2:
-						$this->view->erreur = "Le login est ambigue.";		            	
-	            		break;		            		
-            		case -3:
-						$this->view->erreur = "Le login et/ou le mot de passe ne sont pas bons.";		            	
-	            		break;		            		
-            	}
+			$this->view->code = $result->getCode();
+			switch ($result->getCode()) {
+				case 0:
+					$this->view->erreur = "Problème d'identification. Veuillez contacter le webmaster.";		            	
+					break;		            		
+				case -1:
+					$this->view->erreur = "Le login n'a pas été trouvé. Veillez vous inscrire.";		            	
+					break;		            		
+				case -2:
+					$this->view->erreur = "Le login est ambigue.";		            	
+					break;		            		
+				case -3:
+					$this->view->erreur = "Le login et/ou le mot de passe ne sont pas bons.";		            	
+					break;		            		
+			}
 	   	}
     }
 

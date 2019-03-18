@@ -59,14 +59,20 @@
     <header>
         <!-- Fixed navbar -->
         <nav id="mainNav" class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-            <a class="navbar-brand" href="#">Editeur de formulaires sémantiques</a>
+            <a class="navbar-brand" href="#"><img 
+                    style="background-color:white"
+                    src="../img/logo-paragraphe.svg" 
+                    alt="logo-paragraphe"
+                    height="auto"
+                    width="100px" /> Editeur de formulaires sémantiques               
+            </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 
-                <ul class="navbar-nav">
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                     <form class="form-inline mt-2 mt-md-0">
                         <!--
                         <button id="btnSauver" class="btn btn-outline-primary " type="button">Enregistrer</button>
@@ -75,6 +81,11 @@
                         <button id="btnImport" class="btn btn-outline-primary " type="button">Importer</button>
                     </form>
                 </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="button"><?php echo $this->login; ?></button>
+                    <button class="btn btn-outline-danger my-2 my-sm-0" onclick="deconnexion()" type="button">déconnexion</button>
+                </form>
+
             </div>
         </nav>
     </header>
@@ -259,7 +270,9 @@
 
     <script>
         var urlIeml = "<?php echo $this->urlIeml;?>",
-            urlDico = "<?php echo $this->urlDico;?>";
+            urlDico = "<?php echo $this->urlDico;?>",
+            uti = <?php echo $this->uti;?>;
+
     </script>
     <!-- Bootstrap core JavaScript
     ================================================== -->

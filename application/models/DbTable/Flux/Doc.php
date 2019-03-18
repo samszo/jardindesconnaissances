@@ -211,8 +211,8 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      */
     public function remove($id)
     {
-    		$nbSup = 0;
-    		foreach($this->_dependentTables as $t){
+        $nbSup = 0;
+        foreach($this->_dependentTables as $t){
 			$tEnfs = new $t($this->_db);
 			$nbSup += $tEnfs->removeDoc($id);
 		}

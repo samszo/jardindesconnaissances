@@ -261,21 +261,21 @@ class Model_DbTable_Flux_Rapport extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
-    	/**
+    /**
      * Recherche une entrée Flux_rapport avec la valeur spécifiée
      * et retourne cette entrée.
      *
-     * @param int $id
+     * @param int       $id
+     * @param string    $obj
      *
      * @return array
      */
-    public function findByIdUtitagdoc($id)
+    public function findBySource($id, $obj)
     {
         $query = $this->select()
                     ->from( array("f" => "flux_rapport") )                           
-                    ->where( "f.utitagdoc_id = ?", $id);
-
-                    
+                    ->where( "f.src_id = ?", $id)
+                    ->where( "f.src_obj = ?", $obj);                    
                     
         return $this->fetchAll($query)->toArray(); 
     }

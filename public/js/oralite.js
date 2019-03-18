@@ -185,8 +185,9 @@ function oralite(s,options) {
         
      });
 
-    // Start with the first slide
-		gereSocket({action: 'navigue',s: slide});
+		// Start with the first slide si aucun slide n'est en cours
+		if(typeof slide == 'undefined')slide=0
+		gereSocket({action: 'navigue', s: slide});
 
 		changeImage(0);
 

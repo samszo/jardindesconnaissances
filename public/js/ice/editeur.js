@@ -9,10 +9,16 @@ var idUti=0, arrIEMLitem,
     }],
     urlMatriceIeml = "../ice/ieml?code=", bddNom = 'flux_formsem',
     ifIeml = document.getElementById("ifMatriceIEML").contentWindow,
-    cptLigne = true, evtCellIEML = false, arrForms = [], sltForms,
+    cptLigne = true, evtCellIEML = false, arrForms = [], sltForms, sltQuest,
     arrDico = [], iemlMatrice = [], iemlCartoForce = false;
 
+getForms();
 
+
+function deconnexion(){
+    window.location.assign('../auth/deconnexion?redir=ice/editeur');
+}
+    
 
 //chargement du dico IEML
 d3.json(urlDico, function (err, data) {
@@ -126,7 +132,7 @@ function getForms(){
         var i = 1;
         data.forEach(function(d){
             var f = JSON.parse(d.note);
-            f.recid = i;
+            setBoolean([f]);
             arrForms.push(f);
             i++;
         })
@@ -144,137 +150,131 @@ $("#btnCptLigne input:radio").on('change', function () {
     cptLigne = $(this).attr('id') == 'cptCumul' ? false : true;
     console.log("cptLigne=" + cptLigne);
 })
-$('#btnSauver').click(function () {
-    saveForm();
-})
 
-function saveForm(dF){
-    if(verifForm()){
+function simplifieDataGrid(dF){
 
-        patienter('Enregistrement du formulaire...');
-
-        var arrFormSimple = {'bGeo':dF.bGeo,'bTemps':dF.bTemps,'bdd':dF.bdd,
-                    'idForm':dF.idForm,'iemlForm':dF.iemlForm,
-                    'recid': dF.recid,'txtForm':dF.txtForm
-                };
-        //simplifie la définition des liens
-        var arrQuestionSimples = [];    
-        dF.questions.forEach(function(q){
-            var rs = {
-                'recid':q.recid,
-                'idForm':q.idForm,
-                'nbProp':q.nbProp,
-                'txtQ':q.txtQ,
-                'txtQIeml':q.txtQieml,
-                'liens':[],
-                'propositions':q.propositions
-            }
-            if(q.liens){
-                q.liens.forEach(function(l){
-                    rs.liens.push({
-                        'source':l.source.key ? l.source.key : l.source,
-                        'target':l.target.key ? l.target.key : l.target,
-                        'recidS':l.recidS,
-                        'recidT':l.recidT,
-                        'idEdge':l.idEdge,
-                        'idQuest':l.idQuest,
-                        'index':l.index,
-                        'levenshtein':l.levenshtein,
-                        'reltype':l.reltype,
-                        'value':l.value
-                    });
-                });    
-            }
-            arrQuestionSimples.push(rs);            
-        });
-        //simplifie les réponses
-        var arrReponsesSimples = [];
-        if(sltForms.reponses){
-            sltForms.reponses.forEach(function(r){
-                //construction de la réponse finale
-                var rsR = {
-                    'recidQuest':r.pc[0].recidQuest,
-                    'idsDico':'',
-                    'idForm':r.idForm,
-                    'idUti':r.idUti,
-                    't':r.t,
-                    'lat':r.g ? r.g.lat : 0,
-                    'lng':r.g ? r.g.lng : 0,
-                    'pre':r.g ? r.g.pre : 0
-                }
-                //construction des choix
-                rsR.c = [];
-                r.c.forEach(function(c){
-                    rsR.c.push({'recidQuest':c.recidQuest,'idDico': c.idDico});
+    var arrFormSimple = {'bGeo':dF.bGeo,'bTemps':dF.bTemps,'bdd':dF.bdd,
+                'idForm':dF.idForm,'iemlForm':dF.iemlForm,
+                'recid': dF.recid,'txtForm':dF.txtForm
+            };
+    //simplifie la définition des liens
+    var arrQuestionSimples = [];    
+    dF.questions.forEach(function(q){
+        var rs = {
+            'recid':q.recid,
+            'idForm':q.idForm,
+            'nbProp':q.nbProp,
+            'txtQ':q.txtQ,
+            'txtQIeml':q.txtQieml,
+            'liens':[],
+            'propositions':q.propositions
+        }
+        if(q.liens){
+            q.liens.forEach(function(l){
+                rs.liens.push({
+                    'source':l.source.key ? l.source.key : l.source,
+                    'target':l.target.key ? l.target.key : l.target,
+                    'recidS':l.recidS,
+                    'recidT':l.recidT,
+                    'idEdge':l.idEdge,
+                    'idQuest':l.idQuest,
+                    'index':l.index,
+                    'levenshtein':l.levenshtein,
+                    'reltype':l.reltype,
+                    'value':l.value
                 });
-                //construction des possibilités de choix
-                rsR.pc = [];
-                r.pc.forEach(function(pc){
-                    rsR.pc.push({'recidQuest':pc.recidQuest,'idDico': pc.idDico});
-                });
-                //construction du processus
-                rsR.p = [];
-                r.p.forEach(function(p){
-                    rsR.p.push({'t':p.t,'v':p.v,'idDico':p.idDico});
-                });            
-                arrReponsesSimples.push(rsR);
-
+            });    
+        }
+        arrQuestionSimples.push(rs);            
+    });
+    //simplifie les réponses
+    var arrReponsesSimples = [];
+    if(dF.reponses){
+        dF.reponses.forEach(function(r){
+            //construction de la réponse finale
+            var rsR = {
+                'recidQuest':r.pc[0].recidQuest,
+                'idsDico':'',
+                'idForm':r.idForm,
+                'idUti':r.idUti,
+                't':r.t,
+                'lat':r.g ? r.g.lat : 0,
+                'lng':r.g ? r.g.lng : 0,
+                'pre':r.g ? r.g.pre : 0
+            }
+            //construction des choix
+            rsR.c = [];
+            r.c.forEach(function(c){
+                rsR.c.push({'recidQuest':c.recidQuest,'idDico': c.idDico});
             });
-        }    
+            //construction des possibilités de choix
+            rsR.pc = [];
+            r.pc.forEach(function(pc){
+                rsR.pc.push({'recidQuest':pc.recidQuest,'idDico': pc.idDico});
+            });
+            //construction du processus
+            rsR.p = [];
+            r.p.forEach(function(p){
+                rsR.p.push({'t':p.t,'v':p.v,'idDico':p.idDico});
+            });            
+            arrReponsesSimples.push(rsR);
 
-        //enregistre les paramètres du formulaire
-        var result = saveFormToBDD(arrFormSimple, arrQuestionSimples, arrReponsesSimples);
-
+        });
     }    
+    return {f:arrFormSimple,q:arrQuestionSimples,r:arrReponsesSimples};
 }
 
-function saveFormToBDD(form, questions, reponses){
 
-    $.post("../ice/sauveform", {'form':form,'questions':questions,'reponses':reponses},
+
+function addToBDD(dataSource, table){
+
+    $.post("../ice/addform", {'data':dataSource,'table':table},
         function(data){
             if(data.erreur){
                 w2alert(data.erreur);
             }else{
-                //mise à jour des identifiant avec les données enregistrées
-                arrForms.forEach(function(f){
-                    if(f.recid==data.f.recid){
-                        f.idForm=data.f.idForm;
-                        if(f.questions){
-                            data.f.q.forEach(function(bddQ){
-                                f.questions.forEach(function(q){
-                                    if(q.recid==bddQ.recid)q.idQ = bddQ.idQ;
-                                    if(q.propositions){
-                                        q.propositions.forEach(function(p){
-                                            bddQ.p.forEach(function(bddP){
-                                                if(p.recid==bddP.recid)p.idP = bddP.idP;
-                                            });
-                                        })
-                                    }
-                                    if(q.liens){
-                                        q.liens.forEach(function(l){
-                                            bddQ.liens.forEach(function(bddL){
-                                                if(l.idEdge==bddL.idEdge)l.idL = bddL.idL;
-                                            });
-                                        });    
-                                    }
-                                });                        
-                            });
-                        }
-                        if(f.reponses){
-                            data.f.r.forEach(function(bddR){
-                                f.reponses.forEach(function(r){
-                                    if(r.t==bddR.t && r.idUti == bddR.idUti)r.idR = bddR.idR;
-                                });                    
-                            });
-    
-                        }
-        
-                    }
-                })
-                w2ui.gForms.refresh();
-                w2ui.gProposition.refresh();
+                //mis à jour des grids
+                if(table=='form'){
+                    data.result.questions=[];
+                    arrForms.push(data.result);
+                    w2ui.gForms.records=arrForms;
+                    w2ui.gForms.refresh();
+                    w2ui.gQuestions.clear();
+                    w2ui.gQuestions.refresh();
+                    w2ui.gProposition.clear();
+                    w2ui.gProposition.refresh();    
+                }
+                if(table=='question'){
+                    data.result.propositions=[];
+                    sltForms.questions.push(data.result);
+                    w2ui.gQuestions.records = sltForms.questions;
+                    w2ui.gQuestions.refresh();
+                    w2ui.gProposition.clear();
+                    w2ui.gProposition.refresh();    
+                }
+                if(table=='prop'){
+                    getCptDefinition(data.result);
+                }
+                if(table=='props'){
+                    addPropositionLiens(data.result);            
+                }
+                if(table=='liens'){
+                    //mise à jour des liens
+                    dataSource.forEach(function(p){
+                        p.liens.forEach(function(l){
+                            data.result.forEach(function(lbdd){
+                                if(lbdd.idEdge==l.idEdge)l.idL=lbdd.idL;
+                            })
+                        })
+                        if(!sltQuest.propositions)sltQuest.propositions=[];
+                        sltQuest.propositions.push(p);
+                    })
+                    //mise à jour des grid
+                    w2ui.gProposition.records = sltQuest.propositions;
+                    w2ui.gProposition.refresh();    
+                }
 
-                w2alert('Le formulaire est enregistré.')
+                w2alert("L'ajout est fait.");
             }					 		
         }, "json")
     .fail(function(e) {
@@ -285,6 +285,62 @@ function saveFormToBDD(form, questions, reponses){
         patienter('',true);    
     });
 }
+
+function updateBDD(dataSource, table){
+
+    $.post("../ice/updateform", {'data':dataSource,'table':table},
+        function(data){
+            if(data.erreur){
+                w2alert(data.erreur);
+            }else{
+                w2alert("Les modifications sont enregistrées.");
+            }					 		
+        }, "json")
+    .fail(function(e) {
+        w2alert( "erreur" );
+    })
+    .always(function() {
+        d3.select('#pbPatienter').remove();
+        patienter('',true);    
+    });
+}
+
+
+function deleteToBDD(dataSource, table){
+
+    $.post("../ice/deleteform", {'data':dataSource,'table':table},
+        function(data){
+            if(data.erreur){
+                w2alert(data.erreur);
+            }else{
+                //mis à jour des grids
+                if(table=='form'){
+                    w2ui.gForms.refresh();
+                    w2ui.gQuestions.clear();
+                    w2ui.gQuestions.refresh();
+                    w2ui.gProposition.clear();
+                    w2ui.gProposition.refresh();    
+                }
+                if(table=='question'){
+                    w2ui.gQuestions.refresh();
+                    w2ui.gProposition.clear();
+                    w2ui.gProposition.refresh();    
+                }
+                if(table=='proposition'){
+                    w2ui.gProposition.refresh();    
+                }
+                w2alert('Les supressions sont faites.')
+            }					 		
+        }, "json")
+    .fail(function(e) {
+        w2alert( "erreur" );
+    })
+    .always(function() {
+        d3.select('#pbPatienter').remove();
+        patienter('',true);    
+    });
+}
+
 
 function sauveFormValue(q, sync){
 
@@ -329,7 +385,7 @@ function verifForm(){
         rep = false;
     }
     if (w2ui.gProposition.getChanges().length > 0) {
-        w2alert('Veuillez enregistrer les réponses.');
+        w2alert('Veuillez enregistrer les propositions.');
         rep = false;
     }
 
@@ -386,33 +442,16 @@ function chargeDataForm(data,bdd){
 
     //corrige les boolean et les recid
     data.forms.forEach(function(f){
-        var i = 1;
         f.questions.forEach(function(q){
-            q.recid = i;
-            if(q.propositions){
-                q.propositions.forEach(function(p){
-                    if(p.isGen != typeof "boolean" && p.isGen == 'false')
-                        p.isGen = false;
-                    if(p.isMasque != typeof "boolean" && p.isMasque == 'false')
-                        p.isMasque = false;
-                });    
-            }
-            i++;
+            if(q.propositions)setBoolean(q.propositions);
         });
     });
 
     //charge les grids
-    if(!bdd){
-        data.forms[0].recid = arrForms.length+1;
-        arrForms.push(data.forms);
-        w2ui.gForms.add(arrForms);
-        w2ui.gForms.refresh();    
-    }else{
-        w2ui.gQuestions.records = sltForms.questions = data.forms[0].questions;
-        w2ui.gQuestions.refresh();
-        w2ui.gProposition.clear();
-        w2ui.gProposition.refresh();            
-    }
+    w2ui.gQuestions.records = sltForms.questions = data.forms[0].questions;
+    w2ui.gQuestions.refresh();
+    w2ui.gProposition.clear();
+    w2ui.gProposition.refresh();            
     //charge les réponses
     sltForms.reponses = data.reponses;
 }
@@ -552,22 +591,47 @@ $('#gridForms').w2grid({
         }
     },
     onDelete: function (event) {
+
+        var s = w2ui.gForms.getSelection();
+    
         if (event.force) {
-            /** TODO:verifie si des réponses sont déjà donnée*/
-            w2ui.gQuestions.clear();
-            w2ui.gQuestions.refresh();
-            w2ui.gProposition.clear();
-            w2ui.gProposition.refresh();
+            //récupère les idForm
+            let ids = [];
+            s.forEach(function(id){
+                let f = w2ui.gForms.get(id);
+                if(f.idForm)ids.push(f.idForm);
+            });
+            //met à jour la base si besoin
+            if(ids.length){
+                patienter('Supression de formulaire...');
+                deleteToBDD(ids,'form');    
+            }
+        }else{
+            //Vérifie la présence de réponse
+            let nbR = 0, nbQ=0, nbP=0;
+            s.forEach(function(id){
+                let f = w2ui.gForms.get(id);
+                nbR += f.reponses ? f.reponses.length : 0;
+                nbQ += f.questions ? f.questions.length : 0;
+                if(f.questions){
+                    f.questions.forEach(function(q){
+                        nbP += q.propositions ? q.propositions.length : 0;
+                    });
+                }
+            })
+            if(nbR > 0 || nbQ > 0 || nbP > 0){
+                let m = 'Vous allez supprimer : <br/>'
+                    +s.length+' formulaire(s)<br/>'
+                    +nbQ+' question(s)<br/>'
+                    +nbP+' proposition(s)<br/>'
+                    +nbR+' réponse(s)<br/>';
+                w2obj.grid.prototype.msgDelete = m;
+            }
         }
     },
     onSave: function (event) {
-        var slt = w2ui.gForms.getChanges();        
-        event.onComplete = function() {
-            slt.forEach(function(s){
-                var dF = w2ui.gForms.get(s.recid);
-                saveForm(dF);    
-            })
-        }
+        let arrC = w2ui.gForms.getChanges();
+        updateBDD(arrC, 'form');    
     },
     toolbar: {
         items: [{
@@ -578,28 +642,13 @@ $('#gridForms').w2grid({
         }],
         onClick: function (event) {
             if (event.target == 'add') {
-                var max = d3.max(w2ui.gForms.records.map(function (d) {
-                    return d.recid
-                }));
-                var i = max ? max + 1 : 1;
-                arrForms.push({
-                    idForm: '',
-                    recid: i,
-                    txtForm:'Nouveau formulaire',
-                    iemlForm:'',
-                    bTemps: true,
-                    bGeo:true,
-                    bdd:bddNom,
-                    questions:[]
-                });
-                w2ui.gForms.records=arrForms;
-                w2ui.gForms.refresh();
+               addToBDD({'bGeo':true,'bTemps':true,'bdd':bddNom,
+                'iemlForm':'','txtForm':'Nouveau formulaire'},'form');
             }
         }
     },
     records: arrForms
 });
-getForms();
 $('#gridQuestions').w2grid({
     name: 'gQuestions',
     header: 'Liste des questions',
@@ -665,29 +714,54 @@ $('#gridQuestions').w2grid({
             return;
         }
         w2ui.gProposition.clear();
-        var record = this.get(event.recid);
-        if(record.propositions){
-            w2ui.gProposition.records = record.propositions;            
+        sltQuest = this.get(event.recid);
+        if(sltQuest.propositions){
+            w2ui.gProposition.records = sltQuest.propositions;            
             w2ui.gProposition.refresh();
+        }else{
+            if(sltQuest.idQ){
+                d3.json('../ice/getform?idBase='+bddNom+'&reponse=1&idQ='+sltQuest.idQ, function (err, data){
+                    //correction des valeurs boolean
+                    setBoolean(data.propositions);
+                    sltQuest.propositions=data.propositions;
+                    w2ui.gProposition.records = sltQuest.propositions;            
+                    w2ui.gProposition.refresh();
+                });     
+            }    
         }
-    },
+},
     onSave: function (event) {
-        event.onComplete = function() {
-            var slt = w2ui.gForms.getSelection();
-            slt.forEach(function(s){
-                var dF = w2ui.gForms.get(s);
-                saveForm(dF);    
-            })
-        }
+        let arrC = w2ui.gQuestions.getChanges();
+        updateBDD(arrC, 'question');    
     },
     onDelete: function (event) {
+        var s = w2ui.gQuestions.getSelection();
+    
         if (event.force) {
-            //verifie si des réponses sont déjà données
-
-            w2ui.gProposition.clear();
-            w2ui.gProposition.refresh();
-            var f = w2ui.gForms.get(s[0]);        
-
+            //récupère les idForm
+            let ids = [];
+            s.forEach(function(id){
+                let f = w2ui.gQuestions.get(id);
+                if(f.idQ)ids.push(f.idQ);
+            });
+            //met à jour la base si besoin
+            if(ids.length){
+                patienter('Supression de question...');
+                deleteToBDD(ids, 'question');    
+            }
+        }else{
+            //Vérifie la présence de réponse
+            let nbR = 0, nbQ=0, nbP=0;
+            s.forEach(function(id){
+                let q = w2ui.gQuestions.get(id);
+                nbP += q.propositions ? q.propositions.length : 0;
+            })
+            if(nbP > 0){
+                let m = 'Vous allez supprimer : <br/>'
+                    +s.length+' question(s)<br/>'
+                    +nbP+' proposition(s)<br/>';
+                w2obj.grid.prototype.msgDelete = m;
+            }
         }
     },
     toolbar: {
@@ -701,22 +775,7 @@ $('#gridQuestions').w2grid({
             if (event.target == 'add') {
                 var f = getParamsForm();
                 if(!f) return;        
-
-                var max = d3.max(w2ui.gQuestions.records.map(function (d) {
-                    return d.recid
-                }));
-                var i = max ? max + 1 : 1;
-                var q = {
-                    recid: i,
-                    txtQ:'nouvelle question ?',
-                    propositions: [],
-                    recidForm: f.recid,
-                    idForm: f.idForm,
-                    nbProp: 6
-                };
-                sltForms.questions.push(q);
-                w2ui.gQuestions.records = sltForms.questions;
-                w2ui.gQuestions.refresh();
+                addToBDD({txtQ:'nouvelle question ?',recidForm: f.recid,idForm: f.idForm,nbProp: 6},'question');
             }
         }
     },
@@ -847,7 +906,7 @@ $('#gridPropositions').w2grid({
                     w2alert('Veuillez enregistrer la question.');
                     return;
                 }
-                var r = w2ui.gQuestions.get(s[0]);
+                sltQuest = w2ui.gQuestions.get(s[0]);
                 var max = d3.max(w2ui.gProposition.records.map(function (d) {
                     return d.recid
                 }));
@@ -856,11 +915,11 @@ $('#gridPropositions').w2grid({
                     'target': 'gReponse',
                     'index': i,
                     'value': true,
-                    'recidQuest': r['recid']
+                    'idQ': sltQuest['idQ']
                 };
-                w2ui.gProposition.header = "Proposition(s) pour la question : " + r['txtQ'];
+                w2ui.gProposition.header = "Proposition(s) pour la question : " + sltQuest['txtQ'];
                 $('#modalIemlMatrice').modal('show');
-                //w2ui.gReponse.add({ recid: w2ui.gReponse.records.length + 1,recidQuest: r['recid']});
+                //les grilles IEML déclenche la function d'ajout
             }
         }
     },
@@ -887,7 +946,9 @@ $('#gridPropositions').w2grid({
         }
     },
     onSave: function (event) {
-        w2ui.gProposition.getChanges().forEach(function (c) {
+        let arrC = w2ui.gProposition.getChanges();
+        updateBDD(arrC, 'prop');    
+        arrC.forEach(function (c) {
             if ('isGen' in c) {
                 var r = w2ui[event.target].get(c.recid);
                 if (c.isGen) {
@@ -898,53 +959,73 @@ $('#gridPropositions').w2grid({
                     deleteCptGen(r);
                 }
             }
-            saveForm();        
         });
     }
 });
 
+function setBoolean(propositions){
+    //correction des valeurs boolean
+    propositions.forEach(function(p){
+        if(p.iemlR){
+            if((p.isGen == 'false' || p.isGen == '0'))
+                p.isGen = false;
+            else
+                p.isGen = true;
+            if((p.isMasque == 'false' || p.isMasque == '0'))
+                p.isMasque = false;
+            else
+                p.isMasque = true;
+            if((p.isValide == 'false' || p.isValide == '0'))
+                p.isValide = false;
+            else                            
+                p.isValide = true;
+        }
+        if(p.idForm){
+            if((p.bTemps == 'false' || p.bTemps == '0'))
+                p.bTemps = false;
+            else                            
+                p.bTemps = true;
+            if((p.bGeo == 'false' || p.bGeo == '0'))
+                p.bGeo = false;
+            else                            
+                p.bGeo = true;                
+        }
+    });    
+
+}
 
 function getCptDefinition(r) {
 
-    patienter('Génération des concepts...');
     //récupère la définition du concept génératif
     d3.json(urlIeml + r.iemlR, function (err, data) {
         var gen = getIemlRela(data);
-        var first = true;
-        var max = d3.max(w2ui.gProposition.records.map(function (d) {
-            return d.recid
-        }));
-        var i = max ? max + 1 : 1;
-
+        var props = [];
         gen.forEach(function (g) {
             if (g.dico) {
-                var isGen = g.value == r.iemlR ? true : false;
-                var nr = {
-                    recid: i,
-                    'recidQuest': r.recidQuest,
+                let isGen = g.value == r.iemlR ? 1 : 0;
+                let idP = isGen ? r.idP : 0;
+                let nr = {
+                    'idP': idP,
+                    'idQ': r.idQ,
                     'txtR': g.dico.FR,
                     'iemlR': g.value,
                     'iemlRelaType': g.reltype,
-                    'recidParent': r.recid,
                     'iemlRParent': r.iemlR,
                     'taille': g.dico.TAILLE,
                     'layer': g.dico.LAYER,
                     'idDico': g.dico.INDEX,
                     'iemlRParent': r.iemlR,
                     'isGen': isGen,
-                    'isMasque': false,
-                    'isValid': isGen
+                    'isMasque': 0,
+                    'isValide': isGen
                 };
-                //vérifie les doublons
-                w2ui.gProposition.add(nr);
-                i++;
-                first = false;
+                /** TODO:vérifie les doublons */ 
+                props.push(nr);
             }
         });
-        calculePropositionLiens();
-        saveForm();        
-        patienter('', true);
+        addToBDD(props,'props')
     });
+
 
 }
 
@@ -979,14 +1060,15 @@ function addIemlCode(cpt) {
                 , 'txtR': cpt.dico.FR, 'iemlR': ieml, 'cpt':cpt};
             w2ui[evtCellIEML.target].add(r);
             */
-            var r = {
+           patienter('Génération des concepts...');
+           //ajoute la proposition initiale
+           var r = {
                 recid: w2ui.gProposition.records.length + 1,
-                'recidQuest': evtCellIEML.recidQuest,
+                'idQ': evtCellIEML.idQ,
                 'iemlR': ieml,
-                'isGen': true
+                'isGen': 1
             };
-            getCptDefinition(r);
-
+            addToBDD(r,'prop');
         }
     } else {
         //cumul les concepts
@@ -1017,31 +1099,37 @@ function calculePropositionLiens() {
     //pour chaque question
     sltForms.questions.forEach(function (q) {
         if(q.propositions){
-            //récupère les parents des réponses        
-            var arrParent = q.propositions.filter(function (r) {
-                return r.isGen;
-            });
-            //pour chaque parent
-            q.liens = [];
-            arrParent.forEach(function (rp) {
-                //calcule les liens avec les autres réponses
-                q.propositions.forEach(function (ra) {
-                    if (rp.iemlR != ra.iemlR && !ra.isMasque && !rp.isMasque) {
-                        q.liens.push({
-                            'levenshtein': levenshteinDistance(rp.iemlR, ra.iemlR),
-                            'recidS': rp.recid,
-                            'recidT': ra.recid,
-                            'source': rp.iemlR + "",
-                            'target': ra.iemlR + "",
-                            'value': 1,
-                            'reltype': ra.iemlRelaType,
-                            'idEdge': ra.recidQuest + '_' + ra.recidParent + '_' + ra.recid
-                        });
-                    }
-                })
-            })
+            addQuestionPropositionLiens(q);
         }
     });
+
+}
+
+function addPropositionLiens(props) {
+    //récupère les parents des réponses        
+    var propsParent = props.filter(function (r) {
+        r.liens = [];
+        return r.isGen;
+    });
+    //pour chaque proposition parente
+    propsParent.forEach(function (rp) {
+        //calcule les liens avec les autres réponses
+        props.forEach(function (ra) {
+            if (rp.iemlR != ra.iemlR && !ra.isMasque && !rp.isMasque) {
+                rp.liens.push({
+                    'levenshtein': levenshteinDistance(rp.iemlR, ra.iemlR),
+                    'idPsource': rp.idP,
+                    'idPtarget': ra.idP,
+                    'source': rp.iemlR + "",
+                    'target': ra.iemlR + "",
+                    'value': 1,
+                    'reltype': ra.iemlRelaType,
+                    'idEdge': ra.idQ + '_' + ra.idParent + '_' + ra.idP
+                });
+            }
+        })
+    })
+    addToBDD(props, 'liens');    
 
 }
 

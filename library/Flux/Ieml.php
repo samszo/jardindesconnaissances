@@ -26,7 +26,7 @@
 	var $PATH_DICO_RELA = 'https://dictionary.ieml.io/api/relations';
 	var $PATH_DICO_RANK = 'https://dictionary.ieml.io/api/terms/ranking';
 	var $PATH_DICO = 'https://dictionary.ieml.io/api/all?version=';
-	var $VERSION_DICO = 'dictionary_2018-09-03_20:39:39';
+	var $VERSION_DICO = 'dictionary_2019-03-12_01:16:12';
 	
   	public function __construct($idBase=false,$bTrace=false,$bCache=true)
     {
