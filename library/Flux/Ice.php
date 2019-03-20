@@ -64,9 +64,12 @@ class Flux_Ice extends Flux_Site{
         $rs['forms'][0]=$f;
         $arrQ = $this->dbD->findByParent($idForm);
         foreach ($arrQ as $q) {
-            $rs['forms'][0]->questions[] = json_decode($q['note']);
+            $objQ = json_decode($q['note']);
+            $objQ->propositions = $this->getQuestProps($q['doc_id']); 
+            $rs['forms'][0]->questions[] = $objQ;
         }
         if($reponse){
+            $rs['reponses']=[];
             $arrR = $this->getFormReponse($idForm);
             foreach ($arrR as $r) {
                 $rs['reponses'][] = json_decode($r['valeur']);

@@ -151,81 +151,6 @@ $("#btnCptLigne input:radio").on('change', function () {
     console.log("cptLigne=" + cptLigne);
 })
 
-function simplifieDataGrid(dF){
-
-    var arrFormSimple = {'bGeo':dF.bGeo,'bTemps':dF.bTemps,'bdd':dF.bdd,
-                'idForm':dF.idForm,'iemlForm':dF.iemlForm,
-                'recid': dF.recid,'txtForm':dF.txtForm
-            };
-    //simplifie la définition des liens
-    var arrQuestionSimples = [];    
-    dF.questions.forEach(function(q){
-        var rs = {
-            'recid':q.recid,
-            'idForm':q.idForm,
-            'nbProp':q.nbProp,
-            'txtQ':q.txtQ,
-            'txtQIeml':q.txtQieml,
-            'liens':[],
-            'propositions':q.propositions
-        }
-        if(q.liens){
-            q.liens.forEach(function(l){
-                rs.liens.push({
-                    'source':l.source.key ? l.source.key : l.source,
-                    'target':l.target.key ? l.target.key : l.target,
-                    'recidS':l.recidS,
-                    'recidT':l.recidT,
-                    'idEdge':l.idEdge,
-                    'idQuest':l.idQuest,
-                    'index':l.index,
-                    'levenshtein':l.levenshtein,
-                    'reltype':l.reltype,
-                    'value':l.value
-                });
-            });    
-        }
-        arrQuestionSimples.push(rs);            
-    });
-    //simplifie les réponses
-    var arrReponsesSimples = [];
-    if(dF.reponses){
-        dF.reponses.forEach(function(r){
-            //construction de la réponse finale
-            var rsR = {
-                'recidQuest':r.pc[0].recidQuest,
-                'idsDico':'',
-                'idForm':r.idForm,
-                'idUti':r.idUti,
-                't':r.t,
-                'lat':r.g ? r.g.lat : 0,
-                'lng':r.g ? r.g.lng : 0,
-                'pre':r.g ? r.g.pre : 0
-            }
-            //construction des choix
-            rsR.c = [];
-            r.c.forEach(function(c){
-                rsR.c.push({'recidQuest':c.recidQuest,'idDico': c.idDico});
-            });
-            //construction des possibilités de choix
-            rsR.pc = [];
-            r.pc.forEach(function(pc){
-                rsR.pc.push({'recidQuest':pc.recidQuest,'idDico': pc.idDico});
-            });
-            //construction du processus
-            rsR.p = [];
-            r.p.forEach(function(p){
-                rsR.p.push({'t':p.t,'v':p.v,'idDico':p.idDico});
-            });            
-            arrReponsesSimples.push(rsR);
-
-        });
-    }    
-    return {f:arrFormSimple,q:arrQuestionSimples,r:arrReponsesSimples};
-}
-
-
-
 function addToBDD(dataSource, table){
 
     $.post("../ice/addform", {'data':dataSource,'table':table},
@@ -273,7 +198,11 @@ function addToBDD(dataSource, table){
                     w2ui.gProposition.records = sltQuest.propositions;
                     w2ui.gProposition.refresh();    
                 }
-
+                if(table=='reponse'){
+                    creaForm();
+                    //creaHexaCarto();
+                    creaForceCarto();        
+                }
                 w2alert("L'ajout est fait.");
             }					 		
         }, "json")
@@ -308,6 +237,7 @@ function updateBDD(dataSource, table){
 
 function deleteToBDD(dataSource, table){
 
+    patienter('Supression '+table+' en cours...');
     $.post("../ice/deleteform", {'data':dataSource,'table':table},
         function(data){
             if(data.erreur){
@@ -326,7 +256,7 @@ function deleteToBDD(dataSource, table){
                     w2ui.gProposition.clear();
                     w2ui.gProposition.refresh();    
                 }
-                if(table=='proposition'){
+                if(table=='prop'){
                     w2ui.gProposition.refresh();    
                 }
                 w2alert('Les supressions sont faites.')
@@ -342,103 +272,7 @@ function deleteToBDD(dataSource, table){
 }
 
 
-function sauveFormValue(q, sync){
-
-    $.ajax({
-        type: 'POST',
-        url: "../ice/sauveform",
-        data: q,
-        success: function(result){
-            return result;
-        },
-        dataType: "json",
-        async:sync,
-        error: function (xhr, ajaxOptions, thrownError) {
-            console.log(thrownError);
-        }
-      });
-
-}
-
-$('#btnExport').click(function () {
-
-    if(verifForm()){
-        var df = getParamsForm();
-        if(!df)return;
-        var jsonData = {
-            "forms": df,
-            "reponses": df.reponses
-        };
-        exportJson(JSON.stringify(jsonData), 'formulaireSemantique.json', 'text/plain');    
-    }
-
-})
-
-function verifForm(){
-    let rep = true;
-    if (w2ui.gForms.getChanges().length > 0) {
-        w2alert('Veuillez enregistrer le formulaire.');
-        rep = false;
-    }
-    if (w2ui.gQuestions.getChanges().length > 0) {
-        w2alert('Veuillez enregistrer les questions.');
-        rep = false;
-    }
-    if (w2ui.gProposition.getChanges().length > 0) {
-        w2alert('Veuillez enregistrer les propositions.');
-        rep = false;
-    }
-
-    return rep;
-
-}
-
-function exportJson(content, fileName, contentType) {
-    var a = document.createElement("a");
-    var file = new Blob([content], {
-        type: contentType
-    });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-}
-
-$('#btnImport').click(function () {
-
-    w2confirm('ATTENTION les paramètres actuels seront supprimés.')
-        .yes(function () {
-            $('#modGetFic').modal('show');
-        })
-        .no(function () {
-            console.log('NO');
-        });
-})
-//initialise le champ d'import des fichiers
-$('#fileImport').w2field('file', {
-    max: 1
-});
-
-$('#btnValidImport').click(function () {
-    var f = $('#fileImport').data('selected');
-    fr = new FileReader();
-    fr.onload = receivedText;
-    fr.readAsText(f[0].file);
-
-    function receivedText(e) {
-        let lines = e.target.result;
-        try {
-            var data = JSON.parse(lines);
-            chargeDataForm(data);
-            $('#modGetFic').modal('hide');
-        } catch (error) {
-            w2alert('Les données ne sont pas au bon format.');
-        }
-        $('#fileImport').w2field('file', {
-            max: 1
-        });
-    }
-})
-function chargeDataForm(data,bdd){
+function chargeDataForm(data){
 
     //corrige les boolean et les recid
     data.forms.forEach(function(f){
@@ -581,7 +415,7 @@ $('#gridForms').w2grid({
         //récupère les données du formulaire
         if(sltForms.idForm){
             d3.json('../ice/getform?idBase='+bddNom+'&reponse=1&idForm='+sltForms.idForm, function (err, dataF){
-                chargeDataForm(dataF,true);
+                chargeDataForm(dataF);
             });     
         }else{
             w2ui.gQuestions.records = sltForms.questions;
@@ -603,7 +437,6 @@ $('#gridForms').w2grid({
             });
             //met à jour la base si besoin
             if(ids.length){
-                patienter('Supression de formulaire...');
                 deleteToBDD(ids,'form');    
             }
         }else{
@@ -611,13 +444,14 @@ $('#gridForms').w2grid({
             let nbR = 0, nbQ=0, nbP=0;
             s.forEach(function(id){
                 let f = w2ui.gForms.get(id);
-                nbR += f.reponses ? f.reponses.length : 0;
                 nbQ += f.questions ? f.questions.length : 0;
                 if(f.questions){
                     f.questions.forEach(function(q){
                         nbP += q.propositions ? q.propositions.length : 0;
                     });
                 }
+                nbR += f.reponses ? f.reponses : 0;
+
             })
             if(nbR > 0 || nbQ > 0 || nbP > 0){
                 let m = 'Vous allez supprimer : <br/>'
@@ -746,7 +580,6 @@ $('#gridQuestions').w2grid({
             });
             //met à jour la base si besoin
             if(ids.length){
-                patienter('Supression de question...');
                 deleteToBDD(ids, 'question');    
             }
         }else{
@@ -755,11 +588,16 @@ $('#gridQuestions').w2grid({
             s.forEach(function(id){
                 let q = w2ui.gQuestions.get(id);
                 nbP += q.propositions ? q.propositions.length : 0;
+                let f = w2ui.gForms.get(q.idForm);
+                f.reponses.forEach(function(r){
+                    nbR += r.idQ == q.idQ ? 1 : 0;
+                })
             })
             if(nbP > 0){
                 let m = 'Vous allez supprimer : <br/>'
                     +s.length+' question(s)<br/>'
-                    +nbP+' proposition(s)<br/>';
+                    +nbP+' proposition(s)<br/>'
+                    +nbR+' réponse(s)<br/>';
                 w2obj.grid.prototype.msgDelete = m;
             }
         }
@@ -934,15 +772,35 @@ $('#gridPropositions').w2grid({
         */
     },
     onDelete: function (event) {
+        var s = w2ui.gProposition.getSelection();
+    
         if (event.force) {
-            var s = w2ui[event.target].getSelection();
-            //TODO:érifie si le formulaire a déjà été utilisé
-
-            //supprime les concept généré
-            s.forEach(function (id) {
-                var r = w2ui[event.target].get(id);
-                deleteCptGen(r);
+            //récupère les id
+            let ids = [];
+            s.forEach(function(id){
+                let f = w2ui.gProposition.get(id);
+                if(f.idP)ids.push(f.idP);
             });
+            //met à jour la base si besoin
+            if(ids.length){
+                deleteToBDD(ids, 'prop');    
+            }
+        }else{
+            //Vérifie la présence de réponse
+            let nbR = 0;
+            s.forEach(function(id){
+                let p = w2ui.gProposition.get(id);
+                let q = w2ui.gQuestions.get(p.idQ);
+                let f = w2ui.gForms.get(q.idForm);
+                f.reponses.forEach(function(r){
+                    nbR += r.idP==p.idP ? 1 : 0;
+                })
+            })
+            if(nbR > 0){
+                let m = 'Vous allez supprimer : <br/>'
+                    +nbR+' réponse(s)<br/>';
+                w2obj.grid.prototype.msgDelete = m;
+            }
         }
     },
     onSave: function (event) {
@@ -962,6 +820,89 @@ $('#gridPropositions').w2grid({
         });
     }
 });
+$('#gridReponses').w2grid({
+    name: 'gReponse',
+    header: 'Liste des réponses',
+    show: {
+        toolbar: true,
+        footer: true,
+        header: true,
+        toolbarSave: false,
+        toolbarDelete: true,
+    },
+    columns: [{
+            field: 'recid',
+            caption: 'ID',
+            size: '30px',
+            hidden: true,
+            sortable: true,
+            resizable: true
+        },
+        {
+            field: 'idQ',
+            caption: 'IDQ',
+            size: '50px',
+            hidden: true,
+            sortable: true,
+            resizable: true,
+        },
+        {
+            field: 'idUti',
+            caption: 'Utilisateur',
+            size: '100px',
+            sortable: true,
+            resizable: true,
+            editable: {
+                type: 'text'
+            }
+        },
+        {
+            field: 't',
+            caption: 'Date',
+            size: '100px',
+            sortable: true,
+            resizable: true,
+            editable: {
+                type: 'text'
+            },
+        },
+        {
+            field: 'g',
+            caption: 'Date',
+            size: '100px',
+            sortable: true,
+            resizable: true,
+            editable: {
+                type: 'text'
+            },
+        },
+        {
+            field: 'c',
+            caption: 'Date',
+            size: '100px',
+            sortable: true,
+            resizable: true,
+            editable: {
+                type: 'text'
+            },
+        },
+        {
+            field: 'pc',
+            caption: 'Date',
+            size: '100px',
+            sortable: true,
+            resizable: true,
+            editable: {
+                type: 'text'
+            },
+        }
+    ],
+    records: [],
+    onDelete: function (event) {
+
+    }
+});
+
 
 function setBoolean(propositions){
     //correction des valeurs boolean
@@ -1031,14 +972,14 @@ function getCptDefinition(r) {
 
 function deleteCptGen(r) {
     if (r) {
-        patienter('Suppression des concepts générés...');
-        var arrG = w2ui.gProposition.records.filter(function (g) {
+        var ids=[], arrG = w2ui.gProposition.records.filter(function (g) {
             return g.recidParent == r.recid;
         })
         arrG.forEach(function (g) {
             w2ui.gProposition.remove(g.recid);
+            ids.push(g.recid);
         })
-        patienter('', true);
+        deleteToBDD(ids,'prop');
     }
 }
 
@@ -1087,24 +1028,6 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 })
 
 
-function calculeReponseNombre() {
-
-    sltForms.reponses.forEach(function (d) {
-
-    })
-}
-
-function calculePropositionLiens() {
-
-    //pour chaque question
-    sltForms.questions.forEach(function (q) {
-        if(q.propositions){
-            addQuestionPropositionLiens(q);
-        }
-    });
-
-}
-
 function addPropositionLiens(props) {
     //récupère les parents des réponses        
     var propsParent = props.filter(function (r) {
@@ -1136,7 +1059,7 @@ function addPropositionLiens(props) {
 
 function creaForceCarto(data, div) {
 
-    calculePropositionLiens();
+    if(!sltForms) return;
 
     var height = $('#ifMatriceIEML').height() - $('#navViz').height(),
         width = $('#formTest-result').width(),
@@ -1163,9 +1086,9 @@ function creaForceCarto(data, div) {
 function calculeReponse(){
     //calcule les réponses
     var arrRepTot = [], max = 1;
-    sltForms.reponses.forEach(function (d) {
-        d.c.forEach(function (c) {
-            var k = c.recidQuest + '_' + c.idDico;
+    sltForms.reponses.forEach(function(q){
+        r.c.forEach(function (c) {
+            var k = c.idQ + '_' + c.idP;
             if (arrRepTot[k]) arrRepTot[k].nb++;
             else arrRepTot[k] = {
                 nb: 1,
@@ -1173,7 +1096,7 @@ function calculeReponse(){
             };
             max = max < arrRepTot[k].nb ? arrRepTot[k].nb : max;
         })
-    });
+    });    
     return {'m':max,'r':arrRepTot};
 }
 
@@ -1195,8 +1118,6 @@ function creaTitleCarto() {
 
 //merci beaucoup à  https://bl.ocks.org/mbostock/7833311
 function creaHexaCarto() {
-
-    calculePropositionLiens();
 
     var height = $('#ifMatriceIEML').height() - $('#navViz').height(),
         width = $('#formTest-result').width(),
@@ -1292,7 +1213,7 @@ function creaForm() {
     //ajoute le bouton de sélection    
     r.append("input")
         .attr("id", function (d) {
-            return "rQ" + d.recidQuest;
+            return "rQ" + d.idQ;
         })
         .attr("class", "form-check-input")
         .attr("type", "checkbox")
@@ -1325,17 +1246,16 @@ function creaForm() {
             //récupère les réponses
             var c = d3.selectAll("#formTest-form input:checked").data();
             var pc = d3.selectAll("#formTest-form input").data();
-            sltForms.reponses.push({
+            //enregistre la réponse
+            let r = {
                 't': new Date().toISOString().slice(0, 19).replace('T', ' '),
                 'g': getGeoInfos(),
                 'p': arrProcess,
                 'idUti':idUti,
                 'c': c,
                 'pc': pc,
-            });
-            creaForm();
-            //creaHexaCarto();
-            creaForceCarto();
+            };
+            addToBDD(r, 'reponse');             
         });
 }
 

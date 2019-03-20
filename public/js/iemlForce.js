@@ -60,7 +60,13 @@ function iemlForce() {
             //récupère les parents
             arrValide = data.propositions.filter(function(r){
                     return r.isValide;}),
-            links = data.liens;
+            //récupère les liens
+            //links = data.liens;
+            links = [];
+            arrValide.forEach(function(v){
+                links = links.concat(v.liens);
+            });
+                
             var maxLayers = d3.max(data.propositions.map(function(d)  {
                 d.layer = parseInt(d.layer);
                 return d.layer;
@@ -141,7 +147,7 @@ function iemlForce() {
             
             var circles = node.append("circle")
                 .attr("id", function(d) { 
-                    return 'c_'+d.values[0].recidQuest+'_'+d.values[0].idDico; })
+                    return 'c_'+d.values[0].idQ+'_'+d.values[0].idDico; })
                 .attr("r", function(d) { 
                     return 1; })
                 .attr("fill-opacity",0.4)
