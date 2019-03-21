@@ -33,10 +33,10 @@ d3.json(urlDico, function (err, data) {
         return d.TAILLE;
         }));
     arrIEMLitem = arrDico.filter(function(d){
-            return d.TAILLE == 1;
+            return d.TAILLE <= 2;
         });    
     arrIEMLmatrices = arrDico.filter(function(d){
-        return d.TAILLE > 1;
+        return d.TAILLE > 2;
     });    
     /*création des menus
     d3.select("#mnuMatrices").selectAll("a").data(arrIEMLmatrices).enter().append("a")
@@ -287,7 +287,9 @@ function chargeDataForm(data){
     w2ui.gProposition.clear();
     w2ui.gProposition.refresh();            
     //charge les réponses
-    sltForms.reponses = data.reponses;
+    w2ui.gReponse.records = sltForms.reponses = data.reponses;
+    w2ui.gReponse.refresh();
+
 }
 
 
