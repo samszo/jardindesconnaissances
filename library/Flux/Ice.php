@@ -155,17 +155,17 @@ class Flux_Ice extends Flux_Site{
 	 */
 	function getFormReponse($idForm){
         $sql = "SELECT 
-            rf.*
-        FROM
-            flux_doc dq
-                INNER JOIN
-            flux_rapport rf ON rf.src_id = dq.doc_id
-                AND rf.src_obj = 'doc'
-                AND rf.dst_obj = 'tag'
-                AND rf.dst_id = 3
-                AND rf.pre_obj = 'uti'
-        WHERE
-            dq.parent = ".$idForm;
+                rf.*
+            FROM
+                flux_doc df
+                    INNER JOIN
+                flux_rapport rf ON rf.src_id = df.doc_id
+                    AND rf.src_obj = 'doc'
+                    AND rf.dst_obj = 'tag'
+                    AND rf.dst_id = 3
+                    AND rf.pre_obj = 'uti'
+            WHERE
+                df.doc_id =".$idForm;
         return $this->dbD->exeQuery($sql);
     }
 
@@ -364,7 +364,7 @@ class Flux_Ice extends Flux_Site{
             }
             //création du rapport
             $idRapport = $this->dbR->ajouter(array('monade_id'=>$this->idMonade,'geo_id'=>$this->idGeo
-                ,"src_id"=>$r['idQ'],"src_obj"=>"doc"
+                ,"src_id"=>$r['idForm'],"src_obj"=>"doc"
                 ,"dst_id"=>$this->idTagRep,"dst_obj"=>"tag"
                 ,"pre_id"=>$r['idUti'],"pre_obj"=>"uti"
                 ));

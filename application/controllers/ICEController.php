@@ -242,17 +242,20 @@ class ICEController extends Zend_Controller_Action {
 				break;
 			case 'reponse':
 				$r = $this->_getParam('data');
-				$id = $ice->sauveReponseFormSem($r);	
+				$idR = $ice->sauveReponseFormSem($r);	
 				//enregistre les choix
 				foreach ($r['c'] as $c) {
+					$c['idR']=$idR;
 					$idC = $ice->sauveChoixReponseFormSem($c);				
 				}
 				//enregistre les possibilité de choix
 				foreach ($r['pc'] as $pc) {
+					$pc['idR']=$idR;
 					$idPC = $ice->sauveChoixReponseFormSem($pc,true);				
 				}
 				//enregistre le processus
 				foreach ($r['p'] as $p) {
+					$p['idR']=$idR;
 					$idProc=$ice->sauveProcessusReponseFormSem($p);					
 				}
 				break;

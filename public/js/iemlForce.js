@@ -51,8 +51,10 @@ function iemlForce() {
                     .attr('fill', 'red');                
 
             //récupère les noeuds ieml qui ne sont pas cachés
-            var nodes = d3.nest()
+            var arrKey = [],
+            nodes = d3.nest()
                 .key(function(d){
+                    arrKey.push(d.iemlR);
                     return d.iemlR;
                 })
                 .entries(data.propositions.filter(function(r){
@@ -60,11 +62,18 @@ function iemlForce() {
             //récupère les parents
             arrValide = data.propositions.filter(function(r){
                     return r.isValide;}),
-            //récupère les liens
+            //récupère les liens en relation avec les noeuds valides
             //links = data.liens;
             links = [];
             arrValide.forEach(function(v){
-                links = links.concat(v.liens);
+                //ne prend en compte que les noeuds qui ne sont pas masqué
+                let arrL = v.liens.filter(function(l){
+                    if(l.source.key)
+                        return arrKey.includes(l.source.key) && arrKey.includes(l.target.key);
+                    else
+                        return arrKey.includes(l.source) && arrKey.includes(l.target);
+                });
+                links = links.concat(arrL);
             });
                 
             var maxLayers = d3.max(data.propositions.map(function(d)  {
@@ -149,7 +158,7 @@ function iemlForce() {
                 .attr("id", function(d) { 
                     return 'c_'+d.values[0].idQ+'_'+d.values[0].idDico; })
                 .attr("r", function(d) { 
-                    return 1; })
+                    return 3; })
                 .attr("fill-opacity",0.4)
                 .attr("stroke",'none')
                 .attr("fill", function(d) { 
@@ -296,9 +305,9 @@ function iemlForce() {
       
     
     chart.changeRayonNoeud = function(id,v) {
-
+        let r = rayon(v);
         d3.select('#c_'+id)
-            .attr('r',rayon(v));
+            .attr('r',r);
 
     } 
 

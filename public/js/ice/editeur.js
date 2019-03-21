@@ -199,8 +199,8 @@ function addToBDD(dataSource, table){
                     w2ui.gProposition.refresh();    
                 }
                 if(table=='reponse'){
+                    sltForms.reponses.push(dataSource);
                     creaForm();
-                    //creaHexaCarto();
                     creaForceCarto();        
                 }
                 w2alert("L'ajout est fait.");
@@ -637,7 +637,7 @@ $('#gridPropositions').w2grid({
             resizable: true
         },
         {
-            field: 'recidQuest',
+            field: 'idQ',
             caption: 'IDQ',
             size: '50px',
             hidden: true,
@@ -1086,9 +1086,9 @@ function creaForceCarto(data, div) {
 function calculeReponse(){
     //calcule les réponses
     var arrRepTot = [], max = 1;
-    sltForms.reponses.forEach(function(q){
+    sltForms.reponses.forEach(function(r){
         r.c.forEach(function (c) {
-            var k = c.idQ + '_' + c.idP;
+            var k = c.idQ + '_' + c.idDico;
             if (arrRepTot[k]) arrRepTot[k].nb++;
             else arrRepTot[k] = {
                 nb: 1,
@@ -1191,7 +1191,7 @@ function creaForm() {
     d3.select("#genForm").remove();
     var c = d3.select("#formTest-form").append('div').attr('id', 'genForm');
     c.append('h1').text(dF.txtForm);
-    var f = c.append('form');
+    var f = c.append('div');
     //création des questions
     var q = f.selectAll('.form-group').data(dF.questions)
         .enter().append("div").attr('class', 'form-group')
@@ -1221,7 +1221,9 @@ function creaForm() {
             return "r" + d.recid;
         })
         .on("click", function (d) {
-            arrProcess.push({
+            if(!d.p)d.p=[];
+            d.p.push({
+                'idP': d.idP,
                 'v': this.checked,
                 't': new Date().toISOString().slice(0, 19).replace('T', ' '),
                 'g': getGeoInfos(),
@@ -1244,19 +1246,42 @@ function creaForm() {
         .text("Enregistrer")
         .on("click", function (d) {
             //récupère les réponses
-            var c = d3.selectAll("#formTest-form input:checked").data();
-            var pc = d3.selectAll("#formTest-form input").data();
-            //enregistre la réponse
-            let r = {
-                't': new Date().toISOString().slice(0, 19).replace('T', ' '),
-                'g': getGeoInfos(),
-                'p': arrProcess,
-                'idUti':idUti,
-                'c': c,
-                'pc': pc,
-            };
-            addToBDD(r, 'reponse');             
+            addToBDD(getReponse(), 'reponse');             
         });
+}
+
+function getReponse(){
+
+    var dtC = d3.selectAll("#formTest-form input:checked").data();
+    var dtPC = d3.selectAll("#formTest-form input").data();
+    var g = getGeoInfos();
+    //construction des réponses
+    var r = {'idForm':sltForms.idForm, 'idUti':idUti,
+        't':new Date().toISOString().slice(0, 19).replace('T', ' '),
+        'lat':g ? g.lat : 0,
+        'lng':g ? g.lng : 0,
+        'pre':g ? g.pre : 0,
+        'c':[],'pc':[],'p':[]};
+    dtC.forEach(function(c){
+        r.c.push({
+            'idQ':c.idQ,
+            'idDico':c.idDico,
+            'idP':c.idP
+        });
+    });
+    //construction des possibilités de choix
+    r.pc = [];
+    dtPC.forEach(function(pc){
+        r.pc.push({'idQ':pc.idQ,'idDico': pc.idDico,'idP':pc.idP});
+        //construction du processus
+        if(pc.p){
+            pc.p.forEach(function(p){
+                r.p.push({'t':p.t,'v':p.v,'idP':p.idP,'idDico':p.idDico});
+            });
+        }
+    });
+
+    return r;
 }
 
 function getAleaProposition(arrR, nb) {
