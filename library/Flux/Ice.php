@@ -317,6 +317,7 @@ class Flux_Ice extends Flux_Site{
 	function sauvePropositionFormSem($r,$rs=false,$update=false){
         if($r['idP']){
             $idDoc = $r['idP'];
+            $r['recid']=$idDoc;
         }elseif ($update) {
             foreach ($r as $p) {
                 $rsProp = $this->dbD->findBydoc_id($p['recid']);

@@ -467,3 +467,7 @@ bdd/flux_smel.sql
 bdd/omk_adacemu.sql
 data/diigo/importBookmark.csv
 application/configs/.DS_Store
+bdd/flux_formsem.sql
+data/ieml/ieml_dictionary.json
+data/ieml/M-.I-.n.-(relations).json
+data/ieml/M-.I-.n.-(tables).json

@@ -98,6 +98,7 @@ class ICEController extends Zend_Controller_Action {
 	}
 
 	public function editeurAction(){
+    	$this->view->uti = "[]";
 		$this->initInstance('editeur');
 
     	$this->view->urlIeml = "../flux/ieml?f=getDicoItem&ieml=";
@@ -265,6 +266,12 @@ class ICEController extends Zend_Controller_Action {
 		
 	}
 
+	public function navigiemlAction(){
+    	$this->view->urlDico = $this->_getParam('urlDico',"../../data/ieml/ieml_dictionary.json");
+    	$this->view->ieml = $this->_getParam('ieml',"E:");
+	
+	}
+
 	public function sauveformAction(){
 		$this->initInstance('editeur');
 		$p = $this->_request->getParams();
@@ -342,9 +349,9 @@ class ICEController extends Zend_Controller_Action {
 	}
 
     function initInstance($view=""){
-
-        $this->view->ajax = $this->_getParam('ajax');
+		$this->view->ajax = $this->_getParam('ajax');
         $this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
+		$this->view->uti = "{}";                        
         
         $auth = Zend_Auth::getInstance();
         $this->ssUti = new Zend_Session_Namespace('uti');
@@ -362,7 +369,7 @@ class ICEController extends Zend_Controller_Action {
             $uti = $dbUti->findByuti_id($this->_getParam('idUti'));
             $this->ssUti->uti = $uti;
             $this->ssUti->uti['mdp'] = '***';
-            $this->view->login = $this->ssUti->uti['login'];
+			$this->view->login = $this->ssUti->uti['login'];
             $this->view->uti = json_encode($uti);                        
         }else{
             //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));

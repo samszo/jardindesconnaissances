@@ -798,11 +798,9 @@ $('#gridPropositions').w2grid({
                     nbR += r.idP==p.idP ? 1 : 0;
                 })
             })
-            if(nbR > 0){
-                let m = 'Vous allez supprimer : <br/>'
-                    +nbR+' réponse(s)<br/>';
-                w2obj.grid.prototype.msgDelete = m;
-            }
+            let m = 'Vous allez supprimer : <br/>'
+                +nbR+' réponse(s)<br/>';
+            w2obj.grid.prototype.msgDelete = m;
         }
     },
     onSave: function (event) {
@@ -1087,7 +1085,7 @@ function creaForceCarto(data, div) {
 
 function calculeReponse(){
     //calcule les réponses
-    var arrRepTot = [], max = 1;
+    var arrRepTot = [], max=[];
     sltForms.reponses.forEach(function(r){
         r.c.forEach(function (c) {
             var k = c.idQ + '_' + c.idDico;
@@ -1096,10 +1094,12 @@ function calculeReponse(){
                 nb: 1,
                 id: k
             };
-            max = max < arrRepTot[k].nb ? arrRepTot[k].nb : max;
+            //calcule le max pour chaque réponse
+            if(!max[c.idQ])max[c.idQ]= arrRepTot[k].nb;
+            max[c.idQ] = max[c.idQ] < arrRepTot[k].nb ? arrRepTot[k].nb : max[c.idQ];
         })
     });    
-    return {'m':max,'r':arrRepTot};
+    return {'m':d3.max(max),'r':arrRepTot};
 }
 
 function creaTitleCarto() {
@@ -1291,7 +1291,7 @@ function getAleaProposition(arrR, nb) {
     var r = [];
     //sélectionne les réponses valides
     var v = arrR.filter(function (d) {
-        return d.isValide;
+        return d.isValide && !d.isMasque;
     })
     //ajoute au hasard une des réponses valides
     //r.push(v[d3.randomUniform(v.length-1)()]);
@@ -1309,26 +1309,6 @@ function getAleaProposition(arrR, nb) {
 
     //renvoie la liste des réponses
     return d3.shuffle(r);
-
-}
-
-function patienter(message, fin) {
-
-    if (fin) {
-        w2popup.unlock();
-        w2popup.close();
-    } else {
-        w2popup.open({
-            width: 500,
-            height: 300,
-            title: message,
-            body: '<div id="ppPatienter" class="w2ui-centered"></div>',
-            showMax: false,
-            showClose: false
-        });
-        w2popup.lock("Merci de patienter...", true);
-    }
-
 
 }
 

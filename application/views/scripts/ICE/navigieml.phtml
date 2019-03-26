@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="IEML navigateur">
+    <meta name="author" content="Samuel Szoniecky">
+
+    <title>Navigateur IEML</title>
+    <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
+
+    <style>
+        .node rect {
+        cursor: move;
+        fill-opacity: .9;
+        shape-rendering: crispEdges;
+    }
+
+    .node text {
+        pointer-events: none;
+        text-shadow: 0 1px 0 #fff;
+    }
+
+    .link {
+        stroke-opacity: .2;
+    }
+
+    .link:hover {
+        stroke-opacity: .5;
+    }
+</style>
+</head>
+
+<body>
+
+    <script type="text/javascript" src="../js/d3.v5.min.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/w2ui.min.js"></script>
+    <script type="text/javascript" src="../js/d3-sankey.min.js"></script>
+    <script type="text/javascript" src="../js/site.js"></script>
+    <script type="text/javascript" src="../js/ieml.js"></script>
+
+    <script>
+        //chargement du dictionnaire IEML
+        var objIEML = new ieml({'urlDico':'<? echo $this->urlDico;?>','fctCallBackInit':getIemlDataDetails});
+        //et des data
+        function getIemlDataDetails(){
+            objIEML.getDesc('<? echo $this->ieml;?>',setSankey);
+        }
+
+        // set the dimensions and margins of the graph
+        var margin = {
+                top: 10,
+                right: 10,
+                bottom: 10,
+                left: 10
+            },
+            width = window.innerWidth - margin.left - margin.right,
+            height = window.innerHeight - margin.top - margin.bottom,
+            w = width*4,
+        	h = height*4;
+
+        window.onresize = resize;
+        function resize(){
+            width = window.innerWidth - margin.left - margin.right,
+            height = window.innerHeight - margin.top - margin.bottom,
+            d3.select("svg").transition().duration(2000)
+                .attr("width", width)
+                .attr("height", height)
+                .attr("viewBox","0 0 "+w+" "+h);	
+        }
+
+        // format variables
+        var formatNumber = d3.format(",.0f"), // zero decimal places
+            format = function (d) {
+                return formatNumber(d);
+            },
+            color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        var sankey = d3.sankey()
+            .nodeWidth(15)
+            .nodePadding(10)
+            .nodeAlign(d3.sankeyCenter)
+            .extent([
+                [1, 5],
+                [w - 1, h - 5]
+            ]);
+        var dt, keys, wText = 10;
+        function setSankey(data){
+            console.log(data);
+            dt = {"nodes": [],"links": []}, keys = [];            
+            var graph = modeliseData(data.relations, data.tables);
+            const {
+                nodes,
+                links
+            } = sankey(graph);
+            //supprime le svg s'il existe
+            d3.select("svg").remove();
+            // append the svg object to the body of the page
+            var svg = d3.select("body").append("svg")
+                .attr("width", w)
+                .attr("height", h)
+                .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+
+            // add in the links
+            var link = svg.append("g")
+                .attr("fill", "none")
+                .attr("stroke-opacity", 0.5)
+                .selectAll("g")
+                .data(links)
+                .join("g")
+                .style("mix-blend-mode", "multiply");
+
+            var gradient = link.append("linearGradient")
+                .attr("id",function(d){
+                    wText = d.target.x0-d.source.x1;
+                    return d.source.node + '_' + d.target.node;
+                })
+                .attr("gradientUnits", "userSpaceOnUse")
+                .attr("x1", d => d.source.x1)
+                .attr("x2", d => d.target.x0);
+
+            gradient.append("stop")
+                .attr("offset", "0%")
+                .attr("stop-color", d => color(d.source.fr));
+
+            gradient.append("stop")
+                .attr("offset", "100%")
+                .attr("stop-color", d => color(d.target.fr));
+
+            link.append("path")
+                .attr("class", "link")
+                .attr("d", d3.sankeyLinkHorizontal())
+                .attr("stroke", d => 'url(#' + d.source.node + '_' + d.target.node + ')')
+                .attr("stroke-width", d => Math.max(1, d.width));
+
+
+            // add the link titles
+            link.append("title")
+                .text(function (d) {
+                    return d.source.fr + " → " + d.target.fr;
+                });
+
+            svg.append("g")
+                .attr("stroke", "#000")
+                .selectAll("rect")
+                .data(nodes)
+                .join("rect")
+                .attr("x", d => d.x0)
+                .attr("y", d => d.y0)
+                .attr("height", d => d.y1 - d.y0)
+                .attr("width", d => d.x1 - d.x0)
+                .attr("fill", d => color(d.fr))
+                .style("stroke", function (d) {
+                    return d3.rgb(color(d.fr)).darker(2);
+                })
+                .append("title")
+                .text(d =>  d.ieml ? d.fr+' = '+d.ieml : d.fr);
+
+            var txt = svg.append("g")
+                .selectAll("text")
+                .data(nodes)
+                .join("text")
+                .style("font", d => d.selected ? "64px sans-serif" : "32px sans-serif")
+                .style('cursor','pointer')
+                .attr("x", d => d.x0 < w / 2 ? d.x1 + 6 : d.x0 - 6)
+                .attr("y", d => (d.y1 + d.y0) / 2)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", d => d.x0 < w / 2 ? "start" : "end")
+                .text(d => d.fr)
+                .call(wrap, wText)
+                .on('click',function(d){
+                    console.log(d);
+                    if(d.ieml)objIEML.getDesc(d.ieml,setSankey);
+                })
+            txt.append("title")
+                .text(d =>  d.ieml ? d.fr+' = '+d.ieml : d.fr);
+
+            resize();
+        }
+
+        function modeliseData(r, t) {
+            /*résultat attendu
+            {
+                "nodes":[
+                {"node":0,"name":"node0"},
+                {"node":1,"name":"node1"},
+                {"node":2,"name":"node2"},
+                {"node":3,"name":"node3"},
+                {"node":4,"name":"node4"}
+                ],
+                "links":[
+                {"source":0,"target":2,"value":2},
+                {"source":1,"target":2,"value":2},
+                {"source":1,"target":3,"value":2},
+                {"source":0,"target":4,"value":2},
+                {"source":2,"target":3,"value":2},
+                {"source":2,"target":4,"value":2},
+                {"source":3,"target":4,"value":4}
+                ]}
+            */
+            //création des noeuds
+            var n = t.header.main;
+            n.node = 0;
+            dt.nodes.push(n);
+            /*inclusion
+            for (var p in r.inclusion) {
+                r.inclusion[p].forEach(function (n) {
+                    if(!keys[p]){
+                        let nP = {'node': dt.nodes.length,'fr': p};
+                        dt.nodes.push(nP);
+                        keys[p] = nP.node;
+                        dt.links.push({"source": 0,"target": keys[p],"value": 2});
+                    };
+                    let type = 'inclusion.'+p;
+                    n.node = dt.nodes.length;
+                    dt.nodes.push(n);
+                    dt.links.push({"source": keys[p],"target": n.node,"value": 2, "type": type});
+                    keys[n.fr] = n.node;
+                });
+            }
+            */
+            //etymology père
+            for (var p in r.etymology.father) {
+                r.etymology.father[p].forEach(function (n) {
+                    if(!keys[p]){
+                        let nP = {'node': dt.nodes.length,'fr': p};
+                        dt.nodes.push(nP);
+                        keys[p] = nP.node;
+                        dt.links.push({"source": 0,"target": keys[p],"value": 2});
+                    };
+                    if(!keys[n.ieml]){
+                        n.node = dt.nodes.length;
+                        dt.nodes.push(n);
+                        keys[n.ieml] = n.node;
+                    }
+                    let type = 'etymology.father.'+p;
+                    dt.links.push({"source": keys[p],"target": keys[n.ieml],"value": 2, "type": type});                    
+                });
+            }
+            //lignes
+            t.rows.forEach(function(r,i){
+                let n =setNodeLink(r, 'rows');
+                keys['rows'+i] = n.node;                   
+            });
+            //colonnes
+            t.columns.forEach(function(c,i){
+                let n = setNodeLink(c, 'columns');
+                keys['columns'+i] = n.node;                                      
+            });
+            //cellules
+            t.cells_lines.forEach(function(cl,i){
+                cl.forEach(function(c,j){
+                    if(!keys[c.main.ieml]){
+                        n = c.main;
+                        n.node = dt.nodes.length;
+                        n.type = 'cells_lines';                    
+                        //récupère le concept
+                        if(!n.dico)n.dico=objIEML.getItem(n.ieml);
+                        dt.nodes.push(n);
+                        keys[n.ieml]=n.node;
+                        //création du lien avec la ligne
+                        if(t.rows.length){
+                            if(keys['rows'+i])dt.links.push({"source":keys['rows'+i],"target":n.node,"value":2});
+                        }
+                        //création du lien avec la colonne
+                        if (t.columns.length) {
+                            if(keys['columns'+j])dt.links.push({"source":keys['columns'+j],"target":n.node,"value":2});                         
+                        }
+                        if(t.rows.length==0 && t.columns.length==0){
+                            dt.links.push({"source":0,"target":n.node,"value":2});                                                  
+                        }
+                    }
+                });
+            });
+            //etymology enfant
+            var nSelected = keys[t.selected];
+            if(nSelected)dt.nodes[nSelected].selected=true;
+            for (var p in r.etymology.child) {
+                r.etymology.child[p].forEach(function (n) {
+                    if(!keys[p+'_c']){
+                        let nP = {'node': dt.nodes.length,'fr': p};
+                        dt.nodes.push(nP);
+                        keys[p+'_c'] = nP.node;
+                        dt.links.push({"source": nSelected,"target": keys[p+'_c'],"value": 2});
+                    };
+                    if(!keys[n.ieml]){
+                        n.node = dt.nodes.length;
+                        dt.nodes.push(n);
+                        keys[n.ieml] = n.node;
+                    }
+                    let type = 'etymology.child.'+p;
+                    dt.links.push({"source": keys[p+'_c'],"target": keys[n.ieml],"value": 2, "type": type});                    
+                });
+            }            
+            console.log(dt);
+            return dt;
+        }
+        function setNodeLink(r, type){
+            if(!keys[r.main.ieml]){
+                n = r.main;
+                n.node = dt.nodes.length;
+                dt.nodes.push(n);
+                keys[n.ieml] = n.node;
+            }else n=dt.nodes[keys[r.main.ieml]]; 
+            if(!n.dico)n.dico=objIEML.getItem(n.ieml);
+            if(n.dico){
+                let attr = objIEML.getAttribute(n.dico);
+                if(keys[attr])dt.links.push({"source":keys[attr],"target":n.node,"value":2, "type": type});
+                let subs = objIEML.getSubstance(n.dico);
+                if(keys[subs])dt.links.push({"source":keys[subs],"target":n.node,"value":2, "type": type});                         
+                let mode = objIEML.getMode(n.dico);
+                if(keys[mode])dt.links.push({"source":keys[mode],"target":n.node,"value":2, "type": type});
+            }
+            return n;                         
+        }
+    </script>
+
+</body>
+
+</html>

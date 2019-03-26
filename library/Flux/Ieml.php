@@ -27,6 +27,7 @@
 	var $PATH_DICO_RANK = 'https://dictionary.ieml.io/api/terms/ranking';
 	var $PATH_DICO = 'https://dictionary.ieml.io/api/all?version=';
 	var $VERSION_DICO = 'dictionary_2019-03-12_01:16:12';
+	var $URL_API = 'https://intlekt.io/api/dictionary/';
 	
   	public function __construct($idBase=false,$bTrace=false,$bCache=true)
     {
@@ -493,16 +494,14 @@
     	$this->trace("DEBUT ".__METHOD__." = ".$code);
     	
     	//récupère les élements de l'item
-		$jsonTable = $this->getUrlBodyContent($this->PATH_DICO_TABLE
-			,array('version'=>$this->VERSION_DICO,'ieml'=>$code),$this->bCache);
-		$jsonRela = $this->getUrlBodyContent($this->PATH_DICO_RELA
-			,array('version'=>$this->VERSION_DICO,'ieml'=>$code),$this->bCache);
-		$jsonRank = $this->getUrlBodyContent($this->PATH_DICO_RANK
-			,array('version'=>$this->VERSION_DICO,'ieml'=>$code),$this->bCache);
+		$jsonTable = $this->getUrlBodyContent($this->URL_API.$code.'/tables/'
+			,array('format'=>'json'),$this->bCache);
+		$jsonRela = $this->getUrlBodyContent($this->URL_API.$code.'/relations/'
+			,array('format'=>'json'),$this->bCache);
 		
 		$this->trace("FIN ".__METHOD__);
 		
-		return array('table'=>json_decode($jsonTable),'rela'=>json_decode($jsonRela),'rank'=>json_decode($jsonRank));
+		return array('tables'=>json_decode($jsonTable),'relations'=>json_decode($jsonRela));
     }	
 	/**
 	 * récupère les items d'une version de dictionnaire
