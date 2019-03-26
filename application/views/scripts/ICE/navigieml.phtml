@@ -43,10 +43,10 @@
 
     <script>
         //chargement du dictionnaire IEML
-        var objIEML = new ieml({'urlDico':'<? echo $this->urlDico;?>','fctCallBackInit':getIemlDataDetails});
+        var objIEML = new ieml({'urlDico':'<?php echo $this->urlDico;?>','fctCallBackInit':getIemlDataDetails});
         //et des data
         function getIemlDataDetails(){
-            objIEML.getDesc('<? echo $this->ieml;?>',setSankey);
+            objIEML.getDesc('<?php echo $this->ieml;?>',setSankey);
         }
 
         // set the dimensions and margins of the graph

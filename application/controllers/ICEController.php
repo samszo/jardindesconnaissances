@@ -13,7 +13,7 @@
  */
 require_once 'Zend/Controller/Action.php';
 
-class ICEController extends Zend_Controller_Action {
+class IceController extends Zend_Controller_Action {
 	
 	var $idBase = "flux_formsem";
 	var $idUti = 1;
