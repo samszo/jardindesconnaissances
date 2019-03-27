@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+  <head>
+    <script type="text/javascript" src="../js/d3.v5.min.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/cartoaxes.js"></script>
+  </head>
+  <body>
+    <svg id="drawing"></svg>
+    <script>
+    //merci à http://hassansin.github.io/chronograph-stopwatch-with-d3js
+    var margin = {
+                top: 30,
+                right: 10,
+                bottom: 40,
+                left: 10
+            },
+    width = window.innerWidth - margin.left - margin.right,
+    height = window.innerHeight - margin.top - margin.bottom,
+    rayon = width < height ? width/2 : height/2, nbSecond = 100,
+
+//ajoute le carto axe
+var ca = new cartoaxes({
+        'idSvg':'drawing'
+        ,'width':rayon*2,'height':rayon*2
+        ,'x': (margin.left+(width/2)-rayon),'y':(margin.top+(height/2)-rayon)
+    });
+
+    </script>
+  </body>
+</html>

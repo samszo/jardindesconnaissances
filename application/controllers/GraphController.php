@@ -684,7 +684,11 @@ class GraphController extends Zend_Controller_Action {
 	public function concentricringAction(){
 	    
 	}
-	
+
+	public function balayageAction(){
+	    
+	}
+
 	public function quatreaxesAction(){
 		$json = "[{'lbl':'clair','posi':0},{'lbl':'obscur','posi':180},{'lbl':'pertinent','posi':90},{'lbl':'inadapté','posi':270}]";
 		$this->view->axes = $json;	    
