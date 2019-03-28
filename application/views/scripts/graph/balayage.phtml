@@ -5,11 +5,15 @@
     <script type="text/javascript" src="../js/d3.v5.min.js"></script>
     <script type="text/javascript" src="../js/jquery.min.js"></script>
     <script type="text/javascript" src="../js/cartoaxes.js"></script>
+    <script type="text/javascript" src="../js/balayage.js"></script>
   </head>
   <body>
     <svg id="drawing"></svg>
     <script>
-    //merci à http://hassansin.github.io/chronograph-stopwatch-with-d3js
+    var svg = d3.select("#drawing")
+            .attr("width", window.innerWidth)
+            .attr("height", window.innerHeight);
+
     var margin = {
                 top: 30,
                 right: 10,
@@ -18,14 +22,19 @@
             },
     width = window.innerWidth - margin.left - margin.right,
     height = window.innerHeight - margin.top - margin.bottom,
-    rayon = width < height ? width/2 : height/2, nbSecond = 100,
+    rayon = width < height ? width/2 : height/2;
 
-//ajoute le carto axe
-var ca = new cartoaxes({
-        'idSvg':'drawing'
-        ,'width':rayon*2,'height':rayon*2
-        ,'x': (margin.left+(width/2)-rayon),'y':(margin.top+(height/2)-rayon)
-    });
+    //ajoute le carto axe
+    var ca = new cartoaxes({
+            'idSvg':'drawing'
+            ,'width':rayon*2,'height':rayon*2
+            ,'x': (margin.left+(width/2)-rayon),'y':(margin.top+(height/2)-rayon)
+        });
+    //ajoute le balayage
+    var bal = new balayage({
+            'idSvg':'drawing', 'rayon':rayon, 'nbSecond':100
+            ,'width':width,'height':height,'margin':margin
+        });
 
     </script>
   </body>
