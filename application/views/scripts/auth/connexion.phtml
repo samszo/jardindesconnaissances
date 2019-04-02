@@ -121,7 +121,8 @@
 			            }
 					},
 			    		})
-			    	); 
+					); 
+				w2ui['layout'].toggle('bottom');
 			});
 			function showGoogleAuth(){
 				var html = '<iframe src="google?idBase=<?php echo $this->idBase;?>&redir=<?php echo $this->redir;?>" style="width: 100%; height: 100%;">';
@@ -134,12 +135,13 @@
 			            };
 			        },
 			    });	
-				
 			}
 			function showJDCAuth(){
 				w2ui["formLog"].fields[0].hidden = false;		
 				w2ui["formLog"].fields[1].hidden = false;		
 				w2ui["formLog"].render();
+				w2ui['layout'].toggle('bottom');
+
 			}
 			function showP8Auth(){
 				window.location.assign("cas?idBase=<?php echo $this->idBase;?>&redir=<?php echo $this->redir;?>");				

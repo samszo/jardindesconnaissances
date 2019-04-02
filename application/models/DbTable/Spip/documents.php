@@ -14,8 +14,7 @@
  * @copyright  2014 Samuel Szoniecky
  * @license    "New" BSD License
  */
-//ATTENTION le "s" de Models est nécessaire pour une compatibilité entre application et serveur
-class Models_DbTable_Spip_documents extends Zend_Db_Table_Abstract
+class Model_DbTable_Spip_documents extends Zend_Db_Table_Abstract
 {
     
     /*

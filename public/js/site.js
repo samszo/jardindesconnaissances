@@ -1,3 +1,11 @@
+var prefUrl = "", idBase="", uti={};
+function deconnexion(redir){
+    window.location.assign(prefUrl+'auth/deconnexion?redir='+redir);
+}
+function connexion(redir){
+    window.location.assign(prefUrl+'auth/connexion?redir='+redir+'&idBase='+idBase);
+}
+
 function patienter(message, fin) {
 
     if (fin) {

@@ -15,7 +15,7 @@
  * @license    "New" BSD License
  */
 //ATTENTION le "s" de Models est nécessaire pour une compatibilité entre application et serveur
-class Models_DbTable_Spip_meta extends Zend_Db_Table_Abstract
+class Model_DbTable_Spip_meta extends Zend_Db_Table_Abstract
 {
     
     /*
@@ -133,7 +133,7 @@ class Models_DbTable_Spip_meta extends Zend_Db_Table_Abstract
                     ->from( array("s" => "spip_meta") )                           
                     ->where( "s.nom = ?", $nom );
 
-        return $this->fetchAll($query)->toArray(); 
+        return $this->fetchAll($query)->toArray()[0]; 
     }
     	/**
      * Recherche une entrée Spip_meta avec la valeur spécifiée

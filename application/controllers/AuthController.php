@@ -12,6 +12,8 @@
  */
 class AuthController extends Zend_Controller_Action
 {
+	var $idBase = false;
+	var $redir = "";
     public function loginAction()
     {    	
 		$this->view->erreur = false;    		
@@ -100,6 +102,7 @@ class AuthController extends Zend_Controller_Action
 
     public function connexionAction()
     {
+		$this->clearConnexion();		
         $this->view->erreur = false;
         $this->view->code = 1;
         
@@ -241,16 +244,17 @@ class AuthController extends Zend_Controller_Action
     public function deconnexionAction()
     {
 		$this->clearConnexion();
+	    $this->redirect($this->redir."?idBase=".$this->idBase);            	
     }
     
     function clearConnexion(){
 		$ssExi = new Zend_Session_Namespace('uti'); 		   	
-		$redir = $ssExi->redir;
+		$this->redir = $ssExi->redir;
+		$this->idBase = $ssExi->dbNom;
 		Zend_Session::namespaceUnset('uti');
 		Zend_Session::namespaceUnset('google');
 		$auth = Zend_Auth::getInstance();
 		$auth->clearIdentity();
-	    $this->redirect($redir);            	
     }
 
 	/**

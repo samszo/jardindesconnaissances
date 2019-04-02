@@ -1,4 +1,5 @@
 
+prefUrl = '../'
 var idUti=0, arrIEMLitem, 
     arrMnuAffichage = [{
         fct: showHideTexte,
@@ -13,11 +14,6 @@ var idUti=0, arrIEMLitem,
     arrDico = [], iemlMatrice = [], iemlCartoForce = false;
 
 getForms();
-
-
-function deconnexion(){
-    window.location.assign('../auth/deconnexion?redir=ice/editeur');
-}
     
 
 //chargement du dico IEML

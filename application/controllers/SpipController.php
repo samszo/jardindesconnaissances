@@ -32,8 +32,8 @@ class SpipController extends Zend_Controller_Action
 		
 		//initialisation des objets
 		$sSpip = new Flux_Site($this->_getParam('idBaseSpip'));
-    		$sSpip->bTrace = true;
-    		$sSpip->bTraceFlush = true;
+    	$sSpip->bTrace = true;
+    	$sSpip->bTraceFlush = true;
 		
 		switch ($this->_getParam('type')) {
 			case "fluxSKOs":
@@ -49,7 +49,15 @@ class SpipController extends Zend_Controller_Action
 				//ajouter un mot clef dans spip
 				$dbA->ajouter(array("titre"=>"","descriptif"=>"","id_groupe"=>"","type"=>""
 				,"profondeur"=>"", "id_mot_racine"=>"", "id_parent"=>""));
-
+				break;
+			case "toJDC":
+				$s = new Flux_Spip($this->_getParam('idBaseSpip'));
+				$json = $s->importToJDC($this->_getParam('idDocParent')
+					,$this->_getParam('where')
+					,$this->_getParam('idBaseSpip')
+					,$this->_getParam('idBaseDst')
+					);
+				break;
 		}
 		$this->view->data = "OK"; 				
 		

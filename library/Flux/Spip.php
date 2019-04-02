@@ -20,18 +20,19 @@ class Flux_Spip extends Flux_Site{
     	    	
     		parent::__construct($idBase,$idTrace);
     	    
-    		$this->arrRub = array("en"=>array("Liste"=>15,"Comite"=>16,"Catalog"=>18),"fr"=>array("Liste"=>27,"Comite"=>28,"Catalog"=>23));
-		$this->arrMC = array("serie"=>1,"comite"=>2, "role"=>3);
-    		$this->arrLangue = array("en","fr","ar");
-    				
-		$this->dbArt = new Model_DbTable_Spip_articles($this->db);
-		$this->dbAutS = new Model_DbTable_Spip_auteurs($this->db);
-		$this->dbR = new Model_DbTable_Spip_rubriques($this->db);
-		$this->dbM = new Model_DbTable_Spip_mots($this->db);
-		$this->dbAutL = new Model_DbTable_Spip_auteursliens($this->db);
-		$this->dbML = new Model_DbTable_Spip_motsliens($this->db);
-		$this->dbD = new Model_DbTable_Spip_documents($this->db);
-		$this->dbDL = new Model_DbTable_Spip_documentsliens($this->db);
+				$this->arrRub = array("en"=>array("Liste"=>15,"Comite"=>16,"Catalog"=>18),"fr"=>array("Liste"=>27,"Comite"=>28,"Catalog"=>23));
+				$this->arrMC = array("serie"=>1,"comite"=>2, "role"=>3);
+				$this->arrLangue = array("en","fr","ar");
+								
+				$this->dbArt = new Model_DbTable_Spip_articles($this->db);
+				$this->dbAutS = new Model_DbTable_Spip_auteurs($this->db);
+				$this->dbR = new Model_DbTable_Spip_rubriques($this->db);
+				$this->dbM = new Model_DbTable_Spip_mots($this->db);
+				$this->dbAutL = new Model_DbTable_Spip_auteursliens($this->db);
+				$this->dbML = new Model_DbTable_Spip_motsliens($this->db);
+				$this->dbD = new Model_DbTable_Spip_documents($this->db);
+				$this->dbDL = new Model_DbTable_Spip_documentsliens($this->db);
+				$this->dbP = new Model_DbTable_Spip_meta($this->db);
 				
     }
 
@@ -63,6 +64,83 @@ class Flux_Spip extends Flux_Site{
 
 		$this->trace("FIN ".__METHOD__);		
 		
+	}
+
+	/**
+	 * export to jdc
+	 * 
+	 * @param	int			$idDocParent
+	 * @param	string	$where
+	 * @param	string	$idBddSrc
+	 * @param	string	$idBddDst
+	 * 
+	 */
+	public function importToJDC($idDocParent, $where, $idBddSrc, $idBddDst) {
+			$sSrc = new Flux_Site($idBddSrc);
+			$sDst = new Flux_Site($idBddDst);
+			$dbDocSrc = new Model_DbTable_Flux_Doc($sSrc->db);
+			$dbDocDst = new Model_DbTable_Flux_Doc($sDst->db);
+			$sql = "SELECT 
+					a.id_article,
+					a.titre aTitre,
+					r.id_rubrique,
+					r.titre rTitre,
+					d.id_document,
+					d.titre dTitre,
+					d.fichier,
+					d.id_type
+			FROM
+					spip_articles a
+							INNER JOIN
+					spip_rubriques r ON r.id_rubrique = a.id_rubrique
+							INNER JOIN
+					spip_documents_articles da ON da.id_article = a.id_article
+							INNER JOIN
+					spip_documents d ON d.id_document = da.id_document
+			WHERE ".$where."
+			GROUP BY a.id_article
+			ORDER BY r.id_rubrique , a.id_article , d.id_document DESC";
+			$rs = $dbDocSrc->exeQuery($sql);
+			//récupèration des paramètres du site
+			$urlSite = $this->getParam('adresse_site');
+			$version = $this->getParam('version_installee');
+			$nomSite = $this->getParam('nom_site');
+			if($version<2){
+				$urlRub = $urlSite.'/rubrique.php3?id_rubrique=';	
+				$urlArt = $urlSite.'/article.php3?id_article=';	
+			}
+			//création des documents
+			$idRub = 0;
+			$idSite = $dbDocDst->ajouter(array('titre'=>$nomSite,'parent'=>$idDocParent,'url'=>$urlSite));
+			$this->trace('Site créé : '.$nomSite);
+			foreach ($rs as $d) {
+				if($idRub!=$d['id_rubrique']){
+					//création du doc parent
+					$idRub = $dbDocDst->ajouter(array('titre'=>$d['rTitre'],'parent'=>$idSite,'url'=>$urlRub.$d['id_rubrique']));
+					$this->trace('Rub créée : '.$d['rTitre']);
+				}
+				//création du doc article
+				$idArt = $dbDocDst->ajouter(array('titre'=>$d['aTitre'],'parent'=>$idRub,'url'=>$urlArt.$d['id_article']));
+				$this->trace('Art créé : '.$d['aTitre']);
+				//création du document
+				$dTitre = $d['dTitre'];
+				if($dTitre=='')$dTitre=='doc '.$d['id_document'];
+				$idDoc = $dbDocDst->ajouter(array('titre'=>$dTitre,'parent'=>$idArt,'url'=>$urlSite.'/'.$d['fichier'],'type'=>$d['id_type']));
+				$this->trace('Doc créé : '.$urlSite.'/'.$d['fichier']);
+			}
+
+	}
+		/**
+	 * récupère un paramètre de spip
+	 * 
+	 * @param	array		$param
+	 * 
+	 * @return string
+	 */
+	public function getParam($param) {
+		$rs = $this->dbP->findByNom($param);
+		if($rs)return $rs['valeur'];
+		else false;	
 	}
 
 	/**

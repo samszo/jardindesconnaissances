@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <script type="text/javascript" src="js/d3.v5.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/site.js"></script>
+    <script type="text/javascript" src="js/polarclock.js"></script>
+    <script type="text/javascript" src="js/cartoaxes.js"></script>
+    <script defer src="font/font-awesome/all.min.js" ></script>
+
+    <style>
+        body {
+            background: black;
+            color: white;
+            font-family:"HelveticaNeue, Helvetica Neue";
+        }
+        a {
+          color: #e96656;
+          -webkit-transition: all 700ms;
+                  transition: all 700ms;
+        }
+
+        a,a:hover {
+          text-decoration: none;
+        }
+        a:hover {
+          color: #cb4332;
+        }
+
+        .arc-text {
+            font: 12px sans-serif;
+        }
+
+        .arc-center {
+            fill: none;
+        }
+
+        #credit {
+            position: absolute;
+            font: 10px sans-serif;
+            left: 10px;
+            bottom: 10px;
+            color: #ddd;
+            display: flex;
+            align-items: center;            
+        }
+        #credit a {
+            color: inherit;
+        }
+        .txtTitreAxe0{
+            fill:rgb(3, 246, 162);
+        }
+        .txtTitreAxe90{
+            fill:rgb(252, 161, 205);
+        }
+        .txtTitreAxe180{
+            fill:rgb(84, 214, 255);
+        }
+        .txtTitreAxe270{
+            fill:rgb(173, 158, 253);
+        }
+        .x.axis path {
+            fill: none;
+            stroke: url(#degraxeH);
+            stroke-width:6px;
+        }  
+        .y.axis path {
+            fill: none;
+            stroke: url(#degraxeV);
+            stroke-width:6px;
+        }  
+        .cFond{
+          stroke-opacity:0.5;
+          fill:none;
+          stroke:url(#center-gradient);
+          stroke-width:3px;
+        }
+        #orbit1{
+          fill:url(#center-gradient);
+          stroke:none;
+        }
+        #orbit4{
+          stroke-width:6px;
+        }
+        #mainG{
+          width:50%;
+          float: left;
+        }
+        #mainD{
+          width:50%;
+          float: left;
+        }
+        .eventsG{
+          width:50px;
+          float: left;
+          overflow-y: scroll;
+          scrollbar-color: rgb(84, 214, 255) rgb(173, 158, 253);
+          scrollbar-width: thin;          
+        }
+        .eventsD{
+          float: left;
+        }
+        .txtBtn{
+          fill:#fff;
+          stroke: none;
+          font-size:22px;
+        }
+        #svgBtnG{
+          margin-left:10px;
+          height: 100px;
+        }
+        ul {
+          list-style:none;
+          margin-left:0;
+          padding-left:0;
+        }
+        li {
+          margin-bottom:15px;/* à adapter */
+        }
+        .iconsEventType{
+          font-size: 32px; 
+          color: #5aecbc;
+          cursor:pointer;
+        }
+        .iconsEventListe{
+          font-size: 64px; 
+          color: #5aecbc;
+          float: left;
+          margin-right: 6px;
+          cursor:pointer;
+        }        
+        .eventLien{
+          font-size: larger;
+        }        
+        .iconsBtnFlux{
+          font-size: 18px; 
+          color: #5aecbc;
+          cursor:pointer;
+        }
+        .slct{
+          color: rgb(252, 161, 205);
+        }
+        #eventsListe{
+          overflow-y: scroll;
+          scrollbar-color: rgb(84, 214, 255) rgb(173, 158, 253);
+          scrollbar-width: thin;          
+        }
+        .event {
+          border-radius: 25px;
+          border: 2px solid rgb(84, 214, 255);
+          padding: 8px; 
+          height: 128px; 
+          margin-top: 8px;
+        }
+        #btnConnect{
+          cursor:pointer;
+          fill:none;
+          stroke:#5aecbc;
+          stroke-linejoin:round;
+          stroke-width:1px;
+        }
+
+        audio{
+          width: 100%;
+          height: 32px;
+          margin-top: 6px;          
+        }
+
+#loader {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 1500px;
+  height: 1500px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  border-top: 16px solid rgb(84, 214, 255);
+  border-right: 16px solid rgb(173, 158, 253);
+  border-bottom: 16px solid rgb(252, 161, 205);
+  border-left: 16px solid rgb(3, 246, 162);
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Add animation to "page content" */
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+  from { bottom:-100px; opacity:0 } 
+  to { bottom:0px; opacity:1 }
+}
+
+@keyframes animatebottom { 
+  from{ bottom:-100px; opacity:0 } 
+  to{ bottom:0; opacity:1 }
+}
+
+
+    </style>
+  </head>
+  <body>
+  <div id='mainG'>
+    <img src="svg/logo-sonar.svg" alt="logo-sonar" style="vertical-align: top;" height="auto" width="100px" />
+    <svg id="svgBtnG">
+      <g id="btnConnect" transform="translate(0 40)" >
+        <rect width="134" height="34" rx="17" ></rect>
+        <text id='txtFctCon' class='txtBtn' style="text-anchor: middle;" transform="translate(67 22)" >connexion</text>      
+      </g>
+      <g transform="translate(0 20)">
+        <text class='txtBtn'>Utilisateur : <tspan id='txtUti'></tspan></text>      
+      </g>
+    </svg>
+    <div class='txtBtn'>Flux disponibles : 
+      <span id='nbFlux'></span>
+      <span class='iconsBtnFlux'><i class="fas fa-plus-circle"></i></span>
+    </div>
+    <div id='events'>
+      <div class='eventsG'>
+        <ul id='eventsTypes'>
+        </ul>
+      </div>
+      <div class='eventsD'>
+        <div id='eventsListe'>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id='mainD'>
+  <svg>
+    <defs>
+      <linearGradient id="linear-gradient" y1="0.5" x2="1" y2="0.5" gradientUnits="objectBoundingBox">
+        <stop offset="0" stop-color="#54d6ff"></stop>
+        <stop offset="1" stop-color="#5fff84"></stop>
+      </linearGradient>
+      <linearGradient id="linear-gradient-2" x1="0.005" y1="0.585" x2="0.991" y2="0.585" xlink:href="#linear-gradient">
+      </linearGradient>
+      <linearGradient id="center-gradient" x1="0.717" y1="1" x2="0" y2="1" gradientUnits="objectBoundingBox">
+        <stop offset="0" stop-color="#5ffd8a"></stop>
+        <stop offset="0.65" stop-color="#58e6ce"></stop>
+        <stop offset="1" stop-color="#55daf2"></stop>
+      </linearGradient>
+      <linearGradient id="degraxeH" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop stop-color="rgb(173, 158, 253)" offset="0%"></stop>
+        <stop stop-color="rgb(252, 161, 205)" offset="100%"></stop>
+      </linearGradient>
+      <linearGradient id="degraxeV" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop stop-color="rgb(3, 246, 162)" offset="0%"></stop>
+        <stop stop-color="rgb(84, 214, 255)" offset="100%"></stop>
+      </linearGradient>
+    </defs>
+  </svg>
+  </div>
+<div id="credit">
+  <img src="svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
+  <i class="fab fa-creative-commons"></i>&nbsp;<i class="fab fa-creative-commons-zero"></i>&nbsp;
+  <a href="http://www.samszo.univ-paris8.fr/"> Samuel Szoniecky</a> 
+  &nbsp;- Inspired by Hakim Belhammou, Roch Delannay,&nbsp;<a href="http://blog.pixelbreaker.com/polarclock/"> pixelbreaker</a> 
+  &nbsp;&&nbsp;<a href="http://bl.ocks.org/mbostock/1096355.">Mike Bostock</a>
+</div>
+
+<div id="loader"></div>
+
+<script>
+    idBase = '<?php echo $this->idBase; ?>';
+    uti = <?php echo $this->uti; ?>;
+    showUti()
+    getListeFlux();
+
+    var svg = d3.select(".mainD svg")
+        .attr("id", "svgGlobal")
+        .attr("width", window.innerWidth/2)
+        .attr("height", window.innerHeight);
+
+    var margin = {
+                top: 20,
+                right: 20,
+                bottom: 20,
+                left: 20
+            },
+    width = window.innerWidth/2 - margin.left - margin.right,
+    height = window.innerHeight - margin.top - margin.bottom,
+    rayon = width < height ? width/2 : height/2,spacing=0.06;
+
+    //mise à jour des dimensions
+    d3.select('#eventsListe')
+      .style('width',width-50+'px')
+      .style('height',height-160+'px');
+    d3.select('.eventsG')
+      .style('height',height-160+'px');
+
+    //ajoute la polar clock
+    var pc = new polarclock({
+            'idSvg':'svgGlobal', 'spacing':spacing
+            ,'width':width,'height':height}); 
+    //ajoute la carto axe
+    var ca = new cartoaxes({
+            'idSvg':'svgGlobal', 'tick':0, 'fctGetGrad':pc.getInstantColors
+            ,'width':(rayon*1.5),'height':(rayon*1.5)
+            ,'x': ((width/2)-(rayon*0.75)),'y':((height/2)-(rayon*0.75))
+        });
+    
+    //ajoute les icones pour les types d'événements
+    var lstIcons = [{'class':"fas fa-music"},{'class':"fas fa-podcast",'type':13},{'class':"fas fa-film"},{'class':"fas fa-theater-masks"}
+      ,{'class':"fas fa-book-reader"},{'class':"fas fa-camera"},{'class':"fas fa-robot"},{'class':"fas fa-tags"},{'class':"fas fa-chalkboard-teacher"},{'class':"fas fa-user-graduate"}
+      ,{'class':"fas fa-hiking"},{'class':"fas fa-route"},{'class':"fas fa-tags"},{'class':"fas fa-wine-bottle"},{'class':"fas fa-utensils"}
+      ]
+    var icons = d3.select('#eventsTypes').selectAll('li').data(lstIcons).enter()
+      .append('li').append('span')
+      .attr('class','iconsEventType')
+      .on('click',function(d){
+        let n = d3.select(this);
+        if(n.attr('class')=='iconsEventType')n.attr('class','iconsEventType slct')
+        else n.attr('class','iconsEventType');
+        //TODO:filtrer la liste des événements
+      });
+    icons.append('i')
+      .attr('class',function(d){
+        return d.class;
+      });
+
+
+    //gestion des événements
+    d3.select("#btnConnect")
+      .on('click',function(d){
+        connexion("sonar");
+      });
+      
+    function showUti(){
+      d3.select('#txtUti').html(uti.login);
+      if(uti.uti_id!=1){
+        d3.select('#txtFctCon').html('déconnexion');
+        d3.select('#btnConnect').style('stroke','rgb(252, 161, 205)');
+      }
+    }
+    function getListeFlux(){
+      //récupère la liste des flux
+      waitAnim(true);
+      $.post('sonar/flux', {'q':'listeFlux'}, function (data) {
+            console.log(data);
+            d3.select('#nbFlux').html(data.result.length);
+            setItemFlux(data.result);
+        }, "json")
+        .fail(function (e) {
+            throw new Error("Donnée introuvable : "+e);
+        })
+        .always(function () {
+          waitAnim(false);
+        });
+    }
+    function setItemFlux(items){
+      var events = d3.select('#eventsListe').selectAll('.event').data(items).enter().append('div')
+        .attr('id',d => 'event'+d.doc_id)
+        .attr('class','event');
+      events.append('span').attr('class','iconsEventListe')
+        .attr('class','iconsEventListe')
+        .on('click',setViewer)
+        .append('i')
+        .attr('class',function(d){
+          let icons = lstIcons.filter(function(i){return i.type == d.type});
+          return icons[0].class;
+        });
+      var liens = events.selectAll('.eventLien').data(function(d){
+        return d.parents;})
+        .enter().append('div')
+        .attr('class','eventLien')
+        .style('font-size',function(d,i){return (32/(i+1))+'px'})
+        .html(function(d){
+          let html = "<a href='"+d.url+"' target='_blanck' >"+d.titre+"</a>";
+          return html
+          });      
+    }
+    function setViewer(d){
+
+      if(document.getElementById('viewer_'+d.doc_id+'_'+d.type))return;
+      let html = "";
+      if(d.type==13){
+        //audio
+        html = "<audio controls='controls' id='audioW_"+d.doc_id+"' src='"+d.url+"' ></audio>";
+      }
+      d3.select('#event'+d.doc_id).append('div')
+          .attr('id','viewer_'+d.doc_id+'_'+d.type)
+          .attr('class','viewer_'+d.type)
+          .html(html);
+    }
+    function waitAnim(show){
+      if(show){
+        document.getElementById("mainG").style.display = "none";
+        document.getElementById("mainD").style.display = "none";
+        document.getElementById("loader").style.display = "block";
+      }else{
+        document.getElementById("mainG").style.display = "block";
+        document.getElementById("mainD").style.display = "block";
+        document.getElementById("loader").style.display = "none";
+      }      
+    }
+
+</script>
+  </body>
+</html>
