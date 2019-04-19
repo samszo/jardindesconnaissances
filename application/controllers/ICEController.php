@@ -348,6 +348,31 @@ class IceController extends Zend_Controller_Action {
 		
 	}
 
+
+	public function complexeAction(){
+		$ice = new Flux_Ice($this->_getParam('idBase',false),$this->_getParam('trace',false));
+		$rs = array('result' => array(), 'erreur'=>0);
+		switch ($this->_getParam('q',false)) {
+			case 'save':
+				$rs['result']=$ice->saveComplexDoc($this->_getParam('idDoc',false),$this->_getParam('tronc',false),$this->_getParam('parent',false));
+				break;			
+			default:
+				$rs['result']=$ice->getComplexEcosystem(
+					$this->_getParam('idDoc',0), 
+					$this->_getParam('idTag',0), 
+					$this->_getParam('idExi',0), 
+					$this->_getParam('idGeo',0), 
+					$this->_getParam('idMonade',0), 
+					$this->_getParam('idRapport',0),
+					$this->_getParam('trace',false)
+				);
+				break;
+		}
+		$this->view->data = $rs;
+
+	}
+
+
     function initInstance($view=""){
 		$this->view->ajax = $this->_getParam('ajax');
         $this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);

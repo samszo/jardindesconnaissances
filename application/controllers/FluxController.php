@@ -619,6 +619,12 @@ class FluxController extends Zend_Controller_Action {
 			case 'saveMcCordSearch':
 				$s->saveMcCordSearch($this->_getParam('q','houdini'),$this->_getParam('c',1));
 				break;
+			case 'corrigeGoogleVisionAnalyse':
+				$docs=array(242,275,284,287,290,293,1187,1263);
+				foreach ($docs as $d) {
+					$s->getGoogleVisionAnalyse($d,0);
+				}
+				break;
 			case 'getGoogleVisionAnalyse':
 				$s->getGoogleVisionAnalyse($this->_getParam('idDoc',0), $this->_getParam('all',0));
 				break;
@@ -628,7 +634,15 @@ class FluxController extends Zend_Controller_Action {
 			case 'getCsvToOmeka':
 				$s->getCsvToOmeka('/Users/samszo/Sites/jdc/data/SMEL/importMcCord.csv');
 				break;
-	}        
+			case 'getImageByComplexe':
+				$rs = $s->getArtefactInfos("#",' sum_complex ASC');
+				$s = new Flux_Site();
+				foreach ($rs as $v) {
+					if(!$this->view->content)$this->view->content = $s->arrayToCsv(array_keys($v),",").PHP_EOL;
+					$this->view->content .= $s->arrayToCsv($v,",").PHP_EOL;
+				}
+				break;
+		}        
 	}
 
     public function anAction()

@@ -194,7 +194,7 @@
                 .attr('id',function(d){
                     d.w = w;
                     d.h = h;
-                    d.id = "slide_"+d.aut+"."+d.seq+".0";
+                    d.id = "slide_"+d.aut+"_"+d.seq+"_0";
                     return d.id;})
                 .attr('style','fill-opacity:0.3;stroke-width:4')
                 .style('fill',function(d){
@@ -247,36 +247,38 @@
         /*
         ATTENTION paramétrage des websockets
         merci 
-        pour tutorial python websocket : https://blog.crystalyx.net/utiliser-socket-io-et-les-websockets-avec-apache/
+        pour tutorial python websocket : https://websockets.readthedocs.io/en/stable/intro.html
         pour paramétrage websocket apache : https://blog.crystalyx.net/utiliser-socket-io-et-les-websockets-avec-apache/
         pour mise à jour libtool : https://www.unix.com/unix-for-dummies-questions-and-answers/244302-trying-install-libtool-source-newbie.html
         pour la configuration du virtual host
         ProxyPass "/pyskOralite/" ws://gapai.univ-paris8.fr:7272
         ProxyPassReverse "/pyskOralite/" ws://gapai.univ-paris8.fr:7272        
+        pour lancer le serveur : python3.6 /var/python/websocket/wss_oralite.py
+        pour tester sur la console : python3.6 -m websockets ws://gapai.univ-paris8.fr:7272/
         */
         var websocket = new WebSocket('ws://gapai.univ-paris8.fr/pyskOralite/');
-        
-        websocket.onmessage = function(event) {
-            var newData = JSON.parse(event.data);
-            websocket.onmessage = function (event) {
-                data = JSON.parse(event.data);
-                switch (data.type) {
-                    case 'state':
-                        if(scenes){
-                            slide = data.slide;
-                            idAut = data.auteur;
-                            next_slide();
-                        }
-                        break;
-                    case 'users':
-                        break;
-                    default:
-                        console.error(
-                            "unsupported event", data);
-                }
-            };
-        }        
-
+        if(websocket){
+            websocket.onmessage = function(event) {
+                var newData = JSON.parse(event.data);
+                websocket.onmessage = function (event) {
+                    data = JSON.parse(event.data);
+                    switch (data.type) {
+                        case 'state':
+                            if(scenes){
+                                slide = data.slide;
+                                idAut = data.auteur;
+                                next_slide();
+                            }
+                            break;
+                        case 'users':
+                            break;
+                        default:
+                            console.error(
+                                "unsupported event", data);
+                    }
+                };
+            }        
+        }
     </script>
 
     </body>

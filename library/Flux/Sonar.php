@@ -39,7 +39,7 @@ class Flux_Sonar extends Flux_Site{
     }
         
     /**
-	 * récupère la liste des formulaires
+	 * récupère la liste des flux
      * 
      * @return array
 	 */
@@ -74,5 +74,45 @@ class Flux_Sonar extends Flux_Site{
         }
         return $rs;
     }
+
+
+    /**
+	 * enregistre la position
+     * 
+     * @param array $data
+     * 
+     * @return array
+	 */
+	function savePosi($data){
+        $sql = "SELECT 
+                d.doc_id,
+                d.url,
+                d.type,
+                GROUP_CONCAT(dp.titre) dpTitres,
+                GROUP_CONCAT(dp.url) dpUrls,
+                GROUP_CONCAT(dp.doc_id) dpIds
+            FROM
+                flux_doc d
+                    INNER JOIN
+                flux_doc dp ON d.lft BETWEEN dp.lft AND dp.rgt
+            WHERE
+                d.tronc = 'flux'
+                    AND dp.niveau BETWEEN 2 AND d.niveau - 1
+            GROUP BY d.doc_id";
+        $rs = $this->dbD->exeQuery($sql);
+        foreach ($rs as $id => $d) {
+            $t = explode(',',$d['dpTitres']);
+            $u = explode(',',$d['dpUrls']);
+            $i = explode(',',$d['dpIds']);
+            unset($rs[$id]['dpTitres']);
+            unset($rs[$id]['dpUrls']);
+            unset($rs[$id]['dpIds']);
+            $rs[$id]['parents'] = [];
+            foreach ($t as $k => $v) {
+                $rs[$id]['parents'][] = array('titre'=>$v,'url'=>$u[$k],'id'=>$i[$k]);
+            }
+        }
+        return $rs;
+    }    
 
 }

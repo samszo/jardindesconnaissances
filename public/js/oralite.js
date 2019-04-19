@@ -24,7 +24,7 @@
     ziggy.jonsson.nyc@gmail.com
 */
   
-var svg, son, pSon, slides={},
+var svg, son, pSon, video, pVideo, slides={},
     slide, delay, gH, gW, idAut;
 
 function oralite(s,options) {
@@ -85,9 +85,28 @@ function oralite(s,options) {
 			.attr("autoplay",false)	
 			.attr("controls",true);
 
-    svg.attr("preserveAspectRatio","xMidYMid meet");
-    svg.attr("width",gW);
-    svg.attr("height",gH-10);
+	//ajoute le lecteur de vidéo
+	video = d3.select("body").append("div")
+		.attr("id",'divVideo')
+		.style("position",'absolute')
+		//.style("left",(gW/2)+'px')
+		//.style("bottom",(gH/2)+'px')
+		.style("height",'100%')
+		.style("width",'100%')
+		.style('display','none')
+		.style('border-style','solid');
+	pVideo = video.append("video")
+			.attr("id",'playerVideo')
+			.style("height",'100%')
+			.style("width",'100%')
+			.attr("autoplay",false)	
+			.attr("controls",true)
+			.html("Sorry, your browser doesn't support embedded videos.");
+
+	//dimensionne le svg
+	svg.attr("preserveAspectRatio","xMidYMid meet");
+	svg.attr("width",gW);
+	svg.attr("height",gH-10);
 
     rects = svg.selectAll("rect")._groups[0];
     slides = [];
@@ -147,8 +166,8 @@ function oralite(s,options) {
         if(d3.event.keyCode > 64 && d3.event.keyCode < 92){
             //récupère le nouveau slide
             idAut = d3.event.keyCode-65;
-            var curSlide = keys[slide].split('.');
-            var autSlide = idAut+'.'+curSlide[1]+'.'+curSlide[2];
+            var curSlide = keys[slide].split('_');
+            var autSlide = idAut+'_'+curSlide[1]+'_'+curSlide[2];
             console.log("autSlide : "+autSlide);
             for (let index = 0; index < keys.length; index++) {
                 if(autSlide==keys[index]){
@@ -203,8 +222,14 @@ function gereSocket(params){
 }
 
 function next_slide()  {
+		clearVideo();
     let vb = slides[keys[slide]].x.baseVal.value+" "+slides[keys[slide]].y.baseVal.value+" "+slides[keys[slide]].width.baseVal.value+" "+slides[keys[slide]].height.baseVal.value;
-    svg.transition().duration(delay).attr("viewBox",vb);
+		svg.transition().duration(delay).attr("viewBox",vb);
+		//constuction du selecteur valide = #slide_0\2e 0\2e 0
+		let slt = slides[keys[slide]].id;//.replace(/[.]/gi,'.'.charCodeAt(0));
+		//vérification de la présence de vidéo
+		let rct = d3.select('#'+slt);
+		if(rct.attr('media-type')=="video")joueVideo(rct);
 		console.log("vb : "+vb);	
     changeNavig(slide);
 }
@@ -327,6 +352,22 @@ function playSon(url){
 	son.style('display','block');
 	pSon.attr('autoplay',true)
 		.attr("src",url);	
+}
+function joueVideo(obj){
+	let bb = obj.node().getBBox()
+	video.style('display','block');
+	video.style('width',bb.width+'px');
+	video.style('height',bb.height+'px');
+	video.style('top',((gH/2)+bb.y-(bb.height/2))+'px');
+	video.style('left',((gW/2)+bb.x-(bb.width/2))+'px');
+	pVideo.attr('autoplay',true)
+		.attr("src",obj.attr('media-file'));
+	if(obj.attr('media-size')=='Fullscreen')
+		document.getElementById("playerVideo").requestFullscreen();	
+}
+function clearVideo(){
+	video.style('display','none');
+	document.getElementById('playerVideo').pause();
 }
 
 function getParamUrl(param) {

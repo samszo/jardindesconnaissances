@@ -586,9 +586,14 @@ class GraphController extends Zend_Controller_Action {
     public function imagegridAction(){
 	
 		$this->view->kSrc = $this->_getParam('kSrc', 'src');
-		$this->view->kId = $this->_getParam('kId', 'id');
+		$this->view->kId = $this->_getParam('kId', 'id');		
+		$this->view->urlData =  $this->_getParam('urlData', '../data/googleApi.csv');
 		
-        $this->view->urlData =  $this->_getParam('urlData', '../data/googleApi.csv');
+		if($this->_getParam('q')=='smel'){
+			$this->view->kSrc = 'urlI';
+			$this->view->kId = 'idI';	
+			$this->view->urlData =  $this->_getParam('urlData', '../flux/smel?f=getImageByComplexe&trace=false');
+		}
 		
     }
 

@@ -1,0 +1,196 @@
+body {
+    background: black;
+    color: white;
+    font-family:"HelveticaNeue, Helvetica Neue";
+}
+a {
+  color: rgb(3, 246, 162);
+  -webkit-transition: all 700ms;
+          transition: all 700ms;
+}
+a,a:hover {
+  text-decoration: none;
+}
+a:hover {
+  color: rgb(84, 214, 255);
+}
+a:visited {
+  color: rgb(252, 161, 205);
+}
+.arc-center {
+    fill: none;
+}
+#credit {
+    position: absolute;
+    font: 10px sans-serif;
+    left: 64px;
+    top: 4px;
+    color: #ddd;
+    display: flex;
+    align-items: center;            
+}
+#credit a {
+    color: inherit;
+}
+.txtTitreAxe0{
+    fill:rgb(3, 246, 162);
+}
+.txtTitreAxe90{
+    fill:rgb(252, 161, 205);
+}
+.txtTitreAxe180{
+    fill:rgb(84, 214, 255);
+}
+.txtTitreAxe270{
+    fill:rgb(173, 158, 253);
+}
+.x.axis path {
+    fill: none;
+    stroke: url(#degraxeH);
+    stroke-width:6px;
+}  
+.y.axis path {
+    fill: none;
+    stroke: url(#degraxeV);
+    stroke-width:6px;
+}  
+.cFond{
+  stroke-opacity:0.5;
+  fill:none;
+  stroke:url(#center-gradient);
+  stroke-width:3px;
+}
+#orbit1{
+  fill:url(#center-gradient);
+  stroke:none;
+}
+#orbit4{
+  stroke-width:6px;
+}
+#mainG{
+  width:50%;
+  float: left;
+}
+#mainD{
+  width:50%;
+  float: left;
+}
+.eventsG{
+  width:50px;
+  float: left;
+  overflow-y: scroll;
+  scrollbar-color: rgb(84, 214, 255) rgb(173, 158, 253);
+  scrollbar-width: thin;          
+}
+.eventsD{
+  float: left;
+}
+
+ul {
+  list-style:none;
+  margin-left:0;
+  padding-left:0;
+}
+li {
+  margin-bottom:15px;/* à adapter */
+}
+.iconsEventType{
+  font-size: 32px; 
+  color: #5aecbc;
+  cursor:pointer;
+}
+.iconsEventListe{
+  font-size: 64px; 
+  color: #5aecbc;
+  float: left;
+  margin-right: 6px;
+  cursor:pointer;
+}        
+.eventLien{
+  font-size: larger;
+}        
+.iconsBtnFlux{
+  font-size: 18px; 
+  color: #5aecbc;
+  cursor:pointer;
+}
+.slct{
+  color: rgb(252, 161, 205);
+}
+#eventsListe{
+  overflow-y: scroll;
+  scrollbar-color: rgb(84, 214, 255) rgb(173, 158, 253);
+  scrollbar-width: thin;          
+}
+.event {
+  border-radius: 25px;
+  border: 2px solid rgb(84, 214, 255);
+  padding: 8px; 
+  height: 128px; 
+  margin-top: 8px;
+}
+#btnConnect{
+  cursor:pointer;
+  fill:none;
+  stroke:#5aecbc;
+  stroke-linejoin:round;
+  stroke-width:1px;
+}
+#txtFctCon{
+  text-anchor: middle;
+}
+
+audio{
+  width: 100%;
+  height: 32px;
+  margin-top: 6px;          
+}
+
+#loader {
+display: none;
+position: absolute;
+left: 50%;
+top: 50%;
+z-index: 1;
+width: 1500px;
+height: 1500px;
+margin: -75px 0 0 -75px;
+border-radius: 50%;
+border-top: 16px solid rgb(84, 214, 255);
+border-right: 16px solid rgb(173, 158, 253);
+border-bottom: 16px solid rgb(252, 161, 205);
+border-left: 16px solid rgb(3, 246, 162);
+width: 120px;
+height: 120px;
+-webkit-animation: spin 2s linear infinite;
+animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+0% { -webkit-transform: rotate(0deg); }
+100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+
+/* Add animation to "page content" */
+.animate-bottom {
+position: relative;
+-webkit-animation-name: animatebottom;
+-webkit-animation-duration: 1s;
+animation-name: animatebottom;
+animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+from { bottom:-100px; opacity:0 } 
+to { bottom:0px; opacity:1 }
+}
+
+@keyframes animatebottom { 
+from{ bottom:-100px; opacity:0 } 
+to{ bottom:0; opacity:1 }
+}

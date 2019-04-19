@@ -103,6 +103,17 @@ class Flux_Hal extends Flux_Site{
 	     * uniquement les document et la liste des auteurs
 	     * https://api.archives-ouvertes.fr/search/?wt=xml&q=rteamStructName_s:CITU&fl=docid&facet=true&facet.field=authFullName_s&facet.mincount=1
 	     */	    	
-    }
+	}
+	
+    /**
+     * récupère les information d'une thèse
+     *
+     * @param  string $id l'identifiant de la thède
+     * @return array la liste des information
+     * 
+     */
+	function getInfosThese($id){
+		//https://api.archives-ouvertes.fr/search/?q=tel-01964613&wt=xml&fl=abstract_s,label_s,acm_s,audience_s,authFirstName_s,authFullName_s,authIdHal_i,authQuality_s,authorityInstitution_s,city_s,classification_s,committee_s,country_s,defenseDate_s,director_s,domain_s,files_s,fulltext_t,keyword_s,page_s,popularLevel_s,structAcronym_s,thesisSchool_s		
+	}
     
 }

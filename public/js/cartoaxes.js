@@ -21,6 +21,8 @@ class cartoaxes {
         this.tick = params.tick ? params.tick : 0;
         this.rayons = d3.range(params.nbRayon ? params.nbRayon : 5); // Création d'un tableau pour les rayons des cercles
         this.fctGetGrad = params.fctGetGrad ? params.fctGetGrad : false;
+        this.fctSavePosi = params.fctSavePosi ? params.fctSavePosi : false;
+        this.idDoc = params.idDoc ? params.idDoc : false;
         var scCircle = d3.scalePoint()
             .domain(this.rayons)
             .range([0, this.domainWidth < this.domainHeight ? this.domainWidth / 2 : this.domainHeight / 2]);
@@ -50,11 +52,13 @@ class cartoaxes {
             .attr("width", me.domainWidth)
             .attr("height", me.domainHeight)
             .attr("fill", me.colorFond)
-            .on('mousemove',function(e){
-                console.log(d3.mouse(this)[0]);
-                console.log(me.x.invert(d3.mouse(this)[0]));
-                console.log(me.y.invert(d3.mouse(this)[1]));
-            });                
+                .on('mousemove',function(e){
+                    /*
+                    console.log(d3.mouse(this)[0]);
+                    console.log(me.x.invert(d3.mouse(this)[0]));
+                    console.log(me.y.invert(d3.mouse(this)[1]));
+                    */
+                });                
             
             me.drawAxes();
             me.drawCible();
@@ -143,17 +147,24 @@ class cartoaxes {
         }
 
         this.dragged = function() {
-            console.log(me.domainWidth+','+me.domainHeight+' : '+d3.event.x+','+d3.event.y);
+            //console.log(me.domainWidth+','+me.domainHeight+' : '+d3.event.x+','+d3.event.y);
             if(d3.event.x < me.domainWidth && d3.event.x > 0 && d3.event.y < me.domainHeight && d3.event.y > 0)
                 me.svgDrag.attr("cx", d3.event.x).attr("cy", d3.event.y);
         }
 
         this.dragended = function() {
-            console.log(d3.mouse(this));
+            //récupère les données du points
+            let posi = d3.mouse(this);
+            let r = {'x':posi[0],'y':posi[1]
+                ,'numX':me.x.invert(posi[0]),'numY':me.y.invert(posi[1])
+                ,'structure':me.structure
+                };
+            console.log(r);
+            if(me.fctSavePosi)me.fctSavePosi(r);
         }
 
         this.setSvgDrag = function(p){
-            console.log(p);
+            //console.log(p);
             let c = me.getGradient();
             me.svgDrag = me.g.append("circle")
                 .attr('class','sltDrag')

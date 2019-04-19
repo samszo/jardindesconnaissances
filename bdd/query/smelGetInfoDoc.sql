@@ -3,6 +3,7 @@ SELECT
     d.url,
     d.titre,
     d.note,
+    cplx.sum_niv, cplx.sum_ele, cplx.sum_complex, cplx.details,
     dd.doc_id idDwld,
     di.doc_id idI,
     di.url urlI,
@@ -28,6 +29,8 @@ FROM
     flux_doc dd ON dd.parent = d.doc_id
         INNER JOIN
     flux_doc di ON di.parent = dd.doc_id
+        INNER JOIN
+    flux_complexe cplx ON cplx.obj_id = d.doc_id AND cplx.obj_type = 'doc'
         LEFT JOIN
     flux_rapport rA ON rA.src_id = dd.doc_id
         AND rA.src_obj = 'doc'
@@ -67,5 +70,6 @@ FROM
          AND dgv5.tronc LIKE 'textAnnotations%'
          
 WHERE
-    d.tronc = 'artefact' AND d.doc_id = 1301
+    d.tronc = 'artefact'  -- AND d.doc_id IN (1185, 1261)
+    -- AND dgv1.titre is null
 GROUP BY d.doc_id -- , dgv1.doc_id, dgv2.doc_id, dgv3.doc_id, dgv4.doc_id

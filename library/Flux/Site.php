@@ -213,6 +213,8 @@ class Flux_Site{
         	    	$this->trace("Model_DbTable_Flux_Uti");
         	    	if(!$this->dbG)$this->dbG = new Model_DbTable_Flux_Geo($this->db);
         	    	$this->trace("Model_DbTable_Flux_Geo");  
+        	    	if(!$this->dbCplx)$this->dbCplx = new Model_DbTable_Flux_Complexe($this->db);
+        	    	$this->trace("Model_DbTable_Flux_Complexe");  
 	    	}
         	    	
 	    	$this->trace("FIN ".__METHOD__);

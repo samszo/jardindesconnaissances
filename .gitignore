@@ -471,3 +471,6 @@ bdd/flux_formsem.sql
 data/ieml/ieml_dictionary.json
 data/ieml/M-.I-.n.-(relations).json
 data/ieml/M-.I-.n.-(tables).json
+data/valarnum/flux_doc_titre.csv
+data/valarnum/flux_docTitre.csv
+data/valarnum/flux_docTitreParentEnfant.csv

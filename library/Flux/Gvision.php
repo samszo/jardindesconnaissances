@@ -94,10 +94,10 @@ class Flux_Gvision extends Flux_Site{
 
     		//TODO:implémenter google cloud plateform
     		/*ATTENTION on utilise l'API sans le client
-    		$this->client = new Google_Client();
-		$this->client->setClientId(KEY_GOOGLE_CLIENT_ID);
-		$this->client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
-		*/
+                $this->client = new Google_Client();
+                $this->client->setClientId(KEY_GOOGLE_CLIENT_ID);
+                $this->client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
+            */
     		
     		//on récupère la racine des documents
     		$this->initDbTables();
@@ -151,7 +151,7 @@ class Flux_Gvision extends Flux_Site{
         
         //gestion du cache
         $uMd5 = md5($url);
-        $response = $this->cache->load($uMd5);        
+        $response = false;//$this->cache->load($uMd5);        
         if(!$response){        
             $this->trace($uMd5);
             $url = "https://vision.googleapis.com/v1/images:annotate?key=".KEY_GOOGLE_SERVER."&fields=responses";
@@ -181,7 +181,7 @@ class Flux_Gvision extends Flux_Site{
          */
         $numItem = 0;
         foreach ($arr as $item) {
-            if($item["doc_id"]>=1160){
+            if($item["doc_id"]>=-1){
                 $this->trace('doc_id='.$item["doc_id"]);
                 $c = json_decode($this->analyseImage($item[$champ]), true);
                 foreach ($c['responses'][0] as $k => $r) {

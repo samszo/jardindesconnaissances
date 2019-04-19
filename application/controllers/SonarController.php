@@ -29,6 +29,9 @@ class SonarController extends Zend_Controller_Action
 			case 'listeFlux':
 				$rs['result'] = $sonar->getListeFlux();
 				break;			
+			case 'savePosi':
+				$rs['result'] = $sonar->savePosi();
+				break;			
 		}
 		$this->view->data = $rs;
 	}

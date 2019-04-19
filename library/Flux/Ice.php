@@ -596,7 +596,32 @@ ORDER BY d.tronc
         return $this->dbD->exeQuery($sql);
         
     }
-        	
+    
+    /**
+     * enregistre la complexité des documents
+     *
+     * @param  int          $idDoc
+     * @param  sting        $tronc
+     * @param  int          $parent
+     *
+     * @return array
+     *
+     */
+    function saveComplexDoc($idDoc=0, $tronc="", $parent=0){
+        //récupère les documents
+        if($idDoc)$rs[0] = $this->dbD->findBydoc_id($idDoc);
+        if($tronc)$rs = $this->dbD->findByTronc($tronc);
+        if($parent)$rs = $this->dbD->findByParent($parent);
+        $result = array();
+        foreach ($rs as $d) {
+            $c = $this->getComplexEcosystem($d['doc_id']);
+            $result[]=$this->dbCplx->ajouter(array("sum_niv"=>$c["sumNiv"],"sum_ele"=>$c["sumEle"],"sum_complex"=>$c["sumComplex"]
+            ,"details"=>json_encode($c),"obj_type"=>'doc',"obj_id"=>$d['doc_id']));
+
+        }
+        return $result;
+    }
+
     /**
      * calcule la complexité de l'écosystème
      *
@@ -1066,18 +1091,22 @@ ORDER BY d.tronc
     /**
      * calcule la complexité des documents
      *
-     * @param  string          $ids
+     * @param  string   $ids
+     * @param  int      $maxNiv
      *
      * @return array
      *
      */
-    function getComplexDoc($ids=""){
+    function getComplexDoc($ids="",$maxNiv=0){
         
         $result = array("idBase"=>$this->idBase,"type"=>"document","ids"=>$ids,"sumNb"=>0,"numNiv"=>0,"sumNiv"=>0,"sumComplex"=>0,"details"=>array());
         if($ids == "-1") return $result;
         
-        if ($ids) $w = " WHERE d.doc_id IN (".$ids.") ";
-        else $w = "";
+        $w = " WHERE ";
+        if ($ids) $w .= " d.doc_id IN (".$ids.") ";
+        //TODO:mieux gérer le niveau
+        //if ($maxNiv) $w .= " de.niveau < ".$maxNiv." ";
+        if($w == " WHERE ")$w="";
         
         $sql = "SELECT
             COUNT(DISTINCT de.doc_id) nb,
