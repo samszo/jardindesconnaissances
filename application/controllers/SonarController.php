@@ -17,11 +17,15 @@ class SonarController extends Zend_Controller_Action
 	/**
 	 * The default action - show the home page
 	 */
-  public function indexAction() {
-		$this->initInstance(1);
+	public function indexAction() {
+		$this->initInstance();
 	}
 
-  public function fluxAction() {
+	public function diaporamaAction() {
+		$this->initInstance(false,"/diaporama");
+	}
+
+	public function fluxAction() {
 		$rs = array('result' => array(), 'erreur'=>0);
 		$this->initInstance();		
 		$sonar = new Flux_Sonar($this->idBase);
@@ -36,7 +40,7 @@ class SonarController extends Zend_Controller_Action
 		$this->view->data = $rs;
 	}
 
-	function initInstance($idUti=false){
+	function initInstance($idUti=false, $redir=""){
 		$this->view->ajax = $this->_getParam('ajax');
 		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
 		$idUti = $this->_getParam('idUti',$idUti);
@@ -61,7 +65,7 @@ class SonarController extends Zend_Controller_Action
 				$this->view->login = $this->ssUti->uti['login'];
 				$this->view->uti = json_encode($uti);                        
 		}else{
-				$this->ssUti->redir = "/sonar";
+				$this->ssUti->redir = "/sonar".$redir;
 				$this->ssUti->dbNom = $this->idBase;
 				if($this->view->ajax)$this->redirect('/auth/finsession');
 				else $this->redirect('/auth/connexion');

@@ -24,8 +24,10 @@
     ziggy.jonsson.nyc@gmail.com
 */
   
-var svg, son, pSon, video, pVideo, slides={},
+var svg, son, pSon, video, pVideo, objVideo, slides={},
     slide, delay, gH, gW, idAut;
+// Timer variables
+var timeoutHandle, now, startTime, isStarted = false, elapsedTime = 0, clock = Date, arrNav=[];
 
 function oralite(s,options) {
     svg = s;
@@ -102,6 +104,7 @@ function oralite(s,options) {
 			.attr("autoplay",false)	
 			.attr("controls",true)
 			.html("Sorry, your browser doesn't support embedded videos.");
+	objVideo = document.getElementById("playerVideo");
 
 	//dimensionne le svg
 	svg.attr("preserveAspectRatio","xMidYMid meet");
@@ -150,19 +153,31 @@ function oralite(s,options) {
     
     //cache les éléments à cacher
     var gs = svg.selectAll(".cache").style("opacity", 0);	    
- 
+
     //met à jour le navigateur d'image s'il existe
-	d3.select("#numSlide")
-    			.attr("max",keys.length-1);
-	d3.select("#numSlide-max")
-		.text(keys.length-1);
-    
-    d3.select("body").on("touchmove", function() { if(slide<keys.length-1) {slide++; console.log(slide);}});
+		d3.select("#numSlide")
+						.attr("max",keys.length-1);
+		d3.select("#numSlide-max")
+			.text(keys.length-1);
+		
+		//lance le minuteur
+		resetTimer();		
+		toggleTimer();
+
+		//gestion des événements
+		d3.select("body").on("touchmove", function() { if(slide<keys.length-1) {slide++; console.log(slide);}});
 
     d3.select(window).on("keydown", function() {
-		console.log("Touche DEB : "+d3.event.keyCode+" = "+slide+" : "+keys[slide]);
+			console.log("Touche DEB : "+d3.event.keyCode+" = "+slide+" : "+keys[slide]);
         
-        //vérifie le changement d'auteur
+			//récupère l'élément pour gérer les attributes de navigation
+			let rct = d3.select('#'+slides[keys[slide]].id);
+			//vérifie si une video est en cours
+			console.log('gereSocket:media-type='+rct.attr('media-type')+' currentTime='+objVideo.currentTime+' duration='+objVideo.duration+' -> '+rct.attr('duration'));
+			if(rct.attr('media-type')=="video" && objVideo.currentTime != 0 && objVideo.currentTime < objVideo.duration)return;
+			console.log('OK for next');
+
+				//vérifie le changement d'auteur
         if(d3.event.keyCode > 64 && d3.event.keyCode < 92){
             //récupère le nouveau slide
             idAut = d3.event.keyCode-65;
@@ -213,7 +228,38 @@ function oralite(s,options) {
     return slides
 }
 
+
+// Toggle timer state
+function toggleTimer (){
+		isStarted = !isStarted;
+		if(isStarted){
+				startTime = clock.now();
+				tickInstant();
+		}else {
+				clearTimeout(timeoutHandle);
+		}
+}
+
+
+function resetTimer(){
+		clearTimeout(timeoutHandle);
+		isStarted = false;
+		elapsedTime = now = startTime = 0;
+		arrNav=[];
+}
+
+
+function tickInstant(time) {
+		if(time)elapsedTime=time;
+		now = clock.now();
+		elapsedTime = elapsedTime + now - startTime;
+		startTime = now;	
+		let n = Date.now();
+		setTimeout(tickInstant, 1000 - n % 1000);
+}
+
 function gereSocket(params){
+
 		if(websocket){
 			websocket.send(JSON.stringify(params));
 		}else{
@@ -222,15 +268,26 @@ function gereSocket(params){
 }
 
 function next_slide()  {
+
+		//traitement de changement de slide
 		clearVideo();
+		clearAnimation();
     let vb = slides[keys[slide]].x.baseVal.value+" "+slides[keys[slide]].y.baseVal.value+" "+slides[keys[slide]].width.baseVal.value+" "+slides[keys[slide]].height.baseVal.value;
 		svg.transition().duration(delay).attr("viewBox",vb);
-		//constuction du selecteur valide = #slide_0\2e 0\2e 0
-		let slt = slides[keys[slide]].id;//.replace(/[.]/gi,'.'.charCodeAt(0));
+
 		//vérification de la présence de vidéo
-		let rct = d3.select('#'+slt);
+		let rct = d3.select('#'+slides[keys[slide]].id);
 		if(rct.attr('media-type')=="video")joueVideo(rct);
 		console.log("vb : "+vb);	
+
+		//vérification de la présence d'un générateur
+		let doc = document.getElementById('txt_'+keys[slide]);
+		if(doc){
+			let txt = d3.select('#txt_'+keys[slide]);
+			if(txt.attr('generateur'))generateur(txt);
+		}
+
+
     changeNavig(slide);
 }
 
@@ -272,7 +329,8 @@ function changeNavig(numIma){
    	// adjust the range text
    	//console.log(numIma+" "+slide);
 	d3.select("#numSlide-value").text(numIma);
-	d3.select("#numSlide").property("value", numIma); 	
+	d3.select("#numSlide").property("value", numIma);
+	arrNav.push({'numIma':numIma,'t':elapsedTime}); 	
 }
 
 function showCache(id){
@@ -363,11 +421,14 @@ function joueVideo(obj){
 	pVideo.attr('autoplay',true)
 		.attr("src",obj.attr('media-file'));
 	if(obj.attr('media-size')=='Fullscreen')
-		document.getElementById("playerVideo").requestFullscreen();	
+		objVideo.requestFullscreen();	
 }
 function clearVideo(){
 	video.style('display','none');
 	document.getElementById('playerVideo').pause();
+}
+function clearAnimation(){
+	d3.selectAll('.europeana').remove();
 }
 
 function getParamUrl(param) {
@@ -383,4 +444,63 @@ function getParamUrl(param) {
 		return vars[param] ? vars[param] : null;	
 	}
 	return vars;
+}
+function generateur(n) {
+	if(n.attr('generateur')=='getImageText')getImageText(n)
+}
+function getImageText(txt) {
+	if(typeof erpna !== "undefined"){
+		//transforme les span en images
+		let bb = txt.node().getBBox();
+		txt.selectAll('tspan').each(function(){
+			//erpna.findAleaImage(d3.select(this),setImageAnim);
+			erpna.findImages(d3.select(this),setImagesAnim);
+		})	
+	}
+}
+function setImagesAnim(e, items){
+	items.forEach(function(i){
+		if(i.type!='SOUND'){
+			setImageAnim(e, i);
+			console.log(i.type);
+		}
+	});
+}
+
+function setImageAnim(e, item){
+		//item vient d'europeana
+		let imgSrc = item.edmPreview[0];
+		//récupère la position du rectangle
+		let idRect = e.attr('id').replace('txt','slide');
+		let bb = d3.select('#'+idRect).node().getBBox();
+		//ajoute l'image dans la scene avec une position aléatoire
+		let aleaX = d3.randomUniform(bb.x, bb.x+bb.width);
+		let aleaY = d3.randomUniform(bb.y, bb.y+bb.height);
+		//dans une temporalité aléatoire
+		let aleaTime = d3.randomUniform(3000, 6000);
+
+		let img = d3.select("#"+svgId).append('image')
+				.attr('id',item.id)
+				.attr('class','europeana')
+				.attr('height',"0%")
+				.attr('x',aleaX())
+				.attr('y',aleaY())
+				.attr('xlink:href',imgSrc);
+		//ajoute l'effet d'animation
+		img.transition()
+				.duration(aleaTime())
+				.delay(aleaTime())
+				.on("start", function repeat() {
+						d3.active(this)
+								.attr("height", "100%")
+								.attr("x", bb.x)
+								.attr("y", bb.y)
+						.transition()
+								.attr("height", "0%")
+								.attr("x", aleaX())
+								.attr("y", aleaY())
+						.transition()
+								.on("start", repeat);
+				});                
+	
 }

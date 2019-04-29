@@ -22,9 +22,12 @@
     <script type="text/javascript" src="../js/fontawesome.v5.5.0.all.js" ></script>
     <script type="text/javascript" src="../js/oralite.js" ></script>
     <script type="text/javascript" src="../js/w2ui.min.js"></script>
+    <script type="text/javascript" src="../js/europeana.js"></script>
 
     <style>
-
+        body{
+            background-color: black;
+        }
         #mainSVG {
             position: absolute;
         }
@@ -103,13 +106,14 @@
 
 
     <script>
-        var nbAut=4, nbSeq=10, maxAut=26, maxSeq=32, scenes;
+        var nbAut=4, nbSeq=10, maxAut=26, maxSeq=32, scenes, svgId = 'mainSVG';
+        var erpna = new europeana({apikey:'<?php echo EUROPEANA_API_KEY;?>','svgId':svgId});
         d3.select('#nbAuteur').attr('max',maxAut);
         d3.select('#nbSequence').attr('max',maxSeq);
 
         $('#btnExport').click(function(e) {
             
-            var svgData = $("#mainSVG")[0].outerHTML;
+            var svgData = $("#"+svgId)[0].outerHTML;
             var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
             var svgUrl = URL.createObjectURL(svgBlob);
             var downloadLink = document.createElement("a");
@@ -185,7 +189,7 @@
             clearSlide();
 
             //Générer les slides
-            var slides = d3.select("#mainSVG").selectAll(".slide").data(arrSlide).enter()
+            var slides = d3.select("#"+svgId).selectAll(".slide").data(arrSlide).enter()
                 .append('g')
                 .attr('class',"slide")
             slides.append('rect')
@@ -228,7 +232,7 @@
 
         
         $('#btnTester').click(function(e) {
-            var svg=d3.select("#mainSVG")
+            var svg=d3.select("#"+svgId)
                 .attr("height","96%")
                 .attr("width","100%");
             var h = window.innerHeight-d3.select('#mainNav').node().clientHeight;
