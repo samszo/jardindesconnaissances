@@ -746,7 +746,7 @@ class FluxController extends Zend_Controller_Action {
     
     public function iiifAction()
     {
-        $iiif = new Flux_Iiif($this->_getParam('iif',"http://gapai.univ-paris8.fr/ValArNum/omks/iiif"),$this->_getParam('idBase'));
+        $iiif = new Flux_Iiif($this->_getParam('serveur',"http://gapai.univ-paris8.fr/ValArNum/omks/iiif"),$this->_getParam('idBase'));
         $iiif->bTrace=false;
         switch ($this->_getParam('q')) {
             case "getOmkCollection":

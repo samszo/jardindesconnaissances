@@ -15,17 +15,466 @@
     <script type="text/javascript" src="../js/cartoaxes.js"></script>
     <script type="text/javascript" src="../font/font-awesome/all.min.js"></script>
     <style>
-        html,
-        body {
-            height: 100%;
+        body{
+            font-family: Helvetica Neue,Helvetica,Arial,sans-serif; 
+        }
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+        .bg-dark {
+            background-color: #000000!important;
+        }        
+        .logo{
+            vertical-align: top;
+            height:40px;
+        }
+        @font-face {
+        font-family: "Quantify";
+        src: url("../fonts/quantify/Quantify.ttf");
+        } 
+        .logoTxt{
+            vertical-align: sub;
+            font-family: "Quantify";
+        }
+        .container{
+            font-size: small;
         }
     </style>
+    <link href="../css/carousel.css" rel="stylesheet">
 </head>
 
-<body>
+<body id="dummybodyid">
+    <header>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+            <a class="navbar-brand" href="#">
+            <img class='logo' src="../svg/logo-sonar.svg" alt="logo-sonar" />
+            <span class='logoTxt' >FLUX IMAGES</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-home"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-user-edit"></i>
+                            <span id='txtUti'></span> 
+                            <span id='btnConnexion'></span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="dropdown-divider"></div>
+                <form class="form-inline mt-2 mt-md-0 mr-3">
+                    <label id='lblSrcFlux' for="inSrcFlux">Source du flux IIIF&nbsp;<i class="far fa-question-circle"></i>&nbsp;</label>
+                    <input class="form-control mr-sm-2" type="text" id="inSrcFlux" >
+                    <button id='btnSrcFlux' class="btn btn-outline-success my-2 my-sm-0" type="submit">Charger</button>
+                </form>                                
+                <div class="dropdown-divider"></div>
+                <form class="form-inline mt-2 mt-md-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Chercher">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Trouver</button>
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+
+        <div id="carouselEvals" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators" id="car-ind">
+            </ol>
+            <div class="carousel-inner" id="car-inn">
+            </div>
+
+            <a class="carousel-control-prev" href="#carouselEvals" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselEvals" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+
+
+        <!-- Marketing messaging and featurettes
+  ================================================== -->
+        <!-- Wrap the rest of the page in another container to center all the content. -->
+
+        <div class="container marketing">
+
+            <!-- Three columns of text below the carousel -->
+            <div class="row">
+                <div class="col-lg-4">
+                    <svg class="bd-placeholder-img rounded-circle" width="140" height="140"
+                        xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
+                        role="img" aria-label="Placeholder: 140x140">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#777"
+                            dy=".3em">140x140</text>
+                    </svg>
+                    <h2>Heading</h2>
+                    <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh
+                        ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
+                        Praesent commodo cursus magna.</p>
+                    <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
+                </div><!-- /.col-lg-4 -->
+                <div class="col-lg-4">
+                    <svg class="bd-placeholder-img rounded-circle" width="140" height="140"
+                        xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
+                        role="img" aria-label="Placeholder: 140x140">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#777"
+                            dy=".3em">140x140</text>
+                    </svg>
+                    <h2>Heading</h2>
+                    <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
+                        Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo,
+                        tortor mauris condimentum nibh.</p>
+                    <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
+                </div><!-- /.col-lg-4 -->
+                <div class="col-lg-4">
+                    <svg class="bd-placeholder-img rounded-circle" width="140" height="140"
+                        xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
+                        role="img" aria-label="Placeholder: 140x140">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#777"
+                            dy=".3em">140x140</text>
+                    </svg>
+                    <h2>Heading</h2>
+                    <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id
+                        ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris
+                        condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+                    <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
+                </div><!-- /.col-lg-4 -->
+            </div><!-- /.row -->
+
+
+            <!-- START THE FEATURETTES -->
+
+            <hr class="featurette-divider">
+
+            <div class="row featurette">
+                <div class="col-md-7">
+                    <h2 class="featurette-heading">First featurette heading. <span class="text-muted">It’ll blow your
+                            mind.</span></h2>
+                    <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis
+                        euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus,
+                        tellus ac cursus commodo.</p>
+                </div>
+                <div class="col-md-5">
+                    <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500"
+                        height="500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
+                        focusable="false" role="img" aria-label="Placeholder: 500x500">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#eee"></rect><text x="50%" y="50%" fill="#aaa"
+                            dy=".3em">500x500</text>
+                    </svg>
+                </div>
+            </div>
+
+            <hr class="featurette-divider">
+
+            <div class="row featurette">
+                <div class="col-md-7 order-md-2">
+                    <h2 class="featurette-heading">Oh yeah, it’s that good. <span class="text-muted">See for
+                            yourself.</span></h2>
+                    <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis
+                        euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus,
+                        tellus ac cursus commodo.</p>
+                </div>
+                <div class="col-md-5 order-md-1">
+                    <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500"
+                        height="500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
+                        focusable="false" role="img" aria-label="Placeholder: 500x500">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#eee"></rect><text x="50%" y="50%" fill="#aaa"
+                            dy=".3em">500x500</text>
+                    </svg>
+                </div>
+            </div>
+
+            <hr class="featurette-divider">
+
+            <div class="row featurette">
+                <div class="col-md-7">
+                    <h2 class="featurette-heading">And lastly, this one. <span class="text-muted">Checkmate.</span></h2>
+                    <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis
+                        euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus,
+                        tellus ac cursus commodo.</p>
+                </div>
+                <div class="col-md-5">
+                    <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500"
+                        height="500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
+                        focusable="false" role="img" aria-label="Placeholder: 500x500">
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#eee"></rect><text x="50%" y="50%" fill="#aaa"
+                            dy=".3em">500x500</text>
+                    </svg>
+                </div>
+            </div>
+
+            <hr class="featurette-divider">
+
+            <!-- /END THE FEATURETTES -->
+
+        </div><!-- /.container -->
+
+        <!-- FOOTER -->
+        <footer class="container">
+        <img src="../svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
+  <i class="fab fa-creative-commons"></i>&nbsp;<i class="fab fa-creative-commons-zero"></i>&nbsp;
+  <a href="http://www.samszo.univ-paris8.fr/"> S. Szoniecky</a> 
+  <p>- Inspired by H. Belhammou, R. Delannay,
+  &nbsp;<a href="http://blog.pixelbreaker.com/polarclock/"> pixelbreaker,</a> 
+  &nbsp;<a href="http://bl.ocks.org/mbostock/1096355.">M. Bostock</a></p>
+        </footer>
+    </main>
+
+
+    <!-- Fenêtre modale pour le temps de chargement -->
+    <div class="modal fade" id="modWait" tabindex="-1" role="dialog" aria-labelledby="modWaitLbl" aria-hidden="true">
+        <div class="modal-dialog modal-full" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modWaitLbl">Merci de patienter</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Chargement...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script src="../js/popper.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
+    <script>
+        var idBase = '<?php echo $this->idBase; ?>',
+            uti = <?php echo $this->uti; ?>,
+            //defSrcFlux = 'http://gapai.univ-paris8.fr/smel/omk/iiif/collection/1',
+            defSrcFlux = '../../data/SMEL/iiif-smel1.json',
+            height = window.innerHeight/3,
+            tofEval;
+        d3.select('#inSrcFlux').attr('value',defSrcFlux);    
+        //gestion des événements
+        d3.select('#lblSrcFlux')
+            .on('click',function(){
+                console.log('affiche les information sur les flux');
+            });
+        d3.select('#btnSrcFlux')
+            .on('click',function(){
+                let src = document.getElementById("inSrcFlux").value;
+                console.log('Charge les images du flux IIIF :'+src);
+                showSource(src);
+            });            
+        d3.select('#btnConnexion')
+            .on('click',function(){
+                console.log("connexion ou déconnexion de l'utilisateur");
+            });
+                
+        showUti();
+
+    function showUti(){
+        d3.select('#txtUti').html(uti.login);
+        let btn = '<i class="fas fa-sign-in-alt"></i>';
+        if(uti.uti_id!=1)btn = '<i class="fas fa-sign-in-alt"></i>';
+        d3.select('#btnConnexion').html(btn);
+    }
+
+	function showSource(src){
+        $('.navbar-collapse').collapse('hide');
+        $('#modWait').modal('show');
+		$.ajax({
+	    		url: src,
+	    		dataType: "json",
+	    		method: 	"POST",
+	        	error: function(error){
+                    console.log("Erreur : "+error.responseText);
+                    $('#modWait').modal('hide');                    
+	        	},            	
+	        	success: function(data) {
+                    console.log(data);
+                    //filtre les photo originales
+		        	ajoutPhotosGallerie(data.manifests);		        	
+	        }
+		});	  		
+	}
+    
+	function ajoutPhotosGallerie(tofs) {
+
+        tofEval = d3.shuffle(tofs);
+
+        // Remove old elements as needed.
+	    d3.select('#car-ind').selectAll('li').remove();
+	    d3.select('#car-inn').selectAll('div').remove();
+
+
+	    //Ajoute la photo à la gallerie
+	    var li = d3.select('#car-ind').selectAll('li')
+	        .data(tofEval).enter().append('li')
+	        .attr('data-target', "#carouselEvals")
+	        .attr('data-slide-to', function (d, i) {
+	            return i;
+	        })
+	        .attr('class', function (d, i) {
+	            if (i == 0) return 'active';
+	        });
+
+	    var items = d3.select('#car-inn').selectAll('div')
+	        .data(tofEval).enter().append('div')
+            .style('max-height', height + "px")
+	        .attr('class', function (d, i) {
+	            var c = 'carousel-item';
+	            if (i == 0) c += ' active';
+	            return c;
+            });
+        /*code pour ajouter des images
+	    items.append('img')
+	        .attr('id', function (d,i) {
+                d.idImg = 'img_'+i;
+	            return d.idImg;
+	        })
+	        .attr('class', 'd-block img-fluid')
+            .style('max-height', height + "px");
+        */
+        //code pour ajouter des svg
+	    items.append('svg')
+	        .attr('id', function (d,i) {
+                d.idSvg = 'svg_'+i;
+	            return d.idSvg;
+	        })
+            .style('width', "100%")
+            .style('height', "100%")
+            .append('rect')
+                .attr('id', function (d,i) {
+                    d.idRect = 'rect_'+i;
+                    return d.idRect;
+                })
+                .style('width', '100%')
+                .style('height', '100%')
+                .style('fill-opacity', '0.3')
+                .style('stroke-width','4')
+                .style('fill','red')
+                .style('stroke','green'); 
+
+	    /*ajoute le descriptif
+	    var block = items.append('div').attr('class', 'carousel-caption d-none d-md-block');
+	    block.append('h3').text(function (d) {
+	        return d.label;
+	    });
+	    block.append('h4').text(function (d) {
+	        return d.idOmk;
+	    });
+	    block.append('p').append('a')
+	        .attr('href', function (d) {
+	            return d.original;
+	        })
+	        .attr('target', '_blank').text('original');
+        */
+	    initCarousel();
+    }
+    
+    function initCarousel(){
+
+        //ajoute les événements
+        $('#carouselEvals').on('slid.bs.carousel', function (e) {
+                if(!tofEval[e.to].infos){
+                    $('.carousel').carousel('pause');                                
+                    getTofIIIF(e.to);
+                    $('#modWait').modal('hide');    
+                }
+            })
+
+        $('.carousel').carousel();
+        //$('.carousel').carousel('cycle');
+
+        //$('.carousel').carousel(tofEval.length-1);		
+        //$('.carousel').carousel('pause');                                
+
+    }
+
+    function getTofIIIF(num){
+        let d = tofEval[num];
+		$.ajax({
+            url: d['@id'],
+            dataType: "json",
+            method: 	"POST",
+            error: function(error){
+                console.log("getTofIIIF Erreur : "+error.responseText);
+            },            	
+            success: function(data) {
+                console.log(data);
+                d.infos = data;
+                //vérifie la présence de visage
+                d.infos.metadata.forEach(function(t){
+                    if(t.label=="faceAnnotations"){
+
+                    }                    
+                })                
+
+                //
+                let url = getAleaTofIIIF(d);   
+
+                //code pour ajouter une image HTML
+                //d3.select("#"+d.idImg).attr('src',url);
+                //code pour une image SVG
+                let img = d3.select("#"+d.idSvg).append('image')
+                    .attr('class','iiif')
+                    .attr('x',0)
+                    .attr('y',0)
+                    .attr('xlink:href',url);
+
+                //$('.carousel').carousel('prev');
+                //$('.carousel').carousel('cycle');                                                
+	        }
+		});	  		
+
+    }
+
+
+    function getAleaTofIIIF(d){
+		//item vient de IIIF
+		let imgSrcOri = d.infos.thumbnail["@id"];
+		//récupère la position et la taille du rectangle
+		let bb = d3.select('#'+d.idRect).node().getBBox();
+
+        //calcule l'url IIIF
+        let zoom=3, minPixel = 0, imgOmk = d.infos.sequences[0].canvases[0].images[0].resource.service["@id"];
+        d.img = {}, w=d.infos.sequences[0].canvases[0].width, h=d.infos.sequences[0].canvases[0].height;
+        d.img.w = parseInt(bb.width/zoom);
+        d.img.h = parseInt(bb.height/zoom);
+        d.img.x = parseInt(d3.randomUniform(minPixel, w-d.img.w)());
+        d.img.y = parseInt(d3.randomUniform(minPixel, h-d.img.h)());
+        d.img.r = 0;
+        d.img.url=imgOmk+'/'+d.img.x+','+d.img.y+','+(d.img.w)+','+(d.img.h)+'/'+parseInt(bb.width)+','+parseInt(bb.height)+'/'+d.img.r+'/default.jpg';
+        console.log(w+' '+h+' '+d.img.url);
+
+        return d.img.url;
+	
+    }    
+    </script>
 </body>
 
 </html>
