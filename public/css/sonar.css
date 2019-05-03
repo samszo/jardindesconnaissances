@@ -44,6 +44,13 @@ a:visited {
 .txtTitreAxe270{
     fill:rgb(173, 158, 253);
 }
+.txtTitreAxehaut{
+  fill:white;
+}
+.txtTitreAxebas{
+  fill:white;
+}
+
 .x.axis path {
     fill: none;
     stroke: url(#degraxeH);

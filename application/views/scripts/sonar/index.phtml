@@ -210,7 +210,6 @@
           });      
     }
     function savePosi(d){
-      dc
       $.post('sonar/flux', {'q':'savePosi','dt':d}, function (data) {
             console.log(data);
         }, "json")
@@ -219,7 +218,6 @@
         })
         .always(function () {
         });
-
     }
     function waitAnim(show){
       if(show){

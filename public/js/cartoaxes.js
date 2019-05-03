@@ -3,7 +3,7 @@ class cartoaxes {
         var me = this;
         this.data = [];
         this.structure = params.structure ? params.structure : [{'lbl':'clair','posi':0},{'lbl':'obscur','posi':180},{'lbl':'pertinent','posi':90},{'lbl':'inadapté','posi':270}];
-        this.urlData = params.urlData ? params.urlData : "../data/quatreaxes.json";
+        this.urlData = params.urlData ? params.urlData : false;
         this.fctCallBackInit = params.fctCallBackInit ? params.fctCallBackInit : false;
         this.svg = d3.select("#"+params.idSvg),
         this.margin = params.margin ? params.margin : {top: 20, right: 20, bottom: 20, left: 20},
@@ -90,15 +90,17 @@ class cartoaxes {
 
         // Fonction pour créer les axes
         this.drawAxes = function(d) {
+            if(me.structure.length==4){
+                me.g.append("g")
+                    .attr("class", "y axis")
+                    .attr("transform", "translate(" + me.x.range()[1] / 2 + ", 0)")
+                    .call(d3.axisLeft(me.y).ticks(me.tick));
+            }
             me.g.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + me.y.range()[0] / 2 + ")")
-            .call(d3.axisBottom(me.x).ticks(me.tick));
-        
-            me.g.append("g")
-                .attr("class", "y axis")
-                .attr("transform", "translate(" + me.x.range()[1] / 2 + ", 0)")
-                .call(d3.axisLeft(me.y).ticks(me.tick));
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + me.y.range()[0] / 2 + ")")
+                .call(d3.axisBottom(me.x).ticks(me.tick));    
+    
     
             //ajoute les titre d'axes
             me.g.selectAll(".txtTitreAxe")
@@ -114,20 +116,26 @@ class cartoaxes {
                 })
                 .attr("y", function (d) {
                     if (d.posi == '0') return 0;
-                    if (d.posi == '90') return (me.domainHeight / 2)+10;
-                    if(d.posi == '270') return (me.domainHeight / 2)-30;
+                    if (d.posi == '90' ) return (me.domainHeight / 2)+10;
+                    if(d.posi == '270' ) return (me.domainHeight / 2)-30;
                     if (d.posi == '180') return me.domainHeight;
+                    if (d.posi == 'haut') return (me.domainWidth / 2)-30;
+                    if (d.posi == 'bas') return (me.domainWidth / 2)+30;
                 })
                 .attr("x", function (d) {
-                    if (d.posi == '0') return (me.domainWidth / 2)+10;
-                    if (d.posi == '180') return (me.domainWidth / 2)-10;
+                    if (d.posi == '0' ) return (me.domainWidth / 2)+10;
+                    if (d.posi == '180' ) return (me.domainWidth / 2)-10;
                     if (d.posi == '90') return me.domainWidth;
                     if (d.posi == '270') return 0;
+                    if (d.posi == 'haut' || d.posi == 'bas') return (me.domainWidth / 2);
                 })
                 .attr("text-anchor", function (d) {
-                    if (d.posi == '0' || d.posi == '270') return 'start';
+                    if (d.posi == '0') return 'start';
+                    if (d.posi == '270') return 'start';
                     if (d.posi == '90') return 'end';
                     if (d.posi == '180') return 'end';
+                    if (d.posi == 'haut' || d.posi == 'bas') return 'middle';
+
                 })
                 .attr("dy", function (d) {
                     if (d.posi == '0' || d.posi == '90' || d.posi == '270') return '1em';
@@ -158,6 +166,7 @@ class cartoaxes {
             let r = {'x':posi[0],'y':posi[1]
                 ,'numX':me.x.invert(posi[0]),'numY':me.y.invert(posi[1])
                 ,'structure':me.structure
+                ,'id':me.idDoc
                 };
             console.log(r);
             if(me.fctSavePosi)me.fctSavePosi(r);
@@ -179,38 +188,40 @@ class cartoaxes {
         this.drawData = function () {
             if (typeof patienter !== 'undefined') 
                 patienter('Chargement des données');
-
-            $.post(me.urlData, {}, function (data) {
-                me.data = data;
-                me.drawData();
-                if(me.fctCallBackInit)me.fctCallBackInit();
-            }, "json")
-                .fail(function (e) {
-                    throw new Error("Donnée introuvable : "+e);
-                })
-                .always(function () {
-                    if (typeof patienter !== 'undefined') 
-                        patienter('', true);
+            if(me.urlData){
+                $.post(me.urlData, {}, function (data) {
+                    me.data = data;
+                    //me.drawData();
+                    if(me.fctCallBackInit)me.fctCallBackInit();
+                }, "json")
+                    .fail(function (e) {
+                        throw new Error("Donnée introuvable : "+e);
+                    })
+                    .always(function () {
+                        if (typeof patienter !== 'undefined') 
+                            patienter('', true);
+                    });
+        
+                me.data.forEach(function(d) {
+                    d.consequence = +d.consequence;
+                    d.value = + d.value;
                 });
-    
-            me.data.forEach(function(d) {
-                d.consequence = +d.consequence;
-                d.value = + d.value;
-            });
-            //    
-            me.g.selectAll("circle")
-                .data(me.data)
-              .enter().append("circle")
-                .attr("class", "dot")
-                .attr("r", 7)
-                .attr("cx", function(d) { return me.x(d.consequence); })
-                .attr("cy", function(d) { return me.y(d.value); })
-                  .style("fill", function(d) {        
-                    if (d.value >= 3 && d.consequence <= 3) {return "#60B19C"} // Top Left
-                    else if (d.value >= 3 && d.consequence >= 3) {return "#8EC9DC"} // Top Right
-                    else if (d.value <= 3 && d.consequence >= 3) {return "#D06B47"} // Bottom Left
-                    else { return "#A72D73" } //Bottom Right         
-                });  
+                //    
+                me.g.selectAll("circle")
+                    .data(me.data)
+                  .enter().append("circle")
+                    .attr("class", "dot")
+                    .attr("r", 7)
+                    .attr("cx", function(d) { return me.x(d.consequence); })
+                    .attr("cy", function(d) { return me.y(d.value); })
+                      .style("fill", function(d) {        
+                        if (d.value >= 3 && d.consequence <= 3) {return "#60B19C"} // Top Left
+                        else if (d.value >= 3 && d.consequence >= 3) {return "#8EC9DC"} // Top Right
+                        else if (d.value <= 3 && d.consequence >= 3) {return "#D06B47"} // Bottom Left
+                        else { return "#A72D73" } //Bottom Right         
+                    });  
+            }
+
         };
 
       

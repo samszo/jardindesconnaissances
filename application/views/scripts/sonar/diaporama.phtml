@@ -14,6 +14,9 @@
     <script type="text/javascript" src="../js/polarclock.js"></script>
     <script type="text/javascript" src="../js/cartoaxes.js"></script>
     <script type="text/javascript" src="../font/font-awesome/all.min.js"></script>
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/sonar.css" rel="stylesheet" > 
+
     <style>
         body{
             font-family: Helvetica Neue,Helvetica,Arial,sans-serif; 
@@ -50,8 +53,11 @@
         .container{
             font-size: small;
         }
+        .modal-content{
+            background-color: black;
+        }
     </style>
-    <link href="../css/carousel.css" rel="stylesheet">
+
 </head>
 
 <body id="dummybodyid">
@@ -79,16 +85,21 @@
                     </li>
                 </ul>
                 <div class="dropdown-divider"></div>
-                <form class="form-inline mt-2 mt-md-0 mr-3">
+                <div class="form-inline mt-2 mt-md-0 mr-3">
                     <label id='lblSrcFlux' for="inSrcFlux">Source du flux IIIF&nbsp;<i class="far fa-question-circle"></i>&nbsp;</label>
                     <input class="form-control mr-sm-2" type="text" id="inSrcFlux" >
                     <button id='btnSrcFlux' class="btn btn-outline-success my-2 my-sm-0" type="submit">Charger</button>
-                </form>                                
+                </div>                                
                 <div class="dropdown-divider"></div>
-                <form class="form-inline mt-2 mt-md-0">
-                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Chercher">
+                <div class="form-inline mt-2 mt-md-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Chercher" aria-label="Chercher">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Trouver</button>
-                </form>
+                </div>
+
+                <img src="../svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
+                <i class="fab fa-creative-commons"></i>&nbsp;<i class="fab fa-creative-commons-zero"></i>&nbsp;
+  
+
             </div>
         </nav>
     </header>
@@ -112,137 +123,39 @@
         </div>
 
 
-        <!-- Marketing messaging and featurettes
-  ================================================== -->
-        <!-- Wrap the rest of the page in another container to center all the content. -->
+        <div class="container">
 
-        <div class="container marketing">
+            <div class="row" id='cartoEval'>
+                <svg>
+                    <defs>
+                    <linearGradient id="linear-gradient" y1="0.5" x2="1" y2="0.5" gradientUnits="objectBoundingBox">
+                        <stop offset="0" stop-color="#54d6ff"></stop>
+                        <stop offset="1" stop-color="#5fff84"></stop>
+                    </linearGradient>
+                    <linearGradient id="linear-gradient-2" x1="0.005" y1="0.585" x2="0.991" y2="0.585" xlink:href="#linear-gradient">
+                    </linearGradient>
+                    <linearGradient id="center-gradient" x1="0.717" y1="1" x2="0" y2="1" gradientUnits="objectBoundingBox">
+                        <stop offset="0" stop-color="#5ffd8a"></stop>
+                        <stop offset="0.65" stop-color="#58e6ce"></stop>
+                        <stop offset="1" stop-color="#55daf2"></stop>
+                    </linearGradient>
+                    <linearGradient id="degraxeH" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop stop-color="rgb(173, 158, 253)" offset="0%"></stop>
+                        <stop stop-color="rgb(252, 161, 205)" offset="100%"></stop>
+                    </linearGradient>
+                    <linearGradient id="degraxeV" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop stop-color="rgb(3, 246, 162)" offset="0%"></stop>
+                        <stop stop-color="rgb(84, 214, 255)" offset="100%"></stop>
+                    </linearGradient>
+                    </defs>
+                </svg>
 
-            <!-- Three columns of text below the carousel -->
-            <div class="row">
-                <div class="col-lg-4">
-                    <svg class="bd-placeholder-img rounded-circle" width="140" height="140"
-                        xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
-                        role="img" aria-label="Placeholder: 140x140">
-                        <title>Placeholder</title>
-                        <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#777"
-                            dy=".3em">140x140</text>
-                    </svg>
-                    <h2>Heading</h2>
-                    <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh
-                        ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-                        Praesent commodo cursus magna.</p>
-                    <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
-                </div><!-- /.col-lg-4 -->
-                <div class="col-lg-4">
-                    <svg class="bd-placeholder-img rounded-circle" width="140" height="140"
-                        xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
-                        role="img" aria-label="Placeholder: 140x140">
-                        <title>Placeholder</title>
-                        <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#777"
-                            dy=".3em">140x140</text>
-                    </svg>
-                    <h2>Heading</h2>
-                    <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
-                        Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo,
-                        tortor mauris condimentum nibh.</p>
-                    <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
-                </div><!-- /.col-lg-4 -->
-                <div class="col-lg-4">
-                    <svg class="bd-placeholder-img rounded-circle" width="140" height="140"
-                        xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
-                        role="img" aria-label="Placeholder: 140x140">
-                        <title>Placeholder</title>
-                        <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#777"
-                            dy=".3em">140x140</text>
-                    </svg>
-                    <h2>Heading</h2>
-                    <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id
-                        ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris
-                        condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-                    <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
-                </div><!-- /.col-lg-4 -->
             </div><!-- /.row -->
-
-
-            <!-- START THE FEATURETTES -->
-
-            <hr class="featurette-divider">
-
-            <div class="row featurette">
-                <div class="col-md-7">
-                    <h2 class="featurette-heading">First featurette heading. <span class="text-muted">It’ll blow your
-                            mind.</span></h2>
-                    <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis
-                        euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus,
-                        tellus ac cursus commodo.</p>
-                </div>
-                <div class="col-md-5">
-                    <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500"
-                        height="500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
-                        focusable="false" role="img" aria-label="Placeholder: 500x500">
-                        <title>Placeholder</title>
-                        <rect width="100%" height="100%" fill="#eee"></rect><text x="50%" y="50%" fill="#aaa"
-                            dy=".3em">500x500</text>
-                    </svg>
-                </div>
-            </div>
-
-            <hr class="featurette-divider">
-
-            <div class="row featurette">
-                <div class="col-md-7 order-md-2">
-                    <h2 class="featurette-heading">Oh yeah, it’s that good. <span class="text-muted">See for
-                            yourself.</span></h2>
-                    <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis
-                        euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus,
-                        tellus ac cursus commodo.</p>
-                </div>
-                <div class="col-md-5 order-md-1">
-                    <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500"
-                        height="500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
-                        focusable="false" role="img" aria-label="Placeholder: 500x500">
-                        <title>Placeholder</title>
-                        <rect width="100%" height="100%" fill="#eee"></rect><text x="50%" y="50%" fill="#aaa"
-                            dy=".3em">500x500</text>
-                    </svg>
-                </div>
-            </div>
-
-            <hr class="featurette-divider">
-
-            <div class="row featurette">
-                <div class="col-md-7">
-                    <h2 class="featurette-heading">And lastly, this one. <span class="text-muted">Checkmate.</span></h2>
-                    <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis
-                        euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus,
-                        tellus ac cursus commodo.</p>
-                </div>
-                <div class="col-md-5">
-                    <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500"
-                        height="500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
-                        focusable="false" role="img" aria-label="Placeholder: 500x500">
-                        <title>Placeholder</title>
-                        <rect width="100%" height="100%" fill="#eee"></rect><text x="50%" y="50%" fill="#aaa"
-                            dy=".3em">500x500</text>
-                    </svg>
-                </div>
-            </div>
-
-            <hr class="featurette-divider">
-
-            <!-- /END THE FEATURETTES -->
 
         </div><!-- /.container -->
 
         <!-- FOOTER -->
         <footer class="container">
-        <img src="../svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
-  <i class="fab fa-creative-commons"></i>&nbsp;<i class="fab fa-creative-commons-zero"></i>&nbsp;
-  <a href="http://www.samszo.univ-paris8.fr/"> S. Szoniecky</a> 
-  <p>- Inspired by H. Belhammou, R. Delannay,
-  &nbsp;<a href="http://blog.pixelbreaker.com/polarclock/"> pixelbreaker,</a> 
-  &nbsp;<a href="http://bl.ocks.org/mbostock/1096355.">M. Bostock</a></p>
         </footer>
     </main>
 
@@ -252,14 +165,10 @@
         <div class="modal-dialog modal-full" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modWaitLbl">Merci de patienter</h5>
+                    <h5 class="modal-title" id="modWaitLbl">Merci de patienter...</h5>
                 </div>
-                <div class="modal-body">
-                    <div class="text-center">
-                        <div class="spinner-border" role="status">
-                            <span class="sr-only">Chargement...</span>
-                        </div>
-                    </div>
+                <div class="modal-body" style="height: 180px;">
+                    <div id="loader" style="display:block;"></div>
                 </div>
                 <div class="modal-footer">
                 </div>
@@ -275,8 +184,10 @@
             uti = <?php echo $this->uti; ?>,
             //defSrcFlux = 'http://gapai.univ-paris8.fr/smel/omk/iiif/collection/1',
             defSrcFlux = '../../data/SMEL/iiif-smel1.json',
-            height = window.innerHeight/3,
-            tofEval;
+            height = window.innerHeight,
+            width = window.innerWidth,
+            svg, pc, ca, tofEval;
+
         d3.select('#inSrcFlux').attr('value',defSrcFlux);    
         //gestion des événements
         d3.select('#lblSrcFlux')
@@ -306,20 +217,23 @@
 	function showSource(src){
         $('.navbar-collapse').collapse('hide');
         $('#modWait').modal('show');
+        //
 		$.ajax({
-	    		url: src,
-	    		dataType: "json",
-	    		method: 	"POST",
-	        	error: function(error){
-                    console.log("Erreur : "+error.responseText);
-                    $('#modWait').modal('hide');                    
-	        	},            	
-	        	success: function(data) {
-                    console.log(data);
-                    //filtre les photo originales
-		        	ajoutPhotosGallerie(data.manifests);		        	
-	        }
-		});	  		
+            url: src,
+            dataType: "json",
+            method: 	"GET",
+            error: function(error){
+                console.log("Erreur : "+error.responseText);
+                $('#modWait').modal('hide');                    
+            },            	
+            success: function(data) {
+                console.log(data);
+                //ajoute les photo à la gallery
+                ajoutPhotosGallerie(data.manifests);
+                //ajoute la cartographie
+                if(!ca) showCartoHorlo(data['@id']);        
+            }
+        });
 	}
     
 	function ajoutPhotosGallerie(tofs) {
@@ -344,21 +258,22 @@
 
 	    var items = d3.select('#car-inn').selectAll('div')
 	        .data(tofEval).enter().append('div')
-            .style('max-height', height + "px")
+            .style('max-height', height/3 + "px")
 	        .attr('class', function (d, i) {
 	            var c = 'carousel-item';
 	            if (i == 0) c += ' active';
 	            return c;
             });
-        /*code pour ajouter des images
+
+        //code pour ajouter des images
 	    items.append('img')
 	        .attr('id', function (d,i) {
                 d.idImg = 'img_'+i;
 	            return d.idImg;
 	        })
 	        .attr('class', 'd-block img-fluid')
-            .style('max-height', height + "px");
-        */
+            .style('max-height', height/3 + "px");
+
         //code pour ajouter des svg
 	    items.append('svg')
 	        .attr('id', function (d,i) {
@@ -374,10 +289,13 @@
                 })
                 .style('width', '100%')
                 .style('height', '100%')
-                .style('fill-opacity', '0.3')
+                .style('position', 'absolute')
+                .style('top', '0px')                
+                .style('fill-opacity', '0')
                 .style('stroke-width','4')
-                .style('fill','red')
+                .style('fill','none')
                 .style('stroke','green'); 
+
 
 	    /*ajoute le descriptif
 	    var block = items.append('div').attr('class', 'carousel-caption d-none d-md-block');
@@ -393,6 +311,7 @@
 	        })
 	        .attr('target', '_blank').text('original');
         */
+
 	    initCarousel();
     }
     
@@ -400,16 +319,18 @@
 
         //ajoute les événements
         $('#carouselEvals').on('slid.bs.carousel', function (e) {
+                //
                 if(!tofEval[e.to].infos){
-                    $('.carousel').carousel('pause');                                
+                    //$('.carousel').carousel('pause');                                
                     getTofIIIF(e.to);
                     $('#modWait').modal('hide');    
                 }
+                ca.idDoc = tofEval[e.to]['@id'];
+                console.log(e);
             })
 
-        $('.carousel').carousel();
+        //$('.carousel').carousel();
         //$('.carousel').carousel('cycle');
-
         //$('.carousel').carousel(tofEval.length-1);		
         //$('.carousel').carousel('pause');                                
 
@@ -427,25 +348,27 @@
             success: function(data) {
                 console.log(data);
                 d.infos = data;
+                let url = "";                
                 //vérifie la présence de visage
                 d.infos.metadata.forEach(function(t){
                     if(t.label=="faceAnnotations"){
-
+                        url = getVisageTofIIIF(d, t);
                     }                    
                 })                
 
-                //
-                let url = getAleaTofIIIF(d);   
-
+                //récupère une image aléatoire si pas de visage
+                if(url==""){
+                    url = getAleaTofIIIF(d);   
+                }                
                 //code pour ajouter une image HTML
-                //d3.select("#"+d.idImg).attr('src',url);
-                //code pour une image SVG
-                let img = d3.select("#"+d.idSvg).append('image')
+                d3.select("#"+d.idImg).attr('src',url);
+                /*code pour une image SVG
+                d3.select("#"+d.idSvg).append('image')
                     .attr('class','iiif')
                     .attr('x',0)
                     .attr('y',0)
                     .attr('xlink:href',url);
-
+                */
                 //$('.carousel').carousel('prev');
                 //$('.carousel').carousel('cycle');                                                
 	        }
@@ -456,7 +379,6 @@
 
     function getAleaTofIIIF(d){
 		//item vient de IIIF
-		let imgSrcOri = d.infos.thumbnail["@id"];
 		//récupère la position et la taille du rectangle
 		let bb = d3.select('#'+d.idRect).node().getBBox();
 
@@ -472,8 +394,77 @@
         console.log(w+' '+h+' '+d.img.url);
 
         return d.img.url;
-	
     }    
+
+    function getVisageTofIIIF(d, t){
+		//item vient de IIIF
+		//récupère la position et la taille du rectangle
+        let bb = d3.select('#'+d.idRect).node().getBBox();
+        
+        //récupère a défitinition du visage
+        let vs = JSON.parse('['+t.value+']');
+        console.log(vs);
+
+        let img, imgOmk = d.infos.sequences[0].canvases[0].images[0].resource.service["@id"];
+        vs.forEach(function(v){
+        //calcule l'url IIIF        
+            if(!d.images)d.images = [];
+            img = {'w': v.boundingPoly.vertices[1].x-v.boundingPoly.vertices[0].x,
+                'h':v.boundingPoly.vertices[2].y-v.boundingPoly.vertices[0].y,
+                'x':v.boundingPoly.vertices[0].x,
+                'y':v.boundingPoly.vertices[0].y,
+                'r':0};
+            img.url= imgOmk+'/'+img.x+','+img.y+','+(img.w)+','+(img.h)+'/'+parseInt(bb.width)+','+parseInt(bb.height)+'/'+img.r+'/default.jpg';
+            console.log(img);
+            d.images.push(img);
+        });
+        return img.url;	
+    }    
+
+    function showCartoHorlo(id){
+        //récupère la taille du conteneur
+        let c = document.getElementById('cartoEval');
+        //calcul les tailles
+        let spacing=0.09, w = width, h = height/2,//w = c.clientWidth, h = c.clientHeight,        
+            rayon = w < h ? w/2 : h/2;
+
+        svg = d3.select("#cartoEval svg")
+            .attr("id", "svgGlobal")
+            .attr("width", w)
+            .attr("height", h);
+        //ajoute la polar clock
+        pc = new polarclock({
+              'idSvg':'svgGlobal', 'spacing':spacing
+              ,'width':w,'height':h,'chrono':true
+              ,'nbCouche':6
+            }); 
+        //ajoute la carto axe
+        ca = new cartoaxes({
+              'idSvg':'svgGlobal', 'tick':0, 'idDoc':id
+              , 'structure':[{'lbl':'pertinent','posi':"haut"},{'lbl':'rien à voir','posi':'bas'}]
+              , 'fctGetGrad':pc.getInstantColors, 'fctSavePosi':savePosi
+              ,'width':rayon*2,'height':rayon*2
+              ,'x': (w/2)-rayon,'y':0
+            });
+        //pc.toggleTimer();
+        pc.resetTimer()
+    }
+    function savePosi(d){
+        /*
+        $.post('../sonar/flux', {'q':'savePosi','dt':d}, function (data) {
+            console.log(data);
+        }, "json")
+        .fail(function (e) {
+            throw new Error("Sauvegarde imposible : "+e);
+        })
+        .always(function () {
+        });
+        */
+    }
+    showCartoHorlo();
+    //$('#modWait').modal('show');
+    $('.navbar-collapse').collapse('show');
+
     </script>
 </body>
 

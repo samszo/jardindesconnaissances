@@ -15,6 +15,7 @@ class polarclock {
         this.fctGetGrad = params.fctGetGrad ? params.fctGetGrad : false;
         this.chrono = params.chrono ? params.chrono : false; 
         this.synchro = params.synchro ? params.synchro : false; 
+        this.nbCouche = params.nbCouche ? params.nbCouche : 3; 
         var formatSecond = d3.timeFormat("%-S seconds"),
             formatMinute = d3.timeFormat("%-M minutes"),
             formatHour = d3.timeFormat("%-H hours"),
@@ -141,14 +142,32 @@ class polarclock {
                 //conversion en UTC pour éviter l'heure de trop
                 now =  new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()); 
             }
-            return [
-                    {index: startIndex, text: formatSecond(now), value: now.getSeconds() / 60},
-                    {index: startIndex-me.spacing, text: formatMinute(now), value: now.getMinutes() / 60},
-                    {index: startIndex-(me.spacing*2), text: formatHour(now),   value: now.getHours() / 24},
-                    //{index: .3, text: formatDay(now),    value: now.getDay() / 7},
-                    //{index: .2, text: formatDate(now),   value: (now.getDate() - 1) / (32 - new Date(now.getYear(), now.getMonth(), 32).getDate())},
-                    //{index: .1, text: formatMonth(now),  value: now.getMonth() / 12}
-                ];
+            //choix des couches
+            var couches = [];
+            for (let index = 1; index <= me.nbCouche; index++) {
+                switch (index) {
+                    case 1:
+                        couches.push({index: startIndex, text: formatSecond(now), value: now.getSeconds() / 60});
+                        break;
+                    case 2:
+                        couches.push({index: startIndex-me.spacing, text: formatMinute(now), value: now.getMinutes() / 60});
+                        break;
+                    case 3:
+                        couches.push({index: startIndex-(me.spacing*2), text: formatHour(now),   value: now.getHours() / 24});
+                        break;
+                    case 4:
+                        couches.push({index: startIndex-(me.spacing*3), text: formatDay(now),    value: now.getDay() / 7});
+                        break;
+                    case 5:
+                        couches.push({index: startIndex-(me.spacing*4), text: formatDate(now),   value: (now.getDate() - 1) / (32 - new Date(now.getYear(), now.getMonth(), 32).getDate())});
+                        break;
+                    case 6:
+                        couches.push({index: startIndex-(me.spacing*5), text: formatMonth(now),  value: now.getMonth() / 12});
+                        break;
+                }                
+            }
+
+            return couches;
         }
 
         this.getArcWidth = function(){
