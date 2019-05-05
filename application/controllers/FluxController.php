@@ -634,6 +634,9 @@ class FluxController extends Zend_Controller_Action {
 			case 'getCsvToOmeka':
 				$s->getCsvToOmeka('/Users/samszo/Sites/jdc/data/SMEL/importMcCord.csv');
 				break;
+			case 'getCsvGoogleVisageToOmk':
+				$s->getCsvGoogleVisageToOmk('https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif-img/','/Users/samszo/Sites/jdc/data/SMEL/importMcCordVisage.csv');
+				break;
 			case 'getImageByComplexe':
 				$rs = $s->getArtefactInfos("#",' sum_complex ASC');
 				$s = new Flux_Site();

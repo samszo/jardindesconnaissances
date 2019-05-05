@@ -7,7 +7,7 @@ function connexion(redir){
 }
 
 function patienter(message, fin) {
-
+    if (typeof w2ui !== 'undefined') return;
     if (fin) {
         w2popup.unlock();
         w2popup.close();

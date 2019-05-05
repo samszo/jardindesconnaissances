@@ -13,14 +13,17 @@
     <script type="text/javascript" src="../js/site.js"></script>
     <script type="text/javascript" src="../js/polarclock.js"></script>
     <script type="text/javascript" src="../js/cartoaxes.js"></script>
+
     <script type="text/javascript" src="../font/font-awesome/all.min.js"></script>
+
     <link href="../css/carousel.css" rel="stylesheet">
-    <link href="../css/sonar.css" rel="stylesheet" > 
+    <link href="../css/sonar.css" rel="stylesheet">
 
     <style>
-        body{
-            font-family: Helvetica Neue,Helvetica,Arial,sans-serif; 
+        body {
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         }
+
         .bd-placeholder-img {
             font-size: 1.125rem;
             text-anchor: middle;
@@ -35,25 +38,31 @@
                 font-size: 3.5rem;
             }
         }
+
         .bg-dark {
-            background-color: #000000!important;
-        }        
-        .logo{
-            vertical-align: top;
-            height:40px;
+            background-color: #000000 !important;
         }
+
+        .logo {
+            vertical-align: top;
+            height: 40px;
+        }
+
         @font-face {
-        font-family: "Quantify";
-        src: url("../fonts/quantify/Quantify.ttf");
-        } 
-        .logoTxt{
+            font-family: "Quantify";
+            src: url("../fonts/quantify/Quantify.ttf");
+        }
+
+        .logoTxt {
             vertical-align: sub;
             font-family: "Quantify";
         }
-        .container{
+
+        .container {
             font-size: small;
         }
-        .modal-content{
+
+        .modal-content {
             background-color: black;
         }
     </style>
@@ -64,8 +73,8 @@
     <header>
         <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
             <a class="navbar-brand" href="#">
-            <img class='logo' src="../svg/logo-sonar.svg" alt="logo-sonar" />
-            <span class='logoTxt' >FLUX IMAGES</span>
+                <img class='logo' src="../svg/logo-sonar.svg" alt="logo-sonar" />
+                <span class='logoTxt'>FLUX IMAGES</span>
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,17 +88,28 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="fas fa-user-edit"></i>
-                            <span id='txtUti'></span> 
+                            <span id='txtUti'></span>
                             <span id='btnConnexion'></span>
                         </a>
                     </li>
                 </ul>
                 <div class="dropdown-divider"></div>
                 <div class="form-inline mt-2 mt-md-0 mr-3">
-                    <label id='lblSrcFlux' for="inSrcFlux">Source du flux IIIF&nbsp;<i class="far fa-question-circle"></i>&nbsp;</label>
-                    <input class="form-control mr-sm-2" type="text" id="inSrcFlux" >
+                    <label id='lblSrcFlux' for="inSrcFlux">Source du flux IIIF&nbsp;<i
+                            class="far fa-question-circle"></i>&nbsp;</label>
+                    <input class="form-control mr-sm-2" type="text" id="inSrcFlux">
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ckAleaTaille">
+                        <label class="form-check-label" for="ckAleaTaille">
+                            Taille aléatoire
+                        </label>
+                    </div>
+
                     <button id='btnSrcFlux' class="btn btn-outline-success my-2 my-sm-0" type="submit">Charger</button>
-                </div>                                
+                </div>
+                <div class="form-inline mt-2 mt-md-0 mr-3">
+                </div>
                 <div class="dropdown-divider"></div>
                 <div class="form-inline mt-2 mt-md-0">
                     <input class="form-control mr-sm-2" type="text" placeholder="Chercher" aria-label="Chercher">
@@ -97,9 +117,7 @@
                 </div>
 
                 <img src="../svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
-                <i class="fab fa-creative-commons"></i>&nbsp;<i class="fab fa-creative-commons-zero"></i>&nbsp;
-  
-
+                <i class="fab fa-creative-commons"></i>&nbsp;<i class="fab fa-creative-commons-zero"></i>
             </div>
         </nav>
     </header>
@@ -128,25 +146,27 @@
             <div class="row" id='cartoEval'>
                 <svg>
                     <defs>
-                    <linearGradient id="linear-gradient" y1="0.5" x2="1" y2="0.5" gradientUnits="objectBoundingBox">
-                        <stop offset="0" stop-color="#54d6ff"></stop>
-                        <stop offset="1" stop-color="#5fff84"></stop>
-                    </linearGradient>
-                    <linearGradient id="linear-gradient-2" x1="0.005" y1="0.585" x2="0.991" y2="0.585" xlink:href="#linear-gradient">
-                    </linearGradient>
-                    <linearGradient id="center-gradient" x1="0.717" y1="1" x2="0" y2="1" gradientUnits="objectBoundingBox">
-                        <stop offset="0" stop-color="#5ffd8a"></stop>
-                        <stop offset="0.65" stop-color="#58e6ce"></stop>
-                        <stop offset="1" stop-color="#55daf2"></stop>
-                    </linearGradient>
-                    <linearGradient id="degraxeH" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop stop-color="rgb(173, 158, 253)" offset="0%"></stop>
-                        <stop stop-color="rgb(252, 161, 205)" offset="100%"></stop>
-                    </linearGradient>
-                    <linearGradient id="degraxeV" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop stop-color="rgb(3, 246, 162)" offset="0%"></stop>
-                        <stop stop-color="rgb(84, 214, 255)" offset="100%"></stop>
-                    </linearGradient>
+                        <linearGradient id="linear-gradient" y1="0.5" x2="1" y2="0.5" gradientUnits="objectBoundingBox">
+                            <stop offset="0" stop-color="#54d6ff"></stop>
+                            <stop offset="1" stop-color="#5fff84"></stop>
+                        </linearGradient>
+                        <linearGradient id="linear-gradient-2" x1="0.005" y1="0.585" x2="0.991" y2="0.585"
+                            xlink:href="#linear-gradient">
+                        </linearGradient>
+                        <linearGradient id="center-gradient" x1="0.717" y1="1" x2="0" y2="1"
+                            gradientUnits="objectBoundingBox">
+                            <stop offset="0" stop-color="#5ffd8a"></stop>
+                            <stop offset="0.65" stop-color="#58e6ce"></stop>
+                            <stop offset="1" stop-color="#55daf2"></stop>
+                        </linearGradient>
+                        <linearGradient id="degraxeH" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop stop-color="rgb(173, 158, 253)" offset="0%"></stop>
+                            <stop stop-color="rgb(252, 161, 205)" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient id="degraxeV" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop stop-color="rgb(3, 246, 162)" offset="0%"></stop>
+                            <stop stop-color="rgb(84, 214, 255)" offset="100%"></stop>
+                        </linearGradient>
                     </defs>
                 </svg>
 
@@ -183,121 +203,134 @@
         var idBase = '<?php echo $this->idBase; ?>',
             uti = <?php echo $this->uti; ?>,
             //defSrcFlux = 'http://gapai.univ-paris8.fr/smel/omk/iiif/collection/1',
-            defSrcFlux = '../../data/SMEL/iiif-smel1.json',
+            //defSrcFlux = 'https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1',
+            //collection des visages
+            defSrcFlux = 'https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1496',
+            //pour les tests
+            //defSrcFlux = '../../data/SMEL/iiif-smel1.json',
             height = window.innerHeight,
             width = window.innerWidth,
-            svg, pc, ca, tofEval;
+            svg, pc, ca, tofEval, geo=false;
 
-        d3.select('#inSrcFlux').attr('value',defSrcFlux);    
+        //récupère la géolocalisation de l'utilisateur
+        if (navigator.geolocation) {
+	        navigator.geolocation.getCurrentPosition(function(p){
+                geo = p;
+            });
+	    }
+
+
+        d3.select('#inSrcFlux').attr('value', defSrcFlux);
         //gestion des événements
         d3.select('#lblSrcFlux')
-            .on('click',function(){
+            .on('click', function () {
                 console.log('affiche les information sur les flux');
             });
         d3.select('#btnSrcFlux')
-            .on('click',function(){
+            .on('click', function () {
                 let src = document.getElementById("inSrcFlux").value;
-                console.log('Charge les images du flux IIIF :'+src);
+                console.log('Charge les images du flux IIIF :' + src);
                 showSource(src);
-            });            
+            });
         d3.select('#btnConnexion')
-            .on('click',function(){
+            .on('click', function () {
                 console.log("connexion ou déconnexion de l'utilisateur");
             });
-                
+
         showUti();
 
-    function showUti(){
-        d3.select('#txtUti').html(uti.login);
-        let btn = '<i class="fas fa-sign-in-alt"></i>';
-        if(uti.uti_id!=1)btn = '<i class="fas fa-sign-in-alt"></i>';
-        d3.select('#btnConnexion').html(btn);
-    }
+        function showUti() {
+            d3.select('#txtUti').html(uti.login);
+            let btn = '<i class="fas fa-sign-in-alt"></i>';
+            if (uti.uti_id != 1) btn = '<i class="fas fa-sign-in-alt"></i>';
+            d3.select('#btnConnexion').html(btn);
+        }
 
-	function showSource(src){
-        $('.navbar-collapse').collapse('hide');
-        $('#modWait').modal('show');
-        //
-		$.ajax({
-            url: src,
-            dataType: "json",
-            method: 	"GET",
-            error: function(error){
-                console.log("Erreur : "+error.responseText);
-                $('#modWait').modal('hide');                    
-            },            	
-            success: function(data) {
-                console.log(data);
-                //ajoute les photo à la gallery
-                ajoutPhotosGallerie(data.manifests);
-                //ajoute la cartographie
-                if(!ca) showCartoHorlo(data['@id']);        
-            }
-        });
-	}
-    
-	function ajoutPhotosGallerie(tofs) {
-
-        tofEval = d3.shuffle(tofs);
-
-        // Remove old elements as needed.
-	    d3.select('#car-ind').selectAll('li').remove();
-	    d3.select('#car-inn').selectAll('div').remove();
-
-
-	    //Ajoute la photo à la gallerie
-	    var li = d3.select('#car-ind').selectAll('li')
-	        .data(tofEval).enter().append('li')
-	        .attr('data-target', "#carouselEvals")
-	        .attr('data-slide-to', function (d, i) {
-	            return i;
-	        })
-	        .attr('class', function (d, i) {
-	            if (i == 0) return 'active';
-	        });
-
-	    var items = d3.select('#car-inn').selectAll('div')
-	        .data(tofEval).enter().append('div')
-            .style('max-height', height/3 + "px")
-	        .attr('class', function (d, i) {
-	            var c = 'carousel-item';
-	            if (i == 0) c += ' active';
-	            return c;
+        function showSource(src) {
+            $('.navbar-collapse').collapse('hide');
+            $('#modWait').modal('show');
+            //
+            $.ajax({
+                url: src,
+                dataType: "json",
+                method: "GET",
+                error: function (error) {
+                    console.log("Erreur : " + error.responseText);
+                    $('#modWait').modal('hide');
+                },
+                success: function (data) {
+                    console.log(data);
+                    //ajoute les photo à la gallery
+                    ajoutPhotosGallerie(data.manifests);
+                    //ajoute la cartographie
+                    if (!ca) showCartoHorlo(data['@id']);
+                }
             });
+        }
 
-        //code pour ajouter des images
-	    items.append('img')
-	        .attr('id', function (d,i) {
-                d.idImg = 'img_'+i;
-	            return d.idImg;
-	        })
-	        .attr('class', 'd-block img-fluid')
-            .style('max-height', height/3 + "px");
+        function ajoutPhotosGallerie(tofs) {
 
-        //code pour ajouter des svg
-	    items.append('svg')
-	        .attr('id', function (d,i) {
-                d.idSvg = 'svg_'+i;
-	            return d.idSvg;
-	        })
-            .style('width', "100%")
-            .style('height', "100%")
-            .append('rect')
-                .attr('id', function (d,i) {
-                    d.idRect = 'rect_'+i;
+            //mélange toutes les photos
+            tofEval = d3.shuffle(tofs);
+
+            // Remove old elements as needed.
+            d3.select('#car-ind').selectAll('li').remove();
+            d3.select('#car-inn').selectAll('div').remove();
+
+
+            //Ajoute la photo à la gallerie
+            var li = d3.select('#car-ind').selectAll('li')
+                .data(tofEval).enter().append('li')
+                .attr('data-target', "#carouselEvals")
+                .attr('data-slide-to', function (d, i) {
+                    return i;
+                })
+                .attr('class', function (d, i) {
+                    if (i == 0) return 'active';
+                });
+
+            var items = d3.select('#car-inn').selectAll('div')
+                .data(tofEval).enter().append('div')
+                .style('max-height', height / 3 + "px")
+                .attr('class', function (d, i) {
+                    var c = 'carousel-item';
+                    if (i == 0) c += ' active';
+                    return c;
+                });
+
+            //code pour ajouter des images
+            items.append('img')
+                .attr('id', function (d, i) {
+                    d.idImg = 'img_' + i;
+                    return d.idImg;
+                })
+                .attr('class', 'd-block img-fluid')
+                .style('max-height', height / 3 + "px");
+
+            //code pour ajouter des svg
+            items.append('svg')
+                .attr('id', function (d, i) {
+                    d.idSvg = 'svg_' + i;
+                    return d.idSvg;
+                })
+                .style('width', "100%")
+                .style('height', "100%")
+                .append('rect')
+                .attr('id', function (d, i) {
+                    d.idRect = 'rect_' + i;
                     return d.idRect;
                 })
                 .style('width', '100%')
                 .style('height', '100%')
                 .style('position', 'absolute')
-                .style('top', '0px')                
+                .style('top', '0px')
                 .style('fill-opacity', '0')
-                .style('stroke-width','4')
-                .style('fill','none')
-                .style('stroke','green'); 
+                .style('stroke-width', '4')
+                .style('fill', 'none')
+                .style('stroke', 'green');
 
 
-	    /*ajoute le descriptif
+            /*ajoute le descriptif
 	    var block = items.append('div').attr('class', 'carousel-caption d-none d-md-block');
 	    block.append('h3').text(function (d) {
 	        return d.label;
@@ -312,159 +345,198 @@
 	        .attr('target', '_blank').text('original');
         */
 
-	    initCarousel();
-    }
-    
-    function initCarousel(){
+            initCarousel();
+        }
 
-        //ajoute les événements
-        $('#carouselEvals').on('slid.bs.carousel', function (e) {
+        function initCarousel() {
+
+            //ajoute les événements
+            $('#carouselEvals').on('slid.bs.carousel', function (e) {
                 //
-                if(!tofEval[e.to].infos){
+                if (!tofEval[e.to].infos) {
                     //$('.carousel').carousel('pause');                                
                     getTofIIIF(e.to);
-                    $('#modWait').modal('hide');    
+                    $('#modWait').modal('hide');
                 }
                 ca.idDoc = tofEval[e.to]['@id'];
                 console.log(e);
             })
+            $('.carousel').carousel({
+                interval: 5000
+            })
+            //$('.carousel').carousel();
+            //$('.carousel').carousel('cycle');
+            //$('.carousel').carousel(tofEval.length-1);		
+            //$('.carousel').carousel('pause');                                
 
-        //$('.carousel').carousel();
-        //$('.carousel').carousel('cycle');
-        //$('.carousel').carousel(tofEval.length-1);		
-        //$('.carousel').carousel('pause');                                
+        }
 
-    }
+        function getTofIIIF(num) {
+            let d = tofEval[num];
+            $.ajax({
+                url: d['@id'],
+                dataType: "json",
+                method: "POST",
+                error: function (error) {
+                    console.log("getTofIIIF Erreur : " + error.responseText);
+                },
+                success: function (data) {
+                    console.log(data);
+                    d.infos = data;
+                    let url = "";
+                    //vérifie la présence de visage
+                    d.infos.metadata.forEach(function (t) {
+                        if (t.label == "faceAnnotations") {
+                            url = getVisageTofIIIF(d, t);
+                        }
+                    })
 
-    function getTofIIIF(num){
-        let d = tofEval[num];
-		$.ajax({
-            url: d['@id'],
-            dataType: "json",
-            method: 	"POST",
-            error: function(error){
-                console.log("getTofIIIF Erreur : "+error.responseText);
-            },            	
-            success: function(data) {
-                console.log(data);
-                d.infos = data;
-                let url = "";                
-                //vérifie la présence de visage
-                d.infos.metadata.forEach(function(t){
-                    if(t.label=="faceAnnotations"){
-                        url = getVisageTofIIIF(d, t);
-                    }                    
-                })                
+                    //récupère l'image si pas de visage
+                    if (url == "") {
+                        let isAlea = d3.select("#ckAleaTaille").attr('value');
+                        if(isAlea)
+                            url = getAleaTofIIIF(d);
+                        else
+                           url = d.infos.thumbnail["@id"];
+                    }
+                    //code pour ajouter une image HTML
+                    d3.select("#" + d.idImg).attr('src', url);
+                    /*code pour une image SVG
+                    d3.select("#"+d.idSvg).append('image')
+                        .attr('class','iiif')
+                        .attr('x',0)
+                        .attr('y',0)
+                        .attr('xlink:href',url);
+                    */
+                    //précise l'url à la carto
+                    ca.idDoc = url;
+                    //récupère les data
+                    ca.drawData();                    
+                }
+            });
 
-                //récupère une image aléatoire si pas de visage
-                if(url==""){
-                    url = getAleaTofIIIF(d);   
-                }                
-                //code pour ajouter une image HTML
-                d3.select("#"+d.idImg).attr('src',url);
-                /*code pour une image SVG
-                d3.select("#"+d.idSvg).append('image')
-                    .attr('class','iiif')
-                    .attr('x',0)
-                    .attr('y',0)
-                    .attr('xlink:href',url);
-                */
-                //$('.carousel').carousel('prev');
-                //$('.carousel').carousel('cycle');                                                
-	        }
-		});	  		
-
-    }
+        }
 
 
-    function getAleaTofIIIF(d){
-		//item vient de IIIF
-		//récupère la position et la taille du rectangle
-		let bb = d3.select('#'+d.idRect).node().getBBox();
+        function getAleaTofIIIF(d) {
+            //item vient de IIIF
+            //récupère la position et la taille du rectangle
+            let bb = d3.select('#' + d.idRect).node().getBBox();
 
-        //calcule l'url IIIF
-        let zoom=3, minPixel = 0, imgOmk = d.infos.sequences[0].canvases[0].images[0].resource.service["@id"];
-        d.img = {}, w=d.infos.sequences[0].canvases[0].width, h=d.infos.sequences[0].canvases[0].height;
-        d.img.w = parseInt(bb.width/zoom);
-        d.img.h = parseInt(bb.height/zoom);
-        d.img.x = parseInt(d3.randomUniform(minPixel, w-d.img.w)());
-        d.img.y = parseInt(d3.randomUniform(minPixel, h-d.img.h)());
-        d.img.r = 0;
-        d.img.url=imgOmk+'/'+d.img.x+','+d.img.y+','+(d.img.w)+','+(d.img.h)+'/'+parseInt(bb.width)+','+parseInt(bb.height)+'/'+d.img.r+'/default.jpg';
-        console.log(w+' '+h+' '+d.img.url);
-
-        return d.img.url;
-    }    
-
-    function getVisageTofIIIF(d, t){
-		//item vient de IIIF
-		//récupère la position et la taille du rectangle
-        let bb = d3.select('#'+d.idRect).node().getBBox();
-        
-        //récupère a défitinition du visage
-        let vs = JSON.parse('['+t.value+']');
-        console.log(vs);
-
-        let img, imgOmk = d.infos.sequences[0].canvases[0].images[0].resource.service["@id"];
-        vs.forEach(function(v){
-        //calcule l'url IIIF        
-            if(!d.images)d.images = [];
-            img = {'w': v.boundingPoly.vertices[1].x-v.boundingPoly.vertices[0].x,
-                'h':v.boundingPoly.vertices[2].y-v.boundingPoly.vertices[0].y,
-                'x':v.boundingPoly.vertices[0].x,
-                'y':v.boundingPoly.vertices[0].y,
-                'r':0};
-            img.url= imgOmk+'/'+img.x+','+img.y+','+(img.w)+','+(img.h)+'/'+parseInt(bb.width)+','+parseInt(bb.height)+'/'+img.r+'/default.jpg';
+            //calcule l'url IIIF
+            let zoom = 3,
+                minPixel = 0,
+                imgOmk = d.infos.sequences[0].canvases[0].images[0].resource.service["@id"],
+                w = d.infos.sequences[0].canvases[0].width, h = d.infos.sequences[0].canvases[0].height,
+                wI = parseInt(bb.width / zoom), hI = parseInt(bb.height / zoom);
+            if (!d.images) d.images = [];
+            let img = {
+                    'w': wI,
+                    'h': hI,
+                    'x': parseInt(d3.randomUniform(minPixel, w > wI ? w - wI : w)()),
+                    'y': parseInt(d3.randomUniform(minPixel, h > hI ? h - hI : h)()),
+                    'r': 0
+                };
+            img.url = imgOmk + '/' + img.x + ',' + img.y + ',' + (img.w) + ',' + (img.h) + '/' 
+                + parseInt(bb.width) + ',' + parseInt(bb.height) + '/' + img.r + '/default.jpg';
             console.log(img);
             d.images.push(img);
-        });
-        return img.url;	
-    }    
 
-    function showCartoHorlo(id){
-        //récupère la taille du conteneur
-        let c = document.getElementById('cartoEval');
-        //calcul les tailles
-        let spacing=0.09, w = width, h = height/2,//w = c.clientWidth, h = c.clientHeight,        
-            rayon = w < h ? w/2 : h/2;
+            return img.url;
+        }
 
-        svg = d3.select("#cartoEval svg")
-            .attr("id", "svgGlobal")
-            .attr("width", w)
-            .attr("height", h);
-        //ajoute la polar clock
-        pc = new polarclock({
-              'idSvg':'svgGlobal', 'spacing':spacing
-              ,'width':w,'height':h,'chrono':true
-              ,'nbCouche':6
-            }); 
-        //ajoute la carto axe
-        ca = new cartoaxes({
-              'idSvg':'svgGlobal', 'tick':0, 'idDoc':id
-              , 'structure':[{'lbl':'pertinent','posi':"haut"},{'lbl':'rien à voir','posi':'bas'}]
-              , 'fctGetGrad':pc.getInstantColors, 'fctSavePosi':savePosi
-              ,'width':rayon*2,'height':rayon*2
-              ,'x': (w/2)-rayon,'y':0
+        function getVisageTofIIIF(d, t) {
+            //item vient de IIIF
+            //récupère la position et la taille du rectangle
+            let bb = d3.select('#' + d.idRect).node().getBBox();
+
+            //récupère a défitinition du visage
+            let vs = JSON.parse('[' + t.value + ']');
+            console.log(vs);
+
+            let img, imgOmk = d.infos.sequences[0].canvases[0].images[0].resource.service["@id"];
+            vs.forEach(function (v) {
+                //calcule l'url IIIF        
+                if (!d.images) d.images = [];
+                img = {
+                    'w': v.boundingPoly.vertices[1].x - v.boundingPoly.vertices[0].x,
+                    'h': v.boundingPoly.vertices[2].y - v.boundingPoly.vertices[0].y,
+                    'x': v.boundingPoly.vertices[0].x,
+                    'y': v.boundingPoly.vertices[0].y,
+                    'r': 0
+                };
+                img.url = imgOmk + '/' + img.x + ',' + img.y + ',' + (img.w) + ',' + (img.h) + '/' + parseInt(bb
+                    .width) + ',' + parseInt(bb.height) + '/' + img.r + '/default.jpg';
+                console.log(img);
+                d.images.push(img);
             });
-        //pc.toggleTimer();
-        pc.resetTimer()
-    }
-    function savePosi(d){
-        /*
-        $.post('../sonar/flux', {'q':'savePosi','dt':d}, function (data) {
-            console.log(data);
-        }, "json")
-        .fail(function (e) {
-            throw new Error("Sauvegarde imposible : "+e);
-        })
-        .always(function () {
-        });
-        */
-    }
-    showCartoHorlo();
-    //$('#modWait').modal('show');
-    $('.navbar-collapse').collapse('show');
+            return img.url;
+        }
 
+        function showCartoHorlo(id) {
+            //récupère la taille du conteneur
+            let c = document.getElementById('cartoEval');
+            //calcul les tailles
+            let spacing = 0.0001,
+                w = width,
+                h = height / 2, //w = c.clientWidth, h = c.clientHeight,        
+                rayon = w < h ? w / 2 : h / 2;
+
+            svg = d3.select("#cartoEval svg")
+                .attr("id", "svgGlobal")
+                .attr("width", w)
+                .attr("height", h);
+            //ajoute la polar clock
+            pc = new polarclock({
+                'idSvg': 'svgGlobal',
+                'spacing': spacing,
+                'width': w,
+                'height': h,
+                'chrono': true,
+                'nbCouche': 6
+            });
+            //ajoute la carto axe
+            ca = new cartoaxes({
+                'idSvg': 'svgGlobal',
+                'tick': 0,
+                'idDoc': id,
+                'urlData':'../sonar/flux?q=getEvals',
+                'typeSrc':'IIIF',
+                'structure': [{
+                    'lbl': 'pertinent',
+                    'posi': "haut"
+                }, {
+                    'lbl': 'rien à voir',
+                    'posi': 'bas'
+                }],
+                'fctGetGrad': pc.getInstantColors,
+                'fctSavePosi': savePosi,
+                'width': rayon * 2,
+                'height': rayon * 2,
+                'x': (w / 2) - rayon,
+                'y': 0
+            });
+            //pc.toggleTimer();
+            pc.resetTimer()
+        }
+
+        function savePosi(d) {
+            $.post('../sonar/flux', {
+                    'q': 'savePosi',
+                    'type':'IIIF',
+                    'geo':geo,
+                    'dt': d                    
+                }, function (data) {
+                    console.log(data);
+                }, "json")
+                .fail(function (e) {
+                    throw new Error("Sauvegarde imposible : " + e);
+                })
+                .always(function () {});
+        }
+        //showCartoHorlo();
+        //$('#modWait').modal('show');
+        $('.navbar-collapse').collapse('show');
     </script>
 </body>
 

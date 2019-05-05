@@ -179,7 +179,7 @@ class polarclock {
         }
 
         this.getInstantColors = function(){
-            let ic = {'nom':'InstantColors',colors:[]};
+            let ic = {'nom':'InstantColors',colors:[],'date':now};
             me.gGlobal.selectAll(".arc-body").each(function(n){
                 let v = d3.select(this);
                 ic.colors.push(v.style('fill'));

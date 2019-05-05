@@ -23,10 +23,11 @@ class cartoaxes {
         this.fctGetGrad = params.fctGetGrad ? params.fctGetGrad : false;
         this.fctSavePosi = params.fctSavePosi ? params.fctSavePosi : false;
         this.idDoc = params.idDoc ? params.idDoc : false;
+        this.typeSrc = params.typeSrc ? params.typeSrc : false;
         var scCircle = d3.scalePoint()
             .domain(this.rayons)
             .range([0, this.domainWidth < this.domainHeight ? this.domainWidth / 2 : this.domainHeight / 2]);
-        var svgDefs;
+        var svgDefs, degrad;
         //drag variables
         var onDrag = true, svgDrag;
         // Timer variables
@@ -165,6 +166,7 @@ class cartoaxes {
             let posi = d3.mouse(this);
             let r = {'x':posi[0],'y':posi[1]
                 ,'numX':me.x.invert(posi[0]),'numY':me.y.invert(posi[1])
+                ,'degrad':degrad
                 ,'structure':me.structure
                 ,'id':me.idDoc
                 };
@@ -186,40 +188,26 @@ class cartoaxes {
         }		
         
         this.drawData = function () {
-            if (typeof patienter !== 'undefined') 
-                patienter('Chargement des données');
             if(me.urlData){
-                $.post(me.urlData, {}, function (data) {
-                    me.data = data;
-                    //me.drawData();
-                    if(me.fctCallBackInit)me.fctCallBackInit();
+                $.post(me.urlData, {
+                    'id': me.idDoc,
+                    'type':me.typeSrc,
+                }, function (data) {
+                    console.log(data);
+                    me.g.selectAll(".evals")
+                        .data(data)
+                      .enter().append("circle")
+                        .attr("class", "evals")
+                        .attr('r',scCircle.step()/3)
+                        .attr('cx',function(d) { return d.cX; })
+                        .attr('cy',function(d) { return d.cY; })
+                        .attr('stroke','black')
+                        .attr("stroke-width",'1');
                 }, "json")
-                    .fail(function (e) {
-                        throw new Error("Donnée introuvable : "+e);
-                    })
-                    .always(function () {
-                        if (typeof patienter !== 'undefined') 
-                            patienter('', true);
-                    });
-        
-                me.data.forEach(function(d) {
-                    d.consequence = +d.consequence;
-                    d.value = + d.value;
-                });
-                //    
-                me.g.selectAll("circle")
-                    .data(me.data)
-                  .enter().append("circle")
-                    .attr("class", "dot")
-                    .attr("r", 7)
-                    .attr("cx", function(d) { return me.x(d.consequence); })
-                    .attr("cy", function(d) { return me.y(d.value); })
-                      .style("fill", function(d) {        
-                        if (d.value >= 3 && d.consequence <= 3) {return "#60B19C"} // Top Left
-                        else if (d.value >= 3 && d.consequence >= 3) {return "#8EC9DC"} // Top Right
-                        else if (d.value <= 3 && d.consequence >= 3) {return "#D06B47"} // Bottom Left
-                        else { return "#A72D73" } //Bottom Right         
-                    });  
+                .fail(function (e) {
+                    throw new Error("Chargement des données imposible : " + e);
+                })
+                .always(function () {});
             }
 
         };
@@ -232,7 +220,7 @@ class cartoaxes {
 
         this.getGradient = function(){
             if(!me.fctGetGrad)return 'white';
-            let degrad = me.fctGetGrad();
+            degrad = me.fctGetGrad();
             //pas besoin de vérifier que le dégrader existe puisqu'il est lié à l'instant
 
             var radialG = svgDefs.append('radialGradient')

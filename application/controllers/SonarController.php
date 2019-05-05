@@ -26,6 +26,7 @@ class SonarController extends Zend_Controller_Action
 	}
 
 	public function fluxAction() {
+		$this->initInstance();
 		$rs = array('result' => array(), 'erreur'=>0);
 		$this->initInstance();		
 		$sonar = new Flux_Sonar($this->idBase);
@@ -34,7 +35,10 @@ class SonarController extends Zend_Controller_Action
 				$rs['result'] = $sonar->getListeFlux();
 				break;			
 			case 'savePosi':
-				$rs['result'] = $sonar->savePosi();
+				$rs['result'] = $sonar->savePosi($this->_getParam('dt'),$this->_getParam('type'),$this->_getParam('geo'),$this->ssUti->uti);
+				break;			
+			case 'getEvals':
+				$rs['result'] = $sonar->getEvals($this->_getParam('type'),$this->_getParam('id'));
 				break;			
 		}
 		$this->view->data = $rs;

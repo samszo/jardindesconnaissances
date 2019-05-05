@@ -20,7 +20,13 @@ class Flux_Smel extends Flux_Site{
 	var $doublons;
 	var $idDocRoot;
 	var $idMonade;
-	var $idBaseDefault="flux_smel";
+    var $idBaseDefault="flux_smel";
+    var $idBaseOmk="omks_smel"; 
+    var $isVisage = 1496;
+    var $owner = "samuel.szoniecky@univ-paris8.fr";
+    var $idOwner = 1;
+    var $idClassImage = 26;
+    var $iiif;
 	
     /**
      * Constructeur de la classe
@@ -482,5 +488,119 @@ class Flux_Smel extends Flux_Site{
         if($order)$sql .= " ORDER BY ".$order;
         return $this->dbD->exeQuery($sql);
     }
+
+    /**
+     * exporte une liste de visage pour pour une importation dans Omeka
+     *
+     * @param  string  $pathIIIF
+     * @param  string  $fic
+     * @param  string  $ficFail
+     * @param  boolean $ajoutAbscent
+     * 
+     * @return array
+     *
+     */
+    function getCsvGoogleVisageToOmk($pathIIIF, $fic, $ficFail="", $ajoutAbscent=false){
+			$this->trace(__METHOD__);
+			
+			if($ficFail) require_once($ficFail);
+			
+			/*pour récupérer les visages qui ne sont pas dans OMK = $ajoutAbscent = true
+				INSERT INTO  test (id) 
+				SELECT SUBSTRING(ov.value, 31)    
+			FROM omk_valarnum1.value ov 
+			WHERE ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+				*/        	    
+			$pref = $this->idBase."-flux_doc-doc_id-";
+			$sql = "SELECT 
+            d.doc_id,
+            d.titre,
+            d.note,
+            dp.doc_id idparent,
+            dp.titre titreParent
+            ,ov.resource_id
+            ,ov.value, SUBSTRING(ov.value, ".(strlen($pref)+1).") omkDocId
+            ,om.id imageId
+		FROM
+			flux_doc d
+				INNER JOIN
+			flux_doc dp ON d.lft between dp.lft and dp.rgt AND dp.tronc = 'artefact' 
+				INNER JOIN
+			".$this->idBaseOmk.".value ov ON ov.value LIKE '".$this->idBase."-flux_doc-doc_id-%'
+				AND SUBSTRING(ov.value, ".(strlen($pref)+1).") = dp.doc_id
+				INNER JOIN
+			".$this->idBaseOmk.".media om ON om.item_id = ov.resource_id ";
+			if($ajoutAbscent) $sql .= " LEFT JOIN test t on t.id = d.doc_id ";
+		$sql .= " WHERE d.tronc = 'visage' ";
+			if($ajoutAbscent) $sql .= " AND t.id is null "; 
+		$sql .= " ORDER BY d.parent";
+			
+        $this->trace($sql);
+        $arr = $this->dbD->exeQuery($sql);
+        //foreach ($arr as $h) {
+        $nb = count($arr);
+        $arrItem = array();
+        for ($i = 0; $i < $nb; $i++) {
+            $h = $arr[$i];
+            $h["idClass"] = $this->idClassImage;//image
+            $data = json_decode($h["note"]);
+            $h["titre"] = str_replace('faceAnnotations 0', 'visage', $h["titre"]);
+            //calcule la position de l'image
+            $v = $data->boundingPoly->vertices;
+            if($ficFail && !in_array($h['imageId'], $arrFail) ){
+                $this->trace("PAS FAIL");
+            }elseif($ficFail && isset($v[0]->x) && isset($v[0]->y) && isset($v[1]->x) && isset($v[2]->y)){
+                    $this->trace("FAIL OK");
+            }else{
+                $this->trace($nb." ".$h["doc_id"]." ".$h["titre"]);
+                //met des 0 pour les valeurs abscentes
+                if(!isset($v[0]->x))$v[0]->x=0;
+                if(!isset($v[0]->y))$v[0]->y=0;
+                if(!isset($v[1]->x))$v[1]->x=0;
+                if(!isset($v[1]->y))$v[1]->y=0;
+                if(!isset($v[2]->x))$v[2]->x=0;
+                if(!isset($v[2]->y))$v[2]->y=0;
+                //construction de l'url
+                $h["url"] = $pathIIIF.$h['imageId'].'/'.$v[0]->x.','.$v[0]->y.','.($v[1]->x - $v[0]->x).','.($v[2]->y - $v[0]->y).'/full/0/default.jpg';
+                $h["item_set"]=$this->isVisage;
+                $h["reference"]=$this->idBase."-flux_doc-doc_id-".$h["doc_id"];
+                unset($h['note']);
+                unset($h['doc_id']);
+                unset($h['parent']);
+                unset($h['titreParent']);
+                $h['fic'] = $h["reference"].'.jpg';
+                $arrItem[] = $h;
+                //enregistre l'image dans un fichier
+                $img = ROOT_PATH.'/data/SMEL/McCord/photos/visages/'.$h['fic'];
+                if (!file_exists($img)){
+                    $res = file_put_contents($img, file_get_contents($h["url"]));
+                    $this->trace($res." ko : Fichier créé ".$h["url"]." ".$img);
+                }
+
+
+                $this->trace($h["url"]);        	            
+                /*ajoute l'item
+                $idR = $this->setItem($h);
+                //ajoute le lien vers la photo originale
+                $this->dbV->ajouter(array("resource_id"=>$idR,"property_id"=>$this->isPartOf,"type"=>"resource","value_resource_id"=>$h['resource_id']));
+                //ajoute un lien vers l'itemset visage
+                $this->dbIIS->ajouter(array("item_set"=>$idR,"item_set_id"=>$this->isVisage));
+                */
+            }
+        }
+        
+        //enregistre le csv dans un fichier
+        $fp = fopen($fic, 'w');
+        $first = true;
+        foreach ($arrItem as $v) {
+            if($first)fputcsv($fp, array_keys($v));
+            $first=false;
+            fputcsv($fp, $v);
+        }
+        fclose($fp);        	            	    
+        $this->trace("FIN ".__METHOD__);
+			
+	}
+
 
 }
