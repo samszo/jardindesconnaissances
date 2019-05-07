@@ -6,52 +6,56 @@ class cartoaxes {
         this.urlData = params.urlData ? params.urlData : false;
         this.fctCallBackInit = params.fctCallBackInit ? params.fctCallBackInit : false;
         this.svg = d3.select("#"+params.idSvg),
-        this.margin = params.margin ? params.margin : {top: 20, right: 20, bottom: 20, left: 20},
         this.width = params.width ? params.width : this.svg.attr("width"),
         this.height = params.height ? params.height : svg.attr("height"),
-        this.domainWidth = this.width - this.margin.left - this.margin.right,
-        this.domainHeight = this.height - this.margin.top - this.margin.bottom;
-        this.x = params.x ? params.x : 0;          
-        this.y = params.y ? params.y : 0;          
-        this.xMin = params.xMin ? params.xMin : -100;          
+        this.xMin = params.xMin ? params.xMin : 0;          
         this.xMax = params.xMax ? params.xMax : 100;          
-        this.yMin = params.yMin ? params.yMin : -100;          
+        this.yMin = params.yMin ? params.yMin : 0;          
         this.yMax = params.yMax ? params.yMax : 100;
         this.colorFond = params.colorFond ? params.colorFond : "transparent";
         this.tick = params.tick ? params.tick : 0;
-        this.rayons = d3.range(params.nbRayon ? params.nbRayon : 5); // Création d'un tableau pour les rayons des cercles
+        this.rayons = d3.range(params.nbRayon ? params.nbRayon : 6); // Création d'un tableau pour les rayons des cercles
         this.fctGetGrad = params.fctGetGrad ? params.fctGetGrad : false;
         this.fctSavePosi = params.fctSavePosi ? params.fctSavePosi : false;
         this.idDoc = params.idDoc ? params.idDoc : false;
         this.typeSrc = params.typeSrc ? params.typeSrc : false;
-        var scCircle = d3.scalePoint()
-            .domain(this.rayons)
-            .range([0, this.domainWidth < this.domainHeight ? this.domainWidth / 2 : this.domainHeight / 2]);
-        var svgDefs, degrad;
-        //drag variables
-        var onDrag = true, svgDrag;
-        // Timer variables
 
-        
-        this.transform = params.transform ? params.transform : "translate(" + (this.x+this.margin.left) + "," + (this.y+this.margin.top) + ")";          
+        //variable pour les axes
+        var labelFactor = 1, 	//How much farther than the radius of the outer circle should the labels be placed
+        radius = Math.min(this.width/2, this.height/2),
+		angleSlice = Math.PI * 2 / this.structure.length,
+        scCircle = d3.scalePoint()
+            .domain(this.rayons)
+            .range([0, radius]),
+        //variables pour les débgradés
+        svgDefs, degrad,
+        //drag variables
+        onDrag = true, svgDrag;
+
+        //positionnement du graphique
+        this.transform = params.transform ? params.transform : "translate(" + me.width/2+','+me.height/2 + ") scale(0.9)";          
+        this.g = svg.append("g")
+            .attr("class", "cartoaxes")
+            .attr("transform", this.transform);
+        //calcule des échelles
         this.x = d3.scaleLinear()
             .domain(padExtent([this.xMin,this.xMax]))
-            .range(padExtent([0, this.domainWidth]));
+            .range(padExtent([0, this.width]));
         this.y = d3.scaleLinear()
             .domain(padExtent([this.yMin,this.yMax]))
-            .range(padExtent([this.domainHeight, 0]));
-        this.g = svg.append("g")
-                .attr("class", "cartoaxes")
-                .attr("transform", this.transform);
-
+            .range(padExtent([this.height, 0]));
+        this.rScale = d3.scaleLinear()
+                .range([0, radius])
+                .domain([this.xMin,this.xMax]);
+        
         this.init = function () {
 
             //ajoute une balise def pour les dégradés
             svgDefs = me.g.append('defs');
 
             me.g.append("rect")
-            .attr("width", me.domainWidth)
-            .attr("height", me.domainHeight)
+            .attr("width", me.width)
+            .attr("height", me.height)
             .attr("fill", me.colorFond)
                 .on('mousemove',function(e){
                     /*
@@ -71,17 +75,21 @@ class cartoaxes {
         this.drawCible = function(d) {
             //ajoute les cercles concentriques
             //le cercle 1 sert de curseur d'intensité
-            me.g.selectAll('.cFond').data(this.rayons).enter().append('circle') // Création des cercles + attributs
+            me.g.selectAll('.cFond').data(me.rayons).enter().append('circle') // Création des cercles + attributs
                 .attr('class', 'cFond')
                 .attr('id', function (d, i) {
                     return 'orbit' + i;
                 })
                 .attr('r', function (d) {
-                    let r = d == 0 ? 0 : d == 1 ? scCircle(d)/2 : scCircle(d);
+                    //on affiche ni le premier ni le dernier
+                    let r = scCircle(d)
+                    if(d == 0)r = 0;
+                    if(d == 1)r = scCircle(d)/2;
+                    if(d == me.rayons.length-1)r = 0;
                     return r;
                 })
-                .attr('cx', me.domainWidth / 2)
-                .attr('cy', me.domainHeight / 2)
+                .attr('cx', 0)
+                .attr('cy', 0)
                 .call(d3.drag()
                     .container(me.g.node())
                     .on("start", me.dragstarted)
@@ -91,60 +99,32 @@ class cartoaxes {
 
         // Fonction pour créer les axes
         this.drawAxes = function(d) {
-            if(me.structure.length==4){
-                me.g.append("g")
-                    .attr("class", "y axis")
-                    .attr("transform", "translate(" + me.x.range()[1] / 2 + ", 0)")
-                    .call(d3.axisLeft(me.y).ticks(me.tick));
-            }
-            me.g.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + me.y.range()[0] / 2 + ")")
-                .call(d3.axisBottom(me.x).ticks(me.tick));    
-    
-    
-            //ajoute les titre d'axes
-            me.g.selectAll(".txtTitreAxe")
+	
+            //Create the straight lines radiating outward from the center
+            var axis = me.g.selectAll(".axis")
                 .data(me.structure)
-                .enter().append("text")
-                .attr("class", function(d){
-                    return 'txtTitreAxe'+d.posi;
-                })
-                .attr("transform", function(d){
-                    let t = "rotate(0)";
-                    //if(d.posi=='0' || d.posi=='180' ) t = "rotate(-90)";        
-                    return t;
-                })
-                .attr("y", function (d) {
-                    if (d.posi == '0') return 0;
-                    if (d.posi == '90' ) return (me.domainHeight / 2)+10;
-                    if(d.posi == '270' ) return (me.domainHeight / 2)-30;
-                    if (d.posi == '180') return me.domainHeight;
-                    if (d.posi == 'haut') return (me.domainWidth / 2)-30;
-                    if (d.posi == 'bas') return (me.domainWidth / 2)+30;
-                })
-                .attr("x", function (d) {
-                    if (d.posi == '0' ) return (me.domainWidth / 2)+10;
-                    if (d.posi == '180' ) return (me.domainWidth / 2)-10;
-                    if (d.posi == '90') return me.domainWidth;
-                    if (d.posi == '270') return 0;
-                    if (d.posi == 'haut' || d.posi == 'bas') return (me.domainWidth / 2);
-                })
-                .attr("text-anchor", function (d) {
-                    if (d.posi == '0') return 'start';
-                    if (d.posi == '270') return 'start';
-                    if (d.posi == '90') return 'end';
-                    if (d.posi == '180') return 'end';
-                    if (d.posi == 'haut' || d.posi == 'bas') return 'middle';
+                .enter()
+                .append("g")
+                .attr("class", "axis");
+            //Append the lines
+            axis.append("line")
+                .attr("x1", 0)
+                .attr("y1", 0)
+                .attr("x2", function(d, i){ 
+                    return me.rScale(me.xMax-10) * Math.cos(angleSlice*i - Math.PI/2); })
+                .attr("y2", function(d, i){ 
+                    return me.rScale(me.xMax-10) * Math.sin(angleSlice*i - Math.PI/2); })
+                ;
 
-                })
-                .attr("dy", function (d) {
-                    if (d.posi == '0' || d.posi == '90' || d.posi == '270') return '1em';
-                    if (d.posi == '180') return '-1em';
-                })
-                .text(function(d){
-                    return d.lbl;
-                });     
+            //Append the labels at each axis
+            axis.append("text")
+                .attr("class", "txtTitreAxehaut")
+                //.style("font-size", "11px")
+                .attr("text-anchor", "middle")
+                //.attr("dy", "0.35em")
+                .attr("x", function(d, i){ return me.rScale(me.xMax * labelFactor) * Math.cos(angleSlice*i - Math.PI/2); })
+                .attr("y", function(d, i){ return me.rScale(me.xMax * labelFactor) * Math.sin(angleSlice*i - Math.PI/2); })
+                .text(function(d){return d});
         }
 
         // Fonction pour l'event "drag" d3js
@@ -156,8 +136,8 @@ class cartoaxes {
         }
 
         this.dragged = function() {
-            //console.log(me.domainWidth+','+me.domainHeight+' : '+d3.event.x+','+d3.event.y);
-            if(d3.event.x < me.domainWidth && d3.event.x > 0 && d3.event.y < me.domainHeight && d3.event.y > 0)
+            //console.log(me.width+','+me.height+' : '+d3.event.x+','+d3.event.y);
+            if(d3.event.x < me.width && d3.event.x > 0 && d3.event.y < me.height && d3.event.y > 0)
                 me.svgDrag.attr("cx", d3.event.x).attr("cy", d3.event.y);
         }
 

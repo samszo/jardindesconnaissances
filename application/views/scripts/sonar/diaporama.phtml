@@ -109,14 +109,22 @@
                     <option value='https://jardindesconnaissances.univ-paris8.fr/ValArNum/omks/iiif/collection/151682' >Reportages photographiques des présidences de la république française</option>      
                     <option value='../../data/SMEL/iiif-smel1.json' >Tests locaux</option>
                     </select>
-
-
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="ckAleaTaille">
                         <label class="form-check-label" for="ckAleaTaille">
                             Taille aléatoire
                         </label>
                     </div>
+                    <label for="optListeCpt">Liste des concepts</label>
+                    <select class="form-control" id="optListeCpt">
+                    <option value='bon,mauvais' >bon et mauvais</option>
+                    <option value='vide,actuel,virtuel,signe,être,chose' >IEML</option>
+                    <option value='Ciel,Tonnerre,Eau,Montagne,Terre,Vent,Feu,Brume' >Yi Jing : élémentaires</option>
+                    <option value="le Créatif - le Ciel,le Réceptif,la Difficulté initiale,la Folie juvénile,l'Attente,le Conflit,l'Armée,la Solidarité-  l'Union,le Pouvoir d'apprivoisement du petit,la Marche,la Paix,la Stagnation,la Communauté avec les hommes,le Grand Avoir,l'Humilité,l'Enthousiasme,La Suite,le Travail sur ce qui est corrompu,l'Approche,la Contemplation,Mordre au travers,la Grâce,l'Éclatement,le Retour,l'Innocence,le Pouvoir d'apprivoisement du grand,les Commissures des lèvres,la Prépondérance du grand,l'Insondable,le Feu,l'Influence,la Durée,la Retraite,la Puissance du grand,le Progrès,l'Obscurcissement de la lumière,la Famille,l'Opposition,l'Obstacle,la Libération,la Diminution,l'Augmentation,la Percée,Venir à la rencontre,le Rassemblement,la Poussée vers le haut,l'Accablement,le Puits,la Révolution,le Chaudron,l'Ébranlement,la Montagne,le Développement,l'Épousée,Abondance,le Voyageur,le Doux,le Lac,La Dispersion,la Limitation,la Vérité intérieure,la Prépondérance du Petit,Après l'accomplissement,Avant l'accomplissement" >Yi Jing : hexagrammes</option>                    
+                    <option value='乾,坤,震,坎,艮,巽,離,兌' >易静：小学</option>
+                    </select>                                        
+                    <label for="inListeConcept">Vos concepts séparés par une ,</label>
+                    <input class="form-control mr-sm-2" type="text" id="inListeConcept" value="">
 
                     <button id='btnSrcFlux' class="btn btn-outline-success my-2 my-sm-0" type="submit">Charger</button>
                 </div>
@@ -242,9 +250,10 @@
         */
         d3.select('#btnSrcFlux')
             .on('click', function () {
+                showCartoHorlo();
                 //let src = document.getElementById("inSrcFlux").value;
-                let src = document.getElementById("optSrcFlux").value;
-                console.log('Charge les images du flux IIIF :' + src);
+                let src = document.getElementById("optSrcFlux").value;                
+                console.log('Charge les images du flux IIIF :' + src);                
                 showSource(src);
             });
         d3.select('#btnConnexion')
@@ -494,10 +503,14 @@
             //récupère la taille du conteneur
             let c = document.getElementById('cartoEval');
             //calcul les tailles
-            let spacing = 0.0001,
+            let spacing = 0.000001,
                 w = width,
                 h = height / 2, //w = c.clientWidth, h = c.clientHeight,        
                 rayon = w < h ? w / 2 : h / 2;
+            
+            //suprime le composants existants
+            d3.select(".cartoaxes").remove();
+            d3.select(".polarclock").remove();
 
             svg = d3.select("#cartoEval svg")
                 .attr("id", "svgGlobal")
@@ -512,26 +525,24 @@
                 'chrono': true,
                 'nbCouche': 6
             });
-            //ajoute la carto axe
+            //récupère la structure
+            let stct = document.getElementById('inListeConcept').value;
+            if(!stct){
+                stct = document.getElementById('optListeCpt').value;
+            }
+            stct = stct.split(',');
+            //ajoute la carto axe            
             ca = new cartoaxes({
                 'idSvg': 'svgGlobal',
                 'tick': 0,
                 'idDoc': id,
                 'urlData':'../sonar/flux?q=getEvals',
                 'typeSrc':'IIIF',
-                'structure': [{
-                    'lbl': 'pertinent',
-                    'posi': "haut"
-                }, {
-                    'lbl': 'rien à voir',
-                    'posi': 'bas'
-                }],
+                'structure': stct,
                 'fctGetGrad': pc.getInstantColors,
                 'fctSavePosi': savePosi,
-                'width': rayon * 2,
-                'height': rayon * 2,
-                'x': (w / 2) - rayon,
-                'y': 0
+                'width': w,
+                'height': h
             });
             //pc.toggleTimer();
             pc.resetTimer()
@@ -551,7 +562,7 @@
                 })
                 .always(function () {});
         }
-        //showCartoHorlo();
+        showCartoHorlo();
         //$('#modWait').modal('show');
         $('.navbar-collapse').collapse('show');
     </script>

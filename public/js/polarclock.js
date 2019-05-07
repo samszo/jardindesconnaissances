@@ -6,7 +6,7 @@ class polarclock {
         this.fctCallBackInit = params.fctCallBackInit ? params.fctCallBackInit : false;
         this.svg = d3.select("#"+params.idSvg);
         this.width = params.width ? params.width : this.svg.attr("width");
-        this.height = params.height ? params.height : svg.attr("height");
+        this.height = params.height ? params.height : this.svg.attr("height");
         //propriétés spécifiques
         this.rayon = this.width < this.height ? this.width/2 : this.height/2,
         this.spacing = params.spacing ? params.spacing : .09;
@@ -31,7 +31,7 @@ class polarclock {
 
         this.init = function () {        
             me.gGlobal = me.svg.append('g')
-                .attr('class','global')
+                .attr('class','polarclock')
                 .attr('transform','translate('+me.width/2+','+me.height/2+')');
 
 

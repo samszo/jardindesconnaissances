@@ -50,7 +50,11 @@ a:visited {
 .txtTitreAxebas{
   fill:white;
 }
-
+.axis line {
+  fill: none;
+  stroke: url(#degraxeH);
+  stroke-width:6px;
+}  
 .x.axis path {
     fill: none;
     stroke: url(#degraxeH);
