@@ -417,7 +417,7 @@
 
                     //récupère l'image si pas de visage
                     if (url == "") {
-                        let isAlea = document.getElementById("ckAleaTaille").value;
+                        let isAlea = document.getElementById("ckAleaTaille").checked;
                         url = getTailleTofIIIF(d,isAlea);
                         //url = d.infos.thumbnail["@id"];
                     }
@@ -452,7 +452,7 @@
                 w = d.infos.sequences[0].canvases[0].width, h = d.infos.sequences[0].canvases[0].height, img = {};
                 img.r = 0;
             if (!d.images) d.images = [];
-            if(alea=="on"){
+            if(alea){
                 img.w = parseInt(w < bb.width ? bb.width * zoom : bb.width / zoom);
                 img.h = parseInt(h < bb.height ? bb.height * zoom : bb.height / zoom);
                 img.x = parseInt(d3.randomUniform(minPixel, w > img.w ? w - img.w : w)());

@@ -89,12 +89,8 @@ class cartoaxes {
                     return r;
                 })
                 .attr('cx', 0)
-                .attr('cy', 0)
-                .call(d3.drag()
-                    .container(me.g.node())
-                    .on("start", me.dragstarted)
-                    .on("drag", me.dragged)
-                    .on("end", me.dragended));
+                .attr('cy', 0);
+                d3.select("#orbit1").call(me.drag);
         }
 
         // Fonction pour créer les axes
@@ -132,13 +128,15 @@ class cartoaxes {
             //on ne peut déplacer que le cercle 1
             if(d!=1)return;
             me.setSvgDrag([d3.event.x,d3.event.y]);
+            d3.select(this).raise().classed("active", true);
             me.onDrag = true;
         }
 
         this.dragged = function() {
             //console.log(me.width+','+me.height+' : '+d3.event.x+','+d3.event.y);
-            if(d3.event.x < me.width && d3.event.x > 0 && d3.event.y < me.height && d3.event.y > 0)
-                me.svgDrag.attr("cx", d3.event.x).attr("cy", d3.event.y);
+            //pour limiter le drag
+            //if(d3.event.x < me.width && d3.event.x > 0 && d3.event.y < me.height && d3.event.y > 0)
+            me.svgDrag.attr("cx", d3.event.x).attr("cy", d3.event.y);
         }
 
         this.dragended = function() {
@@ -166,7 +164,12 @@ class cartoaxes {
                 .attr('stroke','black')
                 .attr("stroke-width",'1');
         }		
-        
+
+        this.drag = d3.drag()
+            .on("start", me.dragstarted)
+            .on("drag", me.dragged)
+            .on("end", me.dragended);        
+
         this.drawData = function () {
             if(me.urlData){
                 $.post(me.urlData, {
