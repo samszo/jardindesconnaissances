@@ -23,12 +23,30 @@ class SonarController extends Zend_Controller_Action
 
 	public function diaporamaAction() {
 		$this->initInstance(false,"/diaporama");
+
+		$s = new Flux_Sonar($this->idBase);
+
+		//récupère les collections
+		$colIIIF = $s->getCollectionIIIF();
+		if(count($colIIIF)==0){
+			$s->initCollectionIIIF();
+			$colIIIF = $s->getCollectionIIIF();
+		}
+		$this->view->colIIIF = json_encode($colIIIF);
+
+		//récupère les structure
+		$structures = $s->getStructure();
+		if(count($structures)==0){
+			$s->initStructure();
+			$structures = $s->getStructure();
+		}
+		$this->view->structures = json_encode($structures);
+
 	}
 
 	public function fluxAction() {
 		$this->initInstance();
 		$rs = array('result' => array(), 'erreur'=>0);
-		$this->initInstance();		
 		$sonar = new Flux_Sonar($this->idBase);
 		switch ($this->_getParam('q')) {
 			case 'listeFlux':

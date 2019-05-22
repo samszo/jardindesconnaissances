@@ -17,9 +17,9 @@
 	var $PATH_STAR_PARSER = 'http://localhost/ieml/parser/star2xml.php?iemlExpression=';
 	//var $PATH_STAR_PARSER = 'http://gapai.univ-paris8.fr/ieml/parser/star2xml.php?iemlExpression=';
 	var $XPATH_BINARY = '//@binary';
-  	var $XPATH_PRIMITIVE = '//@primitiveSet';
-  	var $PRIMITIVE_VALUE = array("E"=>1,"U"=>2,"A"=>4,"S"=>8,"B"=>16,"T"=>32);
-  	var $LAYER_PONCT = array(":",".","-","'",",","_",";");
+  var $XPATH_PRIMITIVE = '//@primitiveSet';
+  var $PRIMITIVE_VALUE = array("E"=>1,"U"=>2,"A"=>4,"S"=>8,"B"=>16,"T"=>32);
+  var $LAYER_PONCT = array(":",".","-","'",",","_",";");
 	var $COLORS = array('E'=>"rgb(0,0,0)",'U'=>"rgb(0,255,255)",'A'=>"rgb(255,0,0)",'S'=>"rgb(0,255,0)",'B'=>"rgb(0,0,255)",'T'=>"rgb(255,255,0)");
 	//var $COLORS = array('E'=>"rgb(20,0,0)",'U'=>"rgb(0,40,0)",'A'=>"rgb(0,0,60)",'S'=>"rgb(80,80,0)",'B'=>"rgb(0,100,100)",'T'=>"rgb(120,0,120)");
 	var $PATH_DICO_TABLE = 'https://dictionary.ieml.io/api/scripts/tables';
@@ -28,6 +28,7 @@
 	var $PATH_DICO = 'https://dictionary.ieml.io/api/all?version=';
 	var $VERSION_DICO = 'dictionary_2019-03-12_01:16:12';
 	var $URL_API = 'https://intlekt.io/api/dictionary/';
+	var $LOCAL_DICO = WEB_ROOT.'/data/ieml/ieml_dictionary.json';
 	
   	public function __construct($idBase=false,$bTrace=false,$bCache=true)
     {
@@ -502,7 +503,71 @@
 		$this->trace("FIN ".__METHOD__);
 		
 		return array('tables'=>json_decode($jsonTable),'relations'=>json_decode($jsonRela));
-    }	
+		}	
+		
+	/**
+	 * exporte en CSV les informations d'une item du dictionnaire
+	 * 
+	 * @param string $code
+	 * @param string $type
+	 * 
+	 */
+	function getCSV($code, $type="générateur"){
+
+		$this->trace("DEBUT ".__METHOD__." = ".$code." : ".$type);
+
+		//chargement du dictionnaire
+		//$json = $this->getUrlBodyContent($this->LOCAL_DICO,array(),false);
+		//$dico = json_decode($json);
+		
+		$item = $this->getDicoItem($code);
+
+		$csv = array();
+		$r = array();
+		$c = array();
+		if($type=="générateur"){
+			//entête du CSV
+			array_push($csv,array("concept","type","valeur"));
+			//concept principal
+			array_push($csv,array("table","ieml","[ieml-".$item['tables']->header->main->fr."]"));
+			/*les lignes et colonnes se composent :
+			- d'une forme fixe correspondant au nom du concept
+			- d'un générateur correspondant au cellules
+			*/
+			foreach ($item['tables']->columns as $v) {
+				if($v->main->fr!="???"){
+					$c[]=$v->main->fr;				
+					array_push($csv,array($item['tables']->header->main->fr,"ieml",$v->main->fr));
+					array_push($csv,array($item['tables']->header->main->fr,"ieml","[ieml-".$v->main->fr."]"));	
+				}
+			}
+			foreach ($item['tables']->rows as $v) {				
+				if($v->main->fr!="???"){
+					$r[]=$v->main->fr;
+					$lib = str_replace(' en substance','',$v->main->fr);				
+					array_push($csv,array($item['tables']->header->main->fr,"ieml",$lib));
+					array_push($csv,array($item['tables']->header->main->fr,"ieml","[ieml-".$v->main->fr."]"));
+				}
+			}
+			for ($i=0; $i < count($item['tables']->cells_lines) ; $i++) { 
+				for ($j=0; $j<count($item['tables']->cells_lines[$i]) ; $j++) { 
+					$v = $item['tables']->cells_lines[$i][$j];
+					if($r && $c){
+						array_push($csv,array($r[$i],"ieml",$v->main->fr));
+						array_push($csv,array($c[$j],"ieml",$v->main->fr));
+					}else
+						array_push($csv,array($item['tables']->header->main->fr,"ieml",$v->main->fr));
+				
+				}
+			}
+
+		}
+				
+		$this->trace("FIN ".__METHOD__);
+		
+		return $csv;
+	}	
+
 	/**
 	 * récupère les items d'une version de dictionnaire
 	 * 

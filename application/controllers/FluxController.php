@@ -444,6 +444,18 @@ class FluxController extends Zend_Controller_Action {
     	
     }
 
+    public function omkAction()
+    {
+		$omk = new Flux_Omeka($this->_getParam('idBase',""),$this->_getParam('trace', true));
+		switch ($this->_getParam('q')) {
+			case 'setAnno':
+				$this->view->content = $omk->postAnnotation(array());
+				break;
+			case 'setItem':
+				$this->view->content = $omk->postItem(array());
+				break;
+		}
+	}
     public function diigoAction()
     {
 		$diigo = new Flux_Diigo($this->_getParam('login',""),$this->_getParam('mdp',""),$this->_getParam('idBase', "flux_diigo"),$this->_getParam('trace', true));
@@ -554,8 +566,21 @@ class FluxController extends Zend_Controller_Action {
 			case "getDicoPlus":
 				$data = $ieml->getDicoPlus($this->_getParam('version'));
 				break;
-		}		
-		$this->view->content = json_encode($data);
+			case "getCSV":
+				$rs = $ieml->getCSV($this->_getParam('code'));
+				$csv = "";
+				$s = new Flux_Site();
+				foreach ($rs as $v) {
+					$csv .= $s->arrayToCsv($v,",").PHP_EOL;
+				}
+				break;
+
+		}
+		if($csv){
+			header('Content-type: text/csv');
+			$this->view->content = $csv;		
+		}
+		else $this->view->content = json_encode($data);
 
 	}	
 

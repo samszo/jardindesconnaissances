@@ -2,7 +2,7 @@ class cartoaxes {
     constructor(params) {
         var me = this;
         this.data = [];
-        this.structure = params.structure ? params.structure : [{'lbl':'clair','posi':0},{'lbl':'obscur','posi':180},{'lbl':'pertinent','posi':90},{'lbl':'inadapté','posi':270}];
+        this.structure = params.structure ? params.structure : ['clair','obscur','pertinent','inadapté'];
         this.urlData = params.urlData ? params.urlData : false;
         this.fctCallBackInit = params.fctCallBackInit ? params.fctCallBackInit : false;
         this.svg = d3.select("#"+params.idSvg),
@@ -30,7 +30,9 @@ class cartoaxes {
         //variables pour les débgradés
         svgDefs, degrad,
         //drag variables
-        onDrag = true, svgDrag;
+        onDrag = true, svgDrag,
+        //distance variable
+        pointCentral;
 
         //positionnement du graphique
         this.transform = params.transform ? params.transform : "translate(" + me.width/2+','+me.height/2 + ") scale(0.9)";          
@@ -47,6 +49,9 @@ class cartoaxes {
         this.rScale = d3.scaleLinear()
                 .range([0, radius])
                 .domain([this.xMin,this.xMax]);
+        this.vScale = d3.scaleLinear()
+                .range([0,100])
+                .domain([0, radius]);
         
         this.init = function () {
 
@@ -74,6 +79,7 @@ class cartoaxes {
         // Fonction pour créer la cible
         this.drawCible = function(d) {
             //ajoute les cercles concentriques
+            //le cercle 0 sert de point central pour la distance
             //le cercle 1 sert de curseur d'intensité
             me.g.selectAll('.cFond').data(me.rayons).enter().append('circle') // Création des cercles + attributs
                 .attr('class', 'cFond')
@@ -91,6 +97,9 @@ class cartoaxes {
                 .attr('cx', 0)
                 .attr('cy', 0);
                 d3.select("#orbit1").call(me.drag);
+                let center = d3.select("#orbit1").node();
+                pointCentral = {'X':center.getAttribute("cx"), 'Y':center.getAttribute("cy")};
+
         }
 
         // Fonction pour créer les axes
@@ -109,7 +118,7 @@ class cartoaxes {
                 .attr("x2", function(d, i){ 
                     return me.rScale(me.xMax-10) * Math.cos(angleSlice*i - Math.PI/2); })
                 .attr("y2", function(d, i){ 
-                    return me.rScale(me.xMax-10) * Math.sin(angleSlice*i - Math.PI/2); })
+                    return (me.rScale(me.xMax-10) * Math.sin(angleSlice*i - Math.PI/2))+1; })
                 ;
 
             //Append the labels at each axis
@@ -142,12 +151,16 @@ class cartoaxes {
         this.dragended = function() {
             //récupère les données du points
             let posi = d3.mouse(this);
+            //calcule la distance et la pondération de la structure
+            let v = me.getValorisation(posi[0],posi[1]);
+            //formate les données
             let r = {'x':posi[0],'y':posi[1]
                 ,'numX':me.x.invert(posi[0]),'numY':me.y.invert(posi[1])
-                ,'degrad':degrad
-                ,'structure':me.structure
+                ,'degrad':degrad //récupère les couleurs et la date
+                ,'distance':v.d
+                ,'structure':v.s
                 ,'id':me.idDoc
-                };
+                };                       
             console.log(r);
             if(me.fctSavePosi)me.fctSavePosi(r);
         }
@@ -172,18 +185,30 @@ class cartoaxes {
 
         this.drawData = function () {
             if(me.urlData){
-                $.post(me.urlData, {
+                //enlève les anciennes évaluations
+                me.g.selectAll(".evals").remove();
+                //cherche sur le serveur les évaluations existantes               
+                $.get(me.urlData, {
                     'id': me.idDoc,
                     'type':me.typeSrc,
                 }, function (data) {
                     console.log(data);
+                    data.result.forEach(function(r){
+                        r.valeur=JSON.parse(r.valeur);
+                        r.struc=JSON.parse(r.struc);
+                    });
                     me.g.selectAll(".evals")
-                        .data(data)
+                        .data(data.result)
                       .enter().append("circle")
                         .attr("class", "evals")
                         .attr('r',scCircle.step()/3)
-                        .attr('cx',function(d) { return d.cX; })
-                        .attr('cy',function(d) { return d.cY; })
+                        .attr('cx',function(d) { 
+                            return me.x(d.valeur.numX); })
+                        .attr('cy',function(d) { 
+                            return me.y(d.valeur.numY); })
+                        .attr('fill',function(d){
+                            return me.setGradient(d.valeur.degrad);
+                        })
                         .attr('stroke','black')
                         .attr("stroke-width",'1');
                 }, "json")
@@ -204,23 +229,68 @@ class cartoaxes {
         this.getGradient = function(){
             if(!me.fctGetGrad)return 'white';
             degrad = me.fctGetGrad();
-            //pas besoin de vérifier que le dégrader existe puisqu'il est lié à l'instant
+            
+            return me.setGradient(degrad);
+        }
 
-            var radialG = svgDefs.append('radialGradient')
-                .attr('id', degrad.nom);
-                                                
-            // Create the stops of the main gradient. Each stop will be assigned
-            radialG.selectAll('stop').data(degrad.colors).enter().append('stop')
-                .attr('stop-color', function(d){
-                    return d;
-                })
-                .attr('offset', function(d,i){
-                    let pc = 100/degrad.colors.length*i;
-                    return pc+'%';
-                });
+        this.setGradient = function(degrad){
+
+            if(!document.getElementById(degrad.nom)){
+                var radialG = svgDefs.append('radialGradient')
+                    .attr('id', degrad.nom);
+                                                    
+                // Create the stops of the main gradient. Each stop will be assigned
+                radialG.selectAll('stop').data(degrad.colors).enter().append('stop')
+                    .attr('stop-color', function(d){
+                        return d;
+                    })
+                    .attr('offset', function(d,i){
+                        let pc = 100/degrad.colors.length*i;
+                        return pc+'%';
+                    });
+            }
             return "url(#"+degrad.nom+")";            
         }
 
+
+        // Credits goes to Stackoverflow: http://stackoverflow.com/a/14413632
+        this.getAngleFromPoint = function (point1, point2) {
+            var dy = (point1.Y - point2.Y),
+                dx = (point1.X - point2.X);
+            var theta = Math.atan2(dy, dx);
+            var angle = (((theta * 180) / Math.PI)) % 360;
+            angle = (angle<0) ? 360+angle : angle;
+            return angle;
+        }
+        // Credits goes to http://snipplr.com/view/47207/
+        this.getDistance = function ( point1, point2 ){
+            var xs = 0;
+            var ys = 0;
+            
+            xs = point2.X - point1.X;
+            xs = xs * xs;
+            
+            ys = point2.Y - point1.Y;
+            ys = ys * ys;
+            
+            return Math.sqrt( xs + ys );
+        } 
+
+        //credit goes to https://codepen.io/netsi1964/pen/WrRGoo
+        this.getValorisation = function (x,y){
+            let angle = Math.round(100*me.getAngleFromPoint({'X':x, 'Y':y}, pointCentral))/100;
+            let distance = Math.round(me.getDistance({'X':x, 'Y':y}, pointCentral));
+            let angleAxe = 0;
+            let valo = [];
+            //pondération de la structure
+            //0 de structure = 270 angle
+            me.structure.forEach(function(s,i){
+                angleAxe = angleSlice*i*(180/Math.PI);
+                angleAxe = angleAxe >= 90 ? angleAxe - 90 : angleAxe + 270;
+                valo.push({'t':s,'p':angle-angleAxe});
+            })
+            return {'s':valo,'d':me.vScale(distance)};
+        }
         this.init();
     }
 }

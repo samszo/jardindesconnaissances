@@ -289,13 +289,14 @@ class Flux_Site{
      * Récupère le contenu body d'une url
      *
      * @param string 	$url
-     * @param array 		$param
+     * @param array 	$param
      * @param boolean 	$cache
      * @param array	 	$rawData
+	 * @parma string	$mimeType
      *   
      * @return string
      */
-	function getUrlBodyContent($url, $param=false, $cache=true, $method=null, $rawData=false) {
+	function getUrlBodyContent($url, $param=false, $cache=true, $method=null, $rawData=false, $mimeType=false) {
 		$html = false;
 		/*pas d'encodage explicite
 		if(substr($url, 0, 7)!="http://")$url = urldecode($url);
@@ -307,9 +308,10 @@ class Flux_Site{
 		}
         if(!$html){
 		    	$client = new Zend_Http_Client($url,array('timeout' => 30));
+				if($mimeType) $client->setHeaders('Content-Type', $mimeType);
 		    	if($param && !$method)$client->setParameterGet($param);
 		    	if($param && $method==Zend_Http_Client::POST)$client->setParameterPost($param);
-		    	if($rawData) $client->setRawData($rawData["value"], $rawData["type"]);
+				if($rawData) $client->setRawData($rawData["value"], $rawData["type"]);
 		    	try {
 					$response = $client->request($method);
 					$html = $response->getBody();

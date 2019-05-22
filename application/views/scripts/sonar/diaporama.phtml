@@ -101,13 +101,8 @@
                     <input class="form-control mr-sm-2" type="text" id="inSrcFlux">
                     -->
                     <label for="optSrcFlux">Source du flux IIIF&nbsp;
-                    <i class="far fa-question-circle"></i>&nbsp;</label>
+                        <i class="far fa-question-circle"></i>&nbsp;</label>
                     <select class="form-control" id="optSrcFlux">
-                    <option value='https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1496' >Visages SMEL</option>
-                    <option value='https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1' >Tout SMEL</option>
-                    <option value='https://jardindesconnaissances.univ-paris8.fr/ADACEMU/omk/iiif/collection/63' >Illustrations de thèse</option>
-                    <option value='https://jardindesconnaissances.univ-paris8.fr/ValArNum/omks/iiif/collection/151682' >Reportages photographiques des présidences de la république française</option>      
-                    <option value='../../data/SMEL/iiif-smel1.json' >Tests locaux</option>
                     </select>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="ckAleaTaille">
@@ -115,27 +110,25 @@
                             Taille aléatoire
                         </label>
                     </div>
-                    <label for="optListeCpt">Liste des concepts</label>
+                    <label for="optListeCpt">Liste des concepts&nbsp;
+                        <i id='btnAjoutConcepts' class="fas fa-plus-circle"></i>&nbsp;</label>
                     <select class="form-control" id="optListeCpt">
-                    <option value='bon,mauvais' >bon et mauvais</option>
-                    <option value='vide,actuel,virtuel,signe,être,chose' >IEML</option>
-                    <option value='Ciel,Tonnerre,Eau,Montagne,Terre,Vent,Feu,Brume' >Yi Jing : élémentaires</option>
-                    <option value="le Créatif - le Ciel,le Réceptif,la Difficulté initiale,la Folie juvénile,l'Attente,le Conflit,l'Armée,la Solidarité-  l'Union,le Pouvoir d'apprivoisement du petit,la Marche,la Paix,la Stagnation,la Communauté avec les hommes,le Grand Avoir,l'Humilité,l'Enthousiasme,La Suite,le Travail sur ce qui est corrompu,l'Approche,la Contemplation,Mordre au travers,la Grâce,l'Éclatement,le Retour,l'Innocence,le Pouvoir d'apprivoisement du grand,les Commissures des lèvres,la Prépondérance du grand,l'Insondable,le Feu,l'Influence,la Durée,la Retraite,la Puissance du grand,le Progrès,l'Obscurcissement de la lumière,la Famille,l'Opposition,l'Obstacle,la Libération,la Diminution,l'Augmentation,la Percée,Venir à la rencontre,le Rassemblement,la Poussée vers le haut,l'Accablement,le Puits,la Révolution,le Chaudron,l'Ébranlement,la Montagne,le Développement,l'Épousée,Abondance,le Voyageur,le Doux,le Lac,La Dispersion,la Limitation,la Vérité intérieure,la Prépondérance du Petit,Après l'accomplissement,Avant l'accomplissement" >Yi Jing : hexagrammes</option>                    
-                    <option value='乾,坤,震,坎,艮,巽,離,兌' >易静：小学</option>
-                    </select>                                        
+                    </select>
+                    <!--
                     <label for="inListeConcept">Vos concepts séparés par une ,</label>
                     <input class="form-control mr-sm-2" type="text" id="inListeConcept" value="">
-
+                    <label for="inNomListeConcept">Nom de votre liste de concepts</label>
+                    <input class="form-control mr-sm-2" type="text" id="inNomListeConcept" value="">
+                    -->
                     <button id='btnSrcFlux' class="btn btn-outline-success my-2 my-sm-0" type="submit">Charger</button>
                 </div>
-                <div class="form-inline mt-2 mt-md-0 mr-3">
-                </div>
+                <!--
                 <div class="dropdown-divider"></div>
                 <div class="form-inline mt-2 mt-md-0">
                     <input class="form-control mr-sm-2" type="text" placeholder="Chercher" aria-label="Chercher">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Trouver</button>
                 </div>
-
+                -->
                 <img src="../svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
                 <i class="fab fa-creative-commons"></i>&nbsp;<i class="fab fa-creative-commons-zero"></i>
             </div>
@@ -222,12 +215,8 @@
     <script>
         var idBase = '<?php echo $this->idBase; ?>',
             uti = <?php echo $this->uti; ?>,
-            //defSrcFlux = 'http://gapai.univ-paris8.fr/smel/omk/iiif/collection/1',
-            //defSrcFlux = 'https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1',
-            //collection des visages
-            defSrcFlux = 'https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1496',
-            //pour les tests
-            //defSrcFlux = '../../data/SMEL/iiif-smel1.json',
+            lstFluxIIIF = <?php echo $this->colIIIF; ?>,
+            lstStructure = <?php echo $this->structures; ?>,
             height = window.innerHeight,
             width = window.innerWidth,
             svg, pc, ca, tofEval, geo=false;
@@ -239,27 +228,45 @@
             });
 	    }
 
+        //ajoute la liste des flux
+        d3.select('#optSrcFlux').selectAll('option').data(lstFluxIIIF).enter()
+            .append('option')
+            .attr('value', function (d, i) {
+                return i;})
+            .attr('idDoc', function (d) {
+                return d.doc_id;})
+            .html(function (d) {
+                return d.titre;});
+
+        //ajoute la liste des structure
+        d3.select('#optListeCpt').selectAll('option').data(lstStructure).enter()
+            .append('option')
+            .attr('value', function (d, i) {
+                return i;})
+            .attr('idDoc', function (d) {
+                return d.doc_id;})
+            .html(function (d) {
+                return d.titre;});
+                
 
         //gestion des événements
-        /*
-        d3.select('#inSrcFlux').attr('value', defSrcFlux);
-        d3.select('#lblSrcFlux')
-            .on('click', function () {
-                console.log('affiche les information sur les flux');
-            });
-        */
         d3.select('#btnSrcFlux')
             .on('click', function () {
                 showCartoHorlo();
                 //let src = document.getElementById("inSrcFlux").value;
-                let src = document.getElementById("optSrcFlux").value;                
-                console.log('Charge les images du flux IIIF :' + src);                
-                showSource(src);
+                let i = document.getElementById("optSrcFlux").value;                
+                console.log('Charge les images du flux IIIF :' + lstFluxIIIF[i].url);
+                showSource(lstFluxIIIF[i].url);
             });
         d3.select('#btnConnexion')
             .on('click', function () {
                 console.log("connexion ou déconnexion de l'utilisateur");
             });
+        d3.select('#btnAjoutConcepts')
+            .on('click', function () {
+                console.log("ajoute une structure de concept");
+            });
+            
 
         showUti();
 
@@ -295,7 +302,8 @@
         function ajoutPhotosGallerie(tofs) {
 
             //mélange toutes les photos
-            tofEval = d3.shuffle(tofs);
+            //tofEval = d3.shuffle(tofs);
+            tofEval = tofs;
 
             // Remove old elements as needed.
             d3.select('#car-ind').selectAll('li').remove();
@@ -381,9 +389,12 @@
                     //$('.carousel').carousel('pause');                                
                     getTofIIIF(e.to);
                     $('#modWait').modal('hide');
+                }else{
+                    //récupère les data
+                    ca.drawData();                    
                 }
-                ca.idDoc = tofEval[e.to]['@id'];
                 console.log(e);
+                $('.carousel').carousel('pause');                                
             })
             $('.carousel').carousel({
                 interval: 5000
@@ -419,10 +430,11 @@
                     if (url == "") {
                         let isAlea = document.getElementById("ckAleaTaille").checked;
                         url = getTailleTofIIIF(d,isAlea);
-                        //url = d.infos.thumbnail["@id"];
                     }
+
                     //code pour ajouter une image HTML
                     d3.select("#" + d.idImg).attr('src', url);
+
                     /*code pour une image SVG
                     d3.select("#"+d.idSvg).append('image')
                         .attr('class','iiif')
@@ -430,10 +442,13 @@
                         .attr('y',0)
                         .attr('xlink:href',url);
                     */
+
                     //précise l'url à la carto
                     ca.idDoc = url;
-                    //récupère les data
+
+                    //affiche les données enregistrées
                     ca.drawData();                    
+
                 }
             });
 
@@ -463,8 +478,21 @@
                 img.x = 0;
                 img.y = 0;
             }
+            //calcul la taille de représentation
+//            let sclW = d3.scaleLinear().domain([0,img.w]).range([0,bb.width]);
+//            let sclH = d3.scaleLinear().domain([0,img.h]).range([0,bb.height]);
+            let diaW = bb.width;
+            let diaH = bb.height;            
+            let coef = img.h > img.w ? img.h / img.w : img.w / img.h;
+            if(img.w > bb.width){
+                diaW = bb.width - (bb.width/coef);
+            }else if(img.h > bb.height){
+                diaH = bb.height - (bb.height/coef);
+            }
+
+            //construction de l'url
             img.url = imgOmk + '/' + img.x + ',' + img.y + ',' + (img.w) + ',' + (img.h) + '/' 
-                + parseInt(bb.width) + ',' + parseInt(bb.height) + '/' + img.r + '/default.jpg';
+                + parseInt(diaW) + ',' + parseInt(diaH) + '/' + img.r + '/default.jpg';
             console.log(img);
             d.images.push(img);
 
@@ -526,10 +554,9 @@
                 'nbCouche': 6
             });
             //récupère la structure
-            let stct = document.getElementById('inListeConcept').value;
-            if(!stct){
-                stct = document.getElementById('optListeCpt').value;
-            }
+            //let stct = document.getElementById('inListeConcept').value;
+            let lstCpt = document.getElementById('optListeCpt'); 
+            let stct = lstStructure[lstCpt.value].data;
             stct = stct.split(',');
             //ajoute la carto axe            
             ca = new cartoaxes({
@@ -549,6 +576,9 @@
         }
 
         function savePosi(d) {
+            d.idFlux = lstFluxIIIF[document.getElementById("optSrcFlux").value].doc_id;
+            d.idStr = lstStructure[document.getElementById("optListeCpt").value].doc_id;
+
             $.post('../sonar/flux', {
                     'q': 'savePosi',
                     'type':'IIIF',
@@ -562,7 +592,7 @@
                 })
                 .always(function () {});
         }
-        showCartoHorlo();
+        //showCartoHorlo();
         //$('#modWait').modal('show');
         $('.navbar-collapse').collapse('show');
     </script>
