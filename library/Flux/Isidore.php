@@ -14,7 +14,8 @@
 
 class Flux_Isidore extends Flux_Site{
 
-	var $searchUrl = 'https://api.rechercheisidore.fr/resource/search?';
+	//var $searchUrl = 'https://api.rechercheisidore.fr/resource/search?';
+	var $searchUrl = 'https://api.isidore.science/resource/search?';
 	var $output = "json";
 	var $rs;
 	
@@ -46,8 +47,9 @@ class Flux_Isidore extends Flux_Site{
      */
     public function query($query)
     {
-	    $url = $this->searchUrl."output=".$this->output.$query;
-		return $this->getUrlBodyContent($url,false);
+			$url = $this->searchUrl."output=".$this->output.$query;
+			$this->trace($url);
+			return $this->getUrlBodyContent($url,false);
     }
 
     /**
@@ -94,36 +96,36 @@ class Flux_Isidore extends Flux_Site{
 	    		    	
 	    	$this->rs['total']=array();
 	    	foreach ($arrQ->response->replies->facets->facet as $face) {
-	    		if($face->id=="discipline"){
+	    		if($face->{'@id'}=="discipline"){
 	    			//enregistre le total des disciplines
-	    			foreach ($face->node->node as $n) {
-	    				$this->trace(" total ".$n->label->_value);    				 
+	    			foreach ($face->node as $n) {
+	    				$this->trace(" total ".$n->label->{'$'});    				 
 	    				$this->rs['total'][]=$this->formatData($n, date('Y'));
 	    			}	    			
 	    		}
-	    		if($face->id=="date"){
+	    		if($face->{'@id'}=="date"){
 	    			//récupère le nombre d'items par discipline pour chaque année
 	    			foreach ($face->node as $n1) {
-	    				foreach ($n1->node as $n2) {
-	    					foreach ($n2->node as $n3) {
-	    						$json = $this->query($req."&date=".$n3->key);
+//	    				foreach ($n1->node as $n2) {
+//	    					foreach ($n2->node as $n3) {
+	    						$json = $this->query($req."&date=".$n1->{'@key'});
 	    						$arrAn = json_decode($json);
-	    						$this->trace($req."&date=".$n3->key);
-	    						if($n3->key=="1900/1960/1960"){
+	    						$this->trace($req."&date=".$n1->{'@key'});
+	    						if($n1->{'@key'}=="1900/1960/1960"){
 	    							$t = 1;
 	    						}
 	    						if(is_array($arrAn->response->replies->facets->facet)){
 		    						$n4 = $arrAn->response->replies->facets->facet[1]->node;
-	    							if(is_array($n4->node)){
-		    							foreach ($n4->node as $n5) {
-		    								$this->rs["an"][]=$this->formatData($n5, $n3->label->_value);
+	    							if(is_array($n4)){
+		    							foreach ($n4 as $n5) {
+		    								$this->rs["an"][]=$this->formatData($n5, $n1->{'@key'});
 		    							}
 	    							}else{
-	    								$this->rs["an"][]=$this->formatData($n4->node, $n3->label->_value);	    									
+	    								$this->rs["an"][]=$this->formatData($n4, $n1->{'@key'});	    									
 	    							}
 	    						}
-	    					}	
-	    				}
+	    					//}	
+	    				//}
 	    			}	    			
 	    		}
 	    	}
@@ -155,8 +157,9 @@ class Flux_Isidore extends Flux_Site{
 	 * @return array
 	 */
 	function formatData($dis, $date){
-		$nD = array('key'=>$dis->key,'type'=>$dis->label->_value,'desc'=>$dis->label->_value
-				,'temps'=>$date,'score'=>$dis->items,'value'=>$dis->items
+		$url = explode("/",$dis->label->{'@$'});
+		$nD = array('key'=>$dis->{'@key'},'type'=>$dis->label->{'$'},'desc'=>$dis->label->{'$'}
+				,'temps'=>$date,'score'=>$dis->{'@items'},'value'=>$dis->{'@items'}
 				,'MinDate'=>date($date.'-01-01'),'MaxDate'=>date($date.'-01-01')
 		);
 		

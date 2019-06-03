@@ -115,5 +115,11 @@ class Flux_Hal extends Flux_Site{
 	function getInfosThese($id){
 		//https://api.archives-ouvertes.fr/search/?q=tel-01964613&wt=xml&fl=abstract_s,label_s,acm_s,audience_s,authFirstName_s,authFullName_s,authIdHal_i,authQuality_s,authorityInstitution_s,city_s,classification_s,committee_s,country_s,defenseDate_s,director_s,domain_s,files_s,fulltext_t,keyword_s,page_s,popularLevel_s,structAcronym_s,thesisSchool_s		
 	}
-    
+  
+	
+	//récupère les photos
+	//pdfimages -j /Users/samszo/Documents/veille/va_Sarr_Lamine.pdf /Users/samszo/Documents/veille/tofs/
+	
+
+
 }

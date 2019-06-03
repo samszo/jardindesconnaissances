@@ -11,7 +11,13 @@
  */
 class Flux_Ice extends Flux_Site{
 
-	
+    var $nivMaxEnf = 0;//pour gérer le niveau de prise en compte des enfants
+    /**
+     * @param  string   $groupDate
+     * pour la prise en compte des évolutions dans le temps
+     * valeur attendu un format de date SQL, par exemple : %Y-%m-%d
+    */
+    var $groupDate = "";
     /**
      * Constructeur de la classe
      *
@@ -553,12 +559,12 @@ ORDER BY d.tronc
 
     /**
      * renvoit les évaluations temporelle d'une monade par Document
-     * @param  int      $idMonade
+    *  @param  string   $idsMonade
      * @param  string   $dateUnit
      * @param  string   $dateType
      *
      */
-    function getEvalsMonadeHistoByDoc($idMonade, $dateUnit, $dateType="dateChoix"){
+    function getEvalsMonadeHistoByDoc($idsMonade, $dateUnit, $dateType="dateChoix"){
         
         if($dateType=="dateChoix")$colTemps = "r.maj";
         if($dateType=="dateDoc")$colTemps = "r.maj";
@@ -588,7 +594,7 @@ ORDER BY d.tronc
             INNER JOIN
         flux_tag t ON t.tag_id = r.dst_id
     WHERE
-        r.monade_id = ".$idMonade."
+        r.monade_id IN (".$idsMonade.")
     GROUP BY dp.doc_id, temps
     ORDER BY temps";
         
@@ -774,7 +780,8 @@ ORDER BY d.tronc
      *
      */
     function getNicheDoc($idDoc){
-        
+        $niv = "";
+        if($this->nivMaxEnf) $niv = " AND de.niveau <= (d.niveau + ".$this->nivMaxEnf.") ";
         $sql = "	SELECT
                 de.doc_id idE,
             de.titre titreE,
@@ -798,7 +805,7 @@ ORDER BY d.tronc
             rP.src_id psid,
             rP.src_obj pso
             FROM flux_doc d
-            INNER JOIN flux_doc de ON de.lft BETWEEN d.lft AND d.rgt
+            INNER JOIN flux_doc de ON de.lft BETWEEN d.lft AND d.rgt ".$niv."
             LEFT JOIN
                 flux_rapport rS ON rS.src_id = de.doc_id
                 AND rS.src_obj = 'doc'
@@ -1092,31 +1099,40 @@ ORDER BY d.tronc
      * calcule la complexité des documents
      *
      * @param  string   $ids
-     * @param  int      $maxNiv
      *
      * @return array
      *
      */
-    function getComplexDoc($ids="",$maxNiv=0){
+    function getComplexDoc($ids=""){
         
         $result = array("idBase"=>$this->idBase,"type"=>"document","ids"=>$ids,"sumNb"=>0,"numNiv"=>0,"sumNiv"=>0,"sumComplex"=>0,"details"=>array());
         if($ids == "-1") return $result;
         
+        //gérer le niveau
+        $niv = ""; 
+        if($this->nivMaxEnf) $niv = " AND de.niveau <= (d.niveau + ".$this->nivMaxEnf.") ";
+        //gérer l'é-volution temporelle
+        $gDate="";
+        if($this->groupDate) $gDate = " , DATE_FORMAT(de.maj, '".$this->groupDate."') temps ";
+
         $w = " WHERE ";
         if ($ids) $w .= " d.doc_id IN (".$ids.") ";
-        //TODO:mieux gérer le niveau
-        //if ($maxNiv) $w .= " de.niveau < ".$maxNiv." ";
+
         if($w == " WHERE ")$w="";
         
         $sql = "SELECT
             COUNT(DISTINCT de.doc_id) nb,
                 de.niveau + 1 - d.niveau niv,
                 COUNT(DISTINCT de.doc_id) * (de.niveau + 1 - d.niveau) complexite
+                ".$gDate."
         FROM
             flux_doc d
-        INNER JOIN flux_doc de ON de.lft BETWEEN d.lft AND d.rgt
-        ".$w."
-        GROUP BY de.niveau + 1 - d.niveau";
+        INNER JOIN flux_doc de ON de.lft BETWEEN d.lft AND d.rgt ".$niv."
+        ".$w." 
+        GROUP BY  ";
+        if($this->groupDate) $sql .= " DATE_FORMAT(de.maj, '".$this->groupDate."') ";
+        else $sql .= " de.niveau + 1 - d.niveau ";
+
         $this->trace($sql);
         $arr = $this->dbD->exeQuery($sql);
         
@@ -1145,6 +1161,10 @@ ORDER BY d.tronc
         $result = array("idBase"=>$this->idBase,"type"=>"concept","ids"=>$ids,"sumNb"=>0,"numNiv"=>0,"sumNiv"=>0,"sumComplex"=>0,"details"=>array());
         if($ids == "-1") return $result;
         
+        //gérer l'évolution temporelle
+        $gDate="";
+        if($this->groupDate) $gDate = " , DATE_FORMAT(te.maj, '".$this->groupDate."') temps ";
+
         if ($ids) $w = " WHERE t.tag_id IN (".$ids.") ";        	    
         else $w = "";
         
@@ -1152,13 +1172,15 @@ ORDER BY d.tronc
             count(distinct te.tag_id) nb,
             te.niveau + 1 - t.niveau niv,
             count(distinct te.tag_id)*(te.niveau + 1 - t.niveau) complexite
-        
+            ".$gDate."        
         FROM
             flux_tag t
                 INNER JOIN
             flux_tag te ON te.lft between t.lft and t.rgt
         ".$w."
-        group by te.niveau + 1 - t.niveau";
+        GROUP BY  ";
+        if($this->groupDate) $sql .= " DATE_FORMAT(te.maj, '".$this->groupDate."') ";
+        else $sql .= " te.niveau + 1 - t.niveau ";
         $this->trace($sql);
         $arr = $this->dbD->exeQuery($sql);
         
@@ -1187,6 +1209,10 @@ ORDER BY d.tronc
         $result = array("idBase"=>$this->idBase,"type"=>"acteur-personne","ids"=>$ids,"sumNb"=>0,"numNiv"=>0,"sumNiv"=>0,"sumComplex"=>0,"details"=>array());
         if($ids == "-1") return $result;
         
+        //gérer l'évolution temporelle
+        $gDate="";
+        if($this->groupDate) $gDate = " , DATE_FORMAT(ee.maj, '".$this->groupDate."') temps ";
+
         if ($ids) $w = " WHERE e.exi_id IN (".$ids.") ";
         else $w = "";
         //ATTENTION les exi anciens sont mal géré au niveau lft rgt
@@ -1194,14 +1220,16 @@ ORDER BY d.tronc
             count(distinct ee.exi_id) nb,
             ee.niveau + 1 - e.niveau niv,
             count(distinct ee.exi_id)*(ee.niveau + 1 - e.niveau) complexite
-        
+            ".$gDate."                
         FROM
             flux_exi e
                 INNER JOIN
             -- flux_exi ee ON ee.lft BETWEEN e.lft AND e.rgt
             flux_exi ee ON ee.exi_id = e.exi_id
         ".$w."
-            group by ee.niveau + 1 - e.niveau";
+        GROUP BY  ";
+        if($this->groupDate) $sql .= " DATE_FORMAT(ee.maj, '".$this->groupDate."') ";
+        else $sql .= " ee.niveau + 1 - e.niveau ";
         $this->trace($sql);
         $arr = $this->dbD->exeQuery($sql);
         
@@ -1232,15 +1260,21 @@ ORDER BY d.tronc
         
         if ($ids) $w = " WHERE g.geo_id IN (".$ids.") ";
         else $w = "";
+
+        //gérer l'évolution temporelle
+        $gDate="";
+        if($this->groupDate) $gDate = " , DATE_FORMAT(g.maj, '".$this->groupDate."') temps ";
         
         $sql = "SELECT 
             count(distinct g.geo_id) nb,
                 1 niv,
             count(distinct g.geo_id)*1 complexite
-        
+            ".$gDate."                        
         FROM
             flux_geo g
         ".$w." ";
+        if($this->groupDate) $sql .= " GROUP BY DATE_FORMAT(g.maj, '".$this->groupDate."') ";
+
         $this->trace($sql);
         $arr = $this->dbD->exeQuery($sql);
         
@@ -1273,6 +1307,10 @@ ORDER BY d.tronc
         
         if ($ids) $w = " WHERE m.monade_id IN (".$ids.") ";
         else $w = "";
+
+        //gérer l'évolution temporelle
+        $gDate="";
+        if($this->groupDate) $gDate = " , DATE_FORMAT(r.maj, '".$this->groupDate."') temps ";
         
         $sql = "SELECT 
             COUNT(DISTINCT m.monade_id) nb,
@@ -1288,6 +1326,7 @@ ORDER BY d.tronc
             COUNT(DISTINCT r.dst_id) nbDst,
             COUNT(DISTINCT r.pre_id) nbPre,
             COUNT(DISTINCT r.rapport_id) + COUNT(DISTINCT r.src_id) + COUNT(DISTINCT r.dst_id) + COUNT(DISTINCT r.pre_id) complexiteRapport
+            ".$gDate."                        
         FROM
             flux_monade m
                 INNER JOIN
@@ -1297,7 +1336,9 @@ ORDER BY d.tronc
                 '-',
                 r.dst_obj,
                 '-',
-                r.pre_obj)";
+                r.pre_obj) ";
+        if($this->groupDate) $sql .= " , DATE_FORMAT(r.maj, '".$this->groupDate."') ";
+
         $this->trace($sql);
         $arr = $this->dbD->exeQuery($sql);
         
@@ -1336,6 +1377,10 @@ ORDER BY d.tronc
         
         if ($ids) $w = " WHERE r.rapport_id IN (".$ids.") ";
         else $w = "";
+
+        //gérer l'évolution temporelle
+        $gDate="";
+        if($this->groupDate) $gDate = " , DATE_FORMAT(r.maj, '".$this->groupDate."') temps ";
         
         $sql = "SELECT 
             CONCAT(r.src_obj,
@@ -1348,6 +1393,7 @@ ORDER BY d.tronc
             COUNT(DISTINCT r.dst_id) nbDst,
             COUNT(DISTINCT r.pre_id) nbPre,
             COUNT(DISTINCT r.rapport_id)+COUNT(DISTINCT r.src_id)+COUNT(DISTINCT r.dst_id)+COUNT(DISTINCT r.pre_id) complexite
+            ".$gDate."                        
         FROM
             flux_rapport r
         ".$w."
@@ -1355,7 +1401,8 @@ ORDER BY d.tronc
                 '-',
                 r.dst_obj,
                 '-',
-                r.pre_obj)";
+                r.pre_obj) ";
+        if($this->groupDate) $sql .= " , DATE_FORMAT(r.maj, '".$this->groupDate."') ";
         $this->trace($sql);
         $arr = $this->dbD->exeQuery($sql);
         

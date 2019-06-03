@@ -1147,6 +1147,17 @@ WHERE {
   ?identity bio:death ?date2. 
 }
 
+
+//toutesles information d'une personne = Houdini
+SELECT DISTINCT ?nom ?prenom ?o ?s
+WHERE {
+  ?person isni:identifierValid "0000000108862279" ;
+    foaf:focus ?identity.
+  ?identity foaf:familyName ?nom;
+    foaf:givenName ?prenom;
+    ?o ?s.
+}
+
  */ 
     
     

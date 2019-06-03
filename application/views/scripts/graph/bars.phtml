@@ -70,7 +70,6 @@
   
     var svg = dimple.newSvg("#chartContainer", width, height);
     //d3.tsv("../data/example_data.tsv", function (data) {
-    var urlData = '<?php echo $this->urlData;?>';
     d3.json(urlData, function (data) {    
       var myChart = new dimple.chart(svg, data);
       myChart.setBounds(60, 30, 780, 505)

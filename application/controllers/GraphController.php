@@ -307,8 +307,10 @@ class GraphController extends Zend_Controller_Action {
     	
     }
 
-    public function barsAction(){
-        switch ($this->_getParam('q','compareEco')) {
+	public function barsAction(){
+        $this->view->catX =  $this->_getParam('catX', "idBase");
+        $this->view->catY =  $this->_getParam('catY', "sumComplex");
+        switch ($this->_getParam('q','evolutionEco')) {
             case 'compareUrl':
                 //../flux/an?q=compareComplexEcosystemUrl&idsBase[]=flux_valarnum&idsBase[]=flux_valarnum_prod&idsBase[]=flux_valarnum_prod1&idsBase[]=flux_valarnum_prod1_1&url=http://www.siv.archives-nationales.culture.gouv.fr/mm/media/download/FRAN_0133_0027_L-medium.jpg
                 $url = urldecode($this->_getParam('url', 'http%3A%2F%2Fwww.siv.archives-nationales.culture.gouv.fr%2Fmm%2Fmedia%2Fdownload%2FFRAN_0133_0027_L-medium.jpg'));
@@ -319,9 +321,16 @@ class GraphController extends Zend_Controller_Action {
                 $this->view->urlData =  urldecode($this->_getParam('urlData', "..%2Fflux%2Fan%3Fq%3DcompareComplexEcosystem%26idsBase%5B%5D%3Dflux_valarnum%26idsBase%5B%5D%3Dflux_valarnum_prod%26idsBase%5B%5D%3Dflux_valarnum_prod1%26idsBase%5B%5D%3Dflux_valarnum_prod1_1"));
                 $this->view->urlData =  "../flux/an?q=compareComplexEcosystem&idsBase[]=flux_valarnum_prod1&idsBase[]=flux_valarnum_prod1_1";
                 break;
+			case 'compareEcoNiv':
+				$this->view->urlData =  "../ice/complexe?q=compareNiv&idBase=flux_smel&idDoc=1&nivMaxEnf=4";
+				$this->view->catX =  $this->_getParam('catX', "niveau");				
+                break;
+			case 'evolutionEco':
+				$this->view->urlData =  "../ice/complexe?idBase=flux_smel&q=evolution&idDoc=1";
+				$this->view->catX =  $this->_getParam('catX', "temps");				
+				$this->view->catY =  $this->_getParam('catY', "complexite");
+                break;
         }
-        $this->view->catX =  $this->_getParam('catX', "idBase");
-        $this->view->catY =  $this->_getParam('catY', "sumComplex");
         $this->view->serie =  $this->_getParam('serie', "type");
         
     }

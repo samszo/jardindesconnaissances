@@ -350,12 +350,45 @@ class IceController extends Zend_Controller_Action {
 
 
 	public function complexeAction(){
-		$ice = new Flux_Ice($this->_getParam('idBase',false),$this->_getParam('trace',false));
+		$ice = new Flux_Ice($this->_getParam('idBase',false),$this->_getParam('trace',false));		
+		$ice->nivMaxEnf = $this->_getParam('nivMaxEnf',0);
 		$rs = array('result' => array(), 'erreur'=>0);
 		switch ($this->_getParam('q',false)) {
 			case 'save':
 				$rs['result']=$ice->saveComplexDoc($this->_getParam('idDoc',false),$this->_getParam('tronc',false),$this->_getParam('parent',false));
 				break;			
+			case 'compareNiv':
+				$rs = array();
+				//calcul la complexité pour chaque niveau
+				for ($i=1; $i <= $this->_getParam('nivMaxEnf',1); $i++) { 
+					$ice->nivMaxEnf = $i;
+					$data=$ice->getComplexEcosystem($this->_getParam('idDoc',0),0,0,0,0,0,false);
+					//
+					for ($j=0; $j < count($data["details"]); $j++) { 
+						$data["details"][$j]['niveau']=$i;
+					}
+					$rs = array_merge($rs, $data["details"]);
+				}
+				break;
+			case 'evolution':
+				$ice->groupDate = $this->_getParam("dateUnit", '%Y-%m-%d');
+				$rs=$ice->getComplexEcosystem($this->_getParam('idDoc',0),0,0,0,0,0,false);
+				//compile le résultat
+				$data = array();
+				foreach ($rs['details'] as $r) {
+					foreach ($r['details'] as $d) {
+						$d['type']=$r['type'];
+						$data[]=$d;
+					}
+				}
+				$rs=$data;
+				if($this->_getParam('stream')){
+					//calcul les données pour le stream
+					$sta = new Flux_Stats();
+					$rs = $sta->array_orderby($rs, 'type', SORT_ASC, 'temps', SORT_ASC);
+					$rs = $sta->getDataForStream($rs, $this->_getParam("dateUnit", '%Y-%m-%d'));
+				}
+				break;									
 			default:
 				$rs['result']=$ice->getComplexEcosystem(
 					$this->_getParam('idDoc',0), 
@@ -369,6 +402,10 @@ class IceController extends Zend_Controller_Action {
 				break;
 		}
 		$this->view->data = $rs;
+
+	}
+
+	public function statsAction(){
 
 	}
 

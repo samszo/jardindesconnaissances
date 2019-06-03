@@ -855,7 +855,7 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 			$arrDate[]=$curDate->format($phpFormatDate);
 			$curDate->add($interval);
 		}
-		$this->trace("le tableau des dates",$arrDate);
+		$this->trace("le tableau des dates ",$arrDate);
 		//ajoute les valeurs vides pour chaque éléments
 		$oTag = $data[0]['key'];
 		//définir une valeur par défaut pour la consistance du graph

@@ -69,7 +69,8 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
 	    	
 	    if($existe)$id = $this->existe($data);
 	    	if(!$id){
-	    		$data = $this->updateHierarchie($data);
+				$data = $this->updateHierarchie($data);
+				if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');				
 	    		$id = $this->insert($data);
 	    	}
 	    	    	
@@ -190,6 +191,7 @@ class Model_DbTable_Flux_Tag extends Zend_Db_Table_Abstract
      */
     public function edit($id, $data)
     {        
+		if(!isset($data["maj"])) $data["maj"] = new Zend_Db_Expr('NOW()');
         $this->update($data, 'flux_tag.tag_id = ' . $id);
     }
     
