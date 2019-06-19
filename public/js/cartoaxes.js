@@ -2,7 +2,7 @@ class cartoaxes {
     constructor(params) {
         var me = this;
         this.data = [];
-        this.structure = params.structure ? params.structure : ['clair','obscur','pertinent','inadapté'];
+        this.crible = params.crible ? params.crible : ['clair','obscur','pertinent','inadapté'];
         this.urlData = params.urlData ? params.urlData : false;
         this.fctCallBackInit = params.fctCallBackInit ? params.fctCallBackInit : false;
         this.svg = d3.select("#"+params.idSvg),
@@ -23,7 +23,7 @@ class cartoaxes {
         //variable pour les axes
         var labelFactor = 1, 	//How much farther than the radius of the outer circle should the labels be placed
         radius = Math.min(this.width/2, this.height/2),
-		angleSlice = Math.PI * 2 / this.structure.length,
+		angleSlice = Math.PI * 2 / this.crible.length,
         scCircle = d3.scalePoint()
             .domain(this.rayons)
             .range([0, radius]),
@@ -107,7 +107,7 @@ class cartoaxes {
 	
             //Create the straight lines radiating outward from the center
             var axis = me.g.selectAll(".axis")
-                .data(me.structure)
+                .data(me.crible)
                 .enter()
                 .append("g")
                 .attr("class", "axis");
@@ -151,14 +151,14 @@ class cartoaxes {
         this.dragended = function() {
             //récupère les données du points
             let posi = d3.mouse(this);
-            //calcule la distance et la pondération de la structure
+            //calcule la distance et la pondération de la crible
             let v = me.getValorisation(posi[0],posi[1]);
             //formate les données
             let r = {'x':posi[0],'y':posi[1]
                 ,'numX':me.x.invert(posi[0]),'numY':me.y.invert(posi[1])
                 ,'degrad':degrad //récupère les couleurs et la date
                 ,'distance':v.d
-                ,'structure':v.s
+                ,'crible':v.s
                 ,'id':me.idDoc
                 };                       
             console.log(r);
@@ -282,9 +282,9 @@ class cartoaxes {
             let distance = Math.round(me.getDistance({'X':x, 'Y':y}, pointCentral));
             let angleAxe = 0;
             let valo = [];
-            //pondération de la structure
-            //0 de structure = 270 angle
-            me.structure.forEach(function(s,i){
+            //pondération de la crible
+            //0 de crible = 270 angle
+            me.crible.forEach(function(s,i){
                 angleAxe = angleSlice*i*(180/Math.PI);
                 angleAxe = angleAxe >= 90 ? angleAxe - 90 : angleAxe + 270;
                 valo.push({'t':s,'p':angle-angleAxe});

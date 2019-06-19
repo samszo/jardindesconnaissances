@@ -25,22 +25,11 @@ class SonarController extends Zend_Controller_Action
 		$this->initInstance(false,"/diaporama");
 
 		$s = new Flux_Sonar($this->idBase);
-
+		$s->dbOmk = $this->_getParam('dbOmk','omks_smel');
 		//récupère les collections
-		$colIIIF = $s->getCollectionIIIF();
-		if(count($colIIIF)==0){
-			$s->initCollectionIIIF();
-			$colIIIF = $s->getCollectionIIIF();
-		}
-		$this->view->colIIIF = json_encode($colIIIF);
-
-		//récupère les structure
-		$structures = $s->getStructure();
-		if(count($structures)==0){
-			$s->initStructure();
-			$structures = $s->getStructure();
-		}
-		$this->view->structures = json_encode($structures);
+		$this->view->colIIIF = $s->getCollection($s->titleColIIIF);
+		//récupère les cribles
+		$this->view->cribles = $s->getCollection($s->titleColCrible);
 
 	}
 

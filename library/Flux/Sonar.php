@@ -11,6 +11,12 @@
  */
 class Flux_Sonar extends Flux_Site{
 
+    var $dbOmk = false;
+    var $omk = false;
+    var $titleColCrible = 'Cribles conceptuels';
+    var $titleColIIIF = 'Collection IIIF';
+    var $idsCol = [];
+
 	
     /**
      * Constructeur de la classe
@@ -44,39 +50,137 @@ class Flux_Sonar extends Flux_Site{
     /**
 	 * initialise les collections IIIF
      * 
-     * @return void
+     * @return array
 	 */
     function initCollectionIIIF(){
-		$this->dbD->ajouter(array('titre'=>'Visages SMEL','url'=>'https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1496','parent'=>$this->idDocCol));
-		$this->dbD->ajouter(array('titre'=>'Tout SMEL','url'=>'https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1','parent'=>$this->idDocCol));
-		$this->dbD->ajouter(array('titre'=>'Affiche de mai 68','url'=>'https://octaviana.fr/iiif/collection/346','parent'=>$this->idDocCol));
-		$this->dbD->ajouter(array('titre'=>'Illustrations de thèse','url'=>'https://jardindesconnaissances.univ-paris8.fr/ADACEMU/omk/iiif/collection/63','parent'=>$this->idDocCol));
-		$this->dbD->ajouter(array('titre'=>'Reportages photographiques des présidences de la république française','url'=>'https://jardindesconnaissances.univ-paris8.fr/ValArNum/omks/iiif/collection/151682','parent'=>$this->idDocCol));
-        $this->dbD->ajouter(array('titre'=>'Tests locaux','url'=>'../../data/SMEL/iiif-smel1.json','parent'=>$this->idDocCol));
+        $arr = array(
+            array('titre'=>'Visages SMEL','ancre'=>'SMEL','url'=>'https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1496','parent'=>$this->idDocCol),
+            array('titre'=>'Tout SMEL','ancre'=>'SMEL','url'=>'https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1','parent'=>$this->idDocCol),
+            array('titre'=>'Affiche de mai 68','ancre'=>'octaviana','url'=>'https://octaviana.fr/iiif/collection/346','parent'=>$this->idDocCol),
+            array('titre'=>'Illustrations de thèse','ancre'=>'ADACEMU','url'=>'https://jardindesconnaissances.univ-paris8.fr/ADACEMU/omk/iiif/collection/63','parent'=>$this->idDocCol),
+            array('titre'=>'Reportages photographiques des présidences de la république française','ancre'=>'ValArNum','url'=>'https://jardindesconnaissances.univ-paris8.fr/ValArNum/omks/iiif/collection/151682','parent'=>$this->idDocCol),
+            array('titre'=>'Tests locaux','ancre'=>'SMEL local','url'=>'../../data/SMEL/iiif-smel1.json','parent'=>$this->idDocCol)    
+        );
+        foreach ($arr as $v) {
+            if($this->dbOmk){
+                $this->addIIF($v);
+                $r = $this->omk->postItemSet(array('title'=>$this->titleColIIIF));
+            }else        
+                $r = $this->dbD->ajouter($v);
+        }
+        return $r;
+    }
 
+    /**
+	 * ajoute une collection IIIF
+     * 
+     * @param array $v
+     * 
+     * @return string
+	 */
+    function addIIIF($v){
+        if(!$this->omk)$this->omk=new Flux_Omeka($this->dbOmk);
+        if(!$this->idsCol[$this->titleColIIIF]) {
+            //'Collection IIIF'
+            $col = $this->omk->postItemSet(array('title'=>$this->titleColIIIF));
+            $this->idsCol[$this->titleColIIIF] = $col['o:id'];
+        }
+        return $this->omk->postItem(array('title'=>$v['titre']
+        ,'isReferencedBy'=>array('uri'=>$v['url'],'label'=>$v['ancre'])
+        ,'resource_class'=>23
+        ,'item_set'=>$this->idsCol[$this->titleColIIIF]
+        ));
     }
 
     /**
 	 * recupère les collections IIIF
      * 
+     * @param string    $title
+     * 
      * @return array
 	 */
-    function getCollectionIIIF(){
-		return $this->dbD->findByParent($this->idDocCol);
+    function getCollection($title){
+        if($this->dbOmk){
+            $this->omk = $this->omk ? $this->omk : new Flux_Omeka($this->dbOmk);
+            $r = json_decode($this->omk->search(array('title'=>$title),'item_sets'),true)[0]; 
+            //initialise la collection si vide
+            if(!$r['o:id']){
+                switch ($title) {
+                    case $this->titleColIIIF:
+                        $r = $this->initCollectionIIIF();
+                        break;
+                    case $this->titleColCrible:
+                        $r = $this->initCrible();
+                        break;
+                }
+            }
+            $this->idsCol[$title]=$r['o:id'];             
+
+            //renvoie le lien vers les item de la collection
+            return $r['o:items']['@id'];
+        }else
+    		return $this->dbD->findByParent($this->idDocCol);
     }
 
     /**
-	 * initialise les structures
+	 * initialise les cribles
      * 
-     * @return void
+     * @return array
 	 */
-    function initStructure(){
-        $this->dbD->ajouter(array('titre'=>'bon et mauvais','data'=>'bon,mauvais','parent'=>$this->idDocStruc));
-        $this->dbD->ajouter(array('titre'=>'IEML : élémentaire','data'=>'vide,actuel,virtuel,signe,être,chose','parent'=>$this->idDocStruc));
-        $this->dbD->ajouter(array('titre'=>'Yi Jing : élémentaires','data'=>'Ciel,Tonnerre,Eau,Montagne,Terre,Vent,Feu,Brume','parent'=>$this->idDocStruc));
-        $this->dbD->ajouter(array('titre'=>'Yi Jing : hexagrammes','data'=>"le Créatif - le Ciel,le Réceptif,la Difficulté initiale,la Folie juvénile,l'Attente,le Conflit,l'Armée,la Solidarité-  l'Union,le Pouvoir d'apprivoisement du petit,la Marche,la Paix,la Stagnation,la Communauté avec les hommes,le Grand Avoir,l'Humilité,l'Enthousiasme,La Suite,le Travail sur ce qui est corrompu,l'Approche,la Contemplation,Mordre au travers,la Grâce,l'Éclatement,le Retour,l'Innocence,le Pouvoir d'apprivoisement du grand,les Commissures des lèvres,la Prépondérance du grand,l'Insondable,le Feu,l'Influence,la Durée,la Retraite,la Puissance du grand,le Progrès,l'Obscurcissement de la lumière,la Famille,l'Opposition,l'Obstacle,la Libération,la Diminution,l'Augmentation,la Percée,Venir à la rencontre,le Rassemblement,la Poussée vers le haut,l'Accablement,le Puits,la Révolution,le Chaudron,l'Ébranlement,la Montagne,le Développement,l'Épousée,Abondance,le Voyageur,le Doux,le Lac,La Dispersion,la Limitation,la Vérité intérieure,la Prépondérance du Petit,Après l'accomplissement,Avant l'accomplissement",'parent'=>$this->idDocStruc));
-        $this->dbD->ajouter(array('titre'=>'易静：小学','data'=>"乾,坤,震,坎,艮,巽,離,兌",'parent'=>$this->idDocStruc));
+    function initCrible(){
+
+        $arr = array(
+            array('langue'=>'fr','titre'=>'bon et mauvais','data'=>'bon,mauvais','parent'=>$this->idDocStruc),
+            array('langue'=>'fr','titre'=>'IEML : élémentaire','data'=>'vide,actuel,virtuel,signe,être,chose','parent'=>$this->idDocStruc),
+            array('langue'=>'fr','titre'=>'Yi Jing : élémentaires','data'=>'Ciel,Tonnerre,Eau,Montagne,Terre,Vent,Feu,Brume','parent'=>$this->idDocStruc),
+            array('langue'=>'fr','titre'=>'Yi Jing : hexagrammes','data'=>"le Créatif - le Ciel,le Réceptif,la Difficulté initiale,la Folie juvénile,l'Attente,le Conflit,l'Armée,la Solidarité-  l'Union,le Pouvoir d'apprivoisement du petit,la Marche,la Paix,la Stagnation,la Communauté avec les hommes,le Grand Avoir,l'Humilité,l'Enthousiasme,La Suite,le Travail sur ce qui est corrompu,l'Approche,la Contemplation,Mordre au travers,la Grâce,l'Éclatement,le Retour,l'Innocence,le Pouvoir d'apprivoisement du grand,les Commissures des lèvres,la Prépondérance du grand,l'Insondable,le Feu,l'Influence,la Durée,la Retraite,la Puissance du grand,le Progrès,l'Obscurcissement de la lumière,la Famille,l'Opposition,l'Obstacle,la Libération,la Diminution,l'Augmentation,la Percée,Venir à la rencontre,le Rassemblement,la Poussée vers le haut,l'Accablement,le Puits,la Révolution,le Chaudron,l'Ébranlement,la Montagne,le Développement,l'Épousée,Abondance,le Voyageur,le Doux,le Lac,La Dispersion,la Limitation,la Vérité intérieure,la Prépondérance du Petit,Après l'accomplissement,Avant l'accomplissement",'parent'=>$this->idDocStruc),
+            array('langue'=>'cn','titre'=>'易静：小学','data'=>"乾,坤,震,坎,艮,巽,離,兌",'parent'=>$this->idDocStruc)
+        );
+        foreach ($arr as $v) {
+            if($this->dbOmk){
+                $this->addCrible($v);
+                $r = $this->omk->postItemSet(array('title'=>$this->titleColCrible));
+            }else        
+                $r = $this->dbD->ajouter($v);
+        }
+        return $r;
     }
+
+    /**
+	 * ajoute un crible
+     * 
+     * @param array $v
+     * 
+     * @return string
+	 */
+    function addCrible($v){
+
+        if(!$this->omk)$this->omk=new Flux_Omeka($this->dbOmk);
+        //récupère la Collection crible'
+        if(!$this->idsCol[$this->titleColCrible]) {
+            $col = $this->omk->postItemSet(array('title'=>$this->titleColCrible));
+            $this->idsCol[$this->titleColCrible] = $col['o:id'];
+        }
+        //création du crible
+        $s =  $this->omk->postItem(array('title'=>$v['titre']
+            ,'resource_class'=>182
+            ,'resource_template'=>9
+            ,'type'=>'skos:ConceptScheme'
+            ,'item_set'=>$this->idsCol[$this->titleColCrible]
+            ));
+        
+        //création des concepts du crible
+        $l = explode(',',$v['data']);
+        foreach ($l as $c) {
+            $i = $this->omk->postItem(array('title'=>$c
+            ,'resource_class'=>181
+            ,'type'=>'skos:Concept'
+            ,'prefLabel'=>$c
+            ,'inScheme'=>array('id'=>$s['o:id'],'txt'=>$s['dcterms:title'][0]['@value'])
+            ));
+        }
+    }
+
 
     /**
 	 * recupère les structure

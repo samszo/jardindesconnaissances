@@ -215,8 +215,8 @@
     <script>
         var idBase = '<?php echo $this->idBase; ?>',
             uti = <?php echo $this->uti; ?>,
-            lstFluxIIIF = <?php echo $this->colIIIF; ?>,
-            lstStructure = <?php echo $this->structures; ?>,
+            urlColIIIF = '<?php echo $this->colIIIF; ?>', lstIIIF=[],
+            urlColCrible = '<?php echo $this->cribles; ?>',lstCrible = [],
             height = window.innerHeight,
             width = window.innerWidth,
             svg, pc, ca, tofEval, geo=false;
@@ -227,26 +227,6 @@
                 geo = p;
             });
 	    }
-
-        //ajoute la liste des flux
-        d3.select('#optSrcFlux').selectAll('option').data(lstFluxIIIF).enter()
-            .append('option')
-            .attr('value', function (d, i) {
-                return i;})
-            .attr('idDoc', function (d) {
-                return d.doc_id;})
-            .html(function (d) {
-                return d.titre;});
-
-        //ajoute la liste des structure
-        d3.select('#optListeCpt').selectAll('option').data(lstStructure).enter()
-            .append('option')
-            .attr('value', function (d, i) {
-                return i;})
-            .attr('idDoc', function (d) {
-                return d.doc_id;})
-            .html(function (d) {
-                return d.titre;});
                 
 
         //gestion des événements
@@ -254,9 +234,9 @@
             .on('click', function () {
                 showCartoHorlo();
                 //let src = document.getElementById("inSrcFlux").value;
-                let i = document.getElementById("optSrcFlux").value;                
-                console.log('Charge les images du flux IIIF :' + lstFluxIIIF[i].url);
-                showSource(lstFluxIIIF[i].url);
+                let url = document.getElementById("optSrcFlux").value;                
+                console.log('Charge les images du flux IIIF :' + url);
+                if(url)showSource(url);
             });
         d3.select('#btnConnexion')
             .on('click', function () {
@@ -267,14 +247,69 @@
                 console.log("ajoute une structure de concept");
             });
             
-
+        //charges les données del'application
         showUti();
+        getListeSource();
+        getListeCrible();
+
 
         function showUti() {
             d3.select('#txtUti').html(uti.login);
             let btn = '<i class="fas fa-sign-in-alt"></i>';
             if (uti.uti_id != 1) btn = '<i class="fas fa-sign-in-alt"></i>';
             d3.select('#btnConnexion').html(btn);
+        }
+
+        function getListeSource() {
+
+            //ajoute la liste des flux
+            $.ajax({
+                url: urlColIIIF,
+                dataType: "json",
+                method: "GET",
+                error: function (error) {
+                    console.log("Erreur : " + error.responseText);
+                },
+                success: function (data) {
+                    console.log(data);
+                    lstIIIF = data;
+                    d3.select('#optSrcFlux').selectAll('option').data(lstIIIF).enter()
+                        .append('option')
+                        .attr('value', function (d, i) {
+                            return d['dcterms:isReferencedBy'] ? d['dcterms:isReferencedBy'][0]['@id'] : false;})
+                        .attr('idItem', function (d) {
+                            return d['o:id'];})
+                        .html(function (d) {
+                            return d['dcterms:title'] ? d['dcterms:title'][0]['@value'] : 'inconnu';
+                            });
+                }
+            });
+        }
+
+        function getListeCrible() {
+
+            //ajoute la liste des flux
+            $.ajax({
+                url: urlColCrible,
+                dataType: "json",
+                method: "GET",
+                error: function (error) {
+                    console.log("Erreur : " + error.responseText);
+                },
+                success: function (data) {
+                    console.log(data);
+                    lstCrible = data;
+                    //ajoute la liste des cribles
+                    d3.select('#optListeCpt').selectAll('option').data(lstCrible).enter()
+                        .append('option')
+                        .attr('value', function (d, i) {
+                            return d['@id'];})
+                        .attr('idItem', function (d) {
+                            return d['o:id'];})
+                        .html(function (d) {
+                            return d['dcterms:title'] ? d['dcterms:title'][0]['@value'] : 'inconnu';});
+                }
+            });
         }
 
         function showSource(src) {
@@ -379,8 +414,6 @@
 
             initCarousel();
         }
-
-        <a href='https://gallica.bnf.fr/ark:/12148/btv1b53177935z/f1.item.r=houdini' target='_blank'><img src='https://gallica.bnf.fr/iiif/ark:/12148/btv1b53177935z/f1/1072.4119850187262,891.9371488764043,2453.0861423220967,2850.8838951310863/148,172/0/native.jpg'/></a>
 
         function initCarousel() {
 
@@ -555,31 +588,44 @@
                 'chrono': true,
                 'nbCouche': 6
             });
-            //récupère la structure
+            //récupère la crible
             //let stct = document.getElementById('inListeConcept').value;
-            let lstCpt = document.getElementById('optListeCpt'); 
-            let stct = lstStructure[lstCpt.value].data;
-            stct = stct.split(',');
-            //ajoute la carto axe            
-            ca = new cartoaxes({
-                'idSvg': 'svgGlobal',
-                'tick': 0,
-                'idDoc': id,
-                'urlData':'../sonar/flux?q=getEvals',
-                'typeSrc':'IIIF',
-                'structure': stct,
-                'fctGetGrad': pc.getInstantColors,
-                'fctSavePosi': savePosi,
-                'width': w,
-                'height': h
+            let urlCpt = document.getElementById('optListeCpt').value; 
+            //http://localhost/omeka-s/api/items?property[0][property]=374&property[0][type]=eq&property[0][text]=bon%20et%20mauvais
+            $.ajax({
+                url: urlCpt,
+                dataType: "json",
+                method: "POST",
+                error: function (error) {
+                    console.log("getConcept Erreur : " + error.responseText);
+                },
+                success: function (data) {
+                    //ajoute la carto axe            
+                    let crible = data;
+                    ca = new cartoaxes({
+                        'idSvg': 'svgGlobal',
+                        'tick': 0,
+                        'idDoc': id,
+                        'urlData':'../sonar/flux?q=getEvals',
+                        'typeSrc':'IIIF',
+                        'crible': crible,
+                        'fctGetGrad': pc.getInstantColors,
+                        'fctSavePosi': savePosi,
+                        'width': w,
+                        'height': h
+                    });
+                    //pc.toggleTimer();
+                    pc.resetTimer()
+                  
+
+                }
             });
-            //pc.toggleTimer();
-            pc.resetTimer()
+
         }
 
         function savePosi(d) {
-            d.idFlux = lstFluxIIIF[document.getElementById("optSrcFlux").value].doc_id;
-            d.idStr = lstStructure[document.getElementById("optListeCpt").value].doc_id;
+            d.idFlux = lstIIIF[document.getElementById("optSrcFlux").value].doc_id;
+            d.idStr = lstCrible[document.getElementById("optListeCpt").value].doc_id;
 
             $.post('../sonar/flux', {
                     'q': 'savePosi',

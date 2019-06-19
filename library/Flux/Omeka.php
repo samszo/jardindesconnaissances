@@ -85,18 +85,61 @@ class Flux_Omeka extends Flux_Site{
      * Enregistre un item avec l'API
      *
      * @param array $data
+     * @param boolean   $existe
+     * @param boolean   $patch
      *
+     * @return array
      */
-    function postItem($data){
+    function postItem($data, $existe=true, $patch=true){
+
         //initialisation des paramètres POST
-        $param['o:resource_template']['o:id']="";
-        $param['o:resource_class']['o:id']="";
+        $param['o:resource_template']['o:id']=$data['resource_template'];
+        if($data['resource_class'])$param['o:resource_class']['o:id']=$data['resource_class'];
         $param['dcterms:title'][0]['property_id']= 1;
-        $param['dcterms:title'][0]['@value']= 'test';
-        $param['dcterms:title'][0]['@language']= '';
+        $param['dcterms:title'][0]['type']= 'literal';
+        $param['dcterms:title'][0]['@value']= $data['title'];
+        $param['dcterms:title'][0]['@language']= 'fr';
         $param['dcterms:title'][0]['is_public']= 1;
         $param['o:is_public']= 1;
-
+        if($data['item_set'])$param['o:item_set'][0]= $data['item_set'];
+        if($data['isReferencedBy']){
+            $param['dcterms:isReferencedBy'][0]['property_id']= 35;
+            $param['dcterms:isReferencedBy'][0]['type']= 'uri';
+            $param['dcterms:isReferencedBy'][0]['@id']= $data['isReferencedBy']['uri'];
+            $param['dcterms:isReferencedBy'][0]['o:label']= $data['isReferencedBy']['label'];
+            $param['dcterms:isReferencedBy'][0]['is_public']= 1;    
+        }
+        if($data['type']){
+            $param['rdf:type'][0]['property_id']= 191;
+            $param['rdf:type'][0]['type']= 'literal';
+            $param['rdf:type'][0]['@value']= $data['type'];
+            $param['rdf:type'][0]['is_public']= 1;    
+        }
+        if($data['prefLabel']){
+            $param['skos:prefLabel'][0]['property_id']= 392;
+            $param['skos:prefLabel'][0]['type']= 'literal';
+            $param['skos:prefLabel'][0]['@value']= $data['prefLabel'];
+            $param['skos:prefLabel'][0]['is_public']= 1;    
+        }
+        if($data['inScheme']){
+            $param['skos:inScheme'][0]['property_id']= 374;
+            $param['skos:inScheme'][0]['type']= 'resource';
+            $param['skos:inScheme'][0]['value_resource_id']= $data['inScheme']['id'];
+            $param['skos:inScheme'][0]['is_public']= 1;    
+            $param['skos:inScheme'][1]['property_id']= 374;
+            $param['skos:inScheme'][1]['type']= 'literal';
+            $param['skos:inScheme'][1]['@value']= $data['inScheme']['txt'];
+            $param['skos:inScheme'][1]['is_public']= 1;    
+        }        
+        $r = null;
+        if($existe){
+            $r = json_decode($this->search($data,'items'),true)[0];
+        }
+        if($r==null)
+            $r = json_decode($this->send('items','POST',$this->paramsAuth(),$param),true);
+        elseif($patch)
+            $r = json_decode($this->send('items','PATCH',$this->paramsAuth(),$param,'/'.$r['o:id']),true);
+        
         /*
         dcterms:description[0][property_id]: 4
         dcterms:description[0][type]: literal
@@ -104,8 +147,81 @@ class Flux_Omeka extends Flux_Site{
         dcterms:description[0][@value]: 
         dcterms:description[0][is_public]: 1
         */    
-        return $this->send('items','POST',$this->paramsAuth(),$param);
+        return $r;
     }
+
+    /**
+     * Enregistre une collection avec l'API
+     *
+     * @param array     $data
+     * @param boolean   $existe
+     * @return array
+     */
+    function postItemSet($data, $existe=true){
+        $r = null;
+        if($existe){
+            $r = json_decode($this->search($data,'item_sets'),true)[0];
+        }
+        if($r==null){
+            //initialisation des paramètres POST
+            $param['o:resource_template']['o:id']="";
+            $param['o:resource_class']['o:id']="";
+            $param['dcterms:title'][0]['property_id']= 1;
+            $param['dcterms:title'][0]['type']='literal';
+            $param['dcterms:title'][0]['@value'] = $data['title'];
+            $param['dcterms:title'][0]['@language']= '';
+            $param['dcterms:title'][0]['is_public']= 1;
+            $param['o:is_public']= 1;
+            $param['o:is_open']= 1;
+            $r = json_decode($this->send('item_sets','POST',$this->paramsAuth(),$param),true);
+        }
+        return $r;
+    }
+
+    /**
+     * cherche un objet
+     *
+     * @param array     $data
+     * @param string    $type
+     *
+     */
+    function search($data,$type='items'){
+        //initialisation des paramètres POST
+        $param['property'][0]['property']= 1;
+        $param['property'][0]['type']='eq';
+        $param['property'][0]['text']=$data['title'];
+        $r = $this->send($type,'GET',$param);
+        return $r;
+    }
+
+    /**
+     * Récupère un vocabulaire
+     *
+     * @param array $data
+     *
+     */
+    function getVocab($data){
+        //initialisation des paramètres GET
+        $param = $this->paramsAuth();
+        $param['prefix']="skos";
+
+        return $this->send('vocabularies','GET',$param);
+    }
+
+    /**
+     * Récupère les propriétés de vocabulaire
+     *
+     * @param array $data
+     *
+     */
+    function getProps($data){
+        //initialisation des paramètres GET
+        $param = $this->paramsAuth();
+        $param['vocabulary_prefix']=$data['prefix'];//"skos";
+
+        return $this->send('properties','GET',$param);
+    }
+
 
     /**
      * Envoie une requête à l'API
@@ -114,15 +230,17 @@ class Flux_Omeka extends Flux_Site{
      * @param string    $methode
      * @param array     $get
      * @param array     $post
+     * @param array     $id
      *
      */
-    function send($type, $methode, $get=false, $post=false){
-        $client = new Zend_Http_Client($this->endpoint.$type,array('timeout' => 30));
+    function send($type, $methode, $get=false, $post=false,$id=''){
+        $client = new Zend_Http_Client($this->endpoint.$type.$id,array('timeout' => 30));
         if($get)$client->setParameterGet($get);
         if($post){
             //pour forcer le header
             $client->setRawData(json_encode($post), 'application/json');
         }
+        if($methode=='PATCH')$client->setHeaders('Content-Type','application/json');
         $response = $client->request($methode);
         return $response->getBody();
 

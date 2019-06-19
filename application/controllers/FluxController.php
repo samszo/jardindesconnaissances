@@ -264,7 +264,7 @@ class FluxController extends Zend_Controller_Action {
 
 	public function databnfAction()
     {
-        $bnf = new Flux_Databnf($this->_getParam('idBase'),$this->_getParam('trace'));
+        $bnf = new Flux_Databnf($this->_getParam('idBase','flux_databnf'),$this->_getParam('trace'));
 	   	switch ($this->_getParam('obj')) {
 	   		case 'term':
 				$this->view->reponse = $bnf->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));
@@ -275,6 +275,9 @@ class FluxController extends Zend_Controller_Action {
 	   		case 'rameau':
 				$this->view->reponse = json_encode($bnf->getRameau($this->_getParam('idBNF',''),$this->_getParam('label',''),$this->_getParam('niv',0),$this->_getParam('nivMax',1)));
 				break;	   		
+			case 'saveAudio':
+				$query = '(dc.creator all "Deleuze, Gilles" or dc.contributor all "Deleuze, Gilles" )';
+				$this->view->reponse = $bnf->saveAudio($this->_getParam('q',$query));			
 	   		default:
 	   			break;
 	   	}
@@ -454,7 +457,13 @@ class FluxController extends Zend_Controller_Action {
 			case 'setItem':
 				$this->view->content = $omk->postItem(array());
 				break;
-		}
+			case 'setItemSet':
+				$this->view->content = $omk->postItemSet($this->_request->getParams());
+				break;			
+			case 'getProps':
+			$this->view->content = $omk->getProps($this->_request->getParams());
+			break;
+	}
 	}
     public function diigoAction()
     {

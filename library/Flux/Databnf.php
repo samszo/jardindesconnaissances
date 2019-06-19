@@ -18,8 +18,11 @@ class Flux_Databnf extends Flux_Site{
 	var $formatResponse = "json";
 	var $searchUrl = 'http://data.bnf.fr/sparql?';
 	var $sruUrl = 'http://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve';
+	var $sruUrlGallica = 'https://gallica.bnf.fr/SRU?version=1.2&operation=searchRetrieve';
 	var $rs;
 	var $doublons;
+	var $uploadAudio = "/data/BNF/audio/";
+
 	
     /**
      * Constructeur de la classe
@@ -33,9 +36,8 @@ class Flux_Databnf extends Flux_Site{
 			
 			$this->trace($this->idBase);
 
-    		//on récupère la racine des documents
-    		if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-    		if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
+			//on récupère la racine des documents
+			$this->initDbTables();
     		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
     		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
 			
@@ -47,24 +49,28 @@ class Flux_Databnf extends Flux_Site{
      * @param  	string 	$query
      * @param	boolean	$sru = false
      * @param	boolean	$cache = true
+     * @param	boolean	$gallica = false
+	 * 
      *
      * @return string
      */
-    public function query($query, $sru=false, $cache=true)
+    public function query($query, $sru=false, $cache=true, $gallica=false)
     {
     		$this->trace("DEBUT ".__METHOD__);
     	 	if($sru)
-    			$url = $this->sruUrl.$query;
+				$url = $this->sruUrl.$query;
+			else if($gallica)
+				$url = $this->sruUrlGallica.$query;
     		else
-		    $url = $this->searchUrl.'query='.urlencode($query)
-		      	.'&format='.$this->formatResponse;
+			    $url = $this->searchUrl.'query='.urlencode($query)
+			      	.'&format='.$this->formatResponse;
 		$this->trace($url);
 		$body = $this->getUrlBodyContent($url,false,$cache);
 		$this->trace("FIN ".__METHOD__);
 		return $body;
 	}
-    
-    /**
+
+	/**
      * Recherche un terme à partir de l'autocomplétion
      *
      * @param  string $term
@@ -481,7 +487,7 @@ ORDER BY ASC (?label_a)
      * http://catalogue.bnf.fr/api/test
      *
      * @param  	string 	$cote
-     * @param  	int 		$record
+     * @param  	int 	$record
      * @param	int		$nbResult
      * @param	string  $dateDeb
      * @param	string  $dateFin
@@ -497,7 +503,7 @@ ORDER BY ASC (?label_a)
     	
     	//initialise les gestionnaires de base de données
     	$this->initDbTables();
-    $this->trace("Tables initialisées");
+    	$this->trace("Tables initialisées");
     	 
     	//récupère l'action
     	if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
@@ -543,11 +549,13 @@ ORDER BY ASC (?label_a)
      * Enregistre les références du catalogue général de la BNF au format SRU
      *
      * @param  	xmlObjet 	$r
-     * @param  	int 			$idPre
+     * @param  	int 		$idPre
+     * @param  	string 		$objPre
+     * @param  	boolean 	$audio
      *
      * @return	int 
      */
-    function saveItemSRU($r, $idPre=0, $objPre='rapport'){
+    function saveItemSRU($r, $idPre=0, $objPre='rapport', $audio=false){
     
 	    	$this->trace("DEBUT ".__METHOD__);
 	    	 
@@ -602,9 +610,9 @@ ORDER BY ASC (?label_a)
 	    	$arrVal = array();
 	    	
 	    	//tableau du doc
-	    $arrDoc = array("url"=>$idRecord, "parent"=>$this->idDocParent, "data"=>$xml);
-	    $idD = $this->dbD->ajouter($arrDoc,$this->bExiste);
-	    $this->trace("doc_id : ".$idD." = ".$idRecord);
+			$arrDoc = array("tronc"=>"item catalogue SRU", "parent"=>$this->idDocParent, "data"=>$xml);
+			$idD = $this->dbD->ajouter($arrDoc,$this->bExiste);
+			$this->trace("doc_id : ".$idD." = ".$idRecord);
 	     
 	    	//décompose les datas
 	    	$rd =  $r->getElementsByTagName("dc");
@@ -631,10 +639,10 @@ ORDER BY ASC (?label_a)
 		    					$arrDoc["titre"]=$c->nodeValue;
 		    					break;	    				
 	    					case "dc:identifier":
-	    						$arrDoc["url"]=$c->nodeValue;
+	    						$arrDoc["url"]= $arrDoc["url"] ? $arrDoc["url"] : $c->nodeValue;
 	    						break;
-						case "dc:date":
-							$arrDoc["pubDate"]=$c->nodeValue."-01-01";
+							case "dc:date":
+								$arrDoc["pubDate"]=$c->nodeValue."-01-01";
 	    						break;
 	    				}
 	    			}
@@ -644,8 +652,37 @@ ORDER BY ASC (?label_a)
 	    	//enregistre le doc
 	    	$this->dbD->edit($idD, $arrDoc);
 	    	$this->trace("MAJ doc_id : ".$idD." = ".$idRecord);	    	
-	    	
-	    	
+			
+			//enregistre l'audio
+			if($audio){
+				//boucle sur les medias
+				$pathParts = pathinfo($arrDoc["url"]);
+				$uri = $pathParts['filename'];
+				for ($i=1; $i < 10; $i++) { 
+					$urlAudioSrc = $arrDoc["url"]."/f".$i.'.audio';
+					$pathAudio = ROOT_PATH.$this->uploadAudio.$uri."f".$i.".audio.mp3";
+					$dt = $this->getUrlBodyContent($urlAudioSrc);
+					//merci à http://www.webdigity.com/index.php?action=tutorial;code=45
+					$fp = fopen ($pathAudio, 'w+');//This is the file where we save the information
+					$ch = curl_init($urlAudioSrc);//Here is the file we are downloading
+					curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+					curl_setopt($ch, CURLOPT_FILE, $fp);
+					curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+					curl_exec($ch);
+					curl_close($ch);
+					fclose($fp);				    
+					if (file_exists($urlAudioSrc)) {
+						$this->trace($res." ko : Fichier créé ".$urlAudioSrc." ".$pathAudio);
+						//ajoute la fichier audio
+						$rsDocSon = $this->dbD->ajouter(array("url"=>$this->uploadAudio.$uri."f".$i.".mp3"
+							,"titre"=>"f".$i.'.audio'
+							,"tronc"=>'audio'
+							,"parent"=>$idD));	
+						$this->trace("<a href='".$urlAudioSrc."'>".$urlAudioSrc."</a> -> ".$pathAudio);     			
+					}
+				}		
+
+			}	    	
 	    	$this->trace("FIN ".__METHOD__." doc_id = ".$idD);
 	    return $idD;
     }
@@ -1021,7 +1058,53 @@ ORDER BY ASC (?label_a)
 		} 
 		return $this->doublons[$s."_".$t];		
     }
+	
+	/**
+     * enregistre les documents audios
+     *
+     * @param  	string 	$query
+	* @param  	int 	$record
+	* @param	int		$nbResult
+     *
+     * @return array
+     */
+    function saveAudio($query, $record=1, $nbResult=100){
+
+    	//récupère l'action
+    	if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+
+		$params = "&recordSchema=dublincore&maximumRecords=".$nbResult."&startRecord=".$record."&query=";
+		$params .= urlencode($query.' and (dc.type all "sonore")');
+		$xml = $this->query($params,false,true,true);
+
+		//enregistre la page
+		$this->idDocParent = $this->dbD->ajouter(array("url"=>$this->sruUrlGallica.$params,"titre"=>"Recherche audio ".$query." r.".$record
+			, "parent"=>$this->idDocRoot,"data"=>$xml));
     
+    	$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+    			,"src_id"=>$this->idDocParent,"src_obj"=>"doc"
+    			,"dst_id"=>$this->idAct,"dst_obj"=>"acti"
+    	),$this->bExiste);
+    	$this->trace("document correspondant au lien ajouté = ".$this->idDocParent." : ".$idRap);
+    	   
+    	//recherche les item;
+    	$dom = new Zend_Dom_Query($xml);
+    	//récupère les items
+    	$xPath = '//srw:record';
+    	$results = $dom->queryXpath($xPath);
+    	$arr = array();
+    	$i=0;
+    	foreach ($results as $result) {
+    		$i = $this->saveItemSRU($result, $idRap,'rapport',true);
+    		$arr[] = $i;
+    	}
+    	$record+=$nbResult;
+    	if($i>0)$this->saveAudio($query, $record, $nbResult);
+    
+		return $arr;
+    }
+
+
     /*arboressence rameau par id
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 SELECT DISTINCT ?original_rameau ?prefLabel ?uri_1 ?label_1 ?uri_a ?label_a ?uri_b ?label_b
