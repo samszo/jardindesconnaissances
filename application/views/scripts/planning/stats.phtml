@@ -9,14 +9,20 @@
     <link rel="stylesheet" type="text/css" href="../css/bootstrap-treeview.min.css" >
     <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
     <link rel="stylesheet" type="text/css" href="../css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="../css/cal-heatmap.css" />
 
-    <script type="text/javascript" src="../js/d3.v4.js"></script>
-    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <!-- cal-heatmap incomatible avec d3.v4-->
+    <script type="text/javascript" src="../js/d3.v3.js"></script>
+    <script type="text/javascript" src="../js/jquery.js"></script>
 	<script type="text/javascript" src="../js/popper.min.js"></script>
     <script type="text/javascript" src="../js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../js/bootstrap-treeview.js"></script>    
     <script type="text/javascript" src="../js/w2ui.min.js"></script>
-  
+	<script type="text/javascript" src="../js/cal-heatmap.js"></script>
+    <script type="text/javascript" src="../js/formation.js"></script>
+    <script type="text/javascript" src="../js/planning.js"></script>
+    <script type="text/javascript" src="../font/font-awesome/all.min.js"></script>
+      
     <style>
 
 #sidebar {
@@ -79,7 +85,7 @@ span.modalTitle {
     <div class="container-fluid" >
         <nav id="nbMain" class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
             <a class="navbar-brand" href="#">
-                <h1 class="text-center" >Statistiques des formations</h1>
+                <h1 class="text-center" >Stats formations</h1>
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse"
                 data-target="#navbarTogglerDemo02"
@@ -89,53 +95,125 @@ span.modalTitle {
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
                 <form class="form-inline my-2 my-lg-0">
-                    <label class="my-1 mr-2 text-white" for="sltStats">Calculs disponibles</label>
-                    <select class="custom-select my-1 mr-sm-2" id="sltStats">
-                        <option selected value="NbH">Bilan global</option>
-                        <option value="NbEnseignants">Nb Enseignants nécéssaires</option>
-                    </select>
-                    <button id="btnCalcStat" type="button" class="btn btn-secondary" data-dismiss="modal">Calculer</button>
                     <!-- <button id="btnExportCSV" class="btn btn-outline-primary " type="button">Exporter CSV</button> -->
                     <button id="btnExport" class="btn btn-outline-primary " type="button">Exporter</button>
                     <button id="btnImport" class="btn btn-outline-primary " type="button">Importer</button>
+
+                    <button class="btn btn-outline-success" id='lblUtiInfos' type="button"></button>
+                    <button class="btn btn-outline-danger" id='btnUtiConnexion' type="button"></button>
                 </form>
             </div>
         </nav>	
 
         <div class="row">
-            <div class="col-10">        
+            <div class="col-12">        
                     <h2>Données des formations</h2>
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link" id="interv-tab" data-toggle="tab" href="#interv" role="tab" aria-controls="interv" aria-selected="true">Intervenants</a>
                         </li>
                         <li class="nav-item">
-                                <a class="nav-link active" id="cours-tab" data-toggle="tab" href="#cours" role="tab" aria-controls="cours" aria-selected="true">Cours</a>
+                                <a class="nav-link" id="cours-tab" data-toggle="tab" href="#cours" role="tab" aria-controls="cours" aria-selected="true">Cours</a>
                         </li>
+                        <li class="nav-item">
+                                <a class="nav-link active" id="planning-tab" data-toggle="tab" href="#planning" role="tab" aria-controls="planning" aria-selected="true">Plannings</a>
+                        </li>                        
                     </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade" id="interv" role="tabpanel" aria-labelledby="interv-tab">
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-10">
+                                <form class="form-inline my-2 my-lg-0">
+                                    <label class="my-1 mr-2" for="sltStatsInt">Calculs disponibles</label>
+                                    <select class="custom-select my-1 mr-sm-2" id="sltStatsInt">
+                                        <option selected value="NbHInt">Bilan global</option>
+                                    </select>
+                                    <button id="btnCalcStatInt" type="button" class="btn btn-secondary" data-dismiss="modal">Calculer</button>
+                                </form>
                                 <div id="interv-grid" style="width: 100%; height: 400px;" ></div>
                             </div>        
+                            <div class="col-2">
+                                <h2>Résultats</h2>
+                                <div class="row">
+                                    <div id="rsltCalcInt" class="col-12"></div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade show active" id="cours" role="tabpanel" aria-labelledby="cours-tab">
+                    <div class="tab-pane fade" id="cours" role="tabpanel" aria-labelledby="cours-tab">
+                        <div class="row">
+                            <div class="col-10">
+                                <form class="form-inline my-2 my-lg-0">
+                                    <label class="my-1 mr-2" for="sltStats">Calculs disponibles</label>
+                                    <select class="custom-select my-1 mr-sm-2" id="sltStats">
+                                        <option selected value="NbH">Bilan global</option>
+                                        <option value="NbEnseignants">Nb Enseignants nécéssaires</option>
+                                    </select>
+                                    <button id="btnCalcStat" type="button" class="btn btn-success" data-dismiss="modal">Calculer</button>
+                                </form>
+                               
+                                <div id="cours-grid" style="width: 100%; height: 400px;" ></div>
+                            </div>
+                            <div class="col-2">
+                                <h2>Résultats</h2>
+                                <div class="row">
+                                    <div id="rsltCalc" class="col-12"></div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>                
+                    <div class="tab-pane fade show active" id="planning" role="tabpanel" aria-labelledby="planning-tab">
                         <div class="row">
                             <div class="col-12">
-                                <div id="cours-grid" style="width: 100%; height: 400px;" ></div>
+                                    <div class="form-row align-items-center">
+                                        <div class="col-auto">
+                                            <label for="optFormations">Formations</label>
+                                            <select class="form-control" id="optFormations">
+                                            </select>
+                                        </div>
+                                        <div class="col-auto">
+                                            <label for="optPromotions">Promotions</label>
+                                            <select class="form-control" id="optPromotions">
+                                                <option>2019-2020</option>
+                                                <option>2018-2019</option>
+                                            </select>
+                                        </div>                                        
+                                        <div class="col-auto">
+                                            <button id="btnShowPlanning" class="btn btn-primary">Afficher</button>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button id="btnUpdatePlan" class="btn btn-warning">Effacer le cache</button>                                                                                       
+                                        </div>
+                                        <div class="col-auto">
+                                            <label class="my-1 mr-2" for="sltStatsPlan">Calculs disponibles</label>
+                                            <select class="custom-select my-1 mr-sm-2" id="sltStatsPlan">
+                                                <option selected value="NbHcours">Nb d'heure par cours</option>
+                                                <option value="NbHTypeInt">Nb d'heure par type d'intervenant</option>
+                                                <option value="NbHInt">Nb d'heure par intervenants</option>
+                                                <option value="NbHjour">Nb d'heure par jour</option>
+                                                <option value="PlanInt">Planning par intervenants</option>
+                                                <option value="RecapIntCours">Récapitulatif Intervenants-Cours</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button id="btnCalcStatPlan" class="btn btn-success" >Calculer</button>
+                                        </div>
+                                    </div>
+                                    <div id='cal-heatmap' ></div>
+                                    <div id='btnPrev' ></div>
+                                    <div id='btnNext' ></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                            <div id='statPlanResult' style="width: 100%; height: 400px;"  ></div>
                             </div>
                         </div>
                     </div>                
                 </div>                                            
-            </div>
-            <div class="col-2">
-                <h2>Résultat du calcul</h2>
-                <div class="row">
-                    <div id="rsltCalc" class="col-12"></div>
-                </div>
-
             </div>
         </div>
 
@@ -147,14 +225,17 @@ span.modalTitle {
     <?=$this->partial('planning/modal.phtml', array());?>
 
     <script type="text/javascript">
-var urlCour = "<?php echo $this->urlCour; ?>",
+var dataCour, urlCour = "<?php echo $this->urlCour; ?>",
 dataInt, urlInt = "<?php echo $this->urlInt; ?>",
 dataIntCour, urlIntCour = "<?php echo $this->urlIntCour; ?>",
+dataAgenda, dataResp,
 colorsKey = <?php echo $this->colorsKey; ?>,
 groupKey = <?php echo $this->groupKey; ?>,
 parcours = <?php echo $this->parcours; ?>,
 niveaux = <?php echo $this->niveaux; ?>,
-lblCalcul = "<?php echo $this->lblCalcul; ?>";
+lblCalcul = "<?php echo $this->lblCalcul; ?>",
+utiInfos = [],
+oPlanning;
 
 /** Fonction de génération de la page  */
 function buildPage(){
@@ -217,6 +298,66 @@ function calculeTauxHoraire(c){
     });
     return c;
 }
+
+
+
+$('#btnCalcStatPlan').click(function(){
+    //variable pour le calcule
+    let calcul = $("#sltStatsPlan option:selected" ).val();
+    if(calcul=='NbHcours')oPlanning.getNbHeure();
+    if(calcul=='NbHInt')oPlanning.getNbHInt();
+    if(calcul=='PlanInt')oPlanning.getPlanInt();
+    if(calcul=='RecapIntCours')oPlanning.getRecapIntCours();    
+});
+
+$('#btnUpdatePlan').click(function(){
+    $.get('../', {'cleanCache':1}, function (data) {
+        updatePlanning()
+    })
+    .fail(function (e) {
+        throw new Error("Donnée introuvable : "+e);
+    });
+});
+
+
+$('#btnShowPlanning').click(function(){
+    updatePlanning();
+});
+
+function updatePlanning(){
+    //variable pour le planning
+    let dates = $("#optPromotions option:selected" ).text().split('-')
+        ,idCal = $("#optFormations option:selected" ).val()
+        ,dtMin = new Date(dates[0]+'-09-01')
+        ,dtMax = new Date(dates[1]+'-07-01');
+    /*la fonction update ne marche pas bien 
+    oPlanning.idCal=idCal;
+    oPlanning.dtMin=dtMin;
+    oPlanning.dtMax=dtMax;
+    oPlanning.update();
+    du coup on destroy
+    */
+    oPlanning.destroy();
+    //et on recrée
+    oPlanning = new planning({'idCal':idCal
+        ,'dtMin':dtMin
+        ,'dtMax':dtMax
+        ,'cours':dataCour
+        ,'inters':dataInt
+        ,'resp':dataResp
+        ,'divResult':'statPlanResult'
+        });
+}
+
+
+$('#btnUtiConnexion').click(function(){
+    let redir = '/planning/stats';
+    if(d3.select('#lblUtiInfos').html()=='anonyme'){
+        window.location.assign('../auth/google?scopes[]=Calendar&scopes[]=Profil&scopes[]=Drive&redir='+redir);	
+    }else{
+        window.location.assign('../auth/deconnexion?redir='+redir);
+    }
+});
 
 
 $('#btnCalcStat').click(function(){
@@ -439,7 +580,6 @@ var gridInt = {
             columnHeaders: true},
     name: 'grid_int', 
     columns: [       
-
         { field: 'recid', caption: 'ID', type: 'text', size: '100px', sortable: true },
         { field: 'Civilité', caption: 'Civilité', type: 'text', size: '100px', sortable: true },
         { field: 'Nom', caption: 'Nom', type: 'text', size: '100px', sortable: true },
@@ -461,12 +601,42 @@ d3.json("<?php echo $this->urlJson;?>",function(error,data){
     dataIntCour = data.IntCour;
     dataCour = data.cours;
     dataInt = data.intervenants;
+    dataResp = data.responsables;
+    dataAgenda = data.agendas.filter(function(d){return d.url});
+    d3.select('#optFormations').selectAll('option').data(dataAgenda)
+        .enter().append("option")
+        .attr('value',function(d){
+            return d.url;
+        })
+        .html(function(d){
+            return d.nom;
+        });
     buildPage();
+    //création du planning
+    oPlanning = new planning({'idCal':'44h1cj5bduhf0v5r56anot5vhk@group.calendar.google.com'
+        ,'dtMin':new Date('2019-09-01')
+        ,'dtMax':new Date('2020-07-01')
+        ,'cours':dataCour
+        ,'inters':dataInt
+        ,'resp':dataResp
+        ,'divResult':'statPlanResult'
+    });
+
+});
+
+//récupère l'utilisateur
+d3.json("../auth/googleuserinfo",function(error,data){
+    utiInfos = data;
+    if(utiInfos.id){
+        d3.select('#btnUtiConnexion').html('déconnexion');
+        d3.select('#lblUtiInfos').html(utiInfos.name);
+    }else{
+        d3.select('#btnUtiConnexion').html('connexion');
+        d3.select('#lblUtiInfos').html('anonyme');
+    }
 });
 
     </script>
-
-    <script type="text/javascript" src="../js/formation.js"></script>
 
 
   </body>

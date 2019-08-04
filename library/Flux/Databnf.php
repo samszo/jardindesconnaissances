@@ -655,39 +655,69 @@ ORDER BY ASC (?label_a)
 			
 			//enregistre l'audio
 			if($audio){
+				clearstatcache();
 				//boucle sur les medias
 				$pathParts = pathinfo($arrDoc["url"]);
 				$uri = $pathParts['filename'];
 				for ($i=1; $i < 10; $i++) { 
 					$urlAudioSrc = $arrDoc["url"]."/f".$i.'.audio';
-					$pathAudio = ROOT_PATH.$this->uploadAudio.$uri."f".$i.".audio.mp3";
-					$dt = $this->getUrlBodyContent($urlAudioSrc);
-					//merci à http://www.webdigity.com/index.php?action=tutorial;code=45
-					$fp = fopen ($pathAudio, 'w+');//This is the file where we save the information
-					$ch = curl_init($urlAudioSrc);//Here is the file we are downloading
-					curl_setopt($ch, CURLOPT_TIMEOUT, 50);
-					curl_setopt($ch, CURLOPT_FILE, $fp);
-					curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-					curl_exec($ch);
-					curl_close($ch);
-					fclose($fp);				    
-					if (file_exists($urlAudioSrc)) {
-						$this->trace($res." ko : Fichier créé ".$urlAudioSrc." ".$pathAudio);
+					//le stream est compresssé au format zip
+					$pathAudio = ROOT_PATH.$this->uploadAudio.$uri."_f".$i.".mp3";
+					$pathAudioZip = ROOT_PATH.$this->uploadAudio.$uri."f".$i.".zip";
+					$pathAudioStream = ROOT_PATH.$this->uploadAudio."stream.zip";
+					$existe = file_exists($pathAudioZip);				
+					if (!$existe) {
+						//merci à https://framework.zend.com/manual/1.12/en/zend.http.client.advanced.html#zend.http.client.streaming
+						$client = new Zend_Http_Client($urlAudioSrc,array('timeout' => 300));
+						$client->setStream(); // will use temp file
+						$response = $client->request('GET');
+						// copy file
+						copy($response->getStreamName(), $pathAudioZip);
+						// use stream
+						$fp = fopen($pathAudioStream, "w");
+						stream_copy_to_stream($response->getStream(), $fp);
+						// Also can write to known file
+						$client->setStream($pathAudioZip)->request('GET');
+						$this->trace("stream enregistré ".$pathAudioZip);     			
+					}
+					$size = filesize($pathAudioZip);
+					if($size==442){
+						//suprime les fichiers inutiles à la main
+						unlink($pathAudioZip);
+						$this->trace("SUPPRESSION <a href='".$urlAudioSrc."'>".$urlAudioSrc."</a>".$size." -> ".$pathAudioZip);     			
+					}else{
+						/*décompresse le flux à a main car erreur dans le fichier ???						
+						$zip = new ZipArchive;
+						$res = $zip->open($pathAudioZip);
+						$phar = new Phar($pathAudioZip);
+						$statut = $zip->getStatusString();
+						if ($res === TRUE) {
+							$zip->extractTo(ROOT_PATH.$this->uploadAudio.$uri, array($uri.'_'.$i.'.mp3'));
+							$zip->close();
+							$this->trace("DECOMPRESSION");     			
+						} else {
+							$this->trace("ECHEC decompresion");     			
+						}
+						*/
+						//renome le fichier extrait
+						$pathAudioExtract = ROOT_PATH.$this->uploadAudio.$uri."f".$i;
+						$statut = rename($pathAudioExtract, $pathAudio);	
 						//ajoute la fichier audio
-						$rsDocSon = $this->dbD->ajouter(array("url"=>$this->uploadAudio.$uri."f".$i.".mp3"
+						$rsDocSon = $this->dbD->ajouter(array("url"=>$this->uploadAudio.$uri."_f".$i.".mp3"
 							,"titre"=>"f".$i.'.audio'
 							,"tronc"=>'audio'
-							,"parent"=>$idD));	
-						$this->trace("<a href='".$urlAudioSrc."'>".$urlAudioSrc."</a> -> ".$pathAudio);     			
+							,"parent"=>$idD));
 					}
-				}		
+
+				}
+
 
 			}	    	
 	    	$this->trace("FIN ".__METHOD__." doc_id = ".$idD);
 	    return $idD;
     }
     
-    
+	
     /**
      * Suppression des doublons créé par l'importation
      *

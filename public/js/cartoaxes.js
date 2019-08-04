@@ -2,7 +2,11 @@ class cartoaxes {
     constructor(params) {
         var me = this;
         this.data = [];
-        this.crible = params.crible ? params.crible : ['clair','obscur','pertinent','inadapté'];
+        this.crible = params.crible ? params.crible : [
+            {'label':'clair','id':'0','idP':'0'}
+            ,{'label':'obscur','id':'1','idP':'0'}
+            ,{'label':'pertinent','id':'2','idP':'0'}
+            ,{'label':'inadapté','id':'3','idP':'0'}];
         this.urlData = params.urlData ? params.urlData : false;
         this.fctCallBackInit = params.fctCallBackInit ? params.fctCallBackInit : false;
         this.svg = d3.select("#"+params.idSvg),
@@ -19,6 +23,7 @@ class cartoaxes {
         this.fctSavePosi = params.fctSavePosi ? params.fctSavePosi : false;
         this.idDoc = params.idDoc ? params.idDoc : false;
         this.typeSrc = params.typeSrc ? params.typeSrc : false;
+        this.inScheme = params.inScheme ? params.inScheme : false;
 
         //variable pour les axes
         var labelFactor = 1, 	//How much farther than the radius of the outer circle should the labels be placed
@@ -129,7 +134,9 @@ class cartoaxes {
                 //.attr("dy", "0.35em")
                 .attr("x", function(d, i){ return me.rScale(me.xMax * labelFactor) * Math.cos(angleSlice*i - Math.PI/2); })
                 .attr("y", function(d, i){ return me.rScale(me.xMax * labelFactor) * Math.sin(angleSlice*i - Math.PI/2); })
-                .text(function(d){return d});
+                .text(function(d){
+                    return d.label;
+                });
         }
 
         // Fonction pour l'event "drag" d3js
@@ -160,6 +167,7 @@ class cartoaxes {
                 ,'distance':v.d
                 ,'crible':v.s
                 ,'id':me.idDoc
+                ,'infos':me.data
                 };                       
             console.log(r);
             if(me.fctSavePosi)me.fctSavePosi(r);
@@ -190,24 +198,39 @@ class cartoaxes {
                 //cherche sur le serveur les évaluations existantes               
                 $.get(me.urlData, {
                     'id': me.idDoc,
-                    'type':me.typeSrc,
+                    'inScheme':me.inScheme,
                 }, function (data) {
-                    console.log(data);
-                    data.result.forEach(function(r){
+                    //console.log(data);
+                    //filtre les concepts du crible
+                    let dtFiltre = data.result.filter(function(c){
+                        return c['ma:hasRatingSystem'][0].display_title==me.inScheme;
+                    });
+                    /*
+                    let rs = [];
+                    dtFiltre.forEach(function(r){
                         r.valeur=JSON.parse(r.valeur);
                         r.struc=JSON.parse(r.struc);
                     });
+                    */
                     me.g.selectAll(".evals")
-                        .data(data.result)
+                        .data(dtFiltre)
                       .enter().append("circle")
                         .attr("class", "evals")
                         .attr('r',scCircle.step()/3)
                         .attr('cx',function(d) { 
-                            return me.x(d.valeur.numX); })
+                            //return me.x(d.valeur.numX); 
+                            return me.x(parseFloat(d['jdc:xRatingValue'][0]['@value']));                             
+                        })
                         .attr('cy',function(d) { 
-                            return me.y(d.valeur.numY); })
+                            //return me.y(d.valeur.numY); 
+                            return me.y(parseFloat(d['jdc:yRatingValue'][0]['@value']));                             
+                        })
                         .attr('fill',function(d){
-                            return me.setGradient(d.valeur.degrad);
+                            d.degrad = {'nom':d['jdc:degradName'][0]['@value'],'colors':[]}
+                            d['jdc:degradColors'].forEach(function(c){
+                                d.degrad.colors.push(c['@value']);
+                            });
+                            return me.setGradient(d.degrad);
                         })
                         .attr('stroke','black')
                         .attr("stroke-width",'1');

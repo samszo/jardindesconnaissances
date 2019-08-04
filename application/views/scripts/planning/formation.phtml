@@ -93,10 +93,8 @@ span.modalTitle {
                 <form class="form-inline my-2 my-lg-0">
                     <button id="btnExport" class="btn btn-outline-primary " type="button">Exporter</button>
                     <button id="btnImport" class="btn btn-outline-primary " type="button">Importer</button>
-                    <!--
-                    <button id="uti" class="btn btn-outline-success my-2 my-sm-0" type="button"><?php echo $this->login; ?></button>
-                    <button class="btn btn-outline-danger my-2 my-sm-0" onclick="deconnexion()" type="button">déconnexion</button>
-                    -->
+                    <button class="btn btn-outline-success" id='lblUtiInfos' type="button"></button>
+                    <button class="btn btn-outline-danger" id='btnUtiConnexion' type="button"></button>
                 </form>
             </div>
         </nav>	
@@ -139,9 +137,6 @@ span.modalTitle {
                         <a class="nav-link active" id="interv-tab" data-toggle="tab" href="#interv" role="tab" aria-controls="interv" aria-selected="true">Intervenants</a>
                     </li>
                     <li class="nav-item">
-                            <a class="nav-link" id="etudiant-tab" data-toggle="tab" href="#etudiant" role="tab" aria-controls="etudiant" aria-selected="true">Etudiants</a>
-                        </li>
-                    <li class="nav-item">
                         <a class="nav-link" id="planning-tab" data-toggle="tab" href="#planning" role="tab" aria-controls="planning" aria-selected="false">Plannings</a>
                     </li>
                     <li class="nav-item">
@@ -149,6 +144,9 @@ span.modalTitle {
                     </li>
                     <li class="nav-item">
                             <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="stats" aria-selected="false">Statistiques</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="etudiant-tab" data-toggle="tab" href="#etudiant" role="tab" aria-controls="etudiant" aria-selected="true">Etudiants</a>
                         </li>
                     </ul>
                 <div class="tab-content" id="myTabContent">
@@ -179,11 +177,15 @@ span.modalTitle {
                     <div id="cal-heatmap" ></div>
                     
                 </div>
-                <div class="tab-pane fade" id="etudiant" role="tabpanel" aria-labelledby="etudiant-tab">
-                    <iframe src="../planning/trombino" style="border-width:0" width="100%" height="800px" frameborder="0" scrolling="yes"></iframe>
-                </div>
                 <div class="tab-pane fade" id="salle" role="tabpanel" aria-labelledby="salle-tab">
+                    <!--
                     <iframe src="../planning/trombino" style="border-width:0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+                    -->
+                </div>
+                <div class="tab-pane fade" id="etudiant" role="tabpanel" aria-labelledby="etudiant-tab">
+                    <!--
+                    <iframe src="../planning/trombino" style="border-width:0" width="100%" height="800px" frameborder="0" scrolling="yes"></iframe>
+                    -->
                 </div>
                 
                 </div>                        
@@ -303,6 +305,18 @@ var maxHeureStat = 192, sclHeureStat = d3.scaleLinear().range([0, 100]).domain([
     sclHeureComp = d3.scaleLinear().range([0, 100]).domain([0, maxHeureStat*2]);
 ;
 
+//récupère l'utilisateur
+d3.json("../auth/googleuserinfo",function(error,data){
+    utiInfos = data;
+    if(utiInfos.id){
+        d3.select('#btnUtiConnexion').html('déconnexion');
+        d3.select('#lblUtiInfos').html(utiInfos.name);
+    }else{
+        d3.select('#btnUtiConnexion').html('connexion');
+        d3.select('#lblUtiInfos').html('anonyme');
+    }
+});
+
 
 //initialise les champs pour définir la période
 $('input[type=dateDeb]').w2field('date', { format: 'yyyy-m-d', end: $('input[type=dateFin]'), required: true });
@@ -328,6 +342,14 @@ $('input[type=dateFin]').w2field('date', { format: 'yyyy-m-d', start: $('input[t
     });	
 
 //écouteurs intéractivité
+$('#btnUtiConnexion').click(function(){
+    let redir = '/planning/formation';
+    if(d3.select('#lblUtiInfos').html()=='anonyme'){
+        window.location.assign('../auth/google?scopes[]=Calendar&scopes[]=Profil&scopes[]=Drive&redir='+redir);	
+    }else{
+        window.location.assign('../auth/deconnexion?redir='+redir);
+    }
+});
 
 $('#btnExport').click(function(){
     var jsonData = {"IntCour":dataIntCour, "cours":dataCour,"intervenants":dataInt};

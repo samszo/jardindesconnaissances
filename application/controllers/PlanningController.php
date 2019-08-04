@@ -30,7 +30,7 @@ class PlanningController extends Zend_Controller_Action {
 			$client->setClientId(KEY_GOOGLE_CLIENT_ID);
 			$client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
 			$client->setRedirectUri('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/planning");
-			$client->addScope(array("https://www.googleapis.com/auth/calendar","https://www.googleapis.com/auth/drive"));
+			$client->addScope(array("https://www.googleapis.com/auth/calendar","https://www.googleapis.com/auth/drive","https://www.googleapis.com/auth/userinfo.profile"));
 			$ssPlan->client = $client;
 		}else
 			$client = $ssPlan->client;			
@@ -54,7 +54,7 @@ class PlanningController extends Zend_Controller_Action {
 		if ($this->_getParam('code')) {
 		  $client->authenticate($this->_getParam('code'));
 		  $ssPlan->token = $client->getAccessToken();
-		  $this->_redirect('/planning');
+		  $this->_redirect($ssPlan->redir);
 		}
 		
 		if (isset($_SESSION['upload_token']) && $_SESSION['upload_token']) {
@@ -115,7 +115,7 @@ class PlanningController extends Zend_Controller_Action {
 
 		$ssPlan = new Zend_Session_Namespace('google');
 		$this->view->redirect = '/auth/google?scopes[]=Calendar&scopes[]=Profil&scopes[]=Drive&redir='.urlencode('/planning/ui');	
-		echo "ssPlan->client->isAccessTokenExpired()=".$ssPlan->client->isAccessTokenExpired();
+		//echo "ssPlan->client->isAccessTokenExpired()=".$ssPlan->client->isAccessTokenExpired();
 		if(!$ssPlan->token || $ssPlan->client->isAccessTokenExpired()){
 			$this->_redirect($this->view->redirect);			
 		}else{

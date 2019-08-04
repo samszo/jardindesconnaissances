@@ -243,8 +243,9 @@ class AuthController extends Zend_Controller_Action
     
     public function deconnexionAction()
     {
+		$redir = $this->_getParam('redir');
 		$this->clearConnexion();
-	    $this->redirect($this->redir."?idBase=".$this->idBase);            	
+	    $this->redirect($redir."?idBase=".$this->idBase);            	
     }
     
     function clearConnexion(){
@@ -269,7 +270,7 @@ class AuthController extends Zend_Controller_Action
 		"Blogger"=>"http://www.blogger.com/feeds/",
 		"Book"=>"http://www.google.com/books/feeds/",
 		//"Calendar"=>"https://www.google.com/calendar/feeds/",
-	    "Calendar"=>"https://www.googleapis.com/auth/calendar",
+		"Calendar"=>"https://www.googleapis.com/auth/calendar",
 		"Contacts"=>"https://www.google.com/m8/feeds/",
 		"Shopping"=>"https://www.googleapis.com/auth/structuredcontent",
 		"Documents"=>"https://docs.google.com/feeds/",
@@ -283,8 +284,8 @@ class AuthController extends Zend_Controller_Action
 		"Spreadsheets"=>"https://spreadsheets.google.com/feeds/",
 		"Webmaster"=>"http://www.google.com/webmasters/tools/feeds/",
 		"YouTube"=>"http://gdata.youtube.com",
-        	"Drive"=>"https://www.googleapis.com/auth/drive",
-        	"Profil"=>"https://www.googleapis.com/auth/userinfo.profile"	
+		"Drive"=>"https://www.googleapis.com/auth/drive",
+		"Profil"=>"https://www.googleapis.com/auth/userinfo.profile"	
     );
     
     
@@ -293,7 +294,7 @@ class AuthController extends Zend_Controller_Action
         $ssGoogle = new Zend_Session_Namespace('google');
         //print_r($ssGoogle);
         //echo $ssGoogle->redir;
-        
+        $scopes = $this->_getParam('scopes');
         if(!$ssGoogle->client){
             $client = new Google_Client();
             $client->setClientId(KEY_GOOGLE_CLIENT_ID);
@@ -375,6 +376,22 @@ class AuthController extends Zend_Controller_Action
 		if ($ss->client->isAccessTokenExpired()) {
 		    $ss->token=false;
 		    $this->redirect('/auth/google');
+		}
+	}    
+
+	public function googleuserinfoAction(){
+		$ssPlan = new Zend_Session_Namespace('google');
+		if(!$ssPlan->token || $ssPlan->client->isAccessTokenExpired()){
+			$this->view->UserInfos = array();			
+		}else{
+			$plus = new Google_Service_Oauth2($ssPlan->client);
+			$userinfo = $plus->userinfo->get();
+			$this->view->UserInfos = array("link"=>$userinfo->getLink()
+					,"picture"=>$userinfo->getPicture()
+					,"name"=>$userinfo->getName()
+					,"mail"=>$userinfo->getVerifiedEmail()
+					,"id"=>$userinfo->getId()
+			);
 		}
 	}    
 

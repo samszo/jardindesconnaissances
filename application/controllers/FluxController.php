@@ -24,6 +24,17 @@ class FluxController extends Zend_Controller_Action {
 	    $this->view->flux = array("tags pour un utilisateur", "utilisateurs en relation");
 	}
 
+	public function ajaxAction() {
+		$s = new Flux_Site(false,false);
+		$u = $this->_getParam('u', "http://www.google.com");
+		$s->trace($u);
+		$ch = curl_init ($u) ;
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1) ;
+        $res = curl_exec ($ch) ;
+        curl_close ($ch) ;
+		$this->view->content = $res;
+	}
+
     public function toustagsAction()
     {
 	    if ($this->getRequest()->isPost()) {
@@ -264,7 +275,8 @@ class FluxController extends Zend_Controller_Action {
 
 	public function databnfAction()
     {
-        $bnf = new Flux_Databnf($this->_getParam('idBase','flux_databnf'),$this->_getParam('trace'));
+		$bnf = new Flux_Databnf($this->_getParam('idBase','flux_databnf'),$this->_getParam('trace'));
+		$bnf->bTraceFlush = true;
 	   	switch ($this->_getParam('obj')) {
 	   		case 'term':
 				$this->view->reponse = $bnf->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($this->_getParam('term')));

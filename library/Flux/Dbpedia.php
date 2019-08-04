@@ -421,10 +421,35 @@ WHERE {
      skos:notation ?notation .
   FILTER ((?notation = 306) && langMatches( lang(?prefLabel), "fr" ))
 }
+			*/
+/*WIKIDATA
+#les personnes les plus influentes par occupation
+SELECT (COUNT(*) AS ?count) ?occ ?occLabelEN ?influ ?influLabelEN
+WHERE {
+  ?count wdt:P106/wdt:P279 ?occ;
+        wdt:P737 ?influ.
+  OPTIONAL {
+    ?occ rdfs:label ?occLabelEN filter (lang(?occLabelEN) = "en").
+    ?influ rdfs:label ?influLabelEN filter (lang(?influLabelEN) = "en").
+  }
+}
+GROUP BY ?occ ?occLabelEN ?influ ?influLabelEN
+ORDER BY DESC(?count)
+LIMIT 100
 
-	   	 *
-	   	 *
-	   	 */
+#les occupations les plus influentes
+SELECT (COUNT(*) AS ?count) ?occ ?occLabelEN
+WHERE {
+  ?count wdt:P106/wdt:P279 ?occ;
+        wdt:P737 ?influ.
+  OPTIONAL {
+    ?occ rdfs:label ?occLabelEN filter (lang(?occLabelEN) = "en").
+  }
+}
+GROUP BY ?occ ?occLabelEN
+ORDER BY DESC(?count)
+LIMIT 100
+*/
 	   	
 	   	$searchUrl = 'http://dbpedia.org/sparql?'
 	    	.'query='.urlencode($query)

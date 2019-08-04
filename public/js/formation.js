@@ -8,8 +8,8 @@ var nodesCour,rootCour, treeCour, dataCour, colCour;
 var bClick = false, display = "none", selectCour, selectUE, selectParc;
 
 //variables affichage
-var maxHeureStat = 192, sclHeureStat = d3.scaleLinear().range([0, 100]).domain([0, maxHeureStat]),
-    sclHeureComp = d3.scaleLinear().range([0, 100]).domain([0, maxHeureStat*2]);
+var maxHeureStat = 192, sclHeureStat = d3.scale.linear().range([0, 100]).domain([0, maxHeureStat]),
+    sclHeureComp = d3.scale.linear().range([0, 100]).domain([0, maxHeureStat*2]);
 ;
 
 
@@ -63,7 +63,8 @@ function exportJson(content, fileName, contentType) {
 /** Gestion des grid */
 function initGrid(id, g){
     if(w2ui[g.name])w2ui[g.name].destroy();
-    $("#"+id).w2grid(g);
+    let grid = $("#"+id).w2grid(g);
+    grid.refresh();
 }
 
 /**

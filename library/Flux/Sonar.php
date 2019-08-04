@@ -28,23 +28,85 @@ class Flux_Sonar extends Flux_Site{
      */
 	public function __construct($idBase=false, $bTrace=false, $bCache=true)
     {
-    		parent::__construct($idBase, $bTrace, $bCache);    	
+        parent::__construct($idBase, $bTrace, $bCache);    	
 
-    		//on récupère la racine des documents
-    		$this->initDbTables();
-    		$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
-    		$this->idDocStruc = $this->dbD->ajouter(array("titre"=>'structures','parent'=>$this->idDocRoot));
-    		$this->idDocCol = $this->dbD->ajouter(array("titre"=>'Collection IIIF','parent'=>$this->idDocRoot));
-    		$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
-    		$this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
-    		$this->idTagTypeFlux = $this->dbT->ajouter(array("code"=>'type flux','parent'=>$this->idTagRoot));
-            $this->idTagRep = $this->dbT->ajouter(array('code'=>'réponse', 'parent'=>$this->idTagRoot));
-            $this->idTagChoixRep = $this->dbT->ajouter(array('code'=>'choix', 'parent'=>$this->idTagRoot));
-            $this->idTagNonChoixRep = $this->dbT->ajouter(array('code'=>'non choix', 'parent'=>$this->idTagRoot));
-            $this->idTagPosChoixRep = $this->dbT->ajouter(array('code'=>'possibilité de choix', 'parent'=>$this->idTagRoot));
-            $this->idTagProc = $this->dbT->ajouter(array('code'=>'processus', 'parent'=>$this->idTagRoot));
-            $this->idTagStruc = $this->dbT->ajouter(array('code'=>'structure', 'parent'=>$this->idTagRoot));
-                        
+        //on récupère la racine des documents
+        $this->initDbTables();
+        $this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
+        $this->idDocStruc = $this->dbD->ajouter(array("titre"=>'structures','parent'=>$this->idDocRoot));
+        $this->idDocCol = $this->dbD->ajouter(array("titre"=>'Collection IIIF','parent'=>$this->idDocRoot));
+        $this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
+        $this->idTagRoot = $this->dbT->ajouter(array("code"=>__CLASS__));
+        $this->idTagTypeFlux = $this->dbT->ajouter(array("code"=>'type flux','parent'=>$this->idTagRoot));
+        $this->idTagRep = $this->dbT->ajouter(array('code'=>'réponse', 'parent'=>$this->idTagRoot));
+        $this->idTagChoixRep = $this->dbT->ajouter(array('code'=>'choix', 'parent'=>$this->idTagRoot));
+        $this->idTagNonChoixRep = $this->dbT->ajouter(array('code'=>'non choix', 'parent'=>$this->idTagRoot));
+        $this->idTagPosChoixRep = $this->dbT->ajouter(array('code'=>'possibilité de choix', 'parent'=>$this->idTagRoot));
+        $this->idTagProc = $this->dbT->ajouter(array('code'=>'processus', 'parent'=>$this->idTagRoot));
+        $this->idTagStruc = $this->dbT->ajouter(array('code'=>'structure', 'parent'=>$this->idTagRoot));
+
+    }
+
+    /**
+     * initialise les vocabulaire
+     */
+    function initVocabulaires(){
+        //TODO:l'importation par l'API ne marche pas
+        if(!$this->omk)$this->omk=new Flux_Omeka($this->dbOmk);
+        $r[]=$this->omk->setVocab(array(
+            'url'=>'https://www.w3.org/ns/ma-ont.rdf'
+            ,'prefix'=>'ma'
+            ,'format'=>'guess'
+            ,'ns_uri'=>'http://www.w3.org/ns/ma-ont#'
+            ,'label'=>'Ontology for Media Resources'
+        ));
+        $r[]=$this->omk->setVocab(array(
+            'url'=>'https://semanticweb.cs.vu.nl/2009/11/sem/sem.rdf'
+            ,'prefix'=>'sem'
+            ,'format'=>'rdfxml'
+            ,'ns_uri'=>'http://semanticweb.cs.vu.nl/2009/11/sem/'
+            ,'label'=>'The Simple Event Model (SEM)'
+        ));
+        $r[]=$this->omk->setVocab(array(
+            'url'=>'https://jardindesconnaissances.univ-paris8.fr/onto/jdc.ttl'
+            ,'prefix'=>'jdc'
+            ,'format'=>'guess'
+            ,'ns_uri'=>'https://jardindesconnaissances.univ-paris8.fr/onto/'
+            ,'label'=>'Jardin des connaissances'
+        ));
+        
+        //enregistre les templates
+        $r[] = $this->omk->postResourceTemplate(array(
+            'label'=>'Position sémantique'
+            ,'class'=>'SemanticPosition'
+            ,'props'=>array(
+                array('label'=>'title','required'=>1,'type'=>'literal')
+                ,array('label'=>'creationDate','required'=>1,'type'=>'literal')
+                ,array('label'=>'hasCreator','required'=>1,'type'=>'literal')
+                ,array('label'=>'hasRating','required'=>1,'type'=>'literal')
+                ,array('label'=>'isRatingOf','required'=>1,'type'=>'resource:item')
+                ,array('label'=>'ratingScaleMax','required'=>1,'type'=>'literal')
+                ,array('label'=>'ratingScaleMin','required'=>1,'type'=>'literal')
+                ,array('label'=>'hasRatingSystem','required'=>1,'type'=>'resource:item')
+                ,array('label'=>'locationLatitude','required'=>1,'type'=>'literal')
+                ,array('label'=>'locationLongitude','required'=>1,'type'=>'literal')
+                ,array('label'=>'hasSource','required'=>1,'type'=>'resource:item')
+                ,array('label'=>'isFragmentOf','required'=>1,'type'=>'resource:item')
+                ,array('label'=>'distanceCenter','required'=>1,'type'=>'literal')
+                ,array('label'=>'distanceConcept','required'=>1,'type'=>'literal')
+                ,array('label'=>'hasActor','required'=>1,'type'=>'resource')
+                ,array('label'=>'hasDoc','required'=>1,'type'=>'literal')//litteral pour la recherche
+                ,array('label'=>'hasConcept','required'=>1,'type'=>'resource:item')
+                ,array('label'=>'hasRapport','required'=>1,'type'=>'resource:item')
+                ,array('label'=>'x','required'=>1,'type'=>'literal')
+                ,array('label'=>'y','required'=>1,'type'=>'literal')
+                ,array('label'=>'xRatingValue','required'=>1,'type'=>'literal')
+                ,array('label'=>'yRatingValue','required'=>1,'type'=>'literal')
+                ,array('label'=>'degradColors','required'=>1,'type'=>'literal')
+                ,array('label'=>'degradName','required'=>1,'type'=>'literal')
+            )
+        ));
+        return $r;
     }
 
     /**
@@ -63,7 +125,7 @@ class Flux_Sonar extends Flux_Site{
         );
         foreach ($arr as $v) {
             if($this->dbOmk){
-                $this->addIIF($v);
+                $this->addIIIF($v);
                 $r = $this->omk->postItemSet(array('title'=>$this->titleColIIIF));
             }else        
                 $r = $this->dbD->ajouter($v);
@@ -85,11 +147,23 @@ class Flux_Sonar extends Flux_Site{
             $col = $this->omk->postItemSet(array('title'=>$this->titleColIIIF));
             $this->idsCol[$this->titleColIIIF] = $col['o:id'];
         }
-        return $this->omk->postItem(array('title'=>$v['titre']
-        ,'isReferencedBy'=>array('uri'=>$v['url'],'label'=>$v['ancre'])
-        ,'resource_class'=>23
-        ,'item_set'=>$this->idsCol[$this->titleColIIIF]
+        return $this->omk->postItem(array(
+            'dcterms:title'=>$v['titre']
+            ,'dcterms:isReferencedBy'=>array(array('type'=>'uri','uri'=>$v['url'],'label'=>$v['ancre']))
+            ,'resource_class'=>$this->omk->getIdByName('Collection','resource_classes')//23
+            ,'item_set'=>$this->idsCol[$this->titleColIIIF]
         ));
+    }
+
+    /**
+	 * recupère l'url pour rechercher les item d'une collection
+     *   
+     * @return string
+	 */
+    function getUrlFindItemByCol(){
+        if(!$this->omk)$this->omk=new Flux_Omeka($this->dbOmk);
+        $r = json_decode($this->omk->getPropByName('inScheme'),true);
+        return $this->omk->endpoint.'items?property[0][property]='.$r[0]['o:id'].'&property[0][type]=eq&property[0][text]=';
     }
 
     /**
@@ -162,10 +236,10 @@ class Flux_Sonar extends Flux_Site{
             $this->idsCol[$this->titleColCrible] = $col['o:id'];
         }
         //création du crible
-        $s =  $this->omk->postItem(array('title'=>$v['titre']
-            ,'resource_class'=>182
-            ,'resource_template'=>9
-            ,'type'=>'skos:ConceptScheme'
+        $s =  $this->omk->postItem(array(
+            'dcterms:title'=>$v['titre']
+            ,'resource_class'=>$this->omk->getIdByName('Crible','resource_classes')
+            ,'rdf:type'=>'skos:ConceptScheme'
             ,'item_set'=>$this->idsCol[$this->titleColCrible]
             ));
         
@@ -173,10 +247,10 @@ class Flux_Sonar extends Flux_Site{
         $l = explode(',',$v['data']);
         foreach ($l as $c) {
             $i = $this->omk->postItem(array('title'=>$c
-            ,'resource_class'=>181
-            ,'type'=>'skos:Concept'
-            ,'prefLabel'=>$c
-            ,'inScheme'=>array('id'=>$s['o:id'],'txt'=>$s['dcterms:title'][0]['@value'])
+            ,'resource_class'=>$this->omk->getIdByName('Concept','resource_classes')//
+            ,'rdf:type'=>'skos:Concept'
+            ,'skos:prefLabel'=>$c
+            ,'skos:inScheme'=>array(array('type'=>'resource','value'=>$s['o:id']),$s['dcterms:title'][0]['@value'])
             ));
         }
     }
@@ -305,6 +379,92 @@ class Flux_Sonar extends Flux_Site{
 
     }    
 
+    /**
+	 * enregistre la position
+     * 
+     * @param array     $data
+     * @param array     $uti
+     * 
+     * @return array
+	 */
+	function savePosiOmk($d, $uti){
+
+        if(!$this->omk)$this->omk=new Flux_Omeka($this->dbOmk);
+
+        //enregistre/récupère les collections
+        $isRA = $this->omk->postItemSet(array(
+            'title'=>'Ressources annotées'
+        ));
+        $isPS = $this->omk->postItemSet(array(
+            'title'=>'Positions sémantiques'
+        ));
+        /*
+        $isPOV = $this->omk->postItemSet(array(
+            'title'=>'Point de vue'
+        ));
+        */
+
+        //récupère la ressource annotée
+        //$item = $this->omk->searchByRef($d['ma:hasSource']);
+        $itemTitle = $d['ma:isFragmentOf']['title'].' : fragment';
+        $item = $this->omk->searchByRef($d['ma:hasSource'],'items',true)[0];
+        if($item==null){
+            //enregistre le parent
+            if($d['ma:isFragmentOf']){
+                $itemParent = $this->omk->searchByRef($d['ma:isFragmentOf']['IIIF']);
+                if($itemParent=="[]"){
+                    $itemParent = $this->omk->postItem(array(
+                        'dcterms:title'=>$d['ma:isFragmentOf']['title']
+                        ,'dcterms:isReferencedBy'=>$d['ma:isFragmentOf']['IIIF']
+                        ,'dcterms:isPartOf'=>$d['dcterms:isPartOf']
+                        ,'item_set'=>$isRA['o:id']
+                        ,'resource_class'=>'Image'
+                        ,'IIIF'=>$d['ma:isFragmentOf']
+                    ));        
+                }
+            }
+            //enregistre la ressource
+            $item = $this->omk->postItem(array(
+                'dcterms:title'=>$itemTitle
+                ,'resource_class'=>'Image'
+                ,'dcterms:isReferencedBy'=>$d['ma:hasSource']
+                ,'item_set'=>$isRA['o:id']
+                ,'dcterms:isPartOf'=>array(array('type'=>'resource','value'=>$itemParent['o:id']))
+                ,'ingest_url'=>array('title'=>$d['ma:isFragmentOf']['title'],'source'=>$d['ma:hasSource'])
+            ));    
+        }
+
+        //enregistre la position sémantique
+        $d['ma:isFragmentOf']=null;
+        $d['dcterms:isPartOf']=null;
+        $d['ma:hasSource']=array(array('type'=>'resource','value'=>$item['o:id']));
+        //met un type litteral pour le retrouver à la recherche
+        $d['jdc:hasDoc']=''.$item['o:id'].'';
+
+        $itemPosi = $this->omk->postItem($d,false);    
+
+        //enregistre la geo de l'annotateur
+        if($d['ma:locationLatitude']){
+            $geo = $this->omk->postGeo(array(
+                'value'=>'POINT ('.$d['ma:locationLongitude'].' '.$d['ma:locationLatitude'].')'
+                ,'body'=>"géolocalisation de l'annotateur"
+                ,'motivatedBy'=>'identifying'
+                ,'hasPurpose'=>'moderating'
+                ,'hasSource'=>$itemPosi['o:id']
+            ));
+        }
+        
+        //enregistre l'annotation
+        $a = $this->omk->postAnnotation(array(
+            'body'=>'Point de vue de : '.$d['ma:hasCreator'].' sur : '.$itemTitle
+            ,'motivatedBy'=>'tagging'
+            ,'hasPurpose'=>'moderating'
+            ,'hasSource'=>$item['o:id']
+            ,'hasTarget'=>array('id'=>$itemPosi['o:id'])
+        ));
+
+    }    
+
 
     /**
 	 * récupère les évaluations
@@ -346,5 +506,25 @@ class Flux_Sonar extends Flux_Site{
         return $rs;
 
     }        
+
+    /**
+	 * récupère les évaluations dans omk
+     * 
+     * @param string    $inScheme
+     * @param string    $id
+     * 
+     * @return array
+	 */
+	function getEvalsOmk($inScheme, $id){
+        //inScheme possibilité de filtre non implémenté = fait sur le client
+        $rs=array();
+        $item = $this->omk->searchByRef($id,'items',true)[0];
+        if($item){
+            $rs = $this->omk->search(array('hasDoc'=>$item['o:id']),'items','hasDoc',true);
+        }
+        return $rs;
+
+    }        
+
 
 }

@@ -14,6 +14,7 @@
 class SonarController extends Zend_Controller_Action
 {
 	var $idBase = "flux_sonar";
+
 	/**
 	 * The default action - show the home page
 	 */
@@ -23,13 +24,23 @@ class SonarController extends Zend_Controller_Action
 
 	public function diaporamaAction() {
 		$this->initInstance(false,"/diaporama");
-
+		//initalise l'objet SONAR
 		$s = new Flux_Sonar($this->idBase);
 		$s->dbOmk = $this->_getParam('dbOmk','omks_smel');
+		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés
+		$omk = new Zend_Session_Namespace('omk');
+		if(!$omk->o)$omk->o=new Flux_Omeka($s->dbOmk);
+		$s->omk = $omk->o;
+        //initialise les objets omk
+        $s->initVocabulaires();
+
 		//récupère les collections
-		$this->view->colIIIF = $s->getCollection($s->titleColIIIF);
+		$this->view->urlColIIIF = $s->getCollection($s->titleColIIIF);
 		//récupère les cribles
-		$this->view->cribles = $s->getCollection($s->titleColCrible);
+		$this->view->urlColCribles = $s->getCollection($s->titleColCrible);
+		//récupère les cribles
+		$this->view->urlItemCribles = $s->getUrlFindItemByCol();
+
 
 	}
 
@@ -37,6 +48,11 @@ class SonarController extends Zend_Controller_Action
 		$this->initInstance();
 		$rs = array('result' => array(), 'erreur'=>0);
 		$sonar = new Flux_Sonar($this->idBase);
+		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés
+		$omk = new Zend_Session_Namespace('omk');
+		if(!$omk->o)$omk->o=new Flux_Omeka();
+		$sonar->omk = $omk->o;
+
 		switch ($this->_getParam('q')) {
 			case 'listeFlux':
 				$rs['result'] = $sonar->getListeFlux();
@@ -44,9 +60,15 @@ class SonarController extends Zend_Controller_Action
 			case 'savePosi':
 				$rs['result'] = $sonar->savePosi($this->_getParam('dt'),$this->_getParam('type'),$this->_getParam('geo'),$this->ssUti->uti);
 				break;			
+			case 'savePosiOmk':
+				$rs['result'] = $sonar->savePosiOmk($this->_getParam('dt'), $this->ssUti->uti);
+				break;			
 			case 'getEvals':
 				$rs['result'] = $sonar->getEvals($this->_getParam('type'),$this->_getParam('id'));
-				break;			
+				break;
+			case 'getEvalsOmk':
+				$rs['result'] = $sonar->getEvalsOmk($this->_getParam('inScheme'),$this->_getParam('id'));
+				break;
 		}
 		$this->view->data = $rs;
 	}
@@ -63,7 +85,7 @@ class SonarController extends Zend_Controller_Action
 		
 		if ($auth->hasIdentity() || isset($this->ssUti->uti)) {
 				//utilisateur authentifier
-				$this->ssUti->uti['mdp'] = '***';
+				//$this->ssUti->uti['mdp'] = '***';
 				$this->view->login = $this->ssUti->uti['login'];
 				$this->view->uti = json_encode($this->ssUti->uti);
 		}elseif($idUti){
@@ -72,14 +94,15 @@ class SonarController extends Zend_Controller_Action
 				$dbUti = new Model_DbTable_Flux_Uti($s->db);
 				$uti = $dbUti->findByuti_id($idUti);
 				$this->ssUti->uti = $uti;
-				$this->ssUti->uti['mdp'] = '***';
+				//$this->ssUti->uti['mdp'] = '***';
 				$this->view->login = $this->ssUti->uti['login'];
 				$this->view->uti = json_encode($uti);                        
 		}else{
+				//problème de récupératon des sessions ???			
 				$this->ssUti->redir = "/sonar".$redir;
 				$this->ssUti->dbNom = $this->idBase;
 				if($this->view->ajax)$this->redirect('/auth/finsession');
-				else $this->redirect('/auth/connexion');
+				else $this->redirect('/auth/connexion?idBase='.$this->idBase.'&redir=/sonar'.$redir);
 		}		    	
 	}
 

@@ -215,12 +215,13 @@
     <script>
         var idBase = '<?php echo $this->idBase; ?>',
             uti = <?php echo $this->uti; ?>,
-            urlColIIIF = '<?php echo $this->colIIIF; ?>', lstIIIF=[],
-            urlColCrible = '<?php echo $this->cribles; ?>',lstCrible = [],
+            urlColIIIF = '<?php echo $this->urlColIIIF; ?>', lstIIIF=[],
+            urlColCrible = '<?php echo $this->urlColCribles; ?>',lstCrible = [],
+            urlItemCrible = '<?php echo $this->urlItemCribles; ?>',lstItemCrible = [],
             height = window.innerHeight,
             width = window.innerWidth,
             svg, pc, ca, tofEval, geo=false;
-
+        prefUrl = '../';
         //récupère la géolocalisation de l'utilisateur
         if (navigator.geolocation) {
 	        navigator.geolocation.getCurrentPosition(function(p){
@@ -232,7 +233,7 @@
         //gestion des événements
         d3.select('#btnSrcFlux')
             .on('click', function () {
-                showCartoHorlo();
+                //showCartoHorlo();
                 //let src = document.getElementById("inSrcFlux").value;
                 let url = document.getElementById("optSrcFlux").value;                
                 console.log('Charge les images du flux IIIF :' + url);
@@ -240,7 +241,11 @@
             });
         d3.select('#btnConnexion')
             .on('click', function () {
-                console.log("connexion ou déconnexion de l'utilisateur");
+                if( d3.select('#txtUti').html)
+                    deconnexion("sonar/diaporama");
+                else
+                    connexion("sonar/diaporama");
+                //console.log("connexion ou déconnexion de l'utilisateur");
             });
         d3.select('#btnAjoutConcepts')
             .on('click', function () {
@@ -302,9 +307,9 @@
                     //ajoute la liste des cribles
                     d3.select('#optListeCpt').selectAll('option').data(lstCrible).enter()
                         .append('option')
+                        .attr('id', function (d, i) {
+                            return 'omkId_'+d['o:id'];})
                         .attr('value', function (d, i) {
-                            return d['@id'];})
-                        .attr('idItem', function (d) {
                             return d['o:id'];})
                         .html(function (d) {
                             return d['dcterms:title'] ? d['dcterms:title'][0]['@value'] : 'inconnu';});
@@ -426,6 +431,7 @@
                     $('#modWait').modal('hide');
                 }else{
                     //récupère les data
+                    ca.idDoc = tofEval[e.to].idDoc;
                     ca.drawData();                    
                 }
                 console.log(e);
@@ -479,7 +485,14 @@
                     */
 
                     //précise l'url à la carto
+                    d.idDoc = url;
                     ca.idDoc = url;
+                    //précise le json de la photo
+                    ca.data = {
+                        'IIIF':d.infos.sequences[0].canvases[0].images[0].resource.service["@id"]+'/info.json'
+                        ,'title':d.infos.label
+                    };
+
 
                     //affiche les données enregistrées
                     ca.drawData();                    
@@ -588,27 +601,38 @@
                 'chrono': true,
                 'nbCouche': 6
             });
-            //récupère la crible
+            //récupère le crible
             //let stct = document.getElementById('inListeConcept').value;
-            let urlCpt = document.getElementById('optListeCpt').value; 
-            //http://localhost/omeka-s/api/items?property[0][property]=374&property[0][type]=eq&property[0][text]=bon%20et%20mauvais
+            let idOmk = '#omkId_'+document.getElementById('optListeCpt').value; 
+            let oOmk = d3.select(idOmk).data();
+            let urlCpt = urlItemCrible+oOmk[0]["dcterms:title"][0]["@value"]; 
+            
             $.ajax({
                 url: urlCpt,
                 dataType: "json",
-                method: "POST",
+                method: "GET",
                 error: function (error) {
                     console.log("getConcept Erreur : " + error.responseText);
                 },
                 success: function (data) {
                     //ajoute la carto axe            
-                    let crible = data;
+                    lstItemCrible = [];
+                    var lbl,id,lblP,idP;
+                    data.forEach(function(d){
+                        lbl = d['skos:prefLabel'][0]['@value'];
+                        id = d['o:id'];
+                        lblP = d['skos:inScheme'][0]['display_title'];
+                        idP = d['skos:inScheme'][0]['value_resource_id'];
+                        lstItemCrible.push({'label':lbl,'id':id,'idP':idP,'labelP':lblP});
+                    });
                     ca = new cartoaxes({
                         'idSvg': 'svgGlobal',
                         'tick': 0,
                         'idDoc': id,
-                        'urlData':'../sonar/flux?q=getEvals',
+                        'urlData':'../sonar/flux?q=getEvalsOmk',
                         'typeSrc':'IIIF',
-                        'crible': crible,
+                        'inScheme':lblP,
+                        'crible': lstItemCrible,
                         'fctGetGrad': pc.getInstantColors,
                         'fctSavePosi': savePosi,
                         'width': w,
@@ -624,14 +648,49 @@
         }
 
         function savePosi(d) {
-            d.idFlux = lstIIIF[document.getElementById("optSrcFlux").value].doc_id;
-            d.idStr = lstCrible[document.getElementById("optListeCpt").value].doc_id;
-
+            let srcFlux = document.getElementById("optSrcFlux").value;
+            let flux = lstIIIF.filter(function(f){
+                return f['dcterms:isReferencedBy'][0]['@id']==srcFlux;
+            })
+            d.idFlux = flux[0]['o:id'];
+            d.idCrible = document.getElementById("optListeCpt").value;
+            let omk = {
+                'dcterms:title':flux[0]["dcterms:title"][0]["@value"]+' _ '+d.infos.title+' : '+d.degrad.date
+                ,'dcterms:isReferencedBy':d.infos.title+' : '+d.degrad.date+' : '+uti.login
+                ,'dcterms:isPartOf':[{'type':'resource','value':d.idFlux}]
+                ,'resource_class':"SemanticPosition"
+                ,'ma:creationDate':d.degrad.date
+                ,'ma:hasCreator':uti.login
+                ,'ma:hasRating':[]
+                ,'ma:isRatingOf':[]
+                ,'ma:ratingScaleMax':ca.xMax
+                ,'ma:ratingScaleMin':ca.xMin
+                ,'ma:hasRatingSystem':[{'type':'resource','value':d.idCrible}]
+                ,'ma:locationLatitude':geo.coords.latitude
+                ,'ma:locationLongitude':geo.coords.longitude
+                ,'ma:hasSource':d.id
+                ,'ma:isFragmentOf':{'title':d.infos.title,'IIIF':d.infos.IIIF}
+                ,'jdc:degradName':d.degrad.nom
+                ,'jdc:degradColors':d.degrad.colors
+                ,'jdc:hasDoc':d.id
+                ,'jdc:distanceCenter':d.distance
+                ,'jdc:hasConcept':[]
+                ,'jdc:distanceConcept':[]
+                ,'jdc:x':d.x
+                ,'jdc:y':d.y
+                ,'jdc:xRatingValue':d.numX
+                ,'jdc:yRatingValue':d.numY
+            }
+            d.crible.forEach(function(c){
+                omk['ma:hasRating'].push(c.p);
+                omk['ma:isRatingOf'].push({'type':'resource','value':c.t.id});
+                omk['jdc:hasConcept'].push({'type':'resource','value':c.t.id});
+                omk['jdc:distanceConcept'].push(c.p);
+            })
             $.post('../sonar/flux', {
-                    'q': 'savePosi',
+                    'q': 'savePosiOmk',
                     'type':'IIIF',
-                    'geo':geo,
-                    'dt': d                    
+                    'dt': omk                    
                 }, function (data) {
                     console.log(data);
                 }, "json")
