@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>catégorisation d'un flux d'image</title>
+    <link rel="shortcut icon" href="../img/papi-sonar.ico">
 
     <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
     <script type="text/javascript" src="../js/d3.v5.min.js"></script>
@@ -18,6 +19,20 @@
 
     <link href="../css/carousel.css" rel="stylesheet">
     <link href="../css/sonar.css" rel="stylesheet">
+
+    <link rel="manifest" href="../manifest/sonar-manifest.json">
+  <script>
+    if('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../js/sonar-sw.js')
+        .then(reg => console.log('Service Worker registered', reg))
+        .catch(err => console.error('Service Worker **not** registered', err));
+    }
+    else {
+      console.warn('Service Worker not supported in this browser');
+    }    
+  </script>
+
+
 
     <style>
         body {

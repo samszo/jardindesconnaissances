@@ -1,0 +1,21 @@
+{
+  "name": "JDC - Sonar",
+  "short_name": "Sonar",
+  "description": "Application de positionnement sémantique",
+  "icons": [
+    {
+      "sizes": "192x192",
+      "type": "image/png",
+      "src": "https://cdn.glitch.com/a75d6e18-b525-4d4e-9f86-a443d1583657%2Fpapi-192.png?1559217159191"
+    },
+    {
+      "sizes": "512x512",
+      "type": "image/png",
+      "src": "https://cdn.glitch.com/a75d6e18-b525-4d4e-9f86-a443d1583657%2Fpapi.png?1559217159755"
+    }
+  ],
+  "display": "standalone",
+  "background_color": "blue",
+  "theme_color": "lightblue",
+  "start_url": "/sonar/diaporama"
+}
