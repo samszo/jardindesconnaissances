@@ -687,6 +687,10 @@
                 omk['jdc:hasConcept'].push({'type':'resource','value':c.t.id});
                 omk['jdc:distanceConcept'].push(c.p);
             })
+            //message pour patienter
+            $('#modWait').modal('show');
+            //carrousel en pause
+            $('.carousel').carousel('pause');                                
             $.post('../sonar/flux', {
                     'q': 'savePosiOmk',
                     'type':'IIIF',
@@ -697,10 +701,10 @@
                 .fail(function (e) {
                     throw new Error("Sauvegarde imposible : " + e);
                 })
-                .always(function () {});
+                .always(function () {
+                    $('#modWait').modal('hide');
+                });
         }
-        //showCartoHorlo();
-        //$('#modWait').modal('show');
         $('.navbar-collapse').collapse('show');
     </script>
 </body>

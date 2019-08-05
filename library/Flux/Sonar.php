@@ -48,11 +48,27 @@ class Flux_Sonar extends Flux_Site{
     }
 
     /**
+    * initialise omeka
+    *   @param string   $endpoint
+    *   @param string   $apiIdent
+    *   @param string   $apiKey
+    *   @return object
+
+     */
+    function initOmeka($endpoint, $apiIdent, $apiKey){
+        $o = new Flux_Omeka();
+        $o->endpoint = $endpoint;
+        $o->API_IDENT = $apiIdent;
+        $o->API_KEY = $apiKey;
+        return $o;
+    }
+
+    /**
      * initialise les vocabulaire
      */
     function initVocabulaires(){
-        //TODO:l'importation par l'API ne marche pas
         if(!$this->omk)$this->omk=new Flux_Omeka($this->dbOmk);
+        /*TODO:l'importation par l'API ne marche pas
         $r[]=$this->omk->setVocab(array(
             'url'=>'https://www.w3.org/ns/ma-ont.rdf'
             ,'prefix'=>'ma'
@@ -74,7 +90,8 @@ class Flux_Sonar extends Flux_Site{
             ,'ns_uri'=>'https://jardindesconnaissances.univ-paris8.fr/onto/'
             ,'label'=>'Jardin des connaissances'
         ));
-        
+        */
+
         //enregistre les templates
         $r[] = $this->omk->postResourceTemplate(array(
             'label'=>'Position sémantique'
@@ -120,8 +137,8 @@ class Flux_Sonar extends Flux_Site{
             array('titre'=>'Tout SMEL','ancre'=>'SMEL','url'=>'https://jardindesconnaissances.univ-paris8.fr/smel/omk/iiif/collection/1','parent'=>$this->idDocCol),
             array('titre'=>'Affiche de mai 68','ancre'=>'octaviana','url'=>'https://octaviana.fr/iiif/collection/346','parent'=>$this->idDocCol),
             array('titre'=>'Illustrations de thèse','ancre'=>'ADACEMU','url'=>'https://jardindesconnaissances.univ-paris8.fr/ADACEMU/omk/iiif/collection/63','parent'=>$this->idDocCol),
-            array('titre'=>'Reportages photographiques des présidences de la république française','ancre'=>'ValArNum','url'=>'https://jardindesconnaissances.univ-paris8.fr/ValArNum/omks/iiif/collection/151682','parent'=>$this->idDocCol),
-            array('titre'=>'Tests locaux','ancre'=>'SMEL local','url'=>'../../data/SMEL/iiif-smel1.json','parent'=>$this->idDocCol)    
+            array('titre'=>'Reportages photographiques des présidences de la république française','ancre'=>'ValArNum','url'=>'https://jardindesconnaissances.univ-paris8.fr/ValArNum/omks/iiif/collection/151682','parent'=>$this->idDocCol)
+            //,array('titre'=>'Tests locaux','ancre'=>'SMEL local','url'=>'../../data/SMEL/iiif-smel1.json','parent'=>$this->idDocCol)    
         );
         foreach ($arr as $v) {
             if($this->dbOmk){
@@ -238,20 +255,21 @@ class Flux_Sonar extends Flux_Site{
         //création du crible
         $s =  $this->omk->postItem(array(
             'dcterms:title'=>$v['titre']
-            ,'resource_class'=>$this->omk->getIdByName('Crible','resource_classes')
+            ,'resource_class'=>'Crible'
             ,'rdf:type'=>'skos:ConceptScheme'
             ,'item_set'=>$this->idsCol[$this->titleColCrible]
-            ));
+            ),false);
         
         //création des concepts du crible
         $l = explode(',',$v['data']);
         foreach ($l as $c) {
             $i = $this->omk->postItem(array('title'=>$c
-            ,'resource_class'=>$this->omk->getIdByName('Concept','resource_classes')//
+            ,'resource_class'=>'Concept'
             ,'rdf:type'=>'skos:Concept'
             ,'skos:prefLabel'=>$c
             ,'skos:inScheme'=>array(array('type'=>'resource','value'=>$s['o:id']),$s['dcterms:title'][0]['@value'])
-            ));
+            ),false);
+
         }
     }
 

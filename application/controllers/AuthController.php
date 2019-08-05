@@ -300,6 +300,7 @@ class AuthController extends Zend_Controller_Action
             $client->setClientId(KEY_GOOGLE_CLIENT_ID);
             $client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
             $client->setRedirectUri('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/auth/google");
+            //pour gapai securisé $client->setRedirectUri('https://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/auth/google");
             $client->addScope('https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/plus.login');            
             foreach ($scopes as $s) {
                 $client->addScope($this->googleScopes[$s]);

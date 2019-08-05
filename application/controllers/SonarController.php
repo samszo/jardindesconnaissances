@@ -27,9 +27,10 @@ class SonarController extends Zend_Controller_Action
 		//initalise l'objet SONAR
 		$s = new Flux_Sonar($this->idBase);
 		$s->dbOmk = $this->_getParam('dbOmk','omks_smel');
-		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés
+		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés		
 		$omk = new Zend_Session_Namespace('omk');
-		if(!$omk->o)$omk->o=new Flux_Omeka($s->dbOmk);
+		//pour le debug $omk->o = false;
+		if(!$omk->o)$omk->o=$s->initOmeka(OMEKA_SONAR_ENDPOINT, OMEKA_SONAR_API_IDENT,OMEKA_SONAR_API_KEY);		
 		$s->omk = $omk->o;
         //initialise les objets omk
         $s->initVocabulaires();
@@ -50,7 +51,7 @@ class SonarController extends Zend_Controller_Action
 		$sonar = new Flux_Sonar($this->idBase);
 		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés
 		$omk = new Zend_Session_Namespace('omk');
-		if(!$omk->o)$omk->o=new Flux_Omeka();
+		if(!$omk->o)$omk->o=$sonar->initOmeka(OMEKA_SONAR_ENDPOINT, OMEKA_SONAR_API_IDENT,OMEKA_SONAR_API_KEY);		
 		$sonar->omk = $omk->o;
 
 		switch ($this->_getParam('q')) {

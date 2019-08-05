@@ -177,7 +177,7 @@ class cartoaxes {
             //console.log(p);
             let c = me.getGradient();
             me.svgDrag = me.g.append("circle")
-                .attr('class','sltDrag')
+                .attr('class','evals')
                 .attr('r',scCircle.step()/3)
                 .attr('cx',p[0])
                 .attr('cy',p[1])

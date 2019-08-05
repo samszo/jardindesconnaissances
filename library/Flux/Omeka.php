@@ -18,6 +18,8 @@ class Flux_Omeka extends Flux_Site{
     var $idByTypeName;
     var $language = 'fr';
     var $is_public = 1;
+    var $API_IDENT;
+    var $API_KEY;
 
 	public function __construct($idBase=false, $bTrace=false)
     {
@@ -56,7 +58,7 @@ class Flux_Omeka extends Flux_Site{
 
     /**
      * Enregistre une annotation avec l'API
-     *
+     *postItem
      * @param array $data
      *
      */
@@ -163,7 +165,7 @@ class Flux_Omeka extends Flux_Site{
                                 $param[$k][$i]['@language']= $this->language ;
                                 break;
                         }
-                        $param[$k][$i]['is_public']= $d['is_public'] ? $d['is_public'] : $this->is_public;        
+                        $param[$k][$i]['is_public']= isset($d['is_public']) ? $d['is_public'] : $this->is_public;        
                         $i++;
                     }
                     break;
@@ -389,7 +391,7 @@ class Flux_Omeka extends Flux_Site{
             $param['o:namespace_uri']= $data['ns_uri'];
             $param['o:label']= $data['label'];
             $param['o:comment']= $data['comment'];
-            $v = $this->send('item_sets','POST',$this->paramsAuth(),$param);
+            $v = $this->send('vocabularies','POST',$this->paramsAuth(),$param);
         }
         return $v;
     }
@@ -490,7 +492,7 @@ class Flux_Omeka extends Flux_Site{
 
     function paramsAuth(){
         //initialisation des paramètres GET pour l'authentification
-        return array('key_identity' => OMEKA_API_IDENT, 'key_credential' => OMEKA_API_KEY);
+        return array('key_identity' => $this->API_IDENT, 'key_credential' => $this->API_KEY);
     }
     
 
