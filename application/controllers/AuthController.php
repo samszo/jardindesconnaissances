@@ -299,8 +299,10 @@ class AuthController extends Zend_Controller_Action
             $client = new Google_Client();
             $client->setClientId(KEY_GOOGLE_CLIENT_ID);
             $client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
-            $client->setRedirectUri('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/auth/google");
-            //pour gapai securisé $client->setRedirectUri('https://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/auth/google");
+			if(empty($_SERVER['HTTPS']))
+				$client->setRedirectUri('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/auth/google");
+			else
+				$client->setRedirectUri('https://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/auth/google");
             $client->addScope('https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/plus.login');            
             foreach ($scopes as $s) {
                 $client->addScope($this->googleScopes[$s]);
@@ -358,9 +360,12 @@ class AuthController extends Zend_Controller_Action
                     $s = new Flux_Site($ssGoogle->dbNom);
                     $json = json_encode($userInfo);
                     $dbUti = new Model_DbTable_Flux_Uti($s->db);
-                    $uti = $dbUti->ajouter(array("login"=>$userInfo['givenName'].' '.$userInfo['familyName'],"flux"=>"GOOGLE","data"=>$json,'email'=>$userInfo['email']),true,true);
+					$rs = $dbUti->ajouter(array("login"=>$userInfo['givenName'].' '.$userInfo['familyName'],"flux"=>"GOOGLE","data"=>$json,'email'=>$userInfo['email']),true,true);
+					$ssExi = new Zend_Session_Namespace('uti');
+					$ssExi->uti = $rs;
+					$ssExi->idUti = $rs["uti_id"];		            								
                     //redirige l'utilisateur
-                   $this->redirect($ssGoogle->redir."?idUti=".$uti['uti_id']."&idBase=".$ssGoogle->dbNom);
+                   $this->redirect($ssGoogle->redir."?idUti=".$$rs['uti_id']."&idBase=".$ssGoogle->dbNom);
                     //$this->redirect('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl().urldecode($ssGoogle->redir));
                 }else{
                     $this->view->authUrl = $client->createAuthUrl();

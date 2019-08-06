@@ -7,8 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>catégorisation d'un flux d'image</title>
     <link rel="shortcut icon" href="../img/papi-sonar.ico">
+    <link rel="canonical" href="https://jardindesconnaissances.univ-paris8.fr/jdc/public/sonar/diaporama">
+    <link rel="manifest" href="../manifest/sonar-manifest.json">
 
     <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/carousel.css" >
+    <link rel="stylesheet" type="text/css" href="../css/sonar.css" >
+    
     <script type="text/javascript" src="../js/d3.v5.min.js"></script>
     <script type="text/javascript" src="../js/jquery.min.js"></script>
     <script type="text/javascript" src="../js/site.js"></script>
@@ -17,11 +22,8 @@
 
     <script type="text/javascript" src="../font/font-awesome/all.min.js"></script>
 
-    <link href="../css/carousel.css" rel="stylesheet">
-    <link href="../css/sonar.css" rel="stylesheet">
-
-    <link rel="manifest" href="../manifest/sonar-manifest.json">
-  <script>
+    
+    <script>
     if('serviceWorker' in navigator) {
       navigator.serviceWorker.register('../js/sonar-sw.js')
         .then(reg => console.log('Service Worker registered', reg))
@@ -256,7 +258,9 @@
             });
         d3.select('#btnConnexion')
             .on('click', function () {
-                if( d3.select('#txtUti').html)
+                if(uti.login=='Anonyme')
+                    showGoogleAuth();
+                else if( d3.select('#txtUti').html)
                     deconnexion("sonar/diaporama");
                 else
                     connexion("sonar/diaporama");
@@ -274,10 +278,18 @@
 
 
         function showUti() {
-            d3.select('#txtUti').html(uti.login);
             let btn = '<i class="fas fa-sign-in-alt"></i>';
-            if (uti.uti_id != 1) btn = '<i class="fas fa-sign-in-alt"></i>';
+            let u = uti.login;                          
+            if (uti.login == 'Anonyme') {
+                btn = "<img src=\'../img/google.png\' style=\'height: 30px;\' alt=\'connexion Google\' />";
+                u='Connectez-vous';
+            }  
+            d3.select('#txtUti').html(u);
             d3.select('#btnConnexion').html(btn);
+        }
+
+        function showGoogleAuth(){
+            window.location.href = "../auth/google?idBase="+idBase+"&redir=/sonar/diaporama";
         }
 
         function getListeSource() {

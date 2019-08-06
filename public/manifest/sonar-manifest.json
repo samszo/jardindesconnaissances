@@ -6,16 +6,16 @@
     {
       "sizes": "192x192",
       "type": "image/png",
-      "src": "https://cdn.glitch.com/a75d6e18-b525-4d4e-9f86-a443d1583657%2Fpapi-192.png?1559217159191"
+      "src": "https://jardindesconnaissances.univ-paris8.fr/jdc/public/img/papi-sonar192.png"
     },
     {
       "sizes": "512x512",
       "type": "image/png",
-      "src": "https://cdn.glitch.com/a75d6e18-b525-4d4e-9f86-a443d1583657%2Fpapi.png?1559217159755"
+      "src": "https://jardindesconnaissances.univ-paris8.fr/jdc/public/img/papi-sonar512.png"
     }
   ],
   "display": "standalone",
   "background_color": "blue",
   "theme_color": "lightblue",
-  "start_url": "/sonar/diaporama"
+  "start_url": "https://jardindesconnaissances.univ-paris8.fr/jdc/public/sonar/diaporama"
 }

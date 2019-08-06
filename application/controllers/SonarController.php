@@ -77,7 +77,14 @@ class SonarController extends Zend_Controller_Action
 	function initInstance($idUti=false, $redir=""){
 		$this->view->ajax = $this->_getParam('ajax');
 		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
+		$s = new Flux_Site($this->idBase);
+		$dbUti = new Model_DbTable_Flux_Uti($s->db);
 		$idUti = $this->_getParam('idUti',$idUti);
+		//connexion anonyme par défaut
+		if(!$idUti){
+			$idUti = $dbUti->ajouter(array('login'=>'Anonyme'));
+		}
+
 		$this->view->uti = "{}";                        
         
 		$auth = Zend_Auth::getInstance();
@@ -91,8 +98,6 @@ class SonarController extends Zend_Controller_Action
 				$this->view->uti = json_encode($this->ssUti->uti);
 		}elseif($idUti){
 				//authentification CAS ou google
-				$s = new Flux_Site($this->idBase);
-				$dbUti = new Model_DbTable_Flux_Uti($s->db);
 				$uti = $dbUti->findByuti_id($idUti);
 				$this->ssUti->uti = $uti;
 				//$this->ssUti->uti['mdp'] = '***';
