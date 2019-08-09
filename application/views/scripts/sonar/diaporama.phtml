@@ -19,26 +19,16 @@
     <script type="text/javascript" src="../js/site.js"></script>
     <script type="text/javascript" src="../js/polarclock.js"></script>
     <script type="text/javascript" src="../js/cartoaxes.js"></script>
+    <script type="text/javascript" src="../js/sonar-sw.js"></script>
+
 
     <script type="text/javascript" src="../font/font-awesome/all.min.js"></script>
-
-    
-    <script>
-    if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('../js/sonar-sw.js')
-        .then(reg => console.log('Service Worker registered', reg))
-        .catch(err => console.error('Service Worker **not** registered', err));
-    }
-    else {
-      console.warn('Service Worker not supported in this browser');
-    }    
-  </script>
-
-
 
     <style>
         body {
             font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            font-size: small;
         }
 
         .bd-placeholder-img {
@@ -76,11 +66,34 @@
         }
 
         .container {
-            font-size: small;
+            /*
+            top: 280px;
+            position: absolute;
+            */
         }
 
         .modal-content {
             background-color: black;
+        }
+
+
+        select.btn-mini {
+            height: auto;
+            line-height: 14px;
+        }
+
+        /* this is optional (see below) */
+        select.btn {
+            -webkit-appearance: button;
+            -moz-appearance: button;
+                    appearance: button;
+            padding-right: 16px;
+            width: 80%;
+        }
+
+        select.btn-mini + .caret {
+            margin-left: -20px;
+            margin-top: 9px;
         }
     </style>
 
@@ -91,7 +104,9 @@
         <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
             <a class="navbar-brand" href="#">
                 <img class='logo' src="../svg/logo-sonar.svg" alt="logo-sonar" />
-                <span class='logoTxt'>FLUX IMAGES</span>
+                <span class='logoTxt'>SONAR IIIF</span>
+                <img src="../svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
+
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,54 +115,72 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-home"></i></a>
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-home"></i>
+                            <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-zero"></i>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">
-                            <i class="fas fa-user-edit"></i>
+                            <!--<i class="fas fa-user-edit"></i>-->
                             <span id='txtUti'></span>
                             <span id='btnConnexion'></span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <label for="optListeCpt">Cribles&nbsp;
+                            <i id='btnAjoutConcepts' class="fas fa-plus-circle"></i>&nbsp;</label>
+                        <select class="form-control" id="optListeCpt">
+                        </select>
+                    </li>
+                    <li class="nav-item">
+                        <label for="optSrcFlux">Source du flux IIIF&nbsp;
+                            <i class="far fa-question-circle"></i>&nbsp;</label>
+                        <select class="form-control" id="optSrcFlux">
+                        </select>
+                    </li>
+                    <li class="nav-item">
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="Aléa" disabled>
+
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="ckAleaTaille">
+                                        <label class="form-check-label" for="ckAleaTaille">Taille</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="ckAleaOrdre">
+                                        <label class="form-check-label" for="ckAleaOrdre">Ordre</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <button id='btnSrcFlux' class="btn btn-outline-success my-2 my-sm-0" type="submit">Charger</button>
+                    </li>
+
+
                 </ul>
-                <div class="dropdown-divider"></div>                
+                <!--
                 <div class="form-inline mt-2 mt-md-0 mr-3">
-                    <!--
                     <label id='lblSrcFlux' for="inSrcFlux">Source du flux IIIF&nbsp;<i
                             class="far fa-question-circle"></i>&nbsp;</label>
                     <input class="form-control mr-sm-2" type="text" id="inSrcFlux">
-                    -->
-                    <label for="optSrcFlux">Source du flux IIIF&nbsp;
-                        <i class="far fa-question-circle"></i>&nbsp;</label>
-                    <select class="form-control" id="optSrcFlux">
-                    </select>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ckAleaTaille">
-                        <label class="form-check-label" for="ckAleaTaille">
-                            Taille aléatoire
-                        </label>
-                    </div>
-                    <label for="optListeCpt">Liste des concepts&nbsp;
-                        <i id='btnAjoutConcepts' class="fas fa-plus-circle"></i>&nbsp;</label>
-                    <select class="form-control" id="optListeCpt">
-                    </select>
-                    <!--
+                </div>
+                <div class="dropdown-divider"></div>                
                     <label for="inListeConcept">Vos concepts séparés par une ,</label>
                     <input class="form-control mr-sm-2" type="text" id="inListeConcept" value="">
                     <label for="inNomListeConcept">Nom de votre liste de concepts</label>
                     <input class="form-control mr-sm-2" type="text" id="inNomListeConcept" value="">
-                    -->
-                    <button id='btnSrcFlux' class="btn btn-outline-success my-2 my-sm-0" type="submit">Charger</button>
-                </div>
-                <!--
                 <div class="dropdown-divider"></div>
                 <div class="form-inline mt-2 mt-md-0">
                     <input class="form-control mr-sm-2" type="text" placeholder="Chercher" aria-label="Chercher">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Trouver</button>
                 </div>
                 -->
-                <img src="../svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
-                <i class="fab fa-creative-commons"></i>&nbsp;<i class="fab fa-creative-commons-zero"></i>
             </div>
         </nav>
     </header>
@@ -173,7 +206,22 @@
 
         <div class="container">
 
-            <div class="row" id='cartoEval'>
+            <!--
+            <div class="input-group input-group-sm mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inputGroupSelect01">Cribles</label>
+                </div>
+                <select class="btn btn-mini">
+                <option selected>Choose...</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+            </select>
+            <span class="caret"></span>
+            </div>
+            -->
+
+            <div class="row" id='cartoEval'>                
                 <svg>
                     <defs>
                         <linearGradient id="linear-gradient" y1="0.5" x2="1" y2="0.5" gradientUnits="objectBoundingBox">
@@ -204,9 +252,10 @@
 
         </div><!-- /.container -->
 
-        <!-- FOOTER -->
+        <!-- FOOTER 
         <footer class="container">
         </footer>
+        -->
     </main>
 
 
@@ -244,7 +293,10 @@
 	        navigator.geolocation.getCurrentPosition(function(p){
                 geo = p;
             });
-	    }
+        }
+        //dimensionne les éléments
+        d3.select('.carousel').style('height',height/3);
+
                 
 
         //gestion des événements
@@ -369,7 +421,8 @@
         function ajoutPhotosGallerie(tofs) {
 
             //mélange toutes les photos
-            //tofEval = d3.shuffle(tofs);
+            let isAlea = document.getElementById("ckAleaOrdre").checked;
+            if(isAlea) tofEval = d3.shuffle(tofs);
             tofEval = tofs;
 
             // Remove old elements as needed.
@@ -406,7 +459,7 @@
                 .attr('class', 'd-block img-fluid')
                 .style('max-height', height / 3 + "px");
 
-            //code pour ajouter des svg
+            //code pour ajouter des svg poru connaitre la taille
             items.append('svg')
                 .attr('id', function (d, i) {
                     d.idSvg = 'svg_' + i;
@@ -426,23 +479,22 @@
                 .style('fill-opacity', '0')
                 .style('stroke-width', '4')
                 .style('fill', 'none')
-                .style('stroke', 'green');
-
+                .style('stroke', 'black');
 
             /*ajoute le descriptif
-	    var block = items.append('div').attr('class', 'carousel-caption d-none d-md-block');
-	    block.append('h3').text(function (d) {
-	        return d.label;
-	    });
-	    block.append('h4').text(function (d) {
-	        return d.idOmk;
-	    });
-	    block.append('p').append('a')
-	        .attr('href', function (d) {
-	            return d.original;
-	        })
-	        .attr('target', '_blank').text('original');
-        */
+            var block = items.append('div').attr('class', 'carousel-caption d-none d-md-block');
+            block.append('h3').text(function (d) {
+                return d.label;
+            });
+            block.append('h4').text(function (d) {
+                return d.idOmk;
+            });
+            block.append('p').append('a')
+                .attr('href', function (d) {
+                    return d.original;
+                })
+                .attr('target', '_blank').text('original');
+            */
 
             initCarousel();
         }
@@ -462,7 +514,7 @@
                     ca.drawData();                    
                 }
                 console.log(e);
-                //$('.carousel').carousel('pause');                                
+                $('.carousel').carousel('pause');                                
             })
             $('.carousel').carousel({
                 interval: 5000
@@ -536,38 +588,45 @@
             let bb = d3.select('#' + d.idRect).node().getBBox();
 
             //calcule l'url IIIF
-            let zoom = 2,
-                minPixel = 0,
+            let minPixel = 0,
                 imgOmk = d.infos.sequences[0].canvases[0].images[0].resource.service["@id"],
                 w = d.infos.sequences[0].canvases[0].width, h = d.infos.sequences[0].canvases[0].height, img = {};
                 img.r = 0;
             if (!d.images) d.images = [];
             if(alea){
-                img.w = parseInt(w < bb.width ? bb.width * zoom : bb.width / zoom);
-                img.h = parseInt(h < bb.height ? bb.height * zoom : bb.height / zoom);
+                img.w = parseInt(w < bb.width ? bb.width : bb.width);
+                img.h = parseInt(h < bb.height ? bb.height : bb.height);
                 img.x = parseInt(d3.randomUniform(minPixel, w > img.w ? w - img.w : w)());
                 img.y = parseInt(d3.randomUniform(minPixel, h > img.h ? h - img.h : h)());
             }else{
-                img.w = parseInt(w);
-                img.h = parseInt(h);
+                //Zoom si la photo est trop petite
+                let zoom = w < bb.width ? bb.width/w : 1;
+                img.w = parseInt(w*zoom);
+                img.h = parseInt(h*zoom);
                 img.x = 0;
                 img.y = 0;
             }
             //calcul la taille de représentation
-//            let sclW = d3.scaleLinear().domain([0,img.w]).range([0,bb.width]);
-//            let sclH = d3.scaleLinear().domain([0,img.h]).range([0,bb.height]);
-            let diaW = bb.width;
-            let diaH = bb.height;            
-            let coef = img.h > img.w ? img.h / img.w : img.w / img.h;
-            if(img.w > bb.width){
-                diaW = bb.width - (bb.width/coef);
-            }else if(img.h > bb.height){
-                diaH = bb.height - (bb.height/coef);
+            var MAX_WIDTH = bb.width;
+            var MAX_HEIGHT = bb.height;
+            var width = img.w;
+            var height = img.h;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
             }
 
             //construction de l'url
             img.url = imgOmk + '/' + img.x + ',' + img.y + ',' + (img.w) + ',' + (img.h) + '/' 
-                + parseInt(diaW) + ',' + parseInt(diaH) + '/' + img.r + '/default.jpg';
+                + parseInt(width) + ',' + parseInt(height) + '/' + img.r + '/default.jpg';
             console.log(img);
             d.images.push(img);
 
@@ -733,6 +792,16 @@
                 });
         }
         $('.navbar-collapse').collapse('show');
+
+    if('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../js/sonar-sw.js')
+        .then(reg => console.log('Service Worker registered', reg))
+        .catch(err => console.error('Service Worker **not** registered', err));
+    }
+    else {
+      console.warn('Service Worker not supported in this browser');
+    }    
+
     </script>
 </body>
 

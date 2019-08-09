@@ -1,7 +1,7 @@
 {
-  "name": "JDC - Sonar",
-  "short_name": "Sonar",
-  "description": "Application de positionnement sémantique",
+  "name": "Jardin des connaissances - Sonar",
+  "short_name": "JDC-Sonar",
+  "description": "Application pour le positionnement sémantique",
   "icons": [
     {
       "sizes": "192x192",
@@ -14,8 +14,8 @@
       "src": "https://jardindesconnaissances.univ-paris8.fr/jdc/public/img/papi-sonar512.png"
     }
   ],
-  "display": "standalone",
-  "background_color": "blue",
-  "theme_color": "lightblue",
+  "display": "fullscreen",
+  "background_color": "black",
+  "theme_color": "black",
   "start_url": "https://jardindesconnaissances.univ-paris8.fr/jdc/public/sonar/diaporama"
 }

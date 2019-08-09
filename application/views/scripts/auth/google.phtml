@@ -1,61 +1,59 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Jardin des connaissances : login google</title>
-	<meta name="Description" CONTENT="jardin connaissances login google"/>
-	<meta name="Keywords" CONTENT="jardin connaissances login google"/>
-	<meta name="Author" CONTENT="Samuel Szoniecky"/>
-  	<style type="text/css">
-	body{
-	    background-color:black;
-	}
-	.login {
-	   width:400px; 
-	   margin:0 auto; 
-	}
-    /* unvisited link */
-    a:link {
-        color: red;
-    }
-    /* visited link */
-    a:visited {
-        color: green;
-    }
-    
-    /* mouse over link */
-    a:hover {
-        color: hotpink;
-    }
-    
-    /* selected link */
-    a:active {
-        color: blue;
-    }
-	.request{
-		width:400px;
-		height:260px;
-		position:absolute;
-		left:50%;
-		top:50%;
-		margin:-100px 0 0 -200px;
-		text-align: center;
-	}	
-	.logo{
-	   height:50px;	
-	}
-  	</style>
-	
+	<meta name="Description" CONTENT="jardin connaissances login google" />
+	<meta name="Keywords" CONTENT="jardin connaissances login google" />
+	<meta name="Author" CONTENT="Samuel Szoniecky" />
+	<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+	<script src="../js/popper.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+
+	<style type="text/css">
+		body {
+			background-color: black;
+		}
+
+		.card {
+			margin: 0 auto;
+			/* Added */
+			float: none;
+			/* Added */
+			margin-bottom: 10px;
+			/* Added */
+		}
+	</style>
+
 </head>
-	<body>
-	  <div id="loadingScreen"></div>	
-	  <div class="request">
-	    <?php if (isset($this->authUrl)): ?>
-          <img class="logo" src='../img/google.png' /><br/><br/>	    
-	      <a class='login' target="_parent" href='<?php echo $this->authUrl; ?>'>Connectez-vous à Google !</a>
-	    <?php else: ?>
-	    	<a class='logout' href='?logout=1'>Déconecter</a>
-	    <?php endif ?>
-	</div>	
-  </body>
-</html>	
+
+<body>
+
+<div class="container h-100">
+    <div class="row align-items-center h-100">
+        <div class="col-8 mx-auto">
+            <div class="card h-100 border-primary text-center text-white bg-dark mb-3">
+				<img src="../img/google.png" class="card-img-top img-thumbnail" alt="...">
+				<div class="card-body">
+					<h5 class="card-title">Authentification Google</h5>
+					<p class="card-text">
+						<?php if (isset($this->authUrl)): ?>
+						<a target="_parent" href="<?php echo $this->authUrl; ?>" class="btn btn-primary">Connectez-vous</a>
+						<?php else: ?>
+						<a class="btn btn-primary" href='?logout=1'>
+							<h1>Déconectez-vous</h1>
+						</a>
+						<?php endif ?>
+					</p>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>
