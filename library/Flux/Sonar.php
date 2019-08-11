@@ -143,7 +143,7 @@ class Flux_Sonar extends Flux_Site{
         foreach ($arr as $v) {
             if($this->dbOmk){
                 $this->addIIIF($v);
-                $r = $this->omk->postItemSet(array('title'=>$this->titleColIIIF));
+                $r = $this->omk->postItemSet(array('title'=>$this->titleColIIIF,'resource_class'=>'MediaResource'));
             }else        
                 $r = $this->dbD->ajouter($v);
         }

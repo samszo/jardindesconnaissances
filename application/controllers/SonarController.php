@@ -14,33 +14,30 @@
 class SonarController extends Zend_Controller_Action
 {
 	var $idBase = "flux_sonar";
+	var $idBaseOmk = "omk_sonar";
+	var $s; //objet sonar
 
 	/**
 	 * The default action - show the home page
 	 */
 	public function indexAction() {
 		$this->initInstance();
+		//récupère les ressources disponibles
+		http://localhost/omeka-s/api/item_sets?resource_class_label=MediaResource
 	}
 
 	public function diaporamaAction() {
 		$this->initInstance(false,"/diaporama");
-		//initalise l'objet SONAR
-		$s = new Flux_Sonar($this->idBase);
-		$s->dbOmk = $this->_getParam('dbOmk','omks_smel');
-		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés		
-		$omk = new Zend_Session_Namespace('omk');
-		//pour le debug $omk->o = false;
-		if(!$omk->o)$omk->o=$s->initOmeka(OMEKA_SONAR_ENDPOINT, OMEKA_SONAR_API_IDENT,OMEKA_SONAR_API_KEY);		
-		$s->omk = $omk->o;
-        //initialise les objets omk
-        $s->initVocabulaires();
+
+		//initialise les objets omk
+        $this->s->initVocabulaires();
 
 		//récupère les collections
-		$this->view->urlColIIIF = $s->getCollection($s->titleColIIIF);
+		$this->view->urlColIIIF = $this->s->getCollection($this->s->titleColIIIF);
 		//récupère les cribles
-		$this->view->urlColCribles = $s->getCollection($s->titleColCrible);
+		$this->view->urlColCribles = $this->s->getCollection($this->s->titleColCrible);
 		//récupère les cribles
-		$this->view->urlItemCribles = $s->getUrlFindItemByCol();
+		$this->view->urlItemCribles = $this->s->getUrlFindItemByCol();
 
 
 	}
@@ -48,37 +45,48 @@ class SonarController extends Zend_Controller_Action
 	public function fluxAction() {
 		$this->initInstance();
 		$rs = array('result' => array(), 'erreur'=>0);
-		$sonar = new Flux_Sonar($this->idBase);
-		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés
-		$omk = new Zend_Session_Namespace('omk');
-		if(!$omk->o)$omk->o=$sonar->initOmeka(OMEKA_SONAR_ENDPOINT, OMEKA_SONAR_API_IDENT,OMEKA_SONAR_API_KEY);		
-		$sonar->omk = $omk->o;
 
 		switch ($this->_getParam('q')) {
 			case 'listeFlux':
-				$rs['result'] = $sonar->getListeFlux();
+				$rs['result'] = $this->s->getListeFlux();
 				break;			
 			case 'savePosi':
-				$rs['result'] = $sonar->savePosi($this->_getParam('dt'),$this->_getParam('type'),$this->_getParam('geo'),$this->ssUti->uti);
+				$rs['result'] = $this->s->savePosi($this->_getParam('dt'),$this->_getParam('type'),$this->_getParam('geo'),$this->ssUti->uti);
 				break;			
 			case 'savePosiOmk':
-				$rs['result'] = $sonar->savePosiOmk($this->_getParam('dt'), $this->ssUti->uti);
+				$rs['result'] = $this->s->savePosiOmk($this->_getParam('dt'), $this->ssUti->uti);
 				break;			
 			case 'getEvals':
-				$rs['result'] = $sonar->getEvals($this->_getParam('type'),$this->_getParam('id'));
+				$rs['result'] = $this->s->getEvals($this->_getParam('type'),$this->_getParam('id'));
 				break;
 			case 'getEvalsOmk':
-				$rs['result'] = $sonar->getEvalsOmk($this->_getParam('inScheme'),$this->_getParam('id'));
+				$rs['result'] = $this->s->getEvalsOmk($this->_getParam('inScheme'),$this->_getParam('id'));
 				break;
 		}
 		$this->view->data = $rs;
 	}
 
+	public function jardinAction() {
+		$this->initInstance();
+		$rs = array('result' => array(), 'erreur'=>0);
+
+	}
+
 	function initInstance($idUti=false, $redir=""){
 		$this->view->ajax = $this->_getParam('ajax');
 		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
-		$s = new Flux_Site($this->idBase);
-		$dbUti = new Model_DbTable_Flux_Uti($s->db);
+
+		//initalise l'objet SONAR
+		$this->s = new Flux_Sonar($this->idBase);
+		$this->s->dbOmk = $this->_getParam('dbOmk',$this->idBaseOmk);
+		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés		
+		$omk = new Zend_Session_Namespace('omk');
+		//pour le debug $omk->o = false;
+		if(!$omk->o)$omk->o=$this->s->initOmeka(OMEKA_SONAR_ENDPOINT, OMEKA_SONAR_API_IDENT,OMEKA_SONAR_API_KEY);		
+		$this->s->omk = $omk->o;
+
+		//gestion des authentifications
+		$dbUti = new Model_DbTable_Flux_Uti($this->s->db);
 		$idUti = $this->_getParam('idUti',$idUti);
 		//connexion anonyme par défaut
 		if(!$idUti){
@@ -109,7 +117,9 @@ class SonarController extends Zend_Controller_Action
 				$this->ssUti->dbNom = $this->idBase;
 				if($this->view->ajax)$this->redirect('/auth/finsession');
 				else $this->redirect('/auth/connexion?idBase='.$this->idBase.'&redir=/sonar'.$redir);
-		}		    	
+		}	
+		
+		
 	}
 
 }

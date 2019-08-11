@@ -10,32 +10,50 @@
 	<meta name="Keywords" CONTENT="jardin connaissances login google" />
 	<meta name="Author" CONTENT="Samuel Szoniecky" />
 	<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+	<script src="../js/jquery.min.js"></script>
 	<script src="../js/popper.min.js"></script>
 	<script src="../js/bootstrap.min.js"></script>
 
 	<style type="text/css">
-		body {
+		html, body {
+			height: 100%;
 			background-color: black;
 		}
 
-		.card {
-			margin: 0 auto;
-			/* Added */
-			float: none;
-			/* Added */
-			margin-bottom: 10px;
-			/* Added */
-		}
 	</style>
 
 </head>
 
 <body>
 
+<div class="container h-100" >
+    <!--vertical align on parent using my-auto, horizontal align on self mx-auto-->
+    <div class="row h-100 justify-content-md-center">
+        <div class="col-sm-3 my-auto">
+            <div class="card card-block mx-auto text-center text-white bg-dark">
+			<img src="../img/google.png" class="card-img-top img-thumbnail" alt="...">
+				<div class="card-body">
+					<h5 class="card-title">Authentification Google</h5>
+					<p class="card-text">
+						<?php if (isset($this->authUrl)): ?>
+						<a target="_parent" href="<?php echo $this->authUrl; ?>" class="btn btn-primary">Connectez-vous</a>
+						<?php else: ?>
+						<a class="btn btn-primary" href='?logout=1'>
+							<h1>Déconectez-vous</h1>
+						</a>
+						<?php endif ?>
+					</p>
+				</div>
+
+			</div>
+        </div>
+    </div>
+</div>
+<!--
 <div class="container h-100">
     <div class="row align-items-center h-100">
         <div class="col-8 mx-auto">
-            <div class="card h-100 border-primary text-center text-white bg-dark mb-3">
+            <div class="card border-primary text-center text-white bg-dark mb-3">
 				<img src="../img/google.png" class="card-img-top img-thumbnail" alt="...">
 				<div class="card-body">
 					<h5 class="card-title">Authentification Google</h5>
@@ -53,6 +71,7 @@
         </div>
     </div>
 </div>
+-->
 
 </body>
 

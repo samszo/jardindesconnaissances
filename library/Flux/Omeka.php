@@ -204,7 +204,7 @@ class Flux_Omeka extends Flux_Site{
         if($r==null){
             //initialisation des paramètres POST
             $param['o:resource_template']['o:id']="";
-            $param['o:resource_class']['o:id']="";
+            $param['o:resource_class']['o:id'] = $data['resource_class'] ? $this->getIdByName($data['resource_class'],'resource_classes') : '';
             $param['dcterms:title'][0]['property_id']= $this->getIdByName('title','properties');//;
             $param['dcterms:title'][0]['type']='literal';
             $param['dcterms:title'][0]['@value'] = $data['title'];

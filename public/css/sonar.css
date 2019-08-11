@@ -89,6 +89,7 @@ a:visited {
 .eventsG{
   width:50px;
   float: left;
+  text-align: center;
   overflow-y: scroll;
   scrollbar-color: rgb(84, 214, 255) rgb(173, 158, 253);
   scrollbar-width: thin;          
@@ -103,7 +104,7 @@ ul {
   padding-left:0;
 }
 li {
-  margin-bottom:15px;/* à adapter */
+  /*margin-bottom:15px; à adapter */
 }
 .iconsEventType{
   font-size: 32px; 

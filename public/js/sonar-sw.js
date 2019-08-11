@@ -4,21 +4,23 @@
  
  Version: 0.0.2
 */
+var swDomain = "https://jardindesconnaissances.univ-paris8.fr/jdc/public/";
 
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open('pwa-assets').then(cache => 
       {
         return cache.addAll([
-            "../css/bootstrap.min.css"
-            ,"../js/d3.v5.min.js"
-            ,"../js/jquery.min.js"
-            ,"../js/site.js"
-            ,"../js/polarclock.js"
-            ,"../js/cartoaxes.js"
-            ,"../font/font-awesome/all.min.js"
-            ,"../css/carousel.css"
-            ,"../css/sonar.css"
+            swDomain+"css/bootstrap.min.css"
+            ,swDomain+"js/d3.v5.min.js"
+            ,swDomain+"js/jquery.min.js"
+            ,swDomain+"js/site.js"
+            ,swDomain+"js/polarclock.js"
+            ,swDomain+"js/cartoaxes.js"
+            ,swDomain+"font/font-awesome/all.min.js"
+            ,swDomain+"css/carousel.css"
+            ,swDomain+"css/sonar.css"
+            ,swDomain+"sonar/diaporama"
                 ])
       })
   );
@@ -31,3 +33,5 @@ self.addEventListener('fetch', e => {
     })
   );
 });
+
+

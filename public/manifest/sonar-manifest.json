@@ -14,7 +14,8 @@
       "src": "https://jardindesconnaissances.univ-paris8.fr/jdc/public/img/papi-sonar512.png"
     }
   ],
-  "display": "fullscreen",
+  "display": "standalone",
+  "orientation": "portrait",
   "background_color": "black",
   "theme_color": "black",
   "start_url": "https://jardindesconnaissances.univ-paris8.fr/jdc/public/sonar/diaporama"
