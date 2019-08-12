@@ -173,7 +173,7 @@ class Flux_Sonar extends Flux_Site{
     }
 
     /**
-	 * recupère l'url pour rechercher les item d'une collection
+	 * recupère l'url pour rechercher les items d'une collection
      *   
      * @return string
 	 */
@@ -534,6 +534,25 @@ class Flux_Sonar extends Flux_Site{
      * @return array
 	 */
 	function getEvalsOmk($inScheme, $id){
+        //inScheme possibilité de filtre non implémenté = fait sur le client
+        $rs=array();
+        $item = $this->omk->searchByRef($id,'items',true)[0];
+        if($item){
+            $rs = $this->omk->search(array('hasDoc'=>$item['o:id']),'items','hasDoc',true);
+        }
+        return $rs;
+
+    }        
+
+    /**
+	 * récupère les geolocalisations au format  WebGL Globe
+     * 
+     * @param string    $inScheme
+     * @param string    $id
+     * 
+     * @return array
+	 */
+	function getEvalsWebGLGlobe($inScheme, $id){
         //inScheme possibilité de filtre non implémenté = fait sur le client
         $rs=array();
         $item = $this->omk->searchByRef($id,'items',true)[0];

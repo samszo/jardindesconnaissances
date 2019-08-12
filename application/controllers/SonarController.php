@@ -23,7 +23,7 @@ class SonarController extends Zend_Controller_Action
 	public function indexAction() {
 		$this->initInstance();
 		//récupère les ressources disponibles
-		http://localhost/omeka-s/api/item_sets?resource_class_label=MediaResource
+		//http://localhost/omeka-s/api/item_sets?resource_class_label=MediaResource
 	}
 
 	public function diaporamaAction() {
@@ -38,8 +38,20 @@ class SonarController extends Zend_Controller_Action
 		$this->view->urlColCribles = $this->s->getCollection($this->s->titleColCrible);
 		//récupère les cribles
 		$this->view->urlItemCribles = $this->s->getUrlFindItemByCol();
+	}
 
+	public function iiifAction() {
+		$this->initInstance(false,"/iiif");
 
+		//initialise les objets omk
+        $this->s->initVocabulaires();
+
+		//récupère les collections
+		$this->view->urlColIIIF = $this->s->getCollection($this->s->titleColIIIF);
+		//récupère les cribles
+		$this->view->urlColCribles = $this->s->getCollection($this->s->titleColCrible);
+		//récupère les cribles
+		$this->view->urlItemCribles = $this->s->getUrlFindItemByCol();
 	}
 
 	public function fluxAction() {
