@@ -561,9 +561,33 @@ class Flux_Sonar extends Flux_Site{
 	function getEvalsWebGLGlobe($params=false){
         //TODO: utiliser params poru ajouter des conditions
         //récupère les positions semantiques
+        //https://github.com/dataarts/webgl-globe
+        /*
+        var data = [
+            [
+            'seriesA', [ latitude, longitude, magnitude, latitude, longitude, magnitude, ... ]
+            ],
+            [
+            'seriesB', [ latitude, longitude, magnitude, latitude, longitude, magnitude, ... ]
+            ]
+        ];        
+        */
         $rs= $this->omk->search(array('resource_class_label'=>'SemanticPosition'),'items','resource_class_label',true);
-
-        return $rs;
+        $wgl = array();
+        $series = array();
+        foreach ($rs as $r) {
+            $doc = $r['ma:hasSource'][0];
+            //construction des séries par doc
+            if(!$series[$doc['value_resource_id']]){
+                $series[$doc['value_resource_id']]=array('i'=>count($series),'details'=>$doc);
+                $wgl[]=array($doc['display_title'],array());
+            }
+            $idSerie = $series[$doc['value_resource_id']]['i'];
+            $wgl[$idSerie][1][] = $r["ma:locationLatitude"][0]['@value'];
+            $wgl[$idSerie][1][] = $r["ma:locationLongitude"][0]['@value'];
+            $wgl[$idSerie][1][] = $r["jdc:distanceCenter"][0]['@value'];
+        }
+        return array('wdl'=>$wgl,'series'=>$series);
 
     }        
 

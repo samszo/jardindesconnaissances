@@ -77,12 +77,12 @@ class SonarController extends Zend_Controller_Action
 			case 'getEvalsWebGLGlobe':
 				$rs['result'] = $this->s->getEvalsWebGLGlobe($this->_getParam('params'));
 				break;
-	}
+		}
 		$this->view->data = $rs;
 	}
 
 	public function jardinAction() {
-		$this->initInstance();
+		$this->initInstance(false,"/jardin");
 		$rs = array('result' => array(), 'erreur'=>0);
 
 	}

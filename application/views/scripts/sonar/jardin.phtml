@@ -238,7 +238,7 @@ WebGLGlobeDataSource.prototype.loadUrl = function(url) {
     //and then process is with the `load` function.
     var that = this;
     return Cesium.Resource.fetchJson(url).then(function(json) {
-        return that.load(json, url);
+        return that.load(json.result.wdl, url);
     }).otherwise(function(error) {
         //Otherwise will catch any errors or exceptions that occur
         //during the promise processing. When this happens,
@@ -350,7 +350,9 @@ WebGLGlobeDataSource.prototype._setLoading = function(isLoading) {
 //Now that we've defined our own DataSource, we can use it to load
 //any JSON data formatted for WebGL Globe.
 var dataSource = new WebGLGlobeDataSource();
-dataSource.loadUrl('../data/cesium/population909500.json').then(function() {
+var urlData = '../data/cesium/population909500.json';
+var urlData = '../sonar/flux?q=getEvalsWebGLGlobe';
+dataSource.loadUrl(urlData).then(function() {
 
     //After the initial load, create buttons to let the user switch among series.
     function createSeriesSetter(seriesName) {
