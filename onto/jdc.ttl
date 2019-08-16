@@ -128,3 +128,8 @@ jdc:distanceConcept a rdf:Property ;
     rdfs:label "distance du concept" ;
     rdfs:domain o:Resource ;
     vs:term_status "experimental" .
+
+jdc:ordreCrible a rdf:Property ;
+    rdfs:label "Ordre dans le crible" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .

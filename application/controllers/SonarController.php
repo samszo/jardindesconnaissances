@@ -74,7 +74,10 @@ class SonarController extends Zend_Controller_Action
 			case 'getEvalsOmk':
 				$rs['result'] = $this->s->getEvalsOmk($this->_getParam('inScheme'),$this->_getParam('id'));
 				break;
-		}
+			case 'getEvalsWebGLGlobe':
+				$rs['result'] = $this->s->getEvalsWebGLGlobe($this->_getParam('params'));
+				break;
+	}
 		$this->view->data = $rs;
 	}
 

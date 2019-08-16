@@ -1,0 +1,47 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix o: <http://omeka.org/s/vocabs/o#> .
+@prefix ieml: <https://jardindesconnaissances.univ-paris8.fr/onto/ieml> .
+@prefix ma: <http://www.w3.org/ns/ma-ont#>.
+
+<https://jardindesconnaissances.univ-paris8.fr/onto/ieml> a owl:Ontology ;
+    dcterms:title "Information Economy Meta Language" .
+
+ieml:Lettre a rdfs:Class ;
+    rdfs:label "Lettre" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+ieml:Mot a rdfs:Class ;
+    rdfs:label "Mot" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+ieml:Morpheme a rdfs:Class ;
+    rdfs:label "Morpheme" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+ieml:Paradigme a rdfs:Class ;
+    rdfs:label "Paradigme" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+ieml:Desc a rdf:Property ;
+    rdfs:label "Description" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+ieml:Code a rdf:Property ;
+    rdfs:label "Code" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+ieml:Ref a rdf:Property ;
+    rdfs:label "Reference" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+

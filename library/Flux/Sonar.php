@@ -90,6 +90,13 @@ class Flux_Sonar extends Flux_Site{
             ,'ns_uri'=>'https://jardindesconnaissances.univ-paris8.fr/onto/'
             ,'label'=>'Jardin des connaissances'
         ));
+        $r[]=$this->omk->setVocab(array(
+            'url'=>'https://jardindesconnaissances.univ-paris8.fr/onto/ieml/ieml.ttl'
+            ,'prefix'=>'ieml'
+            ,'format'=>'guess'
+            ,'ns_uri'=>'https://jardindesconnaissances.univ-paris8.fr/onto/ieml'
+            ,'label'=>'Information Economic Meta Language'
+        ));
         */
 
         //enregistre les templates
@@ -547,18 +554,15 @@ class Flux_Sonar extends Flux_Site{
     /**
 	 * récupère les geolocalisations au format  WebGL Globe
      * 
-     * @param string    $inScheme
-     * @param string    $id
+     * @param array    $params
      * 
      * @return array
 	 */
-	function getEvalsWebGLGlobe($inScheme, $id){
-        //inScheme possibilité de filtre non implémenté = fait sur le client
-        $rs=array();
-        $item = $this->omk->searchByRef($id,'items',true)[0];
-        if($item){
-            $rs = $this->omk->search(array('hasDoc'=>$item['o:id']),'items','hasDoc',true);
-        }
+	function getEvalsWebGLGlobe($params=false){
+        //TODO: utiliser params poru ajouter des conditions
+        //récupère les positions semantiques
+        $rs= $this->omk->search(array('resource_class_label'=>'SemanticPosition'),'items','resource_class_label',true);
+
         return $rs;
 
     }        

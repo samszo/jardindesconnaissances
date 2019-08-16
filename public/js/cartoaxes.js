@@ -2,6 +2,7 @@ class cartoaxes {
     constructor(params) {
         var me = this;
         this.data = [];
+        this.titre = params.titre ? params.titre : '';
         this.crible = params.crible ? params.crible : [
             {'label':'clair','id':'0','idP':'0'}
             ,{'label':'obscur','id':'1','idP':'0'}
@@ -27,7 +28,8 @@ class cartoaxes {
 
         //variable pour les axes
         var labelFactor = 1, 	//How much farther than the radius of the outer circle should the labels be placed
-        radius = Math.min(this.width/2, this.height/2),
+        marges = {'top':10},
+        radius = Math.min(this.width/2, (this.height-marges.top)/2),
 		angleSlice = Math.PI * 2 / this.crible.length,
         scCircle = d3.scalePoint()
             .domain(this.rayons)
@@ -50,7 +52,7 @@ class cartoaxes {
             .range(padExtent([0, this.width]));
         this.y = d3.scaleLinear()
             .domain(padExtent([this.yMin,this.yMax]))
-            .range(padExtent([this.height, 0]));
+            .range(padExtent([this.height-marges.top, 0]));
         this.rScale = d3.scaleLinear()
                 .range([0, radius])
                 .domain([this.xMin,this.xMax]);
@@ -78,6 +80,15 @@ class cartoaxes {
             me.drawAxes();
             me.drawCible();
 
+            //Ajoute le titre de la carto
+            me.g.append("text")
+                .attr("class", "txtTitreAxehaut")
+                .style("font-size", "18px")
+                .style("font-style", "italic")
+                .attr("text-anchor", "middle")
+                .attr("x", 0)
+                .attr("y", -(me.height/2)-(marges.top/2))
+                .text(me.titre);
            
         };
 
@@ -131,7 +142,7 @@ class cartoaxes {
                 .attr("class", "txtTitreAxehaut")
                 //.style("font-size", "11px")
                 .attr("text-anchor", "middle")
-                //.attr("dy", "0.35em")
+                .attr("dy", function(d, i){ return i==0 ? "1.2em" : "" ; })
                 .attr("x", function(d, i){ return me.rScale(me.xMax * labelFactor) * Math.cos(angleSlice*i - Math.PI/2); })
                 .attr("y", function(d, i){ return me.rScale(me.xMax * labelFactor) * Math.sin(angleSlice*i - Math.PI/2); })
                 .text(function(d){

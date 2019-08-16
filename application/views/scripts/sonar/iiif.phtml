@@ -272,9 +272,10 @@
         //gestion des événements
         d3.select('#btnSrcFlux')
             .on('click', function () {
-                //showCartoHorlo();
-                console.log('Charge les images du flux IIIF :' + sltFlux.url);
-                if(sltFlux.url)showSource(sltFlux.url);
+                if(sltFlux.url){
+                    showSource(sltFlux.url);
+                    showCartoHorlo(sltFlux.url);
+                }
             });
         d3.select('#btnConnexion')
             .on('click', function () {
@@ -688,14 +689,20 @@
                 success: function (data) {
                     //ajoute la carto axe            
                     lstItemCrible = [];
-                    var lbl,id,lblP,idP;
-                    data.forEach(function(d){
+                    var lbl,id,lblP,idP, ordre;
+                    data.forEach(function(d, i){
                         lbl = d['skos:prefLabel'][0]['@value'];
                         id = d['o:id'];
                         lblP = d['skos:inScheme'][0]['display_title'];
                         idP = d['skos:inScheme'][0]['value_resource_id'];
-                        lstItemCrible.push({'label':lbl,'id':id,'idP':idP,'labelP':lblP});
+                        ordre = d['jdc:ordreCrible'] ? d['jdc:ordreCrible'][0]['@value'] : i;
+                        lstItemCrible.push({'label':lbl,'id':id,'idP':idP,'labelP':lblP,'ordre':ordre});
                     });
+                    //tri les items du crible
+                    lstItemCrible.sort(function(a, b) {
+                        return a.ordre - b.ordre;
+                    });
+                    //construction de la cartgraphie par axe
                     ca = new cartoaxes({
                         'idSvg': 'svgGlobal',
                         'tick': 0,
@@ -704,6 +711,7 @@
                         'typeSrc':'IIIF',
                         'inScheme':lblP,
                         'crible': lstItemCrible,
+                        'titre':sltCrible["dcterms:title"][0]["@value"],
                         'fctGetGrad': pc.getInstantColors,
                         'fctSavePosi': savePosi,
                         'width': w,

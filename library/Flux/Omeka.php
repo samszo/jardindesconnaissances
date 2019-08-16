@@ -328,8 +328,8 @@ class Flux_Omeka extends Flux_Site{
      */
     function search($data,$type='items',$champ='title', $decode=false){
         //initialisation des paramètres POST
-        if($champ=='label'){
-            $param['label']=$data[$champ];
+        if($champ=='label' || $champ=='resource_class_label'){
+            $param[$champ]=$data[$champ];
         }else{
             $param['property'][0]['property']= $this->getIdByName($champ,'properties');//1;
             $param['property'][0]['type']='eq';
