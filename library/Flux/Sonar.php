@@ -573,14 +573,17 @@ class Flux_Sonar extends Flux_Site{
         ];        
         */
         $rs= $this->omk->search(array('resource_class_label'=>'SemanticPosition'),'items','resource_class_label',true);
+        //$this->trace('résultat de la recherche omk',$rs);
         $wgl = array();
         $series = array();
         foreach ($rs as $r) {
+            $this->trace('',$r);
             $doc = $r['ma:hasSource'][0];
             //construction des séries par doc
             if(!$series[$doc['value_resource_id']]){
                 $series[$doc['value_resource_id']]=array('i'=>count($series),'details'=>$doc);
-                $wgl[]=array($doc['display_title'],array());
+                //ATTENTION le nom de la série doit être unique
+                $wgl[]=array($doc['value_resource_id'].' - '.$doc['display_title'],array());
             }
             $idSerie = $series[$doc['value_resource_id']]['i'];
             $wgl[$idSerie][1][] = $r["ma:locationLatitude"][0]['@value'];

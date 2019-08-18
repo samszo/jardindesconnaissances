@@ -9,9 +9,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-    <meta name="description" content="A custom DataSource implementation.">
-    <meta name="cesium-sandcastle-labels" content="Showcases, DataSources, Tutorials">
-    <title>Cesium Demo</title>
+    <meta name="description" content="Visualisation des positions sémantiques dans un écosytème de connaissances">
+    <title>JDC - Sonar - Jardin</title>
     <script type="text/javascript" src="../js/cesium/Sandcastle-header.js"></script>
     <script type="text/javascript" src="../js/cesium/Cesium.js"></script>
 </head>
@@ -238,7 +237,7 @@ WebGLGlobeDataSource.prototype.loadUrl = function(url) {
     //and then process is with the `load` function.
     var that = this;
     return Cesium.Resource.fetchJson(url).then(function(json) {
-        return that.load(json.result.wdl, url);
+        return that.load(json, url);
     }).otherwise(function(error) {
         //Otherwise will catch any errors or exceptions that occur
         //during the promise processing. When this happens,
@@ -253,9 +252,9 @@ WebGLGlobeDataSource.prototype.loadUrl = function(url) {
  * Loads the provided data, replacing any existing data.
  * @param {Array} data The object to be processed.
  */
-WebGLGlobeDataSource.prototype.load = function(data) {
+WebGLGlobeDataSource.prototype.load = function(allData) {
     //>>includeStart('debug', pragmas.debug);
-    if (!Cesium.defined(data)) {
+    if (!Cesium.defined(allData)) {
         throw new Cesium.DeveloperError('data is required.');
     }
     //>>includeEnd('debug');
@@ -284,11 +283,17 @@ WebGLGlobeDataSource.prototype.load = function(data) {
     // ["series2",[latitude, longitude, height, ... ]]
 
     // Loop over each series
+    var data = allData.result.wdl
+    console.log('START data')
     for (var x = 0; x < data.length; x++) {
         var series = data[x];
         var seriesName = series[0];
         var coordinates = series[1];
+        //récupère le détail de la série
+        var idSerie = seriesName.split(' - ')[0];
+        var s = allData.result.series[idSerie].details
 
+        console.log(series)
         //Add the name of the series to our list of possible values.
         this._seriesNames.push(seriesName);
 
@@ -297,13 +302,29 @@ WebGLGlobeDataSource.prototype.load = function(data) {
         if (show) {
             this._seriesToDisplay = seriesName;
         }
+        //montre toutes les séries
+        var show = 1;
+
+
+        //ajoute un rectangle avec l'image
+        entities.add({
+            name: s.display_title,
+                rectangle: {
+                    coordinates: Cesium.Rectangle.fromDegrees(10*x, 10*x, 10, 10),
+                    material: s.thumbnail_url,
+                    classificationType : Cesium.ClassificationType.TERRAIN
+                },
+                height: 10000*x
+        });
 
         //Now loop over each coordinate in the series and create
         // our entities from the data.
+        console.log('START series')
         for (var i = 0; i < coordinates.length; i += 3) {
-            var latitude = coordinates[i];
-            var longitude = coordinates[i + 1];
-            var height = coordinates[i + 2];
+            var latitude = parseFloat(coordinates[i]);
+            var longitude =  parseFloat(coordinates[i + 1]);
+            var height =  parseFloat(coordinates[i + 2]);
+            console.log(latitude+','+longitude+','+height);
 
             //Ignore lines of zero height.
             if(height === 0) {
@@ -332,7 +353,9 @@ WebGLGlobeDataSource.prototype.load = function(data) {
             //Add the entity to the collection.
             entities.add(entity);
         }
+        console.log('END series')
     }
+    console.log('END data')
 
     //Once all data is processed, call resumeEvents and raise the changed event.
     entities.resumeEvents();
@@ -350,8 +373,11 @@ WebGLGlobeDataSource.prototype._setLoading = function(isLoading) {
 //Now that we've defined our own DataSource, we can use it to load
 //any JSON data formatted for WebGL Globe.
 var dataSource = new WebGLGlobeDataSource();
+/*
 var urlData = '../data/cesium/population909500.json';
 var urlData = '../sonar/flux?q=getEvalsWebGLGlobe';
+*/
+var urlData = 'https://jardindesconnaissances.univ-paris8.fr/jdc/public/sonar/flux?q=getEvalsWebGLGlobe';
 dataSource.loadUrl(urlData).then(function() {
 
     //After the initial load, create buttons to let the user switch among series.
@@ -368,6 +394,7 @@ dataSource.loadUrl(urlData).then(function() {
 });
 
 //Create a Viewer instances and add the DataSource.
+Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiYTI3OWI2My03MDNlLTQyZjAtYWY5OS02ZTU5MGY2MjFkMjUiLCJpZCI6MTQ2MjAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NjU5NDU1MzR9.zuJWBeovOnevAVL2LCjrLN8vN3zswKTuPVdRh28hWmc';
 var viewer = new Cesium.Viewer('cesiumContainer', {
     animation : false,
     timeline : false

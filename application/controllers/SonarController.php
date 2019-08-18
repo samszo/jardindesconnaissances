@@ -88,14 +88,18 @@ class SonarController extends Zend_Controller_Action
 	}
 
 	function initInstance($idUti=false, $redir=""){
+		//ouvre les sessions avant toute chose pour éviter un bug 
+		$this->ssUti = new Zend_Session_Namespace('uti');
+		$ssGoogle = new Zend_Session_Namespace('google');
+		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés		
+		$omk = new Zend_Session_Namespace('omk');
+
 		$this->view->ajax = $this->_getParam('ajax');
 		$this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
 
 		//initalise l'objet SONAR
-		$this->s = new Flux_Sonar($this->idBase);
+		$this->s = new Flux_Sonar($this->idBase,$this->_getParam('trace'));
 		$this->s->dbOmk = $this->_getParam('dbOmk',$this->idBaseOmk);
-		//enregistrement de l'objet OMK en cession pour éviter les rechargement des propriétés		
-		$omk = new Zend_Session_Namespace('omk');
 		//pour le debug $omk->o = false;
 		if(!$omk->o)$omk->o=$this->s->initOmeka(OMEKA_SONAR_ENDPOINT, OMEKA_SONAR_API_IDENT,OMEKA_SONAR_API_KEY);		
 		$this->s->omk = $omk->o;
@@ -111,8 +115,6 @@ class SonarController extends Zend_Controller_Action
 		$this->view->uti = "{}";                        
         
 		$auth = Zend_Auth::getInstance();
-		$this->ssUti = new Zend_Session_Namespace('uti');
-		$ssGoogle = new Zend_Session_Namespace('google');
 		
 		if ($auth->hasIdentity() || isset($this->ssUti->uti)) {
 				//utilisateur authentifier
