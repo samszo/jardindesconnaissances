@@ -115,6 +115,8 @@ class Flux_Sonar extends Flux_Site{
                 ,array('label'=>'locationLatitude','required'=>1,'type'=>'literal')
                 ,array('label'=>'locationLongitude','required'=>1,'type'=>'literal')
                 ,array('label'=>'hasSource','required'=>1,'type'=>'resource:item')
+                ,array('label'=>'frameHeight','required'=>1,'type'=>'literal')
+                ,array('label'=>'frameWidth','required'=>1,'type'=>'literal')
                 ,array('label'=>'isFragmentOf','required'=>1,'type'=>'resource:item')
                 ,array('label'=>'distanceCenter','required'=>1,'type'=>'literal')
                 ,array('label'=>'distanceConcept','required'=>1,'type'=>'literal')
@@ -462,7 +464,11 @@ class Flux_Sonar extends Flux_Site{
         //enregistre la position sémantique
         $d['ma:isFragmentOf']=null;
         $d['dcterms:isPartOf']=null;
-        $d['ma:hasSource']=array(array('type'=>'resource','value'=>$item['o:id']));
+        $iiifUrl = str_replace('api/','iiif-img',$this->omk->endpoint).'/'.$item['o:media'][0]['o:id'].'/full/full/0/default.png';
+        $d['ma:hasSource']=array(
+            array('type'=>'resource','value'=>$item['o:id'])
+            ,array('type'=>'uri','uri'=>$iiifUrl,'label'=>'uri IIIF')
+        );
         //met un type litteral pour le retrouver à la recherche
         $d['jdc:hasDoc']=''.$item['o:id'].'';
 
@@ -576,9 +582,15 @@ class Flux_Sonar extends Flux_Site{
         //$this->trace('résultat de la recherche omk',$rs);
         $wgl = array();
         $series = array();
+        $iiif = new Flux_Iiif();
         foreach ($rs as $r) {
             $this->trace('',$r);
             $doc = $r['ma:hasSource'][0];
+            //récupère les données de l'image
+            //http://gapai.univ-paris8.fr/sonar/omk/iiif/560/manifest
+            $iiifUrl = str_replace('api/','iiif',$this->omk->endpoint).'/'.$doc['value_resource_id'].'/manifest';
+            $iiif = json_decode($this->getUrlBodyContent($iiifUrl),true);
+            $doc['img']=$iiif['sequences'][0]['canvases'][0]['images'][0]['resource'];
             //construction des séries par doc
             if(!$series[$doc['value_resource_id']]){
                 $series[$doc['value_resource_id']]=array('i'=>count($series),'details'=>$doc);
@@ -594,5 +606,55 @@ class Flux_Sonar extends Flux_Site{
 
     }        
 
+    /**
+	 * corrige la taille des évaluations sémantiques
+     * 
+     * @return array
+	 */
+	function corrigeEval(){
+        $rs= $this->omk->search(array('resource_class_label'=>'SemanticPosition'),'items','resource_class_label',true);
+        $iiif = new Flux_Iiif();
+        foreach ($rs as $r) {
+            $doc = $r['ma:hasSource'][0];
+            //récupère les données de l'image
+            $iiifUrl = str_replace('api/','iiif',$this->omk->endpoint).'/'.$doc['value_resource_id'].'/manifest';
+            //$iiifUrl = 'http://gapai.univ-paris8.fr/sonar/omk/iiif/'.$doc['value_resource_id'].'/manifest';
+            $iiif = json_decode($this->getUrlBodyContent($iiifUrl),true);
+            $data['ma:frameWidth']="".$iiif['sequences'][0]['canvases'][0]['images'][0]['resource']['width'];
+            $data['ma:frameHeight']="".$iiif['sequences'][0]['canvases'][0]['images'][0]['resource']['height'];
+            $iiifUrl = $iiif['sequences'][0]['canvases'][0]['images'][0]['resource']['@id'];
+            $data['ma:hasSource']=array(
+                array('type'=>'resource','value'=>$doc['value_resource_id'])
+                ,array('type'=>'uri','uri'=>$iiifUrl,'label'=>'uri IIIF')
+            );        
+            $param = $this->omk->setParamAPI($data);
+            $r['ma:frameHeight']=$param['ma:frameHeight'];
+            $r['ma:frameWidth']=$param['ma:frameWidth'];
+            $r['ma:hasSource']=$param['ma:hasSource'];
+            $rs = $this->omk->send('items','PATCH',$this->omk->paramsAuth(),$r,'/'.$r['o:id'],true);
+            $this->trace('',$rs);
+        }
+
+    }        
+
+
+    /**
+	 * récupère les évaluation pour les afficher dans un globe
+     * 
+     * @param array    $params
+     * 
+     * @return array
+	 */
+	function getEvalsForGlobe($params=false){
+        //TODO: utiliser params pour ajouter des conditions
+        //récupère les positions semantiques
+        $rs= $this->omk->search(array('resource_class_label'=>'SemanticPosition'),'items','resource_class_label',true);
+        //récupère la description des images
+        $nb = count($rs);
+        for ($i=0; $i < $nb; $i++) { 
+            # code...
+        }
+        return $rs;
+    }      
 
 }

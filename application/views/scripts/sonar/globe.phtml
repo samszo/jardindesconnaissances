@@ -1,0 +1,101 @@
+<head>
+  <style> body { margin: 0; } </style>
+
+  <script src="//cdn.jsdelivr.net/npm/globe.gl"></script>
+  <!--<script src="../../dist/globe.gl.js"></script>-->
+  <script src="//cdn.jsdelivr.net/npm/three"></script>
+  <script type="text/javascript" src="../js/d3.v5.min.js"></script>
+
+</head>
+
+<body>
+  <div id="globeViz"></div>
+
+  <script>
+
+    // Gen random data
+    const N = 10;
+    const gData = [...Array(N).keys()].map(() => ({
+      lat: (Math.random() - 0.5) * 180,
+      lng: (Math.random() - 0.5) * 360,
+      alt: 12,
+      radius: Math.random() * 5,
+      color: ['red', 'white', 'blue', 'green'][Math.round(Math.random() * 3)]
+    }));
+
+    const world = Globe()
+      (document.getElementById('globeViz'))
+      //.globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg')
+      .globeImageUrl(false)
+      //.showGraticules(true)
+      .pointOfView({ altitude: 20 }, 5000)
+      .polygonCapColor(feat => 'rgba(200, 0, 0, 0.6)')
+      .polygonSideColor(() => 'rgba(0, 100, 0, 0.05)')
+      .polygonLabel(({ properties: d }) => `
+          <b>${d.ADMIN} (${d.ISO_A2})</b> <br />
+          Population: <i>${Math.round(+d.POP_EST / 1e4) / 1e2}M</i>
+        `)
+    /*
+      .customLayerData(gData)
+      .customThreeObject(function(d){
+        var texture = new THREE.TextureLoader().load('../img/papi-sonar.png');
+        // immediately use the texture for material creation
+        var img = new THREE.MeshBasicMaterial( { map: texture } );
+        var plane = new THREE.Mesh(new THREE.PlaneGeometry(100, 100),img);
+        plane.material.side = THREE.DoubleSide;
+        return plane;
+      })
+      .customThreeObjectUpdate((obj, d) => {
+        Object.assign(obj.position, world.getCoords(d.lat, d.lng, d.alt));
+      })
+    */
+    ;
+
+    // Auto-rotate
+    world.controls().autoRotate = true;
+    world.controls().autoRotateSpeed = 0.3;
+
+    fetch('../data/ne_110m_admin_0_countries.geojson').then(res => res.json()).then(countries => {
+      world.polygonsData(countries.features);
+
+      setTimeout(() => world
+        .polygonsTransitionDuration(4000)
+        //.polygonAltitude(feat => Math.max(0.1, Math.sqrt(+feat.properties.POP_EST) * 7e-5))
+        .polygonAltitude(feat => 10)
+      , 3000);
+    });
+
+    fetch('https://jardindesconnaissances.univ-paris8.fr/jdc/public/sonar/flux?q=getEvalsForGlobe').then(res => res.json()).then(evals => {
+        //groupe les données par source
+        var arrKey = [],
+        docs = d3.nest()
+            .key(function(d){
+                arrKey.push(d['ma:hasSource'][0]['value_resource_id']);
+                return d['ma:hasSource'][0]['value_resource_id'];
+            })
+            .entries(evals.result);
+
+
+        //affiche les données
+        world.customLayerData(docs)
+            .customThreeObject(function(d){
+                var urlImg = d.values[0]['ma:hasSource'][1]['@id']
+                , wImg = d.values[0]['ma:frameWidth'][0]['@value']
+                , hImg = d.values[0]['ma:frameHeight'][0]['@value']
+                ,texture = new THREE.TextureLoader().load(urlImg)
+                ,img = new THREE.MeshBasicMaterial( { map: texture } )
+                ,plane = new THREE.Mesh(new THREE.PlaneGeometry(wImg, hImg),img);
+                plane.material.side = THREE.DoubleSide;
+                return plane;
+            })
+            .customThreeObjectUpdate((obj, d) => {
+                Object.assign(obj.position, world.getCoords(
+                    d.values[0]['ma:locationLatitude'][0]['@value']
+                    , d.values[0]['ma:locationLongitude'][0]['@value']
+                    , 12));
+            })
+    });
+    
+
+  </script>
+</body>

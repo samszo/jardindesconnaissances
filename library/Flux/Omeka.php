@@ -106,16 +106,15 @@ class Flux_Omeka extends Flux_Site{
         return $this->send('annotations','POST',$this->paramsAuth(),$param,'',true);
     }
 
+
     /**
-     * Enregistre un item avec l'API
+     * construction des paramètres poru l'API
      *
      * @param array $data
-     * @param boolean   $existe
-     * @param boolean   $patch
      *
      * @return array
      */
-    function postItem($data, $existe=true, $patch=true){
+    function setParamAPI($data){
 
         foreach ($data as $k => $v) {
             switch ($k) {
@@ -172,6 +171,24 @@ class Flux_Omeka extends Flux_Site{
             }
         }
 
+        return $param;
+
+    }
+
+    /**
+     * Enregistre un item avec l'API
+     *
+     * @param array $data
+     * @param boolean   $existe
+     * @param boolean   $patch
+     * @param boolean   $put
+     *
+     * @return array
+     */
+    function postItem($data, $existe=true, $patch=true, $put=false){
+
+
+        $param = $this->setParamAPI($data);
        
         $r = null;
         if($existe){
@@ -181,6 +198,8 @@ class Flux_Omeka extends Flux_Site{
             $r = $this->send('items','POST',$this->paramsAuth(),$param,'',true);
         elseif($patch)
             $r = $this->send('items','PATCH',$this->paramsAuth(),$param,'/'.$r['o:id'],true);
+        elseif($put)
+            $r = $this->send('items','PUT',$this->paramsAuth(),$param,'/'.$r['o:id'],true);
         
         //gestion de l'erreur
         if($r['errors'])
@@ -335,6 +354,8 @@ class Flux_Omeka extends Flux_Site{
             $param['property'][0]['type']='eq';
             $param['property'][0]['text']=$data[$champ];
         }
+        //TODO: ajouter une fonction searchAll
+        $param['per_page']=100;
         $r = $this->send($type,'GET',$param,false,'',$decode);
         return $r;
     }

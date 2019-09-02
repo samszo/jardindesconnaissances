@@ -77,12 +77,24 @@ class SonarController extends Zend_Controller_Action
 			case 'getEvalsWebGLGlobe':
 				$rs['result'] = $this->s->getEvalsWebGLGlobe($this->_getParam('params'));
 				break;
-		}
+			case 'corrigeEval':
+				$rs['result'] = $this->s->corrigeEval();
+				break;
+			case 'getEvalsForGlobe':
+				$rs['result'] = $this->s->getEvalsForGlobe();
+				break;
+}
 		$this->view->data = $rs;
 	}
 
-	public function jardinAction() {
-		$this->initInstance(false,"/jardin");
+	public function cesiumAction() {
+		$this->initInstance(false,"/cecium");
+		$rs = array('result' => array(), 'erreur'=>0);
+
+	}
+
+	public function globeAction() {
+		$this->initInstance(false,"/globe");
 		$rs = array('result' => array(), 'erreur'=>0);
 
 	}

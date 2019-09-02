@@ -77,7 +77,7 @@ class Flux_Iiif extends Flux_Site{
 	}
 	
 	/**
-	 * Fonction pour récupérer les information IIF d'une photo
+	 * Fonction pour récupérer les informations IIF d'une photo
 	 *
 	 * @param  	int 		$id
 	 * @param  	int 		$i

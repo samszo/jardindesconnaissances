@@ -6799,9 +6799,24 @@
                             "Section": "",
                             "Lieu": "",
                             "photo": "img/logop8-3.jpg",
-                            "recid": 45
-                            }
-],
+                            "recid": 48
+                            }, {
+                                "id": 49,
+                                "Civilité": "Mme",
+                                "Nom": "Laurent",
+                                "Prénom": "Melody",
+                                "Mail": "Melody.Laurent@siris.sorbonne.fr ",
+                                "Téléphone": "",
+                                "Adresse": "",
+                                "Type": "Professionnel",
+                                "Roles": "Intervenants",
+                                "Statut": "",
+                                "Section": "",
+                                "Lieu": "",
+                                "photo": "img/logop8-3.jpg",
+                                "recid": 49
+                                }
+    ],
     "agendas": [
         {"nom":"LP-DWM","url":"44h1cj5bduhf0v5r56anot5vhk@group.calendar.google.com"}
         ,{"nom":"M1-CEN","url":"cpfjqr9f2qq3ekgvh44mqp84ds@group.calendar.google.com"}

@@ -274,7 +274,6 @@
             .on('click', function () {
                 if(sltFlux.url){
                     showSource(sltFlux.url);
-                    showCartoHorlo(sltFlux.url);
                 }
             });
         d3.select('#btnConnexion')
@@ -402,7 +401,7 @@
                     //ajoute les photo à la gallery
                     ajoutPhotosGallerie(data.manifests);
                     //ajoute la cartographie
-                    if (!ca) showCartoHorlo(data['@id']);
+                    showCartoHorlo(data['@id']);
                 }
             });
         }
@@ -527,22 +526,22 @@
                 success: function (data) {
                     console.log(data);
                     d.infos = data;
-                    let url = "";
+                    let dt = false;
                     //vérifie la présence de visage
                     d.infos.metadata.forEach(function (t) {
                         if (t.label == "faceAnnotations") {
-                            url = getVisageTofIIIF(d, t);
+                            dt = getVisageTofIIIF(d, t);
                         }
                     })
 
                     //récupère l'image si pas de visage
-                    if (url == "") {
+                    if (!dt) {
                         let isAlea = document.getElementById("ckAleaTaille").checked;
-                        url = getTailleTofIIIF(d,isAlea);
+                        dt = getTailleTofIIIF(d,isAlea);
                     }
 
                     //code pour ajouter une image HTML
-                    d3.select("#" + d.idImg).attr('src', url);
+                    d3.select("#" + d.idImg).attr('src', dt.url);
 
                     /*code pour une image SVG
                     d3.select("#"+d.idSvg).append('image')
@@ -553,12 +552,14 @@
                     */
 
                     //précise l'url à la carto
-                    d.idDoc = url;
-                    ca.idDoc = url;
+                    d.idDoc = dt.url;
+                    ca.idDoc = dt.url;
                     //précise le json de la photo
                     ca.data = {
                         'IIIF':d.infos.sequences[0].canvases[0].images[0].resource.service["@id"]+'/info.json'
                         ,'title':d.infos.label
+                        ,'height':dt.h
+                        ,'width':dt.w
                     };
 
 
@@ -619,7 +620,7 @@
             console.log(img);
             d.images.push(img);
 
-            return img.url;
+            return {'url':img.url,'h':parseInt(height),'w':parseInt(width)};
         }
 
         function getVisageTofIIIF(d, t) {
@@ -647,7 +648,7 @@
                 console.log(img);
                 d.images.push(img);
             });
-            return img.url;
+            return {'url':img.url,'h':parseInt(bb.height),'w':parseInt(bb.width)};
         }
 
         function showCartoHorlo(id) {
@@ -744,6 +745,8 @@
                 ,'ma:locationLatitude':geo.coords.latitude
                 ,'ma:locationLongitude':geo.coords.longitude
                 ,'ma:hasSource':d.id
+                ,'ma:frameHeight':d.infos.height
+                ,'ma:frameWidth':d.infos.width
                 ,'ma:isFragmentOf':{'title':d.infos.title,'IIIF':d.infos.IIIF}
                 ,'jdc:degradName':d.degrad.nom
                 ,'jdc:degradColors':d.degrad.colors

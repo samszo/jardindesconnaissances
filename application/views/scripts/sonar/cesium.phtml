@@ -24,22 +24,22 @@
 <script id="cesium_sandcastle_script">
 function startup(Cesium) {
     'use strict';
-//Sandcastle_Begin
-/**
- * This class is an example of a custom DataSource.  It loads JSON data as
- * defined by Google's WebGL Globe, https://github.com/dataarts/webgl-globe.
- * @alias WebGLGlobeDataSource
- * @constructor
- *
- * @param {String} [name] The name of this data source.  If undefined, a name
- *                        will be derived from the url.
- *
- * @example
- * var dataSource = new Cesium.WebGLGlobeDataSource();
- * dataSource.loadUrl('sample.json');
- * viewer.dataSources.add(dataSource);
- */
-function WebGLGlobeDataSource(name) {
+    //Sandcastle_Begin
+    /**
+     * This class is an example of a custom DataSource.  It loads JSON data as
+     * defined by Google's WebGL Globe, https://github.com/dataarts/webgl-globe.
+     * @alias WebGLGlobeDataSource
+     * @constructor
+     *
+     * @param {String} [name] The name of this data source.  If undefined, a name
+     *                        will be derived from the url.
+     *
+     * @example
+     * var dataSource = new Cesium.WebGLGlobeDataSource();
+     * dataSource.loadUrl('sample.json');
+     * viewer.dataSources.add(dataSource);
+     */
+    function WebGLGlobeDataSource(name) {
     //All public configuration is defined as ES5 properties
     //These are just the "private" variables and their defaults.
     this._name = name;
@@ -52,9 +52,9 @@ function WebGLGlobeDataSource(name) {
     this._seriesToDisplay = undefined;
     this._heightScale = 10000000;
     this._entityCluster = new Cesium.EntityCluster();
-}
+    }
 
-Object.defineProperties(WebGLGlobeDataSource.prototype, {
+    Object.defineProperties(WebGLGlobeDataSource.prototype, {
     //The below properties must be implemented by all DataSource instances
 
     /**
@@ -212,14 +212,14 @@ Object.defineProperties(WebGLGlobeDataSource.prototype, {
             this._entityCluster = value;
         }
     }
-});
+    });
 
-/**
- * Asynchronously loads the GeoJSON at the provided url, replacing any existing data.
- * @param {Object} url The url to be processed.
- * @returns {Promise} a promise that will resolve when the GeoJSON is loaded.
- */
-WebGLGlobeDataSource.prototype.loadUrl = function(url) {
+    /**
+     * Asynchronously loads the GeoJSON at the provided url, replacing any existing data.
+     * @param {Object} url The url to be processed.
+     * @returns {Promise} a promise that will resolve when the GeoJSON is loaded.
+     */
+    WebGLGlobeDataSource.prototype.loadUrl = function(url) {
     if (!Cesium.defined(url)) {
         throw new Cesium.DeveloperError('url is required.');
     }
@@ -246,13 +246,13 @@ WebGLGlobeDataSource.prototype.loadUrl = function(url) {
         that._error.raiseEvent(that, error);
         return Cesium.when.reject(error);
     });
-};
+    };
 
-/**
- * Loads the provided data, replacing any existing data.
- * @param {Array} data The object to be processed.
- */
-WebGLGlobeDataSource.prototype.load = function(allData) {
+    /**
+     * Loads the provided data, replacing any existing data.
+     * @param {Array} data The object to be processed.
+     */
+    WebGLGlobeDataSource.prototype.load = function(allData) {
     //>>includeStart('debug', pragmas.debug);
     if (!Cesium.defined(allData)) {
         throw new Cesium.DeveloperError('data is required.');
@@ -306,15 +306,17 @@ WebGLGlobeDataSource.prototype.load = function(allData) {
         var show = 1;
 
 
-        //ajoute un rectangle avec l'image
+        /*ajoute un rectangle avec l'image
+        */
+        var hght = 200000.0 * x;
+        var cW = -67.0, cS = 27.0, cE = -63.0, cN = 32.0;
         entities.add({
-            name: s.display_title,
-                rectangle: {
-                    coordinates: Cesium.Rectangle.fromDegrees(10*x, 10*x, 10, 10),
-                    material: s.thumbnail_url,
-                    classificationType : Cesium.ClassificationType.TERRAIN
-                },
-                height: 10000*x
+            rectangle : {
+                coordinates : Cesium.Rectangle.fromDegrees(cW, cS, cE, cN),
+                height : hght,
+                //material : Cesium.Color.fromRandom({alpha : 0.5})
+                material: s.thumbnail_url,
+            }
         });
 
         //Now loop over each coordinate in the series and create
@@ -334,6 +336,8 @@ WebGLGlobeDataSource.prototype.load = function(allData) {
             var color = Cesium.Color.fromHsl((0.6 - (height * 0.5)), 1.0, 0.5);
             var surfacePosition = Cesium.Cartesian3.fromDegrees(longitude, latitude, 0);
             var heightPosition = Cesium.Cartesian3.fromDegrees(longitude, latitude, height * heightScale);
+            heightPosition = Cesium.Cartesian3.fromDegrees(cW, cS, hght);
+            
 
             //WebGL Globe only contains lines, so that's the only graphics we create.
             var polyline = new Cesium.PolylineGraphics();
@@ -361,24 +365,22 @@ WebGLGlobeDataSource.prototype.load = function(allData) {
     entities.resumeEvents();
     this._changed.raiseEvent(this);
     this._setLoading(false);
-};
+    };
 
-WebGLGlobeDataSource.prototype._setLoading = function(isLoading) {
+    WebGLGlobeDataSource.prototype._setLoading = function(isLoading) {
     if (this._isLoading !== isLoading) {
         this._isLoading = isLoading;
         this._loading.raiseEvent(this, isLoading);
     }
-};
+    };
 
-//Now that we've defined our own DataSource, we can use it to load
-//any JSON data formatted for WebGL Globe.
-var dataSource = new WebGLGlobeDataSource();
-/*
-var urlData = '../data/cesium/population909500.json';
-var urlData = '../sonar/flux?q=getEvalsWebGLGlobe';
-*/
-var urlData = 'https://jardindesconnaissances.univ-paris8.fr/jdc/public/sonar/flux?q=getEvalsWebGLGlobe';
-dataSource.loadUrl(urlData).then(function() {
+    //Now that we've defined our own DataSource, we can use it to load
+    //any JSON data formatted for WebGL Globe.
+    var dataSource = new WebGLGlobeDataSource();
+    //var urlData = '../data/cesium/population909500.json';
+    var urlData = 'https://jardindesconnaissances.univ-paris8.fr/jdc/public/sonar/flux?q=getEvalsWebGLGlobe';
+    //var urlData = '../sonar/flux?q=getEvalsWebGLGlobe';
+    dataSource.loadUrl(urlData).then(function() {
 
     //After the initial load, create buttons to let the user switch among series.
     function createSeriesSetter(seriesName) {
@@ -391,20 +393,34 @@ dataSource.loadUrl(urlData).then(function() {
         var seriesName = dataSource.seriesNames[i];
         Sandcastle.addToolbarButton(seriesName, createSeriesSetter(seriesName));
     }
-});
+    });
 
-//Create a Viewer instances and add the DataSource.
-Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiYTI3OWI2My03MDNlLTQyZjAtYWY5OS02ZTU5MGY2MjFkMjUiLCJpZCI6MTQ2MjAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NjU5NDU1MzR9.zuJWBeovOnevAVL2LCjrLN8vN3zswKTuPVdRh28hWmc';
-var viewer = new Cesium.Viewer('cesiumContainer', {
+    //Create a Viewer instances and add the DataSource.
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiYTI3OWI2My03MDNlLTQyZjAtYWY5OS02ZTU5MGY2MjFkMjUiLCJpZCI6MTQ2MjAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NjU5NDU1MzR9.zuJWBeovOnevAVL2LCjrLN8vN3zswKTuPVdRh28hWmc';
+    var viewer = new Cesium.Viewer('cesiumContainer', {
     animation : false,
     timeline : false
-});
-viewer.clock.shouldAnimate = false;
-viewer.dataSources.add(dataSource);
+    });
+    viewer.clock.shouldAnimate = false;
+    viewer.dataSources.add(dataSource);
 
-//Sandcastle_End
+
+    // Tropics of Cancer and Capricorn
+    //var coffeeBeltRectangle = Cesium.Rectangle.fromDegrees(-180.0, -23.43687, 180.0, 23.43687);
+    // hemisphère nord
+    var coffeeBeltRectangle = Cesium.Rectangle.fromDegrees(-180.0, 0, 180, 90);
+    // hemisphère sud
+    //var coffeeBeltRectangle = Cesium.Rectangle.fromDegrees(-180.0, -90, 180, 0);
+
+    viewer.scene.globe.cartographicLimitRectangle = coffeeBeltRectangle;
+    viewer.scene.skyAtmosphere.show = false;
+
+
+    //Sandcastle_End
     Sandcastle.finishedLoading();
+
 }
+
 if (typeof Cesium !== 'undefined') {
     startup(Cesium);
 } else if (typeof require === 'function') {
