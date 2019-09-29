@@ -177,7 +177,7 @@ class Model_DbTable_Gen_generateurs extends Zend_Db_Table_Abstract
     public function findByIdConcept($id_concept)
     {
         $query = $this->select()
-        	->from( array("cg" => "gen_concepts_generateurs") )                           
+        	->from( array("cg" => "gen_concepts_generateurs"),array('recid'=>'cg.id_gen') )                           
 	        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         ->joinInner(array('g' => 'gen_generateurs'),
         		'g.id_gen = cg.id_gen')

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title><?php echo $this->titre;?></title>
+	<script src="../js/gantt/dhtmlxgantt.js?v=6.2.6"></script>
+	<link rel="stylesheet" href="../js/gantt/dhtmlxgantt.css?v=6.2.6">
+
+	<script src="http://localhost/exemples/js/gantt/codebase/locale/locale_fr.js?v=6.2.6"></script>
+	<script src="<?php echo $this->urlData;?>"></script>
+	<style>
+		html, body {
+			height: 100%;
+			padding: 0px;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		.high {
+			border: 2px solid #d96c49;
+			color: #d96c49;
+			background: #d96c49;
+		}
+
+		.high .gantt_task_progress {
+			background: #db2536;
+		}
+
+		.medium {
+			border: 2px solid #34c461;
+			color: #34c461;
+			background: #34c461;
+		}
+
+		.medium .gantt_task_progress {
+			background: #23964d;
+		}
+
+		.low {
+			border: 2px solid #6ba8e3;
+			color: #6ba8e3;
+			background: #6ba8e3;
+		}
+
+		.low .gantt_task_progress {
+			background: #547dab;
+		}
+
+		.hyper {
+			border: 2px solid #0f1aa0;
+			color: white;
+			background: #900fa0;
+		}
+
+		.emploi {
+			border: 2px solid #ec6d13;
+			color: black;
+			background: #ecdb13;
+		}
+
+		.emploi .gantt_task_progress {
+			background: #ec6d13bf;
+		}
+
+        .gantt_line_wrapper div {
+            background-color: black;
+        }
+
+        .gantt_link_arrow_right {
+			border-left-color: black;
+		}
+	</style>
+</head>
+
+<body>
+<div id="gantt_here" style='width:100%; height:100%;'></div>
+<script>
+
+	//gantt.config.min_column_width = 100;
+	gantt.config.scale_height = 60;
+
+	var monthScaleTemplate = function (date) {
+		var dateToStr = gantt.date.date_to_str("%M");
+		var endDate = gantt.date.add(date, 2, "month");
+		return dateToStr(date) + " - " + dateToStr(endDate);
+	};
+
+	gantt.config.scales = [
+		{unit: "year", step: 1, format: "%Y"},
+		{unit: "month", step: 3, format: "%M"}
+	];
+    
+	gantt.templates.task_class = function (start, end, task) {
+		switch (task.priority) {
+			case "1":
+				return "high";
+				break;
+			case "2":
+				return "medium";
+				break;
+			case "3":
+				return "low";
+				break;
+            case "4":
+				return "hyper";
+				break;
+            case "5":
+				return "emploi";
+				break;
+		}
+	};
+
+	gantt.init("gantt_here");
+    gantt.parse(demo_tasks);
+
+</script>
+</body>

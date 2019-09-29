@@ -12,7 +12,7 @@
  */
 class GenerateurController extends Zend_Controller_Action
 {
-    var $idBase = "generateur";
+    var $idBaseGen = "generateur";
 
     public function init()
     {
@@ -21,7 +21,6 @@ class GenerateurController extends Zend_Controller_Action
 
     public function indexAction()
     {
-
     	
     }
 
@@ -39,11 +38,66 @@ class GenerateurController extends Zend_Controller_Action
     public function gestionAction()
     {
         $this->initInstance("/gestion");        
+        $sGen = new Flux_Site($this->idBaseGen);
     	
     }
 
     public function creaimportAction()
     {
+    	
+    }
+
+    public function apiAction()
+    {   
+        $this->initInstance("/gestion");        
+        $sGen = new Flux_Site($this->idBaseGen);
+        $o = $this->_getParam('o');
+        switch ($this->_getParam('v')) {
+            case 'c':
+                # code...
+                break;
+            case 'r':
+                switch ($o) {
+                    case 'oeuvre':
+                        $db = new Model_DbTable_Gen_Oeuvres($sGen->db);
+                        $this->view->r = $db->getAll();
+                        break;
+                    case 'uti':
+                        $db = new Model_DbTable_Flux_uti($sGen->db);
+                        $this->view->listeDico = $db->getAll();
+                        break;                    
+                    case 'dico':
+                        if($this->_getParam('idOeu')){
+                            $db = new Model_DbTable_Gen_oeuvresxdicosxutis($sGen->db);
+                            $this->view->r=$db->findByIdOeu($this->_getParam('idOeu'));
+                        }
+                        if($this->_getParam('idDico')){
+                            $db = new Model_DbTable_Gen_concepts($sGen->db);
+                            $this->view->r=$db->getAllByDico($this->_getParam('idDico'),$this->_getParam('type'));
+                        }
+                        if($this->_getParam('idConcept')){
+                            $dbG = new Model_DbTable_Gen_generateurs($sGen->db);
+                            $dbC = new Model_DbTable_Gen_concepts($sGen->db);
+                            $r['gen']=$dbG->findByIdConcept($this->_getParam('idConcept'));
+                            $r[$this->_getParam('type')]=$dbC->getItemByType($this->_getParam('idConcept'),$this->_getParam('type'));                            
+                            $this->view->r = $r;
+                        }
+                        break;                    
+                    default:
+                        $this->view->r=array('erreur'=>"Pas d'objet");
+                        break;
+                }
+                break;
+            case 'u':
+                # code...
+                break;
+            case 'd':
+                # code...
+                break;
+            default:
+                $this->view->r=array('erreur'=>'Aucun verbe');
+                break;
+        }
     	
     }
 

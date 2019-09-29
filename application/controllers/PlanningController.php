@@ -148,6 +148,22 @@ class PlanningController extends Zend_Controller_Action {
 		$this->view->gid = $this->_getParam('gid','76288419');
 		
 	}
+
+	/**
+	 * action permettant d'afficher un diagramme de Gantt
+	 */
+	public function ganttAction() {
+		switch ($this->_getParam('projet')) {
+			case 'H2PTM4.0':
+				$this->view->titre='Gantt '.$this->_getParam('projet');		
+				$this->view->urlData="../../data/planning/gantt/H2PTM4.0.js";		
+				break;			
+			default:
+				$this->view->titre='Gantt';		
+				$this->view->urlData="../../data/planning/gantt/H2PTM4.0.js";		
+				break;
+		}
+	}
 	
 	private function verifExpireToken($ssPlan){
 		$ssPlan->client->setAccessToken($ssPlan->token);

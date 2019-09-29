@@ -326,10 +326,10 @@ class Model_DbTable_Gen_dicos extends Zend_Db_Table_Abstract
 		else 
 			$where = " WHERE d.id_dico = ".$idDico;
     	
-		$sql = "SELECT c.lib as concept, c.type ";
+		$sql = "SELECT c.lib as concept, c.type, c.id_concept ";
 		switch ($type) {
-			case "gen":
-				$sql .= ", g.valeur
+			case "concepts":
+				$sql .= ", g.valeur, g.id_gen recid
 					FROM gen_dicos d
 					INNER JOIN gen_concepts c ON d.id_dico = c.id_dico
 					INNER JOIN gen_concepts_generateurs cg ON c.id_concept = cg.id_concept

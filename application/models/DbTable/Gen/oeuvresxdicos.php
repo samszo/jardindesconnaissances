@@ -135,10 +135,10 @@ class Model_DbTable_Gen_oeuvresxdicos extends Zend_Db_Table_Abstract
         $query = $this->select()
         	->from( array("od" => "gen_oeuvres_dicos") )                           
 	        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
-        ->joinInner(array('d' => 'gen_dicos'),
-        		'd.id_dico = od.id_dico')
+        ->joinInner(array('d' => 'gen_dicos'),'d.id_dico = od.id_dico'
+            ,array('recid'=>'d.id_dico','nom','type','langue','general','licence'))
         ->where( "od.id_oeu = ?", $id_oeu )
-    	->order("d.type");
+        ->order(array("d.general DESC", "d.type"));
         
         return $this->fetchAll($query)->toArray(); 
     }

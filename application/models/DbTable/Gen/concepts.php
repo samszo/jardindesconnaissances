@@ -321,6 +321,40 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
         return $rows; 
     }
     
+
+    /**
+     * Recherche les entrées Gen_concepts dans un dictionnaire
+     *
+     * @param interger  $idDico
+     * @param varchar   $type
+     *
+     * @return array
+     */
+    public function getAllByDico($idDico)
+    {
+        $sql = "SELECT 
+            c.id_concept recid, c.id_concept, c.lib, c.type, COUNT(c.id_concept) nbForme
+        FROM
+            gen_concepts c
+                LEFT JOIN
+            gen_concepts_adjectifs ca ON ca.id_concept = c.id_concept
+                LEFT JOIN
+            gen_concepts_substantifs csu ON csu.id_concept = c.id_concept
+                LEFT JOIN
+            gen_concepts_syntagmes csy ON csy.id_concept = c.id_concept
+                LEFT JOIN
+            gen_concepts_verbes cv ON cv.id_concept = c.id_concept
+        WHERE
+            c.id_dico = ".$idDico."
+        GROUP BY c.id_concept
+        ORDER BY c.type , c.lib";
+        $smtp = $this->_db->query($sql);
+        return $smtp->fetchAll();
+
+    }
+    
+
+
     /**
      * Recherche une entrée Gen_concepts avec la valeur spécifiée
      * et retourne cette entrée.
@@ -431,6 +465,43 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
 				break; 
         }
     	return $txtGen;
+    }
+
+    /**
+     * renvoie les items lié génératif conrrespondant à un concept
+     *
+     * @param int       $id
+     * @param string    $type
+     *
+     * @return string
+     */
+    public function getItemByType($id, $type)
+    {
+    	switch ($type) {
+            case "a":
+                $db = new Model_DbTable_Gen_adjectifs($this->_db);
+                $rs = $db->findByIdConcept($id);
+				break; 
+			case "m": 
+				$txtGen = " [".$cpt["type"]. "_".$cpt["lib"]. "]";
+				break; 
+			case "s":
+				$txtGen = " [".$cpt["type"]. "_".$cpt["lib"]. "]";
+				break;
+			case "v": 
+				$txtGen = " [".$cpt["type"]. "_".$cpt["lib"]. "]";
+				break; 
+			case "carac": 
+				$txtGen = "[".$cpt["type"].$cpt["lib"]. "]";
+				break; 
+			case "caract": 
+				$txtGen = "[".$cpt["type"].$cpt["lib"]. "]";
+				break; 
+			default: 
+				$txtGen = "[".$cpt["type"]. "-".$cpt["lib"]. "]";
+				break; 
+        }
+    	return $rs;
     }
 
     /**

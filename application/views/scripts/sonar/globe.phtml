@@ -34,26 +34,12 @@
       .polygonLabel(({ properties: d }) => `
           <b>${d.ADMIN} (${d.ISO_A2})</b> <br />
           Population: <i>${Math.round(+d.POP_EST / 1e4) / 1e2}M</i>
-        `)
-    /*
-      .customLayerData(gData)
-      .customThreeObject(function(d){
-        var texture = new THREE.TextureLoader().load('../img/papi-sonar.png');
-        // immediately use the texture for material creation
-        var img = new THREE.MeshBasicMaterial( { map: texture } );
-        var plane = new THREE.Mesh(new THREE.PlaneGeometry(100, 100),img);
-        plane.material.side = THREE.DoubleSide;
-        return plane;
-      })
-      .customThreeObjectUpdate((obj, d) => {
-        Object.assign(obj.position, world.getCoords(d.lat, d.lng, d.alt));
-      })
-    */
-    ;
+        `);
 
-    // Auto-rotate
+    /* Auto-rotate
     world.controls().autoRotate = true;
     world.controls().autoRotateSpeed = 0.3;
+    */
 
     fetch('../data/ne_110m_admin_0_countries.geojson').then(res => res.json()).then(countries => {
       world.polygonsData(countries.features);
@@ -70,7 +56,11 @@
         var arrKey = [],
         docs = d3.nest()
             .key(function(d){
-                arrKey.push(d['ma:hasSource'][0]['value_resource_id']);
+                arrKey[d['ma:hasSource'][0]['value_resource_id']]={
+                    'urlImg':d['ma:hasSource'][1]['@id']
+                    ,'wImg':d['ma:frameWidth'][0]['@value']
+                    ,'hImg':d['ma:frameHeight'][0]['@value']
+                };
                 return d['ma:hasSource'][0]['value_resource_id'];
             })
             .entries(evals.result);

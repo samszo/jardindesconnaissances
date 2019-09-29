@@ -22,8 +22,14 @@ class Flux_Databnf extends Flux_Site{
 	var $rs;
 	var $doublons;
 	var $uploadAudio = "/data/BNF/audio/";
-
-	
+/*
+https://catalogue.bnf.fr/affiner.do?motRecherche=&listeAffinages=FacSpe_-1%3BFacLocal_Lcl2FRdjOpera&affinageSupprimer=true&codeFacetteAffine=FacLocal&valeurFacetteAffine=Lcl2FRdjOpera&afficheRegroup=false&trouveDansFiltre=NoticePUB&triResultParPage=0&nbResultParPage=10&critereRecherche=0
+http://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.doctype%20all%20%22v%22&recordSchema=unimarcxchange&maximumRecords=20&startRecord=1
+SELECT ?champ ?valeur
+WHERE {
+  <http://data.bnf.fr/ark:/12148/cb39526007r> ?champ ?valeur.
+}
+*/	
     /**
      * Constructeur de la classe
      *

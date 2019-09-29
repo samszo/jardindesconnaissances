@@ -24,6 +24,9 @@
 <script id="cesium_sandcastle_script">
 function startup(Cesium) {
     'use strict';
+
+    var altSurface = 10000000.0;
+
     //Sandcastle_Begin
     /**
      * This class is an example of a custom DataSource.  It loads JSON data as
@@ -40,18 +43,18 @@ function startup(Cesium) {
      * viewer.dataSources.add(dataSource);
      */
     function WebGLGlobeDataSource(name) {
-    //All public configuration is defined as ES5 properties
-    //These are just the "private" variables and their defaults.
-    this._name = name;
-    this._changed = new Cesium.Event();
-    this._error = new Cesium.Event();
-    this._isLoading = false;
-    this._loading = new Cesium.Event();
-    this._entityCollection = new Cesium.EntityCollection();
-    this._seriesNames = [];
-    this._seriesToDisplay = undefined;
-    this._heightScale = 10000000;
-    this._entityCluster = new Cesium.EntityCluster();
+        //All public configuration is defined as ES5 properties
+        //These are just the "private" variables and their defaults.
+        this._name = name;
+        this._changed = new Cesium.Event();
+        this._error = new Cesium.Event();
+        this._isLoading = false;
+        this._loading = new Cesium.Event();
+        this._entityCollection = new Cesium.EntityCollection();
+        this._seriesNames = [];
+        this._seriesToDisplay = undefined;
+        this._heightScale = 10000000;
+        this._entityCluster = new Cesium.EntityCluster();
     }
 
     Object.defineProperties(WebGLGlobeDataSource.prototype, {
@@ -308,7 +311,8 @@ function startup(Cesium) {
 
         /*ajoute un rectangle avec l'image
         */
-        var hght = 200000.0 * x;
+        var altCouche = 3;
+        var hght = altSurface * altCouche * x;
         var cW = -67.0, cS = 27.0, cE = -63.0, cN = 32.0;
         entities.add({
             rectangle : {
@@ -334,7 +338,7 @@ function startup(Cesium) {
             }
 
             var color = Cesium.Color.fromHsl((0.6 - (height * 0.5)), 1.0, 0.5);
-            var surfacePosition = Cesium.Cartesian3.fromDegrees(longitude, latitude, 0);
+            var surfacePosition = Cesium.Cartesian3.fromDegrees(longitude, latitude, altSurface);
             var heightPosition = Cesium.Cartesian3.fromDegrees(longitude, latitude, height * heightScale);
             heightPosition = Cesium.Cartesian3.fromDegrees(cW, cS, hght);
             
@@ -342,7 +346,7 @@ function startup(Cesium) {
             //WebGL Globe only contains lines, so that's the only graphics we create.
             var polyline = new Cesium.PolylineGraphics();
             polyline.material = new Cesium.ColorMaterialProperty(color);
-            polyline.width = new Cesium.ConstantProperty(2);
+            polyline.width = new Cesium.ConstantProperty(10);
             polyline.arcType = new Cesium.ConstantProperty(Cesium.ArcType.NONE);
             polyline.positions = new Cesium.ConstantProperty([surfacePosition, heightPosition]);
 
@@ -382,24 +386,24 @@ function startup(Cesium) {
     //var urlData = '../sonar/flux?q=getEvalsWebGLGlobe';
     dataSource.loadUrl(urlData).then(function() {
 
-    //After the initial load, create buttons to let the user switch among series.
-    function createSeriesSetter(seriesName) {
-        return function() {
-            dataSource.seriesToDisplay = seriesName;
-        };
-    }
-
-    for (var i = 0; i < dataSource.seriesNames.length; i++) {
-        var seriesName = dataSource.seriesNames[i];
-        Sandcastle.addToolbarButton(seriesName, createSeriesSetter(seriesName));
-    }
+        //After the initial load, create buttons to let the user switch among series.
+        function createSeriesSetter(seriesName) {
+            return function() {
+                dataSource.seriesToDisplay = seriesName;
+            };
+        }
+        for (var i = 0; i < dataSource.seriesNames.length; i++) {
+            var seriesName = dataSource.seriesNames[i];
+            //Sandcastle.addToolbarButton(seriesName, createSeriesSetter(seriesName));
+        }
     });
-
+    
     //Create a Viewer instances and add the DataSource.
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiYTI3OWI2My03MDNlLTQyZjAtYWY5OS02ZTU5MGY2MjFkMjUiLCJpZCI6MTQ2MjAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NjU5NDU1MzR9.zuJWBeovOnevAVL2LCjrLN8vN3zswKTuPVdRh28hWmc';
     var viewer = new Cesium.Viewer('cesiumContainer', {
-    animation : false,
-    timeline : false
+        animation : false
+        ,timeline : false
+        //,terrainProvider:false        
     });
     viewer.clock.shouldAnimate = false;
     viewer.dataSources.add(dataSource);
@@ -408,13 +412,166 @@ function startup(Cesium) {
     // Tropics of Cancer and Capricorn
     //var coffeeBeltRectangle = Cesium.Rectangle.fromDegrees(-180.0, -23.43687, 180.0, 23.43687);
     // hemisphère nord
-    var coffeeBeltRectangle = Cesium.Rectangle.fromDegrees(-180.0, 0, 180, 90);
+    //var coffeeBeltRectangle = Cesium.Rectangle.fromDegrees(-180.0, 0, 180, 90);
     // hemisphère sud
     //var coffeeBeltRectangle = Cesium.Rectangle.fromDegrees(-180.0, -90, 180, 0);
+    //viewer.scene.globe.cartographicLimitRectangle = coffeeBeltRectangle;
 
-    viewer.scene.globe.cartographicLimitRectangle = coffeeBeltRectangle;
-    viewer.scene.skyAtmosphere.show = false;
+    viewer.scene.skyAtmosphere.show = true;
 
+
+    //var promise = Cesium.GeoJsonDataSource.load('../data/ne_110m_admin_0_countries.geojson');
+    var promise = Cesium.GeoJsonDataSource.load('../data/europe.geojson');
+    
+    promise.then(function(dataGeo) {
+        viewer.dataSources.add(dataGeo);
+
+        //Get the array of entities
+        var entities = dataGeo.entities.values;
+
+        var colorHash = {};
+        for (var i = 0; i < entities.length; i++) {
+            //For each entity, create a random color based on the state name.
+            //Some states have multiple entities, so we store the color in a
+            //hash so that we use the same color for the entire state.
+            var entity = entities[i];
+            var name = entity.name;
+            /*
+            var color = colorHash[name];
+            if (!color) {
+                color = Cesium.Color.fromRandom({
+                    alpha : 0.8
+                });
+                colorHash[name] = color;
+            }
+            */
+            var color = colorHash[name] = Cesium.Color.fromRandom({
+                        red : 1.0,
+                        green : 1.0,
+                        blue : 1.0,
+                        alpha : 0.6
+                    });
+            //Set the polygon material to our random color.
+            entity.polygon.material = color;
+            //Remove the outlines.
+            entity.polygon.outline = false;
+
+            //Extrude the polygon based on the state's population.  Each entity
+            //stores the properties for the GeoJSON feature it was created from
+            //Since the population is a huge number, we divide by 50.
+            //entity.polygon.extrudedHeight = 30000000;
+            entity.polygon.height = altSurface;
+        }
+    }).otherwise(function(error){
+        //Display any errrors encountered while loading.
+        window.alert(error);
+    });    
+
+    //var posiCenter = getMapCenter(viewer);
+    var nbConcept=6, lng = 2.3613169, lat=48.9449133//P8
+    ,angleSlice=Math.PI * 2 / nbConcept, posi = Cesium.Cartesian3.fromDegrees(lng,lat, 0)
+    ,posiPoly = [], altCrible = altSurface/4, radius = 6;
+    for (let index = 0; index < nbConcept; index++) {
+        let ln = lng + (radius * Math.cos(angleSlice*index - Math.PI/2)); 
+        //let ln = (radius * Math.cos(angleSlice*index - Math.PI/2)); 
+        posiPoly.push(ln);
+        let la = lat + (radius * Math.sin(angleSlice*index - Math.PI/2)); 
+        //let la = (radius * Math.sin(angleSlice*index - Math.PI/2)); 
+        posiPoly.push(la);        
+        posiPoly.push(altCrible);        
+    }
+    var cribleP = viewer.entities.add({
+        name : 'Crible polygon',
+        polygon : {
+            hierarchy : Cesium.Cartesian3.fromDegreesArrayHeights(posiPoly),
+            //extrudedHeight: 0,
+        perPositionHeight : true,
+        material : Cesium.Color.ORANGE.withAlpha(0.5),
+        outline : true,
+        outlineColor : Cesium.Color.BLACK,
+        arcType : Cesium.ArcType.GEODESIC
+            
+            }
+    });
+    var opo = (3*nbConcept)/(nbConcept/2);
+    var radius = 100000*Cesium.Cartesian3.distance(
+        new Cesium.Cartesian3(posiPoly[0], posiPoly[1], posiPoly[2])
+        , new Cesium.Cartesian3(posiPoly[opo], posiPoly[opo+1], posiPoly[opo+2])
+        );
+    var cribleE = viewer.entities.add({
+        name : 'Crible ellipsoid',
+        position: posi,
+        ellipsoid : {
+            radii : new Cesium.Cartesian3(radius, radius, radius),
+            fill : false,
+            outline : true,
+            outlineColor : Cesium.Color.YELLOW,
+            slicePartitions : nbConcept,
+            stackPartitions : nbConcept
+        }
+    });
+    /*
+    var cribleC = viewer.entities.add({
+            position: posi,
+            cylinder : {
+                length :altCrible,
+                topRadius : altCrible,
+                bottomRadius : 10.0,
+                material : Cesium.Color.fromRandom({alpha : 0.3}),
+                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+            }
+        });    
+
+    var blueStar = viewer.entities.add({
+        name : 'Blue star with mitered corners and outline',
+        polylineVolume : {
+            positions : Cesium.Cartesian3.fromDegreesArrayHeights([lng, lat, 0.0,
+                                                                lng+10, lat+10, altCrible/4,
+                                                                lng+20, lat+20, altCrible/3,
+                                                                lng+30, lat+30, altCrible/2,
+                                                                lng, lat, altCrible
+                                                            ]),
+            //shape : computeStar(nbConcept, 70000, 50000),
+            shape : computePoly(nbConcept, 100000),
+            //cornerType : Cesium.CornerType.MITERED,
+            material : Cesium.Color.BLUE
+        }
+    });
+    */
+    //construction des lignes d'axes
+    for (let i = 0; i < nbConcept; i++) {
+        var posiAxes = [];
+        //ajoute un ligne du centre 
+        posiAxes.push(lng);
+        posiAxes.push(lat);
+        posiAxes.push(altCrible);
+        //vers le point du concept
+        let idx = 3*i;
+        posiAxes.push(posiPoly[idx]);
+        posiAxes.push(posiPoly[idx+1]);
+        posiAxes.push(posiPoly[idx+2]);
+
+        var orangeOutlined = viewer.entities.add({
+        name : 'Axe '+i,
+        polyline : {
+            positions : Cesium.Cartesian3.fromDegreesArrayHeights(posiAxes),
+            width : 12,
+            /*
+            material : new Cesium.PolylineOutlineMaterialProperty({
+                color : Cesium.Color.ORANGE,
+                outlineWidth : 3,
+                outlineColor : Cesium.Color.BLACK
+            })
+            */
+            arcType : Cesium.ArcType.GEODESIC,
+            material : new Cesium.PolylineArrowMaterialProperty(Cesium.Color.PURPLE)
+        }
+    });
+
+    }
+
+
+    //Cesium.Ellipsoid.UNIT_SPHERE
 
     //Sandcastle_End
     Sandcastle.finishedLoading();
@@ -426,6 +583,38 @@ if (typeof Cesium !== 'undefined') {
 } else if (typeof require === 'function') {
     require(['Cesium'], startup);
 }
+
+function getMapCenter(viewer) {            
+        var windowPosition = new Cesium.Cartesian2(viewer.container.clientWidth / 2, viewer.container.clientHeight / 2);
+        var pickRay = viewer.scene.camera.getPickRay(windowPosition);
+        var pickPosition = viewer.scene.globe.pick(pickRay, viewer.scene);
+        var pickPositionCartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(pickPosition);
+        //console.log(pickPositionCartographic.longitude * (180/Math.PI));
+        //console.log(pickPositionCartographic.latitude * (180/Math.PI));
+        return pickPositionCartographic;
+}
+
+function computeStar(arms, rOuter, rInner) {
+    var angle = Math.PI / arms;
+    var length = 2 * arms;
+    var positions = new Array(length);
+    for (var i = 0; i < length; i++) {
+        var r = (i % 2) === 0 ? rOuter : rInner;
+        positions[i] = new Cesium.Cartesian2(Math.cos(i * angle) * r, Math.sin(i * angle) * r);
+    }
+    return positions;
+}
+
+function computePoly(nbConcept, r) {
+    let angleSlice=Math.PI * 2 / nbConcept,positions = [];
+    for (let index = 0; index < nbConcept; index++) {
+        let ln = r * Math.cos(angleSlice*index - Math.PI/2); 
+        let la = r * Math.sin(angleSlice*index - Math.PI/2); 
+        positions.push(new Cesium.Cartesian2(ln, la));
+    }
+    return positions;
+}
+
 </script>
 </body>
 </html>

@@ -318,7 +318,7 @@ class Model_DbTable_Gen_adjectifs extends Zend_Db_Table_Abstract
     public function findByIdConcept($id_concept)
     {
         $query = $this->select()
-        	->from( array("ca" => "gen_concepts_adjectifs") )                           
+        	->from( array("ca" => "gen_concepts_adjectifs"),array('recid'=>'ca.id_adj') )                           
 	        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         ->joinInner(array('a' => 'gen_adjectifs'),
         		'a.id_adj = ca.id_adj')

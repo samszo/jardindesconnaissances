@@ -112,8 +112,11 @@ class Model_DbTable_Gen_oeuvres extends Zend_Db_Table_Abstract
     {
    	
     	$query = $this->select()
-                    ->from( array("gen_oeuvres" => "gen_oeuvres") );
-                    
+            ->from( array("go" => "gen_oeuvres") )
+            ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('o' => 'gen_oeuvres'),'go.id_oeu = o.id_oeu',array('recid'=>'id_oeu'))			
+                    ;
+            
         if($order != null)
         {
             $query->order($order);
