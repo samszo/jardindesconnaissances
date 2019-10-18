@@ -104,7 +104,7 @@ class GenerateurController extends Zend_Controller_Action
     function initInstance($redir){
         $this->view->ajax = $this->_getParam('ajax');
         $this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
-        
+                
         $auth = Zend_Auth::getInstance();
         $this->ssUti = new Zend_Session_Namespace('uti');
         $ssGoogle = new Zend_Session_Namespace('google');

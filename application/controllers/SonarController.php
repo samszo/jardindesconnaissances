@@ -77,6 +77,9 @@ class SonarController extends Zend_Controller_Action
 			case 'getEvalsWebGLGlobe':
 				$rs['result'] = $this->s->getEvalsWebGLGlobe($this->_getParam('params'));
 				break;
+			case 'getPulsationsOntoEthique':
+				$rs['result'] = $this->s->getPulsationsOntoEthique($this->_getParam('params'));
+				break;
 			case 'corrigeEval':
 				$rs['result'] = $this->s->corrigeEval();
 				break;

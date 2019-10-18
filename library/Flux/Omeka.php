@@ -499,7 +499,7 @@ class Flux_Omeka extends Flux_Site{
      *
      */
     function send($type, $methode, $get=false, $post=false,$id='',$decode=false){
-        $client = new Zend_Http_Client($this->endpoint.$type.$id,array('timeout' => 30));
+        $client = new Zend_Http_Client($this->endpoint.$type.$id,array('timeout' => 100));
         if($get)$client->setParameterGet($get);
         if($post){
             //pour forcer le header

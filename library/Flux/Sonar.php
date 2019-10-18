@@ -438,17 +438,17 @@ class Flux_Sonar extends Flux_Site{
         if($item==null){
             //enregistre le parent
             if($d['ma:isFragmentOf']){
-                $itemParent = $this->omk->searchByRef($d['ma:isFragmentOf']['IIIF']);
-                if($itemParent=="[]"){
-                    $itemParent = $this->omk->postItem(array(
-                        'dcterms:title'=>$d['ma:isFragmentOf']['title']
-                        ,'dcterms:isReferencedBy'=>$d['ma:isFragmentOf']['IIIF']
-                        ,'dcterms:isPartOf'=>$d['dcterms:isPartOf']
-                        ,'item_set'=>$isRA['o:id']
-                        ,'resource_class'=>'Image'
-                        ,'IIIF'=>$d['ma:isFragmentOf']
-                    ));        
-                }
+                $dataParent = array(
+                    'dcterms:title'=>$d['ma:isFragmentOf']['title']
+                    ,'dcterms:isReferencedBy'=>$d['ma:isFragmentOf']['IIIF']
+                    ,'dcterms:isPartOf'=>$d['dcterms:isPartOf']
+                    ,'item_set'=>$isRA['o:id']
+                    ,'resource_class'=>'Image'
+                    ,'ma:isRelatedTo'=>$d['ma:isFragmentOf']['manifest']
+                    ,'ma:description'=>json_encode($d['ma:isFragmentOf']['metadata'])
+                    ,'IIIF'=>$d['ma:isFragmentOf']
+                );
+                $itemParent = $this->omk->postItem($dataParent);        
             }
             //enregistre la ressource
             $item = $this->omk->postItem(array(
@@ -558,13 +558,15 @@ class Flux_Sonar extends Flux_Site{
     }        
 
     /**
-	 * récupère les geolocalisations au format  WebGL Globe
+	 * récupère les geolocalisations au format WebGL Globe
      * 
-     * @param array    $params
+     * @param array     $params
+     * @param boolean   $cache
      * 
      * @return array
 	 */
-	function getEvalsWebGLGlobe($params=false){
+	function getEvalsWebGLGlobe($params=false,$cache=true){
+
         //TODO: utiliser params poru ajouter des conditions
         //récupère les positions semantiques
         //https://github.com/dataarts/webgl-globe
@@ -578,32 +580,135 @@ class Flux_Sonar extends Flux_Site{
             ]
         ];        
         */
-        $rs= $this->omk->search(array('resource_class_label'=>'SemanticPosition'),'items','resource_class_label',true);
-        //$this->trace('résultat de la recherche omk',$rs);
-        $wgl = array();
-        $series = array();
-        $iiif = new Flux_Iiif();
-        foreach ($rs as $r) {
-            $this->trace('',$r);
-            $doc = $r['ma:hasSource'][0];
-            //récupère les données de l'image
-            //http://gapai.univ-paris8.fr/sonar/omk/iiif/560/manifest
-            $iiifUrl = str_replace('api/','iiif',$this->omk->endpoint).'/'.$doc['value_resource_id'].'/manifest';
-            $iiif = json_decode($this->getUrlBodyContent($iiifUrl),true);
-            $doc['img']=$iiif['sequences'][0]['canvases'][0]['images'][0]['resource'];
-            //construction des séries par doc
-            if(!$series[$doc['value_resource_id']]){
-                $series[$doc['value_resource_id']]=array('i'=>count($series),'details'=>$doc);
-                //ATTENTION le nom de la série doit être unique
-                $wgl[]=array($doc['value_resource_id'].' - '.$doc['display_title'],array());
-            }
-            $idSerie = $series[$doc['value_resource_id']]['i'];
-            $wgl[$idSerie][1][] = $r["ma:locationLatitude"][0]['@value'];
-            $wgl[$idSerie][1][] = $r["ma:locationLongitude"][0]['@value'];
-            $wgl[$idSerie][1][] = $r["jdc:distanceCenter"][0]['@value'];
-        }
-        return array('wdl'=>$wgl,'series'=>$series);
 
+		$c = str_replace("::", "_", __METHOD__); 
+		if($params)$c .= "_".$this->getParamString($params);
+		if($cache){
+		   	$result = $this->cache->load($c);
+		}
+        if(!$result){
+
+            $rs= $this->omk->search(array('resource_class_label'=>'SemanticPosition'),'items','resource_class_label',true);
+            //$this->trace('résultat de la recherche omk',$rs);
+            $wgl = array();
+            $series = array();
+            $cribles = array();                
+            $iiif = new Flux_Iiif();
+            foreach ($rs as $r) {
+                $this->trace('',$r);
+                $doc = $r['ma:hasSource'][0];
+                //construction des séries par doc
+                if(!$series[$doc['value_resource_id']]){
+                    //récupère les données de l'image
+                    //http://gapai.univ-paris8.fr/sonar/omk/iiif/560/manifest
+                    $iiifUrl = str_replace('api/','iiif',$this->omk->endpoint).'/'.$doc['value_resource_id'].'/manifest';
+                    $iiif = json_decode($this->getUrlBodyContent($iiifUrl),true);
+                    if($iiif)$doc['img']=$iiif['sequences'][0]['canvases'][0]['images'][0]['resource'];
+                    else $doc['img']="";
+                    $series[$doc['value_resource_id']]=array('i'=>count($series),'details'=>$doc);
+                    //ATTENTION le nom de la série doit être unique
+                    $wgl[]=array($doc['value_resource_id'].' - '.$doc['display_title'],array());
+                }
+                $idSerie = $series[$doc['value_resource_id']]['i'];
+                $wgl[$idSerie][1][] = $r["ma:locationLatitude"][0]['@value'];
+                $wgl[$idSerie][1][] = $r["ma:locationLongitude"][0]['@value'];
+                $wgl[$idSerie][1][] = $r["jdc:distanceCenter"][0]['@value'];
+                //construction des cribles
+                $idCrible = $r['ma:hasRatingSystem'][0]['value_resource_id'];
+                if(!$cribles[$idCrible]){
+                    $cribles[$idCrible]=array('id'=>$idCrible
+                        , 'label'=>$r['ma:hasRatingSystem'][0]['display_title']
+                        , 'concepts'=>array());
+                    foreach ($r['ma:isRatingOf'] as $cpt) {
+                        $cribles[$idCrible]['concepts'][]=array('id'=>$cpt['value_resource_id']
+                            , 'label'=>$cpt['display_title']
+                            , 'idP'=>$idCrible
+                        );
+                    }
+                }                
+            }
+            $result = array('wdl'=>$wgl,'series'=>$series,'SemanticPosition'=>$rs,'cribles'=>$cribles);
+            $this->cache->save($result, $c);
+        }
+        return $result;
+    }        
+
+    /**
+	 * récupère les données d'évaluation au format Pulsation Onto-Ethique
+     * 
+     * @param array     $params
+     * @param boolean   $cache
+     * 
+     * @return array
+	 */
+	function getPulsationsOntoEthique($params=false,$cache=true){
+
+		$c = str_replace("::", "_", __METHOD__); 
+		if($params)$c .= "_".$this->getParamString($params);
+		if($cache){
+		   	$result = $this->cache->load($c);
+		}
+        if(!$result){
+            //récupérer les positionnements sémantiques
+            $rs= $this->omk->search(array('resource_class_label'=>'SemanticPosition'),'items','resource_class_label',true);
+            //$this->trace('résultat de la recherche omk',$rs);
+            $documents = array();
+            $acteurs = array();
+            $cribles = array();
+            $rapports = array();                
+            $iiif = new Flux_Iiif();
+            foreach ($rs as $r) {
+                $this->trace('',$r);
+                $doc = $r['ma:hasSource'][0];
+                //construction des docs
+                $idDoc = $doc['value_resource_id'];
+                if(!$documents[$doc['value_resource_id']]){
+                    //récupère les données de l'image
+                    //http://gapai.univ-paris8.fr/sonar/omk/iiif/560/manifest
+                    $iiifUrl = str_replace('api/','iiif',$this->omk->endpoint).'/'.$doc['value_resource_id'].'/manifest';
+                    $iiif = json_decode($this->getUrlBodyContent($iiifUrl),true);
+                    if($iiif)$doc['img']=$iiif['sequences'][0]['canvases'][0]['images'][0]['resource'];
+                    else $doc['img']="";
+                    $documents[$doc['value_resource_id']]=array('i'=>count($documents),'details'=>$doc);
+                    //TODO:gérer la géolocalisation du document 
+                }
+                //construction des acteurs
+                if(!$acteur[$r['ma:hasCreator'][0]['@value']]){
+                    //TODO:gérer la description détaillée des acteurs
+                    $acteur[$r['ma:hasCreator'][0]['@value']]=array('i'=>count($documents),'details'=>$r['ma:hasCreator'][0]);
+                }
+                $idAct = $acteur[$r['ma:hasCreator'][0]['@value']]['i'];
+
+                //construction des cribles
+                $idCrible = $r['ma:hasRatingSystem'][0]['value_resource_id'];
+                if(!$cribles[$idCrible]){
+                    $cribles[$idCrible]=array('id'=>$idCrible
+                        , 'label'=>$r['ma:hasRatingSystem'][0]['display_title']
+                        , 'concepts'=>array());
+                    foreach ($r['ma:isRatingOf'] as $cpt) {
+                        $cribles[$idCrible]['concepts'][]=array('id'=>$cpt['value_resource_id']
+                            , 'label'=>$cpt['display_title']
+                            , 'idP'=>$idCrible
+                        );
+                    }
+                }
+
+                //constuction des rapports
+                $rapports[]=array('lat'=>$r["ma:locationLatitude"][0]['@value'],
+                    'lng'=>$r["ma:locationLatitude"][0]['@value'],
+                    'r'=>$r["jdc:distanceCenter"][0]['@value'],
+                    'date'=>$r["o:created"]["@value"],
+                    'idDoc'=>$idDoc,
+                    'idAct'=>$idAct,
+                    'idCrible'=>$idCrible,
+                    'details'=>$r
+                );
+
+            }
+            $result = array('rapports'=>$rapports,'acteurs'=>$acteurs,'cribles'=>$cribles,'cribles'=>$cribles);
+            $this->cache->save($result, $c);
+        }
+        return $result;
     }        
 
     /**

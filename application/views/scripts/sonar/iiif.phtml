@@ -557,6 +557,8 @@
                     //précise le json de la photo
                     ca.data = {
                         'IIIF':d.infos.sequences[0].canvases[0].images[0].resource.service["@id"]+'/info.json'
+                        ,'manifest':d['@id']
+                        ,'metadata':d.infos.metadata
                         ,'title':d.infos.label
                         ,'height':dt.h
                         ,'width':dt.w
@@ -703,7 +705,7 @@
                     lstItemCrible.sort(function(a, b) {
                         return a.ordre - b.ordre;
                     });
-                    //construction de la cartgraphie par axe
+                    //construction de la cartographie par axe
                     ca = new cartoaxes({
                         'idSvg': 'svgGlobal',
                         'tick': 0,
@@ -747,7 +749,7 @@
                 ,'ma:hasSource':d.id
                 ,'ma:frameHeight':d.infos.height
                 ,'ma:frameWidth':d.infos.width
-                ,'ma:isFragmentOf':{'title':d.infos.title,'IIIF':d.infos.IIIF}
+                ,'ma:isFragmentOf':{'title':d.infos.title,'IIIF':d.infos.IIIF,'manifest':d.infos.manifest,'metadata':d.infos.metadata}
                 ,'jdc:degradName':d.degrad.nom
                 ,'jdc:degradColors':d.degrad.colors
                 ,'jdc:hasDoc':d.id
