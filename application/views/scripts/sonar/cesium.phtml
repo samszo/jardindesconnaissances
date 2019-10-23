@@ -290,43 +290,27 @@ function startup(Cesium) {
     entities.suspendEvents();
     entities.removeAll();
 
-    //WebGL Globe JSON is an array of series, where each series itself is an
-    //array of two items, the first containing the series name and the second
-    //being an array of repeating latitude, longitude, height values.
-    //
-    //Here's a more visual example.
-    //[["series1",[latitude, longitude, height, ... ]
-    // ["series2",[latitude, longitude, height, ... ]]
+    console.log('START data');
 
-    // Loop over each series
-    var data = allData.result.wdl
-    console.log('START data')
-    for (var x = 0; x < data.length; x++) {
-        var series = data[x];
-        var seriesName = series[0];
-        var coordinates = series[1];
-        //récupère le détail de la série
-        var idSerie = seriesName.split(' - ')[0];
-        var s = allData.result.series[idSerie].details
+    //la structure des données est basée sur 
+    //la modélisation onto-éthique d'une existence informationnelle
 
-        console.log(series)
-        //Add the name of the series to our list of possible values.
-        this._seriesNames.push(seriesName);
+    //TODO construction des listes dans un grid pour sélection 
 
-        //Make the first series the visible one by default
-        //montre toutes les séries
-        var show = 1;
-        if (show) {
-            this._seriesToDisplay = seriesName;
-        }
+    //ajoute les documents
+    allData.result.documents.forEach(function(d,i){
         
 
         /*ajoute un rectangle avec l'image
         */
         var altCouche = 3, cImages=[];
-        var hght = altSurface * altCouche * x;
-        //var cW = -67.0, cS = 27.0, cE = -63.0, cN = 32.0;
+        var hght = altSurface * (altCouche + i);
+        //TODO:gérer la géolocalisation des documents
+        //calcul paramétrique de l aposition des document
         var cW = 0, cS = 0, cE = scaleEast(s.img.width), cN = scaleNorth(s.img.height);
+        d.lat = cN;
+        d.lng = cE;
+        d.altitude = hght;
         cImages.push(new cesiumDocument({
             'label':s['thumbnail_title'],
             'id':s['value_resource_id'],
@@ -338,93 +322,77 @@ function startup(Cesium) {
             'entities':entities,
             'altitude':hght
         }))
-        /*
-        entities.add({
-            //position : Cesium.Cartesian3.fromDegrees(cW, cS),
-            position : Cesium.Cartesian3.fromDegrees(cE, cN, hght),
-            billboard : {
-                image : s.img["@id"],
-                //width : s.img.width,
-                //height : s.img.height
-            }
-        });
-       */
-        //Now loop over each coordinate in the series and create
-        // our entities from the data.
-        console.log('START series')
-        for (var i = 0; i < coordinates.length; i += 3) {
-            var latitude = parseFloat(coordinates[i]);
-            var longitude =  parseFloat(coordinates[i + 1]);
-            var height =  parseFloat(coordinates[i + 2]);
-            console.log(latitude+','+longitude+','+height);
-
-            //Ignore lines of zero height.
-            if(height === 0) {
-                continue;
-            }
-
-            var color = Cesium.Color.fromHsl((0.6 - (height * 0.5)), 1.0, 0.5);
-            var surfacePosition = Cesium.Cartesian3.fromDegrees(longitude, latitude, altSurface);
-            var heightPosition = Cesium.Cartesian3.fromDegrees(longitude, latitude, height * heightScale);
-            heightPosition = Cesium.Cartesian3.fromDegrees(cW, cS, hght);
-
-            //WebGL Globe only contains lines, so that's the only graphics we create.
-            var polyline = new Cesium.PolylineGraphics();
-            polyline.material = new Cesium.ColorMaterialProperty(color);
-            polyline.width = new Cesium.ConstantProperty(10);
-            polyline.arcType = new Cesium.ConstantProperty(Cesium.ArcType.NONE);
-            polyline.positions = new Cesium.ConstantProperty([surfacePosition, heightPosition]);
-
-            //The polyline instance itself needs to be on an entity.
-            var entity = new Cesium.Entity({
-                id : seriesName + '_' + x+ '_' + i,
-                show : show,
-                polyline : polyline,
-                seriesName : seriesName //Custom property to indicate series name
-            });
-
-            //Add the entity to the collection.
-            entities.add(entity);
-        }
-        console.log('END series')
-    }
-    console.log('END data')
+    });
 
     //ajouter les cribles
     var i = 1, radius = 6, ccc=[];
-    for (const idC in allData.result.cribles) {
-        let c = allData.result.cribles[idC];
+    //for (const idC in allData.result.cribles) {
+    //    let c = allData.result.cribles[idC];
+    allData.result.cribles.forEach(function(c,i){
+        //TOO : calculer un positionnement plus juste cf. topologie D3
+        c.lng = longitude+(radius*i*4);
+        c.lat = 48.9449133;
+        c.radius = radius;
         ccc.push(new cesiumCribleConceptuel({
             'titre':c.label,
             'crible':c.concepts,
             //P8
-            'lng':longitude+(radius*i*4),
-            'lat':48.9449133,
+            'lng':c.lng,
+            'lat':c.lat,
             'entities':entities,
-            'radius':radius
+            'radius':c.radius
             //'altitude':altSurface/i,
         }));
-        i++;
-    };
+    });
 
-    //ajouter les acteurs
+    //ajouter les acteurs et les rapports
     var ca=[],caColor=[];
-    allData.result.SemanticPosition.forEach(function(sp,i){
-        //création des acteurs
-        if(!caColor[sp['ma:hasCreator'][0]['@value']])
-            caColor[sp['ma:hasCreator'][0]['@value']]=Cesium.Color.fromRandom({alpha : 0.3});
-        ca.push(new cesiumActeur({
-            'label':sp['ma:hasCreator'][0]['@value'],
-            'id':i,
-            'color':caColor[sp['ma:hasCreator'][0]['@value']],
-            'lng':parseFloat(sp['ma:locationLongitude'][0]['@value']),
-            'lat':parseFloat(sp['ma:locationLatitude'][0]['@value']),
+    allData.result.rapports.forEach(function(r,i){
+        //création de l'acteur à la position de l'évaluation
+        if(!caColor[r['idAct']])
+            caColor[r['idAct']]=Cesium.Color.fromRandom({alpha : 0.3});
+        //TODO:création de l'acteur sous forme fullerénique
+        //cf. https://onlinelibrary.wiley.com/doi/pdf/10.1002/wcms.1207
+        let act = ca.push(new cesiumActeur({
+            'label':allData.result.acteurs[r['idAct']].label,
+            'id':allData.result.acteurs[r['idAct']].recid,
+            'color':caColor[r['idAct']],
+            'lng':parseFloat(r['lng']),
+            'lat':parseFloat(r['lat']),
             'entities':entities,
             'radius':1,
             'altitude':altSurface,
         }));
+        //création du rapport entre le document, l'acteur et le crible
+        let doc = allData.result.documents[r['idDoc']],
+            docPosi = Cesium.Cartesian3.fromDegrees(doc.lng, doc.lat, doc.altitude),
+            crb = allData.result.cribles[r['idCrible']],
+            crbPosi = Cesium.Cartesian3.fromDegrees(crb.lng, crb.lat, crb.altitude),
+            actPosi = Cesium.Cartesian3.fromDegrees(act.lng, act.lat, act.altitude)
+ 
+        //WebGL Globe only contains lines, so that's the only graphics we create.
+        var polyline = new Cesium.PolylineGraphics();
+        polyline.material = new Cesium.ColorMaterialProperty(caColor[r['idAct']]);
+        polyline.width = new Cesium.ConstantProperty(10);
+        polyline.arcType = new Cesium.ConstantProperty(Cesium.ArcType.NONE);
+        polyline.positions = new Cesium.ConstantProperty([docPosi, actPosi, crbPosi]);
+
+        /*The polyline instance itself needs to be on an entity.
+        var entity = new Cesium.Entity({
+            id : seriesName + '_' + x+ '_' + i,
+            show : show,
+            polyline : polyline,
+            seriesName : seriesName //Custom property to indicate series name
+        });
+        */
+
+        //Add the entity to the collection.
+        entities.add(polyline);
 
     });
+    console.log('END data')
+
+
 
     //ajouter les liens acteur->document acteur->concept 
 
@@ -444,9 +412,7 @@ function startup(Cesium) {
     //Now that we've defined our own DataSource, we can use it to load
     //any JSON data formatted for WebGL Globe.
     var dataSource = new WebGLGlobeDataSource();
-    //var urlData = '../data/cesium/population909500.json';
-    //var urlData = 'https://jardindesconnaissances.univ-paris8.fr/jdc/public/sonar/flux?q=getEvalsWebGLGlobe';
-    var urlData = '../sonar/flux?q=getEvalsWebGLGlobe';
+    var urlData = '../sonar/flux?q=getPulsationsOntoEthique';
     dataSource.loadUrl(urlData).then(function() {
 
         //After the initial load, create buttons to let the user switch among series.

@@ -1,0 +1,95 @@
+{
+    "o:label": "Concept dans crible",
+    "o:resource_template_property": [
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/purl.org\/dc\/terms\/",
+            "vocabulary_label": "Dublin Core",
+            "local_name": "title",
+            "label": "Title"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/",
+            "vocabulary_label": "Jardin des connaissances",
+            "local_name": "ordreCrible",
+            "label": "Ordre dans le crible"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/www.w3.org\/2004\/02\/skos\/core#",
+            "vocabulary_label": "SKOS",
+            "local_name": "prefLabel",
+            "label": "preferred label"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/www.w3.org\/2004\/02\/skos\/core#",
+            "vocabulary_label": "SKOS",
+            "local_name": "inScheme",
+            "label": "is in scheme"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#",
+            "vocabulary_label": "The RDF Concepts Vocabulary (RDF)",
+            "local_name": "type",
+            "label": "type"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/ieml",
+            "vocabulary_label": "Information Economic Meta Language",
+            "local_name": "iemlCode",
+            "label": "Code"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/ieml",
+            "vocabulary_label": "Information Economic Meta Language",
+            "local_name": "iemlRef",
+            "label": "Reference"
+        }
+    ],
+    "o:resource_class": {
+        "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/",
+        "vocabulary_label": "Jardin des connaissances",
+        "local_name": "Concept",
+        "label": "Concept"
+    }
+}

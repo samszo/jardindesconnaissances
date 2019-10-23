@@ -643,10 +643,10 @@ class Flux_Sonar extends Flux_Site{
 	 */
 	function getPulsationsOntoEthique($params=false,$cache=true){
 
-		$c = str_replace("::", "_", __METHOD__); 
-		if($params)$c .= "_".$this->getParamString($params);
+		$cFic = str_replace("::", "_", __METHOD__); 
+		if($params)$cFic .= "_".$this->getParamString($params);
 		if($cache){
-		   	$result = $this->cache->load($c);
+		   	$result = $this->cache->load($cFic);
 		}
         if(!$result){
             //récupérer les positionnements sémantiques
@@ -655,43 +655,51 @@ class Flux_Sonar extends Flux_Site{
             $documents = array();
             $acteurs = array();
             $cribles = array();
+            $docUn = array();
+            $actUn = array();
+            $crUn = array();
             $rapports = array();                
             $iiif = new Flux_Iiif();
             foreach ($rs as $r) {
                 $this->trace('',$r);
                 $doc = $r['ma:hasSource'][0];
                 //construction des docs
-                $idDoc = $doc['value_resource_id'];
-                if(!$documents[$doc['value_resource_id']]){
+                if(!$docUn[$doc['value_resource_id']]){
                     //récupère les données de l'image
                     //http://gapai.univ-paris8.fr/sonar/omk/iiif/560/manifest
                     $iiifUrl = str_replace('api/','iiif',$this->omk->endpoint).'/'.$doc['value_resource_id'].'/manifest';
                     $iiif = json_decode($this->getUrlBodyContent($iiifUrl),true);
                     if($iiif)$doc['img']=$iiif['sequences'][0]['canvases'][0]['images'][0]['resource'];
                     else $doc['img']="";
-                    $documents[$doc['value_resource_id']]=array('i'=>count($documents),'details'=>$doc);
+                    $docUn[$doc['value_resource_id']]=count($docUn);
+                    $documents[]=array('recid'=>count($docUn), 'label'=>$doc['display_title'],'details'=>$doc);
                     //TODO:gérer la géolocalisation du document 
                 }
+                $idDoc = $docUn['value_resource_id'];
+
                 //construction des acteurs
-                if(!$acteur[$r['ma:hasCreator'][0]['@value']]){
+                if(!$actUn[$r['ma:hasCreator'][0]['@value']]){
                     //TODO:gérer la description détaillée des acteurs
-                    $acteur[$r['ma:hasCreator'][0]['@value']]=array('i'=>count($documents),'details'=>$r['ma:hasCreator'][0]);
+                    $actUn[$r['ma:hasCreator'][0]['@value']]=count($acteurs);
+                    $acteurs[]=array('recid'=>$actUn[$r['ma:hasCreator'][0]['@value']],'label'=>$r['ma:hasCreator'][0]['@value'],'details'=>$r['ma:hasCreator'][0]);
                 }
-                $idAct = $acteur[$r['ma:hasCreator'][0]['@value']]['i'];
+                $idAct = $actUn[$r['ma:hasCreator'][0]['@value']];
 
                 //construction des cribles
-                $idCrible = $r['ma:hasRatingSystem'][0]['value_resource_id'];
-                if(!$cribles[$idCrible]){
-                    $cribles[$idCrible]=array('id'=>$idCrible
+                if(!$crUn[$r['ma:hasRatingSystem'][0]['value_resource_id']]){
+                    $c=array('recid'=>count($crUn)
                         , 'label'=>$r['ma:hasRatingSystem'][0]['display_title']
                         , 'concepts'=>array());
                     foreach ($r['ma:isRatingOf'] as $cpt) {
-                        $cribles[$idCrible]['concepts'][]=array('id'=>$cpt['value_resource_id']
+                        $c['concepts'][]=array('recid'=>$cpt['value_resource_id']
                             , 'label'=>$cpt['display_title']
-                            , 'idP'=>$idCrible
+                            , 'idP'=>count($crUn)
                         );
                     }
+                    $cribles[]=$c;
+                    $crUn[$r['ma:hasRatingSystem'][0]['value_resource_id']]=count($crUn);
                 }
+                $idCrible = $crUn[$r['ma:hasRatingSystem'][0]['value_resource_id']];
 
                 //constuction des rapports
                 $rapports[]=array('lat'=>$r["ma:locationLatitude"][0]['@value'],
@@ -705,8 +713,8 @@ class Flux_Sonar extends Flux_Site{
                 );
 
             }
-            $result = array('rapports'=>$rapports,'acteurs'=>$acteurs,'cribles'=>$cribles,'cribles'=>$cribles);
-            $this->cache->save($result, $c);
+            $result = array('rapports'=>$rapports,'acteurs'=>$acteurs,'documents'=>$documents,'cribles'=>$cribles);
+            $this->cache->save($result, $cFic);
         }
         return $result;
     }        
