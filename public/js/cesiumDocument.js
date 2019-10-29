@@ -28,7 +28,7 @@ class cesiumDocument {
         this.drawImage = function() {
             
             //ajoute l'image du document'
-            entities.add({
+            me.entities.add({
                 //position : Cesium.Cartesian3.fromDegrees(cW, cS),
                 position : me.posiCenter,
                 billboard : {

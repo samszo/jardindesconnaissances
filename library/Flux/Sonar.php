@@ -675,7 +675,7 @@ class Flux_Sonar extends Flux_Site{
                     $documents[]=array('recid'=>count($docUn), 'label'=>$doc['display_title'],'details'=>$doc);
                     //TODO:gérer la géolocalisation du document 
                 }
-                $idDoc = $docUn['value_resource_id'];
+                $idDoc = $docUn[$doc['value_resource_id']];
 
                 //construction des acteurs
                 if(!$actUn[$r['ma:hasCreator'][0]['@value']]){
@@ -703,7 +703,7 @@ class Flux_Sonar extends Flux_Site{
 
                 //constuction des rapports
                 $rapports[]=array('lat'=>$r["ma:locationLatitude"][0]['@value'],
-                    'lng'=>$r["ma:locationLatitude"][0]['@value'],
+                    'lng'=>$r["ma:locationLongitude"][0]['@value'],
                     'r'=>$r["jdc:distanceCenter"][0]['@value'],
                     'date'=>$r["o:created"]["@value"],
                     'idDoc'=>$idDoc,

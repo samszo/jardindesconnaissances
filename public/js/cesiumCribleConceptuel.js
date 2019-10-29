@@ -3,7 +3,8 @@ class cesiumCribleConceptuel {
         var me = this;
         this.data = [];
         this.entities = params.entities;
-        this.titre = params.titre ? params.titre : 'Crible polygon';
+        this.id = params.id ? params.id : '1';
+        this.label = params.label ? params.label : 'Crible polygon';
         this.crible = params.crible ? params.crible : [
             {'label':'clair','id':'0','idP':'0'}
             ,{'label':'obscur','id':'1','idP':'0'}
@@ -48,7 +49,7 @@ class cesiumCribleConceptuel {
         this.drawPolygone = function() {
             //ajoute le polygone du crible
             var cribleP = me.entities.add({
-                name : me.titre,
+                name : me.label,
                 polygon : {
                     hierarchy : Cesium.Cartesian3.fromDegreesArrayHeights(posiPoly),
                     //extrudedHeight: 0,

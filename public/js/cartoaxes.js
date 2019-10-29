@@ -169,7 +169,7 @@ class cartoaxes {
         this.dragended = function() {
             //récupère les données du points
             let posi = d3.mouse(this);
-            //calcule la distance et la pondération de la crible
+            //calcule la distance et la pondération du crible
             let v = me.getValorisation(posi[0],posi[1]);
             //formate les données
             let r = {'x':posi[0],'y':posi[1]
@@ -316,7 +316,7 @@ class cartoaxes {
             let distance = Math.round(me.getDistance({'X':x, 'Y':y}, pointCentral));
             let angleAxe = 0;
             let valo = [];
-            //pondération de la crible
+            //pondération du crible
             //0 de crible = 270 angle
             me.crible.forEach(function(s,i){
                 angleAxe = angleSlice*i*(180/Math.PI);

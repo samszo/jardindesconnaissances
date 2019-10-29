@@ -17,6 +17,7 @@
     <script type="text/javascript" src="../js/cesiumCribleConceptuel.js"></script>
     <script type="text/javascript" src="../js/cesiumActeur.js"></script>
     <script type="text/javascript" src="../js/cesiumDocument.js"></script>
+    <script type="text/javascript" src="../js/cesiumRapport.js"></script>
     
     
 </head>
@@ -291,7 +292,8 @@ function startup(Cesium) {
     entities.removeAll();
 
     console.log('START data');
-
+    //positionne le max de position à afficher
+    var debug = 8000000;
     //la structure des données est basée sur 
     //la modélisation onto-éthique d'une existence informationnelle
 
@@ -300,23 +302,22 @@ function startup(Cesium) {
     //ajoute les documents
     allData.result.documents.forEach(function(d,i){
         
-
         /*ajoute un rectangle avec l'image
         */
         var altCouche = 3, cImages=[];
         var hght = altSurface * (altCouche + i);
         //TODO:gérer la géolocalisation des documents
         //calcul paramétrique de l aposition des document
-        var cW = 0, cS = 0, cE = scaleEast(s.img.width), cN = scaleNorth(s.img.height);
-        d.lat = cN;
-        d.lng = cE;
+        var cW = 0, cS = 0, cE = scaleEast(d.details.img.width), cN = scaleNorth(d.details.img.height);
+        d.lat = cN ? cN : 0;
+        d.lng = cE ? cE : 0;
         d.altitude = hght;
-        cImages.push(new cesiumDocument({
-            'label':s['thumbnail_title'],
-            'id':s['value_resource_id'],
-            'urlImg':s.img["@id"],
-            'width' : s.img.width,
-            'height' : s.img.height,
+        d.oCesium = cImages.push(new cesiumDocument({
+            'label':d.label,
+            'id':d.recid,
+            'urlImg':d.details.img["@id"],
+            'width' : d.details.img.width,
+            'height' : d.details.img.height,
             'lng':cE,
             'lat':cN,
             'entities':entities,
@@ -325,70 +326,70 @@ function startup(Cesium) {
     });
 
     //ajouter les cribles
-    var i = 1, radius = 6, ccc=[];
+    var radius = 6;
     //for (const idC in allData.result.cribles) {
     //    let c = allData.result.cribles[idC];
     allData.result.cribles.forEach(function(c,i){
-        //TOO : calculer un positionnement plus juste cf. topologie D3
-        c.lng = longitude+(radius*i*4);
-        c.lat = 48.9449133;
-        c.radius = radius;
-        ccc.push(new cesiumCribleConceptuel({
-            'titre':c.label,
-            'crible':c.concepts,
-            //P8
-            'lng':c.lng,
-            'lat':c.lat,
-            'entities':entities,
-            'radius':c.radius
-            //'altitude':altSurface/i,
-        }));
+        //limite les positions pour débug
+        if(i<=debug){
+            //TODO : calculer un positionnement plus juste cf. topologie D3
+            c.lng = (radius*i*4)+1;//ATTENTION si 0 prend position par défaut
+            c.lat = 1;
+            c.radius = radius;
+            //TODO: calculer l'altitude suivant l'historique des positions
+            c.altitude = 0;
+            c.oCesium = new cesiumCribleConceptuel({
+                'titre':c.label,
+                'crible':c.concepts,
+                //P8
+                'lng':c.lng,
+                'lat':c.lat,
+                'entities':entities,
+                'radius':c.radius,
+                'altitude':c.altitutude
+            });
+        }
     });
 
     //ajouter les acteurs et les rapports
-    var ca=[],caColor=[];
+    var caColor=[];
     allData.result.rapports.forEach(function(r,i){
-        //création de l'acteur à la position de l'évaluation
-        if(!caColor[r['idAct']])
-            caColor[r['idAct']]=Cesium.Color.fromRandom({alpha : 0.3});
-        //TODO:création de l'acteur sous forme fullerénique
-        //cf. https://onlinelibrary.wiley.com/doi/pdf/10.1002/wcms.1207
-        let act = ca.push(new cesiumActeur({
-            'label':allData.result.acteurs[r['idAct']].label,
-            'id':allData.result.acteurs[r['idAct']].recid,
-            'color':caColor[r['idAct']],
-            'lng':parseFloat(r['lng']),
-            'lat':parseFloat(r['lat']),
-            'entities':entities,
-            'radius':1,
-            'altitude':altSurface,
-        }));
-        //création du rapport entre le document, l'acteur et le crible
-        let doc = allData.result.documents[r['idDoc']],
-            docPosi = Cesium.Cartesian3.fromDegrees(doc.lng, doc.lat, doc.altitude),
-            crb = allData.result.cribles[r['idCrible']],
-            crbPosi = Cesium.Cartesian3.fromDegrees(crb.lng, crb.lat, crb.altitude),
-            actPosi = Cesium.Cartesian3.fromDegrees(act.lng, act.lat, act.altitude)
- 
-        //WebGL Globe only contains lines, so that's the only graphics we create.
-        var polyline = new Cesium.PolylineGraphics();
-        polyline.material = new Cesium.ColorMaterialProperty(caColor[r['idAct']]);
-        polyline.width = new Cesium.ConstantProperty(10);
-        polyline.arcType = new Cesium.ConstantProperty(Cesium.ArcType.NONE);
-        polyline.positions = new Cesium.ConstantProperty([docPosi, actPosi, crbPosi]);
-
-        /*The polyline instance itself needs to be on an entity.
-        var entity = new Cesium.Entity({
-            id : seriesName + '_' + x+ '_' + i,
-            show : show,
-            polyline : polyline,
-            seriesName : seriesName //Custom property to indicate series name
-        });
-        */
-
-        //Add the entity to the collection.
-        entities.add(polyline);
-
+        //limite les positions pour débug
+        if(i<=debug){
+            //création de l'acteur à la position de l'évaluation
+            if(!caColor[r['idAct']])
+                caColor[r['idAct']]=Cesium.Color.fromRandom({alpha : 0.3});
+            //TODO:création de l'acteur sous forme fullerénique
+            //cf. https://onlinelibrary.wiley.com/doi/pdf/10.1002/wcms.1207
+            let act = allData.result.acteurs[r['idAct']];        
+            if(!act.positions)act.positions=[];
+            act.positions.push(new cesiumActeur({
+                'label':act.label,
+                'id':act.recid,
+                'color':caColor[r['idAct']],
+                'lng':parseFloat(r['lng']),
+                'lat':parseFloat(r['lat']),
+                'entities':entities,
+                'radius':1000,
+                'altitude':altSurface,
+            }));
+            //création du rapport entre le document, l'acteur et le crible
+            console.log('rapport '+i);
+            r.oCesium = new cesiumRapport({
+                'label':'rapport',
+                'id':r.details['o:id'],
+                'color':caColor[r['idAct']],
+                'lng':parseFloat(r['lng']),
+                'lat':parseFloat(r['lat']),
+                'data':r,
+                'entities':entities,
+                'altitude':altSurface,
+                'act':act,
+                'doc':allData.result.documents[r['idDoc']],
+                'crb':allData.result.cribles[r['idCrible']]
+            })
+            //
+        }
     });
     console.log('END data')
 

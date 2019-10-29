@@ -75,10 +75,10 @@ class SonarController extends Zend_Controller_Action
 				$rs['result'] = $this->s->getEvalsOmk($this->_getParam('inScheme'),$this->_getParam('id'));
 				break;
 			case 'getEvalsWebGLGlobe':
-				$rs['result'] = $this->s->getEvalsWebGLGlobe($this->_getParam('params'));
+				$rs['result'] = $this->s->getEvalsWebGLGlobe($this->_getParam('params'),$this->_getParam('cache',true));
 				break;
 			case 'getPulsationsOntoEthique':
-				$rs['result'] = $this->s->getPulsationsOntoEthique($this->_getParam('params'));
+				$rs['result'] = $this->s->getPulsationsOntoEthique($this->_getParam('params'),$this->_getParam('cache',true));
 				break;
 			case 'corrigeEval':
 				$rs['result'] = $this->s->corrigeEval();
@@ -115,7 +115,8 @@ class SonarController extends Zend_Controller_Action
 		//initalise l'objet SONAR
 		$this->s = new Flux_Sonar($this->idBase,$this->_getParam('trace'));
 		$this->s->dbOmk = $this->_getParam('dbOmk',$this->idBaseOmk);
-		//pour le debug $omk->o = false;
+		//pour le debug 
+		$omk->o = false;
 		if(!$omk->o)$omk->o=$this->s->initOmeka(OMEKA_SONAR_ENDPOINT, OMEKA_SONAR_API_IDENT,OMEKA_SONAR_API_KEY);		
 		$this->s->omk = $omk->o;
 
