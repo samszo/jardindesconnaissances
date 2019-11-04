@@ -30,11 +30,11 @@ class cesiumDocument {
             //ajoute l'image du document'
             me.entities.add({
                 //position : Cesium.Cartesian3.fromDegrees(cW, cS),
-                position : me.posiCenter,
+                position : posiCenter,
                 billboard : {
                     image : me.urlImg,
-                    //width : s.img.width,
-                    //height : s.img.height
+                    width : me.width,
+                    height : me.height
                 }
             });
     

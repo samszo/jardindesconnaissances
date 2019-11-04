@@ -17,7 +17,6 @@
     
     <script type="text/javascript" src="../js/d3.v5.min.js"></script>
     <script type="text/javascript" src="../js/jquery.min.js"></script>
-    <script type="text/javascript" src="../js/site.js"></script>
     <script type="text/javascript" src="../js/polarclock.js"></script>
     <script type="text/javascript" src="../js/cartoaxes.js"></script>
 
@@ -232,6 +231,7 @@
 
     <script src="../js/popper.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/site.js"></script>
     <script>
 
 
@@ -252,9 +252,8 @@
                 geo = p;
             });
         }
-
         var idBase = '<?php echo $this->idBase; ?>',
-            uti = <?php echo $this->uti; ?>,
+            uti = <?php echo $this->uti; ?>,            
             urlColIIIF = '<?php echo $this->urlColIIIF; ?>', lstIIIF=[],
             urlColCrible = '<?php echo $this->urlColCribles; ?>',lstCrible = [],
             urlItemCrible = '<?php echo $this->urlItemCribles; ?>',lstItemCrible = [],
@@ -276,41 +275,17 @@
                     showSource(sltFlux.url);
                 }
             });
-        d3.select('#btnConnexion')
-            .on('click', function () {
-                if(uti.login=='Anonyme')
-                    showGoogleAuth();
-                else if( d3.select('#txtUti').html)
-                    deconnexion("sonar/iiif");
-                else
-                    connexion("sonar/iiif");
-                //console.log("connexion ou déconnexion de l'utilisateur");
-            });
         d3.select('#btnAjoutConcepts')
             .on('click', function () {
                 console.log("ajoute une structure de concept");
             });
             
-        //charges les données del'application
+        //charges les données de l'application
+        initConnexion('sonar/iiif');
         showUti();
         getListeSource();
         getListeCrible();
 
-
-        function showUti() {
-            let btn = '<i class="fas fa-sign-in-alt"></i>';
-            let u = uti.login;                          
-            if (uti.login == 'Anonyme') {
-                btn = "<img src=\'../img/google.png\' style=\'height: 30px;\' alt=\'connexion Google\' />";
-                u='Connectez-vous';
-            }  
-            d3.select('#txtUti').html(u);
-            d3.select('#btnConnexion').html(btn);
-        }
-
-        function showGoogleAuth(){
-            window.location.href = "../auth/google?idBase="+idBase+"&redir=/sonar/iiif";
-        }
 
         function getListeSource() {
 

@@ -44,7 +44,7 @@ class cesiumRapport {
             //calcul la position du pdv dans le crible à partir du crible d'expression
             let scaleCrible = d3.scaleLinear()
                 .domain([me.minCribleSrc, me.maxCribleSrc])
-                .range([0, me.radiusCribleDst]);
+                .range([-me.radiusCribleDst, me.radiusCribleDst]);
             let posiY = scaleCrible(parseFloat(me.data.details['jdc:y'][0]['@value']));
             let posiX = scaleCrible(parseFloat(me.data.details['jdc:x'][0]['@value']));
             let latPosiEval = me.crb.lat + posiY; 

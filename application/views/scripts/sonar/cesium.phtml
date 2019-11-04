@@ -9,28 +9,112 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-    <meta name="description" content="Visualisation des positions sémantiques dans un écosytème de connaissances">
-    <title>JDC - Sonar - Jardin</title>
-    <script type="text/javascript" src="../js/cesium/Sandcastle-header.js"></script>
-    <script type="text/javascript" src="../js/cesium/Cesium.js"></script>
-    <script type="text/javascript" src="../js/d3.V5.min.js"></script>
-    <script type="text/javascript" src="../js/cesiumCribleConceptuel.js"></script>
-    <script type="text/javascript" src="../js/cesiumActeur.js"></script>
-    <script type="text/javascript" src="../js/cesiumDocument.js"></script>
-    <script type="text/javascript" src="../js/cesiumRapport.js"></script>
-    
+    <meta name="description" content="Visualisation des pulsations cognitives dans un écosystème de connaissances">
+    <title>JDC - Sonar - Pulsations cognitives</title>
+
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/w2ui-1.5.rc1.min.css" />
+    <link rel="stylesheet" type="text/css" href="../css/sonar-dashboard.css">
+        
+    <style>
+        @font-face {
+            font-family: "Quantify";
+            src: url("../fonts/quantify/Quantify.ttf");
+        }
+        .logo {
+            vertical-align: top;
+            height: 40px;
+        }
+        .logoTxt {
+            vertical-align: sub;
+            font-family: "Quantify";
+        }    
+    </style>
+
     
 </head>
 <body class="sandcastle-loading" data-sandcastle-bucket="bucket-requirejs.html">
 <style>
     @import url(../templates/bucket.css);
 </style>
-<div id="cesiumContainer" class="fullSize"></div>
-<div id="loadingOverlay"><h1>Loading...</h1></div>
-<div id="toolbar"></div>
+
+
+<nav id="navMain" class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">
+        <img class='logo' src="../svg/logo-sonar.svg" alt="logo-sonar" />
+        <span class='logoTxt'>SONAR</span>
+        <img src="../svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
+  </a>
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+  <ul class="navbar-nav px-3">
+    <li class="nav-item text-nowrap">
+        <button class="btn btn-dark" ><span id='txtUti'></span></button>
+        <button class="btn btn-dark" ><span id='btnConnexion'></span></button>
+    </li>
+  </ul>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <span>Les dimensions</span>
+        </h6>
+        <div id="layoutListe" class="nav flex-column" style="width: 100%; height: 100%;"></div>
+      </div>
+    </nav>
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      <div id="contCesium" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <div id="cesiumContainer" class="fullSize"></div>
+            <div id="loadingOverlay"><h1>Loading...</h1></div>
+      </div>
+
+      
+    </main>
+  </div>
+</div>
+
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script type="text/javascript" src="../js/popper.min.js"></script>
+<script type="text/javascript" src="../js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../js/d3.V5.min.js"></script>
+<script type="text/javascript" src="../font/font-awesome/all.min.js"></script>
+<script type="text/javascript" src="../js/w2ui.min.js"></script>
+
+<script type="text/javascript" src="../js/cesium/Sandcastle-header.js"></script>
+<script type="text/javascript" src="../js/cesium/Cesium.js"></script>
+<script type="text/javascript" src="../js/cesiumCribleConceptuel.js"></script>
+<script type="text/javascript" src="../js/cesiumActeur.js"></script>
+<script type="text/javascript" src="../js/cesiumDocument.js"></script>
+<script type="text/javascript" src="../js/cesiumRapport.js"></script>
+<script type="text/javascript" src="../js/site.js"></script>
+
 <script id="cesium_sandcastle_script">
+var idBase = '<?php echo $this->idBase; ?>',
+    uti = <?php echo $this->uti; ?>;            
+
+//charges les données de l'application
+showUti();
+initConnexion('sonar/cesium');
+
+//Create a Viewer instances and add the DataSource.
+Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiYTI3OWI2My03MDNlLTQyZjAtYWY5OS02ZTU5MGY2MjFkMjUiLCJpZCI6MTQ2MjAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NjU5NDU1MzR9.zuJWBeovOnevAVL2LCjrLN8vN3zswKTuPVdRh28hWmc';
+var viewer = new Cesium.Viewer('cesiumContainer', {
+    animation : false
+    ,timeline : false
+    ,terrainProvider:false        
+});
+viewer.clock.shouldAnimate = false;
+
+
 function startup(Cesium) {
     'use strict';
+
+    var height = window.innerHeight - document.getElementById('navMain').clientHeight;
+    d3.select('#contCesium').style('height',height+"px");
+    
 
     var altSurface = 10000000.0, maxTailleTof = 10000;
     //échelle des taille de photo
@@ -270,137 +354,143 @@ function startup(Cesium) {
      * @param {Array} data The object to be processed.
      */
     WebGLGlobeDataSource.prototype.load = function(allData) {
-    //>>includeStart('debug', pragmas.debug);
-    if (!Cesium.defined(allData)) {
-        throw new Cesium.DeveloperError('data is required.');
-    }
-    //>>includeEnd('debug');
-
-    //Clear out any data that might already exist.
-    this._setLoading(true);
-    this._seriesNames.length = 0;
-    this._seriesToDisplay = undefined;
-
-    var heightScale = this.heightScale;
-    var entities = this._entityCollection;
-
-    //It's a good idea to suspend events when making changes to a
-    //large amount of entities.  This will cause events to be batched up
-    //into the minimal amount of function calls and all take place at the
-    //end of processing (when resumeEvents is called).
-    entities.suspendEvents();
-    entities.removeAll();
-
-    console.log('START data');
-    //positionne le max de position à afficher
-    var debug = 8000000;
-    //la structure des données est basée sur 
-    //la modélisation onto-éthique d'une existence informationnelle
-
-    //TODO construction des listes dans un grid pour sélection 
-
-    //ajoute les documents
-    allData.result.documents.forEach(function(d,i){
-        
-        /*ajoute un rectangle avec l'image
-        */
-        var altCouche = 3, cImages=[];
-        var hght = altSurface * (altCouche + i);
-        //TODO:gérer la géolocalisation des documents
-        //calcul paramétrique de l aposition des document
-        var cW = 0, cS = 0, cE = scaleEast(d.details.img.width), cN = scaleNorth(d.details.img.height);
-        d.lat = cN ? cN : 0;
-        d.lng = cE ? cE : 0;
-        d.altitude = hght;
-        d.oCesium = cImages.push(new cesiumDocument({
-            'label':d.label,
-            'id':d.recid,
-            'urlImg':d.details.img["@id"],
-            'width' : d.details.img.width,
-            'height' : d.details.img.height,
-            'lng':cE,
-            'lat':cN,
-            'entities':entities,
-            'altitude':hght
-        }))
-    });
-
-    //ajouter les cribles
-    var radius = 6;
-    //for (const idC in allData.result.cribles) {
-    //    let c = allData.result.cribles[idC];
-    allData.result.cribles.forEach(function(c,i){
-        //limite les positions pour débug
-        if(i<=debug){
-            //TODO : calculer un positionnement plus juste cf. topologie D3
-            c.lng = (radius*i*4)+1;//ATTENTION si 0 prend position par défaut
-            c.lat = 1;
-            c.radius = radius;
-            //TODO: calculer l'altitude suivant l'historique des positions
-            c.altitude = 0;
-            c.oCesium = new cesiumCribleConceptuel({
-                'titre':c.label,
-                'crible':c.concepts,
-                //P8
-                'lng':c.lng,
-                'lat':c.lat,
-                'entities':entities,
-                'radius':c.radius,
-                'altitude':c.altitutude
-            });
+        //>>includeStart('debug', pragmas.debug);
+        if (!Cesium.defined(allData)) {
+            throw new Cesium.DeveloperError('data is required.');
         }
-    });
+        //>>includeEnd('debug');
 
-    //ajouter les acteurs et les rapports
-    var caColor=[];
-    allData.result.rapports.forEach(function(r,i){
-        //limite les positions pour débug
-        if(i<=debug){
-            //création de l'acteur à la position de l'évaluation
-            if(!caColor[r['idAct']])
-                caColor[r['idAct']]=Cesium.Color.fromRandom({alpha : 0.3});
-            //TODO:création de l'acteur sous forme fullerénique
-            //cf. https://onlinelibrary.wiley.com/doi/pdf/10.1002/wcms.1207
-            let act = allData.result.acteurs[r['idAct']];        
-            if(!act.positions)act.positions=[];
-            act.positions.push(new cesiumActeur({
-                'label':act.label,
-                'id':act.recid,
-                'color':caColor[r['idAct']],
-                'lng':parseFloat(r['lng']),
-                'lat':parseFloat(r['lat']),
+        //Clear out any data that might already exist.
+        this._setLoading(true);
+        this._seriesNames.length = 0;
+        this._seriesToDisplay = undefined;
+
+        var heightScale = this.heightScale;
+        var entities = this._entityCollection;
+
+        //It's a good idea to suspend events when making changes to a
+        //large amount of entities.  This will cause events to be batched up
+        //into the minimal amount of function calls and all take place at the
+        //end of processing (when resumeEvents is called).
+        entities.suspendEvents();
+        entities.removeAll();
+
+        console.log('START data');
+        //positionne le max de position à afficher
+        var debug = 8000000;
+        //la structure des données est basée sur 
+        //la modélisation onto-éthique d'une existence informationnelle
+
+        //construction des listes dans un grid pour sélection
+        grids.docs.records = allData.result.documents;
+        w2ui['layoutDimensions'].content('top', $().w2grid(grids.docs));        
+        grids.acteurs.records = allData.result.acteurs;
+        w2ui['layoutDimensions'].content('main', $().w2grid(grids.acteurs));        
+        grids.cribles.records = allData.result.cribles;
+        w2ui['layoutDimensions'].content('bottom', $().w2grid(grids.cribles));        
+
+
+        //ajoute les documents
+        allData.result.documents.forEach(function(d,i){
+            
+            /*ajoute un rectangle avec l'image
+            */
+            var altCouche = 3, cImages=[];
+            var hght = altSurface * (altCouche + i);
+            //TODO:gérer la géolocalisation des documents
+            //calcul paramétrique de l aposition des document
+            var cW = 0, cS = 0, cE = scaleEast(d.details.img.width), cN = scaleNorth(d.details.img.height);
+            d.lat = cN ? cN : 0;
+            d.lng = cE ? cE : 0;
+            d.altitude = hght;
+            d.oCesium = cImages.push(new cesiumDocument({
+                'label':d.label,
+                'id':d.recid,
+                'urlImg':d.details.img["@id"],
+                'width' : d.details.img.width,
+                'height' : d.details.img.height,
+                'lng':cE,
+                'lat':cN,
                 'entities':entities,
-                'radius':1000,
-                'altitude':altSurface,
-            }));
-            //création du rapport entre le document, l'acteur et le crible
-            console.log('rapport '+i);
-            r.oCesium = new cesiumRapport({
-                'label':'rapport',
-                'id':r.details['o:id'],
-                'color':caColor[r['idAct']],
-                'lng':parseFloat(r['lng']),
-                'lat':parseFloat(r['lat']),
-                'data':r,
-                'entities':entities,
-                'altitude':altSurface,
-                'act':act,
-                'doc':allData.result.documents[r['idDoc']],
-                'crb':allData.result.cribles[r['idCrible']]
-            })
-            //
-        }
-    });
-    console.log('END data')
+                'altitude':hght
+            }))
+        });
+
+        //ajouter les cribles
+        var radius = 6;
+        //for (const idC in allData.result.cribles) {
+        //    let c = allData.result.cribles[idC];
+        allData.result.cribles.forEach(function(c,i){
+            //limite les positions pour débug
+            if(i<=debug){
+                //TODO : calculer un positionnement plus juste cf. topologie D3
+                c.lng = (radius*i*4)+1;//ATTENTION si 0 prend position par défaut
+                c.lat = 1;
+                c.radius = radius;
+                //TODO: calculer l'altitude suivant l'historique des positions
+                c.altitude = 0;
+                c.oCesium = new cesiumCribleConceptuel({
+                    'titre':c.label,
+                    'crible':c.concepts,
+                    //P8
+                    'lng':c.lng,
+                    'lat':c.lat,
+                    'entities':entities,
+                    'radius':c.radius,
+                    'altitude':c.altitutude
+                });
+            }
+        });
+
+        //ajouter les acteurs et les rapports
+        var caColor=[];
+        allData.result.rapports.forEach(function(r,i){
+            //limite les positions pour débug
+            if(i<=debug){
+                //création de l'acteur à la position de l'évaluation
+                if(!caColor[r['idAct']])
+                    caColor[r['idAct']]=Cesium.Color.fromRandom({alpha : 0.3});
+                //TODO:création de l'acteur sous forme fullerénique
+                //cf. https://onlinelibrary.wiley.com/doi/pdf/10.1002/wcms.1207
+                let act = allData.result.acteurs[r['idAct']];        
+                if(!act.positions)act.positions=[];
+                act.positions.push(new cesiumActeur({
+                    'label':act.label,
+                    'id':act.recid,
+                    'color':caColor[r['idAct']],
+                    'lng':parseFloat(r['lng']),
+                    'lat':parseFloat(r['lat']),
+                    'entities':entities,
+                    'radius':1000,
+                    'altitude':altSurface,
+                }));
+                //création du rapport entre le document, l'acteur et le crible
+                r.oCesium = new cesiumRapport({
+                    'label':'rapport',
+                    'id':r.details['o:id'],
+                    'color':caColor[r['idAct']],
+                    'lng':parseFloat(r['lng']),
+                    'lat':parseFloat(r['lat']),
+                    'data':r,
+                    'entities':entities,
+                    'altitude':altSurface,
+                    'act':act,
+                    'doc':allData.result.documents[r['idDoc']],
+                    'crb':allData.result.cribles[r['idCrible']]
+                })
+                //
+            }
+        });
+        console.log('END data')
 
 
 
-    //ajouter les liens acteur->document acteur->concept 
+        //ajouter les liens acteur->document acteur->concept 
 
-    //Once all data is processed, call resumeEvents and raise the changed event.
-    entities.resumeEvents();
-    this._changed.raiseEvent(this);
-    this._setLoading(false);
+        //Once all data is processed, call resumeEvents and raise the changed event.
+        entities.resumeEvents();
+        this._changed.raiseEvent(this);
+        this._setLoading(false);
     };
 
     WebGLGlobeDataSource.prototype._setLoading = function(isLoading) {
@@ -428,14 +518,7 @@ function startup(Cesium) {
         }
     });
     
-    //Create a Viewer instances and add the DataSource.
-    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiYTI3OWI2My03MDNlLTQyZjAtYWY5OS02ZTU5MGY2MjFkMjUiLCJpZCI6MTQ2MjAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NjU5NDU1MzR9.zuJWBeovOnevAVL2LCjrLN8vN3zswKTuPVdRh28hWmc';
-    var viewer = new Cesium.Viewer('cesiumContainer', {
-        animation : false
-        ,timeline : false
-        ,terrainProvider:false        
-    });
-    viewer.clock.shouldAnimate = false;
+    //ajoute le data source au viewer
     viewer.dataSources.add(dataSource);
 
 
@@ -508,6 +591,150 @@ if (typeof Cesium !== 'undefined') {
     require(['Cesium'], startup);
 }
 
+//construction des grids
+var contentHeight = 200, style = 'color:black;';
+var grids = {'docs':
+    {   name: 'gridDocs', 
+        style      : style,
+        header: 'Documents',		
+        show: { 
+            header			: true,		
+            toolbar			: true,
+            toolbarReload   : false,
+            toolbarColumns  : false,
+            toolbarSearch   : true,
+            toolbarAdd      : false,
+            toolbarDelete   : false,
+            toolbarSave		: false,
+            selectColumn	: true,
+            footer			: true,
+        },
+        columns: [         
+            { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
+            { field: 'label', caption: 'Label', size: '100%', sortable: true, resizable: true},
+        ],
+        records: [],
+        onSelect: function (event) {
+            event.onComplete = function () {
+                var s = w2ui['gridDocs'].getSelection();
+                    if(s.length)
+                        mouvetoDimension(s);
+            }
+        },
+        onUnselect: function (event) {
+            event.onComplete = function () {
+            }
+        },	    
+        onAdd: function(event) {
+            console.log(event);
+        }			    
+    },
+    'acteurs':{ 
+        name: 'gridActeurs', 
+        style      : style,
+        header: "Acteurs",		
+        show: { 
+            header			: true,		
+            toolbar			: true,
+            toolbarReload   : false,
+            toolbarColumns  : false,
+            toolbarSearch   : true,
+            toolbarAdd      : false,
+            toolbarDelete   : false,
+            toolbarSave		: false,
+            selectColumn	: true,
+            footer			: true,
+        },
+        columns: [         
+            { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
+            { field: 'label', caption: 'Valeur', size: '100%', sortable: true, resizable: true},
+        ],
+        records: [],
+        onSelect: function (event) {
+            event.onComplete = function () {
+                console.log(event);
+            }
+        },	 
+        onUnselect: function (event) {
+            event.onComplete = function () {
+                console.log(event);
+            }
+        },	    
+    },       
+    'cribles':{ 
+        name: 'gridCribles', 
+        style      : style,
+        header: "Cribles",		
+        show: { 
+            header			: true,		
+            toolbar			: true,
+            toolbarReload   : false,
+            toolbarColumns  : false,
+            toolbarSearch   : true,
+            toolbarAdd      : false,
+            toolbarDelete   : false,
+            toolbarSave		: false,
+            selectColumn	: true,
+            footer			: true,
+        },
+        columns: [         
+            { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
+            { field: 'label', caption: 'Valeur', size: '100%', sortable: true, resizable: true},
+        ],
+        records: [],
+        onSelect: function (event) {
+            event.onComplete = function () {
+                console.log(event);
+            }
+        },	 
+        onUnselect: function (event) {
+            event.onComplete = function () {
+                console.log(event);
+            }
+        },	    
+    }       
+};
+
+$(function () {
+    var pstyle = 'border: 1px solid #dfdfdf; padding: 5px;';
+    $('#layoutListe').w2layout({
+        name: 'layoutDimensions',
+        padding: 2,
+        panels: [
+            { type: 'top', size: 200, resizable: true, style: pstyle, content: 'top' },
+            { type: 'main', size: 200, resizable: true, style: pstyle, content: 'main' },
+            { type: 'bottom', size: 200, resizable: true, style: pstyle, content: 'right' }
+        ]
+    });
+});
+
+function mouvetoDimension(d){
+
+
+    var center = Cesium.Cartesian3.fromDegrees(-75.59777, 40.03883);
+    var transform = Cesium.Transforms.eastNorthUpToFixedFrame(center);
+
+    // View in east-north-up frame
+    var camera = viewer.camera;
+    camera.constrainedAxis = Cesium.Cartesian3.UNIT_Z;
+    camera.lookAtTransform(transform, new Cesium.Cartesian3(-120000.0, -120000.0, 120000.0));
+
+    // Show reference frame.  Not required.
+    referenceFramePrimitive = scene.primitives.add(new Cesium.DebugModelMatrixPrimitive({
+        modelMatrix : transform,
+        length : 100000.0
+    }));
+    /*
+    viewer.camera.flyTo({
+        destination : Cesium.Cartesian3.fromDegrees(-122.22, 46.12, 5000.0),
+        orientation : {
+            heading : Cesium.Math.toRadians(20.0),
+            pitch : Cesium.Math.toRadians(-35.0),
+            roll : 0.0
+        }
+    });
+    */
+}
 
 </script>
 </body>

@@ -91,7 +91,7 @@ class SonarController extends Zend_Controller_Action
 	}
 
 	public function cesiumAction() {
-		$this->initInstance(false,"/cecium");
+		$this->initInstance(false,"/cesium");
 		$rs = array('result' => array(), 'erreur'=>0);
 
 	}

@@ -1,4 +1,4 @@
-var prefUrl = "", idBase="", uti={};
+var prefUrl = "", idBase="", uti={},urlController = '';
 function deconnexion(redir){
     window.location.assign(prefUrl+'auth/deconnexion?redir='+redir);
 }
@@ -53,3 +53,31 @@ function wrap(text, width) {
     }) 
 }
 
+function initConnexion(url){
+    urlController = url;
+    d3.select('#btnConnexion')
+        .on('click', function () {
+            if(uti.login=='Anonyme')
+                showGoogleAuth();
+            else if( d3.select('#txtUti').html)
+                deconnexion(urlController);
+            else
+                connexion(urlController);
+            //console.log("connexion ou déconnexion de l'utilisateur");
+        });
+}
+
+function showUti() {
+    let btn = '<i class="fas fa-sign-in-alt"></i>';
+    let u = uti.login;                          
+    if (uti.login == 'Anonyme') {
+        btn = "<img src=\'../img/google.png\' style=\'height: 30px;\' alt=\'connexion Google\' />";
+        u='Connectez-vous';
+    }  
+    d3.select('#txtUti').html(u);
+    d3.select('#btnConnexion').html(btn);
+}
+
+function showGoogleAuth(){
+    window.location.href = "../auth/google?idBase="+idBase+"&redir=/"+urlController;
+}
