@@ -496,7 +496,6 @@ class Flux_Sonar extends Flux_Site{
 
     }    
 
-
     /**
 	 * récupère les évaluations
      * 

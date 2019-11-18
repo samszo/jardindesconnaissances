@@ -22,6 +22,7 @@ class Flux_Databnf extends Flux_Site{
 	var $rs;
 	var $doublons;
 	var $uploadAudio = "/data/BNF/audio/";
+	var $bExiste = true;
 /*
 https://catalogue.bnf.fr/affiner.do?motRecherche=&listeAffinages=FacSpe_-1%3BFacLocal_Lcl2FRdjOpera&affinageSupprimer=true&codeFacetteAffine=FacLocal&valeurFacetteAffine=Lcl2FRdjOpera&afficheRegroup=false&trouveDansFiltre=NoticePUB&triResultParPage=0&nbResultParPage=10&critereRecherche=0
 http://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.doctype%20all%20%22v%22&recordSchema=unimarcxchange&maximumRecords=20&startRecord=1
@@ -505,7 +506,7 @@ ORDER BY ASC (?label_a)
     	set_time_limit(0);
     	$this->trace("DEBUT ".__METHOD__." : $cote, $record, $nbResult, $dateDeb, $dateFin");
     
-    	$this->bExiste = false;
+    	$this->bExiste = true;
     	
     	//initialise les gestionnaires de base de données
     	$this->initDbTables();
@@ -614,51 +615,59 @@ ORDER BY ASC (?label_a)
 	    	
 	    	//tableau des valeurs
 	    	$arrVal = array();
-	    	
-	    	//tableau du doc
-			$arrDoc = array("tronc"=>"item catalogue SRU", "parent"=>$this->idDocParent, "data"=>$xml);
-			$idD = $this->dbD->ajouter($arrDoc,$this->bExiste);
-			$this->trace("doc_id : ".$idD." = ".$idRecord);
-	     
-	    	//décompose les datas
-	    	$rd =  $r->getElementsByTagName("dc");
-	    	foreach ($rd as $d) {
-	    		foreach($d->childNodes as $c) {
-	    			if($c->nodeName!="#text"){
-		    			//récupère le tag
-		    			if(!isset($arrTag[$c->localName])){
-			    			$idTag = $this->dbT->ajouter(array("code"=>$c->localName,"ns"=>$c->prefix,"parent"=>$this->idTagGen));
-			    			$arrTag[$c->localName] = $idTag;
-		    			}else 
-		    				$idTag = $arrTag[$c->localName];
-		    				
-	    				$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
-	    						,"src_id"=>$idD,"src_obj"=>"doc"
-	    						,"dst_id"=>$idTag,"dst_obj"=>"tag"
-	    						,"pre_id"=>$idPre,"pre_obj"=>$objPre
-	    						,"valeur"=>$c->nodeValue
-	    				),$this->bExiste);
-		    				
-		    			//met à jour le document
-		    			switch ($c->nodeName) {
-		    				case "dc:title":
-		    					$arrDoc["titre"]=$c->nodeValue;
-		    					break;	    				
-	    					case "dc:identifier":
-	    						$arrDoc["url"]= $arrDoc["url"] ? $arrDoc["url"] : $c->nodeValue;
-	    						break;
-							case "dc:date":
-								$arrDoc["pubDate"]=$c->nodeValue."-01-01";
-	    						break;
-	    				}
-	    			}
-	    		}
-	    	}
-	    	
-	    	//enregistre le doc
-	    	$this->dbD->edit($idD, $arrDoc);
-	    	$this->trace("MAJ doc_id : ".$idD." = ".$idRecord);	    	
 			
+			//vérifie l'existence de l'item
+			if($this->bExiste){
+				$url = $this->getItemSRUid($r);
+				$ids = $this->dbD->existe(array('url'=>$url));
+				$idD = $ids[0]['doc_id'];
+				$arrDoc = $ids[0];
+			}else{
+				//tableau du doc
+				$arrDoc = array("tronc"=>"item catalogue SRU", "parent"=>$this->idDocParent, "data"=>$xml);
+				$idD = $this->dbD->ajouter($arrDoc,$this->bExiste);
+				$this->trace("doc_id : ".$idD." = ".$idRecord);
+			
+				//décompose les datas
+				$rd =  $r->getElementsByTagName("dc");
+				foreach ($rd as $d) {
+					foreach($d->childNodes as $c) {
+						if($c->nodeName!="#text"){
+							//récupère le tag
+							if(!isset($arrTag[$c->localName])){
+								$idTag = $this->dbT->ajouter(array("code"=>$c->localName,"ns"=>$c->prefix,"parent"=>$this->idTagGen));
+								$arrTag[$c->localName] = $idTag;
+							}else 
+								$idTag = $arrTag[$c->localName];
+								
+							$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+									,"src_id"=>$idD,"src_obj"=>"doc"
+									,"dst_id"=>$idTag,"dst_obj"=>"tag"
+									,"pre_id"=>$idPre,"pre_obj"=>$objPre
+									,"valeur"=>$c->nodeValue
+							),$this->bExiste);
+								
+							//met à jour le document
+							switch ($c->nodeName) {
+								case "dc:title":
+									$arrDoc["titre"]=$c->nodeValue;
+									break;	    				
+								case "dc:identifier":
+									$arrDoc["url"]= $arrDoc["url"] ? $arrDoc["url"] : $c->nodeValue;
+									break;
+								case "dc:date":
+									$arrDoc["pubDate"]=$c->nodeValue."-01-01";
+									break;
+							}
+						}
+					}
+				}
+				
+				//enregistre le doc
+				$this->dbD->edit($idD, $arrDoc);
+				$this->trace("MAJ doc_id : ".$idD." = ".$idRecord);	    	
+			}
+
 			//enregistre l'audio
 			if($audio){
 				clearstatcache();
@@ -666,53 +675,66 @@ ORDER BY ASC (?label_a)
 				$pathParts = pathinfo($arrDoc["url"]);
 				$uri = $pathParts['filename'];
 				for ($i=1; $i < 10; $i++) { 
-					$urlAudioSrc = $arrDoc["url"]."/f".$i.'.audio';
-					//le stream est compresssé au format zip
-					$pathAudio = ROOT_PATH.$this->uploadAudio.$uri."_f".$i.".mp3";
-					$pathAudioZip = ROOT_PATH.$this->uploadAudio.$uri."f".$i.".zip";
-					$pathAudioStream = ROOT_PATH.$this->uploadAudio."stream.zip";
-					$existe = file_exists($pathAudioZip);				
-					if (!$existe) {
-						//merci à https://framework.zend.com/manual/1.12/en/zend.http.client.advanced.html#zend.http.client.streaming
-						$client = new Zend_Http_Client($urlAudioSrc,array('timeout' => 300));
-						$client->setStream(); // will use temp file
-						$response = $client->request('GET');
-						// copy file
-						copy($response->getStreamName(), $pathAudioZip);
-						// use stream
-						$fp = fopen($pathAudioStream, "w");
-						stream_copy_to_stream($response->getStream(), $fp);
-						// Also can write to known file
-						$client->setStream($pathAudioZip)->request('GET');
-						$this->trace("stream enregistré ".$pathAudioZip);     			
-					}
-					$size = filesize($pathAudioZip);
-					if($size==442){
-						//suprime les fichiers inutiles à la main
-						unlink($pathAudioZip);
-						$this->trace("SUPPRESSION <a href='".$urlAudioSrc."'>".$urlAudioSrc."</a>".$size." -> ".$pathAudioZip);     			
-					}else{
-						/*décompresse le flux à a main car erreur dans le fichier ???						
-						$zip = new ZipArchive;
-						$res = $zip->open($pathAudioZip);
-						$phar = new Phar($pathAudioZip);
-						$statut = $zip->getStatusString();
-						if ($res === TRUE) {
-							$zip->extractTo(ROOT_PATH.$this->uploadAudio.$uri, array($uri.'_'.$i.'.mp3'));
-							$zip->close();
-							$this->trace("DECOMPRESSION");     			
-						} else {
-							$this->trace("ECHEC decompresion");     			
+					if($arrDoc["url"]){
+						$urlAudioSrc = $arrDoc["url"]."/f".$i.'.audio';
+						//le stream est compresssé au format zip
+						$pathAudio = ROOT_PATH.$this->uploadAudio.$uri."_f".$i.".mp3";
+						$pathAudioZip = ROOT_PATH.$this->uploadAudio.$uri."f".$i.".zip";
+						$pathAudioStream = ROOT_PATH.$this->uploadAudio."stream.zip";
+						$existe = file_exists($pathAudioZip);				
+						if (!$existe) {
+							//merci à https://framework.zend.com/manual/1.12/en/zend.http.client.advanced.html#zend.http.client.streaming
+							$client = new Zend_Http_Client($urlAudioSrc,array('timeout' => 300));
+							$client->setStream(); // will use temp file
+							$response = $client->request('GET');
+							// copy file
+							copy($response->getStreamName(), $pathAudioZip);
+							// use stream
+							$fp = fopen($pathAudioStream, "w");
+							stream_copy_to_stream($response->getStream(), $fp);
+							// Also can write to known file
+							$client->setStream($pathAudioZip)->request('GET');
+							$this->trace("stream enregistré ".$pathAudioZip);     			
 						}
-						*/
-						//renome le fichier extrait
-						$pathAudioExtract = ROOT_PATH.$this->uploadAudio.$uri."f".$i;
-						$statut = rename($pathAudioExtract, $pathAudio);	
-						//ajoute la fichier audio
-						$rsDocSon = $this->dbD->ajouter(array("url"=>$this->uploadAudio.$uri."_f".$i.".mp3"
-							,"titre"=>"f".$i.'.audio'
-							,"tronc"=>'audio'
-							,"parent"=>$idD));
+						$size = filesize($pathAudioZip);
+						if($size==442){
+							//suprime les fichiers inutiles à la main
+							unlink($pathAudioZip);
+							$this->trace("SUPPRESSION <a href='".$urlAudioSrc."'>".$urlAudioSrc."</a>".$size." -> ".$pathAudioZip);     			
+						}else{
+							/*décompresse le flux à a main car erreur dans le fichier ???						
+							$zip = new ZipArchive;
+							$res = $zip->open($pathAudioZip);
+							$phar = new Phar($pathAudioZip);
+							$statut = $zip->getStatusString();
+							if ($res === TRUE) {
+								$zip->extractTo(ROOT_PATH.$this->uploadAudio.$uri, array($uri.'_'.$i.'.mp3'));
+								$zip->close();
+								$this->trace("DECOMPRESSION");     			
+							} else {
+								$this->trace("ECHEC decompresion");     			
+							}
+							*/
+							//décompresser avec une ligne de commande 
+							//$cmd = "unzip ".$pathAudioZip;
+							//avec unar cf. https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/theunarchiver/unar1.8.1.zip
+							$cmd = "/Users/samszo/Downloads/unar1.8.1/unar ".$pathAudioZip." -o ".ROOT_PATH.$this->uploadAudio;
+							$result = exec($cmd);	
+				
+							//renome le fichier extrait
+							$existe = file_exists($pathAudio);
+							if(!$existe){
+								$pathAudioExtract = ROOT_PATH.$this->uploadAudio.$uri."f".$i;
+								$statut = rename($pathAudioExtract, $pathAudio);	
+								//ajoute la fichier audio
+								$rsDocSon = $this->dbD->ajouter(array("url"=>$this->uploadAudio.$uri."_f".$i.".mp3"
+									,"titre"=>"f".$i.'.audio'
+									,"tronc"=>'audio'
+									,"parent"=>$idD));
+							}
+						}
+					}else{
+						$this->trace("ERREUR : chemin audio vide ".$arrDoc["url"]);     			
 					}
 
 				}
@@ -722,6 +744,27 @@ ORDER BY ASC (?label_a)
 	    	$this->trace("FIN ".__METHOD__." doc_id = ".$idD);
 	    return $idD;
     }
+	
+    /**
+     * récupère l'identifiant d'une item SRU
+     *
+     * @param  	xmlObjet 	$r
+     *
+     * @return	string
+     */
+    function getItemSRUid($r){
+		$this->trace("DEBUT ".__METHOD__);	
+		$id = false;
+		$rd =  $r->getElementsByTagName("dc");
+		foreach ($rd as $d) {
+			foreach($d->childNodes as $c) {
+				if($c->nodeName=="dc:identifier"){
+					return $c->nodeValue;
+				}
+			}
+		}
+		return $id;
+	}
     
 	
     /**
@@ -1135,7 +1178,7 @@ ORDER BY ASC (?label_a)
     		$arr[] = $i;
     	}
     	$record+=$nbResult;
-    	if($i>0)$this->saveAudio($query, $record, $nbResult);
+    	if(count($arr))$this->saveAudio($query, $record, $nbResult);
     
 		return $arr;
     }

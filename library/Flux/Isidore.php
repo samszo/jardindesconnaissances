@@ -49,7 +49,7 @@ class Flux_Isidore extends Flux_Site{
     {
 			$url = $this->searchUrl."output=".$this->output.$query;
 			$this->trace($url);
-			return $this->getUrlBodyContent($url,false);
+			return $this->getUrlBodyContent($url,$this->bCache);
     }
 
     /**

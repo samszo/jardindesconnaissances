@@ -289,7 +289,7 @@ class FluxController extends Zend_Controller_Action {
 				break;	   		
 			case 'saveAudio':
 				$query = '(dc.creator all "Deleuze, Gilles" or dc.contributor all "Deleuze, Gilles" )';
-				$this->view->reponse = $bnf->saveAudio($this->_getParam('q',$query));			
+				$this->view->reponse = $bnf->saveAudio($this->_getParam('q',$query),201);			
 	   		default:
 	   			break;
 	   	}
@@ -642,18 +642,19 @@ class FluxController extends Zend_Controller_Action {
     
     public function isidoreAction()
     {
-	    	$isidore = new Flux_Isidore($this->_getParam('idBase'),$this->_getParam('trace'));
-	    	$isidore->bTraceFlush = $this->_getParam('trace');
-	    	switch ($this->_getParam('q')) {
-	    		case "getHistoDiscipline":
-	    			$data = $isidore->getHistoDiscipline($this->_getParam('req'),"stream");
-	    			$this->view->content = json_encode($data);
-	    			break;
-				case "getDoc":
-	    			$data = $isidore->getDoc($this->_getParam('req'),$this->_getParam('params'));
-	    			$this->view->content = json_encode($data);
-	    			break;
-	    	}
+		$isidore = new Flux_Isidore($this->_getParam('idBase'),$this->_getParam('trace'));
+		$isidore->bTraceFlush = $this->_getParam('trace');
+		$isidore->bCache = true;
+		switch ($this->_getParam('q')) {
+			case "getHistoDiscipline":
+				$data = $isidore->getHistoDiscipline($this->_getParam('req'),"stream");
+				$this->view->content = json_encode($data);
+				break;
+			case "getDoc":
+				$data = $isidore->getDoc($this->_getParam('req'),$this->_getParam('params'));
+				$this->view->content = json_encode($data);
+				break;
+		}
     
     }
 

@@ -564,6 +564,7 @@ class GraphController extends Zend_Controller_Action {
 	    		case "getHistoDiscipline":
 	    			$this->view->titre =  "Evolution des disciplines dans https://www.rechercheisidore.fr";
 	    			$this->view->soustitre =  "Pour la recherche : ".$this->_getParam('q', "écosystème");
+	    			$this->view->q = $this->_getParam('q', "écosystème");
 	    			$this->view->urlData = "../flux/isidore?q=getHistoDiscipline&req=".urldecode($this->_getParam('q', "écosystème"));
 	    			$this->view->legendetitre =  "Disciplines";
 	    			break;
