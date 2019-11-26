@@ -56,6 +56,16 @@ class Flux_Omeka extends Flux_Site{
 
     }
 
+    /**TODO
+     * Enregistre une annotation par describe leaflet comme enfant de l'image
+     *postItem
+     * @param array $data
+     *
+    function postAnnotationImageDetail($data){
+
+    }
+     */
+
     /**
      * Enregistre une annotation avec l'API
      *postItem

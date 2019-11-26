@@ -642,7 +642,8 @@ class FluxController extends Zend_Controller_Action {
     
     public function isidoreAction()
     {
-		$isidore = new Flux_Isidore($this->_getParam('idBase'),$this->_getParam('trace'));
+		$idBase = $this->_getParam('idBase');
+		$isidore = new Flux_Isidore($idBase,$this->_getParam('trace'));
 		$isidore->bTraceFlush = $this->_getParam('trace');
 		$isidore->bCache = true;
 		switch ($this->_getParam('q')) {

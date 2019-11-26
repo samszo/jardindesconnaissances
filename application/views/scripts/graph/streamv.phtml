@@ -75,6 +75,7 @@
 	var formatJour = d3.timeFormat("%d %B %Y"), formatAn = d3.timeFormat("%Y"), formatMois = d3.timeFormat("%Y %B");
 	var formatTemps;
 	var bLegende = true;
+	var arrDoc = [];
 	if(getParamUrl('legende')=="0"){
 		bLegende=false;
 		d3.select('#titresViz').style('display','none');
@@ -337,12 +338,19 @@ function buildStreamGraph(mqpdata) {
 		})
 	    .on('click', function(d){      
 			//récupère les datas liés à la position de la souris
-			var dt = getRef(d3.mouse(this),y,d);
-			var arrSelect = $('#selectPoint').data('selected');
-			arrSelect.push({ id: arrSelect.length, text: dt.desc+' ('+dt.temps+')',color:refTag[d.key].color});
-			$('#selectPoint').w2field().set(arrSelect);
+			var dt = getRef(d3.mouse(this),y,d)
+				, k = d.key+dt.temps;
+			//vérifie la présence des data
+			if(!arrDoc[k]){
+				var arrSelect = $('#selectPoint').data('selected');
+				arrSelect.push({ id: arrSelect.length, text: dt.desc+' ('+dt.temps+')',color:refTag[d.key].color});
+				$('#selectPoint').w2field().set(arrSelect);
+				getDoc(dt);
+			}else{
+				//affiche les docs
+				showDoc(arrDoc[k]);
+			}
 
-			getDoc(dt);
 		})
 	//construction de l'axe y
 	svg.append("g")
@@ -357,16 +365,45 @@ function buildStreamGraph(mqpdata) {
 	    .call(xAxis);    
     */
 }
+	
+	function getDoc(dt, k){
 
-	function getDoc(dt){
+		w2popup.open({
+			width: 500,
+			height: 300,
+			title: 'Chargement des données',
+			body: '<div class="w2ui-centered"></div>',
+			showMax: false,
+			showClose: false
+		});
+		w2popup.lock("Merci de patienter...", true);	
+
 		var url = "../flux/isidore";
 		$.ajax({
 			dataType: "json",
 			url: url,
-			data: {'q':'getDoc','req':q,'params':{'after':dt.temps+'-01-01','before':dt.temps+'-12-31','discipline':dt.key}}
+			data: {'q':'getDoc','req':q
+				,'params':{'after':dt.temps+'-01-01'
+					,'before':dt.temps+'-12-31'
+					,'discipline':dt.key
+					,'replies':1000
+				}}
 		}).done(function( data ) {
 			console.log(data);	
-		});
+			let rs = [];
+			data.response.replies.content.reply.foreach(function(d){
+				rs.push(r);
+			})
+			arrDoc[k] = rs;
+			//supprime le message de chargement	
+			w2popup.unlock();
+			w2popup.close();
+		}).error(function(e){
+			//supprime le message de chargement	
+			w2popup.unlock();
+			w2popup.close();
+		})
+		;
 	}
 
 

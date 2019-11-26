@@ -18,6 +18,7 @@ class Flux_Isidore extends Flux_Site{
 	var $searchUrl = 'https://api.isidore.science/resource/search?';
 	var $output = "json";
 	var $rs;
+	var $NbResult=1000;
 	
     /**
      * Constructeur de la classe
