@@ -117,7 +117,9 @@ class SonarController extends Zend_Controller_Action
 		$this->s->dbOmk = $this->_getParam('dbOmk',$this->idBaseOmk);
 		//pour le debug 
 		$omk->o = false;
-		if(!$omk->o)$omk->o=$this->s->initOmeka(OMEKA_SONAR_ENDPOINT, OMEKA_SONAR_API_IDENT,OMEKA_SONAR_API_KEY);		
+		$omkParams = OMK_PARAMS[$this->idBaseOmk];
+		if(!$omk->o)$omk->o=$this->s->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"]);		
+		//if(!$omk->o)$omk->o=$this->s->initOmeka(OMEKA_SONAR_ENDPOINT, OMEKA_SONAR_API_IDENT,OMEKA_SONAR_API_KEY);		
 		$this->s->omk = $omk->o;
 
 		//gestion des authentifications
