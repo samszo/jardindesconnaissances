@@ -1321,6 +1321,21 @@ WHERE {
 }
 
  */ 
-    
+
+/*recherche les document de gallica avec un mot clef rameau
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+SELECT ?doc ?title ?idArk ?date ?editeur ?cote ?URLGallica
+WHERE {
+	?doc dcterms:subject <http://data.bnf.fr/ark:/12148/cb11952386r>.   
+	?doc rdarelationships:electronicReproduction ?URLGallica
+	OPTIONAL{?doc dcterms:date ?date}
+	OPTIONAL{?doc dcterms:title ?title}
+	OPTIONAL{?doc dcterms:publisher ?editeur}
+  	OPTIONAL{?doc bnf-onto:FRBNF ?idArk}
+  	OPTIONAL{?doc bnf-onto:cote ?cote}
+  	
+}
+*/ 
+
     
 }

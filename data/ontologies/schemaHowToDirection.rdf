@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dct="http://purl.org/dc/terms/"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:schema="http://schema.org/"
+>
+  
+  <rdf:Property rdf:about="http://schema.org/duringMedia">
+    <schema:rangeIncludes rdf:resource="http://schema.org/URL"/>
+    <rdfs:comment>A media object representing the circumstances while performing this direction.</rdfs:comment>
+    <schema:rangeIncludes rdf:resource="http://schema.org/MediaObject"/>
+    <rdfs:label>duringMedia</rdfs:label>
+    <schema:domainIncludes rdf:resource="http://schema.org/HowToDirection"/>
+  </rdf:Property>
+  
+  <rdf:Property rdf:about="http://schema.org/tool">
+    <rdfs:subPropertyOf rdf:resource="http://schema.org/instrument"/>
+    <schema:domainIncludes rdf:resource="http://schema.org/HowToDirection"/>
+    <schema:rangeIncludes rdf:resource="http://schema.org/Text"/>
+    <schema:domainIncludes rdf:resource="http://schema.org/HowTo"/>
+    <schema:rangeIncludes rdf:resource="http://schema.org/HowToTool"/>
+    <rdfs:label>tool</rdfs:label>
+    <rdfs:comment>A sub property of instrument. An object used (but not consumed) when performing instructions or a direction.</rdfs:comment>
+  </rdf:Property>
+  
+  <rdf:Property rdf:about="http://schema.org/prepTime">
+    <schema:domainIncludes rdf:resource="http://schema.org/HowTo"/>
+    <schema:rangeIncludes rdf:resource="http://schema.org/Duration"/>
+    <schema:domainIncludes rdf:resource="http://schema.org/HowToDirection"/>
+    <rdfs:label>prepTime</rdfs:label>
+    <rdfs:comment><![CDATA[The length of time it takes to prepare the items to be used in instructions or a direction, in <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration format</a>.]]></rdfs:comment>
+  </rdf:Property>
+  
+  <rdf:Property rdf:about="http://schema.org/beforeMedia">
+    <rdfs:label>beforeMedia</rdfs:label>
+    <schema:domainIncludes rdf:resource="http://schema.org/HowToDirection"/>
+    <rdfs:comment>A media object representing the circumstances before performing this direction.</rdfs:comment>
+    <schema:rangeIncludes rdf:resource="http://schema.org/MediaObject"/>
+    <schema:rangeIncludes rdf:resource="http://schema.org/URL"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://schema.org/afterMedia">
+    <schema:rangeIncludes rdf:resource="http://schema.org/MediaObject"/>
+    <rdfs:comment>A media object representing the circumstances after performing this direction.</rdfs:comment>
+    <schema:domainIncludes rdf:resource="http://schema.org/HowToDirection"/>
+    <rdfs:label>afterMedia</rdfs:label>
+    <schema:rangeIncludes rdf:resource="http://schema.org/URL"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://schema.org/totalTime">
+    <rdfs:comment><![CDATA[The total time required to perform instructions or a direction (including time to prepare the supplies), in <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration format</a>.]]></rdfs:comment>
+    <rdfs:label>totalTime</rdfs:label>
+    <schema:rangeIncludes rdf:resource="http://schema.org/Duration"/>
+    <schema:domainIncludes rdf:resource="http://schema.org/HowToDirection"/>
+    <schema:domainIncludes rdf:resource="http://schema.org/HowTo"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://schema.org/cookTime">
+    <rdfs:subPropertyOf>
+      <rdf:Property rdf:about="http://schema.org/performTime">
+        <schema:domainIncludes rdf:resource="http://schema.org/HowToDirection"/>
+        <schema:rangeIncludes rdf:resource="http://schema.org/Duration"/>
+        <rdfs:comment><![CDATA[The length of time it takes to perform instructions or a direction (not including time to prepare the supplies), in <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration format</a>.]]></rdfs:comment>
+        <rdfs:label>performTime</rdfs:label>
+        <schema:domainIncludes rdf:resource="http://schema.org/HowTo"/>
+      </rdf:Property>
+    </rdfs:subPropertyOf>
+    <schema:domainIncludes rdf:resource="http://schema.org/Recipe"/>
+    <schema:rangeIncludes rdf:resource="http://schema.org/Duration"/>
+    <rdfs:label>cookTime</rdfs:label>
+    <rdfs:comment><![CDATA[The time it takes to actually cook the dish, in <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration format</a>.]]></rdfs:comment>
+  </rdf:Property>
+
+  <rdfs:Class rdf:about="http://schema.org/HowToDirection">
+    <rdfs:comment>A direction indicating a single action to do in the instructions for how to achieve a result.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://schema.org/ListItem"/>
+    <rdfs:label>HowToDirection</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://schema.org/CreativeWork"/>
+  </rdfs:Class>
+  
+</rdf:RDF>

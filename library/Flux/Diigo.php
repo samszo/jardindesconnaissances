@@ -456,15 +456,17 @@ class Flux_Diigo extends Flux_Site{
     			$j = 0;
     			$this->trace("   ".$i." : ".count($arr));
     			foreach ($arr as $item){
-    				$this->trace($i."   ".$j." : ".$item->url);
     				//vérifie que l'item existe
     				$doc = $this->dbD->findByUrl($item->url);
     				//$this->trace("vérifie que l'item existe ",$doc);
     				if($doc) {
-    					$arr = array();
-    					break;
+    					$rs = array();
+    					//break;
     				}
-    				else $this->saveItem($item);
+    				else{
+						$this->trace($i."   ".$j." : ".$item->url);
+						$this->saveItem($item);
+					} 
     				$j++;
     			}
     			if(count($arr)==0 || $j<$count)$i=-1;

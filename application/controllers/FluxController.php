@@ -842,7 +842,19 @@ class FluxController extends Zend_Controller_Action {
                 
         }
         
-    }
+	}
+	
+    public function zoteroAction()
+    {
+		$z = new Flux_Zotero($this->_getParam('login'),$this->_getParam('idBase',"flux_zotero"));
+		$z->bTrace=true;
+		switch ($this->_getParam('q')) {
+			case 'saveAll':
+				$z->saveAll();
+				break;
+		}
+	}
+
     
 	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);

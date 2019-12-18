@@ -21,16 +21,19 @@ class Flux_Zotero extends Flux_Site{
 	var $idTagLatestEdition;	
 	var $idUtiDewey = 638;	
 	var $zoteroAPIversion = 3;
+	var $idAct = false;
 	
 	public function __construct($login, $idBase="flux_zotero", $libraryID=ZOTERO_ID_LIB)
     {
 	    	parent::__construct($idBase);
 	    	$this->libraryID = $libraryID;
 	    	$this->login = $login;
-	    	
+
+	    	//initialise les gestionnaires de base de données
+	    	$this->initDbTables();
+	    	$this->trace("Tables initialisées");
+			
 	    	//on récupère la racine des documents
-	    	if(!$this->dbD)$this->dbD = new Model_DbTable_Flux_Doc($this->db);
-	    	if(!$this->dbM)$this->dbM = new Model_DbTable_Flux_Monade($this->db);
 	    	$this->idDocRoot = $this->dbD->ajouter(array("titre"=>__CLASS__));
 	    	$this->idMonade = $this->dbM->ajouter(array("titre"=>__CLASS__),true,false);
 	    	
@@ -47,14 +50,14 @@ class Flux_Zotero extends Flux_Site{
         	$params['format'] = $format;
         	if(!isset($params['sort']))$params['sort'] = "asc";
         	  	    	
-	    	if($format == "atom"){
-	    		$params['content'] = "json";
-	    		$body = $this->getUrlBodyContent($url, $params);
-	    		$flux = Zend_Feed::importString($body);	        
+		if($format == "atom"){
+			$params['content'] = "json";
+			$body = $this->getUrlBodyContent($url, $params, $this->bCache);
+			$flux = Zend_Feed::importString($body);	        
 		}        
 		if($params['format'] == "json"){
 			$params['include'] = "data";
-			$body = $this->getUrlBodyContent($url, $params);
+			$body = $this->getUrlBodyContent($url, $params, $this->bCache);
 			$flux = json_decode($body);
 		}
 				
@@ -62,35 +65,31 @@ class Flux_Zotero extends Flux_Site{
     	
     }	
 
-    function saveAll(){
+    function saveAll($i=1){
 
 	    	$this->trace("DEBUT ".__METHOD__);
 	    	set_time_limit(0);
-	    	
-	    	//initialise les gestionnaires de base de données
-	    	$this->initDbTables();
-	    	$this->trace("Tables initialisées");
-	    	
+	    		    	
 	    	//récupère l'action
-	    	if(!isset($this->idAct))$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+	    	if(!$this->idAct)$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
 	    	$this->bExiste = true;
 	    	
-	    	$i = 1; $limit = 100; $j=0;
-	    	$this->url = self::API_URI."/users/".$this->libraryID."/items";
-		while ($i>0) {
-	    		$flux = $this->getRequest($this->url,array("limit"=>$limit, "start"=>$i, "sort"=>"desc"));	    		 
-	    		foreach ($flux as $item){
-	    			$this->saveItem($item,$j);
-	    			$j++;
-	    		}
-	    		$i = $i+count($flux);
-		}
+			$limit = 100; $j=0; 
+			//pour le debug
+			$this->bCache = false;
+			$this->url = self::API_URI."/users/".$this->libraryID."/items";			
+			$flux = $this->getRequest($this->url,array("limit"=>$limit, "start"=>$i, "sort"=>"desc"));	    		 
+			foreach ($flux as $item){
+				$this->saveItem($item,$j);
+				$j++;
+			}
+			if(count($flux))$this->saveAll($i+$j);
     		//$this->lucene->index->optimize();
     }
 
     function saveItem($i,$j){
 
-	    	$this->trace("DEBUT ".__METHOD__);
+	    	$this->trace("DEBUT ".__METHOD__." - ".$j." - ".$i->links->self->href);
 
 	    	//enregistre le lien parent
 	    	$idDP = $this->idDocRoot;
@@ -101,7 +100,7 @@ class Flux_Zotero extends Flux_Site{
 	    	//enregistre le document
 	    	$url = $i->links->self->href;
 	    	$idD = $this->dbD->ajouter(array("url"=>$url,"tronc"=>$j,"parent"=>$idDP));
-	    //et son rapport 	
+	    	//et son rapport 	
 	    	$idRap = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
 	    			,"src_id"=>$idD,"src_obj"=>"doc"
 	    			,"dst_id"=>$this->idAct,"dst_obj"=>"acti"
@@ -113,7 +112,7 @@ class Flux_Zotero extends Flux_Site{
 	    	if(!$this->idTagRel)$this->idTagRel = $this->dbT->ajouter(array("code"=>"relations","parent"=>$this->idTagData));
 	    	if(!$this->idTagCol)$this->idTagCol = $this->dbT->ajouter(array("code"=>"collections","parent"=>$this->idTagData));
 	    	foreach ($i->data as $k => $v) {
-	    		$this->trace($k."  ");	    		 
+	    		//$this->trace($k."  ");	    		 
     	 		if($k=="tags"){
     	 			foreach ($k as $t) {
     	 				$idTag = $this->dbT->ajouter(array("code"=>$t->tag,"parent"=>$this->idTagTags));
@@ -162,7 +161,7 @@ class Flux_Zotero extends Flux_Site{
 	    	 				,"src_id"=>$idD,"src_obj"=>"doc"
 	    	 				,"dst_id"=>$idTag,"dst_obj"=>"tag"
 	    	 				,"pre_id"=>$idRap,"pre_obj"=>"rapport"
-	    	 				,"valeur"=>$v
+	    	 				,"valeur"=>$v.""
 	    	 		),$this->bExiste);
     	 		}    	 		    	 		
     	 	}
@@ -181,7 +180,7 @@ class Flux_Zotero extends Flux_Site{
     	 	}
     	 	 									    
 
-		$this->trace("FIN ".__METHOD__);
+		//$this->trace("FIN ".__METHOD__);
 		
     } 
 
