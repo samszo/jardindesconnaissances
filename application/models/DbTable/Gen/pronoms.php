@@ -19,7 +19,32 @@ class Model_DbTable_Gen_pronoms extends Zend_Db_Table_Abstract
      */
     protected $_primary = 'id_pronom';
 
+
+    protected $_referenceMap    = array(
+        'Verbe' => array(
+            'columns'           => 'id_dico',
+            'refTableClass'     => 'Model_DbTable_Gen_dicos',
+            'refColumns'        => 'id_dico'
+        )
+    );	    
+
     
+    public function obtenirPronomByDicoNumType($idDico,$num,$type)
+    {
+        $query = $this->select()
+            ->where( "id_dico IN (".$idDico.")")
+        	->where( "num = ?",$num)
+        	->where( "type = ?",$type)
+        	;
+		$r = $this->fetchRow($query);        
+    	if (!$r) {
+            return new Exception("Le pronom - $num - de type - $type - n'a pas été trouvé");
+        }
+        
+        return $r->toArray();
+    }
+
+
     /**
      * Vérifie si une entrée est utilisée comme sujet.
      *

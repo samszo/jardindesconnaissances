@@ -13,6 +13,7 @@
 class GenerateurController extends Zend_Controller_Action
 {
     var $idBaseGen = "generateur";
+    var $maxExeTime = 180;
 
     public function init()
     {
@@ -53,6 +54,35 @@ class GenerateurController extends Zend_Controller_Action
         $sGen = new Flux_Site($this->idBaseGen);
         $o = $this->_getParam('o');
         switch ($this->_getParam('v')) {
+            case 'test':
+                set_time_limit($this->maxExeTime);
+                //initialisation du moteur
+                $m = new Gen_Moteur($this->idBaseGen);                        
+                //paramétrage du moteur
+                $arrDico = $m->getDicosOeuvre($this->_getParam('idOeu'));
+                $arrText = $this->_getParam('txts',[]);
+                $this->view->r = $m->Tester($arrText,$arrDico,$this->_getParam('trace',false));
+                break;
+            case 'gen':
+                set_time_limit($this->maxExeTime);
+                //initialisation du moteur
+                $m = new Gen_Moteur($this->idBaseGen);                        
+                //paramétrage du moteur
+                $m->arrDicos = $m->getDicosOeuvre($this->_getParam('idOeu'));
+                $m->showErr = $this->_getParam('err',false);
+                $m->bTrace = $this->_getParam('trace',false);
+                $m->forceCalcul = $this->_getParam('force',true);
+                $m->coupures = $this->_getParam('coupures',false);
+                $m->finLigne = $this->_getParam('rtn','\n');
+                $txtGen = $this->_getParam('txt');
+                $nb = $this->_getParam('nb',1);
+                $this->view->r = array();
+                for ($i = 0; $i < $nb; $i++) {
+                    $txt = $m->Generation($txtGen);
+                    //if($rtn == "\n")$txt = str_replace("<br/>", "\n", $txt);
+                    $this->view->r[] = array('txt'=>$txt,'detail'=>$m->arrClass);
+                }       
+                break;
             case 'c':
                 # code...
                 break;
@@ -64,8 +94,12 @@ class GenerateurController extends Zend_Controller_Action
                         break;
                     case 'uti':
                         $db = new Model_DbTable_Flux_uti($sGen->db);
-                        $this->view->listeDico = $db->getAll();
-                        break;                    
+                        $this->view->r = $db->getAll();
+                        break;
+                    case 'conj':                    
+                        $db = new Model_DbTable_Gen_conjugaisons($sGen->db);
+                        $this->view->r = $db->getAll();
+                        break;
                     case 'dico':
                         if($this->_getParam('idOeu')){
                             $db = new Model_DbTable_Gen_oeuvresxdicosxutis($sGen->db);

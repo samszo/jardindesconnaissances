@@ -20,12 +20,25 @@ class Model_DbTable_Gen_negations extends Zend_Db_Table_Abstract
     protected $_primary = 'id_negation';
 
     protected $_referenceMap    = array(
-        'Lieux' => array(
-            'columns'           => 'id_lieu',
-            'refTableClass'     => 'Models_DbTable_Gevu_lieux',
-            'refColumns'        => 'id_lieu'
+        'Verbe' => array(
+            'columns'           => 'id_dico',
+            'refTableClass'     => 'Model_DbTable_Gen_dicos',
+            'refColumns'        => 'id_dico'
         )
-    );	
+    );	    
+
+    public function obtenirNegationByDicoNum($idDico,$num)
+    {
+        $query = $this->select()
+            ->where( "id_dico IN (?)",$idDico)
+        	->where( "num = ?",$num)
+            ;
+		$r = $this->fetchRow($query);        
+    	if (!$r) {
+            throw new Exception("Count not find rs $idDico,$num");
+        }
+        return $r->toArray();
+    }
 
     /**
      * Vérifie si une entrée est utilisée 

@@ -26,7 +26,21 @@ class Model_DbTable_Gen_terminaisons extends Zend_Db_Table_Abstract
             'refColumns'        => 'id_lieu'
         )
     );	
+
+    public function obtenirConjugaisonByConjNum($idConj,$num)
+    {
+        $query = $this->select()
+            ->where( "id_conj = ?",$idConj)
+        	->where( "num = ?",$num)
+        	;
+		$r = $this->fetchRow($query);        
+    	if (!$r) {
+            return new Exception("La terminaison - $num - de la conjugaison - $idConj - n'a pas été trouvé");
+        }
+        return $r->toArray();
+    }
     
+
     /**
      * Vérifie si une entrée Gen_terminaisons existe.
      *

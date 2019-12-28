@@ -204,7 +204,7 @@ class Model_DbTable_Gen_substantifs extends Zend_Db_Table_Abstract
     public function findByIdConcept($id_concept)
     {
         $query = $this->select()
-        	->from( array("cs" => "gen_concepts_substantifs") )                           
+        	->from( array("cs" => "gen_concepts_substantifs"),array('recid'=>'cs.id_sub') )                           
 	        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         ->joinInner(array('s' => 'gen_substantifs'),
         		's.id_sub = cs.id_sub')

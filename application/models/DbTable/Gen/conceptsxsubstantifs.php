@@ -20,12 +20,17 @@ class Model_DbTable_Gen_conceptsxsubstantifs extends Zend_Db_Table_Abstract
     protected $_primary = 'id_concept';
 
     protected $_referenceMap    = array(
-        'Lieux' => array(
-            'columns'           => 'id_lieu',
-            'refTableClass'     => 'Models_DbTable_Gevu_lieux',
-            'refColumns'        => 'id_lieu'
+        'Concept' => array(
+            'columns'           => 'id_concept',
+            'refTableClass'     => 'Model_DbTable_Gen_concepts',
+            'refColumns'        => 'id_concept'
         )
-    );	
+        ,'Substantif' => array(
+            'columns'           => 'id_sub',
+            'refTableClass'     => 'Model_DbTable_Gen_substantifs',
+            'refColumns'        => 'id_sub'
+        )
+	);	
     
     /**
      * Vérifie si une entrée Gen_concepts_substantifs existe.

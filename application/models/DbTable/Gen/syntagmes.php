@@ -20,12 +20,12 @@ class Model_DbTable_Gen_syntagmes extends Zend_Db_Table_Abstract
     protected $_primary = 'id_syn';
 
     protected $_referenceMap    = array(
-        'Lieux' => array(
-            'columns'           => 'id_lieu',
-            'refTableClass'     => 'Models_DbTable_Gevu_lieux',
-            'refColumns'        => 'id_lieu'
+        'Dico' => array(
+            'columns'           => 'id_dico',
+            'refTableClass'     => 'Model_DbTable_Gen_dicos',
+            'refColumns'        => 'id_dico'
         )
-    );	
+    );	    
     
     /**
      * Vérifie si une entrée Gen_syntagmes existe.
@@ -217,6 +217,18 @@ class Model_DbTable_Gen_syntagmes extends Zend_Db_Table_Abstract
         return $this->fetchAll($query)->toArray();
     }
 
+    public function obtenirSyntagmeByDicoNum($idDico,$num)
+    {
+        $query = $this->select()
+            ->where( "id_dico IN (?)",$idDico)
+        	->where( "num = ?",$num)
+            ;
+		$r = $this->fetchRow($query);        
+    	if (!$r) {
+            return new Exception("Impossible de trouver le sntagme $num dans le dictionnaire $idDico");
+        }
+        return $r->toArray();
+    }
 
 	/**
      * Recherche une entrée Gen_verbes avec la valeur spécifiée
@@ -227,10 +239,10 @@ class Model_DbTable_Gen_syntagmes extends Zend_Db_Table_Abstract
      *
      * @return array
      */
-    public function findByIdConcept($id_concept, $idsDico)
+    public function findByIdConcept($id_concept, $idsDico=false)
     {
         $query = $this->select()
-        	->from( array("cs" => "gen_concepts_syntagmes") )                           
+        	->from( array("cs" => "gen_concepts_syntagmes"),array('recid'=>'id_syn') )                           
 	        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         ->joinInner(array('s' => 'gen_syntagmes'),
         		's.id_syn = cs.id_syn')

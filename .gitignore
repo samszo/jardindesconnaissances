@@ -479,3 +479,5 @@ data/planning/eventsDWM_18-19.json
 data/paragraphe/paragrapheFormations.json
 public/data/spinoza-ethica-fr-appuhn.json
 bdd/remoteconnect.txt
+bdd/query/diplogouvStatPays.sql
+data/diplomatie.gouv.fr/Flux RSS - France-Diplomatie - Ministère de l’Europe et des Affaires étrangères.htm

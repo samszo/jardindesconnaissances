@@ -347,7 +347,7 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
         WHERE
             c.id_dico = ".$idDico."
         GROUP BY c.id_concept
-        ORDER BY c.type , c.lib";
+        ORDER BY c.lib, c.type";
         $smtp = $this->_db->query($sql);
         return $smtp->fetchAll();
 
@@ -483,13 +483,16 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
                 $rs = $db->findByIdConcept($id);
 				break; 
 			case "m": 
-				$txtGen = " [".$cpt["type"]. "_".$cpt["lib"]. "]";
+                $db = new Model_DbTable_Gen_substantifs($this->_db);
+                $rs = $db->findByIdConcept($id);
 				break; 
 			case "s":
-				$txtGen = " [".$cpt["type"]. "_".$cpt["lib"]. "]";
+                $db = new Model_DbTable_Gen_syntagmes($this->_db);
+                $rs = $db->findByIdConcept($id);
 				break;
 			case "v": 
-				$txtGen = " [".$cpt["type"]. "_".$cpt["lib"]. "]";
+                $db = new Model_DbTable_Gen_verbes($this->_db);
+                $rs = $db->findByIdConcept($id);
 				break; 
 			case "carac": 
 				$txtGen = "[".$cpt["type"].$cpt["lib"]. "]";
@@ -525,4 +528,82 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
         return $smtp->fetchAll();
     }
     
+    /**
+     * Récupère les concepts par type.
+     *
+     * @param integer $idDico
+     * @param array $arrClass
+     *
+     * @return array
+     */
+    public function obtenirConceptDescription($idDico, $arrClass){
+
+        $cpt = $this->obtenirConceptByDicoLibType($idDico,$arrClass[1],$arrClass[0]);
+        //vérifie l'exeption
+        if(get_class($cpt)=="Exception"){
+            return $cpt;
+        }
+        $arrCpt = $cpt->toArray();
+        
+        //cherche les enfants suivant le type de concept
+        $arrEnf = array();
+        /*
+        $tType ="";
+        if($arrClass[0]=="a")$tType="Adjectifs";
+        if($arrClass[0]=="v")$tType="Verbes";
+        if($arrClass[0]=="m" || $arrClass[0]=="carac" || $arrClass[0]=="dis")$tType="Substantifs";
+        if($arrClass[0]=="s")$tType="Syntagmes";
+        if($arrClass[0]=="age" || $arrClass[0]=="univers")$tType="Generateurs";
+        if($tType!=""){
+            $enfants = $cpt->findManyToManyRowset('Model_DbTable_'.$tType,
+                                                 'Model_DbTable_Concepts'.$tType);
+            $arrEnf = $enfants->toArray();
+        }
+        */
+        $enfants = $cpt->findManyToManyRowset('Model_DbTable_Gen_adjectifs', 'Model_DbTable_Gen_conceptsxadjectifs');
+        $arr = $enfants->toArray();
+        if(count($arr)>0)$arrEnf = array_merge($arrEnf,$arr);
+        $enfants = $cpt->findManyToManyRowset('Model_DbTable_Gen_verbes', 'Model_DbTable_Gen_conceptsxverbes');
+        $arr = $enfants->toArray();
+        if(count($arr)>0)$arrEnf = array_merge($arrEnf,$arr);
+        $enfants = $cpt->findManyToManyRowset('Model_DbTable_Gen_substantifs', 'Model_DbTable_Gen_conceptsxsubstantifs');
+        $arr = $enfants->toArray();
+        if(count($arr)>0)$arrEnf = array_merge($arrEnf,$arr);
+        $enfants = $cpt->findManyToManyRowset('Model_DbTable_Gen_syntagmes', 'Model_DbTable_Gen_conceptsxsyntagmes');
+        $arr = $enfants->toArray();
+        if(count($arr)>0)$arrEnf = array_merge($arrEnf,$arr);
+        
+        //cherche les générateurs
+        $gens = $cpt->findManyToManyRowset('Model_DbTable_Gen_generateurs',
+                                                 'Model_DbTable_Gen_conceptsxgenerateurs');    	
+        //cherche les générateurs
+        //$cptgens = $this->findGensByIdconcept($arrCpt["id_concept"]);    	
+        //return array("src"=>$arrCpt,"dst"=>array_merge($arrEnf,$gens->toArray(),$cptgens));
+        
+        return array("src"=>$arrCpt,"dst"=>array_merge($arrEnf,$gens->toArray()));
+    }
+
+    /**
+     * Récupère les concepts par type.
+     *
+     * @param integer $idDico
+     * @param string $lib
+     * @param string $type
+     *
+     * @return array
+     */
+    public function obtenirConceptByDicoLibType($idDico,$lib,$type)
+    {
+        $query = $this->select()
+            ->where( "id_dico IN ($idDico)")
+        	->where( "lib = ?",$lib)
+            ->where( "type = ?",$type)
+            ;
+        $sql = $query->__toString();
+		$r = $this->fetchRow($query);        
+    	if (!$r) {
+            $r = new Exception("La classe - $lib - de type - $type - n'a pas été trouvé dans le(s) dictionnaire(s) - $idDico -");
+        }
+        return $r;
+    }
 }

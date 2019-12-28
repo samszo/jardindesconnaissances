@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Texte Tree</title>
+
+    <style> /* set the CSS */
+    
+    body{
+      background-color: black;
+      height: 100%;
+      width: 100%;
+    }
+
+    .node circle {
+      fill: #fff;
+      stroke: steelblue;
+      stroke-width: 3px;
+    }
+    
+    .node text { font: 12px sans-serif; }
+    
+    .node--internal text {
+      text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+    }
+    
+    .link {
+      fill: none;
+      stroke: #ccc;
+      stroke-width: 2px;
+    }
+    </style>
+    <script src="../js/d3.V5.min.js"></script>    
+    <script src="../js/menuSunburst.js"></script>    
+    <script src="../js/textree.js"></script>    
+    <script src="../js/emotionswheel.js"></script>    
+</head>
+<body>
+<div id="txt1" ></div>
+<script>
+//met le conteneur en fullpage
+var idCont = 'txt1';
+d3.select('#'+idCont)
+    .style('height',window.innerHeight+'px')
+    .style('width',window.innerWidth+'px');
+//création du texttree
+var txt = "Bonjour c'est moi le plus beau ! Et en plus je suis bien. Bonjour c'est moi le plus beau ! Et en plus je suis bien.Bonjour c'est moi le plus beau ! Et en plus je suis bien. Bonjour c'est moi le plus beau ! Et en plus je suis bien. Bonjour c'est moi le plus beau ! Et en plus je suis bien. Bonjour c'est moi le plus beau ! Et en plus je suis bien.";  
+var tt1 = new textree({'text':txt,'idCont':idCont});  
+
+</script>
+
+
+</body>
+</html>

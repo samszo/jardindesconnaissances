@@ -20,12 +20,17 @@ class Model_DbTable_Gen_conceptsxsyntagmes extends Zend_Db_Table_Abstract
     protected $_primary = 'id_concept';
 
     protected $_referenceMap    = array(
-        'Lieux' => array(
-            'columns'           => 'id_lieu',
-            'refTableClass'     => 'Models_DbTable_Gevu_lieux',
-            'refColumns'        => 'id_lieu'
+        'Concept' => array(
+            'columns'           => 'id_concept',
+            'refTableClass'     => 'Model_DbTable_Gen_concepts',
+            'refColumns'        => 'id_concept'
         )
-    );	
+        ,'Syntagme' => array(
+            'columns'           => 'id_syn',
+            'refTableClass'     => 'Model_DbTable_Gen_syntagmes',
+            'refColumns'        => 'id_syn'
+        )
+	);	
     
     /**
      * Vérifie si une entrée Gen_concepts_syntagmes existe.

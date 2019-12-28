@@ -18,13 +18,15 @@ class Model_DbTable_Gen_adjectifs extends Zend_Db_Table_Abstract
      */
     protected $_primary = 'id_adj';
 
+    protected $_dependentTables = array('Model_DbTable_Gen_conceptsxadjectifs');
+    
     protected $_referenceMap    = array(
-        'Lieux' => array(
-            'columns'           => 'id_lieu',
-            'refTableClass'     => 'Models_DbTable_Gevu_lieux',
-            'refColumns'        => 'id_lieu'
+        'Dico' => array(
+            'columns'           => 'id_dico',
+            'refTableClass'     => 'Model_DbTable_Gen_dicos',
+            'refColumns'        => 'id_dico'
         )
-    );	
+        );	
     
     /**
      * Vérifie si une entrée est utilisée.

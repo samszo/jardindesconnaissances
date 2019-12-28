@@ -116,7 +116,21 @@ class Flux_Site{
         if (!$fp = curl_init($url)) return false;
         return true;
     }
-    
+
+    /**
+     * fonction pour purger les BINARY LOGS lors d'une importation en masse
+     * 
+     * @return  array
+     *
+     */
+    public function purgeMysqlBinaryLogs() {
+		$dbD = new Model_DbTable_Flux_Doc($this->db);
+		$date = new DateTime();
+		$sql = "PURGE BINARY LOGS BEFORE '".$date->format('Y-m-d H:i:s')."'";
+		$r = $dbD->exeQuery($sql,false);
+        return $r;
+    }
+	
 	/**
 	* fonction pour tracer l'éxécution du code
 	*

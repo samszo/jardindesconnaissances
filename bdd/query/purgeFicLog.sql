@@ -1,1 +1,4 @@
-purge binary logs before '2019-31-12 12:00:00';
+-- flush logs;
+  show binary logs;
+ PURGE BINARY LOGS BEFORE '2019-12-21 8:42:26';
+  show binary logs;

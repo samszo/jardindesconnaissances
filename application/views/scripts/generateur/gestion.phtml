@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Générateur</title>
+    <title>Générateur - Gestion</title>
     <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
     <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../css/bootstrap-treeview.min.css" >
@@ -26,8 +26,10 @@
     <div class="container-fluid" >
         <nav id="nbMain" class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
             <a class="navbar-brand" href="#">
-                <h1 class="text-center" >Générateur - Gestion</h1>
+                <img src="../svg/logo-paragraphe-blanc.svg" alt="logo-paragraphe" style="height:40px;" />
+                <span class='logoTxt'>Générateur - Gestion</span>
             </a>
+
             <button class="navbar-toggler" type="button" data-toggle="collapse"
                 data-target="#navbarTogglerDemo02"
                 aria-controls="navbarTogglerDemo02" aria-expanded="false"
@@ -40,12 +42,14 @@
                         <a class="nav-link dropdown-toggle" id="ddOeuvre" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Oeuvres</a>
                         <div id="ddOeuvreItem" class="dropdown-menu" aria-labelledby="ddOeuvre">
                             <a class="dropdown-item" href="#">Créer</a>
+                            <div class="dropdown-divider"></div>                            
                         </div>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="ddUti" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Utilisateurs</a>
                         <div class="dropdown-menu" aria-labelledby="ddUti">
                             <a class="dropdown-item" href="#">Ajouter</a>
+                            <div class="dropdown-divider"></div>                            
                         </div>
                     </li>
                 </ul>
@@ -63,16 +67,7 @@
                         <a class="nav-link active" id="dico-tab" data-toggle="tab" href="#dico" role="tab" aria-controls="dico" aria-selected="true">Dictionnaires</a>
                     </li>
                     <li class="nav-item">
-                            <a class="nav-link" id="etudiant-tab" data-toggle="tab" href="#etudiant" role="tab" aria-controls="etudiant" aria-selected="true">Etudiants</a>
-                        </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="planning-tab" data-toggle="tab" href="#planning" role="tab" aria-controls="planning" aria-selected="false">Plannings</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="salle-tab" data-toggle="tab" href="#salle" role="tab" aria-controls="salle" aria-selected="false">Salles</a>
-                    </li>
-                    <li class="nav-item">
-                            <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="stats" aria-selected="false">Statistiques</a>
+                            <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="stats" aria-selected="true">Stats</a>
                         </li>
                     </ul>
                 <div class="tab-content" id="myTabContent">
@@ -93,12 +88,14 @@
                                 </div>        
                             </div>
                             <div class="col-4">        
-                                <div id="txtGen" style="height: 100px; width: 100%;"></div>
+                                <div class="row">
+                                    <div id="testerItem" style="height: 100px; width: 100%;"></div>
+                                </div>        
+                                <div class="row">
+                                    <div id="diffuserItem" style="height: 100px; width: 100%;"></div>
+                                </div>        
                             </div>
                         </div>
-                    </div>
-                <div class="tab-pane fade" id="planning" role="tabpanel" aria-labelledby="planning-tab">
-
                 </div>
                 <div class="tab-pane fade" id="stats" role="tabpanel" aria-labelledby="stat-tab">
                     <div class="w2ui-field">
@@ -108,14 +105,6 @@
                     <div id="cal-heatmap" ></div>
                     
                 </div>
-                <div class="tab-pane fade" id="etudiant" role="tabpanel" aria-labelledby="etudiant-tab">
-
-                </div>
-                <div class="tab-pane fade" id="salle" role="tabpanel" aria-labelledby="salle-tab">
-
-                </div>
-                
-                </div>                        
             </div>
         </div>
 
@@ -235,7 +224,19 @@
 
     <script type="text/javascript">
     "use strict";
-    var contentHeight, sidebarDico, grids, rsGen;
+    var contentHeight, sidebarDico, grids, rsGen,
+    conjugaisons, genres = [{ id: 1, text: '\u2642' },{ id: 2, text: '\u2640' }],
+    sltOeu,testsConju = [
+        {'temps':'indicatif présent','codes':['011','012','013','014','015','017']}
+        ,{'temps':'indicatif imparfait','codes':['021','022','023','024','025','027']}
+        ,{'temps':'passé simple','codes':['031','032','033','034','035','037']}
+        ,{'temps':'futur simple','codes':['041','042','043','044','045','047']}
+        ,{'temps':'conditionnel présent','codes':['051','052','053','054','055','057']}
+        ,{'temps':'subjonctif présent','codes':['061','062','063','064','065','067']}
+        ,{'temps':'participe passé','codes':['080']}
+        ,{'temps':'infinitif présent','codes':['090']}
+    ];
+
 $(function () {
     contentHeight = getContentHeight();
     getInitData();
@@ -271,8 +272,10 @@ $(function () {
             },
             columns: [         
                 { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
-                { field: 'lib', caption: 'Concept', size: '100%', sortable: true, resizable: true},
-                { field: 'type', caption: 'Type', size: '100px', sortable: true, resizable: true},
+                { field: 'lib', caption: 'Concept', size: '100%', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
+                { field: 'type', caption: 'Type', size: '100px', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
             ],
             multiSearch: true,
             searches: [
@@ -283,14 +286,17 @@ $(function () {
             toolbar: {
                 items: [
                     { id: 'export', type: 'button', caption: 'Exporter', icon: 'fa-file' },
-                    { id: 'genConcept', type: 'button', caption: 'Générer', icon: 'fa-file' },
+                    //{ id: 'genConcept', type: 'button', caption: 'Générer', icon: 'fa-calculator' },
                 ],
                 onClick: function (event) {
                     if (event.target == 'export') {
                         open(urlP+'export?obj=venteISBN',"_blank")
                     }
                     if (event.target == 'genConcept') {
-                        open(urlP+'export?obj=venteISBN',"_blank")
+                        var s = w2ui['gridDico'].getSelection();
+                        if(s.length){
+                            generer(w2ui['gridDico'].get(s[0]));
+                        }
                     }
                 }
             },
@@ -300,13 +306,14 @@ $(function () {
                     var s = w2ui['gridDico'].getSelection();
                     if(s.length){
                         showDicoItem(w2ui[event.target].get(s[0]));
+                        testerDicoItem(w2ui[event.target].get(s[0]));
                     }
                 }
             },
             onUnselect: function (event) {
                 event.onComplete = function () {
-                    w2ui['gridDetail'].records = rsGen;
-                    w2ui['gridDetail'].refresh();
+                    w2ui['gridGenDetail'].records = [];
+                    w2ui['gridGenDetail'].refresh();
                 }
             },	    
             onAdd: function(event) {
@@ -325,7 +332,7 @@ $(function () {
                 toolbarSearch   : false,
                 toolbarAdd      : true,
                 toolbarDelete   : true,
-                toolbarSave		: false,
+                toolbarSave		: true,
                 selectColumn	: false,
                 footer			: true,
             },
@@ -335,7 +342,7 @@ $(function () {
             ],
             toolbar: {
                 items: [
-                    { id: 'genItem', type: 'button', caption: 'Générer item', icon: 'fa-file' }
+                    //{ id: 'genItem', type: 'button', caption: 'Générer', icon: 'fa-calculator' }
                 ],
                 onClick: function (event) {
                     if (event.target == 'genItem') {
@@ -346,7 +353,10 @@ $(function () {
             records: [],
             onSelect: function (event) {
                 event.onComplete = function () {
-                    console.log(event);
+                    var s = w2ui[event.target].getSelection();
+                    if(s.length){
+                        testerDicoItem(w2ui[event.target].get(s[0]));
+                    }
                 }
             },	 
             onUnselect: function (event) {
@@ -370,23 +380,29 @@ $(function () {
                 toolbarSearch   : false,
                 toolbarAdd      : true,
                 toolbarDelete   : true,
-                toolbarSave		: false,
+                toolbarSave		: true,
                 selectColumn	: false,
                 footer			: true,
             },
             columns: [         
                 { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
-                { field: 'elision', caption: 'elision', size: '50px', sortable: true, resizable: true},
-                { field: 'prefix', caption: 'prefix', size: '100%', sortable: true, resizable: true},
-                { field: 'f_p', caption: 'f p', size: '50px', sortable: true, resizable: true},
-                { field: 'f_s', caption: 'f s', size: '50px', sortable: true, resizable: true},
-                { field: 'm_p', caption: 'm p', size: '50px', sortable: true, resizable: true},
-                { field: 'm_s', caption: 'm s', size: '50px', sortable: true, resizable: true},
+                { field: 'elision', caption: 'elision', size: '50px', sortable: true, resizable: true
+                    ,editable: { type: 'checkbox', style: 'text-align: center' }},
+                { field: 'prefix', caption: 'prefix', size: '100%', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
+                { field: 'f_s', caption: '\u2640', size: '50px', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
+                { field: 'f_p', caption: '\u2640 \u2640', size: '50px', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
+                { field: 'm_s', caption: '\u2642', size: '50px', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
+                { field: 'm_p', caption: '\u2642 \u2642', size: '50px', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
             ],
             multiSearch: false,
             toolbar: {
                 items: [
-                    { id: 'genItem', type: 'button', caption: 'Générer item', icon: 'fa-file' }
+                    //{ id: 'genItem', type: 'button', caption: 'Générer', icon: 'fa-calculator' }
                 ],
                 onClick: function (event) {
                     if (event.target == 'genItem') {
@@ -408,17 +424,189 @@ $(function () {
             onAdd: function(event) {
                 console.log(event);
             }			    
-        }                        
+        },                        
+        'mDetails':{ 
+            name: 'gridMDetail', 
+            style      : 'height:'+(contentHeight/2)+'px;',
+            header: 'Substantifs',		
+            show: { 
+                header			: true,		
+                toolbar			: true,
+                toolbarReload   : false,
+                toolbarColumns  : false,
+                toolbarSearch   : false,
+                toolbarAdd      : true,
+                toolbarDelete   : true,
+                toolbarSave		: true,
+                selectColumn	: false,
+                footer			: true,
+            },
+            columns: [         
+                { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
+                { field: 'elision', caption: 'elision', size: '50px', sortable: true, resizable: true
+                    ,editable: { type: 'checkbox', style: 'text-align: center' }},
+                { field: 'prefix', caption: 'prefix', size: '100%', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
+                { field: 'genre', caption: 'genre', size: '50px', sortable: true, resizable: true, 
+                editable: { type: 'select', items: genres}, 
+                render: function (record, index, col_index) {
+                    var html = '';
+                    for (var p in genres) {
+                        if (genres[p].id == this.getCellValue(index, col_index)) html = genres[p].text;
+                    }
+                    return html;
+                }},
+                { field: 's', caption: 's', size: '50px', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
+                { field: 'p', caption: 'p', size: '50px', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
+            ],
+            multiSearch: false,
+            toolbar: {
+                items: [
+                    //{ id: 'genItem', type: 'button', caption: 'Générer', icon: 'fa-calculator' }
+                ],
+                onClick: function (event) {
+                    if (event.target == 'genItem') {
+                        open(urlP+'export?obj=venteISBN',"_blank")
+                    }
+                }
+            },
+            records: [],
+            onSelect: function (event) {
+                event.onComplete = function () {
+                    console.log(event);
+                }
+            },	 
+            onUnselect: function (event) {
+                event.onComplete = function () {
+                    console.log(event);
+                }
+            },	    
+            onAdd: function(event) {
+                console.log(event);
+            }			    
+        },
+        'vDetails':{ 
+            name: 'gridVDetail', 
+            style      : 'height:'+(contentHeight/2)+'px;',
+            header: 'Verbes',		
+            show: { 
+                header			: true,		
+                toolbar			: true,
+                toolbarReload   : false,
+                toolbarColumns  : false,
+                toolbarSearch   : false,
+                toolbarAdd      : true,
+                toolbarDelete   : true,
+                toolbarSave		: true,
+                selectColumn	: false,
+                footer			: true,
+            },
+            columns: [         
+                { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
+                { field: 'elision', caption: 'elision', size: '50px', sortable: true, resizable: true
+                    ,editable: { type: 'checkbox', style: 'text-align: center' }},
+                { field: 'prefix', caption: 'prefix', size: '50%', sortable: true, resizable: true, 
+                editable: { type: 'text' }},
+                { field: 'id_conj', caption: 'conjugaison', size: '50%', sortable: true, resizable: true, 
+                editable: { type: 'select', items: conjugaisons}, 
+                render: function (record, index, col_index) {
+                    var html = '';
+                    for (var p in conjugaisons) {
+                        if (conjugaisons[p].recid == this.getCellValue(index, col_index)) html = conjugaisons[p].modele;
+                    }
+                    return html;
+                }},
+            ],
+            multiSearch: false,
+            toolbar: {
+                items: [
+                    //{ id: 'genItem', type: 'button', caption: 'Générer', icon: 'fa-calculator' }
+                ],
+                onClick: function (event) {
+                    if (event.target == 'genItem') {
+                        open(urlP+'export?obj=venteISBN',"_blank")
+                    }
+                }
+            },
+            records: [],
+            onSelect: function (event) {
+                event.onComplete = function () {
+                    console.log(event);
+                }
+            },	 
+            onUnselect: function (event) {
+                event.onComplete = function () {
+                    console.log(event);
+                }
+            },	    
+            onAdd: function(event) {
+                console.log(event);
+            }			    
+        },
+        'sDetails':{ 
+            name: 'gridSDetail', 
+            style      : 'height:'+(contentHeight/2)+'px;',
+            header: 'Syntagmes',		
+            show: { 
+                header			: true,		
+                toolbar			: true,
+                toolbarReload   : false,
+                toolbarColumns  : false,
+                toolbarSearch   : false,
+                toolbarAdd      : true,
+                toolbarDelete   : true,
+                toolbarSave		: true,
+                selectColumn	: false,
+                footer			: true,
+            },
+            columns: [         
+                { field: 'recid', caption: 'ID', size: '50px', hidden:true, sortable: true, resizable: true },
+                {hidden:true, field: 'num', caption: 'num', size: '50px', sortable: true, resizable: true, 
+                editable: { type: 'int' }},
+                {hidden:true, field: 'ordre', caption: 'ordre', size: '50px', sortable: true, resizable: true, 
+                editable: { type: 'int' }},
+                { field: 'lib', caption: 'libellé', size: '100%', sortable: true, resizable: true, 
+                    editable: { type: 'int', min: 0, max: 10000}},
+            ],
+            multiSearch: false,
+            toolbar: {
+                items: [
+                    //{ id: 'genItem', type: 'button', caption: 'Générer', icon: 'fa-calculator' }
+                ],
+                onClick: function (event) {
+                    if (event.target == 'genItem') {
+                        open(urlP+'export?obj=venteISBN',"_blank")
+                    }
+                }
+            },
+            records: [],
+            onSelect: function (event) {
+                event.onComplete = function () {
+                    console.log(event);
+                }
+            },	 
+            onUnselect: function (event) {
+                event.onComplete = function () {
+                    console.log(event);
+                }
+            },	    
+            onAdd: function(event) {
+                console.log(event);
+            }			    
+        }                                                      
     }
 });
 
 function getInitData(){
 
-    var urls = ['../generateur/api?v=r&o=oeuvre', '../generateur/api?v=r&o=uti'];
+    var urls = ['../generateur/api?v=r&o=oeuvre', '../generateur/api?v=r&o=uti', '../generateur/api?v=r&o=conj'];
 
     Promise.all(urls.map(url => d3.json(url))).then(function(values) {
         //console.log(values)
         initMenuOeuvre(values[0]);
+        conjugaisons = values[2];
     });
 
     
@@ -440,6 +628,7 @@ function initMenuOeuvre(rs){
 function showListeDico(o) {
     //TODO:gérer la fin de l'affichage pour lancer ajax $('#modWait').modal('show');
     if(w2ui['sidebarDico'])w2ui['sidebarDico'].destroy();
+    sltOeu = o;
 
     //
     $.ajax({
@@ -480,7 +669,12 @@ function showDico(type, id) {
     //initialise les grids
     if(w2ui[grids[type].name])w2ui[grids[type].name].destroy();
     if(w2ui[grids['aDetails'].name])w2ui[grids['aDetails'].name].destroy();
+    if(w2ui[grids['mDetails'].name])w2ui[grids['mDetails'].name].destroy();
+    if(w2ui[grids['sDetails'].name])w2ui[grids['sDetails'].name].destroy();
+    if(w2ui[grids['vDetails'].name])w2ui[grids['vDetails'].name].destroy();
     if(w2ui[grids['genDetails'].name])w2ui[grids['genDetails'].name].destroy();
+    d3.select('#testerItem').selectAll('.card').remove();  
+
     
     //
     $.ajax({
@@ -503,7 +697,7 @@ function showDico(type, id) {
 }
 
 function showDicoItem(item) {
-    if(w2ui[grids[item.type+'Details'].name])w2ui[grids[item.type+'Details'].name].destroy();
+    if(grids[item.type+'Details'] && w2ui[grids[item.type+'Details'].name])w2ui[grids[item.type+'Details'].name].destroy();
     if(w2ui[grids['genDetails'].name])w2ui[grids['genDetails'].name].destroy();
 
     //
@@ -517,22 +711,225 @@ function showDicoItem(item) {
         },
         success: function (data) {
             //console.log(data);
-            //construction des grids                       
-            grids[item.type+'Details'].records = data[item.type];
+            //construction des grids
+            if(item.type=='a' || item.type=='m' || item.type=='s' || item.type=='v'){
+                grids[item.type+'Details'].records = data[item.type];
+                $('#detailsItem').w2grid(grids[item.type+'Details']);
+            }                       
             grids['genDetails'].records = data['gen'];
-            $('#detailsItem').w2grid(grids[item.type+'Details']);
             $('#detailsGen').w2grid(grids['genDetails']);
-
             
             //$('#modWait').modal('hide');
         }
     });
 }
 
+function testerDicoItem(item) {
+
+    //suppression de l'ancienne interface
+    d3.select('#testerItem').selectAll('.card').remove();  
+    //initialisation de la card de test
+    var html ='<div class="card">'
+            + '<div class="card-header">'
+            + 'TESTER / VERIFIER'
+            + '</div>'
+            + '<div id="cardTest" class="card-body">'                      
+            + '</div>'
+            + '</div>';
+    d3.select('#testerItem').html(html);                        
+
+    //création de l'interface de test
+    switch (item.type) {
+        case 'm':
+            html = '<div class="input-group mb-3">'
+            + '<div class="input-group-prepend">'
+            + '<span class="input-group-text" id="m_s">singulier</span>'
+            + '</div>'
+            + '<input id="m_s_v" type="text" class="form-control" aria-describedby="m_s" value="[12|m_'+item.lib+']">'
+            + '<div id="m_s_fb" style="display:block;" class="valid-feedback"></div>'
+            + '</div>'
+            + '<div class="input-group mb-3">'
+            + '<div class="input-group-prepend">'
+            + '<span class="input-group-text" id="m_p">pluriel</span>'
+            + '</div>'
+            + '<input id="m_p_v"  type="text" class="form-control" aria-describedby="m_p" value="[62|m_'+item.lib+']">'
+            + '<div id="m_p_fb" style="display:block;" class="valid-feedback"></div>'
+            + '</div>';
+            d3.select('#cardTest').html(html);                        
+            break;    
+        case 's':
+            html = '<div class="input-group mb-3">'
+            + '<input id="s_v" type="text" class="form-control" value="[s_'+item.lib+']">'
+            + '<div id="s_fb" style="display:block;" class="valid-feedback"></div>'
+            + '</div>';
+            d3.select('#cardTest').html(html);                        
+            break;    
+        case 'a':
+            html = '<div class="input-group mb-3">'
+            + '<div class="input-group-prepend">'
+            + '<span class="input-group-text" id="a_fs">'+genres[1].text+'</span>'
+            + '</div>'
+            + '<input id="a_fs_v" type="text" class="form-control" aria-describedby="a_fs" value="[32|m_phrase] [a_'+item.lib+']">'
+            + '<div id="a_fs_fb" style="display:block;" class="valid-feedback"></div>'
+            + '</div>'
+            + '<div class="input-group mb-3">'
+            + '<div class="input-group-prepend">'
+            + '<span class="input-group-text" id="a_fp">'+genres[1].text+' '+genres[1].text+'</span>'
+            + '</div>'
+            + '<input id="a_fp_v" type="text" class="form-control" aria-describedby="a_fp" value="[82|m_phrase] [a_'+item.lib+']">'
+            + '<div id="a_fp_fb" style="display:block;" class="valid-feedback"></div>'
+            + '</div>'
+            + '<div class="input-group mb-3">'
+            + '<div class="input-group-prepend">'
+            + '<span class="input-group-text" id="a_ms">'+genres[0].text+'</span>'
+            + '</div>'
+            + '<input id="a_ms_v" type="text" class="form-control" aria-describedby="a_ms" value="[32|m_mot] [a_'+item.lib+']">'
+            + '<div id="a_ms_fb" style="display:block;" class="valid-feedback"></div>'
+            + '</div>'
+            + '<div class="input-group mb-3">'
+            + '<div class="input-group-prepend">'
+            + '<span class="input-group-text" id="a_mp">'+genres[0].text+' '+genres[0].text+'</span>'
+            + '</div>'
+            + '<input id="a_mp_v" type="text" class="form-control" aria-describedby="a_mp" value="[82|m_mot] [a_'+item.lib+']">'
+            + '<div id="a_mp_fb" style="display:block;" class="valid-feedback"></div>'
+            + '</div>';
+            d3.select('#cardTest').html(html);                        
+            break; 
+        case 'v':
+            let test = d3.select('#cardTest').append('nav');
+            let navtabs = test.append('div')
+                .attr('class',"nav nav-tabs")
+                .attr('id',"test-v-tab")
+                .attr('role',"tablist");
+            navtabs.selectAll('a').data(testsConju).enter()
+                .append('a')
+                .attr('class',function(d,i){return i ? "nav-item nav-link" : "nav-item nav-link active"})
+                .attr('id',function(d,i){return "test-v-"+i+"-tab"})
+                .attr('data-toggle',"tab")
+                .attr('href',function(d,i){return "#test-v-"+i})
+                .attr('role',"tab")
+                .attr('aria-controls',function(d,i){return "#test-v-"+i})
+                .attr('aria-selected',function(d,i){return i ? false : true})
+                .html(d=>d.temps);
+            let tabs = test.append('div')
+                .attr('class',"tab-content")
+                .attr('id',"test-v-tabContent");
+            let content = tabs.selectAll('div').data(testsConju).enter()
+                .append('div')
+                .attr('class',function(d,i){return i ? "tab-pane fade show" : "tab-pane fade show active"})
+                .attr('id',function(d,i){return "test-v-"+i})
+                .attr('role',"tabpanel")
+                .attr('aria-labelledby',function(d,i){return "test-v-"+i+"-tab"})
+                .append('div')
+                    .attr('class','container-fluid');
+            let rows = content.selectAll('div').data(d=>d.codes).enter()
+                .append('div')
+                .attr('class','row')
+                .style('margin-top','5px')
+                .style('margin-bottom','5px');
+            //ajoute les input
+            rows.append('div')    
+                .attr('class','col-8').html(function(d){
+                    return '<input id="test-v-'+d+'" type="text" class="form-control" value="['+d+'000000|v_'+item.lib+']">';
+                });
+            //ajoute les result
+            rows.append('div')    
+                .attr('class','col_4').html(function(d){
+                    return '<div id="test-v-'+d+'-fb" style="display:block;" class="valid-feedback"></div>';
+                });
+            break;    
+        default:
+            let val = item.valeur ? item.valeur : item.type == 'carac' ? '['+item.type+item.lib+']' : '['+item.type+'-'+item.lib+']';  
+            html = '<div class="input-group mb-3">'
+                + '<input id="gen_v" type="text" class="form-control" value="'+val+'">'
+                + '<div id="gen_fb" style="display:block;" class="valid-feedback"></div>'
+                + '</div>';
+                d3.select('#cardTest').html(html);                        
+            break;
+    }
+    //ajoute les boutons de test et de vérification
+    d3.select('#cardTest').selectAll('button').data([item,item]).enter()
+        .append('button')
+        .attr('type','button')
+        .attr('class',function(d,i){return i ? 'btn btn-warning' : 'btn btn-primary'})
+        .html(function(d,i){return i ? 'Vérifier' : 'Tester'})
+        .on('click',function(d,i){
+            if(i) genererVerif(d);
+            else genererTest(d);
+        });
+
+}
+
+
 function getContentHeight(){
     return window.innerHeight 
         - document.getElementById('myTab').clientHeight 
         - document.getElementById('nbMain').clientHeight;
+}
+
+function genererTest(d){
+    console.log(d);
+    let txt, dest;
+    $('#modWait').modal('show');
+
+    switch (d.type) {
+        case 'm':
+            txt = [$('#m_s_v').val(),$('#m_p_v').val()];
+            generer({'idOeu':sltOeu.id_oeu,'txts':txt},['#m_s_fb','#m_p_fb'],'test');
+            break;    
+        case 's':
+            txt = [$('#s_v').val()];
+            generer({'idOeu':sltOeu.id_oeu,'txts':txt},['#s_fb'],'test');
+            break;    
+        case 'a':
+            txt = [$('#a_fs_v').val(),$('#a_fp_v').val(),$('#a_ms_v').val(),$('#a_mp_v').val()];
+            generer({'idOeu':sltOeu.id_oeu,'txts':txt},['#a_fs_fb','#a_fp_fb','#a_ms_fb','#a_mp_fb'],'test');
+            break;    
+        case 'v':
+            txt = [],dest=[];
+            testsConju.forEach(t => {
+                t.codes.forEach(c =>{
+                    txt.push($('#test-v-'+c).val());    
+                    dest.push('#test-v-'+c+'-fb');    
+                })
+            })
+            generer({'idOeu':sltOeu.id_oeu,'txts':txt},dest,'test');
+            break;    
+        default:
+            txt = [$('#gen_v').val()];
+            generer({'idOeu':sltOeu.id_oeu,'txts':txt},['#gen_fb'],'test');
+            break;
+    }
+}
+function genererVerif(d){
+    console.log(d);
+}
+function generer(params,dest,v){
+    $.ajax({
+        url: '../generateur/api?v='+v ,
+        dataType: "json",
+        data : params,
+        method: "GET",
+        error: function (error) {
+            console.log("Erreur : " + error.responseText);
+            $('#modWait').modal('hide');
+        },
+        success: function (data) {
+            if(Array.isArray(dest)){
+                for (let i = 0; i < dest.length; i++) {
+                    $(dest[i]).html(data[i].text);
+                }
+            }else{
+                let txt="";
+                data.forEach(t=>txt+=t.txt);
+                $(dest).html(txt);
+            }
+            $('#modWait').modal('hide');
+        },
+        always:function(){
+            $('#modWait').modal('hide');
+        } 
+    });
 }
 
     </script>

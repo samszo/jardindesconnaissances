@@ -195,8 +195,12 @@ class Model_DbTable_Gen_conjugaisons extends Zend_Db_Table_Abstract
     public function getAll($order=null, $limit=0, $from=0)
     {
    	
-    	$query = $this->select()
-                    ->from( array("gen_conjugaisons" => "gen_conjugaisons") );
+        $query = $this->select()
+            ->distinct()        
+            ->from( array("c" => "gen_conjugaisons") )
+            ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
+            ->joinInner(array('cc' => 'gen_conjugaisons'),'c.id_conj = cc.id_conj',array('recid'=>'id_conj'))			
+            ;
                     
         if($order != null)
         {

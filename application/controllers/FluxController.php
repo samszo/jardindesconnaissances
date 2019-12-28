@@ -855,6 +855,21 @@ class FluxController extends Zend_Controller_Action {
 		}
 	}
 
+    public function diplomatiegouvfrAction()
+    {
+		$dv = new Flux_Diplomatiegouvfr($this->_getParam('idBase',"flux_veille_diplo"),$this->_getParam('trace',true));
+		switch ($this->_getParam('q')) {
+			case 'saveAll':
+				foreach ($dv->pays as $p) {
+					$dv->saveVeillePays($p);
+					$dv->nbArticleParPage=0;
+				}
+				break;
+			case 'savePays':
+				$dv->saveVeillePays($this->_getParam('pays'));
+				break;
+			}
+	}
     
 	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);

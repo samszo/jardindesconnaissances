@@ -20,12 +20,17 @@ class Model_DbTable_Gen_conceptsxverbes extends Zend_Db_Table_Abstract
     protected $_primary = 'id_concept';
 
     protected $_referenceMap    = array(
-        'Lieux' => array(
-            'columns'           => 'id_lieu',
-            'refTableClass'     => 'Models_DbTable_Gevu_lieux',
-            'refColumns'        => 'id_lieu'
+        'Concept' => array(
+            'columns'           => 'id_concept',
+            'refTableClass'     => 'Model_DbTable_Gen_concepts',
+            'refColumns'        => 'id_concept'
         )
-    );	
+        ,'Verbe' => array(
+            'columns'           => 'id_verbe',
+            'refTableClass'     => 'Model_DbTable_Gen_verbes',
+            'refColumns'        => 'id_verbe'
+        )
+	);	
     
     /**
      * Vérifie si une entrée Gen_concepts_verbes existe.

@@ -297,6 +297,7 @@ class Model_DbTable_Gen_verbes extends Zend_Db_Table_Abstract
         	->from( array("cv" => "gen_concepts_verbes") )                           
 	        ->setIntegrityCheck(false) //pour pouvoir sélectionner des colonnes dans une autre table
         ->joinInner(array('v' => 'gen_verbes'), 'v.id_verbe = cv.id_verbe')
+        ->joinInner(array('cpt' => 'gen_concepts'), 'cpt.id_concept = cv.id_concept',array('recid'=>'id_concept'))
         ->joinInner(array('c' => 'gen_conjugaisons'), 'c.id_conj = v.id_conj')
         ->joinInner(array('dc' => 'gen_dicos'), 'dc.id_dico = c.id_dico', array("dicoConj"=>"nom"))
         ->where("cv.id_concept = ?", $id_concept );

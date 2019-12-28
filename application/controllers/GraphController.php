@@ -704,11 +704,15 @@ class GraphController extends Zend_Controller_Action {
 	    
 	}
 
+	public function textreeAction(){
+
+	}
+
 	public function quatreaxesAction(){
 		$json = "[{'lbl':'clair','posi':0},{'lbl':'obscur','posi':180},{'lbl':'pertinent','posi':90},{'lbl':'inadapté','posi':270}]";
 		$this->view->axes = $json;	    
 	}
-		
+				
     function getSpipMot(){
 	    	//vérifie s'il faut récupérer les données dans spip
 		$dt = "[";

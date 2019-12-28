@@ -1,0 +1,168 @@
+{
+    "name": "menu",
+    "children": [{
+        "name": "supprimer",
+        "size": 1,
+        "fct": false
+    }, {
+        "name": "modifier",
+        "size": 1,
+        "fct": false
+    }, {
+        "name": "déplacer",
+        "size": 1,
+        "fct": false
+    }, {
+        "name": "regrouper",
+        "size": 1,
+        "fct": false
+    }, {
+        "name": "émotions",
+        "size": 1,
+        "fct": "showRoueEmotion"
+    }, {
+        "name": "annoter",
+        "fct": false,
+        "children": [{
+            "name": "motivation",
+            "fct": false,
+            "size": 1,
+            "children": [{
+                    "name": "assessing",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "bookmarking",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "classifying",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "commenting",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "describing",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "editing",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "highlighting",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "identifying",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "linking",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "moderating",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "questioning",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "replying",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "tagging",
+                    "fct": false,
+                    "size": 1
+                }
+            ]
+        }, {
+            "name": "objectif",
+            "fct": false,
+            "size": 1,
+            "children": [{
+                    "name": "assessing",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "bookmarking",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "classifying",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "commenting",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "describing",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "editing",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "highlighting",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "identifying",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "linking",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "moderating",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "questioning",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "replying",
+                    "fct": false,
+                    "size": 1
+                },
+                {
+                    "name": "tagging",
+                    "fct": false,
+                    "size": 1
+                }
+            ]
+        }]
+    }]
+}

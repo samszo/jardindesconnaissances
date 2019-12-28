@@ -289,13 +289,15 @@ class Model_DbTable_Flux_Doc extends Zend_Db_Table_Abstract
      * Execute uen requete sur la base connecté
      *
      * @param string $sql
+     * @param boolean $bFetch
      *
      * @return array
      */
-    public function exeQuery($sql)
+    public function exeQuery($sql,$bFetch=true)
     {
-	    	$stmt = $this->_db->query($sql);
-	    	return $stmt->fetchAll();
+            $stmt = $this->_db->query($sql);
+            if($bFetch) return $stmt->fetchAll();
+            else return $stmt->execute();
     }    
     /**
      * Recherche une entrée flux_doc avec la valeur spécifiée

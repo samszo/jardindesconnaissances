@@ -24,11 +24,10 @@
  *
  * @category   Generateur
  * @package    Moteur
- * @copyright  Copyright (c) 2010 J-P Balpe (http://www.balpe.com)
+ * @copyright  Copyright (c) 2020 S Szoniecky (http://www.samszo.univ-paris8.fr) 2010 J-P Balpe (http://www.balpe.com)
  * @license    http://framework.generateur.com/license/Artistic/GPL License
  */
-class Gen_Moteur
-{
+class Gen_Moteur extends Flux_Site{
 
 	var $urlDesc;
 	var $xmlDesc;
@@ -71,42 +70,21 @@ class Gen_Moteur
     /**
      * Fonction du moteur
      *
+     * @param string $idBase
      * @param string $urlDesc
      * @param string $forceCalcul
      * @param string $xmlDesc
      *
      */
-	public function __construct($urlDesc="", $forceCalcul = false, $xmlDesc=false) {
+	public function __construct($idBase=false, $urlDesc="", $forceCalcul = false, $xmlDesc=false) {
+
+		parent::__construct($idBase);
 
 		$this->urlDesc = $urlDesc;
 		if($this->urlDesc=="")$this->urlDesc=APPLICATION_PATH.'/configs/LangageDescripteur.xml';	
 		if(!$xmlDesc) $this->xmlDesc = simplexml_load_file($this->urlDesc);
 		else $this->xmlDesc = $xmlDesc;
 		$this->forceCalcul = $forceCalcul;	
-	}
-
-	
-    /**
-     * trace l'éxécution du code
-     *
-     * @param string $message
-     * 
-     */
-	public function trace($message){
-		if($this->bTrace){
-			if(!$this->temps_debut)$this->temps_debut = microtime(true);
-			
-			$temps_fin = microtime(true);
-			$tG = str_replace(".",",",round($temps_fin - $this->temps_debut, 4));
-			$tI = str_replace(".",",",round($temps_fin - $this->temps_inter, 4));
-			$mess = $this->temps_nb." | ".$message." |".$tG."|".$tI.$this->finLigne;
-			if($this->echoTrace)
-				$this->echoTrace .= $mess;
-			else
-				echo $mess;
-			$this->temps_inter = $temps_fin;
-			$this->temps_nb ++;
-		}		
 	}
 	
     /**
@@ -137,7 +115,7 @@ class Gen_Moteur
      * @return array
      */
 	public function getDicosOeuvre($idOeu){
-		$dbODU = new Model_DbTable_Gen_oeuvresxdicosxutis();
+		$dbODU = new Model_DbTable_Gen_oeuvresxdicosxutis($this->db);
 		$arrDico = $dbODU->findByIdOeu($idOeu);		
 		foreach ($arrDico as $dico) {
 			if(substr($dico["type"],0,7)=="pronoms" ){
@@ -184,7 +162,7 @@ class Gen_Moteur
 		
 		foreach ($arrTextes as $texte) {
 			$this->Generation($texte);
-			$arrResult[]=$this->texte;	
+			$arrResult[]=['text'=>$this->texte,'details'=>$this->detail];	
 		}
 		
 		$this->trace("FIN ".__METHOD__);
@@ -297,9 +275,10 @@ class Gen_Moteur
                 
         //on calcule le texte
         if($getTexte){
-        		$this->genereTexte();
+        	$this->genereTexte();
         }
         
+		$this->trace($this->texte);
 		$this->trace("FIN ".__METHOD__);
         return $this->texte;
 	}
@@ -686,7 +665,7 @@ class Gen_Moteur
 					$vecteur = $this->getVecteur("genre",-1,$arr["determinant_verbe"][7]);
 					$genre = $vecteur["genre"];     	
 					//génère le pronom
-					$m = new Gen_Moteur($this->urlDesc,$this->forceCalcul, $this->xmlDesc);
+					$m = new Gen_Moteur($this->idBase,$this->urlDesc,$this->forceCalcul, $this->xmlDesc);
 					$m->showErr = $this->showErr;
 					$m->timeDeb = $this->timeDeb;
 					$m->arrDicos = $this->arrDicos;
@@ -720,7 +699,7 @@ class Gen_Moteur
 						$genre = $vecteur["genre"];     	
 					}
 					//génère le pronom
-					$m = new Gen_Moteur($this->urlDesc,$this->forceCalcul,$this->xmlDesc);
+					$m = new Gen_Moteur($this->idBase,$this->urlDesc,$this->forceCalcul,$this->xmlDesc);
 					$m->showErr = $this->showErr;
 					$m->timeDeb = $this->timeDeb;
 					$m->arrDicos = $this->arrDicos;
@@ -1494,7 +1473,7 @@ class Gen_Moteur
         	$c = md5("getDeterminant_".$this->arrDicos["déterminants"]."_".$class."_".$pluriel);
         	if($this->forceCalcul)$this->cache->remove($c);
 			if(!$arrClass = $this->cache->load($c)) {
-		        $tDtr = new Model_DbTable_Determinants();
+		        $tDtr = new Model_DbTable_Gen_Determinants($this->db);
 	        	$arrClass = $tDtr->obtenirDeterminantByDicoNumNombre($this->arrDicos["déterminants"],$class,$pluriel);        				
 			    $this->cache->save($arrClass, $c);
 			}
@@ -1567,7 +1546,7 @@ class Gen_Moteur
         	if($this->forceCalcul)$this->cache->remove($c);
 	        if(!$arrClass = $this->cache->load($c)) {
 	        	//récupère la définition de la class
-	        	$table = new Model_DbTable_Syntagmes();
+	        	$table = new Model_DbTable_Gen_Syntagmes($this->db);
 	        	$arrClass = $table->obtenirSyntagmeByDicoNum($this->arrDicos['syntagmes'],$class);
 				if(is_object($arrClass) && get_class($arrClass)=="Exception"){
 		    		$this->arrClass[$this->ordre]["ERREUR"] = $arrClass->getMessage();//."<br/><pre>".$arrCpt->getTraceAsString()."</pre>";
@@ -1668,7 +1647,7 @@ class Gen_Moteur
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$arrClass = $this->cache->load($c)) {
         	//récupère la définition de la class
-        	$table = new Model_DbTable_Negations();
+        	$table = new Model_DbTable_Gen_Negations($this->db);
         	$arrClass = $table->obtenirNegationByDicoNum($this->arrDicos['negations'],$class);
 			$this->cache->save($arrClass,$c);
 		}
@@ -1690,7 +1669,7 @@ class Gen_Moteur
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$arrClass = $this->cache->load($c)) {
 			//récupère la définition de la class
-       		$table = new Model_DbTable_Pronoms();
+       		$table = new Model_DbTable_Gen_Pronoms($this->db);
         	$arrClass = $table->obtenirPronomByDicoNumType($this->arrDicos['pronoms'],$class,$type);
         	if(is_array($arrClass))	$this->cache->save($arrClass,$c);
 		}
@@ -1717,7 +1696,7 @@ class Gen_Moteur
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$arrClass = $this->cache->load($c)) {
 			//récupère la définition de la class
-        	$table = new Model_DbTable_Terminaisons();
+        	$table = new Model_DbTable_Gen_Terminaisons($this->db);
         	$arrClass = $table->obtenirConjugaisonByConjNum($idConj, $num);
 			$this->cache->save($arrClass,$c);
 		}
@@ -1920,7 +1899,7 @@ class Gen_Moteur
         //Vérifie si le concept est un générateur
         if(isset($cpt["id_gen"])){
         	//générer l'expression
-			$m = new Gen_Moteur($this->urlDesc,$this->forceCalcul,$this->xmlDesc);
+			$m = new Gen_Moteur($this->idBase,$this->urlDesc,$this->forceCalcul,$this->xmlDesc);
 			$m->showErr = $this->showErr;
 			$m->timeDeb = $this->timeDeb;
 			$m->niv = $this->niv+1;
@@ -2023,7 +2002,7 @@ class Gen_Moteur
         if(!$arrCpt = $this->cache->load($c)) {
 			//récupère la définition de la class
 			$arrClass=explode("_", $class);
-	        $table = new Model_DbTable_Concepts();	
+	        $table = new Model_DbTable_Gen_Concepts($this->db);	
 	   	    $arrCpt = $table->obtenirConceptDescription($this->arrDicos['concepts'],$arrClass);
 			if(is_object($arrCpt) && get_class($arrCpt)=="Exception"){
 	    		$this->arrClass[$this->ordre]["ERREUR"] = $arrCpt->getMessage();//."<br/><pre>".$arrCpt->getTraceAsString()."</pre>";
