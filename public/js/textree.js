@@ -1,9 +1,12 @@
+"use strict";
 class textree {
     constructor(params) {
         var me = this;
         this.text = params.text ? params.text : false;
         this.data = params.data ? params.data : false;
+        this.langage = params.langage ? params.langage : 'texte';
         this.cont = d3.select("#"+params.idCont);
+        this.contMenu = params.idContMenu ? d3.select("#"+params.idContMenu) : d3.select('body');
         this.fontSize = params.fontSize ? params.fontSize : 18;
         this.urlDataMenu = params.urlDataMenu ? params.urlDataMenu : "../data/menuTextree.json";
         this.dataMenu = params.dataMenu ? params.dataMenu : {
@@ -36,7 +39,7 @@ class textree {
             }]
           }; 
 
-        var svg, w, h, wMenu, hMenu, divMenu, svgMenu, color, hierarchie, divTexte, opacity=1;
+        var svg, w, h, wMenu, hMenu, divMenu, svgMenu, color, nbNiv = 4, invNiv, hierarchie, divTexte, opacity=1;
 
         this.init = function () {
 
@@ -49,16 +52,20 @@ class textree {
 
             //analyse du texte            
             if(!me.data)me.analyseText();
+            console.log(me.data);
             hierarchie = d3.hierarchy(me.data);
             console.log(hierarchie);
 
-            color = d3.scaleOrdinal().range(d3.quantize(d3.interpolateMagma, 4));
+            color = d3.scaleOrdinal().range(d3.quantize(d3.interpolateMagma, nbNiv));
+            invNiv = d3.scaleLinear().range([0,nbNiv]).domain([nbNiv,0]);
 
             //calcul la taille du menu
-            hMenu = wMenu = this.cont.node().clientHeight/2;
+            //hMenu = wMenu = this.cont.node().clientHeight/2;
+            hMenu = wMenu = window.innerHeight/2;
 
             //ajoute le div du menu
-            divMenu = d3.select('body').append("div")
+            d3.select('#txtreeMenu').remove();
+            divMenu = me.contMenu.append("div")
                 .attr("id", "txtreeMenu")
                 .style('position','absolute')
                 .style('height',hMenu+'px')
@@ -66,29 +73,35 @@ class textree {
                 .style('display','none');
             
             //ajoute le texte
+            this.cont.selectAll('.txtree').remove();
             divTexte = this.cont.selectAll('.txtree').data([hierarchie]).enter().append("div")
                 .attr("class", "txtree")
                 .style('height','100%')
+                .style('float','left')
                 .style('padding',me.fontSize+'px')
                 .style('margin',me.fontSize+'px')
                 .style('background-color',d => me.getColor(d.depth,opacity))
                 .on('click',me.clickTexte);
 
             var divPhrases = divTexte.selectAll('.txtreePhrase').data(function(d){
-                return d.children
+                return d.children ? d.children : []
                 }).enter().append("div")
                 .attr("class", "txtreePhrase")
                 .style('float','left')
-                //.style('height',(me.fontSize*3)+'px')
+                .style('min-height','54px')
                 .style('padding',(me.fontSize/2)+'px')
                 .style('padding-bottom',(me.fontSize)+'px')
                 .style('margin-left',(me.fontSize/5)+'px')
                 .style('margin-top',(me.fontSize/5)+'px')
                 .style('background-color',d => me.getColor(d.depth,opacity))
+                .style('color',d => me.getColor(d.depth,opacity,true))
+                .text(function(d){
+                    return d.children ? "" : d.data.txt;
+                })
                 .on('click',me.clickPhrase);
 
             var divMots = divPhrases.selectAll('.txtreeMot').data(function(d){
-                return d.children
+                return d.children ? d.children : []
                 }).enter().append("div")
                 .attr("class", "txtreeMot")
                 .style('float','left')
@@ -98,6 +111,10 @@ class textree {
                 //.style('padding-top',(me.fontSize)+'px')
                 .style('margin-left',(me.fontSize/10)+'px')
                 .style('background-color',d => me.getColor(d.depth,opacity))
+                .style('color',d => me.getColor(d.depth,opacity,true))
+                .text(function(d){
+                    return d.children ? "" : d.data.txt;
+                })
                 .on('click',me.clickMot);
             var divCaract = divMots.selectAll('.txtreeCaract').data(function(d){
                     return d.children ? d.children : []; 
@@ -106,9 +123,10 @@ class textree {
                 .style('float','left')
                 .style('height',(me.fontSize*1.5)+'px')
                 .style('padding',(me.fontSize/4)+'px')
-                .style('margin-left',(me.fontSize/15)+'px')
+                .style('margin-left','1px')
                 .style('font-size',(me.fontSize)+'px')
                 .style('background-color',d => me.getColor(d.depth,opacity))
+                .style('color',d => me.getColor(d.depth,opacity,true))
                 .text(function(d){
                     return d.data.txt;
                 })
@@ -169,30 +187,80 @@ class textree {
         // Fonction pour analyser le texte
         //merci à https://github.com/raitucarp/paratree
         this.analyseText = function() {
-            me.data = {'txt':me.text,'type':'paragraphe','children':me.parsePhrases(me.text)};
-            console.log(me.data);
+            if(me.langage == 'texte')
+                me.data = {'txt':me.text,'type':'paragraphe','children':me.parsePhrases(me.text)};
+            if(me.langage == 'gen')
+                me.data = {'txt':me.text,'type':'paragraphe','children':me.parseGen(me.text)};
         }
 
+        this.parseGen = function(text) {
+            //extraction des générateurs
+            //merci à https://openclassrooms.com/forum/sujet/regex-recuperer-texte-entre-crochets-57625
+            let stc = text
+                .match( /\[(.*?)\]/g )
+                .map(function(t, i){return {'txt':t, 'type':'generateur', 'children':[]};});
+            //ajout des textes suplémentaires
+            let iDeb = 0, dataGen = [];
+            for (let i = 0; i < stc.length; i++) {
+                //récupère les positions du générateur
+                let posi1 = text.indexOf(stc[i].txt, iDeb);
+                let posi1fin = posi1+stc[i].txt.length;
+                let posi2 = posi1+1;
+                //ajout le texte avant le premier générateur
+                if(i==0 && posi1 > 0){
+                    dataGen = me.parsePhrases(text.substring(0,posi1));
+                }
+                //ajoute le générateur
+                dataGen.push(stc[i]);
+                //vérifie la présence de texte
+                if(stc[(i+1)])
+                    posi2 = text.indexOf(stc[(i+1)].txt, iDeb+1);                    
+                if(posi2 > posi1fin){
+                    //ajoute les textes intermédiaires
+                    dataGen.push(me.parsePhrases(text.substring(posi1fin,posi2)));
+                }
+                iDeb = posi1fin;                
+            }
+            //ajout le texte après le dernier générateur
+            if(iDeb < text.length){
+                dataGen = dataGen.concat(me.parsePhrases(text.substring(iDeb)));
+            }
+            return dataGen;
+        }        
+
         this.parsePhrases = function(text) {
-            return text
-            //merci à https://stackoverflow.com/questions/11761563/javascript-regexp-for-splitting-text-into-sentences-and-keeping-the-delimiter
-            .match( /[^\.!\?]+[\.!\?]+/g )
-            .map(function(t, i){return {'txt':t, 'type':'phrase', 'children':me.parseMots(t)};});
+            //vérifie si des phrases sont présentes
+            if(text.match( /[^\.!\?]+[\.!\?]+/g ))
+                return  text
+                //merci à https://stackoverflow.com/questions/11761563/javascript-regexp-for-splitting-text-into-sentences-and-keeping-the-delimiter
+                .match( /[^\.!\?]+[\.!\?]+/g )
+                .map(function(t, i){return {'txt':t, 'type':'phrase', 'children':me.parseMots(t)};});
+            else
+                return {'txt':text, 'type':'phrase', 'children':me.parseMots(text)};
+
         }        
 
         this.parseMots = function(text) {
-            return text
-            .split(/\s{1,}/gi)
-            .map(function(t, i){return {'txt':t, 'type':'mot', 'children':me.parseCaracteres(t)};});
+            if(text.match(/\s/gi))
+                return text
+                .split(/\s/gi)
+                .map(function(t, i){return {'txt':t, 'type':'mot', 'children':me.parseCaracteres(t)};});
+            else
+                return {'txt':text, 'type':'mot', 'children':me.parseCaracteres(text)};
         }        
 
         this.parseCaracteres = function(text) {
-            return text
+            let cs = text
             .split("")
-            .map(function(t, i){return {'txt':t, 'type':'caractere'};});
+            .map(function(t, i){
+                return {'i':i, 'txt':t, 'type':'caractere', 'children':[]};
+            });
+            return cs ;
         }        
           
-        this.getColor = function(i,o){
+        this.getColor = function(i,o,comp){
+            if(comp)
+                i = invNiv(i);
             let c = d3.color(color(i));
             c.opacity = o;
             return c;

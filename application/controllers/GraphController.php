@@ -57,8 +57,9 @@ class GraphController extends Zend_Controller_Action {
 		$this->view->urlStats = "../stat/tagassos?".$arrUrl[1];	    
     }	
 
-    public function forceclusterAction()
+	public function forceclusterAction()
     {
+
 	}
 
     public function forcelabelAction()
@@ -67,6 +68,18 @@ class GraphController extends Zend_Controller_Action {
 
     public function forceradialAction()
     {
+	}
+
+    public function forceAction()
+    {
+		//..%2Fgenerateur%2Fapi%3Fv%3Dstructure%26idOeu%3D2%26txt%3D%5Bdis-qualif-%5D%26reseau%3D1
+		$url = "../data/miserForce.json";
+		//$url = "../generateur/api?v=structure&idOeu=2&txt=[thl-pr%C3%A9sente-01]&force=0&reseau=1";
+		$url = "../generateur/api?v=structure&idOeu=2&txt=[dis-adverbe]&force=0&reseau=1";
+		$url = "../generateur/api?v=structure&idOeu=2&txt=[dis-date]&reseau=1&force=0&nivMax=2";
+		//$url = "../generateur/api?v=structure&idOeu=2&txt=[32|m_matin] [10|dis-mois]&reseau=1&force=0&nivMax=2";
+		
+    	$this->view->urlData = $this->_getParam('urlData',$url);
 	}
 
 	public function chordAction()
@@ -543,6 +556,17 @@ class GraphController extends Zend_Controller_Action {
 		 	
     }
 
+    public function streamgraphAction(){
+		//affiche l'exemple isidore référence
+		$this->view->urlData =  $this->_getParam('urlData', "../flux/isidore?q=getRefHistoDiscipline");
+		$this->view->typeData =  $this->_getParam('urlType', 'json');
+		/*affiche l'exemple csv
+		$this->view->urlData =  $this->_getParam('urlData');
+		$this->view->typeData =  $this->_getParam('urlType');
+		*/
+		 	
+    }
+
     public function streamvAction(){
 	    	$this->view->titre =  $this->_getParam('titre', "Stream Graph Vertical");
 	    	$this->view->soustitre =  $this->_getParam('soustitre', "Pour plonger dans le temps");
@@ -567,7 +591,13 @@ class GraphController extends Zend_Controller_Action {
 	    			$this->view->q = $this->_getParam('q', "écosystème");
 	    			$this->view->urlData = "../flux/isidore?q=getHistoDiscipline&req=".urldecode($this->_getParam('q', "écosystème"));
 	    			$this->view->legendetitre =  "Disciplines";
-	    			break;
+					break;
+				case "getRefHistoDiscipline":
+					$this->view->titre =  "Evolution du nombre de document par disciplines dans https://www.rechercheisidore.fr";
+					$this->view->soustitre =  "";
+					$this->view->urlData = "../flux/isidore?q=getRefHistoDiscipline";
+					$this->view->legendetitre =  "Disciplines";
+					break;
 	    		case "valarnum":
 	    		    $this->view->titre =  "Evolution des explorations émotionnelles";
 	    		    $this->view->soustitre =  "Valorisation des archives numériques";
@@ -707,6 +737,17 @@ class GraphController extends Zend_Controller_Action {
 	public function textreeAction(){
 
 	}
+
+	public function sunburstmenuAction(){
+
+	}
+
+
+	public function treeAction(){
+
+	}
+
+
 
 	public function quatreaxesAction(){
 		$json = "[{'lbl':'clair','posi':0},{'lbl':'obscur','posi':180},{'lbl':'pertinent','posi':90},{'lbl':'inadapté','posi':270}]";

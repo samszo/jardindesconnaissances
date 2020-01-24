@@ -62,8 +62,8 @@ class menuSunburst {
 
             //ajoute le svg du menu
             svgMenu = me.cont.append("svg")
-                    .style("width", "100%")
-                    .style("height", "auto")
+                    .style("width", "96%")
+                    .style("height", "96%")
                     .style("position","absolute")
                     .attr('viewBox',"0 0 "+me.width+" "+me.width)
                     .style("font", "10px sans-serif");

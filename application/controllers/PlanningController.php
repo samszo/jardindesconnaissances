@@ -158,7 +158,11 @@ class PlanningController extends Zend_Controller_Action {
 				$this->view->titre='Gantt '.$this->_getParam('projet');		
 				$this->view->urlData="../../data/planning/gantt/H2PTM4.0.js";		
 				break;			
-			default:
+			case 'H2PTM-4.0':
+				$this->view->titre='Gantt '.$this->_getParam('projet');		
+				$this->view->urlData="../../data/planning/gantt/H2PTM-4.0.js";		
+				break;			
+				default:
 				$this->view->titre='Gantt';		
 				$this->view->urlData="../../data/planning/gantt/H2PTM4.0.js";		
 				break;

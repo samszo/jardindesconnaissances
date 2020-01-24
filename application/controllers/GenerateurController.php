@@ -27,10 +27,24 @@ class GenerateurController extends Zend_Controller_Action
 
     public function importAction()
     {
-        $oDico = new Gen_Dico();
         if($this->_getParam('csv') && $this->_getParam('csv') && $this->_getParam('path')){
             //importation d'un fichier csv
+            $oDico = new Gen_Dico();
             $oDico->importCSV($this->_getParam('csv'), $this->_getParam('path'));	
+        }
+        if($this->_getParam('bdd')){
+            //commenter la connexion quand utilisé avec curl
+            $this->initInstance("/import");
+            //pour curl il faut modifier les paramètre dans le fichier /genlod/tmp/import.sh
+            //lancer le fichier par la commande ./import.sh
+        
+            $genO = new Gen_Omk($this->idBaseGen,true);
+            $genO->bTrace = $this->_getParam('trace',true);
+            $genO->bTraceFlush = $genO->bTrace;
+            $omkParams = OMK_PARAMS['omk_genlod'];
+            $genO->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"]);		
+            $genO->importBaseGen($this->_getParam('refL',""));
+
         }
 
     	
@@ -47,17 +61,32 @@ class GenerateurController extends Zend_Controller_Action
     {
     	
     }
-
+    
     public function apiAction()
     {   
         $this->initInstance("/gestion");        
         $sGen = new Flux_Site($this->idBaseGen);
+        $m = new Gen_Moteur($this->idBaseGen);                        
         $o = $this->_getParam('o');
         switch ($this->_getParam('v')) {
+            case 'structure':
+                $m->arrDicos = $m->getDicosOeuvre($this->_getParam('idOeu'));
+                $m->forceCalcul = $this->_getParam('force');
+                $this->view->r = $m->getStructure($this->_getParam('txt'),intval($this->_getParam('niv')),$this->_getParam('root','root'),intval($this->_getParam('nivMax')));
+                if($this->_getParam('reseau'))$this->view->r = $m->getReseauStructure($this->view->r,intval($this->_getParam('nivMax')));               
+                break;
+            case 'enum':
+                $rqst = json_decode($this->_getParam('request'));
+                $s = $rqst->search;
+                //récupére les dicos
+                $arrDico = $m->getDicosOeuvre($this->_getParam('idOeu'));
+                //réupère les items
+                $db = new Model_DbTable_Gen_concepts($sGen->db);
+                $rs = $db->findAllByDicos($arrDico,true,$s);
+                $this->view->r = array('status'=>"success", 'records'=>$rs);
+            break;
             case 'test':
                 set_time_limit($this->maxExeTime);
-                //initialisation du moteur
-                $m = new Gen_Moteur($this->idBaseGen);                        
                 //paramétrage du moteur
                 $arrDico = $m->getDicosOeuvre($this->_getParam('idOeu'));
                 $arrText = $this->_getParam('txts',[]);
@@ -65,8 +94,6 @@ class GenerateurController extends Zend_Controller_Action
                 break;
             case 'gen':
                 set_time_limit($this->maxExeTime);
-                //initialisation du moteur
-                $m = new Gen_Moteur($this->idBaseGen);                        
                 //paramétrage du moteur
                 $m->arrDicos = $m->getDicosOeuvre($this->_getParam('idOeu'));
                 $m->showErr = $this->_getParam('err',false);

@@ -19,7 +19,7 @@
     }, {
         "name": "émotions",
         "size": 1,
-        "fct": "showRoueEmotion"
+        "fct": "showRoueEmotions"
     }, {
         "name": "annoter",
         "fct": false,

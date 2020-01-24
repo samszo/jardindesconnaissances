@@ -481,3 +481,14 @@ public/data/spinoza-ethica-fr-appuhn.json
 bdd/remoteconnect.txt
 bdd/query/diplogouvStatPays.sql
 data/diplomatie.gouv.fr/Flux RSS - France-Diplomatie - Ministère de l’Europe et des Affaires étrangères.htm
+application/configs/applicationVMJDC.ini
+application/configs/configVMJDC.php
+application/configs/my.cnf
+application/configs/mysql.cnf
+application/configs/mysqld.cnf
+bdd/generateur.sql
+data/generateur/gen_doublons.csv
+data/generateur/structure.json
+data/generateur/structure[thl-présente-01].json
+data/generateur/structure[thl-présente-01].json
+data/generateur/structure[thl-présente-01].json

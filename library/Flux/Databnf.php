@@ -63,14 +63,14 @@ WHERE {
      */
     public function query($query, $sru=false, $cache=true, $gallica=false)
     {
-    		$this->trace("DEBUT ".__METHOD__);
-    	 	if($sru)
-				$url = $this->sruUrl.$query;
-			else if($gallica)
-				$url = $this->sruUrlGallica.$query;
-    		else
-			    $url = $this->searchUrl.'query='.urlencode($query)
-			      	.'&format='.$this->formatResponse;
+		$this->trace("DEBUT ".__METHOD__);
+		if($sru)
+			$url = $this->sruUrl.$query;
+		else if($gallica)
+			$url = $this->sruUrlGallica.$query;
+		else
+			$url = $this->searchUrl.'query='.urlencode($query)
+				.'&format='.$this->formatResponse;
 		$this->trace($url);
 		$body = $this->getUrlBodyContent($url,false,$cache);
 		$this->trace("FIN ".__METHOD__);

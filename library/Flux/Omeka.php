@@ -129,7 +129,12 @@ class Flux_Omeka extends Flux_Site{
         foreach ($data as $k => $v) {
             switch ($k) {
                 case 'item_set':
-                    $param['o:item_set']['o:id']=$v;
+                    $i = 0;
+                    $v = is_array($v) ? $v : array($v);
+                    foreach ($v as $d) {
+                        $param['o:item_set'][]=$d;
+                        $i++;
+                    }
                     break;
                 case 'resource_template':
                     $param['o:resource_template']['o:id']=$data['resource_template'];
@@ -197,8 +202,9 @@ class Flux_Omeka extends Flux_Site{
      */
     function postItem($data, $existe=true, $patch=true, $put=false){
 
-
+        $this->trace("DEBUT ".__METHOD__,$data);
         $param = $this->setParamAPI($data);
+        $this->trace("PARAM ".__METHOD__,$param);
        
         $r = null;
         if($existe){
@@ -211,10 +217,14 @@ class Flux_Omeka extends Flux_Site{
         elseif($put)
             $r = $this->send('items','PUT',$this->paramsAuth(),$param,'/'.$r['o:id'],true);
         
+        $this->trace("RESULT ".__METHOD__,$r);
+
+        /*
         //gestion de l'erreur
         if($r['errors'])
             throw new Exception(json_encode($r['errors']));
-
+        */
+        $this->trace("FIN ".__METHOD__);
         return $r;
     }
 
@@ -506,24 +516,40 @@ class Flux_Omeka extends Flux_Site{
      * @param array     $post
      * @param array     $id
      * @param boolean   $decode
-     *
+     * 
+     * @return array
+     * 
+     * POUR TESTER
+     curl -XPOST -H "Content-type: application/json" -d '{"dcterms:title":[{"property_id":1,"type":"literal","@value":"test","@language":"fr","is_public":1}],"dcterms:isReferencedBy":[{"property_id":35,"type":"literal","@value":"test","@language":"fr","is_public":1}],"o:item_set":[14]}' 'http://192.168.20.232/genlod/api/items?key_identity=lqwqQkzUq2UZtoYmvKp5bs68YiWSFf0t&key_credential=sRikncbW7O6Whmlo4HJq9QOBy7cLuUu6'
+     * 
      */
     function send($type, $methode, $get=false, $post=false,$id='',$decode=false){
+        $this->trace("DEBUT ".__METHOD__.' '.$type.' '.$methode.' '.$get.' '.$post.' '.$id.' '.$decode);
         $client = new Zend_Http_Client($this->endpoint.$type.$id,array('timeout' => 100));
-        if($get)$client->setParameterGet($get);
+        $this->trace($this->endpoint.$type.$id,$post);
+        if($get){
+            $client->setParameterGet($get);
+            $this->trace('GET',$get);
+        }
         if($post){
+            $js = json_encode($post);
+            $this->trace($js);
             //pour forcer le header
-            $client->setRawData(json_encode($post), 'application/json');
+            $client->setRawData($js, 'application/json');
         }
         if($methode=='PATCH')$client->setHeaders('Content-Type','application/json');
         $response = $client->request($methode);
-        return $decode ? json_decode($response->getBody(),true) : $response->getBody();
+        $body = $response->getBody();
+        //$this->trace("RESULT ".__METHOD__.' '.$body);
+        return $decode ? json_decode($body,true) : $body;
 
     }
 
     function paramsAuth(){
         //initialisation des paramètres GET pour l'authentification
-        return array('key_identity' => $this->API_IDENT, 'key_credential' => $this->API_KEY);
+        $p = array('key_identity' => $this->API_IDENT, 'key_credential' => $this->API_KEY);
+        //$this->trace(__METHOD__,$p);
+        return $p;
     }
     
 

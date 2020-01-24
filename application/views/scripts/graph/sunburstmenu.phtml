@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Menu Sunburst</title>
+
+    <script type="text/javascript" src="../js/d3.v5.min.js"></script>
+    <script type="text/javascript" src="../js/menuSunburst.js"></script>    
+    <script type="text/javascript" src="../js/emotionswheel.js"></script>    
+    <style>
+        #cont{
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="cont" ></div>
+    <script>
+        var svgMenu, urlData = 'http://localhost/jdc/public/generateur/api?v=structure&idOeu=2&txt=[dis-prep][dis-qualif-]&force=0'
+            ,h = d3.select('#cont').node();
+
+        d3.json(urlData).then(function(dt) {
+            let data = {"name": "menu", "children": [dt]};
+            svgMenu = new menuSunburst({'idCont':'cont','data':data});
+        });        
+    </script>
+</body>
+</html>

@@ -381,6 +381,39 @@ class Flux_Site{
 	
 	
 	/**
+	 * Returns an array representation of a DOMNode
+	 * Note, make sure to use the LIBXML_NOBLANKS flag when loading XML into the DOMDocument
+	 * @param DOMDocument $dom
+	 * @param DOMNode $node
+	 * @return array
+	 */
+	function nodeToArray($dom, $node) {
+		if(!is_a( $dom, 'DOMDocument' ) || !is_a( $node, 'DOMNode' )) {
+			return false;
+		}
+		$array = false;
+		if( empty( trim( $node->localName ))) {// Discard empty nodes
+			return false;
+		}
+		if( XML_TEXT_NODE == $node->nodeType ) {
+			return $node->nodeValue;
+		}
+		foreach ($node->attributes as $attr) {
+			$array['@'.$attr->localName] = $attr->nodeValue;
+		}
+		foreach ($node->childNodes as $childNode) {
+			if ( 1 == $childNode->childNodes->length && XML_TEXT_NODE == $childNode->firstChild->nodeType ) {
+				$array[$childNode->localName] = $childNode->nodeValue;
+			}  else {
+				if( false !== ($a = self::nodeToArray( $dom, $childNode))) {
+					$array[$childNode->localName] =     $a;
+				}
+			}
+		}
+		return $array;
+	}
+
+	/**
 	 * Formats a line (passed as a fields  array) as CSV and returns the CSV as a string.
 	 * Adapted from http://us3.php.net/manual/en/function.fputcsv.php#87120
 	 * 

@@ -647,6 +647,10 @@ class FluxController extends Zend_Controller_Action {
 		$isidore->bTraceFlush = $this->_getParam('trace');
 		$isidore->bCache = true;
 		switch ($this->_getParam('q')) {
+			case "getRefHistoDiscipline":
+				$data = $isidore->getRefHistoDiscipline("stream");
+				$this->view->content = json_encode($data);
+				break;
 			case "getHistoDiscipline":
 				$data = $isidore->getHistoDiscipline($this->_getParam('req'),"stream");
 				$this->view->content = json_encode($data);
@@ -870,7 +874,21 @@ class FluxController extends Zend_Controller_Action {
 				break;
 			}
 	}
-    
+
+    public function gorafiAction()
+    {
+		$g = new Flux_Gorafi($this->_getParam('idBase',"flux_gorafi"),$this->_getParam('trace',true));
+		switch ($this->_getParam('q')) {
+			case 'saveAll':
+				foreach ($g->categories as $c) {
+					$g->nbPagination = 0;
+					$g->saveCategorie($c);
+				}
+				break;
+		}
+	}
+	
+
 	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);
 		if ($ss->client->isAccessTokenExpired()) {

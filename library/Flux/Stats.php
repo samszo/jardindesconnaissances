@@ -861,7 +861,7 @@ WHERE `url` LIKE '%http://opencrs.com/%'
 		//définir une valeur par défaut pour la consistance du graph
 		$defVal = 0.01;
 		$j=0; $i=0; $nbDate = count($arrDate); $nbData = count($data);
-		$nData;
+		$nData = array();
 		//foreach ($data as $d) {
 		for ($z = 0; $z < $nbData; $z++) {
 			$d = $data[$z];

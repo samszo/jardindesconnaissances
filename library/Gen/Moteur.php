@@ -65,7 +65,10 @@ class Gen_Moteur extends Flux_Site{
     var $temps_nb=0;
 	var $arrEli = array("a", "e", "é", "ê", "i","o","u","y","h");
 	var $arrEliCode = array(195);
-    
+	var $arrStructure = [];
+	var $arrReseau;
+	var $arrId;
+
     
     /**
      * Fonction du moteur
@@ -256,7 +259,7 @@ class Gen_Moteur extends Flux_Site{
         		//c'est le début d'une notification de format
         		$i = $this->traiteFormat($texte, $i);
         	*/
-        	}elseif($c == "F"){
+        	}elseif($c == "F"){//obsolete
         		if($texte[$i+1]=="F"){
 	        		//c'est la fin du segment
 			        $this->arrSegment[$this->segment]["ordreFin"]= $this->ordre;
@@ -270,6 +273,7 @@ class Gen_Moteur extends Flux_Site{
         		//on ajoute le caractère
 				$this->arrClass[$this->ordre]["texte"] = $c;
         	}
+			$this->arrClass[$this->ordre]["niveau"] = $this->niv;
         	$this->ordre ++;
         }
                 
@@ -1229,11 +1233,7 @@ class Gen_Moteur extends Flux_Site{
 				$classSpe = substr($class,0,$c)."_".substr($class,$c+1);
 				$this->getClassSpe($classSpe);
 			}			
-		}
-
-        
-		
-		
+		}        		
 	}
 
     /**
@@ -1296,8 +1296,7 @@ class Gen_Moteur extends Flux_Site{
 		//ajoute les déterminants
 		if($this->verif){
 			
-		}
-		
+		}		
 
 	}
 	
@@ -1502,7 +1501,6 @@ class Gen_Moteur extends Flux_Site{
         //ajoute le déterminant
 		$this->arrClass[$this->ordre]["determinant"] = $arrClass;
                         
-        return $arrClass;
 	}
 	
     /**
@@ -1570,6 +1568,7 @@ class Gen_Moteur extends Flux_Site{
 	        	$this->arrClass[$this->ordre]["syntagme"] = $arrClass;			
 	        }
 		}
+		return $arrClass;
 	}
 	
     /**
@@ -1586,7 +1585,7 @@ class Gen_Moteur extends Flux_Site{
 			if($this->verif){
 				$this->xmlGen = $this->xml->createElement('gen',$cls);
 				$this->xmlRoot->appendChild($this->xmlGen);		
-			}
+			}		
 			$this->getClass($cls);
         }	        	
 		return $arrClass["fin"];
@@ -1772,7 +1771,7 @@ class Gen_Moteur extends Flux_Site{
         
         if($this->typeChoix=="tout" && $this->niv < 1 && count($arrCpt["dst"]) > 1){
         	$this->verifClass($arrCpt);
-        	$cpt = false;
+			$cpt = false;
         }else{
 	        //choisi un concept aléatoirement
 	        //initialise le random
@@ -1781,7 +1780,7 @@ class Gen_Moteur extends Flux_Site{
 	        $a = mt_rand(0, count($arrCpt["dst"])-1);        
 	        
 	        $cpt = $this->getClassGen($arrCpt["dst"][$a],$class);        
-        }
+		}
 
         if($cpt){
         	//conserve le parent pour le lien vers l'administration
@@ -1838,7 +1837,6 @@ class Gen_Moteur extends Flux_Site{
         }
 		
 	}
-
 	
     /**
      * Fonction du moteur
@@ -1987,8 +1985,319 @@ class Gen_Moteur extends Flux_Site{
          // if isn't in array return FALSE
          return FALSE;
     } 	
-	
+
     /**
+     * Fonction du moteur pour transformer la structure hiérarchique d'un générateur en réseau
+	 * 
+	{
+		"nodes": [
+			{
+			"id": "Myriel",
+			"group": 1
+			},
+			{
+			"id": "Napoleon",
+			"group": 1
+			},
+		],
+		"links": [
+			{
+			"source": "Napoleon",
+			"target": "Myriel",
+			"value": 1
+			},
+			{
+			"source": "Mlle.Baptistine",
+			"target": "Myriel",
+			"value": 8
+			},
+		]
+	}
+     *
+     * @param array $s
+     * @param array $nivMax
+ 
+	 * @return array
+     */
+    public function getReseauStructure($s,$nivMax=-1){
+
+		if(!$this->arrReseau){
+			$this->arrReseau = array("nodes"=>array(),"links"=>array());
+		}
+		if($s["id"]=='4_451_syn'){
+			$t = 1;
+		}
+		//conserve les enfants pour le traitement récursif
+		$child = $s['children'];
+		//supprime les enfants pour les infos du réseau
+		unset($s['children']);
+		//vérifie la création de doublons
+		if($this->arrId[$s["id"]]){
+			//incrémentation de la taille
+			$this->arrId[$s["id"]]['nb'] ++;
+			$i = $this->arrId[$s["id"]]['i'];
+			$this->arrReseau["nodes"][$i]['size']=$this->arrId[$s["id"]]['nb'];
+		}else{
+			//création du noeud
+			$this->arrReseau["nodes"][] = array("id"=>$s["id"],"group"=>$s["type"],"obj"=>$s,"size"=>1);
+			$i = $this->arrReseau["nodes"] ? count($this->arrReseau["nodes"])-1 : 0;
+			$this->arrId[$s["id"]] = array('nb'=>1,'i'=>$i);
+		}
+
+		foreach ($child as $c) {
+			if($nivMax<0 || $nivMax >= $c['niv']){
+				$this->getReseauStructure($c,$nivMax);
+				$idLink = $s["id"].'-'.$c["id"];
+				//vérifie la création de doublons
+				if($this->arrId[$idLink]){
+					//incrémentation de la taille
+					$i = $this->arrId[$idLink]['i'];
+					$this->arrId[$idLink]['nb'] ++;
+					$this->arrReseau["links"][$i]["value"]=$this->arrId[$idLink]['nb'];
+				}else{
+					//création du lien
+					$this->arrReseau["links"][] = array("source"=>$s["id"],"target"=>$c["id"],"value"=>1);	
+					$i = $this->arrReseau["links"] ? count($this->arrReseau["links"])-1 : 0;	
+					$this->arrId[$idLink] = array('nb'=>1,'i'=>$i);
+				}
+			}
+		}
+
+		return $this->arrReseau;
+	}
+	
+
+    /**
+     * Fonction du moteur
+     *
+     * @param string 	$class
+     * @param int	 	$niv
+     * @param string	$id
+     * @param string	$nivMax
+
+	 * @return array
+     */
+    public function parseGen($texte){
+
+		$re = '/\[[^\]]*\]/';
+		
+		preg_match_all($re, $texte, $stc, PREG_SET_ORDER);
+
+		$iDeb = 0;
+		$dataGen = array();
+		for ($i=0; $i < count($stc); $i++) { 
+			//récupère les positions du générateur
+			$posi1 = strpos($texte, $stc[$i][0], $iDeb);
+			$posi1fin = $posi1+strlen($stc[$i][0]);
+			$posi2 = $posi1+1;
+			if($i==0 && $posi1 > 0){
+				//ajout le texte avant le premier générateur
+				$t = substr($texte, 0, $posi1);
+				$dataGen[] = array('v'=>$t,'t'=>'txt');
+			}
+			//ajoute le générateur
+			$dataGen[]=array('v'=>$stc[$i][0],'t'=>'gen');
+			//vérifie la présence de texte
+			if($stc[($i+1)])
+				$posi2 = strpos($texte, $stc[$i+1][0], $iDeb+1);                    
+			if($posi2 > $posi1fin){
+				//ajoute les textes intermédiaires
+				$t = substr($texte, $posi1fin, $posi2-$posi1fin);
+				$dataGen[] = array('v'=>$t,'t'=>'txt');
+			}
+			$iDeb = $posi1fin;                
+		}
+		//ajout le texte après le dernier générateur
+		if($iDeb < count($texte)){
+			$t = substr($texte, $iDeb);
+			$dataGen[] = array('v'=>$t,'t'=>'txt');
+		}
+		return $dataGen;
+	}
+	
+
+    /**
+     * Fonction du moteur
+     *
+     * @param string 	$class
+     * @param int	 	$niv
+     * @param string	$id
+     * @param string	$nivMax
+
+	 * @return array
+     */
+    public function getStructure($texte, $niv=0, $id='root',$nivMax=-1){
+
+		$this->setCache();
+		$keyCache = md5("getStructure".$texte.$nivMax);
+		if($this->forceCalcul)$this->cache->remove($keyCache);
+		if(!$structure = $this->cache->load($keyCache)) {
+			//if($niv>3)return [];
+
+			$structure = array("size"=>($niv+1),"id"=>$id,"niv"=>$niv,"type"=>'texte',"name"=>$texte,"children"=>array());
+
+			//récupère la structure du texte
+			$gens = $this->parseGen($texte);
+			$iTxt = 0;
+			foreach ($gens as $g) {
+				$iTxt ++;					
+				if($g['t']=='txt'){
+					//traitement des textes libres
+					$gen = array(
+						'id'=>'txt_'.$iTxt,
+						'niv'=>$niv,
+						'size'=>1,'name'=>$g['v'],'type'=>$g['t'],'children'=>array()
+					);
+					$structure['children'][]=$gen;
+				}else{
+					//vérifie s'il faut créer une sous class
+					if($texte!=$g['v'])
+						$structure['children'][]=$this->getStructure($g['v'], $niv+1, $id='txt_'.$iTxt,$nivMax);
+					else{
+						//traitement des générateurs
+						$this->Generation($g['v'],false);
+						foreach($this->arrClass as $cls){
+							//on ne traite que les niveaux 0
+							if($cls['niveau']===0){
+								foreach ($cls['class'] as $class) {
+									if(!is_numeric($class)){
+										//récupération de la class
+										if(strpos($class,"#")){
+											//la class est un déterminant
+											$classSpe = str_replace("#","",$class); 
+											$arrClass = $this->getSyntagme($classSpe);	
+										}elseif(strpos($class,"_")){
+											//la class possède un déterminant de class
+											$arrClass = $this->getClassDef($class);
+										}elseif(substr($class,0,5)=="carac"){
+											//la class est un caractère
+											$classSpe = str_replace("carac", "carac_", $class);
+											$arrClass = $this->getClassDef($classSpe);
+										}elseif($c = strpos($class,"-")){
+											//la class est un type spécifique
+											$classSpe = substr($class,0,$c)."_".substr($class,$c+1);
+											$arrClass = $this->getClassDef($classSpe);
+										} 
+										//construction de l'item       	
+										if($arrClass['src']['id_gen'])
+											$gen = array(
+												'id'=>$arrClass['src']['id_dico'].'_'.$arrClass['src']['id_gen'].'_gen',
+												'niv'=>$niv,
+												'id_dico'=>$arrClass['src']['id_dico'],'id_gen'=>$arrClass['src']['id_gen']
+												,'size'=>1,'name'=>$arrClass['src']['valeur'],'children'=>array(),'type'=>'gen'
+											);
+										elseif($arrClass['id_syn'])
+											$gen = array(
+												'id'=>$arrClass['id_dico'].'_'.$arrClass['id_syn'].'_syn',
+												'niv'=>$niv,
+												'id_dico'=>$arrClass['id_dico'],'id_syn'=>$arrClass['id_syn']
+												,'size'=>1,'name'=>$arrClass['lib'],'num'=>$arrClass['num'],'ordre'=>$arrClass['ordre']
+												,'children'=>array(),'type'=>'syn'
+											);
+										else
+											$gen = array(
+												'id'=>$arrClass['src']['id_dico'].'_'.$arrClass['src']['id_concept'].'_'.$arrClass['src']['type'],
+												'niv'=>$niv,
+												'id_dico'=>$arrClass['src']['id_dico'],'id_concept'=>$arrClass['src']['id_concept']
+												,'size'=>1,'name'=>$arrClass['src']['lib'],'type'=>$arrClass['src']['type'],'children'=>array()
+											);
+										//récupération des enfants
+										foreach ($arrClass['dst'] as $dst) {
+											if($dst['valeur']){
+												$id = $dst['id_dico'].'_'.$dst['id_gen'].'_gen';
+												if($nivMax<0 || $nivMax >= $niv){
+													$genStruct = $this->getStructure($dst['valeur'],$niv+1,$id,$nivMax);
+													$gen['children'][] = $genStruct;
+												}else $gen['children']=[]; 
+											}else{
+												$dst['name']=$dst['prefix'];
+												$dst['niv']=$niv;
+												$dst['id']=$this->getIdClass($dst);									
+												$dst['size']=1;
+												$gen['children'][]=$dst;
+											}
+										}
+									}elseif($cls['determinant']){
+										$gen = array(
+											'id'=>$cls['determinant'][0]['id_dico'].'_'.$class.'_dtm',
+											'niv'=>$niv,
+											'id_dico'=>$cls['determinant'][0]['id_dico']
+											,'size'=>1,'name'=>$class,'type'=>'det','children'=>array()
+										);
+										foreach ($cls['determinant'] as $d) {
+											$gen['children'][] = array(
+												'id'=>$d['id_dico'].'_'.$d['id_dtm'].'_dtm',
+												'niv'=>$niv,
+												'id_dico'=>$d['id_dico'],'id_dtm'=>$d['id_dtm']
+												,'size'=>1,'name'=>$d['lib'],'type'=>'det','ordre'=>$d['ordre']
+												,'children'=>array()
+											);
+										}
+									}elseif($cls['determinant_verbe']){
+										$arr = $this->generePronom($cls);
+										$gen = array(
+											'id'=>$cls['concept'][0]['id_dico'].'_'.$class.'_detverb',
+											'niv'=>$niv,
+											'id_dico'=>$cls['concept']['idDico']
+											,'size'=>1,'name'=>$class,'type'=>'detverb','children'=>array()
+										);
+										if($arr['prosuj']){
+											$gen['children'][] = array(
+												'id'=>$arr['prosuj']['id_dico'].'_'.$arr['prosuj']['id_pronom'].'_'.$arr['prosuj']['type'],
+												'niv'=>$niv,
+												'id_dico'=>$arr['prosuj']['id_dico'],'id_pronom'=>$arr['prosuj']['id_pronom']
+												,'size'=>1,'name'=>$arr['prosuj']['lib'],'type'=>$arr['prosuj']['type'],'num'=>$arr['prosuj']['num']
+												,'children'=>array()
+											);
+										}
+										if($arr['prodem']){
+											$gen['children'][] = array(
+												'id'=>$arr['prodem']['id_dico'].'_'.$arr['prodem']['id_pronom'].'_'.$arr['prodem']['type'],
+												'niv'=>$niv,
+												'id_dico'=>$arr['prodem']['id_dico'],'id_pronom'=>$arr['prodem']['id_pronom']
+												,'size'=>1,'name'=>$arr['prodem']['lib'],'type'=>$arr['prodem']['type'],'num'=>$arr['prodem']['num']
+												,'children'=>array()
+											);
+										}
+									}
+									if($gen['id_dico']){
+										$structure['children'][]=$gen;
+									}
+								}
+							}
+						}						
+					} 					
+				}
+			}
+			$this->cache->save($structure, $keyCache);
+		}
+
+		return $structure;
+
+	}
+
+	/**
+     * Fonction du moteur pour récupérer l'identifiant d'une class
+     *
+     * @param mixte $class
+     *
+	 * @return string
+     */
+    public function getIdClass($class){
+		$id = $class['id_dico'].'_';
+		if($class['id_adj'])$id.=$class['id_adj'].'_adj';
+		if($class['id_sub'])$id.=$class['id_sub'].'_sub';
+		if($class['id_verbe'])$id.=$class['id_verb'].'_verbe';
+		if($class['id_syn'])$id.=$class['id_syn'].'_syn';
+		if($id == $class['id_dico'].'_')
+			$l=1;
+		
+		return $id;
+
+	}
+
+
+	/**
      * Fonction du moteur
      *
      * @param mixte $class

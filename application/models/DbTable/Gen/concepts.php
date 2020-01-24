@@ -232,96 +232,112 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
      *
      * @param array		$dicos
      * @param boolean	$merge
+     * @param string	$search
+     * @param boolean	$enum
      *
      * @return array
      */
-    public function findAllByDicos($dicos, $merge=true)
+    public function findAllByDicos($dicos, $merge=true, $search="", $enum=true)
     {
-
+        $lib = $enum ? ' lib as text ' : ' lib ';
         //récupère les concepts
     	$sql ="SELECT id_concept as id
-    		, lib
+    		, ".$lib."
 			, type
 			, 0 as num 
     		, '' as ordre	  
 		FROM gen_concepts c
-		WHERE c.id_dico IN (".$dicos["concepts"].")";
+        WHERE c.id_dico IN (".$dicos["concepts"].")";
+        if($search) $sql .= " AND lib LIKE '".$search."%' ";
+        $sql .= " ORDER BY lib ";
 		$smtp = $this->_db->query($sql);
         $concepts = $smtp->fetchAll();
 
         //récupère les syntagmes
     	$sql ="SELECT id_syn as id
-    		, lib
+    		, ".$lib."
 			, 'syntagmes' as type
 			, num
     		, ordre 
 		FROM gen_syntagmes 
 		WHERE id_dico IN (".$dicos["syntagmes"].")";
+        if($search) $sql .= " AND lib LIKE '".$search."%' ";
+        $sql .= " ORDER BY lib ";
 		$smtp = $this->_db->query($sql);
         $syns = $smtp->fetchAll();
 
         //récupère les pronoms
     	$sql ="SELECT id_pronom as id
-    		, lib
+    		, ".$lib."
 			, CONCAT('pronom ',type) as type
 			, num 
     		, '' as ordre	  
 		FROM gen_pronoms 
 		WHERE id_dico IN (".$dicos["pronoms"].") AND type='complément'";
+        if($search) $sql .= " AND lib LIKE '".$search."%' ";
 		$smtp = $this->_db->query($sql);
         $prosComp = $smtp->fetchAll();
+        $sql .= " ORDER BY lib ";
 
     	$sql ="SELECT id_pronom as id
-    		, lib
+    		, ".$lib."
 			, CONCAT('pronom ',type) as type
 			, num 
     		, '' as ordre	  
 		FROM gen_pronoms 
 		WHERE id_dico IN (".$dicos["pronoms"].") AND type='sujet'";
+        if($search) $sql .= " AND lib LIKE '".$search."%' ";
+        $sql .= " ORDER BY lib ";
 		$smtp = $this->_db->query($sql);
         $prosSujet = $smtp->fetchAll();
 
     	$sql ="SELECT id_pronom as id
-    		, lib
+    		, ".$lib."
 			, CONCAT('pronom ',type) as type
 			, num 
     		, '' as ordre	  
 		FROM gen_pronoms 
 		WHERE id_dico IN (".$dicos["pronoms"].") AND type='sujet_indefini'";
+        if($search) $sql .= " AND lib LIKE '".$search."%' ";
+        $sql .= " ORDER BY lib ";
 		$smtp = $this->_db->query($sql);
         $prosSujetInd = $smtp->fetchAll();
 
         //récupère les déterminants
     	$sql ="SELECT id_dtm as id
-    		, lib
+    		, ".$lib."
 			, 'déterminant' as type
 			, num 
     		, ordre	
 		FROM gen_determinants 
 		WHERE id_dico IN (".$dicos["déterminants"].")";
+        if($search) $sql .= " AND lib LIKE '".$search."%' ";
+        $sql .= " ORDER BY lib ";
 		$smtp = $this->_db->query($sql);
         $dets = $smtp->fetchAll();
         
         //récupère les négations
     	$sql ="SELECT id_negation as id
-    		, lib
+    		, ".$lib."
 			, 'négation' as type
 			, num
     		, '' as ordre	  
 		FROM gen_negations 
 		WHERE id_dico IN (".$dicos["negations"].")";
+        if($search) $sql .= " AND lib LIKE '".$search."%' ";
+        $sql .= " ORDER BY lib ";
 		$smtp = $this->_db->query($sql);
         $negs = $smtp->fetchAll();
         $nb = count($concepts)+count($syns)+count($pros)+count($dets)+count($negs);
-        if($merge)
-	        $rows = array_merge($concepts, $syns, $prosComp, $prosSujet, $prosSujetInd, $dets, $negs);
-    	else
+        if($merge){
+            $rows = array_merge($concepts, $syns, $prosComp, $prosSujet, $prosSujetInd, $dets, $negs);
+            usort($rows, function($a, $b) { return $a['lib'] <=> $b['lib'];});
+        }else
     		$rows = array("concepts"=>$concepts,"syntagmes"=>$syns,"pronomsComp"=>$prosComp, "pronomsSujet"=>$prosSujet, "pronomsSujetInd"=>$prosSujetInd,"determinants"=>$dets,"negations"=>$negs);
     		
         return $rows; 
     }
     
-
     /**
      * Recherche les entrées Gen_concepts dans un dictionnaire
      *
@@ -371,7 +387,8 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
-    	/**
+
+    /**
      * Recherche une entrée Gen_concepts avec la valeur spécifiée
      * et retourne cette entrée.
      *
@@ -494,15 +511,9 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
                 $db = new Model_DbTable_Gen_verbes($this->_db);
                 $rs = $db->findByIdConcept($id);
 				break; 
-			case "carac": 
-				$txtGen = "[".$cpt["type"].$cpt["lib"]. "]";
-				break; 
-			case "caract": 
-				$txtGen = "[".$cpt["type"].$cpt["lib"]. "]";
-				break; 
 			default: 
-				$txtGen = "[".$cpt["type"]. "-".$cpt["lib"]. "]";
-				break; 
+                $db = new Model_DbTable_Gen_substantifs($this->_db);
+                $rs = $db->findByIdConcept($id);
         }
     	return $rs;
     }
@@ -605,5 +616,85 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
             $r = new Exception("La classe - $lib - de type - $type - n'a pas été trouvé dans le(s) dictionnaire(s) - $idDico -");
         }
         return $r;
+    }
+
+    /**
+     * Récupère les concepts exportés dans doublons
+     * exporter par la requête genInsertAllConceptToDoublon.sql
+     * @param integer $idDico
+     * @param string $lib
+     * @param string $type
+     *
+     * @return array
+     */
+    public function getAllConceptDoublons()
+    {
+        $sql = "SELECT 
+        COUNT(*) nb, 
+        COUNT(DISTINCT d.title) nbTitle,
+        d.title,
+        GROUP_CONCAT(DISTINCT d.refC) refC,
+        GROUP_CONCAT(DISTINCT d.refL) refL,
+        GROUP_CONCAT(DISTINCT d.type_concept) arrTypeConcept,
+        GROUP_CONCAT(DISTINCT d.type_lien) arrTypeLien,
+        d.description,
+        d.lexTermElement, 
+        MAX(d.lexTermElement_e) lexTermElement_e, 
+        MAX(d.grammaticalGender) grammaticalGender, 
+        MAX(d.pluralNumberForm) pluralNumberForm, 
+        MAX(d.pluralNumberForm_f) pluralNumberForm_f, 
+        MAX(d.pluralNumberForm_fe) pluralNumberForm_fe, 
+        MAX(d.pluralNumberForm_m) pluralNumberForm_m, 
+        MAX(d.pluralNumberForm_me) pluralNumberForm_me, 
+        MAX(d.singularNumberForm) singularNumberForm, 
+        MAX(d.singularNumberForm_f) singularNumberForm_f, 
+        MAX(d.singularNumberForm_fe) singularNumberForm_fe, 
+        MAX(d.singularNumberForm_m) singularNumberForm_m, 
+        MAX(d.singularNumberForm_me) singularNumberForm_me, 
+        MAX(d.aspect) aspect
+    FROM
+        gen_doublons d
+     WHERE d.title <> '' AND d.type_concept <> '' 
+    GROUP BY d.title, d.description, d.lexTermElement
+    ORDER BY  d.title, arrTypeConcept, arrTypeLien";
+
+        $stmt = $this->_db->query($sql);
+        return $stmt->fetchAll();
+
+    }
+
+    /**
+     * récupère tous les concepts de la base
+     * 
+     *
+     * @return array
+     */
+    public function getAllConcept()
+    {
+        $sql = "SELECT 
+            COUNT(*) nb, c.lib
+            , g.valeur
+            , a.prefix ap, a.elision ae, a.m_s, a.m_p, a.f_p
+            , s.prefix sp, s.elision se, s.genre, s.s, s.p
+            , sy.num, sy.ordre, sy.lib sylib
+            , v.prefix vp, v.id_conj, v.elision ve
+        FROM
+            gen_concepts c
+            left join gen_concepts_generateurs cg on cg.id_concept = c.id_concept
+            left join gen_generateurs g on g.id_gen = cg.id_gen
+            left join gen_concepts_adjectifs ca on ca.id_concept = c.id_concept
+            left join gen_adjectifs a on a.id_adj = ca.id_adj
+            left join gen_concepts_substantifs cs on cs.id_concept = c.id_concept
+            left join gen_substantifs s on s.id_sub = cs.id_sub
+            left join gen_concepts_syntagmes csy on csy.id_concept = c.id_concept
+            left join gen_syntagmes sy on sy.id_syn = csy.id_syn
+            left join gen_concepts_verbes cv on cv.id_concept = c.id_concept
+            left join gen_verbes v on v.id_verbe = cv.id_verbe
+        GROUP BY c.lib, g.valeur, a.prefix, s.prefix, sy.lib, v.prefix
+        ORDER BY c.lib DESC";
+
+        $stmt = $this->_db->query($sql);
+        return $stmt->fetchAll();
+
     }
 }
