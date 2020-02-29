@@ -1,0 +1,38 @@
+#!/bin/bash
+# merci à https://www.geek-directeur-technique.com/2017/07/17/utilisation-de-mysqldump
+
+# pour rendre le script exécutable
+# sudo chmod +x dumpMysql
+# exécution du script 
+# sudo ./dumpMysql
+
+# configuration de l'utilisateur MySQL et de son mot de passe
+DB_USER="root"
+DB_PASS="tu rêves ou quoi ?"
+
+# configuration de la machine hébergeant le serveur MySQL
+DB_HOST="localhost"
+
+# sous-chemin de destination
+OUTDIR=`date +%Y-%m-%d/%H:%M:%S`
+# création de l'arborescence
+mkdir -p /var/www/sauvebdd/$OUTDIR
+
+# récupération de la liste des bases
+# DATABASES=`MYSQL_PWD=$DB_PASS mysql -u $DB_USER -e "SHOW DATABASES;" | tr -d "| " | grep -v -e Database -e _schema -e mysql`
+DATABASES=`MYSQL_PWD=$DB_PASS mysql -u $DB_USER -e "SELECT nom FROM sauvebdd.bdd WHERE action = 'archive' or action = 'migrer';" | tr -d "| " | grep -v -e nom -e _schema -e mysql`
+
+# echo $DATABASES
+
+# boucle sur les bases pour les dumper
+for DB_NAME in $DATABASES; do
+    MYSQL_PWD=$DB_PASS mysqldump -u $DB_USER --single-transaction --skip-lock-tables $DB_NAME -h $DB_HOST > /var/www/sauvebdd/$OUTDIR/$DB_NAME.sql
+    echo 'dump' $DB_NAME
+done
+
+# boucle sur les bases pour compresser les fichiers
+for DB_NAME in $DATABASES; do
+    gzip /var/www/sauvebdd/$OUTDIR/$DB_NAME.sql
+    echo 'zip' $DB_NAME
+done
+

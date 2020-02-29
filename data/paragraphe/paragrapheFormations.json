@@ -6830,7 +6830,23 @@
                                     "Lieu": "P8 UFR MITSIC",
                                     "photo": "img/logop8-3.jpg",
                                     "recid": 50
-                                    }
+                                    }, {
+                                        "id": 50,
+                                        "Civilité": "Mme",
+                                        "Nom": "Arruabarrena",
+                                        "Prénom": "Béatrice",
+                                        "Mail": "",
+                                        "Téléphone": "",
+                                        "Adresse": "",
+                                        "Type": "Titulaires CNAM",
+                                        "Roles": "Intervenants",
+                                        "Statut": "MCF",
+                                        "Section": "",
+                                        "Lieu": "P8 UFR MITSIC",
+                                        "photo": "img/logop8-3.jpg",
+                                        "recid": 51
+                                        }
+                                         
                                      
 
     ],

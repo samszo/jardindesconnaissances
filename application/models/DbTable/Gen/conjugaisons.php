@@ -380,5 +380,35 @@ class Model_DbTable_Gen_conjugaisons extends Zend_Db_Table_Abstract
 
         return $this->fetchAll($query)->toArray(); 
     }
+
+    /**
+     * Recherche toute les conjugaisons et leur terminaison dans la table doublon
+     *
+     *
+     * @return array
+     */
+    public function getAllConjDoublons()
+    {
+        $sql = "SELECT 
+            COUNT(*) nb,
+            GROUP_CONCAT(DISTINCT d.aspect) aspects,
+            c.num,
+            c.modele,
+            t.num,
+            t.lib
+        FROM
+            gen_doublons d
+                INNER JOIN
+            gen_conjugaisons c ON c.id_conj = d.aspect
+                INNER JOIN
+            gen_terminaisons t ON t.id_conj = c.id_conj
+        GROUP BY c.modele, t.num , t.lib
+        ORDER BY c.modele, t.num ";
+
+        $stmt = $this->_db->query($sql);
+        return $stmt->fetchAll();
+
+    }
     
+        
 }

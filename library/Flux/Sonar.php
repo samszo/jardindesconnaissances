@@ -11,11 +11,8 @@
  */
 class Flux_Sonar extends Flux_Site{
 
-    var $dbOmk = false;
-    var $omk = false;
     var $titleColCrible = 'Cribles conceptuels';
     var $titleColIIIF = 'Collection IIIF';
-    var $idsCol = [];
 
 	
     /**
@@ -47,21 +44,6 @@ class Flux_Sonar extends Flux_Site{
 
     }
 
-    /**
-    * initialise omeka
-    *   @param string   $endpoint
-    *   @param string   $apiIdent
-    *   @param string   $apiKey
-    *   @return object
-
-     */
-    function initOmeka($endpoint, $apiIdent, $apiKey){
-        $o = new Flux_Omeka();
-        $o->endpoint = $endpoint;
-        $o->API_IDENT = $apiIdent;
-        $o->API_KEY = $apiKey;
-        return $o;
-    }
 
     /**
      * initialise les vocabulaire

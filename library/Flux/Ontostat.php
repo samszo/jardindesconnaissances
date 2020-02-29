@@ -999,5 +999,102 @@ ORDER BY t.code ;
     	        	
 		return $this->dbD->fetchAll($query)->toArray();
     }
-    
+
+    /**
+     * Fonction pour récupérer la hierarchie complète d'une item dans omeka
+     *
+     * @param array	$subclass
+     * @param array	$item
+     * @param int	$niv
+	 * 
+     * @return	array
+     *
+     */
+    function getConceptHierarchie($item, $niv){
+		 
+		foreach ($item['rdfs:subClassOf'] as $sc) {
+			if($sc['type']=="resource"){
+				//ajoute l'item dans la hierarchie
+				if(!$this->doublons[$sc['value_resource_id']]){
+					$this->doublons[$sc['value_resource_id']]=1;
+					//contruction des concepts plus large
+					$this->param['skos:broader'][]=array('type'=>'resource','value'=>$sc['value_resource_id']);
+					//pas nécessaire, le niveau = l'ordre de création $this->param['md:hierarchyLevel'][]=$niv."";
+					//construction des concepts plus précis
+					$this->hier[$sc['value_resource_id']]['skos:narrower'][$item['o:id']][]=$niv;
+					//remonte la hiérarchie
+					$this->id = $sc['value_resource_id'];
+					$itemE = array_filter($this->items, function($v, $k) {
+						return $v['o:id'] == $this->id;
+					}, ARRAY_FILTER_USE_BOTH);
+					//si pas trouvé on va le chercher dans omeka
+					if(!count($itemE)){
+						$itemE[] = $this->omk->getItem($this->id);				
+					} 
+					foreach ($itemE as $i) {
+						if($i['rdfs:subClassOf']){
+							$this->getConceptHierarchie($i, $niv+1);
+						}				
+					}
+				}else{
+					$this->doublons[$sc['value_resource_id']]++;
+				}				
+			}
+		}
+	}
+
+    /**
+     * Fonction pour ajouter dans omeka s la hierarchie complète d'une item
+     *
+     *
+     * @return	array
+     *
+     */
+    function setConceptHierarchieToOmeka(){
+		 
+		//récupère les items de la collection Stato fr	
+		//ATTENTION le nombre d'item ne correspond pas à celui de l'admin omeka 
+		//cf. http://localhost/omkOntostat/admin/item?item_set_id=1982 	
+		$this->items = $this->omk->getAllItem('item_set_id',1982);
+		//$json = $this->getUrlBodyContent("http://localhost/ontostats/data/items1982.json");
+		//$items = json_decode($json);
+		foreach ($this->items as $i) {
+			//récupère la hiérarchie de l'item
+			$this->param=[];
+			$this->doublons=[];
+			$this->getConceptHierarchie($i, 1);
+			//$this->trace('hiérarchie '.$i['dc:title'],$this->param);
+			//pour debug
+			if($i['o:id']==7138)
+				$t = 1;
+			$this->param = [];
+			if(count($this->param)){
+				$param = array_merge($i,$this->omk->setParamAPI($this->param));
+				$r = $this->omk->send('items','PATCH',$this->omk->paramsAuth(),$param,'/'.$i['o:id'],true);
+				//gestion de l'erreur
+				if($r['errors'])
+					throw new Exception(json_encode($r['errors']).' : '.$i['dc:title'].' : '.$i['o:id']);
+				$this->trace('hiérarchie skos:broader OK '.$i['dc:title'].' : '.$i['o:id']);	
+			}else{
+				$this->trace('hiérarchie skos:broader AUCUNNE '.$i['dc:title'].' : '.$i['o:id']);	
+			}
+		}
+		//traitement des concepts plus précis
+		foreach ($this->hier as $i => $v) {
+			//récupère l'item
+			$item = $this->omk->getItem($i);
+			//création des paramètres de mis à jour
+			$param=[];
+			$narrower = array_keys($v['skos:narrower']);
+			foreach ($narrower as $id) {
+				$param['skos:narrower'][]=array('type'=>'resource','value'=>$id."");
+			}
+			$param = array_merge($item,$this->omk->setParamAPI($param));
+			//met à jour la propriété
+			$r = $this->omk->send('items','PATCH',$this->omk->paramsAuth(),$param,'/'.$item['o:id'],true);
+			if($r['errors'])
+				throw new Exception(json_encode($r['errors']).' : '.$item['dc:title'].' : '.$item['o:id']);
+			$this->trace('hiérarchie skos:narrower OK '.$r['dc:title'].' : '.$r['o:id']);	
+		}
+	}	
 }

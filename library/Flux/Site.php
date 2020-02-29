@@ -64,6 +64,10 @@ class Flux_Site{
 	var $rsVerifGroup = array();
 	var $bconnect = false;
 	var $ice;
+	//pour omeka
+    var $dbOmk = false;
+    var $omk = false;
+    var $idsCol = [];
 	
     
     function __construct($idBase=false, $bTrace=false, $bCache=true){    	
@@ -103,6 +107,25 @@ class Flux_Site{
         }
         
     }
+
+    /**
+    * initialise omeka
+    *   @param string   $endpoint
+    *   @param string   $apiIdent
+    *   @param string   $apiKey
+    *   @param string   $idBase
+    *   @return object
+
+     */
+    function initOmeka($endpoint, $apiIdent, $apiKey, $idBase=""){
+        $o = new Flux_Omeka($idBase);
+        $o->endpoint = $endpoint;
+        $o->API_IDENT = $apiIdent;
+        $o->API_KEY = $apiKey;
+        $this->omk = $o;
+        return $o;
+    }
+
 
     /**
      * fonction pour tester l'existance d'une URL

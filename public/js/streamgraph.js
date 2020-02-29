@@ -1,8 +1,8 @@
 class streamgraph {
     //merci beaucoup à https://observablehq.com/@d3/streamgraph
     /*utilise :
-    d3.js pour data driving document
-    moment.js pour gérer les dates
+    - d3.js v5 pour data driving document
+    - moment.js pour gérer les dates
     */
 
     constructor(params) {
@@ -14,12 +14,24 @@ class streamgraph {
         this.dataType = params.dataType ? params.dataType : "csv";
         this.tempsFormat = params.tempsFormat ? params.tempsFormat : "YYYY";
         this.orientation = params.orientation ? params.orientation : "horizon";
-        this.data = []; 
+        this.data = [], this.dataGroup, this.dataOri; 
+        this.svg = false;
+        this.fctLoad = params.fctLoad ? params.fctLoad : false;
+        this.container = false;
 
-        var svg, container, series, margin, color, x, y, area, xAxis, yAxis, keys, extreme, formatTemps;
+        var series, margin, color, colorInit, x, y, area, tempsAxis, axe, keys, extreme, tooltip
+            , totalTemps = [], totalKey = []
+            , colorFond = 'black', colorText = 'white';
 
         this.init = function () {
             
+            //construction du svg principal
+            me.svg = this.cont.append("svg")
+                .attr('id', 'streamgraph')
+                .style('position','absolute')
+                .attr("width", me.width+'px').attr("height", me.height+'px');
+
+
             if(me.dataType=='csv'){
                 d3.csv(me.dataUrl,d3.autoType)
                 .then(function(dt) {
@@ -35,21 +47,33 @@ class streamgraph {
             if(me.dataType=='json'){
                 d3.json(me.dataUrl)
                 .then(function(dt) {
-                    //format le temps en date
-                    dt.forEach(d => d.date = moment(d.temps, me.tempsFormat));
+                    //consruction des clefs
                     keys = Array.from(new Set(dt.map(d => d.key)));       
+                    dt.forEach(d => {
+                        //format le temps en date
+                        d.date = moment(d.temps, me.tempsFormat);
+                        //format le temps en date
+                        d.value = parseInt(d.value);
+                        //cumul la valeur pour le temps
+                        totalTemps[d.temps] ? totalTemps[d.temps] = totalTemps[d.temps]+d.value : totalTemps[d.temps] = d.value;
+                        //cumul la valeur pour la ref
+                        totalKey[d.key] ? totalKey[d.key] = totalKey[d.key]+d.value : totalKey[d.key] = d.value;
+                        //cumul les valeurs total
+                        totalTemps['total'] ? totalTemps['total'] = totalTemps['total']+d.value : totalTemps['total'] = d.value;
+                        totalKey['total'] ? totalKey['total'] = totalKey['total']+d.value : totalKey['total'] = d.value;
+                    });
                     extreme = d3.extent(dt, d => d.date);
-                    //construction des regroupement
-                    let nested_data = d3.nest()
+                    me.dataOri = dt;
+                    //construction des regroupements
+                    me.dataGroup = d3.nest()
                         .key(d => d.temps)
-                        .entries(dt);
-                    let mqpdata = nested_data.map(function(d){
+                        .entries(me.dataOri);
+                    let mqpdata = me.dataGroup.map(function(d){
                         let obj = {
                           date: d.values[0].date      
                         }                        
                         d.values.forEach(function(v){
                           obj[v.key] = v.value;
-                          obj.k = v.key+'-'+d.key.valueOf();		  	      
                         })                        
                         return obj;
                     })
@@ -68,9 +92,8 @@ class streamgraph {
 
             margin = ({top: 0, right: 20, bottom: 30, left: 20});
 
-            color = d3.scaleOrdinal()
-                .domain(keys)
-                .range(d3.schemeCategory10);
+            //color = d3.scaleOrdinal().domain(keys).range(d3.schemeCategory20);
+            color = d3.scaleSequential().domain([0, keys.length]).interpolator(d3.interpolateSinebow);
 
             series = d3.stack()
                 .keys(keys)
@@ -111,74 +134,113 @@ class streamgraph {
                     .curve(d3.curveBasis);
             }
                                             
-            xAxis = g => g
-                .attr("transform", `translate(0,${me.height - margin.bottom})`)
-                .call(d3.axisBottom(x).ticks(me.width / 80).tickSizeOuter(0))
-                .call(g => g.select(".domain").remove());
-            yAxis= g => g
-                .attr("transform", `translate(${30 + margin.left},0)`)
-                .call(d3.axisLeft(y).ticks(me.height / 80))
-                .call(g => g.select(".domain").remove());
+            //ajoute les fonctionnalités de zoom
+            me.svg.call(
+                d3.zoom()
+                    //.scaleExtent([0, 4])
+                    .on("zoom", zoomed)
+            );
 
-            svg = me.cont.append("svg")
-                .attr("width", me.width+'px').attr("height", me.height+'px')
-                .attr("viewBox", [0, 0, me.width, me.height]);
-            
-            container = svg.append("g")
-                .selectAll("path")
+            //ajoute les couche du graph
+            me.container = me.svg.append("g")
+            //ajoute un fond noir
+            me.container.append('rect').attr("width", me.width+'px').attr("height", me.height+'px').attr('fill',colorFond);
+            //ajoute les couche du stream
+            me.container.selectAll("path")
                 .data(series)
                 .join("path")
-                .attr("fill", ({key}) => color(key))
+                .attr("fill", function(d){
+                    return color(d.index);
+                })
                 .attr("d", area)
-                .append("title")
-                .text(({key}) => key);
+                .on('mouseover', function(d){
+                    let p = d3.select(this);
+                    colorInit = p.style("fill");      
+                    p.style('fill',d3.rgb(colorInit).brighter());
+                    tooltip.transition()
+                       .duration(700)
+                       .style("opacity", 1);
+                })
+                .on('mousemove', function(d){      
+                    //console.log(d);
+                    //récupère les datas liés à la position de la souris
+                    var dt = getRef(d3.mouse(this),y,d);
+                    getTooltip(d, dt);
+                })
+                .on('mouseout', function(d){      
+                    d3.select(this).style('fill',d3.rgb(colorInit));
+                    tooltip.transition()
+                           .duration(500)
+                           .style("opacity", 0);
+                });
             
-            if(me.orientation=='vertical')
-                svg.append("g").call(yAxis);
-            else
-                svg.append("g").call(xAxis);
+            /*construction de l'axe temporel suivant l'orientation*/
+            if(me.orientation!='vertical'){
+                tempsAxis = d3.axisBottom(x);
+                axe = me.svg.append("g").style('stroke',colorText).style('fill',colorText).call(tempsAxis);
+            }else{
+                tempsAxis = d3.axisRight(y);
+                axe = me.svg.append("g").style('stroke',colorText).style('fill',colorText).call(tempsAxis);
+            }
+
+            //ajout du tooltip
+            tooltip = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style('position','absolute')
+                //.style('width','300px')
+                //.style('height','70px')
+                .style('padding','4px')
+                .style('background-color',colorFond)
+                .style('color',colorText)
+                .style('pointer-events','none');
+    
+            //execute la fonction de fin de construction
+            if(me.fctLoad)me.fctLoad();            
+
         }
 
         this.hide = function(){
-          svg.attr('visibility',"hidden");
+          me.svg.attr('visibility',"hidden");
         }
 
         this.show = function(){
-          svg.attr('visibility',"visible");
+          me.svg.attr('visibility',"visible");
         }
         
 
-        function tempsToDate(temps) {
-            var dfy, dRef, arrTemps = temps.split('-')
-            formatTemps = arrTemps.length;
-            if(arrTemps.length==3){
-                //vérifie la présence d'heure
-                var arrTemps2 = arrTemps[2].split(' ');
-                if(arrTemps2.length==1) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps[2], 0, 0, 0];
-                else{
-                    var arrTemps3 = arrTemps2[1].split(':');
-                    formatTemps += arrTemps3.length;				
-                    if(arrTemps3.length==1) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps2[1], 0, 0];
-                    if(arrTemps3.length==2) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps3[0], arrTemps3[1], 0];		  	 
-                    if(arrTemps3.length==3) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, arrTemps2[0], arrTemps3[0], arrTemps3[1], arrTemps3[2]];		  	 
-                }
-            }
-            if(arrTemps.length==2) dRef = [arrTemps[0], parseInt(arrTemps[1])-1, 1, 0, 0, 0];
-            if(arrTemps.length==1) dRef = [arrTemps[0], 0, 1, 0, 0, 0];
-            dfy = new Date(dRef[0], dRef[1], dRef[2], dRef[3], dRef[4], dRef[5]);
-            dfy.setFullYear(dRef[0]);
-              
-            return dfy 
+        function zoomed() {
+            me.container.attr("transform", d3.event.transform);
+            //svg.selectAll("path").attr("transform", d3.event.transform);
+            if(me.orientation=='vertical')
+                axe.call(tempsAxis.scale(d3.event.transform.rescaleY(y)));
+            else
+                axe.call(tempsAxis.scale(d3.event.transform.rescaleX(x)));
         }
-        function dateToTemps(dt) {
-            if(formatTemps==6) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(), dt.getHours(), dt.getMinutes(), dt.getSeconds());
-            if(formatTemps==5) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(), dt.getHours(), dt.getMinutes(),0);
-            if(formatTemps==4) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(), dt.getHours(),0, 0);
-            if(formatTemps==3) return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDay(),0,0,0);
-            if(formatTemps==2) return Date.UTC(dt.getFullYear(), dt.getMonth(), 1,0,0,0);
-            if(formatTemps==1) return Date.UTC(dt.getFullYear(), 0, 1,0,0,0);	    			
-        }
-    
+
+        function getRef(mouse,y,d){
+			//récupère les datas liés à la position de la souris
+            let dRef = y.invert(mouse[1]);
+            let t = moment(dRef).format(me.tempsFormat);
+            let dt = me.dataOri.filter(o => o.key ==  d.key && o.temps == t);	    
+			return dt[0];
+	    }
+
+        function getTooltip(d, dt){
+            //calcule les élément du tooltip
+            //if(totalTemps[dt.temps]==0)totalTemps[dt.temps] = 0.1;			
+            var pcTemps = totalTemps[dt.temps]/totalTemps['total']*100;	    	
+            var pcKey = totalKey[d.key]/totalKey['total']*100;	    	
+            var pcKeyTemps = Math.trunc(dt.value)/totalTemps[dt.temps]*100;	    	
+            tooltip.html("<h3>"+dt.type+"</h3>"
+                    //+"Nb document :<br/>"
+                    +"Total couche = "+totalKey[d.key]+" = "+pcKey.toFixed(2)+" %<br/>"
+                    +"Total "+dt.temps+" = "+totalTemps[dt.temps]+" = "+pcTemps.toFixed(2)+" %<br/>"
+                    +"Total couche "+dt.temps+" = "+Math.trunc(dt.value)+" = "+pcKeyTemps.toFixed(2)+" %<br/>"
+                    )
+                   .style("left", (d3.event.pageX + 12) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+	    }
+        
         me.init();
 
     }

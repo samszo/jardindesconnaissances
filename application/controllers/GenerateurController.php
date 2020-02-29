@@ -31,24 +31,55 @@ class GenerateurController extends Zend_Controller_Action
             //importation d'un fichier csv
             $oDico = new Gen_Dico();
             $oDico->importCSV($this->_getParam('csv'), $this->_getParam('path'));	
-        }
-        if($this->_getParam('bdd')){
+        }else{
             //commenter la connexion quand utilisé avec curl
-            $this->initInstance("/import");
             //pour curl il faut modifier les paramètre dans le fichier /genlod/tmp/import.sh
             //lancer le fichier par la commande ./import.sh
-        
+            $this->initInstance("/import");
             $genO = new Gen_Omk($this->idBaseGen,true);
             $genO->bTrace = $this->_getParam('trace',true);
             $genO->bTraceFlush = $genO->bTrace;
             $omkParams = OMK_PARAMS['omk_genlod'];
-            $genO->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"]);		
-            $genO->importBaseGen($this->_getParam('refL',""));
+            $genO->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"], $omkParams["BDD"]);		
+            switch ($this->_getParam('q')) {
+                case 'bdd':
+                    $genO->importBaseGen($this->_getParam('refL',""));
+                    break;
+                case 'conj':
+                    $genO->importBaseGen($this->_getParam('refL',""));
+                    break;
+                case 'corrigeDoublonsImport':
+                    $genO->corrigeDoublonsImport();
+                    break;
+                }
+         }
 
-        }
+        
 
     	
     }
+
+    public function omkAction()
+    {
+        $this->initInstance("/omk");        
+        $genO = new Gen_Omk($this->idBaseGen,true);
+        $genO->bTrace = $this->_getParam('trace',false);
+        $genO->bTraceFlush = $genO->bTrace;
+        $omkParams = OMK_PARAMS['omk_genlod'];
+        $genO->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"]);		
+
+
+        switch ($this->_getParam('q',false)) {
+            case 'verbes':
+                $this->view->r = $genO->getVerbes();
+                break;
+            case 'getConceptReseau':
+                $this->view->r = $genO->getConceptReseau($this->_getParam('cpt'));
+                break;
+            }
+    
+    }
+
 
     public function gestionAction()
     {

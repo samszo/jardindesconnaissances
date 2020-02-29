@@ -473,9 +473,14 @@ class FluxController extends Zend_Controller_Action {
 				$this->view->content = $omk->postItemSet($this->_request->getParams());
 				break;			
 			case 'getProps':
-			$this->view->content = $omk->getProps($this->_request->getParams());
+				$this->view->content = $omk->getProps($this->_request->getParams());
+				break;
+			case 'setHierarchie':
+				$omkParams = OMK_PARAMS['omk_gestforma'];
+				$o = $omk->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"]);
+				$o->setHierarchie("dcterms:isPartOf","dcterms:isPartOf",'resource_class_id',112);						
 			break;
-	}
+		}
 	}
     public function diigoAction()
     {
@@ -875,6 +880,20 @@ class FluxController extends Zend_Controller_Action {
 			}
 	}
 
+    public function ontostatAction()
+    {
+		$o = new Flux_Ontostat($this->_getParam('idBase','flux_ontostats'));
+		$o->bTrace = $this->_getParam('trace',true);
+		$o->bTraceFlush = $o->bTrace;
+		$omkParams = OMK_PARAMS['omk_ontostat'];
+		$o->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"]);		
+		switch ($this->_getParam('q')) {
+			case 'setConceptHierarchie':
+				$o->setConceptHierarchieToOmeka();
+				break;
+		}
+	}
+	
     public function gorafiAction()
     {
 		$g = new Flux_Gorafi($this->_getParam('idBase',"flux_gorafi"),$this->_getParam('trace',true));
@@ -887,7 +906,6 @@ class FluxController extends Zend_Controller_Action {
 				break;
 		}
 	}
-	
 
 	function verifExpireToken($ss){
 		$ss->client->setAccessToken($ss->token);

@@ -8,9 +8,13 @@
     <script src='../js/d3.v5.min.js'></script>
     <script src='../js/moment.js'></script>
     <script src='../js/streamgraph.js'></script>
+    <script src='../js/hypernode.js'></script>
+    <link rel="stylesheet" href="../css/hypernode.css">
+    
+    
     <style>
-    #dataviz{
-        background-color: grey;
+    body{
+        background-color: black;
     }
     </style>
 <body>
@@ -27,7 +31,18 @@ var sg = new streamgraph({
     ,'dataUrl':"<?php echo $this->urlData; ?>"
     ,'dataType':"<?php echo $this->typeData; ?>"
     ,'orientation':'vertical'
+    ,'fctLoad':initHyperNode
     });
+function initHyperNode(){
+    var hn = new hypernode({
+    'idCont':'dataviz'
+    ,'width':window.innerWidth
+    ,'height':window.innerHeight
+    ,'svg':sg.container
+    });
+}
+
 </script>    
+
 </body>
 </html>

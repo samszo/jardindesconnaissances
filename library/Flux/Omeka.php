@@ -16,10 +16,17 @@ class Flux_Omeka extends Flux_Site{
 
     var $endpoint = "http://localhost/omeka-s/api/";
     var $idByTypeName;
+    var $snNameId;
     var $language = 'fr';
     var $is_public = 1;
     var $API_IDENT;
     var $API_KEY;
+    var $doublons;
+    var $param;
+    var $hier;
+    var $id;
+    var $idsCol;
+    var $reseau; 
 
 	public function __construct($idBase=false, $bTrace=false)
     {
@@ -381,6 +388,102 @@ class Flux_Omeka extends Flux_Site{
     }
 
     /**
+     * cherche un objet avec plusieurs critères
+     * suivant les paramètre de l'API
+property[{index}][joiner]: "and" OR "or" joiner with previous query
+property[{index}][property]: property ID
+property[{index}][text]: search text
+property[{index}][type]: search type
+eq: is exactly
+neq: is not exactly
+in: contains
+nin: does not contain
+ex: has any value
+nex: has no value
+res: is this RDF resource (by ID)
+nres: is not this RDF resource (by ID)
+     *
+     * @param array     $data
+     * @param string    $type
+     * @param string    $champ
+     * @param array     $params
+     * @param boolean   $decode
+     */
+    function searchMulti($data,$type='items',$params=[],$decode=true){
+
+        $i=0;
+        foreach ($data as $k => $v) {
+            if($k=='item_set_id'){
+                if(!is_int($v))$v = $this->getColId($v);
+                $param['item_set_id']=$v;
+            }else{  
+                //vérifie si le passage de paramètre est simple = property => valeur              
+                if(!is_array($v)){
+                    $data[$k] = array('t'=>'eq','s'=>'text','v'=>$v);
+                }
+                //défini les valeurs par défaut
+                if(!$data[$k]['t'])$data[$k]['t']='eq';
+                if(!$data[$k]['s'])$data[$k]['s']='text';
+                if(!$data[$k]['v'])$data[$k]['v']=$v;
+                //construction du paramètre
+                $param['property'][$i]['property']= $this->getIdByNSName($k,'properties');
+                $param['property'][$i]['type']=$data[$k]['t'];
+                $param['property'][$i][$data[$k]['s']]=$data[$k]['v'];
+            }
+            $i++;
+        }
+        /*
+Parameter	Description	Type	Default
+sort_by	    Sort the result set by this field	string	created
+sort_order	Sort the result set in this order, ascending ("asc") or descending ("desc")	string	desc
+page	    The page number of the result set to return	integer	1
+per_page	The number of results per page	integer	uses global "results per page" setting
+limit	    The number of results to return	integer	0 (all)
+offset	    The number offset of results to return	integer	0 (no offset)        
+        */        
+        foreach ($params as $k => $v) {
+            $param[$k]=$v;
+        }
+        //property[0][property]=33&property[0][type]=res&property[0][text]=396182
+        $r = $this->send($type,'GET',$param,false,'',$decode);
+        return $r;
+    }
+
+
+    /**
+     * cherche tout les objets
+     *
+     * @param array     $data
+     * @param string    $type
+     * @param string    $champ
+     * @param array     $params
+     * 
+     * @return array
+     */
+    function searchAllMulti($data, $type='items',$params=false){
+        if(!$params)$params = array("page"=>1);
+        else $params["page"]++;
+
+        $items = $this->searchMulti($data,$type,$params,true);
+        if(count($items))$allitems=array_merge($items,$this->searchAllMulti($data,$type,$params));
+        else $allitems=[];
+        return $allitems;
+    }
+
+
+    /**
+	 * cherche des items suivant des critères
+     * 
+     * @param array     $params
+     * 
+     * @return array
+	 */
+    function searchItems($params){
+        return $this->searchMulti($params,'items',array('per_page'=>10000));
+    }
+
+
+    /**
      * cherche un objet par une référence
      *
      * @param string    $ref
@@ -490,6 +593,26 @@ class Flux_Omeka extends Flux_Site{
     }
 
     /**
+     * Récupère un identifiant par son nom avec name space
+     *
+     * @param string $nsName
+     *
+     * @return int
+     */
+    function getIdByNSName($nsName){
+        //vérifie la présence de l'id
+        if(!$this->nsNameId[$nsName]){
+            //récupère l'id
+            $param = $this->paramsAuth();
+            $champ='term';
+            $param[$champ]=$nsName;   
+            $r = $this->send('properties','GET',$param,false,'',true);
+            $this->nsNameId[$nsName]=$r[0]['o:id'];
+        }
+        return $this->nsNameId[$nsName];
+    }
+
+    /**
      * Récupère une propriété par son term
      *
      * @param string $term
@@ -552,5 +675,236 @@ class Flux_Omeka extends Flux_Site{
         return $p;
     }
     
+
+    /**
+     * Récupère toute les items d'une collection
+     *
+     * @param string    $param
+     * @param int       $value
+     * @param int       $page
+     * 
+     * @return array
+     * 
+     * 
+     */
+    function getAllItem($param, $value, $page=0){
+        //récupère les items de la collection Stato fr	
+        $url = $this->endpoint."items?".$param."=".$value."&page=".$page."&per_page=100&key_identity=".$this->API_IDENT."&key_credential=".$this->API_KEY;
+		$json = $this->getUrlBodyContent($url);
+        $items = json_decode($json,true);
+        if(count($items))$allitems=array_merge($items,$this->getAllItem($param,$value,$page+1));
+        else $allitems=[];
+        return $allitems;
+    }
+
+     /**
+     * Récupère un item
+     *
+     * @param int    $id
+     * 
+     * @return array
+     * 
+     * 
+     */
+    function getItem($id){
+        $url = $this->endpoint."items/".$id."&key_identity=".$this->API_IDENT."&key_credential=".$this->API_KEY;
+		$json = $this->getUrlBodyContent($url);
+        return json_decode($json,true);
+    }
+
+
+    /**
+     * Fonction pour récupérer la hierarchie complète d'une item
+     *
+     * @param string	$propSrc
+     * @param string	$propDst
+     * @param array	    $item
+     * @param int	    $niv
+	 * 
+     * @return	array
+     *
+     */
+    function getHierarchie($propSrc, $propDst, $item, $niv){
+		 
+		foreach ($item[$propSrc] as $sc) {
+			if($sc['type']=="resource"){
+				//ajoute l'item dans la hierarchie
+				if(!$this->doublons[$sc['value_resource_id']]){
+					$this->doublons[$sc['value_resource_id']]=1;
+					//contruction des concepts plus large
+					$this->param[$propDst][]=array('type'=>'resource','value'=>$sc['value_resource_id']);
+					//pas nécessaire, le niveau = l'ordre de création $this->param['md:hierarchyLevel'][]=$niv."";
+					//construction des concepts plus précis
+					$this->hier[$sc['value_resource_id']][$propDst][$item['o:id']][]=$niv;
+					//remonte la hiérarchie
+					$this->id = $sc['value_resource_id'];
+					$itemE = array_filter($this->items, function($v, $k) {
+						return $v['o:id'] == $this->id;
+					}, ARRAY_FILTER_USE_BOTH);
+					//si pas trouvé on va le chercher dans omeka
+					if(!count($itemE)){
+						$itemE[] = $this->getItem($this->id);				
+					} 
+					foreach ($itemE as $i) {
+						if($i[$propSrc]){
+							$this->getHierarchie($propSrc, $propDst, $i, $niv+1);
+						}				
+					}
+				}else{
+					$this->doublons[$sc['value_resource_id']]++;
+				}				
+			}
+		}
+	}    
+
+    /**
+     * Fonction pour récupérer les liens sortant d'un item
+     *
+     * @param array	    $item
+     * @param string	$prop
+     * @param int	    $niv
+	 * 
+     * @return	array
+     *
+     */
+    function getItemLiensSortant($item, $prop, $niv=0){
+        
+
+        $items = $this->searchAllMulti(array($prop=>array('v'=>$item['o:id'],'t'=>'res')));    
+
+		foreach ($items as $i) {
+            if(!$this->doublons[$i['o:id']]){
+                //enregistre le noeud du lien 
+                $this->reseau['nodes'][]=$i;
+                $this->doublons[$i['o:id']]=1;                
+            }else{
+                $this->doublons[$i['o:id']] ++;                
+            }
+            //enregistre le lien
+            $this->reseau['links'][]=array("source"=>$item['o:id'],"target"=>$i['o:id'],"niv"=>$niv,"value"=>1,"type"=>$prop);
+            //recherche les liens de la target
+            $this->getItemLiensSortant($i, $prop, $niv+1);
+        }
+        return $this->reseau;
+	}        
+
+    /**
+     * Fonction pour récupérer les liens entrant d'un item
+     *
+     * @param array	    $item
+     * @param string	$prop
+     * @param int	    $niv
+	 * 
+     * @return	array
+     *
+     */
+    function getItemLiensEntrant($item, $prop, $niv=0){
+
+        
+
+		foreach ($item[$prop] as $sc) {
+			if($sc['type']=="resource"){
+
+                //récupère l'item
+                $i = $this->getItem($sc['value_resource_id']);
+                if(!$this->doublons[$i['o:id']]){
+                    //enregistre le noeud du lien 
+                    $this->reseau['nodes'][]=$i;
+                    $this->doublons[$i['o:id']]=1;                
+                }else{
+                    $this->doublons[$i['o:id']] ++;                
+                }
+                //enregistre le lien
+                $this->reseau['links'][]=array("source"=>$i['o:id'],"target"=>$item['o:id'],"niv"=>$niv,"value"=>1,"type"=>$prop);
+                $this->getItemLiensEntrant($i, $prop, $niv+1);
+            }
+        }
+        return $this->reseau;
+
+    }    
+    
+
+    /**
+     * Fonction pour récupérer le réseau d'un item
+     *
+     * @param array	    $item
+     * @param string	$prop
+     * @param int	    $niv
+     * @param boolean	$init
+	 * 
+     * @return	array
+     *
+     */
+    function getItemReseau($item, $prop, $niv=0, $init=true){
+
+        if($init){
+            $this->doublons = array();
+            $this->reseau = array('nodes'=>array(),'links'=>array());    
+        }
+        $this->reseau['nodes'][]=$item;
+        $this->doublons[$item['o:id']]=1;     
+        
+        $this->getItemLiensEntrant($item, $prop, $niv);
+        $this->getItemLiensSortant($item, $prop, $niv);
+    
+        return $this->reseau;
+
+	}        
+
+
+
+
+    /**
+     * Fonction pour ajouter la hierarchie complète d'une item
+     *
+     * @param string	$propSrc
+     * @param string	$propDst
+     * @param   string  $qParam
+     * @param   string  $qValue
+     * 
+     * @return	array
+     *
+     */
+    function setHierarchie($propSrc,$propDst,$qParam,$qValue){
+		 
+		//récupère les items EC	
+        $this->items = $this->getAllItem($qParam,$qValue);
+		foreach ($this->items as $i) {
+			//récupère la hiérarchie de l'item
+			$this->param=[];
+			$this->doublons=[];
+			$this->getHierarchie($propSrc,$propDst,$i, 1);
+			//$this->trace('hiérarchie '.$i['dc:title'],$this->param);
+			//pour debug
+			if($i['o:id']==7138)
+				$t = 1;
+			if(count($this->param)){
+				$param = array_merge($i,$this->setParamAPI($this->param));
+				$r = $this->send('items','PATCH',$this->paramsAuth(),$param,'/'.$i['o:id'],true);
+				//gestion de l'erreur
+				if($r['errors'])
+					throw new Exception(json_encode($r['errors']).' : '.$i['dc:title'].' : '.$i['o:id']);
+				$this->trace('hiérarchie $propSrc to $propDst  OK '.$i['dc:title'].' : '.$i['o:id']);	
+			}else{
+				$this->trace('hiérarchie $propSrc AUCUNNE '.$i['dc:title'].' : '.$i['o:id']);	
+			}
+		}
+    }	    
+    
+    /**
+	 * recupère l'identifiant d'une collection
+     * 
+     * @param string    $lib
+     * 
+     * @return int
+	 */
+    function getColId($lib){
+        if(!$this->idsCol[$lib]) {
+            $col = $this->postItemSet(array('title'=>$lib));
+            $this->idsCol[$lib] = $col['o:id'];
+        }
+        return $this->idsCol[$lib];
+    }
+
 
 }
