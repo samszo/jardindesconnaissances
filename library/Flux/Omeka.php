@@ -147,7 +147,7 @@ class Flux_Omeka extends Flux_Site{
                     $param['o:resource_template']['o:id']=$data['resource_template'];
                     break;
                 case 'resource_class':
-                    $param['o:resource_class']['o:id']=$this->getIdByName($data['resource_class'],'resource_classes');;
+                    $param['o:resource_class']['o:id']=$this->getIdByNSName($data['resource_class'],'resource_classes');;
                     break;
                 case 'IIIF':
                     $param['o:media'][0]['dcterms:title'][0]['@value']= $v['title'];
@@ -575,10 +575,11 @@ offset	    The number offset of results to return	integer	0 (no offset)
      *
      * @param string $name
      * @param string $type
+     * @param string $champ
      *
      * @return int
      */
-    function getIdByName($name,$type){
+    function getIdByName($name,$type,$champ='local_name'){
         //vérifie la présence de l'id
         if(!$this->idByTypeName[$type.'_'.$name]){
             //récupère l'id
@@ -596,17 +597,18 @@ offset	    The number offset of results to return	integer	0 (no offset)
      * Récupère un identifiant par son nom avec name space
      *
      * @param string $nsName
+     * @param string $type
      *
      * @return int
      */
-    function getIdByNSName($nsName){
+    function getIdByNSName($nsName, $type="properties"){
         //vérifie la présence de l'id
         if(!$this->nsNameId[$nsName]){
             //récupère l'id
             $param = $this->paramsAuth();
             $champ='term';
             $param[$champ]=$nsName;   
-            $r = $this->send('properties','GET',$param,false,'',true);
+            $r = $this->send($type,'GET',$param,false,'',true);
             $this->nsNameId[$nsName]=$r[0]['o:id'];
         }
         return $this->nsNameId[$nsName];

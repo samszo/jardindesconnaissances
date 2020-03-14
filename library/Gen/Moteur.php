@@ -1472,7 +1472,7 @@ class Gen_Moteur extends Flux_Site{
         	$c = md5("getDeterminant_".$this->arrDicos["déterminants"]."_".$class."_".$pluriel);
         	if($this->forceCalcul)$this->cache->remove($c);
 			if(!$arrClass = $this->cache->load($c)) {
-		        $tDtr = new Model_DbTable_Gen_Determinants($this->db);
+		        $tDtr = new Model_DbTable_Gen_determinants($this->db);
 	        	$arrClass = $tDtr->obtenirDeterminantByDicoNumNombre($this->arrDicos["déterminants"],$class,$pluriel);        				
 			    $this->cache->save($arrClass, $c);
 			}
@@ -1544,7 +1544,7 @@ class Gen_Moteur extends Flux_Site{
         	if($this->forceCalcul)$this->cache->remove($c);
 	        if(!$arrClass = $this->cache->load($c)) {
 	        	//récupère la définition de la class
-	        	$table = new Model_DbTable_Gen_Syntagmes($this->db);
+	        	$table = new Model_DbTable_Gen_syntagmes($this->db);
 	        	$arrClass = $table->obtenirSyntagmeByDicoNum($this->arrDicos['syntagmes'],$class);
 				if(is_object($arrClass) && get_class($arrClass)=="Exception"){
 		    		$this->arrClass[$this->ordre]["ERREUR"] = $arrClass->getMessage();//."<br/><pre>".$arrCpt->getTraceAsString()."</pre>";
@@ -1646,7 +1646,7 @@ class Gen_Moteur extends Flux_Site{
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$arrClass = $this->cache->load($c)) {
         	//récupère la définition de la class
-        	$table = new Model_DbTable_Gen_Negations($this->db);
+        	$table = new Model_DbTable_Gen_negations($this->db);
         	$arrClass = $table->obtenirNegationByDicoNum($this->arrDicos['negations'],$class);
 			$this->cache->save($arrClass,$c);
 		}
@@ -1668,7 +1668,7 @@ class Gen_Moteur extends Flux_Site{
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$arrClass = $this->cache->load($c)) {
 			//récupère la définition de la class
-       		$table = new Model_DbTable_Gen_Pronoms($this->db);
+       		$table = new Model_DbTable_Gen_pronoms($this->db);
         	$arrClass = $table->obtenirPronomByDicoNumType($this->arrDicos['pronoms'],$class,$type);
         	if(is_array($arrClass))	$this->cache->save($arrClass,$c);
 		}
@@ -1695,7 +1695,7 @@ class Gen_Moteur extends Flux_Site{
         if($this->forceCalcul)$this->cache->remove($c);
         if(!$arrClass = $this->cache->load($c)) {
 			//récupère la définition de la class
-        	$table = new Model_DbTable_Gen_Terminaisons($this->db);
+        	$table = new Model_DbTable_Gen_terminaisons($this->db);
         	$arrClass = $table->obtenirConjugaisonByConjNum($idConj, $num);
 			$this->cache->save($arrClass,$c);
 		}
@@ -2311,7 +2311,7 @@ class Gen_Moteur extends Flux_Site{
         if(!$arrCpt = $this->cache->load($c)) {
 			//récupère la définition de la class
 			$arrClass=explode("_", $class);
-	        $table = new Model_DbTable_Gen_Concepts($this->db);	
+	        $table = new Model_DbTable_Gen_concepts($this->db);	
 	   	    $arrCpt = $table->obtenirConceptDescription($this->arrDicos['concepts'],$arrClass);
 			if(is_object($arrCpt) && get_class($arrCpt)=="Exception"){
 	    		$this->arrClass[$this->ordre]["ERREUR"] = $arrCpt->getMessage();//."<br/><pre>".$arrCpt->getTraceAsString()."</pre>";

@@ -1,0 +1,143 @@
+{
+    "o:label": "genex_Term",
+    "o:resource_template_property": [
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": true,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/purl.org\/dc\/terms\/",
+            "vocabulary_label": "Dublin Core",
+            "local_name": "title",
+            "label": "Title"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/purl.org\/dc\/terms\/",
+            "vocabulary_label": "Dublin Core",
+            "local_name": "description",
+            "label": "Description"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/purl.org\/dc\/terms\/",
+            "vocabulary_label": "Dublin Core",
+            "local_name": "isReferencedBy",
+            "label": "Is Referenced By"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/genex#",
+            "vocabulary_label": "G\u00e9n\u00e9rateur d'expressions",
+            "local_name": "hasConcept",
+            "label": "A comme concept"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": "genre de la forme nominale",
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/www.lexinfo.net\/ontology\/2.0\/lexinfo",
+            "vocabulary_label": "lexinfo",
+            "local_name": "gender",
+            "label": "grammatical gender"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": "premi\u00e8re valeur = f\u00e9minin\r\ndeuxi\u00e8me valeur = masculin\r\ntroisi\u00e8me valeur = f\u00e9minin \u00e9lision\r\nquatri\u00e8me valeur = masculin \u00e9lision",
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/www.lexinfo.net\/ontology\/2.0\/lexinfo",
+            "vocabulary_label": "lexinfo",
+            "local_name": "pluralNumberForm",
+            "label": "pluralNumberForm"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": "premi\u00e8re valeur = f\u00e9minin\r\ndeuxi\u00e8me valeur = masculin\r\ntroisi\u00e8me valeur = f\u00e9minin \u00e9lision\r\nquatri\u00e8me valeur = masculin \u00e9lision",
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "http:\/\/www.lexinfo.net\/ontology\/2.0\/lexinfo",
+            "vocabulary_label": "lexinfo",
+            "local_name": "singularNumberForm",
+            "label": "singularNumberForm"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/genex#",
+            "vocabulary_label": "G\u00e9n\u00e9rateur d'expressions",
+            "local_name": "hasPrefix",
+            "label": "A comme pr\u00e9fix"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/genex#",
+            "vocabulary_label": "G\u00e9n\u00e9rateur d'expressions",
+            "local_name": "hasGenerateur",
+            "label": "A comme g\u00e9n\u00e9rateur"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/genex#",
+            "vocabulary_label": "G\u00e9n\u00e9rateur d'expressions",
+            "local_name": "hasConjugaison",
+            "label": "A comme conjugaison"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "data_type_name": null,
+            "data_type_label": null,
+            "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/genex#",
+            "vocabulary_label": "G\u00e9n\u00e9rateur d'expressions",
+            "local_name": "hasElision",
+            "label": "A une \u00e9lision"
+        }
+    ],
+    "o:resource_class": {
+        "vocabulary_namespace_uri": "https:\/\/jardindesconnaissances.univ-paris8.fr\/onto\/genex#",
+        "vocabulary_label": "G\u00e9n\u00e9rateur d'expressions",
+        "local_name": "Term",
+        "label": "Terme"
+    }
+}

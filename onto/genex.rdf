@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:dct="http://purl.org/dc/terms/"
+  xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xml:base="http://www.w3.org/2004/02/skos/core" xmlns:genex="https://jardindesconnaissances.univ-paris8.fr/onto/genex" >
+  <!-- Ontologie du générateur automatique d'expressions   
+   -->
+  <owl:Ontology rdf:about="https://jardindesconnaissances.univ-paris8.fr/onto/genex">
+    <dct:title xml:lang="en">genex Vocabulary</dct:title>
+    <dct:description xml:lang="en">An RDF vocabulary for describing automatic generation of expressions.</dct:description>
+    <dct:creator>Samuel Szoniecky</dct:creator>
+    <dct:creator>Jean-Pierre Balpe</dct:creator>
+  </owl:Ontology>
+  <rdf:Description rdf:about="#Concept">
+    <rdfs:label xml:lang="en">Concept</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://jardindesconnaissances.univ-paris8.fr/onto/genex"/>
+    <skos:definition xml:lang="en">An idea or notion; a unit of thought.</skos:definition>
+    <owl:sameAs xml:lang="en">skos:Concept</owl:sameAs>
+    <!-- S1 -->
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#hasGenerator">
+    <rdfs:label xml:lang="en">has generator</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://jardindesconnaissances.univ-paris8.fr/onto/genex"/>
+    <skos:definition xml:lang="en">genex:hasGenerator determine link between concept and generative form.</skos:definition>
+    <!-- S38 -->
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </rdf:Description>
+</rdf:RDF>

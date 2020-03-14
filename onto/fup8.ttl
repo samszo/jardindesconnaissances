@@ -4,7 +4,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
 @prefix o: <http://omeka.org/s/vocabs/o#> .
-@prefix fup8: <https://jardindesconnaissances.univ-paris8.fr/onto/fup8> .
+@prefix fup8: <https://jardindesconnaissances.univ-paris8.fr/onto/fup8#> .
 @prefix teach: <http://linkedscience.org/teach/ns#> .
 
 <https://jardindesconnaissances.univ-paris8.fr/onto/fup8> a owl:Ontology ;

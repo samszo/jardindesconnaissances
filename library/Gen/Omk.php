@@ -21,6 +21,9 @@ class Gen_Omk extends Flux_Site{
         array('num'=>8,'lib'=>'participe présent'),
         array('num'=>9,'lib'=>'infinitif'),
     );
+    var $termType = array('a','v','m','s');
+    var $sepType = '-';
+    var $sepTerm = '_';
 
 	
     /**
@@ -166,13 +169,14 @@ class Gen_Omk extends Flux_Site{
 	 * importe dans omeka les données de la base générateur
      * 
      * pour gérer la reprise d'importation
-     * @param string    $refL 
+     * @param string    $ref 
      * @param int       $inext 
      * @param array     $arrC 
+     * @param boolean   $bConceptOnly 
      * 
      * @return string
 	 */
-    function importBaseGen($refL="", $inext=-1, $arrC=false){    
+    function importBaseGen($ref="", $inext=-1, $arrC=false, $bConceptOnly=true){    
         $this->trace("DEBUT ".__METHOD__);
         //execution infinie
         set_time_limit(0);
@@ -187,20 +191,31 @@ class Gen_Omk extends Flux_Site{
         */
         $this->omk->bTrace = false;//$this->bTrace;        
 
+        $this->RT['genex_Concept']=$this->omk->getIdByName('genex_Concept','resource_templates');
+        $this->RT['genex_Term']=$this->omk->getIdByName('genex_Term','resource_templates');
+        $this->RT['genex_Generateur']=$this->omk->getIdByName('genex_Generateur','resource_templates');
+                
 
         $this->existe = false;//mettre true pour corriger une importation
 
+        $dbC = new Model_DbTable_Gen_concepts($this->db);        
         if(!$arrC){
             $this->trace("récupère tous les concepts et leurs class");
-            $c = "getAllConceptDoublons";
+            $c = "getAllConceptDoublons".$bConceptOnly;
             if(!$this->bCache)
                 $this->cache->remove($c);
             $this->trace("recupère le cache");
             $arrC = $this->cache->load($c);
             if(!$arrC) {
                 $this->trace("Requete Concepts et class");
-                $dbC = new Model_DbTable_Gen_concepts($this->db);        
-                $arrC = $dbC->getAllConceptDoublons();
+                if($bConceptOnly){
+                    //on récupère uniquement les concept
+                    $arrC = $dbC->getOnlyConceptDoublons();
+                }else{
+                    //on récupère les concept et leur définition
+                    $arrC = $dbC->getAllConceptDoublons();
+                }
+
                 $this->cache->save($arrC, $c);
             }
             $this->trace("Concepts et class récupéré = ".count($arrC));
@@ -211,10 +226,10 @@ class Gen_Omk extends Flux_Site{
         $this->trace("Boucle sur les concepts = ".count($arrC));
         foreach ($arrC as $c) {
             //pour la reprise de l'importation
-            if($refL){                
-                if($c['refL']==$refL){
-                    $this->importBaseGen("", $i+1, $arrC); 
-                    $this->trace("FIN TROUVE ".$refL);               
+            if($ref){                
+                if($c['refC']==$ref){
+                    $this->importBaseGen("", $i+1, $arrC, $bConceptOnly); 
+                    $this->trace("FIN TROUVE ".$ref);               
                 }
             }else{
                 if($i > $inext){
@@ -225,8 +240,18 @@ class Gen_Omk extends Flux_Site{
                         $this->trace($i.' concept : '.$c['refC'].' '.$cpt['o:title'].' o:id='.$cpt['o:id']);
                     }
                     //création des class
-                    $item = $this->addClass($c,$cpt);
-                    $this->trace($i.' class : '.$c['refL'].' '.$item['o:title'].' o:id='.$item['o:id']);   
+                    if($bConceptOnly){
+                        //on récupère uniquement les concept
+                        $arrClass = $dbC->getClassConceptDoublons(trim($c['title']));
+                        foreach ($arrClass as $cls) {
+                            $item = $this->addClass($cls,$cpt);
+                            $this->trace($i.' class : '.$cls['refL'].' '.$item['o:title'].' o:id='.$item['o:id']);   
+                        }
+                    }else{
+                        $item = $this->addClass($c,$cpt);
+                        $this->trace($i.' class : '.$c['refL'].' '.$item['o:title'].' o:id='.$item['o:id']);   
+                    }
+    
                 }    
             }    
             $i++;
@@ -416,10 +441,8 @@ class Gen_Omk extends Flux_Site{
 
         //création de la class
         $param = array(
-            'resource_class'=>'gen_class'
-            ,'dcterms:isReferencedBy'=>$v['refL']
-            ,'dcterms:isPartOf'=>array(array('type'=>'resource','value'=>$cpt['o:id']))
-            ,'dcterms:type'=>$v['arrTypeLien']
+            'dcterms:isReferencedBy'=>$v['refL']
+            ,'genex:hasConcept'=>array(array('type'=>'resource','value'=>$cpt['o:id']))
         );
 
         //mise à jour des données de la class suivant les valeurs renseignées
@@ -427,10 +450,12 @@ class Gen_Omk extends Flux_Site{
         foreach ($arrLien as $l) {
             switch ($l) {
                 case 'adjectif':
+                    $param['ressource_template'] = $this->RT['genex_Term'];
+                    $param['resource_class'] = 'genex:Term';
                     $param['dcterms:title'] =$v['lexTermElement'].$v['singularNumberForm_f'];
-                    $param['lexinfo:termElement'] = $v['lexTermElement'];
-                    $param['bibo:prefixName']=$v['lexTermElement_e'];
-                    $param['item_set'][]=$this->getColId('gen_adjectif');
+                    $param['genex:hasPrefix']=$v['lexTermElement'];
+                    $param['genex:hasElision']=$v['lexTermElement_e'];
+                    //$param['item_set'][]=$this->getColId('gen_adjectif');
                     $param['lexinfo:pluralNumberForm'][]=$v['pluralNumberForm_f'];
                     $param['lexinfo:pluralNumberForm'][]=$v['pluralNumberForm_m'];
                     $param['lexinfo:singularNumberForm'][]=$v['singularNumberForm_f'];
@@ -439,43 +464,56 @@ class Gen_Omk extends Flux_Site{
                 case 'generateur':
                     $param['dcterms:title'] =uniqid('gen');
                     $param['dcterms:description']=$v['description'];
-                    $param['item_set'][]=$this->getColId('gen_generateur');
+                    //$param['item_set'][]=$this->getColId('gen_generateur');
+                    $param['ressource_template'] = $this->RT['genex_Generateur'];
+                    $param['resource_class'] = 'genex:Generateur';
                     break;            
                 case 'pronom':
                     $param['dcterms:title']=$v['lexTermElement'].' - '.$v['lexTermElement_e'];
-                    $param['item_set'][]=$this->getColId('gen_pronom_'.$l);
+                    //$param['item_set'][]=$this->getColId('gen_pronom_'.$l);
                     $param['dcterms:description']=$v['description'];
-                    $param['lexinfo:termElement'][] = $v['lexTermElement'];
-                    $param['lexinfo:termElement'][] = $v['lexTermElement_e'];
+                    $param['genex:hasPrefix']=$v['lexTermElement'];
+                    $param['genex:hasElision']=$v['lexTermElement_e'];
+                    $param['resource_class'] = 'genex:Pronom';
                     break;            
                 case 'substantif':
                     $param['dcterms:title']=$v['lexTermElement'];
-                    $param['lexinfo:termElement'] = $v['lexTermElement'];
+                    $param['genex:hasPrefix']=$v['lexTermElement'];
+                    $param['genex:hasElision']=$v['lexTermElement_e'];
                     $param['lexinfo:gender'] = $v['grammaticalGender'];
                     $param['lexinfo:singularNumberForm'] = $v['singularNumberForm'];
                     $param['lexinfo:pluralNumberForm'] = $v['pluralNumberForm'];
-                    $param['bibo:prefixName']=$v['lexTermElement_e'];
-                    $param['item_set']=$this->getColId('gen_substantif');
+                    //$param['item_set']=$this->getColId('gen_substantif');
+                    $param['ressource_template'] = $this->RT['genex_Term'];
+                    $param['resource_class'] = 'genex:Term';
                     break;            
                 case 'syntagme':
                     $param['dcterms:title']=$v['lexTermElement'];
-                    $param['item_set'][]=$this->getColId('gen_syntagme');
+                    $param['genex:hasPrefix']=$v['lexTermElement'];
+                    $param['genex:hasElision']=$v['lexTermElement_e'];
+                    //$param['item_set'][]=$this->getColId('gen_syntagme');
                     $param['dcterms:description']=$v['description'];
+                    $param['ressource_template'] = $this->RT['genex_Term'];
+                    $param['resource_class'] = 'genex:Term';
                     break;            
                 case 'verbe':
                     $param['dcterms:title']=$v['lexTermElement'];
-                    $param['bibo:prefixName']=$v['lexTermElement_e'];
-                    $param['item_set']=$this->getColId('gen_verbe');
-                    $param['lexinfo:aspect']=$v['aspect'];                    
+                    $param['genex:hasPrefix']=$v['lexTermElement'];
+                    $param['genex:hasElision']=$v['lexTermElement_e'];
+                    //$param['item_set']=$this->getColId('gen_verbe');
+                    $param['genex:hasConjugaison']=$v['aspect'];                    
+                    $param['ressource_template'] = $this->RT['genex_Term'];
+                    $param['resource_class'] = 'genex:Term';
                     break;            
                 case 'negation':
                     $param['dcterms:title']=$v['lexTermElement'];
-                    $param['item_set']=$this->getColId('gen_negation');
+                    //$param['item_set']=$this->getColId('gen_negation');
                     $param['dcterms:description']=$v['description'];
+                    $param['resource_class'] = 'genex:Negation';
                     break;  
                 case 'determinant':
                     $param['dcterms:title'] = $v['singularNumberForm_f'].' - '.$v['pluralNumberForm_f'];
-                    $param['item_set']=$this->getColId('gen_determinant');
+                    //$param['item_set']=$this->getColId('gen_determinant');
                     $param['dcterms:description']=$v['description'];
                     $param['lexinfo:pluralNumberForm'][]=$v['pluralNumberForm_f'];
                     $param['lexinfo:pluralNumberForm'][]=$v['pluralNumberForm_m'];
@@ -485,6 +523,7 @@ class Gen_Omk extends Flux_Site{
                     $param['lexinfo:singularNumberForm'][]=$v['singularNumberForm_m'];
                     $param['lexinfo:singularNumberForm'][]=$v['singularNumberForm_fe'];
                     $param['lexinfo:singularNumberForm'][]=$v['singularNumberForm_me'];
+                    $param['resource_class'] ='genex:Determinant';
                     break;                                    
             }
         }       
@@ -502,13 +541,24 @@ class Gen_Omk extends Flux_Site{
     function getConcept($v){
         $this->trace("DEBUT ".__METHOD__.' '.$v['title']);
         $arr = array(
-            'dcterms:title'=>trim($v['title'])
+            'dcterms:title'=>$v['arrTypeConcept'].$this->sepType.trim($v['title'])
             ,'dcterms:isReferencedBy'=>$v['refC']
-            ,'item_set'=>$this->getColId('gen_concept')
+            //,'item_set'=>$this->getColId('gen_concept')
+            ,'resource_template'=>$this->RT['genex_Concept']
+            ,'resource_class'=> 'genex:Concept'   
         );
-        if($v['arrTypeConcept']=='carac'){
-            $arr['dcterms:title']=$v['arrTypeConcept'].trim($v['title']);
-            $arr['foaf:member']='carac';
+        //récupère les types
+        $arrType = explode(',',$v['arrTypeConcept']);
+        foreach ($arrType as $t) {
+            if($t=='carac'){
+                $arr['genex:isCaract']=1;
+                $arr['dcterms:description'][]=$t.trim($v['title']);
+            }
+            $arr['genex:hasType'][]=$t;
+            if(in_array($t,$this->termType))
+                $arr['dcterms:description'][]=$t.$this->sepTerm.trim($v['title']);
+            else
+                $arr['dcterms:description'][]=$t.$this->sepType.trim($v['title']);
         }
         return $this->omk->postItem($arr, $this->existe);    
     }
@@ -622,8 +672,8 @@ class Gen_Omk extends Flux_Site{
         $c = "getConceptReseau".md5($cpt);
         //if(!$this->bCache)
         //    $this->cache->remove($c);
-        $r = $this->cache->load($c);
-        if(!$r) {
+        $this->omk->reseau = $this->cache->load($c);
+        if(!$this->omk->reseau) {
 
             if(!$cpt)
                 throw new Exception('Impossible de récupérer le réseau. Veuillez préciser le nom du concept');
@@ -654,7 +704,7 @@ class Gen_Omk extends Flux_Site{
             }
         }
     
-        return $r;
+        return $this->omk->reseau;
     }
 
     /**
@@ -696,12 +746,48 @@ class Gen_Omk extends Flux_Site{
 	 */
     function getGenCompo($gen){
 
-        //on récupère le tableau des class
-        $arr = explode("|",$gen);        		        
+        $genCompo = array();
 
-        return array("det"=>$arr[0],"class"=>$arr[1]);
+        //on récupère le déterminant
+        $arrGen = explode("|",$gen);
+        
+        if(count($arrGen)==1){
+            $genCompo['class']=$arrGen[0];
+            return $genCompo;
+        }
+
+        $genCompo['det']=$arrGen[0];
+        $genCompo['class']=$arrGen[1];
+
+		//gestion du changement de position de la classe
+		$genCompo['posi']=explode("@", $genCompo['class']);
+        
+		//vérifie si la class est un déterminant
+		if(is_numeric($genCompo['class']))$genCompo['classDet']=$genCompo['class'];
+
+		//vérifie si la class possède un type de class
+		if(strpos($genCompo['class'],"_")){
+            $arr = explode("_",$genCompo['class']);			
+            $genCompo['type']=$arr[0];
+            $genCompo['gen']=$arr[1];
+		}elseif(substr($genCompo['class'],0,5)=="carac"){
+			//la class est un caractère
+            $genCompo['caract'] = str_replace("carac", "carac_", $genCompo['class']);
+		}elseif(strpos($genCompo['class'],"#")){
+				$genCompo['gen'] = str_replace("#","determinant",$genCompo['class']); 
+        }elseif(substr($genCompo['class'],0,1)=="=" && is_numeric(substr($genCompo['class'],1,1))){
+            $genCompo['bloc'] = substr($genCompo['class'],1);
+        }elseif(substr($genCompo['class'],0,1)=="=" && substr($genCompo['class'],1,1)=="x"){
+            $genCompo['bloc'] = substr($genCompo['class'],1);
+        }elseif(strpos($genCompo['class'],"-")){
+            $genCompo['gen']=$genCompo['class'];
+        }			
+
+        return $genCompo;
 
     }
+
+    
 
     /**
 	 * recupère les générateurs d'une expression textuelle

@@ -1,0 +1,124 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix o: <http://omeka.org/s/vocabs/o#> .
+@prefix lexinfo: <http://www.lexinfo.net/ontology/2.0/lexinfo#> .
+@prefix genex: <https://jardindesconnaissances.univ-paris8.fr/onto/genex#> .
+
+<http://www.w3.org/2004/02/skos/core>
+  a owl:Ontology ;
+  dc:title "Vocabulaire GenEx "@fr ;
+  dc:creator "Samuel Szoniecky", "Jean-Pierre Balpe" ;
+  rdfs:seeAlso <https://jardindesconnaissances.univ-paris8.fr/onto/genex> .
+
+genex:Concept
+  rdfs:label "Concept"@fr ;
+  skos:definition "Une idée ou notion, une unité de pensée."@fr ;
+  owl:sameAs skos:Concept ;
+  a owl:Class .
+
+genex:Term
+  rdfs:label "Terme"@fr ;
+  skos:definition "Forme d'un concept."@fr ;
+  owl:sameAs lexinfo:termElement;
+  a owl:Class .
+
+genex:Generateur
+  rdfs:label "Générateur"@fr ;
+  skos:definition "Forme générative."@fr ;
+  a owl:Class .
+
+genex:Generation
+  rdfs:label "Génération"@fr ;
+  skos:definition "Instantiotion d'une forme générative."@fr ;
+  a owl:Class .
+
+genex:Conjugaison
+  rdfs:label "Conjugaison"@fr ;
+  skos:definition "Style de conjugaison."@fr ;
+  a owl:Class .
+
+genex:ConjugaisonTempsTerms
+  rdfs:label "Terminaisons d'un temps de conjugaison"@fr ;
+  skos:definition "Terminaisons d'un temps de conjugaison."@fr ;
+  a owl:Class .
+
+genex:Pronom
+  rdfs:label "Pronom"@fr ;
+  skos:definition "Pronom."@fr ;
+  a owl:Class .
+
+genex:Determinant
+  rdfs:label "Déterminant"@fr ;
+  skos:definition "Determinant."@fr ;
+  owl:sameAs lexinfo:Determiner;
+  a owl:Class .
+
+genex:Syntagme
+  rdfs:label "Syntagme"@fr ;
+  skos:definition "Syntagme."@fr ;
+  a owl:Class .
+
+genex:Negation
+  rdfs:label "Négation"@fr ;
+  skos:definition "Négation."@fr ;
+  a owl:Class .
+
+genex:hasPrefix a rdf:Property ;
+    rdfs:label "A comme préfix"@fr ;
+    rdfs:comment "Préfix de l'élément"@fr ;
+    owl:sameAs lexinfo:Prefix.
+
+genex:hasReseau a rdf:Property ;
+    rdfs:label "A comme réseau"@fr ;
+    rdfs:comment "Pour enregistrer l'instanciation du réseau d'un concept ou d'un générateur"@fr.
+
+genex:hasGenerateur a rdf:Property ;
+    rdfs:label "A comme générateur"@fr ;
+    rdfs:comment "Pour associer un ou plusieurs générateur à un concept"@fr ;
+    rdfs:domain o:Resource .
+
+genex:hasTerm a rdf:Property ;
+    rdfs:label "A comme terme"@fr ;
+    rdfs:comment "Pour associer un ou plusieurs terme à un concept"@fr ;
+    rdfs:domain o:Resource .
+
+genex:hasConcept a rdf:Property ;
+    rdfs:label "A comme concept"@fr ;
+    rdfs:comment "Pour associer un ou plusieurs concept à un term"@fr ;
+    rdfs:domain o:Resource .
+
+genex:hasGeneration a rdf:Property ;
+    rdfs:label "A comme génération"@fr ;
+    rdfs:comment "Pour associer une génération à une instantiation du générateur"@fr ;
+    rdfs:domain o:Resource .
+
+genex:isGenerateBy a rdf:Property ;
+    rdfs:label "Est généré par"@fr ;
+    rdfs:comment "Pour associer un générateur à une génération"@fr ;
+    rdfs:domain o:Resource .
+
+genex:hasTempsTerms a rdf:Property ;
+    rdfs:label "A comme terminaisons de temps"@fr ;
+    rdfs:comment "Pour associer les terminaisons de temps à une conjugaison"@fr ;
+    rdfs:domain o:Resource .
+
+genex:hasConjugaison a rdf:Property ;
+    rdfs:label "A comme conjugaison"@fr ;
+    rdfs:comment "Pour associer un type de conjugaison à un verbe"@fr ;
+    owl:sameAs lexinfo:aspect
+    rdfs:domain o:Resource .
+
+genex:isCaract a rdf:Property ;
+    rdfs:label "Est un caractère"@fr ;
+    rdfs:comment "Utiliser pour ne pas réévaluer le choix d'un concept. Le choix du concept est conservé lors de la génération."@fr .
+
+genex:hasElision a rdf:Property ;
+    rdfs:label "A une élision"@fr ;
+    rdfs:comment "Utiliser pour définir si le term a une élision."@fr.
+
+genex:hasType a rdf:Property ;
+    rdfs:label "A comme type"@fr ;
+    rdfs:comment "Utiliser pour définir le(s) type(s) d'un concept."@fr .

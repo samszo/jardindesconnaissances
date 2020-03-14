@@ -663,6 +663,71 @@ class Model_DbTable_Gen_concepts extends Zend_Db_Table_Abstract
 
     }
 
+
+    /**
+     * Récupère uniquement les concepts exportés dans doublons
+     * exporter par la requête genInsertAllConceptToDoublon.sql
+     *
+     * @return array
+     */
+    public function getOnlyConceptDoublons()
+    {
+        $sql = "SELECT 
+        COUNT(*) nb, 
+            d.title,
+            GROUP_CONCAT(DISTINCT d.refC) refC,
+            GROUP_CONCAT(DISTINCT d.type_concept) arrTypeConcept
+        FROM
+            gen_doublons d
+        WHERE d.title <> '' AND d.type_concept <> '' 
+        GROUP BY d.title
+        ORDER BY  d.title";
+
+        $stmt = $this->_db->query($sql);
+        return $stmt->fetchAll();
+
+    }    
+
+    /**
+     * Récupère les class d'un concept exportés dans doublons
+     * exporter par la requête genInsertAllConceptToDoublon.sql
+     * @param string $lib
+     *
+     * @return array
+     */
+    public function getClassConceptDoublons($lib)
+    {
+        $sql = 'SELECT 
+            COUNT(*) nb, 
+            d.title,
+            GROUP_CONCAT(DISTINCT d.refL) refL,
+            GROUP_CONCAT(DISTINCT d.type_lien) arrTypeLien,
+            d.description,
+            d.lexTermElement, 
+            MAX(d.lexTermElement_e) lexTermElement_e, 
+            MAX(d.grammaticalGender) grammaticalGender, 
+            MAX(d.pluralNumberForm) pluralNumberForm, 
+            MAX(d.pluralNumberForm_f) pluralNumberForm_f, 
+            MAX(d.pluralNumberForm_fe) pluralNumberForm_fe, 
+            MAX(d.pluralNumberForm_m) pluralNumberForm_m, 
+            MAX(d.pluralNumberForm_me) pluralNumberForm_me, 
+            MAX(d.singularNumberForm) singularNumberForm, 
+            MAX(d.singularNumberForm_f) singularNumberForm_f, 
+            MAX(d.singularNumberForm_fe) singularNumberForm_fe, 
+            MAX(d.singularNumberForm_m) singularNumberForm_m, 
+            MAX(d.singularNumberForm_me) singularNumberForm_me, 
+            MAX(d.aspect) aspect
+        FROM
+            gen_doublons d
+        WHERE d.title = "'.$lib.'" AND d.type_concept <> "" 
+        GROUP BY d.description, d.lexTermElement
+        ORDER BY  d.title, arrTypeLien';
+
+        $stmt = $this->_db->query($sql);
+        return $stmt->fetchAll();
+
+    }    
+
     /**
      * récupère tous les concepts de la base
      * 
