@@ -314,7 +314,7 @@ ORDER BY ASC (?label_a)
 
 
     	$this->trace("DEBUT ".__METHOD__." = ".$idBnf." : ".$label);
-    	
+    	$this->bCache = false;
 		if($this->bCache){
 			$c = str_replace("::", "_", __METHOD__)."_".$idBnf; 
 			$arr = $this->cache->load($c);

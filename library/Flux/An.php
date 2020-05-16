@@ -39,7 +39,7 @@ class Flux_An extends Flux_Site{
      * @param  string $idBase
      * 
      */
-	public function __construct($idBase=false, $idBaseOmk=false, $bTrace=false)
+	public function __construct($idBase=false, $idBaseOmk="omk-valarnum", $bTrace=false)
     {
         $this->dbOmk = $this->getDb($idBaseOmk);
         $this->idBaseOmk = $idBaseOmk;
@@ -1259,10 +1259,10 @@ class Flux_An extends Flux_Site{
 				INNER JOIN
 			flux_doc dp ON dp.doc_id = d.parent
 				INNER JOIN
-			".$this->idBaseOmk.".value ov ON ov.value LIKE '".$this->idBase."-flux_doc-doc_id-%'
+				`".$this->idBaseOmk."`.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
 				AND SUBSTRING(ov.value, 31) = dp.doc_id
 				INNER JOIN
-			".$this->idBaseOmk.".media om ON om.item_id = ov.resource_id ";
+				`".$this->idBaseOmk."`.media om ON om.item_id = ov.resource_id ";
 			if($ajoutAbscent) $sql .= " LEFT JOIN test t on t.id = d.doc_id ";
 		$sql .= " WHERE d.tronc = 'visage' ";
 			if($ajoutAbscent) $sql .= " AND t.id is null "; 
@@ -1759,10 +1759,10 @@ class Flux_An extends Flux_Site{
                     FROM
                         flux_visage v
                             INNER JOIN
-                        omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+							`".$this->idBaseOmk."`.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
                             AND SUBSTRING(ov.value, 31) = v.doc_id
                             INNER JOIN
-                        omk_valarnum1.media om ON om.item_id = ov.resource_id
+							`".$this->idBaseOmk."`.media om ON om.item_id = ov.resource_id
                             INNER JOIN
                         flux_doc dv ON dv.doc_id = v.doc_id
                             INNER JOIN
@@ -1815,10 +1815,10 @@ class Flux_An extends Flux_Site{
                     INNER JOIN
                 flux_visage v ON v.doc_id = dv.doc_id
                     INNER JOIN
-                omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+					`".$this->idBaseOmk."`.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
                     AND SUBSTRING(ov.value, 31) = dv.doc_id
                     INNER JOIN
-                omk_valarnum1.media om ON om.item_id = ov.resource_id
+					`".$this->idBaseOmk."`.media om ON om.item_id = ov.resource_id
             WHERE
                 d.type = 1 
             GROUP BY dv.doc_id, om.item_id, om.source  ";
@@ -2142,10 +2142,10 @@ FROM
         INNER JOIN
     flux_doc dp ON dp.doc_id = d.parent
         INNER JOIN
-    omk_valarnum1.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
+		`".$this->idBaseOmk."`.value ov ON ov.value LIKE 'flux_valarnum-flux_doc-doc_id-%'
         AND SUBSTRING(ov.value, 31) = d.doc_id
         INNER JOIN
-    omk_valarnum1.media om ON om.item_id = ov.resource_id
+		`".$this->idBaseOmk."`.media om ON om.item_id = ov.resource_id
 WHERE
     d.type = 1
 GROUP BY d.doc_id , om.item_id , om.source

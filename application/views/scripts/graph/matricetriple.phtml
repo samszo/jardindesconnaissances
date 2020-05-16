@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrice triple</title>
+    <script src='../js/d3.v5.min.js'></script>
+    <script src='../js/matricetriple.js'></script>
+</head>
+<style>
+    #vdataviz{
+        background-color: grey;
+    }
+    </style>
+<body>
+<div id='dataviz'></div>
+</body>
+
+<script>
+//
+var viz = d3.select('#dataviz').style('width',window.innerWidth).style('height',window.innerHeight);
+var m = new matricetriple({'idCont':'dataviz','width':window.innerWidth,'height':window.innerHeight
+//        ,'matrice':[['dicernement fort','dicernement faible','dicernement vide','choix fort','choix faible','choix vide','agir fort','agir faible','agir vide']]
+//        ,'matrice':[['dicernement vide','choix fort','choix faible','choix vide','agir fort','agir faible','agir vide']]
+//        ,'matrice':[['dicerner','penser','choisir','agir'],['fort','faible','vide']]
+//        ,'matrice':[['dicerner','penser','choisir','agir','évaluer'],['fort','faible','vide']]
+        ,'matrice':[['dicerner','penser','choisir','agir','évaluer','valoriser'],['fort','faible','vide']]
+//,'matrice':[['dicernement','choix','agir'],['fort','faible','vide']]
+//,'matrice':[['vide','vide 1','vide 2'],['fort','faible','vide']]
+//,'matrice':[['vide','vide 1'],['fort','faible','vide']]
+//,'matrice':[['vide'],['fort','faible','vide']]
+});
+
+
+
+</script>
+</body>
+</html>

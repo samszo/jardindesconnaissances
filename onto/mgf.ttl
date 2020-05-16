@@ -1,0 +1,176 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix o: <http://omeka.org/s/vocabs/o#> .
+@prefix mgf: <https://jardindesconnaissances.univ-paris8.fr/onto/mgf#> .
+
+<https://jardindesconnaissances.univ-paris8.fr/onto/mgf> a owl:Ontology ;
+    dcterms:title "modèle génératif de fiction" .
+
+mgf:Monde a rdfs:Class ;
+    rdfs:label "Monde" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:Entite a rdfs:Class ;
+    rdfs:label "Entité" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:Relation a rdfs:Class ;
+    rdfs:label "Relation" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:Histoire a rdfs:Class ;
+    rdfs:label "Histoire" ;
+    rdfs:domain o:Resource ; 
+    vs:term_status "experimental" .
+
+mgf:Narration a rdfs:Class ;
+    rdfs:label "Intervention" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:EtatMonde a rdfs:Class ;
+    rdfs:label "Etat du monde" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:Evenement a rdfs:Class ;
+    rdfs:label "Evenement" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:Contrainte a rdfs:Class ;
+    rdfs:label "Contrainte" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:PointDeVue a rdfs:Class ;
+    rdfs:label "Point de vue" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:FragmentSemantique a rdfs:Class ;
+    rdfs:label "FragmentSemantique" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:FragmentNarratif a rdfs:Class ;
+    rdfs:label "FragmentNarratif" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:FragmentMedia a rdfs:Class ;
+    rdfs:label "FragmentMedia" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:Heuristique a rdfs:Class ;
+    rdfs:label "Heuristique" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:Fonction a rdfs:Class ;
+    rdfs:label "Fonction" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:hasFonction a rdf:Property ;
+    rdfs:label "hasFonction" ;
+    rdfs:comment "A comme fonction" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .    
+
+mgf:hasFragmentNarratif a rdf:Property ;
+    rdfs:label "hasFragmentNarratif" ;
+    rdfs:comment "A comme fragment narratif" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .    
+
+mgf:hasFragmentMedia a rdf:Property ;
+    rdfs:label "hasFragmentMedia" ;
+    rdfs:comment "A comme fragment media" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .    
+
+mgf:hasHeuristique a rdf:Property ;
+    rdfs:label "hasHeuristique" ;
+    rdfs:comment "A comme heuristique" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .    
+
+mgf:hasFragmentSemantique a rdf:Property ;
+    rdfs:label "hasFragmentSemantique" ;
+    rdfs:comment "A comme fragment sémantique" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .    
+
+mgf:hasEvenement a rdf:Property ;
+    rdfs:label "hasEvenement" ;
+    rdfs:comment "A comme évènement" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:hasEtatMonde a rdf:Property ;
+    rdfs:label "hasEtatMonde" ;
+    rdfs:comment "A comme état du monde" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:hasConditionInitiale a rdf:Property ;
+    rdfs:label "hasConditionInitiale" ;
+    rdfs:comment "A comme condition initiale" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:hasConditionFinale a rdf:Property ;
+    rdfs:label "hasConditionFinale" ;
+    rdfs:comment "A comme condition finale" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:hasEvenementInitiale a rdf:Property ;
+    rdfs:label "hasEvenementInitiale" ;
+    rdfs:comment "A comme évènement initiale" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:hasEntite a rdf:Property ;
+    rdfs:label "hasEntite" ;
+    rdfs:comment "A comme entité" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:hasRelation a rdf:Property ;
+    rdfs:label "hasRelation" ;
+    rdfs:comment "A comme relation" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:hasContrainte a rdf:Property ;
+    rdfs:label "hasContrainte" ;
+    rdfs:comment "A comme contrainte" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:hasPointDeVue a rdf:Property ;
+    rdfs:label "hasPointDeVue" ;
+    rdfs:comment "A comme point de vue" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:isEtatClef a rdf:Property ;
+    rdfs:label "isEtatClef" ;
+    rdfs:comment "Est un état clef" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+mgf:isUse a rdf:Property ;
+    rdfs:label "isUse" ;
+    rdfs:comment "Est utilisé" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .

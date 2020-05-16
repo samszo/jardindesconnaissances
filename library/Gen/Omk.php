@@ -24,6 +24,7 @@ class Gen_Omk extends Flux_Site{
     var $termType = array('a','v','m','s');
     var $sepType = '-';
     var $sepTerm = '_';
+    var $maxNivReseau = 2;
 
 	
     /**
@@ -193,7 +194,7 @@ class Gen_Omk extends Flux_Site{
 
         $this->RT['genex_Concept']=$this->omk->getIdByName('genex_Concept','resource_templates');
         $this->RT['genex_Term']=$this->omk->getIdByName('genex_Term','resource_templates');
-        $this->RT['genex_Generateur']=$this->omk->getIdByName('genex_Generateur','resource_templates');
+        $this->RT['genex_Generateur']=$this->omk->getIdByName('genex_Generateur','resource_templates');        
                 
 
         $this->existe = false;//mettre true pour corriger une importation
@@ -287,6 +288,11 @@ class Gen_Omk extends Flux_Site{
         */
         $this->omk->bTrace = false;//$this->bTrace;        
 
+        $this->RT['genex_Concept']=$this->omk->getIdByName('genex_Concept','resource_templates');
+        $this->RT['genex_Term']=$this->omk->getIdByName('genex_Term','resource_templates');
+        $this->RT['genex_Generateur']=$this->omk->getIdByName('genex_Generateur','resource_templates');
+        $this->RT['genex_Conjugaison']=$this->omk->getIdByName('genex_Conjugaison','resource_templates');
+
 
         $this->existe = false;//mettre true pour corriger une importation
 
@@ -313,6 +319,7 @@ class Gen_Omk extends Flux_Site{
         foreach ($arrC as $c) {
             //pour la reprise de l'importation
             if($aspects){                
+                $this->trace("reprise de l'importation $aspects = ".$i." = ".$c['aspects']);
                 if($c['aspects']==$aspects){
                     $this->importBaseGenConj("", $i+37, $arrC); 
                     $this->trace("FIN TROUVE ".$aspects);
@@ -333,13 +340,11 @@ class Gen_Omk extends Flux_Site{
                         foreach ($idsConj as $id) {
                             //récupère les verbes avec cet aspect et sans la conjugaison
                             $arrV = $this->omk->searchItems(array(
-                                'dcterms:type'=>array('v'=>'verbe')
-                                ,'lexinfo:aspect'=>array('v'=>$id)
-                                //,'lexinfo:aspect'=>array('t'=>'nres','v'=>$conj['o:id'])                                
+                                'genex:hasConjugaison'=>array('v'=>$id)
                                 ));
                             foreach ($arrV as $vrb) {
-                                $p = $this->omk->setParamAPI(array('lexinfo:aspect'=>array(array('type'=>'resource','value'=>$conj['o:id']))));
-                                $vrb['lexinfo:aspect'][]=$p['lexinfo:aspect'][0];
+                                $p = $this->omk->setParamAPI(array('genex:hasConjugaison'=>array(array('type'=>'resource','value'=>$conj['o:id']))));
+                                $vrb['genex:hasConjugaison'][]=$p['genex:hasConjugaison'][0];
                                 //ajout el'identifiant de conjugaison dans l'aspect
                                 $p = $this->omk->send('items','PUT',$this->omk->paramsAuth(),$vrb,'/'.$vrb['o:id'],true);
                             }
@@ -356,9 +361,11 @@ class Gen_Omk extends Flux_Site{
                         $param=array();
                         $param['dcterms:title'] = $conj['o:title'].' '.$t['lib'];
                         $param['lexinfo:mood'] = $t['lib'];
-                        $param['dcterms:isPartOf']=array(array('type'=>'resource','value'=>$conj['o:id']));
+                        $param['genex:hasConjugaison']=array(array('type'=>'resource','value'=>$conj['o:id']));
                         $param['dcterms:isReferencedBy'] = $conj['o:id'].'_'.$t['num'];
-                        $param['item_set'][]=$this->getColId('gen_conjugaison_temps');
+                        $param['resource_template'] = $this->RT['genex_ConjugaisonTempsTerms'];
+                        $param['resource_class'] = 'genex:ConjugaisonTempsTerms';
+                        //$param['item_set'][]=$this->getColId('gen_conjugaison_temps');
                         $param['lexinfo:firstPersonForm'][]=$arrC[$i+$posi]['lib'];
                         if($t['num'] < 8){
                             $param['lexinfo:firstPersonForm'][]=$arrC[$i+(1+$posi)]['lib'];
@@ -574,9 +581,10 @@ class Gen_Omk extends Flux_Site{
         $this->trace("DEBUT ".__METHOD__.' '.$v['modele']);
         $arr = array(
             'dcterms:title'=>$v['title']
+            ,'resource_template'=>$this->RT['genex_Conjugaison']
+            ,'resource_class'=> 'genex:Conjugaison'   
             ,'dcterms:description'=>trim($v['modele'])
             ,'dcterms:isReferencedBy'=>$v['aspects']
-            ,'item_set'=>$this->getColId('gen_conjugaison')
         );
         return $this->omk->postItem($arr, $this->existe);    
     }
@@ -661,50 +669,68 @@ class Gen_Omk extends Flux_Site{
     /**
 	 * recupère le réseau d'un concept
      * 
-     * @param string $cpt
+     * @param string    $cpt
+     * @param int       $niv
+     * @param array     $itemSrc
      * 
      * 
      * @return array
 	 */
-    function getConceptReseau($cpt){
+    function getConceptReseau($cpt, $niv=0, $itemSrc=false){
 
 
         $c = "getConceptReseau".md5($cpt);
-        //if(!$this->bCache)
-        //    $this->cache->remove($c);
-        $this->omk->reseau = $this->cache->load($c);
-        if(!$this->omk->reseau) {
+        $this->trace($c);
+
+        if(!$this->bCache)
+           $this->cache->remove($c);
+        $reseau = $this->cache->load($c);
+        if(!$reseau) {
 
             if(!$cpt)
                 throw new Exception('Impossible de récupérer le réseau. Veuillez préciser le nom du concept');
 
             //récupère l'item concept
-            $items = $this->omk->searchMulti(array('dcterms:title'=>$cpt,'item_set_id'=>'gen_concept'));
+            $items = $this->omk->searchMulti(array('dcterms:description'=>$cpt,'resource_class_id'=> $this->omk->getIdByNSName('genex:Concept','resource_classes')));
 
             if(count($items)>1)
-                throw new Exception("Impossible de récupérer le réseau. Plusieurs concepts ont été trouvétrouvé");
-
-            if($items[0]['o:title']!=$cpt)
+                throw new Exception("Impossible de récupérer le réseau. Plusieurs concepts ont été trouvé");
+            $inDesc = false;
+            foreach ($items[0]['dcterms:description'] as $d) {
+                if($d['@value']==$cpt)$inDesc=true;
+            }    
+            if(!$inDesc)
                 throw new Exception("Impossible de récupérer le réseau. Le concept n'a pas été trouvé");
             
-            //récupère le reseau des isPartOf
-            $this->omk->getItemReseau($items[0],"dcterms:isPartOf");
+            //récupère le reseau des genex:hasConcept pour ce concept
+            $this->omk->getItemReseau($items[0],"genex:hasConcept",$niv,$niv == 0);
 
-            $this->cache->save($this->omk->reseau, $c);
-        }
-
-        //récupère les générateurs inclu dans les items
-        $nb = count($this->omk->reseau['nodes']);
-        for ($i=0; $i < $nb; $i++) { 
-            if(isset($this->omk->reseau['nodes'][$i]['dcterms:description'])){
-                $genFlux = $this->getGenFlux($this->omk->reseau['nodes'][$i]['dcterms:description'][0]['@value']);
-                $this->omk->reseau['nodes'][$i]['flux']=$genFlux;
-                //calcul le réseau de générateurs inclus
-
+            //ajoute le lien vers la source
+            if($itemSrc){
+                $this->omk->reseau['links'][]=array("source"=>$itemSrc['o:id'],"target"=>$items[0]['o:id'],"niv"=>$niv,"value"=>1,"type"=>"genex:hasConcept");
             }
+
+            $this->trace("récupère les générateurs inclu dans les items");
+            $nb = count($this->omk->reseau['nodes']);
+            for ($i=0; $i < $nb; $i++) { 
+                //vérifie qu'il y a un générateur et qu'il n'est pas déjà traité
+                if(isset($this->omk->reseau['nodes'][$i]['dcterms:description']) && ! $this->omk->reseau['nodes'][$i]['flux']){
+                    $genFlux = $this->getGenFlux($this->omk->reseau['nodes'][$i]['dcterms:description'][0]['@value']);
+                    $this->omk->reseau['nodes'][$i]['flux']=$genFlux;                
+                    foreach ($genFlux as $f) {
+                        $this->trace("calcul le réseau des générateurs inclus",$f);
+                        if($f['gen'] && $niv < $this->maxNivReseau)
+                            $this->getConceptReseau($f['compo']['class'],$niv+1,$this->omk->reseau['nodes'][$i]);
+                    }
+
+                }
+            }
+            $this->cache->save($this->omk->reseau, $c);
+            $reseau = $this->omk->reseau;
         }
-    
-        return $this->omk->reseau;
+
+        //renvoit le réseau du concept et de tous ces enfants
+        return $reseau;
     }
 
     /**
@@ -787,8 +813,6 @@ class Gen_Omk extends Flux_Site{
 
     }
 
-    
-
     /**
 	 * recupère les générateurs d'une expression textuelle
      * merci à https://stackoverflow.com/questions/10104473/capturing-text-between-square-brackets-in-php
@@ -799,6 +823,24 @@ class Gen_Omk extends Flux_Site{
     function getGenInTxt($exp){
 
         preg_match_all("/\[([^\]]*)\]/", $exp, $matches);
+        return $matches;
+
+    }
+
+    /**
+	 * création d'un monde
+     * 
+     * @param string $type
+     * 
+     * @return array
+	 */
+    function setMonde($type='complet'){
+
+        if($type=='complet'){
+            //récupère tous les événements
+            $events = $this->omk->searchMulti(array('resource_class_id'=> $this->omk->getIdByNSName('mgf:Evenement','resource_classes')));
+
+        }
         return $matches;
 
     }

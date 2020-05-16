@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.1-dev (ddb55ca, 2020-02-02)"
+   sodipodi:docname="matricetriple.svg"
+   id="svg1958"
+   version="1.1"
+   height="849px"
+   width="774px">
+  <metadata
+     id="metadata1964">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs1962" />
+  <sodipodi:namedview
+     inkscape:current-layer="svg1958"
+     inkscape:window-maximized="0"
+     inkscape:window-y="23"
+     inkscape:window-x="0"
+     inkscape:cy="445.61425"
+     inkscape:cx="455.45304"
+     inkscape:zoom="0.95388667"
+     showgrid="false"
+     id="namedview1960"
+     inkscape:window-height="925"
+     inkscape:window-width="1680"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     bordercolor="#666666"
+     pagecolor="#ffffff" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3044"
+     d="M 566,258 H 720 L 488.99997,658.10374 412,524.73583 Z"
+     style="fill:#00ff00;stroke:#fd0000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:0.34810126;stroke-miterlimit:4;stroke-dasharray:none" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3050"
+     d="m 412,258 h 154 l 77,133.36792 -77,133.3679 z"
+     style="fill:#00ff00;stroke:#fd0000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:0.34810126" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3048"
+     d="M 412,258 H 566 L 412.00001,524.73584 335,391.36791 Z"
+     style="fill:#00ff00;stroke:#ff0000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:0.34810126;stroke-miterlimit:4;stroke-dasharray:none" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3040"
+     d="M 257.99999,257.99999 412,258.00001 566,524.73583 489.00001,658.10375 258,258"
+     style="fill:#00ff00;stroke:#fd0000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:0.34810126;stroke-miterlimit:4;stroke-dasharray:none" />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1850"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="373.5,324.68396 412,258 335,258 " />
+  <text
+     transform="rotate(-30)"
+     id="text1804"
+     style="font-size:12px;font-family:Arial;fill:#555555"
+     y="429.43454"
+     x="-24.565445">dicernement</text>
+  <text
+     transform="rotate(-30)"
+     id="text1806"
+     style="font-size:12px;font-family:Arial;fill:#555555"
+     y="583.43457"
+     x="-24.565445">choix</text>
+  <text
+     transform="rotate(-30)"
+     id="text1808"
+     style="font-size:12px;font-family:Arial;fill:#555555"
+     y="737.43457"
+     x="-24.565445">agir</text>
+  <rect
+     transform="rotate(-30)"
+     id="rect1810"
+     style="stroke:#ff0000;fill:#00ff00;fill-opacity:0.10980392"
+     height="154"
+     width="129"
+     y="352.43454"
+     x="-34.565445" />
+  <rect
+     transform="rotate(-30)"
+     id="rect1812"
+     style="stroke:#ff0000;fill:#00ff00;fill-opacity:0.10980392"
+     height="154"
+     width="129"
+     y="506.43454"
+     x="-34.565445" />
+  <rect
+     transform="rotate(-30)"
+     id="rect1814"
+     style="stroke:#ff0000;fill:#00ff00;fill-opacity:0.10980392"
+     height="154"
+     width="129"
+     y="660.43457"
+     x="-34.565445" />
+  <text
+     transform="rotate(-90)"
+     id="text1818"
+     style="font-size:12px;font-family:Arial;fill:#555555"
+     y="335"
+     x="-248">dicernement</text>
+  <text
+     transform="rotate(-90)"
+     id="text1820"
+     style="font-size:12px;font-family:Arial;fill:#555555"
+     y="489"
+     x="-248">choix</text>
+  <text
+     transform="rotate(-90)"
+     id="text1822"
+     style="font-size:12px;font-family:Arial;fill:#555555"
+     y="643"
+     x="-248">agir</text>
+  <rect
+     transform="rotate(-90)"
+     id="rect1824"
+     style="stroke:#ff0000;fill:#00ff00;fill-opacity:0.10980392"
+     height="154"
+     width="129"
+     y="258"
+     x="-258" />
+  <rect
+     transform="rotate(-90)"
+     id="rect1826"
+     style="stroke:#ff0000;fill:#00ff00;fill-opacity:0.10980392"
+     height="154"
+     width="129"
+     y="412"
+     x="-258" />
+  <rect
+     transform="rotate(-90)"
+     id="rect1828"
+     style="stroke:#ff0000;fill:#00ff00;fill-opacity:0.10980392"
+     height="154"
+     width="129"
+     y="566"
+     x="-258" />
+  <text
+     transform="rotate(30)"
+     id="text1832"
+     style="font-size:12px;font-family:Arial;fill:#555555"
+     y="-59.565445"
+     x="762.53827">dicernement</text>
+  <text
+     transform="rotate(30)"
+     id="text1834"
+     style="font-size:12px;font-family:Arial;fill:#555555"
+     y="94.434555"
+     x="762.53827">choix</text>
+  <text
+     transform="rotate(30)"
+     id="text1836"
+     style="font-size:12px;font-family:Arial;fill:#555555"
+     y="248.43456"
+     x="762.53827">agir</text>
+  <rect
+     transform="rotate(30)"
+     id="rect1838"
+     style="stroke:#ff0000;fill:#00fd00;fill-opacity:0.1107595"
+     height="154"
+     width="129"
+     y="-136.56544"
+     x="752.53827" />
+  <rect
+     transform="rotate(30)"
+     id="rect1840"
+     style="fill:#00fd00;fill-opacity:0.110759;stroke:#ff0000"
+     height="154"
+     width="129"
+     y="483.45163"
+     x="727.43658" />
+  <rect
+     transform="rotate(30)"
+     id="rect1842"
+     style="stroke:#ff0000;fill:#00fd00;fill-opacity:0.1107595"
+     height="154"
+     width="129"
+     y="171.43456"
+     x="752.53827" />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1846"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="258,258 296.5,324.68396 335,258 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(115.5,200.05187)"
+     id="polygon1848"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="296.5,324.68396 335,258 373.5,324.68396 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(-38.5,66.683952)"
+     id="polygon1852"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="412,258 450.5,324.68396 373.5,324.68396 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1854"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="450.5,324.68396 489,258 412,258 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(38.5,200.05186)"
+     id="polygon1856"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="450.5,324.68396 489,258 527.5,324.68396 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1858"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="527.5,324.68396 566,258 489,258 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1860"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="566,258 604.5,324.68396 527.5,324.68396 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1862"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="604.5,324.68396 643,258 566,258 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(-38.5,66.68395)"
+     id="polygon1864"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="643,258 681.5,324.68396 604.5,324.68396 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(-231,266.73582)"
+     id="polygon1866"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="681.5,324.68396 720,258 643,258 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1868"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="335,391.36791 373.5,324.68396 296.5,324.68396 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(38.5,-66.68395)"
+     id="polygon1870"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="373.5,324.68396 412,391.36791 335,391.36791 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(192.5,66.68396)"
+     id="polygon1872"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="450.5,324.68396 373.5,324.68396 412,391.36791 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1874"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="489,391.36791 412,391.36791 450.5,324.68396 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(192.5,-66.68396)"
+     id="polygon1876"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="527.5,324.68396 450.5,324.68396 489,391.36791 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1878"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="566,391.36791 489,391.36791 527.5,324.68396 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(-154,133.36791)"
+     id="polygon1880"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="604.5,324.68396 527.5,324.68396 566,391.36791 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="matrix(1,0,0,-1,-115.5,716.05187)"
+     id="polygon1882"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="566,391.36791 604.5,324.68396 643,391.36791 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1884"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="643,391.36791 681.5,324.68396 604.5,324.68396 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1886"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="373.5,458.05187 412,391.36791 335,391.36791 " />
+  <polygon
+     transform="matrix(1,0,0,-1,38.5,849.41978)"
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1888"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="412,391.36791 450.5,458.05187 373.5,458.05187 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(38.5,200.05187)"
+     id="polygon1890"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="450.5,458.05187 489,391.36791 412,391.36791 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1892"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="489,391.36791 527.5,458.05187 450.5,458.05187 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(38.5,66.68396)"
+     id="polygon1894"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="566,391.36791 489,391.36791 527.5,458.05187 " />
+  <polygon
+     transform="rotate(180,546.75,424.70989)"
+     style="fill:#f28de5;fill-opacity:0.25"
+     id="polygon1896"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="604.5,458.05187 527.5,458.05187 566,391.36791 " />
+  <polygon
+     style="fill:#f28de5;fill-opacity:0.25"
+     transform="translate(-77,133.36791)"
+     id="polygon1898"
+     stroke-width="2"
+     stroke="#666666"
+     fill="rgba(32, 32, 32, 0.32)"
+     points="643,391.36791 566,391.36791 604.5,458.05187 " />
+</svg>

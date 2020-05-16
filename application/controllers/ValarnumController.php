@@ -31,7 +31,7 @@ class ValarnumController extends Zend_Controller_Action
      */
     public function exploemoAction(){
         
-        $this->initInstance();
+        $this->initInstance("/exploemo");
         
         $this->view->q =  $this->_getParam('q', "getOmkCollection");
         $this->view->idCol =  $this->_getParam('idCol', 1572);
@@ -52,7 +52,7 @@ class ValarnumController extends Zend_Controller_Action
 
     public function identacteursAction(){
         
-        $this->initInstance();
+        $this->initInstance("/identacteurs");
         //récupère le nombre total de photo
         $an = new Flux_An($this->idBase);
         //ATTENTION nb de Data != Nb de Visage car il manque des dates
@@ -65,9 +65,8 @@ class ValarnumController extends Zend_Controller_Action
     }
     
     public function photofacettesAction(){
-        
-        $this->initInstance();
-        
+        $this->initInstance("/photofacettes");
+                
     }
 
     public function visagefacettesAction(){
@@ -193,12 +192,14 @@ class ValarnumController extends Zend_Controller_Action
     
     
     
-    function initInstance(){
+    function initInstance($redir=""){
         $this->view->ajax = $this->_getParam('ajax');
         $this->view->idBase = $this->idBase = $this->_getParam('idBase', $this->idBase);
         
         $auth = Zend_Auth::getInstance();
         $this->ssUti = new Zend_Session_Namespace('uti');
+        $this->ssUti->redir = "/valarnum".$redir;
+
         $ssGoogle = new Zend_Session_Namespace('google');
         
         if ($auth->hasIdentity() || isset($this->ssUti->uti)) {
@@ -217,10 +218,9 @@ class ValarnumController extends Zend_Controller_Action
             $this->view->uti = json_encode($uti);                        
         }else{
             //$this->view->uti = json_encode(array("login"=>"inconnu", "id_uti"=>0));
-            $this->ssUti->redir = "/valarnum";
             $this->ssUti->dbNom = $this->idBase;
             if($this->view->ajax)$this->redirect('/auth/finsession');
-            else $this->redirect('/auth/connexion');
+            else $this->redirect('/auth/connexion?redir='.$this->ssUti->redir);
         }
         
     }

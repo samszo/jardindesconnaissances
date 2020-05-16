@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Document</title>
+</head>
+<body>
+
+<div style="height:100px;">COUO</div>
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="300" height="300" viewBox="0 0 300 300">
+
+  <text style="font: 20px/25px sans-serif;
+               text-align: center;
+               shape-inside: circle(120px at 150px 150px);">
+    Lorem ipsum dolor sit amet, consec-tetuer adipiscing elit...</text>
+
+</svg>
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="450" height="300" viewBox="0 0 450 300">
+
+  <rect id="rect1" x="25"  y="25"  width="225" height="175" fill="white" stroke="black"/>
+  <rect id="rect2" x="200" y="125" width="225" height="150" fill="white" stroke="black"
+        style="shape-margin:25px;"/>
+
+  <text style="shape-inside:url(#rect1);
+	       shape-subtract:url(#rect2);
+	       shape-padding:25px;
+           font-family:DejaVu Sans;
+	       font-size:12px;
+	       text-align:justified;
+	       line-height:110%">Lorem ipsum ...</text>
+  <text style="shape-inside:url(#rect2);
+	       shape-padding:25px;
+               font-family:DejaVu Sans;
+	       font-size:12px;
+	       text-align:justified;
+	       line-height:110%">Lorem ipsum ...</text>
+</svg>
+
+
+</body>
+</html>
+
+

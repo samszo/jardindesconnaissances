@@ -237,8 +237,8 @@ class streamgraph {
                     +"Total "+dt.temps+" = "+totalTemps[dt.temps]+" = "+pcTemps.toFixed(2)+" %<br/>"
                     +"Total couche "+dt.temps+" = "+Math.trunc(dt.value)+" = "+pcKeyTemps.toFixed(2)+" %<br/>"
                     )
-                   .style("left", (d3.event.pageX + 12) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+                .style("left", (d3.event.pageX + 12) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
 	    }
         
         me.init();

@@ -147,7 +147,7 @@ class Flux_Omeka extends Flux_Site{
                     $param['o:resource_template']['o:id']=$data['resource_template'];
                     break;
                 case 'resource_class':
-                    $param['o:resource_class']['o:id']=$this->getIdByNSName($data['resource_class'],'resource_classes');;
+                    $param['o:resource_class']['o:id']=$this->getIdByNSName($data['resource_class'],'resource_classes');
                     break;
                 case 'IIIF':
                     $param['o:media'][0]['dcterms:title'][0]['@value']= $v['title'];
@@ -416,6 +416,8 @@ nres: is not this RDF resource (by ID)
             if($k=='item_set_id'){
                 if(!is_int($v))$v = $this->getColId($v);
                 $param['item_set_id']=$v;
+            }elseif ($k=='resource_class_id') {
+                $param['resource_class_id']=$v;
             }else{  
                 //vérifie si le passage de paramètre est simple = property => valeur              
                 if(!is_array($v)){
@@ -489,10 +491,11 @@ offset	    The number offset of results to return	integer	0 (no offset)
      * @param string    $ref
      * @param string    $type
      * @param boolean   $decode
+     * @param string    $prop
      */
-    function searchByRef($ref,$type='items',$decode=false){
+    function searchByRef($ref,$type='items',$decode=false,$prop='dcterms:isReferencedBy'){
         //initialisation des paramètres POST
-        $param['property'][0]['property']= $this->getIdByName('isReferencedBy','properties');
+        $param['property'][0]['property']= $this->getIdByNSName($prop);
         $param['property'][0]['type']='eq';
         $param['property'][0]['text']=$ref;
         $r = $this->send($type,'GET',$param);
@@ -775,13 +778,7 @@ offset	    The number offset of results to return	integer	0 (no offset)
         $items = $this->searchAllMulti(array($prop=>array('v'=>$item['o:id'],'t'=>'res')));    
 
 		foreach ($items as $i) {
-            if(!$this->doublons[$i['o:id']]){
-                //enregistre le noeud du lien 
-                $this->reseau['nodes'][]=$i;
-                $this->doublons[$i['o:id']]=1;                
-            }else{
-                $this->doublons[$i['o:id']] ++;                
-            }
+            $this->gereDoublons($i);                
             //enregistre le lien
             $this->reseau['links'][]=array("source"=>$item['o:id'],"target"=>$i['o:id'],"niv"=>$niv,"value"=>1,"type"=>$prop);
             //recherche les liens de la target
@@ -809,13 +806,9 @@ offset	    The number offset of results to return	integer	0 (no offset)
 
                 //récupère l'item
                 $i = $this->getItem($sc['value_resource_id']);
-                if(!$this->doublons[$i['o:id']]){
-                    //enregistre le noeud du lien 
-                    $this->reseau['nodes'][]=$i;
-                    $this->doublons[$i['o:id']]=1;                
-                }else{
-                    $this->doublons[$i['o:id']] ++;                
-                }
+
+                $this->gereDoublons($i);                
+
                 //enregistre le lien
                 $this->reseau['links'][]=array("source"=>$i['o:id'],"target"=>$item['o:id'],"niv"=>$niv,"value"=>1,"type"=>$prop);
                 $this->getItemLiensEntrant($i, $prop, $niv+1);
@@ -839,22 +832,43 @@ offset	    The number offset of results to return	integer	0 (no offset)
      */
     function getItemReseau($item, $prop, $niv=0, $init=true){
 
-        if($init){
-            $this->doublons = array();
-            $this->reseau = array('nodes'=>array(),'links'=>array());    
+        $c = "getItemReseau".$item['o:id'];
+        if(!$this->bCache)
+           $this->cache->remove($c);
+        $reseau = $this->cache->load($c);
+
+        if(!$reseau) {
+
+            if($init){
+                $this->doublons = array();
+                $this->reseau = array('nodes'=>array(),'links'=>array());    
+            }
+
+            $this->gereDoublons($item);
+
+            $this->getItemLiensEntrant($item, $prop, $niv);
+            $this->getItemLiensSortant($item, $prop, $niv);
+            
+            $this->cache->save($this->omk->reseau, $c);
+            $reseau = $this->omk->reseau;
         }
-        $this->reseau['nodes'][]=$item;
-        $this->doublons[$item['o:id']]=1;     
-        
-        $this->getItemLiensEntrant($item, $prop, $niv);
-        $this->getItemLiensSortant($item, $prop, $niv);
     
-        return $this->reseau;
+        return $reseau;
 
 	}        
 
 
-
+    function gereDoublons($item){
+        //vérifie les doublons et incrémente la taille du noeud
+        if($this->doublons[$item['o:id']]){
+            $this->doublons[$item['o:id']]['nb']++;
+            $this->reseau['nodes'][ $this->doublons[$item['o:id']]['i']]['size']++;        
+        }else{
+            $item['size']=1;        
+            $this->doublons[$item['o:id']]=array('nb'=>1,'i'=>count($this->reseau['nodes']));
+            $this->reseau['nodes'][]=$item;
+        }         
+    }
 
     /**
      * Fonction pour ajouter la hierarchie complète d'une item

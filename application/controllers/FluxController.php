@@ -707,7 +707,8 @@ class FluxController extends Zend_Controller_Action {
 
     public function anAction()
     {
-        $an = new Flux_An($this->_getParam('idBase','flux_an'),false,$this->_getParam('trace'));
+        $an = new Flux_An($this->_getParam('idBase','flux_valarnum'),$this->_getParam('idBaseOmk',"omk-valarnum"),$this->_getParam('trace'));
+		$ice = new Flux_Ice($this->_getParam('idBase','flux_valarnum'));
         $an->bTraceFlush = $an->bTrace;
         $an->trace("DEBUT ".__METHOD__);        
         switch ($this->_getParam('q')) {
@@ -715,12 +716,11 @@ class FluxController extends Zend_Controller_Action {
                 $idsBase = $this->_getParam('idsBase');
                 $rs = array();
                 foreach ($idsBase as $idBase) {
-                    $an = new Flux_An($idBase,false,$this->_getParam('trace'));
                     //récupère l'identifiant du document
                     $dbD = new Model_DbTable_Flux_Doc($an->db);
                     $doc = $dbD->findByUrl($this->_getParam('url'),true);
                     if($doc){
-                        $data = $an->getComplexEcosystem($doc['doc_id']
+                        $data = $ice->getComplexEcosystem($doc['doc_id']
                             ,$this->_getParam('idTag'),$this->_getParam('idExi')
                             , $this->_getParam('idGeo'), $this->_getParam('idMonade'), $this->_getParam('idRapport'), $this->_getParam('cache',true));
                         $rs = array_merge($rs, $data["details"]);
@@ -732,15 +732,14 @@ class FluxController extends Zend_Controller_Action {
                 $idsBase = $this->_getParam('idsBase');
                 $rs = array();
                 foreach ($idsBase as $idBase) {
-                    $an = new Flux_An($idBase,false,$this->_getParam('trace'));
-                    $data = $an->getComplexEcosystem($this->_getParam('idDoc'),$this->_getParam('idTag'),$this->_getParam('idExi')
+                    $data = $ice->getComplexEcosystem($this->_getParam('idDoc'),$this->_getParam('idTag'),$this->_getParam('idExi')
                         , $this->_getParam('idGeo'), $this->_getParam('idMonade'), $this->_getParam('idRapport'), $this->_getParam('cache',true));
                     $rs = array_merge($rs, $data["details"]);
                 }
                 $this->view->content = json_encode($rs);
                 break;
             case "getComplexEcosystem":
-                $data = $an->getComplexEcosystem($this->_getParam('idDoc'),$this->_getParam('idTag'),$this->_getParam('idExi')
+                $data = $ice->getComplexEcosystem($this->_getParam('idDoc'),$this->_getParam('idTag'),$this->_getParam('idExi')
                 , $this->_getParam('idGeo'), $this->_getParam('idMonade'), $this->_getParam('idRapport'),  $this->_getParam('cache',true));
                 $this->view->content = json_encode($data);
                 break;
@@ -765,13 +764,13 @@ class FluxController extends Zend_Controller_Action {
                 if($this->_getParam('sauve'))$an->sauveJson(ROOT_PATH."/data/AN/getVisageData_".$this->_getParam('deb',"")."_".$this->_getParam('nb',"").".json", $data);                
                 break;
             case "getEvalsMonade":
-                $data = $an->getEvalsMonade($this->_getParam('idMonade',3));
+                $data = $ice->getEvalsMonade($this->_getParam('idMonade',3));
                 $this->view->content = json_encode($data);
                 break;
             case "getEvalsMonadeHistoTag":
                 //récupère les évaluations par tag
                 $sta = new Flux_Stats();
-                $data = $an->getEvalsMonadeHistoByTag($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d'));
+                $data = $ice->getEvalsMonadeHistoByTag($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d'));
                 if($this->_getParam('stream')){
                     //calcul les données pour le stream
                     $data = $sta->array_orderby($data, 'type', SORT_ASC, 'temps', SORT_ASC);
@@ -781,7 +780,7 @@ class FluxController extends Zend_Controller_Action {
                 break;
             case "getEvalsMonadeHistoUti":
                 //récupère les évaluations par utilisateur
-                $data = $an->getEvalsMonadeHistoByUti($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d %H:%i')
+                $data = $ice->getEvalsMonadeHistoByUti($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d %H:%i')
                     ,$this->_getParam("dateType", 'dateChoix'),$this->_getParam("idTag", false));
                 if($this->_getParam('stream')){
                     //calcul les données pour le stream
@@ -792,7 +791,7 @@ class FluxController extends Zend_Controller_Action {
                 break;
             case "getEvalsMonadeHistoDoc":
                 //récupère les évaluations par document
-                $data = $an->getEvalsMonadeHistoByDoc($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d %H:%i'));
+                $data = $ice->getEvalsMonadeHistoByDoc($this->_getParam('idMonade',3),$this->_getParam("dateUnit", '%Y-%m-%d %H:%i'));
                 if($this->_getParam('stream')){
                     //calcul les données pour le stream
                     $data = $sta->array_orderby($data, 'type', SORT_ASC, 'temps', SORT_ASC);
@@ -861,7 +860,12 @@ class FluxController extends Zend_Controller_Action {
 			case 'saveAll':
 				$z->saveAll();
 				break;
-		}
+				case 'saveAllToOmk':
+					$omkParams = OMK_PARAMS[$this->_getParam('idBaseOmk','omk_samszo')];
+					$z->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"]);		
+					$z->saveAllToOmk();
+					break;
+			}
 	}
 
     public function diplomatiegouvfrAction()

@@ -65,27 +65,125 @@ class Flux_Zotero extends Flux_Site{
     	
     }	
 
+
+    /**
+     * saveAllToOmk
+     *
+     * enrichie les informations des items zotero dans une base omk
+	 * 
+	 * @param integer	$i 
+     * 
+     */
+    function saveAllToOmk($i=1){
+
+		$this->trace("DEBUT ".__METHOD__);
+		set_time_limit(0);
+					
+        if(!$this->omk)$this->omk=new Flux_Omeka($this->dbOmk);
+		$this->bExiste = true;
+		
+		$limit = 100; $j=0; 
+		//pour le debug
+		$this->bCache = false;
+		$this->url = self::API_URI."/users/".$this->libraryID."/items";			
+		$flux = $this->getRequest($this->url,array("limit"=>$limit, "start"=>$i, "sort"=>"desc"));	    		 
+		foreach ($flux as $item){
+			$this->saveItemOmk($item,$j);
+			$j++;
+		}
+		if(count($flux))$this->saveAllToOmk($i+$j);
+	}
+
+
+    function saveItemOmk($i,$j){
+
+		$this->trace("DEBUT ".__METHOD__." - ".$j." - ".$i->links->self->href);
+
+		//récupère l'item
+		$item = $this->omk->searchByRef($i->key,"items",true,'dcterms:identifier');
+
+		
+		 //enregistre les data
+		foreach ($i->data as $k => $v) {
+			//$this->trace($k."  ");	    		 
+			if($k=="tags"){
+				foreach ($k as $t) {
+					$idTag = $this->dbT->ajouter(array("code"=>$t->tag,"parent"=>$this->idTagTags));
+					$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+							,"src_id"=>$idD,"src_obj"=>"doc"
+							,"dst_id"=>$idTag,"dst_obj"=>"tag"
+							,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+					),$this->bExiste);
+				}
+			}elseif($k=="relations"){
+				//"owl:sameAs" : "http://zotero.org/groups/1/items/JKLM6543",
+				foreach ($k as $t) {
+					$idTag = $this->dbT->ajouter(array("code"=>$k,"parent"=>$this->idTagRel));
+					$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+							,"src_id"=>$idD,"src_obj"=>"doc"
+							,"dst_id"=>$idTag,"dst_obj"=>"tag"
+							,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+							,"valeur"=>$t    	 						
+					),$this->bExiste);    	 				
+				}    	 					
+			}elseif($k=="collections"){
+				//"owl:sameAs" : "http://zotero.org/groups/1/items/JKLM6543",
+				foreach ($k as $t) {
+					$idTag = $this->dbT->ajouter(array("code"=>$k,"parent"=>$this->$this->idTagCol));
+					$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+							,"src_id"=>$idD,"src_obj"=>"doc"
+							,"dst_id"=>$idTag,"dst_obj"=>"tag"
+							,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+							,"valeur"=>$t
+					),$this->bExiste);
+				}
+			}elseif($k=="creators"){
+				foreach ($k as $t) {
+					$idExi = $this->dbE->ajouter(array("nom"=>$t->lastName,"prenom"=>$t->firstName));
+					$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+							,"src_id"=>$idD,"src_obj"=>"doc"
+							,"dst_id"=>$idExi,"dst_obj"=>"exi"
+							,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+							,"valeur"=>$t->creatorType
+					),$this->bExiste);
+				}					 
+			}else{
+				$idTag = $this->dbT->ajouter(array("code"=>$k,"parent"=>$this->idTagData));
+				$idRapD = $this->dbR->ajouter(array("monade_id"=>$this->idMonade,"geo_id"=>$this->idGeo
+						,"src_id"=>$idD,"src_obj"=>"doc"
+						,"dst_id"=>$idTag,"dst_obj"=>"tag"
+						,"pre_id"=>$idRap,"pre_obj"=>"rapport"
+						,"valeur"=>$v.""
+				),$this->bExiste);
+			}    	 		    	 		
+		}
+												  
+		//$this->trace("FIN ".__METHOD__);
+		
+	} 	
+
+
     function saveAll($i=1){
 
-	    	$this->trace("DEBUT ".__METHOD__);
-	    	set_time_limit(0);
-	    		    	
-	    	//récupère l'action
-	    	if(!$this->idAct)$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
-	    	$this->bExiste = true;
-	    	
-			$limit = 100; $j=0; 
-			//pour le debug
-			$this->bCache = false;
-			$this->url = self::API_URI."/users/".$this->libraryID."/items";			
-			$flux = $this->getRequest($this->url,array("limit"=>$limit, "start"=>$i, "sort"=>"desc"));	    		 
-			foreach ($flux as $item){
-				$this->saveItem($item,$j);
-				$j++;
-			}
-			if(count($flux))$this->saveAll($i+$j);
-    		//$this->lucene->index->optimize();
-    }
+		$this->trace("DEBUT ".__METHOD__);
+		set_time_limit(0);
+					
+		//récupère l'action
+		if(!$this->idAct)$this->idAct = $this->dbA->ajouter(array("code"=>__METHOD__));
+		$this->bExiste = true;
+		
+		$limit = 100; $j=0; 
+		//pour le debug
+		$this->bCache = false;
+		$this->url = self::API_URI."/users/".$this->libraryID."/items";			
+		$flux = $this->getRequest($this->url,array("limit"=>$limit, "start"=>$i, "sort"=>"desc"));	    		 
+		foreach ($flux as $item){
+			$this->saveItem($item,$j);
+			$j++;
+		}
+		if(count($flux))$this->saveAll($i+$j);
+		//$this->lucene->index->optimize();
+	}
 
     function saveItem($i,$j){
 

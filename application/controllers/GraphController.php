@@ -73,11 +73,11 @@ class GraphController extends Zend_Controller_Action {
     public function forceAction()
     {
 		//..%2Fgenerateur%2Fapi%3Fv%3Dstructure%26idOeu%3D2%26txt%3D%5Bdis-qualif-%5D%26reseau%3D1
-		$url = "../data/miserForce.json";
 		//$url = "../generateur/api?v=structure&idOeu=2&txt=[thl-pr%C3%A9sente-01]&force=0&reseau=1";
 		$url = "../generateur/api?v=structure&idOeu=2&txt=[dis-adverbe]&force=0&reseau=1";
 		$url = "../generateur/api?v=structure&idOeu=2&txt=[dis-date]&reseau=1&force=0&nivMax=2";
 		//$url = "../generateur/api?v=structure&idOeu=2&txt=[32|m_matin] [10|dis-mois]&reseau=1&force=0&nivMax=2";
+		$url = "../data/miserForce.json";
 		
     	$this->view->urlData = $this->_getParam('urlData',$url);
 	}
@@ -715,6 +715,10 @@ class GraphController extends Zend_Controller_Action {
     }
     
 	public function matriceAction(){
+		
+	}
+
+	public function matricetripleAction(){
 		
 	}
 	

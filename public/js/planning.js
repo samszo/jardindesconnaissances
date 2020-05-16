@@ -50,10 +50,21 @@ class planning {
                 { field: 'UE', caption: "UE", type: 'text', size: '100px', sortable: true },
                 { field: 'EC', caption: "EC", type: 'text', size: '100px', sortable: true },
                 { field: 'apogee', caption: 'Apogée', type: 'int', size: '100px', sortable: true },
+                { field: '%CM', caption: "% CM", type: 'text', size: '100px', sortable: true },
+                { field: '%TD', caption: "% TD", type: 'text', size: '100px', sortable: true },
+                { field: '%TP', caption: "% TP", type: 'text', size: '100px', sortable: true },
                 { field: 'nbHeure', caption: "Nb d'heure", type: 'text', size: '100px', sortable: true },
                 { field: 'nbHeureTD', caption: "Nb d'heure TD", type: 'text', size: '100px', sortable: true},
                 { field: 'intervenants', caption: "Intervenants", type: 'text', size: '100%', sortable: true },
             ],
+            toolbar: {
+                items: [{id: 'export',type: 'button',text: 'Exporter',icon: 'fas fa-file-export'}],
+                onClick: function (event) {
+                    if (event.target == 'export') {
+                        me.showCSV(w2ui['gridCoursNbHeure'].records);
+                    }
+                }
+            }
         };	 
 
         var gridItvsNbHeure = {
@@ -77,6 +88,14 @@ class planning {
                 { field: 'nbHeureTD', caption: "Nb d'heure TD", type: 'text', size: '100px', sortable: true},
                 { field: 'cours', caption: "cours", type: 'text', size: '100%', sortable: true },
             ],
+            toolbar: {
+                items: [{id: 'export',type: 'button',text: 'Exporter',icon: 'fas fa-file-export'}],
+                onClick: function (event) {
+                    if (event.target == 'export') {
+                        me.showCSV(w2ui['gridItvsNbHeure'].records);
+                    }
+                }
+            }
         };	 
 
         var gridPlanItvs = {
@@ -99,6 +118,15 @@ class planning {
                 { field: 'cours', caption: "Cours", type: 'text', size: '30%', sortable: true },
                 { field: 'lieu', caption: "Lieu", type: 'text', size: '100px', sortable: true},
             ],
+            toolbar: {
+                items: [{id: 'export',type: 'button',text: 'Exporter',icon: 'fas fa-file-export'}],
+                onClick: function (event) {
+                    if (event.target == 'export') {
+                        me.showCSV(w2ui['gridPlanItvs'].records);
+                    }
+                }
+            }
+
         };	 
 
         var gridRecapItvsCours = {
@@ -124,34 +152,68 @@ class planning {
                 { field: 'nbH', caption: "Nb. d'heure", type: 'text', size: '100px', sortable: true},
             ],
             toolbar: {
-                items: [{
-                    id: 'export',
-                    type: 'button',
-                    text: 'Exporter',
-                    icon: 'fas fa-file-export'
-                }],
+                items: [{id: 'export',type: 'button',text: 'Exporter',icon: 'fas fa-file-export'}],
                 onClick: function (event) {
                     if (event.target == 'export') {
-                        let csv = me.convertToCSV(w2ui['gridRecapItvsCours'].records);
-                        w2popup.open({
-                            title: 'Données CSV',
-                            body: '<div class="w2ui-centered" style="">'
-                                //+'<label for="csv">Les données :</label>'
-                                +'<textarea id="csv" name="csv" rows="'+w2ui['gridRecapItvsCours'].records.length+'" cols="100">'
-                                +csv
-                                +'</textarea>',
-                            width:800,     // width in px
-                            height:600,     // height in px
-                        });
+                        me.showCSV(w2ui['gridRecapItvsCours'].records);
                     }
                 }
             }
         };	 
+
+        var gridTypeItvsCours = {
+            header: "Nb d'heure par type d'intervenant",
+            show: {toolbar		: true,
+                    toolbarReload   : false,
+                    toolbarColumns  : true,
+                    toolbarSearch   : true,
+                    toolbarAdd      : false,
+                    toolbarDelete   : false,
+                    toolbarSave		: false,
+                    header: true, 
+                    selectColumn: false,
+                    columnHeaders: true},
+            name: 'gridTypeItvsCours',         
+            columns: [               
+                { field: 'recid', caption: 'ID', type: 'text', size: '100px', hidden: true },
+                { field: 'Type', caption: "Type intervenant", type: 'text', size: '130px', sortable: true },
+                { field: 'nbHeure', caption: "Nb. d'heure", type: 'text', size: '130px', sortable: true},
+                { field: 'nbHeureTD', caption: "Nb. d'heure chargées", type: 'text', size: '130px', sortable: true},
+                { field: 'nbHeureTuto', caption: "Nb. d'heure tutorat", type: 'text', size: '130px', sortable: true},
+                { field: 'nbHeureStage', caption: "Nb. d'heure stage", type: 'text', size: '130px', sortable: true},
+                { field: 'nbHeureJury', caption: "Nb. d'heure jury", type: 'text', size: '130px', sortable: true},
+                { field: 'nbHeurePro', caption: "Nb. d'heure contrat", type: 'text', size: '130px', sortable: true},
+            ],
+            toolbar: {
+                items: [{id: 'export',type: 'button',text: 'Exporter',icon: 'fas fa-file-export'}],
+                onClick: function (event) {
+                    if (event.target == 'export') {
+                        me.showCSV(w2ui['gridTypeItvsCours'].records);
+                    }
+                }
+            }
+        };	         
+
+        this.showCSV = function(data){
+            let csv = me.convertToCSV(data);
+            w2popup.open({
+                title: 'Données CSV',
+                body: '<div class="w2ui-centered" style="">'
+                    //+'<label for="csv">Les données :</label>'
+                    +'<textarea id="csv" name="csv" rows="'+data.length+'" cols="100">'
+                    +csv
+                    +'</textarea>',
+                width:800,     // width in px
+                height:600,     // height in px
+            });
+        }
         
         this.init = function () {
             let urlData = "../planning/events?idCal="+me.idCal+"&timeMax="+me.dtMax.toISOString()+"&timeMin="+me.dtMin.toISOString();
             //urlData = "../../data/planning/eventsDWM_18-19.json";
- 
+         
+            this.patienter();
+
             this.calY.init({
                 domain:"month", subDomain: "day",cellSize: sizeCell, subDomainTextFormat: "%d", cellPadding: 4, domainMargin: 6
                 ,range:nbMois
@@ -171,7 +233,20 @@ class planning {
                 });				           
         };
 
+        this.patienter = function () {
+            w2popup.open({
+                width: 500,
+                height: 300,
+                title: 'Chargement des données',
+                body: '<div class="w2ui-centered"></div>',
+                showMax: false
+            });
+            w2popup.lock('Patientez...', true);
+        }
+        
+
         this.update = function(){
+            this.patienter();
             let urlData = "../planning/events?idCal="+me.idCal+"&timeMax="+me.dtMax.toISOString()+"&timeMin="+me.dtMin.toISOString();
             me.calY.update(urlData,true,me.calY.RESET_ALL_ON_UPDATE);
         };        
@@ -206,7 +281,8 @@ class planning {
         function parser(data) {
 
             if(!data){
-                w2alert('Veuillez vous connecter pour afficher le planning.').done(function () {return;});
+                w2popup.close();
+                w2alert('Pas de données dans cette agenda.').done(function () {return;});
                 return;
             } 
 
@@ -378,6 +454,9 @@ class planning {
             var H = document.getElementsByTagName('head')[0];
             H.appendChild(S);
             */
+
+            w2popup.close();
+
             return rs;
 
         };
@@ -405,6 +484,9 @@ class planning {
                         'UE':cc.cours['UE nom court'],
                         'EC':cc.cours['EC nom court'],
                         'apogee':cc.cours['apogee'],
+                        '%CM':cc.cours['%CM'],
+                        '%TD':cc.cours['%TD'],
+                        '%TP':cc.cours['%TP'],
                         'nbHeure':cc.nbHeure,
                         'nbHeureTD':cc.nbHeureTD,
                         'intervenants':itvs,                    
@@ -493,6 +575,20 @@ class planning {
             gridRecapItvsCours.records = data;
             //initialise le grid actif par défaut
             initGrid(me.divResult,gridRecapItvsCours);
+
+        }        
+
+        this.getNbHTypeInt = function(){
+            let data = [], recid = 1;
+            for (var k in me.cumulType) {
+                let r = me.cumulType[k];
+                r.recid = recid;
+                data.push(r);
+                recid ++;
+            }
+            gridTypeItvsCours.records = data;
+            //initialise le grid actif par défaut
+            initGrid(me.divResult,gridTypeItvsCours);
 
         }        
 

@@ -39,7 +39,7 @@ class GenerateurController extends Zend_Controller_Action
             $genO = new Gen_Omk($this->idBaseGen,true);
             $genO->bTrace = $this->_getParam('trace',true);
             $genO->bTraceFlush = $genO->bTrace;
-            $omkParams = OMK_PARAMS['omk-genlod-1'];//OMK_PARAMS['omk_genlod'];
+            $omkParams = OMK_PARAMS['omk_genlod'];
             $genO->trace('OMK_PARAMS',$omkParams);
             $genO->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"], $omkParams["BDD"]);		
             $genO->trace('OMK OK');
@@ -49,7 +49,7 @@ class GenerateurController extends Zend_Controller_Action
                     $genO->importBaseGen($this->_getParam('refL',""));
                     break;
                 case 'conj':
-                    $genO->importBaseGen($this->_getParam('refL',""));
+                    $genO->importBaseGenConj($this->_getParam('refL',""));
                     break;
                 case 'corrigeDoublonsImport':
                     $genO->corrigeDoublonsImport();
@@ -68,7 +68,7 @@ class GenerateurController extends Zend_Controller_Action
         $genO = new Gen_Omk($this->idBaseGen,true);
         $genO->bTrace = $this->_getParam('trace',false);
         $genO->bTraceFlush = $genO->bTrace;
-        $omkParams = OMK_PARAMS['omk_genlod'];
+        $omkParams = OMK_PARAMS[$this->_getParam('idBaseOmk','omk_genlod')];
         $genO->initOmeka($omkParams["ENDPOINT"], $omkParams["API_IDENT"], $omkParams["API_KEY"]);		
 
 
@@ -78,6 +78,9 @@ class GenerateurController extends Zend_Controller_Action
                 break;
             case 'getConceptReseau':
                 $this->view->r = $genO->getConceptReseau($this->_getParam('cpt'));
+                break;
+            case 'setMonde':
+                $this->view->r = $genO->setMonde($this->_getParam('type','complet'));
                 break;
             }
     
