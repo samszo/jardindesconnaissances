@@ -1,0 +1,99 @@
+<svg width="890" height="309"
+    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<style>
+    /* <![CDATA[ */
+
+.txtTitreAxe0{
+    fill:rgb(3, 246, 162);
+}
+.txtTitreAxe90{
+    fill:rgb(252, 161, 205);
+}
+.txtTitreAxe180{
+    fill:rgb(84, 214, 255);
+}
+.txtTitreAxe270{
+    fill:rgb(173, 158, 253);
+}
+.txtTitreAxehaut{
+  fill:white;
+}
+.txtTitreAxebas{
+  fill:white;
+}
+.axis line {
+  fill: none;
+  stroke: url(#degraxeH);
+  stroke-width:6px;
+}  
+.x.axis path {
+    fill: none;
+    stroke: url(#degraxeH);
+    stroke-width:6px;
+}  
+.y.axis path {
+    fill: none;
+    stroke: url(#degraxeV);
+    stroke-width:6px;
+}  
+.cFond{
+  stroke-opacity:0.5;
+  fill:none;
+  stroke:url(#center-gradient);
+  stroke-width:3px;
+}
+#orbit1{
+  fill:url(#center-gradient);
+  stroke:none;
+}
+#orbit4{
+  stroke-width:6px;
+}
+    /* ]]> */
+  </style>
+  <defs>
+    <linearGradient id="linear-gradient" y1="0.5" x2="1" y2="0.5" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#54d6ff"></stop>
+      <stop offset="1" stop-color="#5fff84"></stop>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="0.005" y1="0.585" x2="0.991" y2="0.585" xlink:href="#linear-gradient">
+    </linearGradient>
+    <linearGradient id="center-gradient" x1="0.717" y1="1" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#5ffd8a"></stop>
+      <stop offset="0.65" stop-color="#58e6ce"></stop>
+      <stop offset="1" stop-color="#55daf2"></stop>
+    </linearGradient>
+    <linearGradient id="degraxeH" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop stop-color="rgb(173, 158, 253)" offset="0%"></stop>
+      <stop stop-color="rgb(252, 161, 205)" offset="100%"></stop>
+    </linearGradient>
+    <linearGradient id="degraxeV" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop stop-color="rgb(3, 246, 162)" offset="0%"></stop>
+      <stop stop-color="rgb(84, 214, 255)" offset="100%"></stop>
+    </linearGradient>
+  </defs>
+  <g class="cartoaxes" transform="translate(445,154.5) scale(0.9)">
+    <defs></defs>
+    <rect width="890" height="309" fill="transparent"></rect>
+    <g class="axis">
+      <line x1="0" y1="0" x2="8.238811341263819e-15" y2="-133.55"></line><text class="txtTitreAxehaut"
+        text-anchor="middle" dy="1.2em" x="9.154234823626465e-15" y="-149.5">vérité</text>
+    </g>
+    <g class="axis">
+      <line x1="0" y1="0" x2="116.52371807919624" y2="68.27499999999998"></line><text class="txtTitreAxehaut"
+        text-anchor="middle" dy="" x="129.4707978657736" y="74.74999999999997">utilité</text>
+    </g>
+    <g class="axis">
+      <line x1="0" y1="0" x2="-116.52371807919621" y2="68.27500000000005"></line><text class="txtTitreAxehaut"
+        text-anchor="middle" dy="" x="-129.47079786577356" y="74.75000000000006">beauté</text>
+    </g>
+    <circle class="cFond" id="orbit0" r="0" cx="0" cy="0"></circle>
+    <circle class="cFond" id="orbit1" r="14.95" cx="0" cy="0"></circle>
+    <circle class="cFond" id="orbit2" r="59.8" cx="0" cy="0"></circle>
+    <circle class="cFond" id="orbit3" r="89.69999999999999" cx="0" cy="0"></circle>
+    <circle class="cFond" id="orbit4" r="119.6" cx="0" cy="0"></circle>
+    <circle class="cFond" id="orbit5" r="0" cx="0" cy="0"></circle><text class="txtTitreAxehaut"
+      style="font-size: 18px; font-style: italic;" text-anchor="middle" x="0" y="-159.5"></text>
+  </g>
+</svg>

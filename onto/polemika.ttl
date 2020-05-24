@@ -15,6 +15,16 @@ plmk:Monde a rdfs:Class ;
     rdfs:domain o:Resource ;
     vs:term_status "experimental" .
 
+plmk:Argument a rdfs:Class ;
+    rdfs:label "Argument" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+plmk:LieuCommun a rdfs:Class ;
+    rdfs:label "Lieu commun" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
 plmk:echelleMicro a rdf:Property ;
     rdfs:label "Echelle Micro" ;
     rdfs:domain o:Resource ;
@@ -67,5 +77,15 @@ plmk:fonctionReferentiel a rdf:Property ;
 
 plmk:valeurNegative a rdf:Property ;
     rdfs:label "Valeurs négatives" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+plmk:hasMonde a rdf:Property ;
+    rdfs:label "A comme monde" ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+plmk:hasMonde a rdf:Property ;
+    rdfs:label "A comme monde" ;
     rdfs:domain o:Resource ;
     vs:term_status "experimental" .

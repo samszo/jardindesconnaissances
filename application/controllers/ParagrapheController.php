@@ -73,4 +73,9 @@ class ParagrapheController extends Zend_Controller_Action {
 	public function pupitreAction() {
 
 	}
+
+	public function verifsiteAction() {
+
+
+	}
 }

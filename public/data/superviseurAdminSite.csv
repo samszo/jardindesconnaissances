@@ -1,0 +1,14 @@
+nom site,urlVPN,urlPublicIP,urlPublicDomain,urlPublicDomainNew
+paragraphe,http://192.168.20.224/paragraphe/,http://193.54.152.43/paragraphe,http://paragraphe.site,
+jdc,http://192.168.20.232/jdc,http://193.54.152.41/jdc,https://jardindesconnaissances.univ-paris8.fr/,
+DTU,http://192.168.20.219/digitaluses-congress/,http://193.54.152.42/digitaluses-congress/,http://www.digitaluses-congress.univ-paris8.fr/,
+adacemu,http://192.168.20.214/ADACEMU,http://193.54.152.33/ADACEMU/,http://www.adacemu.univ-paris8.fr/,
+polemika,http://192.168.20.230/polemika,http://193.54.152.34/polemika/,,http://www.polemika.univ-paris8.fr/
+creatic,http://192.168.20.212/creatic,http://193.54.152.35/creatic,,http://creatic.archives.univ-paris8.fr/
+samszo,http://192.168.20.223/samszo,http://193.54.152.36/samszo/,http://www.samszo.univ-paris8.fr,
+isaleh,http://192.168.20.216/isaleh,http://193.54.152.37/isaleh,http://www.isaleh.univ-paris8.fr,
+ontostat,http://192.168.20.222/ontostats,http://193.54.152.38/ontostats,http://www.ontostats.univ-paris8.fr,
+machinealire,http://192.168.20.225/,http://193.54.152.39/machinealire,,http://www.machinealire.univ-paris8.fr/
+lire-ensemble,http://192.168.20.233/lireensemble,http://193.54.152.40/lireensemble,,http://www.lire-ensemble.univ-paris8.fr/
+hom,http://192.168.20.235/hom,http://193.54.152.44/hom,,http://www.hom.univ-paris8.fr
+pepe,http://192.168.20.201/pepe,http://193.54.152.45/pepe/omk,,http://pepe.univ-paris8.fr

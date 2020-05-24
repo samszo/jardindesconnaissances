@@ -17,6 +17,8 @@ application/configs/configP8-Paragraphe.php
 
 tmp/
 
+ssl/
+
 data/SMEL/
 
 data/diigo/
@@ -502,3 +504,4 @@ certificat/jardindesconnaissances_univ-paris8_fr_3034756/INSTALL_INSTRUCTIONS.fr
 certificat/jardindesconnaissances_univ-paris8_fr_3034756/INSTALL_INSTRUCTIONS.it.txt
 certificat/jardindesconnaissances_univ-paris8_fr_3034756/INSTALL_INSTRUCTIONS.lt.txt
 certificat/jardindesconnaissances_univ-paris8_fr_3034756/jardindesconnaissances_univ-paris8_fr.crt
+public/data/.~lock.superviseurAdminSite.csv#

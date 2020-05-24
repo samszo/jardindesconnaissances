@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vérification des sites de Paragraphe</title>
+    <link rel="stylesheet" type="text/css" href="../font/font-awesome/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/font-awesome.css">
+
+    <script type="text/javascript" src="../js/d3.js"></script>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/popper.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../font/font-awesome/all.min.js"></script>
+      
+    <style>
+      iframe{
+        height: 300px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='main' class="container-fluid" >
+        <nav id="nbMain" class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+            <a class="navbar-brand" href="#">
+                <h1 class="text-center" >Vérification des sites Web de Paragraphe</h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarTogglerDemo02"
+                aria-controls="navbarTogglerDemo02" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+            </div>
+        </nav>	
+
+
+
+    </div>
+
+    <script type="text/javascript">
+
+  d3.csv("../data/superviseurAdminSite.csv",function(data){
+    var headerNames = d3.keys(data[0]);
+    var rowSites = d3.select("#main").selectAll('.row')
+      .data(data)
+      .enter()
+      .append('div')
+      .attr('class',"row");
+      headerNames.forEach((c,i) => {
+        if(i>0 && i < 4){
+          let cardSite = rowSites.append('div').attr('class',"col-4")
+          .append('div')
+          .attr('class',"card")
+          .append('div')
+          .attr('class',"card-body");
+          cardSite.append('h5').attr('class',"card-title").text(
+            r => r['nom site']+' : '+c);
+          cardSite.append("a")
+            .attr('href',r => c == 'urlPublicDomain' ? r['urlPublicDomain'] ? r['urlPublicDomain'] : r['urlPublicDomainNew'] : r[c])
+            .text(r => c == 'urlPublicDomain' ? r['urlPublicDomain'] ? r['urlPublicDomain'] : r['urlPublicDomainNew'] : r[c]);
+          cardSite.append("iframe").attr("src",r => r[c]);
+        }
+      })
+  })
+
+</script>
+
+
+  </body>
+</html>
