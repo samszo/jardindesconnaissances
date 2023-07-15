@@ -408,10 +408,6 @@ class FluxController extends Zend_Controller_Action {
     		}
     }
 
-
-	,%vjW=*2kxjU9bpXYY!`c9Ea@(bT~l*]
-
-
 	public function googlekgAction()
     {
         $g = new Flux_Gknowledgegraph($this->_getParam('idBase'),$this->_getParam('trace'));
