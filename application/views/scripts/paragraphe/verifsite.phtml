@@ -43,14 +43,15 @@
 
     <script type="text/javascript">
 
-  d3.csv("../data/superviseurAdminSite.csv",function(data){
+  d3.csv("../data/superviseurDetailsNew.csv",function(data){
     var headerNames = d3.keys(data[0]);
     var rowSites = d3.select("#main").selectAll('.row')
       .data(data)
       .enter()
       .append('div')
       .attr('class',"row");
-      headerNames.forEach((c,i) => {
+    /*
+    headerNames.forEach((c,i) => {
         if(i>0 && i < 4){
           let cardSite = rowSites.append('div').attr('class',"col-4")
           .append('div')
@@ -64,7 +65,49 @@
             .text(r => c == 'urlPublicDomain' ? r['urlPublicDomain'] ? r['urlPublicDomain'] : r['urlPublicDomainNew'] : r[c]);
           cardSite.append("iframe").attr("src",r => r[c]);
         }
-      })
+    })
+    */
+
+    let cardSite = rowSites.append('div').attr('class',"col-12")
+      .append('div')
+      .attr('class',"card")
+      .append('div')
+      .attr('class',"card-body");
+      cardSite.append('h5').attr('class',"card-title").text(r => r['VM']+' : '+r['nom']);
+    let rowIf = cardSite.append('div')
+        .attr('class',"row");
+    let colIf = rowIf.append('div')
+        .attr('class',"col-6");
+    colIf.append("a")
+        .attr('target','_blanck')
+        .attr('href',r => 'https://'+r['IP_DMZ'])
+        .text(r => 'IP_DMZ : https://'+r['IP_DMZ']);
+    colIf.append("iframe").attr("src",r => 'https://'+r['IP_DMZ']);
+    colIf = rowIf.append('div')
+        .attr('class',"col-6");
+    colIf.append("a")
+        .attr('target','_blanck')
+        .attr('href',r => 'https://'+r['IP_public'])
+        .text(r => 'IP_public : https://'+r['IP_public']);
+    colIf.append("iframe").attr("src",r => 'https://'+r['IP_public']);
+    rowIf = cardSite.append('div')
+        .attr('class',"row");
+    colIf = rowIf.append('div')
+        .attr('class',"col-6");
+    colIf.append("a")
+        .attr('target','_blanck')
+        .attr('href',r => 'http://'+r['FQDN'])
+        .text(r => 'FQDN : '+'http://'+r['FQDN']);
+    colIf.append("iframe").attr("src",r => 'http://'+r['FQDN']);
+    colIf = rowIf.append('div')
+        .attr('class',"col-6");
+    colIf.append("a")
+        .attr('target','_blanck')
+        .attr('href',r => 'https://'+r['FQDN'])
+        .text(r => 'FQDN SECURE : '+'https://'+r['FQDN']);
+    colIf.append("iframe").attr("src",r => 'https://'+r['FQDN']);
+
+
   })
 
 </script>

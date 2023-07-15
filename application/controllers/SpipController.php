@@ -212,7 +212,7 @@ class SpipController extends Zend_Controller_Action
 					//récupère les articles de la rubrique
 					$arrArt = $dbA->findById_rubrique($idRubAuteur);
 					/*construction de la vue
-					 * http://stackoverflow.com/questions/11076428/sending-newsletter-from-a-zend-framework-project
+					 * http://stackoverflow.com/questions/11076428/sending-newsletter-from-a-Zend-framework-project
 					 */
 					$mailView = new Zend_View();
 					$mailView->setScriptPath(APPLICATION_PATH.'/views/scripts/mail/');
@@ -233,7 +233,7 @@ class SpipController extends Zend_Controller_Action
 
 					/*envoie du mail
 					merci à http://stackoverflow.com/questions/18361233/gmail-sending-limits
-					http://stackoverflow.com/questions/11076428/sending-newsletter-from-a-zend-framework-project
+					http://stackoverflow.com/questions/11076428/sending-newsletter-from-a-Zend-framework-project
 					*/
 					try {
 			    		$date = date("m/d/Y H:i:s");

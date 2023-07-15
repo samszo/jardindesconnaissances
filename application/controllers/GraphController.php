@@ -575,7 +575,7 @@ class GraphController extends Zend_Controller_Action {
 	    	$this->view->nbMin = $this->_getParam('nbMin', 0);
 	    	$this->view->legende =  1;//par défaut la légende apparait     
 	    	$this->view->q =  $this->_getParam('q');   
-	    	switch ($this->_getParam('type')) {
+	    	switch ($this->_getParam('type','getHistoDiscipline')) {
 	    		case "diigo":
 	    			//var url = "http://localhost/jdc/public/flux/diigo?q=getHistoTagLies&idTag=27&idMonade=2&idUti=1&idActi=2&idParent=1&dateUnit=%Y-%m&for=stream&arrTags[]=ecosysteminfo";//&dates[]=1456669433&dates[]=1489415262";
 	    			$this->view->titre =  "Evolution des mots clefs dans https://www.diigo.com/user/luckysemiosis";

@@ -1,14 +1,22 @@
-nom site,urlVPN,urlPublicIP,urlPublicDomain,urlPublicDomainNew
-paragraphe,http://192.168.20.224/paragraphe/,http://193.54.152.43/paragraphe,http://paragraphe.site,
-jdc,http://192.168.20.232/jdc,http://193.54.152.41/jdc,https://jardindesconnaissances.univ-paris8.fr/,
-DTU,http://192.168.20.219/digitaluses-congress/,http://193.54.152.42/digitaluses-congress/,http://www.digitaluses-congress.univ-paris8.fr/,
-adacemu,http://192.168.20.214/ADACEMU,http://193.54.152.33/ADACEMU/,http://www.adacemu.univ-paris8.fr/,
-polemika,http://192.168.20.230/polemika,http://193.54.152.34/polemika/,,http://www.polemika.univ-paris8.fr/
-creatic,http://192.168.20.212/creatic,http://193.54.152.35/creatic,,http://creatic.archives.univ-paris8.fr/
-samszo,http://192.168.20.223/samszo,http://193.54.152.36/samszo/,http://www.samszo.univ-paris8.fr,
-isaleh,http://192.168.20.216/isaleh,http://193.54.152.37/isaleh,http://www.isaleh.univ-paris8.fr,
-ontostat,http://192.168.20.222/ontostats,http://193.54.152.38/ontostats,http://www.ontostats.univ-paris8.fr,
-machinealire,http://192.168.20.225/,http://193.54.152.39/machinealire,,http://www.machinealire.univ-paris8.fr/
-lire-ensemble,http://192.168.20.233/lireensemble,http://193.54.152.40/lireensemble,,http://www.lire-ensemble.univ-paris8.fr/
-hom,http://192.168.20.235/hom,http://193.54.152.44/hom,,http://www.hom.univ-paris8.fr
-pepe,http://192.168.20.201/pepe,http://193.54.152.45/pepe/omk,,http://pepe.univ-paris8.fr
+nom site,ipVPN,ipPublic,urlPublicDomain
+paragraphe,192.168.20.224,193.54.152.43,https://paragraphe.site
+jdc,192.168.20.232,193.54.152.41,https://jardindesconnaissances.univ-paris8.fr/
+DTU,192.168.20.219,193.54.152.42,https://digitaluses-congress.univ-paris8.fr/
+adacemu,192.168.20.214,193.54.152.33,https://adacemu.univ-paris8.fr/
+polemika,192.168.20.230,193.54.152.34,https://polemika.univ-paris8.fr/
+creatic,192.168.20.212,193.54.152.35,https://creatic.archives.univ-paris8.fr/
+samszo,192.168.20.223,193.54.152.36,https://samszo.univ-paris8.fr
+isaleh,192.168.20.216,193.54.152.37,https://isaleh.univ-paris8.fr
+ontostat,192.168.20.222,193.54.152.38,https://ontostats.univ-paris8.fr
+machinealire,192.168.20.225,193.54.152.39,https://machinealire.univ-paris8.fr/
+lire-ensemble,192.168.20.233,193.54.152.40,https://lire-ensemble.univ-paris8.fr
+hom,192.168.20.235,193.54.152.44,https://hom.univ-paris8.fr
+pepe,192.168.20.201,193.54.152.45,https://pepe.univ-paris8.fr
+AVUN,192.168.30.203,193.54.152.47,https://avun.univ-paris8.fr
+promo-THYP,192.168.30.204,193.54.152.48,https://promo-thyp.univ-paris8.fr
+BOT,192.168.30.205,193.54.152.49,https://bot.univ-paris8.fr
+iot,192.168.30.206,193.54.152.50,https://iot.univ-paris8.fr
+bootz,192.168.30.207,193.54.152.51,https://bootz.univ-paris8.fr
+arcanes,192.168.30.208,193.54.152.52,https://arcanes.univ-paris8.fr
+archives-creatic,192.168.20.192,193.54.152.35,https://creatic-archives.univ-paris8.fr
+doctorants-paragraphe,192.168.30.209,193.54.152.56,https://doctorants-paragraphe.univ-paris8.fr

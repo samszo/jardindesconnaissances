@@ -267,23 +267,23 @@ class AuthController extends Zend_Controller_Action
     var $googleScopes = array(
 		"Analytics"=>"https://www.google.com/analytics/feeds/",
 		"Sites"=>"https://sites.google.com/feeds/",
-		"Blogger"=>"http://www.blogger.com/feeds/",
-		"Book"=>"http://www.google.com/books/feeds/",
+		"Blogger"=>"https://www.blogger.com/feeds/",
+		"Book"=>"https://www.google.com/books/feeds/",
 		//"Calendar"=>"https://www.google.com/calendar/feeds/",
 		"Calendar"=>"https://www.googleapis.com/auth/calendar",
 		"Contacts"=>"https://www.google.com/m8/feeds/",
 		"Shopping"=>"https://www.googleapis.com/auth/structuredcontent",
 		"Documents"=>"https://docs.google.com/feeds/",
-		"Finance"=>"http://finance.google.com/finance/feeds/",
+		"Finance"=>"https://finance.google.com/finance/feeds/",
 		"Gmail"=>"https://mail.google.com/mail/feed/atom/",
 		"Health"=>"https://www.google.com/health/feeds/",
-		"Maps"=>"http://maps.google.com/maps/feeds/",
-		"Picasa"=>"http://picasaweb.google.com/data/",
-		"Portable"=>"http://www-opensocial.googleusercontent.com/api/people",
-		"Sidewiki"=>"http://www.google.com/sidewiki/feeds/",
+		"Maps"=>"https://maps.google.com/maps/feeds/",
+		"Picasa"=>"https://picasaweb.google.com/data/",
+		"Portable"=>"https://www-opensocial.googleusercontent.com/api/people",
+		"Sidewiki"=>"https://www.google.com/sidewiki/feeds/",
 		"Spreadsheets"=>"https://spreadsheets.google.com/feeds/",
-		"Webmaster"=>"http://www.google.com/webmasters/tools/feeds/",
-		"YouTube"=>"http://gdata.youtube.com",
+		"Webmaster"=>"https://www.google.com/webmasters/tools/feeds/",
+		"YouTube"=>"https://gdata.youtube.com",
 		"Drive"=>"https://www.googleapis.com/auth/drive",
 		"Profil"=>"https://www.googleapis.com/auth/userinfo.profile"	
     );
@@ -299,8 +299,9 @@ class AuthController extends Zend_Controller_Action
             $client = new Google_Client();
             $client->setClientId(KEY_GOOGLE_CLIENT_ID);
             $client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
+			//force le HHTPS pour le serveur
 			if(empty($_SERVER['HTTPS']))
-				$client->setRedirectUri('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/auth/google");
+				$client->setRedirectUri('https://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/auth/google");
 			else
 				$client->setRedirectUri('https://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/auth/google");
             $client->addScope('https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/plus.login');            
@@ -317,11 +318,11 @@ class AuthController extends Zend_Controller_Action
             /************************************************
              If we're logging out we just need to clear our
              local access token in this case
-             pour zend suppression de la session
+             pour Zend suppression de la session
              ************************************************/
             if ($this->_getParam('logout')) {
                 unset($_SESSION['upload_token']);
-                $redir = 'http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl().urldecode($ssGoogle->redir);
+                $redir = 'https://' .$this->getRequest()->getHttpHost().$this->view->baseUrl().urldecode($ssGoogle->redir);
                 Zend_Session::namespaceUnset('google');
                 $this->redirect($redir);
             }else{
@@ -467,7 +468,7 @@ class AuthController extends Zend_Controller_Action
             	if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             		$curbase = 'https://' . $_SERVER['SERVER_NAME'];
             	} else {
-            		$curbase = 'http://' . $_SERVER['SERVER_NAME'];
+            		$curbase = 'https://' . $_SERVER['SERVER_NAME'];
             	}
             	if ($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) {
             		$curbase .= ':' . $_SERVER['SERVER_PORT'];

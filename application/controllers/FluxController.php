@@ -35,6 +35,13 @@ class FluxController extends Zend_Controller_Action {
 		$this->view->content = $res;
 	}
 
+	public function gubcAction() {
+		$s = new Flux_Site(false,false);
+		$u = $this->_getParam('u', "http://www.google.com");
+		$s->trace($u);
+		$this->view->content = 	$s->getUrlBodyContent($u,false,false);
+	}
+
     public function toustagsAction()
     {
 	    if ($this->getRequest()->isPost()) {
@@ -400,6 +407,10 @@ class FluxController extends Zend_Controller_Action {
 				break;
     		}
     }
+
+
+	,%vjW=*2kxjU9bpXYY!`c9Ea@(bT~l*]
+
 
 	public function googlekgAction()
     {

@@ -146,8 +146,11 @@ var gridActeurAdd = {
 	            			if(c[0].prenom)q = c[0].prenom;
             				if(c[0].nom)q += c[0].nom;
 		            		findActeurGoogle(q);
-	            		}else
-	            			findActeurGoogle(acteur.prenom+' '+acteur.nom);
+	            		}else{
+	            			if(acteur.prenom)q = acteur.prenom;
+            				if(acteur.nom)q += ' '+acteur.nom;
+	            			findActeurGoogle(q);
+						}
 	            }
 	            if (event.target == 'lier_photo') {
 	            		ajoutActeurLien(getSaisiActeur(acteur, c),tofSelect['pId'],tofSelect);

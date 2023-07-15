@@ -29,7 +29,7 @@ class PlanningController extends Zend_Controller_Action {
 			$client = new Google_Client();
 			$client->setClientId(KEY_GOOGLE_CLIENT_ID);
 			$client->setClientSecret(KEY_GOOGLE_CLIENT_SECRET);
-			$client->setRedirectUri('http://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/planning");
+			$client->setRedirectUri('https://' .$this->getRequest()->getHttpHost().$this->view->baseUrl()."/planning");
 			$client->addScope(array("https://www.googleapis.com/auth/calendar","https://www.googleapis.com/auth/drive","https://www.googleapis.com/auth/userinfo.profile"));
 			$ssPlan->client = $client;
 		}else

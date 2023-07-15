@@ -367,7 +367,7 @@ try {
 	$server = new Zend_Amf_Server();
 	// *ZAMFBROWSER IMPLEMENTATION*
 	$server->setClass( "ZendAmfServiceBrowser" );
-	ZendAmfServiceBrowser::$ZEND_AMF_SERVER = $server;
+	ZendAmfServiceBrowser::$Zend_AMF_SERVER = $server;
 	$server->setClass('Flux_delicious');
 	*/
 	//$response = $server->handle();

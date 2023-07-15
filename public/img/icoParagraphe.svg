@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="19.396559mm"
+   height="20.122633mm"
+   viewBox="0 0 19.396559 20.122633"
+   version="1.1"
+   id="svg3167"
+   inkscape:export-filename="logo-paragrapheModule.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
+   sodipodi:docname="icoParagraphe.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview3169"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="10.545133"
+     inkscape:cx="36.651981"
+     inkscape:cy="38.027023"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs3164" />
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-90.187911,-117.17014)">
+    <rect
+       style="opacity:0.998;fill:#ffffff;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round"
+       id="rect3486"
+       width="19.37845"
+       height="20.120964"
+       x="90.201828"
+       y="117.19445" />
+    <g
+       id="g354"
+       transform="matrix(0.18253131,0,0,0.18253131,90.125446,117.68737)">
+      <circle
+         cx="94.000999"
+         cy="22.666"
+         r="6.25"
+         id="circle2" />
+      <circle
+         cx="47.000999"
+         cy="22.666"
+         r="6.25"
+         id="circle4" />
+      <rect
+         x="47.000999"
+         y="22.666"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         width="47"
+         height="47"
+         id="rect6" />
+      <rect
+         x="23.500999"
+         y="47.666"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         width="47"
+         height="47"
+         id="rect8" />
+      <rect
+         x="13.001"
+         y="10.166"
+         fill="none"
+         stroke="#c2000b"
+         stroke-miterlimit="10"
+         width="47"
+         height="47"
+         id="rect10" />
+      <circle
+         cx="94.000999"
+         cy="69.666"
+         r="6.25"
+         id="circle12" />
+      <circle
+         cx="47.000999"
+         cy="69.666"
+         r="6.25"
+         id="circle14" />
+      <circle
+         cx="70.500999"
+         cy="47.666"
+         r="6.25"
+         id="circle16" />
+      <circle
+         cx="70.500999"
+         cy="94.666"
+         r="6.25"
+         id="circle18" />
+      <circle
+         cx="23.500999"
+         cy="94.666"
+         r="6.25"
+         id="circle20" />
+      <circle
+         cx="23.500999"
+         cy="47.666"
+         r="6.25"
+         id="circle22" />
+      <circle
+         fill="#c2000b"
+         cx="13.001"
+         cy="10.166"
+         r="6.25"
+         id="circle24" />
+      <circle
+         fill="#c2000b"
+         cx="60.000999"
+         cy="10.166"
+         r="6.25"
+         id="circle26" />
+      <circle
+         fill="#c2000b"
+         cx="59.500999"
+         cy="57.166"
+         r="6.25"
+         id="circle28" />
+      <circle
+         fill="#c2000b"
+         cx="13.001"
+         cy="57.166"
+         r="6.25"
+         id="circle30" />
+    </g>
+  </g>
+</svg>

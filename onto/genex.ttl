@@ -10,7 +10,7 @@
 <http://www.w3.org/2004/02/skos/core>
   a owl:Ontology ;
   dc:title "Vocabulaire GenEx "@fr ;
-  dc:creator "Samuel Szoniecky", "Jean-Pierre Balpe" ;
+  dc:creator "Samuel Szoniecky" ;
   rdfs:seeAlso <https://jardindesconnaissances.univ-paris8.fr/onto/genex> .
 
 genex:Concept
@@ -108,7 +108,7 @@ genex:hasTempsTerms a rdf:Property ;
 genex:hasConjugaison a rdf:Property ;
     rdfs:label "A comme conjugaison"@fr ;
     rdfs:comment "Pour associer un type de conjugaison à un verbe"@fr ;
-    owl:sameAs lexinfo:aspect
+    owl:sameAs lexinfo:aspect ;
     rdfs:domain o:Resource .
 
 genex:isCaract a rdf:Property ;
@@ -122,3 +122,24 @@ genex:hasElision a rdf:Property ;
 genex:hasType a rdf:Property ;
     rdfs:label "A comme type"@fr ;
     rdfs:comment "Utiliser pour définir le(s) type(s) d'un concept."@fr .
+
+genex:hasRefIeml a rdf:Property ;
+    rdfs:label "A comme référence IEML"@fr ;
+    rdfs:comment "Utiliser pour définir un lien vers IEML."@fr .    
+
+genex:hasRefWikidata a rdf:Property ;
+    rdfs:label "A comme référence Wikidata"@fr ;
+    rdfs:comment "Utiliser pour définir un lien vers Wikidata."@fr .        
+
+genex:hasSynonyme a rdf:Property ;
+    rdfs:label "A comme synonyme"@fr ;
+    owl:sameAs lexinfo:synonym ;    
+    rdfs:comment "Utiliser pour définir des synonymes."@fr .        
+
+genex:sparqlQuery a rdf:Property ;
+    rdfs:label "Requête SPARQL"@fr ;
+    rdfs:comment "Utiliser pour générer des items à partir d'une requête SPARL."@fr .        
+
+genex:sparqlEndpoint a rdf:Property ;
+    rdfs:label "Endpoint SPARQL"@fr ;
+    rdfs:comment "Adresse d'un service SPARQL."@fr .            

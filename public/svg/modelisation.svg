@@ -1,0 +1,44 @@
+<svg>
+  <g id="exploskosLegende">
+    <g class="ilgd">
+      <rect x="111.09999999999997" y="14" fill="#1f77b4" height="28" width="888.8000000000001"></rect><text x="555.5"
+        y="35" text-anchor="middle" font-size="14" style="fill: white;">concept</text>
+    </g>
+  </g>
+  <g>
+    <g stroke-opacity="0.5">
+      <g style="mix-blend-mode: multiply;">
+        <linearGradient id="gdtLink0" gradientUnits="userSpaceOnUse" x1="10" x2="550.5">
+          <stop offset="0%" stop-color="#fcffa4"></stop>
+          <stop offset="100%" stop-color="#bd3853"></stop>
+        </linearGradient>
+        <path d="M10,253.5C280.25,253.5,280.25,253.5,550.5,253.5" stroke="url(#gdtLink0)" stroke-width="395"></path>
+        <title>Plus générique → PMAVEP</title>
+      </g>
+      <g style="mix-blend-mode: multiply;">
+        <linearGradient id="gdtLink1" gradientUnits="userSpaceOnUse" x1="560.5" x2="1101">
+          <stop offset="0%" stop-color="#bd3853"></stop>
+          <stop offset="100%" stop-color="#010106"></stop>
+        </linearGradient>
+        <path d="M560.5,253.5C830.75,253.5,830.75,253.5,1101,253.5" stroke="url(#gdtLink1)" stroke-width="395"></path>
+        <title>PMAVEP → Plus spécifique</title>
+      </g>
+    </g>
+    <g>
+      <rect x="0" y="56" fill="#fcffa4" height="395" width="10">
+        <title>Plus générique</title>
+      </rect>
+      <rect x="1101" y="56" fill="#010106" height="395" width="10">
+        <title>Plus spécifique</title>
+      </rect>
+      <rect x="550.5" y="56" fill="#1f77b4" height="395" width="10">
+        <title>concept=PMAVEP -&gt; fin=Plus spécifique
+        </title>
+      </rect>
+    </g>
+    <g font-family="sans-serif"><text x="16" y="253.5" dy="0.35em" text-anchor="start" font-size="14"
+        style="fill: white; cursor: none;">Plus générique</text><text x="1095" y="253.5" dy="0.35em" text-anchor="end"
+        font-size="14" style="fill: white; cursor: none;">Plus spécifique</text><text x="566.5" y="253.5" dy="0.35em"
+        text-anchor="start" font-size="28" style="fill: white; cursor: zoom-in;">PMAVEP</text></g>
+  </g>
+</svg>

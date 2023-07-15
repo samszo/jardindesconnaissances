@@ -4,10 +4,10 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
 @prefix o: <http://omeka.org/s/vocabs/o#> .
-@prefix ieml: <https://jardindesconnaissances.univ-paris8.fr/onto/ieml> .
+@prefix ieml: <https://jardindesconnaissances.univ-paris8.fr/onto/ieml#> .
 @prefix ma: <http://www.w3.org/ns/ma-ont#>.
 
-<https://jardindesconnaissances.univ-paris8.fr/onto/ieml> a owl:Ontology ;
+<https://jardindesconnaissances.univ-paris8.fr/onto/ieml#> a owl:Ontology ;
     dcterms:title "Information Economy Meta Language" .
 
 ieml:Lettre a rdfs:Class ;
