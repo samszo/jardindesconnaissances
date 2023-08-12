@@ -39,7 +39,7 @@ class Flux_An extends Flux_Site{
      * @param  string $idBase
      * 
      */
-	public function __construct($idBase=false, $idBaseOmk="omk-valarnum", $bTrace=false)
+	public function __construct($idBase=false, $idBaseOmk="omk_valarnum", $bTrace=false)
     {
         $this->dbOmk = $this->getDb($idBaseOmk);
         $this->idBaseOmk = $idBaseOmk;

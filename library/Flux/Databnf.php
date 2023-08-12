@@ -4,8 +4,8 @@
  * Classe qui gère les flux dbpedia
  *
  * THANKS
- * http://data.bnf.fr/sparql/
- * http://data.bnf.fr/docs/doc_requetes_data.pdf
+ * https://data.bnf.fr/sparql/
+ * https://data.bnf.fr/docs/doc_requetes_data.pdf
  *
  * @author Samuel Szoniecky
  * @category   Zend
@@ -16,7 +16,7 @@
 class Flux_Databnf extends Flux_Site{
 
 	var $formatResponse = "json";
-	var $searchUrl = 'http://data.bnf.fr/sparql?';
+	var $searchUrl = 'https://data.bnf.fr/sparql?';
 	var $sruUrl = 'http://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve';
 	var $sruUrlGallica = 'https://gallica.bnf.fr/SRU?version=1.2&operation=searchRetrieve';
 	var $rs;
@@ -28,7 +28,7 @@ https://catalogue.bnf.fr/affiner.do?motRecherche=&listeAffinages=FacSpe_-1%3BFac
 http://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.doctype%20all%20%22v%22&recordSchema=unimarcxchange&maximumRecords=20&startRecord=1
 SELECT ?champ ?valeur
 WHERE {
-  <http://data.bnf.fr/ark:/12148/cb39526007r> ?champ ?valeur.
+  <https://data.bnf.fr/ark:/12148/cb39526007r> ?champ ?valeur.
 }
 */	
     /**
@@ -86,7 +86,7 @@ WHERE {
      */
     public function getTerm($term)
     {
-		return $this->getUrlBodyContent("http://data.bnf.fr/search-letter/?term=".urlencode($term));
+		return $this->getUrlBodyContent("https://data.bnf.fr/search-letter/?term=".urlencode($term));
     }
 
     /*
@@ -1006,7 +1006,7 @@ ORDER BY ASC (?label_a)
 		//foreach ($docs as $d) {
 		for ($i = 422; $i < $nbDoc; $i++) {				
 			$d = $docs[$i];
-			$url = "http://data.bnf.fr".$d["url"];
+			$url = "https://data.bnf.fr".$d["url"];
 			$rs = $this->saveProp($url);
 			if($rs){
 				if(isset($rs['FRBNF'])){
@@ -1073,7 +1073,7 @@ ORDER BY ASC (?label_a)
 		$sql = "	SELECT
 			d.doc_id ,d.url, d.titre, SUBSTRING(d.url,31)
 			FROM flux_doc d
-			WHERE d.url LIKE 'http://data.bnf.fr/ark:/12148/%'
+			WHERE d.url LIKE 'https://data.bnf.fr/ark:/12148/%'
 			AND d.doc_id not in (
 					SELECT
 					d.doc_id
@@ -1256,7 +1256,7 @@ LIMIT 100
 /* nombre de notice ayant un mot
  * 
 PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+PREFIX bnf-onto: <https://data.bnf.fr/ontology/bnf-onto/>
 select ?decennie (count(?manif) as ?nbManif) where {
   ?manif a <http://rdvocab.info/uri/schema/FRBRentitiesRDA/Manifestation>.
   ?manif dcterms:title ?titre.
@@ -1270,10 +1270,10 @@ ORDER BY ?decennie
     
 /* tous les ouvrages lié à un sujet rameau
  * 
-PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+PREFIX bnf-onto: <https://data.bnf.fr/ontology/bnf-onto/>
 SELECT ?doc ?title ?idArk ?date ?editeur ?cote
 WHERE {
-	?doc dcterms:subject <http://data.bnf.fr/ark:/12148/cb121118875>.   
+	?doc dcterms:subject <https://data.bnf.fr/ark:/12148/cb121118875>.   
   
 	OPTIONAL{?doc dcterms:date ?date}
 	OPTIONAL{?doc dcterms:title ?title}
@@ -1291,7 +1291,7 @@ WHERE {
  */
 /*requête pour renvoyer les différentes version d'une oeuvre
  * SELECT DISTINCT ?edition ?title ?date ?editeur WHERE {
-<http://data.bnf.fr/ark:/12148/cb11947965f> foaf:focus ?Oeuvre .
+<https://data.bnf.fr/ark:/12148/cb11947965f> foaf:focus ?Oeuvre .
 ?edition rdarelationships:workManifested ?Oeuvre.
 OPTIONAL{?edition dcterms:date ?date}
 OPTIONAL{?edition dcterms:title ?title}
@@ -1323,10 +1323,10 @@ WHERE {
  */ 
 
 /*recherche les document de gallica avec un mot clef rameau
-PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+PREFIX bnf-onto: <https://data.bnf.fr/ontology/bnf-onto/>
 SELECT ?doc ?title ?idArk ?date ?editeur ?cote ?URLGallica
 WHERE {
-	?doc dcterms:subject <http://data.bnf.fr/ark:/12148/cb11952386r>.   
+	?doc dcterms:subject <https://data.bnf.fr/ark:/12148/cb11952386r>.   
 	?doc rdarelationships:electronicReproduction ?URLGallica
 	OPTIONAL{?doc dcterms:date ?date}
 	OPTIONAL{?doc dcterms:title ?title}

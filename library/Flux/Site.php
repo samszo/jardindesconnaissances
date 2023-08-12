@@ -344,7 +344,12 @@ class Flux_Site{
 		   	$html = $this->cache->load($c);
 		}
         if(!$html){
-		    	$client = new Zend_Http_Client($url,array('timeout' => 30));
+				$config = array(
+					'adapter'     => 'Zend_Http_Client_Adapter_Curl',
+					'curloptions' => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
+					'timeout' => 30
+				);
+		    	$client = new Zend_Http_Client($url,$config);
 				if($mimeType) $client->setHeaders('Content-Type', $mimeType);
 		    	if($param && !$method)$client->setParameterGet($param);
 		    	if($param && $method==Zend_Http_Client::POST)$client->setParameterPost($param);

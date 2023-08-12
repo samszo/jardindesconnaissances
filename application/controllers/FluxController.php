@@ -714,7 +714,7 @@ class FluxController extends Zend_Controller_Action {
 
     public function anAction()
     {
-        $an = new Flux_An($this->_getParam('idBase','flux_valarnum'),$this->_getParam('idBaseOmk',"omk-valarnum"),$this->_getParam('trace'));
+        $an = new Flux_An($this->_getParam('idBase','flux_valarnum'),$this->_getParam('idBaseOmk',"omk_valarnum"),$this->_getParam('trace'));
 		$ice = new Flux_Ice($this->_getParam('idBase','flux_valarnum'));
         $an->bTraceFlush = $an->bTrace;
         $an->trace("DEBUT ".__METHOD__);        
